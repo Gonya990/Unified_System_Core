@@ -1,0 +1,6 @@
+faster-whisper>=0.8.2
+sounddevice
+soundfile
+pyttsx3
+transformers
+torch

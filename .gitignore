@@ -1,0 +1,28 @@
+# System
+.DS_Store
+.Trash
+Sandbox/
+
+# Secrets
+*.key
+*.pem
+*.odt
+id_rsa*
+secrets.yaml
+bot_config.py
+setup_telegram.py
+
+# Python / UV / Builds
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Windows
+Thumbs.db
+$RECYCLE.BIN/
+
+# Logs
+*.log
