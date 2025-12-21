@@ -1,0 +1,23 @@
+# Unified System SSH Config
+# Copy the content below to your ~/.ssh/config file to use with VS Code Remote - SSH
+
+# 1. Proxmox Host (Virtualization Base)
+Host proxmox-pve
+    HostName 100.74.194.25
+    User root
+    IdentityFile /Users/macbook/Documents/Unified_System/Sandbox/id_rsa_proxmox
+    StrictHostKeyChecking no
+
+# 2. Windows AI Core (Computation Node)
+Host windows-ai
+    HostName 100.127.194.111
+    User gonya
+    StrictHostKeyChecking no
+
+# 3. Ubuntu Home Core (New VM)
+Host home-core-vm
+    HostName 192.168.190.180
+    User gonya
+    IdentityFile /Users/macbook/Documents/Unified_System/Sandbox/id_rsa_proxmox
+    StrictHostKeyChecking no
+    # ProxyJump proxmox-pve # Uncomment if direct connection fails

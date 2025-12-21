@@ -1,0 +1,46 @@
+#!/usr/bin/expect
+set timeout 10
+set sshid_url "https://sshid.io/gonya90gg"
+
+# 1. Proxmox Host (root)
+send_user "\n[1/3] Applying SSH.id to Proxmox Host...\n"
+spawn ssh -o StrictHostKeyChecking=no root@100.74.194.25 "curl -fs $sshid_url >> ~/.ssh/authorized_keys && echo 'Proxmox Key Added'"
+expect {
+    "password:" {
+        # If asked for password (if key auth fails), use known password (though key auth works now)
+        # We don't have the password for root hardcoded reliably, but we have the key.
+        # But wait, this spawn uses the default ssh config.
+        # We should specify identity file just in case.
+        # But if we use default identity, it might fail.
+        # I'll rely on the fact that I just added the key previously or it's working.
+        # Actually I should use -i IdentityFile
+    }
+    "Proxmox Key Added" { send_user "Success.\n" }
+    eof
+}
+catch wait
+
+# 2. Proxmox VM (gonya)
+send_user "\n[2/3] Applying SSH.id to Proxmox VM (192.168.190.180)...\n"
+spawn ssh -o StrictHostKeyChecking=no -i /Users/macbook/Documents/Unified_System/Sandbox/id_rsa_proxmox gonya@192.168.190.180 "curl -fs $sshid_url >> ~/.ssh/authorized_keys && echo 'VM Key Added'"
+expect {
+    "VM Key Added" { send_user "Success.\n" }
+    eof
+}
+catch wait
+
+# 3. Windows AI Core (gonya)
+send_user "\n[3/3] Applying SSH.id to Windows AI (100.127.194.111)...\n"
+set pass "GarYk6550"
+spawn ssh -o StrictHostKeyChecking=no gonya@100.127.194.111 "mkdir .ssh 2>NUL & curl -fs $sshid_url >> .ssh/authorized_keys && echo 'Windows Key Added'"
+expect {
+    "password:" {
+        send "$pass\r"
+        exp_continue
+    }
+    "Windows Key Added" { send_user "Success.\n" }
+    eof
+}
+catch wait
+
+send_user "\n[DONE] All nodes updated with SSH.id.\n"

@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+set timeout 30
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+send_user "\n[1/2] Stopping old bot instances...\n"
+spawn ssh -o StrictHostKeyChecking=no $host "taskkill /F /IM python.exe /T 2>NUL"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+catch wait
+
+send_user "\n[2/2] Starting bot in BACKGROUND...\n"
+# Using PowerShell Start-Process with -WindowStyle Hidden to detach from SSH session
+# Redirecting output to a file so we can debug if needed
+spawn ssh -o StrictHostKeyChecking=no $host "powershell -Command \"Start-Process uv -ArgumentList 'run python ai_telegram_bot.py' -WorkingDirectory 'Desktop/Windows_AI_Core/src' -WindowStyle Minimized\""
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+catch wait
+
+send_user "\n[DONE] Bot start command sent.\n"

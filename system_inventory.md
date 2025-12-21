@@ -28,6 +28,9 @@
 - **Components**:
   - **RAM**: ✅ **64GB Verified** (62Gi Total available).
   - **Status**: Online.
+  - **VMs**:
+    - `100/101` (Gaming/Old).
+    - `106` (unified-home-core): Ubuntu 22.04 Cloud, 4GB RAM, 2 Cores. (Deploying...)
 
 ## Software Resources (Программные Ресурсы)
 
@@ -35,8 +38,8 @@
 
 - **Location**: `/Users/macbook/Documents/Unified_System`
 - **Modules**:
-  - `Windows_AI_Core`: RTX AI setup scripts.
-  - `Home_Assistant_Config`: Smart home automation config.
+  - `Windows_AI_Core`: RTX AI setup (Cleaned & Structured: src/scripts/docs).
+  - `_Archive/Home_Assistant_Config`: Archived (Old config).
   - `Sandbox`: Testing and script development area.
 
 ### Network

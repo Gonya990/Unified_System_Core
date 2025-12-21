@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+set timeout -1
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+send_user "\nConnecting to $host to run setup script...\n"
+
+# Only cd to the directory where pyproject.toml is (Desktop/Windows_AI_Core)
+# The setup script expects to be run from the root of the project usually, or we adjust where we run it.
+# The previous error "No pyproject.toml found" suggests we need to be in the project root.
+# Project root on remote is likely Desktop/Windows_AI_Core
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core && powershell -ExecutionPolicy Bypass -File scripts/setup_with_uv.ps1"
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "Permission denied" {
+        send_user "\n[FAIL] Permission denied.\n"
+        exit 1
+    }
+    eof
+}
+
+send_user "\n[DONE] Remote setup finished.\n"
+exit 0

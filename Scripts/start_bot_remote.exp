@@ -1,0 +1,20 @@
+#!/usr/bin/expect
+set timeout 30
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core/src && uv run python ai_telegram_bot.py"
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "Bot Started" {
+        send_user "\n[SUCCESS] Bot launched successfully!\n"
+    }
+    "error" {
+        send_user "\n[FAIL] Bot crashed!\n"
+    }
+}
+# Keep open for a bit to ensure it runs
+sleep 5

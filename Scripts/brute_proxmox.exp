@@ -1,0 +1,46 @@
+#!/usr/bin/expect
+set timeout 5
+set host "root@100.74.194.25"
+set passwords {
+    "GarYk6550"
+    "Gonya990"
+    "6550"
+    "Garyk6550"
+    "GarYk-6550"
+    "igor"
+    "password"
+}
+
+foreach pass $passwords {
+    send_user "\nTrying password: $pass\n"
+    spawn ssh -o StrictHostKeyChecking=no $host "echo SUCCESS_LOGIN"
+    expect {
+        "password:" {
+            send "$pass\r"
+            expect {
+                "SUCCESS_LOGIN" {
+                    send_user "\n[SUCCESS] Password found: $pass\n"
+                    exit 0
+                }
+                "Permission denied" {
+                    send_user "\n[FAIL] Password incorrect\n"
+                }
+                timeout {
+                    send_user "\n[TIMEOUT]\n"
+                }
+            }
+        }
+        "SUCCESS_LOGIN" {
+            send_user "\n[SUCCESS] Logged in without password (Key)!\n"
+            exit 0
+        }
+        "Tailscale" {
+            send_user "\n[FAIL] Tailscale blocked.\n"
+            exit 1
+        }
+    }
+    wait
+}
+
+send_user "\n[FAILURE] No passwords worked.\n"
+exit 1

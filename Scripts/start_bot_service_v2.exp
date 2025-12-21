@@ -1,0 +1,23 @@
+#!/usr/bin/expect
+set timeout 30
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+# Escape brackets or remove them from send_user string to avoid Tcl interpretation
+send_user "\nStopping old bot instances...\n"
+spawn ssh -o StrictHostKeyChecking=no $host "taskkill /F /IM python.exe /T"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    "ERROR" { send_user "No running process found (OK)\n" }
+    "SUCCESS" { send_user "Old process killed\n" }
+    eof
+}
+catch wait
+
+send_user "\nStarting bot in BACKGROUND...\n"
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core/src && start /B uv run python ai_telegram_bot.py"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+send_user "\nBot start command sent.\n"
