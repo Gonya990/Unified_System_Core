@@ -1,0 +1,16 @@
+# Proxmox Hardware Upgrade Preparation
+
+## Phase 1: Safeguard (VM/LXC Shutdown)
+- [ ] Connect to Proxmox host 'pve'
+- [ ] List all running VMs (`qm list`) and Containers (`pct list`)
+- [ ] Initiate Shutdown for each running guest
+- [ ] Monitor status (Wait Loop up to 3 minutes)
+- [ ] Identify and report any stuck guests
+
+## Phase 2: Host Shutdown
+- [ ] Verify all guests are stopped
+- [ ] Execute `shutdown -h now` on Proxmox host
+
+## Phase 3: Verification
+- [ ] Check power state (via PiKVM if available)
+- [ ] Final confirmation to user: "СЕРВЕР ОБЕСТОЧЕН. ГОТОВ К ВСКРЫТИЮ."

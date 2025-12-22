@@ -1,0 +1,4 @@
+# Investigation: Google Cloud Logs Error
+
+- [ ] Investigate local codebase for project context `gen-lang-client-0982257437` <!-- id: 0 -->
+- [ ] Determine root cause of the error (blocked on access to logs) <!-- id: 1 -->

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Complete walkthrough of Hybrid Cloud Cortex activation including Phase 1 (Browser Agent), Phase 2 (Proxmox status), and Phase 3 (Google Cloud integration). Documents successful remote browser control via Tailscale, Gemini API activation with 26 available models, infrastructure setup, and verification results. Includes architecture diagrams, test outputs, and next steps for advanced automation.",
+  "updatedAt": "2025-12-18T21:24:27.446359961Z"
+}

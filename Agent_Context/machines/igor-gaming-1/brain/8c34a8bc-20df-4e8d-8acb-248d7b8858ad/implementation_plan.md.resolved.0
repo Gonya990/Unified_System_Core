@@ -1,0 +1,26 @@
+# Chrome Remote Debugging Setup (Docker Enforced)
+
+## Goal
+Establish a Chrome instance listening on port 9222 (TCP) bound to 0.0.0.0, enabling remote debugging and control, utilizing Docker to manage dependencies and permissions cleanly on the Linux host.
+
+## User Review Required
+> [!NOTE]
+> **Docker Strategy**: Since Google Chrome is not installed on the host and requires sudo to install/configure, I will use a **Docker container** (`zenika/alpine-chrome`) to run Chrome. This abstracts the "Administrator" requirement to "Docker User" rights, which are present.
+
+## Proposed Changes
+### Infrastructure
+#### [NEW] Chrome Container
+- **Image**: `zenika/alpine-chrome:latest`
+- **Container Name**: `chrome-headless`
+- **Network**: Port `9222` mapped to host `9222`.
+- **Capabilities**: `--cap-add=SYS_ADMIN` (Required for Chrome sandbox/headless).
+- **Arguments**: `--no-sandbox --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222`
+
+## Verification Plan
+### Automated Tests
+1. **Container Status**: `docker ps | grep chrome-headless`
+2. **Port Check**: `ss -tuln | grep 9222`
+3. **Service Check**: `curl -v http://127.0.0.1:9222/json/version` (Should return JSON with Browser info).
+
+### Manual Verification
+- Access `http://<LINUX_IP>:9222` from the user's remote machine (Windows/Mac) to confirm connectivity.

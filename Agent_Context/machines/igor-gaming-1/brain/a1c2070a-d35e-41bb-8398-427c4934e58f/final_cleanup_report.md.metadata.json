@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Final report for Operation Deep Clean on Windows host. Details space recovered from automated cleanup of Recycle Bin, Temp files, and Windows Update caches. Provides specific recommendations for recovering 150GB+ from WSL (via disk compaction) and 500GB+ from Steam (via migration to G: drive). Includes PowerShell commands for manual execution.",
+  "updatedAt": "2025-12-19T18:35:20.606959172Z"
+}

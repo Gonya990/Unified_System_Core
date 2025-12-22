@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Comprehensive system inventory cataloging all assets: directory structure with file counts, Docker images and containers, Tailscale network nodes, software packages (Docker, Git, Node.js, Python), AI/ML resources (Ollama, Google Cloud APIs, browser automation), project files (PRJ-004_AI_Agents, MCP server, Home Assistant, N8N), configuration files, storage distribution across drives, credential locations, hardware specs (RTX 3080, RAM, CPU), and running processes.",
+  "updatedAt": "2025-12-19T17:12:42.406492282Z"
+}

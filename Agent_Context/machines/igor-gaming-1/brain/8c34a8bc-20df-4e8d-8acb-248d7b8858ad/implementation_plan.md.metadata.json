@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Configure `browser_agent.py` to use the existing Dockerized Chrome instance via CDP (port 9222). Install dependencies and Execute.",
+  "updatedAt": "2025-12-18T17:13:30.252176324Z",
+  "version": "1"
+}
