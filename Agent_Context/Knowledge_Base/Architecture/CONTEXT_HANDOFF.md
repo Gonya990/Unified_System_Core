@@ -43,9 +43,9 @@
 
 ---
 
-## 🧠 ANTIGRAVITY BRAIN (Session Artifacts)
+## 🧠 ANTIGRAVITY BRAIN (Unified Knowledge Base)
 
-**Location:** `/home/gonya/.gemini/antigravity/brain/`
+**Location:** `Agent_Context/Knowledge_Base/Sessions/`
 
 ### Active Conversation Artifacts
 
@@ -300,11 +300,11 @@ For the next session, ensure:
 
 | Document | Location |
 |----------|----------|
-| Navigation Guide | [NAVIGATION.md](file:///home/gonya/00_NAV/NAVIGATION.md) |
-| Project Registry | [PROJECTS.yaml](file:///home/gonya/00_NAV/PROJECTS.yaml) |
-| System Inventory | [system_inventory.md](file:///home/gonya/.gemini/antigravity/brain/a1c2070a-d35e-41bb-8398-427c4934e58f/system_inventory.md) |
-| MCP Setup Guide | [guide_n8n_setup.md](file:///home/gonya/.gemini/antigravity/brain/0866ee1f-5969-46a1-9ab8-ee14130c2bc1/guide_n8n_setup.md) |
-| Unified Topology Walkthrough | [walkthrough.md](file:///home/gonya/.gemini/antigravity/brain/0866ee1f-5969-46a1-9ab8-ee14130c2bc1/walkthrough.md) |
+| Navigation Guide | [NAVIGATION.md](file:///Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Docs/NAVIGATION.md) |
+| Project Registry | [PROJECTS.yaml](file:///Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Docs/PROJECTS.yaml) |
+| System Inventory | [system_inventory.md](file:///Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/system_inventory.md) |
+| MCP Setup Guide | [guide_n8n_setup.md](file:///Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/0866ee1f-5969-46a1-9ab8-ee14130c2bc1/guide_n8n_setup.md) |
+| Unified Topology Walkthrough | [walkthrough.md](file:///Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/0866ee1f-5969-46a1-9ab8-ee14130c2bc1/walkthrough.md) |
 
 ---
 
