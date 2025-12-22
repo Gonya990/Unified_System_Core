@@ -153,28 +153,21 @@ Write-Host "✅ Context from $MachineName pushed to repository"
 
 ## 📁 Unified Repository Structure
 
-After collecting from all machines:
-
 ```
 Unified_System_Core/
 ├── Agent_Context/
-│   ├── CONTEXT_HANDOFF.md      # Main documentation
-│   ├── README.md               # How to use
-│   ├── HANDOFF_GUIDE.md        # This file
-│   ├── brain/                  # Primary host brain (igor-gaming-1)
-│   ├── machines/               # Other machines
-│   │   ├── macbook-air/
-│   │   │   ├── MACHINE_INFO.md
-│   │   │   └── brain/
-│   │   ├── igor-gaming/        # Windows host
-│   │   │   ├── MACHINE_INFO.md
-│   │   │   └── brain/
-│   │   └── pve/                # Proxmox server
-│   │       └── ...
-│   ├── docs/
-│   ├── scripts/
-│   ├── mcp-server/
-│   └── configs/
+│   ├── README.md               # Folder overview
+│   ├── Knowledge_Base/         # Central unified storage
+│   │   ├── Sessions/           # Consolidated brain sessions
+│   │   ├── Architecture/       # Handoff guides & system architecture
+│   │   ├── Docs/               # Unified documentation
+│   │   ├── Scripts/            # Universal tools
+│   │   ├── Configs/            # Shared configs
+│   │   └── mcp-server/         # MCP Server source
+│   └── machines/               # Machine-specific overrides
+│       ├── igor-gaming-1/      # WSL2 metadata
+│       ├── MacBook-Air/        # macOS metadata
+│       └── ...
 └── ...
 ```
 
