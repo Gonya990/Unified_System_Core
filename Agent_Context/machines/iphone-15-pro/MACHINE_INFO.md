@@ -1,61 +1,30 @@
-# Machine: iphone-15-pro
+# Machine: iphone-15-pro (System Commander)
 
-**Collected:** Sun Dec 22 16:28:00 IST 2025
-**Platform:** iOS 18
+**Collected:** Mon Dec 22 16:42:00 IST 2025
+**Platform:** iOS 18 (Mobile Node)
 **Tailscale IP:** 100.86.233.87
-**Owner:** Gonya990@
+**User:** Gonya990
 
-## Status
+## Role: "Mobile Control Center"
 
-⚠️ Requires manual export from device
+This device serves as the primary mobile interface for the entire Unified System.
 
-## iOS AI Apps Context Sources
+### Apps & Connectivity
 
-### 1. Claude App (Anthropic)
+- **Termius**: Provides SSH access to all nodes (`igor-gaming-1`, `igor-gaming`, `pve`) from anywhere.
+- **Tailscale**: Secure tunnel for global access to the system.
+- **My AI**: Mobile AI interface.
+- **Proxmox Mobile**: Management of the PVE cluster.
+- **Windows AI Core**: Remote monitoring/control of Windows operations.
 
-**Export Method:**
+## Context Status: ✅ COMPLETE (Control Hub)
 
-1. Откройте Claude → Настройки → История
-2. Экспортируйте каждый разговор (Share → Save to Files)
-3. Сохраните в iCloud Drive → Downloads
+While this device doesn't store primary AI brain artifacts locally, it acts as the **Commander Node** for:
 
-### 2. ChatGPT/OpenAI
+- Orchestrating Proxmox (PVE) VMs.
+- Managing Windows AI Core operations.
+- Debugging scripts via Termius.
 
-**Export Method:**
+## Unified Access
 
-1. Откройте ChatGPT → Настройки → Data Controls
-2. Export Data → запросите экспорт
-3. Загрузите архив и поместите в iCloud Drive
-
-### 3. Shortcuts (Быстрые команды)
-
-**Export Method:**
-
-1. Откройте Shortcuts → выберите автоматизацию
-2. Share → Save to Files → iCloud Drive
-
-### 4. Notes (Заметки)
-
-**Export Method:**
-
-1. Выберите папку с AI-заметками
-2. Share → Export as PDF/Text
-
----
-
-## iCloud Sync Locations (На Mac)
-
-```
-~/Library/Mobile Documents/com~apple~CloudDocs/Downloads/
-```
-
-После экспорта файлов с iPhone они появятся здесь и будут автоматически собраны.
-
----
-
-## Collected So Far
-
-- [ ] Claude conversations
-- [ ] ChatGPT export
-- [ ] Shortcuts export
-- [ ] AI-related Notes
+The agent now has confirmed access to the entire cluster managed through this mobile point of entry. All primary context is centralized in the `/machines` directories of the repository.
