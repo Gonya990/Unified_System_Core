@@ -1,0 +1,104 @@
+# 🌌 Unified System Core
+
+> **Distributed AI Cluster** — Мозги, Руки и Сердце в одной системе.
+
+---
+
+## 🚀 Quick Navigation
+
+| 📂 Section | 🔗 Link | 📝 Description |
+|------------|---------|----------------|
+| **🧠 Knowledge Base** | [Agent_Context/Knowledge_Base/](Agent_Context/Knowledge_Base/) | Centralized AI context, sessions, and scripts |
+| **💻 Windows AI Core** | [Windows_AI_Core/](Windows_AI_Core/) | Telegram Bot + Ollama inference code |
+| **⚙️ Scripts** | [Scripts/](Scripts/) | Deployment, automation, expect scripts |
+| **🏗 Architecture** | [Architecture Docs](Agent_Context/Knowledge_Base/Architecture/) | System design and handoff guides |
+
+---
+
+## 🖥️ System Nodes
+
+```mermaid
+graph LR
+    subgraph Tailscale Mesh
+        A[📱 iPhone Commander] --> B[💻 MacBook Admin]
+        B --> C[🖥️ Windows AI Core]
+        B --> D[🐧 igor-gaming-1 WSL2]
+        B --> E[📦 Proxmox PVE]
+    end
+    C --> F[🧠 Ollama GPU]
+    D --> G[🏠 Home Assistant]
+```
+
+| Node | IP (Tailscale) | Role |
+|------|----------------|------|
+| **igor-gaming-1** | `100.88.65.71` | Primary AI workstation (WSL2) |
+| **igor-gaming** | `100.127.194.111` | Windows AI Core (GPU inference) |
+| **MacBook-Air** | `100.93.121.47` | Admin & development |
+| **pve** | `100.74.194.25` | Proxmox hypervisor |
+| **iphone-15-pro** | `100.86.233.87` | Mobile commander (Termius) |
+
+---
+
+## 📁 Repository Structure
+
+```
+Unified_System_Core/
+├── Agent_Context/
+│   ├── Knowledge_Base/          # 🧠 Central knowledge store
+│   │   ├── Sessions/            # 32 AI conversation artifacts
+│   │   ├── Architecture/        # System docs & handoff guides
+│   │   ├── Docs/                # Navigation, rules, projects
+│   │   ├── Scripts/             # Python & shell utilities
+│   │   └── Configs/             # Service configurations
+│   └── machines/                # Per-host metadata only
+├── Windows_AI_Core/             # Telegram bot source
+├── Scripts/                     # Deployment & automation
+└── README.md                    # ← You are here
+```
+
+---
+
+## 🔗 Deep Dive Links
+
+### For Agents 🤖
+
+- **Full Context Handoff**: [CONTEXT_HANDOFF.md](Agent_Context/Knowledge_Base/Architecture/CONTEXT_HANDOFF.md)
+- **MCP Server Setup**: [guide_n8n_setup.md](Agent_Context/Knowledge_Base/Sessions/0866ee1f-5969-46a1-9ab8-ee14130c2bc1/guide_n8n_setup.md)
+- **System Inventory**: [system_inventory.md](Agent_Context/Knowledge_Base/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/system_inventory.md)
+
+### For Humans 👤
+
+- **Quick Start Architecture**: [SYSTEM_ARCHITECTURE.md](Agent_Context/Knowledge_Base/Architecture/SYSTEM_ARCHITECTURE.md)
+- **Multi-Machine Handoff**: [HANDOFF_GUIDE.md](Agent_Context/Knowledge_Base/Architecture/HANDOFF_GUIDE.md)
+- **Project Registry**: [PROJECTS.yaml](Agent_Context/Knowledge_Base/Docs/PROJECTS.yaml)
+
+---
+
+## 🛠️ Quick Commands
+
+```bash
+# Clone & navigate
+git clone https://github.com/Gonya990/Unified_System_Core.git
+cd Unified_System_Core
+
+# Check system status (from any node)
+tailscale status
+
+# SSH to main workstation
+ssh gonya@igor-gaming-1
+
+# Start MCP server
+cd Agent_Context/Knowledge_Base/mcp-server && npm start
+```
+
+---
+
+## 📊 Stats
+
+- **Machines**: 5 nodes connected
+- **Sessions**: 32 AI conversation artifacts
+- **Last Sync**: 2025-12-22
+
+---
+
+*Powered by Antigravity Agent* 🚀
