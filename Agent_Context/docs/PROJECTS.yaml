@@ -1,0 +1,54 @@
+projects:
+  - id: PRJ-001
+    name: "Home Assistant Smart Home"
+    aliases: ["hass", "ha", "homeassistant"]
+    status: active
+    path: "01_Projects/PRJ-001_HomeAssistant"
+    owner: "Gonya"
+    keywords: ["dashboard", "energy", "backup", "zigbee", "wyoming", "paradox"]
+    description: "Main Home Assistant configuration, dashboards, and reports."
+
+  - id: PRJ-002
+    name: "Tuya & IoT Devices"
+    aliases: ["tuya", "iot", "tinytuya", "matter"]
+    status: active
+    path: "01_Projects/PRJ-002_IoT_Devices"
+    owner: "Gonya"
+    keywords: ["scan", "ir", "broadlink", "sonoff", "tasmota", "matter-data"]
+    description: "IoT device management, Tuya keys, scanning scripts, and Matter credentials."
+
+  - id: PRJ-003
+    name: "N8N & NodeRed Automation"
+    aliases: ["n8n", "nodered", "automation"]
+    status: active
+    path: "01_Projects/PRJ-003_Automation_Stack"
+    owner: "Gonya"
+    keywords: ["workflow", "flow", "json", "mqtt"]
+    description: "Complex automations, workflows, and logic layers using N8N and NodeRed."
+
+  - id: PRJ-004
+    name: "AI Agents & LLMs"
+    aliases: ["llm", "ai", "ollama", "council"]
+    status: active
+    path: "01_Projects/PRJ-004_AI_Agents"
+    owner: "Gonya"
+    keywords: ["browser_agent", "model", "super_agent", "openai", "claude"]
+    description: "LLM Council, Ollama setup, and custom AI agents."
+
+  - id: PRJ-005
+    name: "Media & TV Control"
+    aliases: ["tv", "media", "cast", "dlna"]
+    status: active
+    path: "01_Projects/PRJ-005_Media_Center"
+    owner: "Gonya"
+    keywords: ["android_tv", "panel", "remote", "airplay"]
+    description: "TV control panels, casting configurations, and media device setup."
+
+  - id: PRJ-006
+    name: "OpenCode Server"
+    aliases: ["opencode"]
+    status: paused
+    path: "01_Projects/PRJ-006_OpenCode"
+    owner: "Gonya"
+    keywords: ["opencode-server", "service"]
+    description: "OpenCode server configuration and scripts."

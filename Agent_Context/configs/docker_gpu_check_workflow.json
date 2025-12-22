@@ -1,0 +1,62 @@
+{
+    "active": false,
+    "name": "Antigravity: Docker & GPU Access Check",
+    "nodes": [
+        {
+            "parameters": {
+                "command": "docker ps"
+            },
+            "id": "1d8b3c4f-5e6a-4f7b-8c9d-1e2f3a4b5c6d",
+            "name": "Check Docker",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                460,
+                240
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://host.docker.internal:11434/api/tags",
+                "options": {}
+            },
+            "id": "2e9c4d5f-6a7b-4e8c-9d0e-1f2a3b4c5d6e",
+            "name": "Check Ollama (GPU)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                460,
+                440
+            ]
+        },
+        {
+            "parameters": {},
+            "id": "3f0d5e6a-7b8c-4f9d-0e1f-2a3b4c5d6e7f",
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                200,
+                340
+            ]
+        }
+    ],
+    "connections": {
+        "Manual Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Check Docker",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Check Ollama (GPU)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
