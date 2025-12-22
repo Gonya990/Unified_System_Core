@@ -1,0 +1,32 @@
+# System Integration and Audit Task List
+
+- [x] **System Reconnaissance**
+  - [x] List available workspaces and directories in Documents <!-- id: 0 -->
+  - [x] Identify "Sandbox" location and content <!-- id: 1 -->
+  - [x] Inventory existing tools and resources <!-- id: 2 -->
+- [x] **Planning & consolidation**
+  - [x] Design directory structure for merged zones <!-- id: 3 -->
+  - [x] Create implementation plan for consolidation <!-- id: 4 -->
+  - [x] Create Unified_System directory and Sandbox <!-- id: 13 -->
+- [x] **Execution**
+  - [x] Move existing projects to Unified_System <!-- id: 5 -->
+  - [ ] Refactor common logic <!-- id: 6 -->
+  - [x] Configure Russian locale for admin "igor/gonya" <!-- id: 7 -->
+- [x] **Security & Verification**
+  - [x] Perform security audit <!-- id: 8 -->
+  - [x] Verify tool connectivity <!-- id: 9 -->
+  - [x] Verify device communication (Restarting Check) <!-- id: 10 -->
+  - [x] Verify Proxmox RAM (64GB Check) <!-- id: 18 -->
+- [x] **Reporting**
+  - [x] Generate deployment report <!-- id: 11 -->
+  - [x] Generate final full report (Updated) <!-- id: 12 -->
+- [x] **User Support**
+  - [x] Provide Telegram verification instructions <!-- id: 14 -->
+- [x] **Telegram Bot Setup**
+  - [x] Extract/Get Bot Token (User to provide) <!-- id: 15 -->
+  - [x] Create verification script <!-- id: 16 -->
+  - [x] Send "System Ready" message (Ready for manual run) <!-- id: 17 -->
+- [x] **Project Launch**
+  - [x] Create start_mission.sh <!-- id: 19 -->
+  - [x] Activate Interfaces <!-- id: 20 -->
+  - [x] Create Persistent AI Script (ai_telegram_bot.py) <!-- id: 21 -->
