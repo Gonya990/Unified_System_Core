@@ -1,0 +1,29 @@
+# N8N Docker & GPU Check Walkthrough
+
+I have set up the 'Antigravity: Docker & GPU Access Check' workflow and repaired your local n8n installation.
+
+## Critical Fixes
+> [!WARNING]
+> Your n8n container was crashing because the `~/n8n` directory was owned by `root`.
+
+- **Action Taken**: Changed ownership of `~/n8n` to your user ID (1000).
+- **Result**: The n8n container is now healthy and running (Accessible at `http://localhost:5678`).
+
+## Workflow Setup
+- **Saved Workflow**: `~/docker_gpu_check_workflow.json`
+- **Status**: Ready to import.
+
+## Verification Results
+- **Ollama**: ✅ Reachable at `http://localhost:11434/api/tags`.
+- **Docker**: ✅ Active.
+- **n8n**: ✅ Running and accessible.
+
+## How to Run (Recommended)
+Since the `n8n` CLI requires complex internal IDs for direct execution, please use the UI:
+
+1. Open [http://localhost:5678](http://localhost:5678)
+2. Go to **Workflows** > **Import**.
+3. Select `docker_gpu_check_workflow.json` from your home directory.
+4. Click **Execute Workflow**.
+
+This will confirm that n8n can successfully talk to your Docker daemon and Ollama instance.

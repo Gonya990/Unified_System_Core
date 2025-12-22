@@ -1,0 +1,16 @@
+# Project Antigravity: Strategic Context
+> Insights from "State of AI" (OpenRouter, Dec 2025)
+
+## The Shift to Agentic Inference
+We are moving Antigravity to an MCP architecture to align with the industry-wide shift from "Chat" to "Agentic Inference".
+
+- **Inference > Generation**: Models are no longer just generating text; they are planning, reasoning, and acting (multi-step workflows).
+- **Reasoning Models**: The rise of `o1` class models (and DeepSeek R1) normalizes "thinking" before acting. Our MCP server is the "arms" for this "brain".
+- **Tool Use**: High-value workflows (programming, orchestration) rely heavily on reliable tool invocation.
+
+## Application in Antigravity
+1.  **Orchestrator (Phase 5)**: We are building the substrate for this agentic behavior.
+2.  **MCP Server**: Provides the deterministic tools (`docker`, `gpu_status`) that the reasoning models will invoke.
+3.  **Transport**: We successfully implemented dual Stdio/SSE transport to allow both local (IDE) and remote (Agentic) control, mirroring the "Global & Distributed" nature of modern AI usage.
+
+*"Agentic inference will exceed, if it hasn't already, human inference."*

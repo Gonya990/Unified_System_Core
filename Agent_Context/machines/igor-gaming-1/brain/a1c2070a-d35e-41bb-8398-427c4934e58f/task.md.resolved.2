@@ -1,0 +1,44 @@
+# Operation Deep Clean - C:\ Drive Analysis
+
+## Objective
+
+Free up minimum 100 GB on C:\ drive (currently 96% full - 892/931 GB used)
+
+## Approach: SSH with Password Authentication
+- [x] Create comprehensive PowerShell scanning script
+- [x] Discovered credentials (password: GarYk6550)
+- [x] Connect via SSH using discovered credentials
+- [x] Execute scanning script on Windows machine
+- [x] Retrieve scan results: WSL (147GB), Steam (546GB), Docker (22GB)
+
+## Phase 1: Gaming Scan (DONE)
+- [x] Scan Program Files for game clients
+- [x] Scan Program Files (x86) for game clients
+- [x] Scan root C:\ for Games/XboxGames folders
+- [x] List all gaming installations with sizes
+
+## Phase 2: Ghost Apps Scan (DONE)
+- [x] Scan for Adobe Creative Cloud installations
+- [x] Scan for DaVinci Resolve
+- [x] Scan for Visual Studio old versions
+- [x] Scan for Android Studio
+- [x] Check AppData\Local for heavy caches
+- [x] Check AppData\Roaming for heavy caches
+
+## Phase 3: Forgotten Files Scan (DONE)
+- [x] Scan Downloads folder for files > 1GB
+- [x] Scan Desktop for files > 1GB
+- [x] Identify ISO, ZIP, RAR, 7Z, EXE, MP4, MKV files
+- [x] Check root C:\ for suspicious folders (Backup, Copy, Old)
+
+## Phase 4: Cleanup (IN PROGRESS)
+- [/] Clear Recycle Bin
+- [/] Clear User and System Temp files
+- [/] Clear Delivery Optimization cache
+- [ ] Verify recovered space
+
+## Reporting
+- [ ] Generate deletion candidates list
+- [ ] Generate migration candidates list
+- [ ] Generate suspicious folders list
+- [ ] Present report to user for approval

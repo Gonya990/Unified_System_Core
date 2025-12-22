@@ -1,0 +1,452 @@
+# 📦 SYSTEM INVENTORY
+
+**Catalog Generated:** 2025-12-19 19:08:28 UTC+2  
+**Scope:** Complete system asset inventory
+
+---
+
+## 🗂️ DIRECTORY STRUCTURE
+
+### Root Level (`/home/gonya`)
+
+```
+/home/gonya/
+├── 00_NAV/                      # Navigation & documentation (11 items)
+├── 01_Projects/                 # Active projects (8,348 items)
+│   └── PRJ-004_AI_Agents/       # Current AI agent project
+├── 02_Shared/                   # Shared resources (3 items)
+├── 03_Operations/               # Operations & infrastructure
+├── 90_Inbox_ToSort/             # Unsorted files (105 items)
+├── 99_Archive_Original/         # Archived content
+├── antigravity-mcp-server/      # MCP server implementation
+├── hass/                        # Home Assistant config (14 items)
+├── n8n/                         # N8N workflows (6 items)
+├── gcloud-config/               # Google Cloud credentials (5 items)
+├── miniconda3/                  # Python environment (54,007 items)
+└── [configuration directories]
+```
+
+---
+
+## 🐳 DOCKER RESOURCES
+
+### Images Inventory
+
+| Image | Tag | Size | Purpose | Status |
+|-------|-----|------|---------|--------|
+| zenika/alpine-chrome | latest | - | Headless browser | ✅ In use |
+| n8nio/n8n | latest | - | Workflow automation | ✅ In use |
+| ghcr.io/home-assistant/home-assistant | stable | - | Home automation | ✅ In use |
+
+### Container Inventory
+
+**Container 1: chrome-headless**
+- ID: e57fc1d262a2
+- Image: zenika/alpine-chrome:latest
+- Created: 24 hours ago
+- Status: Running (23 hours)
+- Ports: 0.0.0.0:9222→9222/tcp
+- Purpose: Remote browser automation via CDP
+- Network: Default bridge
+
+**Container 2: n8n**
+- ID: 6bfc675b0aa8
+- Image: n8nio/n8n
+- Created: 2 days ago
+- Status: Running (2 days)
+- Ports: 0.0.0.0:5678→5678/tcp
+- Purpose: Workflow orchestration platform
+- Network: Default bridge
+- Volumes: Docker socket mounted
+
+**Container 3: homeassistant**
+- ID: 0bc944348249
+- Image: ghcr.io/home-assistant/home-assistant:stable
+- Created: 5 days ago
+- Status: Running (3 days)
+- Ports: 0.0.0.0:8123→8123/tcp
+- Purpose: Home automation control
+- Network: Default bridge
+
+---
+
+## 🌐 NETWORK RESOURCES
+
+### Tailscale Nodes
+
+| Hostname | IP Address | OS | Tags | Status |
+|----------|-----------|-----|------|--------|
+| igor-gaming-1 | 100.88.65.71 | Linux | - | ✅ This node |
+| igor-gaming | 100.127.194.111 | Windows | tagged-devices | ✅ Active |
+| macbook-air | 100.93.121.47 | macOS | - | ✅ Active |
+| iphone-15-pro | 100.86.233.87 | iOS | - | ⚠️ Idle |
+| smart | 100.81.133.25 | Linux | tagged-devices | ⚠️ Idle |
+| rocinante | 100.127.166.76 | Linux | - | ❌ Offline |
+
+### Open Ports
+
+| Port | Service | Protocol | Accessibility |
+|------|---------|----------|---------------|
+| 9222 | Chrome CDP | TCP | 0.0.0.0 (all interfaces) |
+| 5678 | N8N | TCP | 0.0.0.0 (all interfaces) |
+| 8123 | Home Assistant | TCP | 0.0.0.0 (all interfaces) |
+| 3000 | Antigravity MCP | TCP | localhost (HTTP/SSE) |
+| 37191 | Language Server | TCP | localhost |
+
+### Funnel Configuration
+- **Public URL:** https://igor-gaming-1.tail5e8a72.ts.net
+- **Status:** ✅ Active
+- **Purpose:** External access to local services
+
+---
+
+## 💻 SOFTWARE INVENTORY
+
+### System Packages
+
+**Container Runtime:**
+- Docker Engine: ✅ Installed
+- Docker Compose: ✅ Available
+
+**Version Control:**
+- Git: ✅ Installed
+
+**Networking:**
+- Tailscale: ✅ Installed (snap package)
+- curl: ✅ Installed
+- wget: ✅ Installed
+
+**Development Tools:**
+- Node.js: ✅ Installed (via NVM)
+- Python: ✅ Installed (Miniconda3)
+- Bun: ✅ Installed
+
+**GPU Drivers:**
+- NVIDIA Driver: 535.274.02 (WSL) / 581.57 (Windows)
+- CUDA: 13.0
+- nvidia-smi: ✅ Available
+
+### Python Environments
+
+**Miniconda3:**
+- Location: `/home/gonya/miniconda3`
+- Items: 54,007 files
+- Status: ✅ Active
+
+**Virtual Environments:**
+- `.venv`: ✅ Present in home directory
+
+### Node.js Packages
+
+**Global Installations:**
+- n8n: ✅ Installed (`/usr/local/bin/n8n`)
+- NVM: ✅ Installed (`.nvm` directory)
+
+**Project Dependencies:**
+- antigravity-mcp-server: ✅ node_modules present
+- Various project-specific packages
+
+---
+
+## 🧠 AI/ML RESOURCES
+
+### Language Models (Ollama)
+
+**Service:**
+- Binary: `/home/gonya/bin/ollama`
+- PID: 207207
+- Status: ✅ Running since Dec 15
+- Purpose: Local LLM inference
+
+**Models:** (Inventory requires `ollama list` command)
+
+### Cloud AI Services
+
+**Google Cloud:**
+- Config Directory: `/home/gonya/gcloud-config` (5 items)
+- Status: ⏳ Credentials pending
+- Available APIs:
+  - Generative Language API (Gemini)
+  - Cloud Document AI API
+  - Compute Engine API
+
+### Browser Automation
+
+**Remote Chrome Instance:**
+- Location: Windows node (100.127.194.111)
+- Port: 9222
+- Protocol: Chrome DevTools Protocol (CDP)
+- Version: HeadlessChrome/124.0.6367.78
+- WebSocket: ws://100.127.194.111:9222/devtools/browser/...
+
+---
+
+## 📁 PROJECT INVENTORY
+
+### PRJ-004_AI_Agents
+
+**Location:** `/home/gonya/01_Projects/PRJ-004_AI_Agents`
+
+**Documentation:**
+- `00_README.md` (140 bytes)
+- `MISSION_STATUS.md` (5,158 bytes)
+- `PHASE3_CREDENTIALS.md` (4,147 bytes)
+
+**Credentials:**
+- `telegram_creds.json` (218 bytes)
+- `credentials/` directory (2 items)
+  - `README.md`
+
+**Workflows:**
+- `telegram_test_workflow.json` (1,431 bytes)
+- `telegram_response_workflow.json` (1,486 bytes)
+
+**Development Files (02_Dev/):**
+- Total: 6,435 items
+- Key files:
+  - `browser_agent.py`
+  - `test_gemini_cloud_brain.py`
+  - `test_phase1_chrome.py`
+  - `extract_credentials.py`
+
+**Other Directories:**
+- `01_Docs/` (1 item)
+- `gemini_demo/` (1 item)
+- `n8n_data/`
+
+### Antigravity MCP Server
+
+**Location:** `/home/gonya/antigravity-mcp-server`
+
+**Source Code:**
+- `src/` directory (3 items)
+- `dist/` directory (3 items - compiled)
+
+**Configuration:**
+- `package.json` (971 bytes)
+- `package-lock.json` (98,097 bytes)
+- `tsconfig.json` (414 bytes)
+- `.env` (279 bytes)
+
+**Scripts:**
+- `start_server.sh` (412 bytes)
+- `start_mcp.bat` (565 bytes - Windows)
+
+**Logs:**
+- `mcp-server.log` (263 bytes)
+- `/home/gonya/antigravity-mcp-server.log` (258 bytes)
+
+**Dependencies:**
+- `node_modules/` ✅ Installed
+
+### Home Assistant
+
+**Location:** `/home/gonya/hass`
+
+**Items:** 14 files/directories
+- Configuration files
+- Automations
+- Scripts
+- Custom components
+
+### N8N Workflows
+
+**Location:** `/home/gonya/n8n`
+
+**Items:** 6 files/directories
+- Workflow definitions
+- Credentials
+- Settings
+
+---
+
+## 🔧 CONFIGURATION FILES
+
+### Shell Configuration
+- `.bashrc` (3,968 bytes)
+- `.bash_logout` (220 bytes)
+- `.profile` (807 bytes)
+- `.bash_history` (77,367 bytes)
+
+### Application Configs
+- `.claude.json` (50,957 bytes)
+- `.claude.json.backup` (50,863 bytes)
+- `.fehbg` (82 bytes)
+- `.wget-hsts` (307 bytes)
+- `.lesshst` (20 bytes)
+
+### Cloud Configs
+- `.aws` (23 bytes)
+- `.azure` (25 bytes)
+- `.kube/` directory
+- `gcloud-config/` (5 items)
+
+### IDE/Editor Configs
+- `.vscode/` (363 items)
+- `.vscode-server/` directory
+- `.antigravity-server/` directory
+
+---
+
+## 📊 STORAGE INVENTORY
+
+### Mounted Filesystems
+
+| Mount Point | Device | Type | Size | Used | Available | Use% |
+|-------------|--------|------|------|------|-----------|------|
+| / | /dev/sdd | ext4 | 1007G | 76G | 881G | 8% |
+| /mnt/c | C:\ | drvfs | 931G | 892G | 40G | 96% |
+| /mnt/d | D:\ | drvfs | 141G | 33G | 108G | 24% |
+| /mnt/f | F:\ | drvfs | 238G | 141G | 98G | 60% |
+| /mnt/g | G:\ | drvfs | 299G | 75G | 224G | 26% |
+| /mnt/h | H:\ | drvfs | 466G | 336G | 130G | 73% |
+
+### Snap Packages
+
+| Package | Version | Size | Mount |
+|---------|---------|------|-------|
+| core24 | 1225 | 67M | /snap/core24/1225 |
+| core24 | 1237 | 67M | /snap/core24/1237 |
+| tailscale | 115 | 30M | /snap/tailscale/115 |
+| snapd | 25577 | 51M | /snap/snapd/25577 |
+
+---
+
+## 🔐 CREDENTIALS & SECRETS
+
+### Located Credential Files
+
+> [!CAUTION]
+> Sensitive files detected - ensure proper access controls
+
+**Telegram:**
+- `/home/gonya/01_Projects/PRJ-004_AI_Agents/telegram_creds.json`
+
+**Google Cloud:**
+- `/home/gonya/gcloud-config/` (5 items)
+- Status: ⏳ credentials.json pending
+
+**SSH:**
+- `.ssh/` directory
+- `setup_ssh_consortium.sh` (1,586 bytes)
+
+**Cloud Providers:**
+- `.aws` directory
+- `.azure` directory
+- `.kube` directory
+
+**MCP Server:**
+- API Key: antigravity-secret (in .env)
+
+---
+
+## 🎮 HARDWARE INVENTORY
+
+### GPU
+- **Model:** NVIDIA GeForce RTX 3080
+- **Memory:** 10,240 MiB
+- **Driver:** 535.274.02 (WSL) / 581.57 (Windows)
+- **CUDA:** 13.0
+- **Status:** ✅ Active, 0% utilization
+
+### CPU
+- **Architecture:** x86_64
+- **Platform:** WSL2 (Windows Subsystem for Linux)
+- **Kernel:** 6.6.87.2-microsoft-standard-WSL2
+
+### Memory
+- **Total RAM:** 7.7 GiB
+- **Swap:** 2.0 GiB
+- **Current Usage:** 43% (3.3 GiB used)
+
+---
+
+## 📦 ARCHIVE & BACKUP
+
+### Archive Directories
+- `99_Archive_Original/` - Original archived content
+- `.claude.json.backup` - Claude config backup
+
+### Temporary & Cache
+- `.cache/` directory
+- `.docker-temp/` directory
+- `/tmp` (tmpfs, 787M)
+
+---
+
+## 🔄 RUNNING PROCESSES
+
+### Critical Processes
+
+**Antigravity Ecosystem:**
+- Main server: PID 25213
+- Language server: PID 25818
+- Extension host: PID 25503
+- File watcher: PID 25257
+- ESLint server: PID 26192
+- Markdown server: PID 26213
+- Pyrefly: PID 26290
+
+**AI Services:**
+- Ollama: PID 207207
+- N8N: PID 71160
+
+**System Services:**
+- Docker containers: 3 running
+- Tailscale: Active
+
+---
+
+## 📈 INVENTORY STATISTICS
+
+### File Count Summary
+- **Total Items in Projects:** 8,348
+- **Miniconda Files:** 54,007
+- **VSCode Items:** 363
+- **Gemini Brain Data:** 174
+- **Inbox Unsorted:** 105
+- **Navigation Docs:** 11
+
+### Storage Distribution
+- **WSL2 Root:** 76 GB used (8%)
+- **Windows C:\:** 892 GB used (96%) ⚠️
+- **Total Available:** ~1.5 TB across all drives
+
+### Service Count
+- **Docker Containers:** 3 running
+- **Antigravity Processes:** 8 active
+- **Tailscale Nodes:** 6 total (2 active, 2 idle, 1 offline)
+- **Open Ports:** 5 services
+
+---
+
+## 🎯 ASSET SUMMARY
+
+### Operational Assets
+- ✅ 3 Docker containers
+- ✅ 1 GPU (RTX 3080)
+- ✅ 6 Tailscale nodes (mesh network)
+- ✅ 8 Antigravity processes
+- ✅ 2 AI services (Ollama, N8N)
+- ✅ 1 Browser automation agent
+- ✅ 1 Home automation system
+
+### Development Assets
+- ✅ 1 active AI agent project
+- ✅ Multiple Python environments
+- ✅ Node.js ecosystem
+- ✅ MCP server implementation
+- ✅ Various workflow definitions
+
+### Infrastructure Assets
+- ✅ Tailscale mesh VPN
+- ✅ Docker container platform
+- ✅ GPU compute capability
+- ✅ Multi-drive storage (1.5TB+)
+- ✅ WSL2 Linux environment
+
+---
+
+**Inventory Version:** 1.0  
+**Last Updated:** 2025-12-19 19:08:28 UTC+2  
+**Next Review:** Run `/inventory` to refresh

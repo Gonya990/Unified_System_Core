@@ -1,0 +1,6 @@
+# SSH Key Setup for AI Consortium
+
+- [ ] Convert PowerShell script to Bash (`setup_ssh_consortium.sh`) <!-- id: 0 -->
+- [ ] Review and verify script logic <!-- id: 1 -->
+- [ ] Execute script (if approved) <!-- id: 2 -->
+- [ ] Verify SSH connectivity to NUC and WSL <!-- id: 3 -->

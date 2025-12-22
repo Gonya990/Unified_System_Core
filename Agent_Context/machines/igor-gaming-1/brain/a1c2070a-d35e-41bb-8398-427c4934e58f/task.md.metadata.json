@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Updated task checklist to verify the Mac Agent's connectivity and execution status as a prerequisite for the upgrade preparation.",
+  "updatedAt": "2025-12-19T22:17:46.869530481Z",
+  "version": "5"
+}

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Complete system scan report covering OS details (WSL2 Linux), hardware resources (RTX 3080 GPU, 7.7GB RAM), Docker containers (Chrome, N8N, Home Assistant), Tailscale network topology, running services (Ollama, Antigravity), project structure, and system health metrics. Identifies critical issues including C: drive at 96% capacity and offline Proxmox node.",
+  "updatedAt": "2025-12-19T17:11:28.714604874Z"
+}
