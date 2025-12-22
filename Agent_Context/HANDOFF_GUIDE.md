@@ -208,7 +208,7 @@ Unified_System_Core/
 |---------|----------|--------|------|----------|
 | **igor-gaming-1** | Linux/WSL2 | ✅ Complete | 2025-12-22 | 18 |
 | igor-gaming | Windows | ⏳ Pending | - | - |
-| macbook-air | macOS | ⏳ Pending | - | - |
+| MacBook-Air | macOS | ✅ Complete | 2025-12-22 | 14 |
 | pve | Linux | ⏳ Pending | - | - |
 | iphone-15-pro | iOS | ❌ N/A | - | - |
 
