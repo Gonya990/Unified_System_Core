@@ -1,0 +1,20 @@
+[Unit]
+Description=Antigravity MCP Server
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=gonya
+WorkingDirectory=/home/gonya/antigravity-mcp-server
+ExecStart=/usr/bin/node /home/gonya/antigravity-mcp-server/dist/index.js --transport=sse
+Restart=always
+RestartSec=10
+Environment=PORT=3005
+Environment=HOST=0.0.0.0
+Environment=MCP_API_KEY=YOUR_API_KEY_HERE
+# Add other env vars from .env if needed
+# EnvironmentFile=/home/gonya/antigravity-mcp-server/.env
+
+[Install]
+WantedBy=multi-user.target

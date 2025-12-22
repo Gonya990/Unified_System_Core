@@ -1,0 +1,60 @@
+# Antigravity MCP Server Setup Walkthrough
+
+I have successfully initialized and configured the `antigravity-mcp-server` to act as the execution node for Phase 5.
+
+## Changes Implemented
+
+### 1. Project Initialization
+
+- Initialized Node.js project.
+- Installed dependencies:
+  - `@modelcontextprotocol/sdk`: Core MCP SDK.
+  - `dockerode`: For Docker control via Unix socket.
+  - `axios`: For HTTP requests to Ollama.
+  - Development tools: `typescript`, `@types/node`, `@types/dockerode`.
+
+### 2. Tool Implementation
+
+- **Docker Control** (`src/tools/docker.ts`):
+  - Uses `dockerode` to connect to `/var/run/docker.sock`.
+  - Tools: `listContainers`, `restartContainer`.
+- **Brain Status** (`src/tools/ollama.ts`):
+  - Checks Ollama status at `http://localhost:11434`.
+  - Tool: `checkGpuStatus`.
+
+### 3. Server Configuration (`src/index.ts`)
+
+- Configured as an MCP Server using `StdioServerTransport`.
+- This ensures it can be run directly by clients like Claude Desktop or VS Code.
+
+## Verification
+
+### 3. Startup (SSE/HTTP Mode)
+
+We have created a helper script for robust startup.
+
+```bash
+cd ~/antigravity-mcp-server
+./start_server.sh
+```
+
+- **Port**: `3005` (Custom override)
+
+- **URL**: `http://<HOST_IP>:3005/sse`
+- **Logs**: `tail -f ~/antigravity-mcp-server/mcp-server.log`
+  - Message Endpoint: `http://localhost:3000/message`
+
+### Configuration for Clients
+
+To use this server, add the following to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "antigravity": {
+      "command": "node",
+      "args": ["/home/gonya/antigravity-mcp-server/dist/index.js"]
+    }
+  }
+}
+```
