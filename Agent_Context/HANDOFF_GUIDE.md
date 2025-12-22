@@ -210,7 +210,7 @@ Unified_System_Core/
 | igor-gaming | Windows | ✅ Complete | 2025-12-22 | 2 (LMStudio) |
 | MacBook-Air | macOS | ✅ Complete | 2025-12-22 | 14 |
 | pve | Linux | ✅ Complete | 2025-12-22 | 0 (hypervisor) |
-| iphone-15-pro | iOS | ❌ N/A | - | - |
+| iphone-15-pro | iOS | ⚠️ Manual | 2025-12-22 | Pending export |
 
 ---
 
