@@ -1,0 +1,16 @@
+#!/usr/bin/expect
+set timeout 30
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+send_user "\nOpening TCP port 11434 in Windows Firewall...\n"
+spawn ssh -o StrictHostKeyChecking=no $host "powershell -Command \"New-NetFirewallRule -DisplayName 'Ollama API' -Direction Inbound -LocalPort 11434 -Protocol TCP -Action Allow\""
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    "Access is denied" { send_user "Need Admin privileges! Trying runas or hope user is admin...\n" }
+    "The requested operation requires elevation" { send_user "[FAIL] Admin rights needed.\n" }
+    eof
+}
+catch wait
+
+send_user "\nFirewall rule attempt finished.\n"

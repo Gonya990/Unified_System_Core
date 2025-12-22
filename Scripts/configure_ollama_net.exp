@@ -1,0 +1,31 @@
+#!/usr/bin/expect
+set timeout 30
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+send_user "\nConfiguring Ollama to listen on 0.0.0.0...\n"
+# Set environment variable globally (User level) and restart Ollama app if possible
+spawn ssh -o StrictHostKeyChecking=no $host "setx OLLAMA_HOST 0.0.0.0"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    "SUCCESS" { send_user "Env var set.\n" }
+    eof
+}
+catch wait
+
+send_user "\nRestarting Ollama (Killing old process)...\n"
+spawn ssh -o StrictHostKeyChecking=no $host "taskkill /F /IM ollama.exe /T 2>NUL"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+catch wait
+
+send_user "\nStarting Ollama again...\n"
+# We assume Ollama is in PATH or AppData
+spawn ssh -o StrictHostKeyChecking=no $host "start /B ollama serve"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+send_user "\nOllama restarted in network mode.\n"
