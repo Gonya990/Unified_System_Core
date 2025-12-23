@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-telegram-bot
+  namespace: telegram-bot
+  labels:
+    app: ai-telegram-bot
+    app.kubernetes.io/name: ai-telegram-bot
+    app.kubernetes.io/component: bot
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: ai-telegram-bot
+  template:
+    metadata:
+      labels:
+        app: ai-telegram-bot
+    spec:
+      containers:
+        - name: bot
+          image: ghcr.io/gonya990/ai-telegram-bot:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: telegram-bot-secrets
+            - configMapRef:
+                name: telegram-bot-config
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: telegram-bot-pvc
