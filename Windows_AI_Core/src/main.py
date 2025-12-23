@@ -43,6 +43,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "Commands:\n"
         "/status - Show current configuration\n"
         "/models - List available models\n"
+        "/setprovider <name> - Set provider (ollama/openai/gemini)\n"
         "/setendpoint <url> - Set inference API URL\n"
         "/setapikey <key> - Set API key\n"
         "/setmodel <name> - Set model name\n"
@@ -59,14 +60,18 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     """Handle /status command - show current configuration."""
     status = config.get_status()
     
+    # Get provider info
+    provider = inference.provider.upper()
+    
     # Check inference health
     is_healthy = await inference.health_check()
     health_emoji = "✅" if is_healthy else "❌"
     
     await update.message.reply_text(
         f"📊 **Bot Status**\n\n"
-        f"🔗 Inference URL: `{status['inference_url']}`\n"
-        f"🤖 Model: `{status['model']}`\n"
+        f"🌐 Provider: `{provider}`\n"
+        f"🔗 Inference URL: `{inference.base_url}`\n"
+        f"🤖 Model: `{inference.model}`\n"
         f"🔑 API Key: {'✅ Set' if status['api_key_set'] else '❌ Not set'}\n"
         f"💚 Connection: {health_emoji} {'Online' if is_healthy else 'Offline'}",
         parse_mode="Markdown"
@@ -125,6 +130,50 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     logger.info(f"Model updated to: {model}", extra={"user_id": update.effective_user.id})
     
     await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
+
+
+async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /setprovider command - set inference provider."""
+    providers = ["ollama", "openai", "gemini"]
+    
+    if not context.args:
+        current = config.get("INFERENCE_PROVIDER", "ollama")
+        await update.message.reply_text(
+            f"Current provider: `{current}`\n\n"
+            f"Usage: /setprovider <provider>\n"
+            f"Available: {', '.join(providers)}\n\n"
+            f"Examples:\n"
+            f"`/setprovider ollama`\n"
+            f"`/setprovider openai`\n"
+            f"`/setprovider gemini`",
+            parse_mode="Markdown"
+        )
+        return
+    
+    provider = context.args[0].lower()
+    if provider not in providers:
+        await update.message.reply_text(
+            f"❌ Unknown provider: `{provider}`\n"
+            f"Available: {', '.join(providers)}",
+            parse_mode="Markdown"
+        )
+        return
+    
+    config.set("INFERENCE_PROVIDER", provider)
+    logger.info(f"Provider updated to: {provider}", extra={"user_id": update.effective_user.id})
+    
+    # Show help for setting up the provider
+    if provider == "openai":
+        hint = "Set your API key with /setapikey"
+    elif provider == "gemini":
+        hint = "Set your Gemini API key with /setapikey"
+    else:
+        hint = "Make sure Ollama is running"
+    
+    await update.message.reply_text(
+        f"✅ Provider set to: `{provider}`\n\n💡 {hint}",
+        parse_mode="Markdown"
+    )
 
 
 async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -195,6 +244,7 @@ async def post_init(application: Application) -> None:
         BotCommand("help", "Show help message"),
         BotCommand("status", "Show current configuration"),
         BotCommand("models", "List available models"),
+        BotCommand("setprovider", "Set provider (ollama/openai/gemini)"),
         BotCommand("setendpoint", "Set inference API URL"),
         BotCommand("setapikey", "Set API key"),
         BotCommand("setmodel", "Set model name"),
@@ -238,6 +288,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", cmd_help))
     application.add_handler(CommandHandler("status", cmd_status))
     application.add_handler(CommandHandler("models", cmd_models))
+    application.add_handler(CommandHandler("setprovider", cmd_setprovider))
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
