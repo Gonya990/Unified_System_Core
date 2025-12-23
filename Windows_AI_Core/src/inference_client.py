@@ -18,6 +18,7 @@ class InferenceClient:
     def __init__(self, config: ConfigManager):
         self.config = config
         self._session: Optional[aiohttp.ClientSession] = None
+        self._session_api_key: str = ""  # Track the API key used for current session
     
     @property
     def base_url(self) -> str:
@@ -32,12 +33,19 @@ class InferenceClient:
         return self.config.get("MODEL_NAME", "llama3.2")
     
     async def _get_session(self) -> aiohttp.ClientSession:
-        """Get or create aiohttp session."""
-        if self._session is None or self._session.closed:
+        """Get or create aiohttp session. Recreates if API key changed."""
+        current_key = self.api_key
+        
+        # Recreate session if API key changed or session is closed
+        if self._session is None or self._session.closed or self._session_api_key != current_key:
+            if self._session and not self._session.closed:
+                await self._session.close()
+            
             headers = {"Content-Type": "application/json"}
-            if self.api_key:
-                headers["Authorization"] = f"Bearer {self.api_key}"
+            if current_key:
+                headers["Authorization"] = f"Bearer {current_key}"
             self._session = aiohttp.ClientSession(headers=headers)
+            self._session_api_key = current_key
         return self._session
     
     async def close(self) -> None:
@@ -116,3 +124,32 @@ class InferenceClient:
                 return response.status == 200
         except Exception:
             return False
+    
+    async def list_models(self) -> list[str]:
+        """Get list of available models from the provider."""
+        session = await self._get_session()
+        models = []
+        
+        try:
+            # Try Ollama format first
+            if "openai" not in self.base_url.lower():
+                url = f"{self.base_url.rstrip('/')}/api/tags"
+                async with session.get(url, timeout=10) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if "models" in data:
+                            models = [m.get("name", m.get("model", "unknown")) for m in data["models"]]
+                            return models
+            
+            # Try OpenAI format
+            url = f"{self.base_url.rstrip('/')}/v1/models"
+            async with session.get(url, timeout=10) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if "data" in data:
+                        models = [m.get("id", "unknown") for m in data["data"]]
+                        return models
+        except Exception as e:
+            logger.error(f"Failed to list models: {e}")
+        
+        return models

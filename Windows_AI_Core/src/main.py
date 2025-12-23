@@ -42,6 +42,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "👋 Hello! I'm your AI assistant.\n\n"
         "Commands:\n"
         "/status - Show current configuration\n"
+        "/models - List available models\n"
         "/setendpoint <url> - Set inference API URL\n"
         "/setapikey <key> - Set API key\n"
         "/setmodel <name> - Set model name\n"
@@ -126,6 +127,34 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
 
 
+async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /models command - list available models from provider."""
+    await update.message.reply_text("🔍 Fetching available models...")
+    
+    models = await inference.list_models()
+    
+    if not models:
+        base_url = config.get("INFERENCE_BASE_URL")
+        await update.message.reply_text(
+            f"❌ Could not fetch models from `{base_url}`\n\n"
+            "Make sure the endpoint is accessible.",
+            parse_mode="Markdown"
+        )
+        return
+    
+    # Format models list (limit to 30 for readability)
+    models_display = models[:30]
+    models_text = "\n".join([f"• `{m}`" for m in models_display])
+    
+    if len(models) > 30:
+        models_text += f"\n\n_...and {len(models) - 30} more_"
+    
+    await update.message.reply_text(
+        f"📋 **Available Models ({len(models)})**\n\n{models_text}",
+        parse_mode="Markdown"
+    )
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle regular text messages - send to AI."""
     user_text = update.message.text
@@ -165,6 +194,7 @@ async def post_init(application: Application) -> None:
         BotCommand("start", "Start the bot"),
         BotCommand("help", "Show help message"),
         BotCommand("status", "Show current configuration"),
+        BotCommand("models", "List available models"),
         BotCommand("setendpoint", "Set inference API URL"),
         BotCommand("setapikey", "Set API key"),
         BotCommand("setmodel", "Set model name"),
@@ -207,6 +237,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", cmd_start))
     application.add_handler(CommandHandler("help", cmd_help))
     application.add_handler(CommandHandler("status", cmd_status))
+    application.add_handler(CommandHandler("models", cmd_models))
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
