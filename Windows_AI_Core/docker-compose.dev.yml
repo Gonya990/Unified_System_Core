@@ -1,0 +1,26 @@
+version: "3.8"
+
+# Development configuration with hot-reload and debug settings
+services:
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-telegram-bot-dev
+    volumes:
+      - ./src:/app/src:ro  # Mount source for inspection (not hot-reload in Python)
+      - ./data:/data       # Local data directory
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - INFERENCE_BASE_URL=${INFERENCE_BASE_URL:-http://host.docker.internal:11434}
+      - INFERENCE_API_KEY=${INFERENCE_API_KEY:-}
+      - MODEL_NAME=${MODEL_NAME:-llama3.2}
+      - LOG_LEVEL=DEBUG
+      - CONFIG_PATH=/data/bot_config.json
+    ports:
+      - "8080:8080"  # Health/debug port
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Linux compatibility
+
+volumes:
+  bot-data:

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegram-bot-config
+  namespace: telegram-bot
+data:
+  INFERENCE_BASE_URL: "http://ollama.inference.svc:11434"
+  MODEL_NAME: "llama3.2"
+  LOG_LEVEL: "INFO"
+  CONFIG_PATH: "/data/bot_config.json"
