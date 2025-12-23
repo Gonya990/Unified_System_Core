@@ -1,12 +1,32 @@
 [project]
-name = "windows-ai-core"
-version = "0.1.0"
-description = "Local AI Chatbot for Unified System"
+name = "ai-telegram-bot"
+version = "1.0.0"
+description = "AI Telegram Bot for Unified System with configurable inference backend"
 requires-python = ">=3.10"
 dependencies = [
+    "python-telegram-bot>=20.0",
+    "aiohttp>=3.9.0",
+    "cryptography>=41.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+]
+gpu = [
     "torch",
     "transformers",
     "accelerate",
+]
+
+[project.scripts]
+ai-telegram-bot = "src.main:main"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
 ]
 
 [[tool.uv.index]]
@@ -16,5 +36,8 @@ explicit = true
 
 [tool.uv.sources]
 torch = { index = "pytorch" }
-torchvision = { index = "pytorch" }
-torchaudio = { index = "pytorch" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py"]

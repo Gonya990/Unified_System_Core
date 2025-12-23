@@ -32,6 +32,20 @@
     - `100/101` (Gaming/Old).
     - `106` (unified-home-core): Ubuntu 22.04 Cloud, 4GB RAM, 2 Cores. (Deploying...)
 
+### 4. Планшет Артура (Контроль ребёнка)
+
+- **Device**: Lenovo TB-J606F (Tab P11)
+- **Tailscale IP**: `100.114.27.103`
+- **Local IP**: `192.168.190.111`
+- **Role**: Детский планшет с родительским контролем
+- **User**: Артур (<arturgoncarenko92@gmail.com>)
+- **Parents**: <gonya90.gg@gmail.com>, <OksanaGorodetski@gmail.com>
+- **Components**:
+  - **Family Link**: ✅ Активен (родительский контроль)
+  - **ADB (5555)**: ✅ Открыт через Tailscale
+  - **Geolocation**: ✅ HIGH_ACCURACY
+  - **Tailscale VPN**: ✅ Постоянно подключен
+
 ## Software Resources (Программные Ресурсы)
 
 ### Active Working Zones (Unified_System)

@@ -1,6 +1,6 @@
 # 🌌 ANTIGRAVITY CONTEXT HANDOFF
 >
-> **Generated:** 2025-12-22  
+> **Generated:** 2025-12-23  
 > **Purpose:** Complete system knowledge transfer for session continuity
 
 ---
@@ -51,6 +51,7 @@
 
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
+| `6afbab64-f024-...` | **Codex Context Handoff (Mac)** | ✅ Complete | Artifact index, session handoff, task + walkthrough |
 | `0866ee1f-5969-...` | **Unified Topology Setup** | ✅ Complete | MCP server, n8n guide, walkthrough |
 | `a1c2070a-d35e-...` | **Proxmox Network Reconnaissance** | 🔄 In Progress | System inventory, deep clean briefing |
 | `b64b29bb-d3b8-...` | **Hybrid Cortex Activation** | ✅ Complete | RAG/Function calling implementation plan |

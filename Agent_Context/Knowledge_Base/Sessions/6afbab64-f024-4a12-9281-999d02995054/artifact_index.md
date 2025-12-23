@@ -1,0 +1,279 @@
+# Artifact Index
+
+Generated: 2025-12-23
+
+This index lists all session directories and their artifact files (relative to Knowledge_Base/Sessions).
+
+## Sessions
+- 05f8ce34-9356-43e0-9c62-efca146a032d
+  - (no files)
+- 0866ee1f-5969-46a1-9ab8-ee14130c2bc1
+  - context.md
+  - context.md.metadata.json
+  - context.md.resolved
+  - context.md.resolved.0
+  - guide_n8n_setup.md
+  - guide_n8n_setup.md.metadata.json
+  - guide_n8n_setup.md.resolved
+  - guide_n8n_setup.md.resolved.0
+  - guide_n8n_setup.md.resolved.1
+  - guide_n8n_setup.md.resolved.2
+  - guide_n8n_setup.md.resolved.3
+  - guide_n8n_setup.md.resolved.4
+  - guide_n8n_setup.md.resolved.5
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - implementation_plan.md.resolved.1
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.10
+  - task.md.resolved.11
+  - task.md.resolved.12
+  - task.md.resolved.13
+  - task.md.resolved.14
+  - task.md.resolved.15
+  - task.md.resolved.16
+  - task.md.resolved.17
+  - task.md.resolved.18
+  - task.md.resolved.19
+  - task.md.resolved.2
+  - task.md.resolved.20
+  - task.md.resolved.21
+  - task.md.resolved.22
+  - task.md.resolved.23
+  - task.md.resolved.24
+  - task.md.resolved.25
+  - task.md.resolved.26
+  - task.md.resolved.3
+  - task.md.resolved.4
+  - task.md.resolved.5
+  - task.md.resolved.6
+  - task.md.resolved.7
+  - task.md.resolved.8
+  - task.md.resolved.9
+  - walkthrough.md
+  - walkthrough.md.metadata.json
+  - walkthrough.md.resolved
+  - walkthrough.md.resolved.0
+  - walkthrough.md.resolved.1
+  - walkthrough.md.resolved.2
+  - walkthrough.md.resolved.3
+- 0cc3e59e-49af-43d8-98d5-8e24f7bf422b
+  - implementation_plan.md
+  - task.md
+  - walkthrough.md
+- 269ef814-7919-4d61-9768-319837af8b93
+  - implementation_plan.md
+  - task.md
+  - walkthrough.md
+- 2f686e4f-32ba-4893-9c60-36aa597cc73b
+  - task.md
+- 30813860-99c6-4099-9ab9-de209ce72e7e
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+- 3d901560-8866-4b17-a27f-c9031b8ead69
+  - implementation_plan.md
+  - system_report.md
+  - task.md
+  - walkthrough.md
+- 3fe18888-b757-4f61-a198-f8b1a4b2f008
+  - (no files)
+- 42d2957e-fc71-4565-9946-e2fef1ee6b21
+  - (no files)
+- 6afbab64-f024-4a12-9281-999d02995054
+  - CONTEXT_HANDOFF.md
+  - artifact_index.md
+  - task.md
+  - walkthrough.md
+- 86bffbe1-e0b5-4eb9-a98f-77f31832bfa3
+  - task.md
+- 8c34a8bc-20df-4e8d-8acb-248d7b8858ad
+  - browser_agent_walkthrough.md
+  - browser_agent_walkthrough.md.metadata.json
+  - browser_agent_walkthrough.md.resolved
+  - browser_agent_walkthrough.md.resolved.0
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - implementation_plan.md.resolved.1
+  - walkthrough.md
+  - walkthrough.md.metadata.json
+  - walkthrough.md.resolved
+  - walkthrough.md.resolved.0
+- 8e11d8ff-863d-452f-af08-bf2a546fd3e6
+  - (no files)
+- a1c2070a-d35e-41bb-8398-427c4934e58f
+  - deep_clean_instructions.md
+  - deep_clean_instructions.md.metadata.json
+  - deep_clean_instructions.md.resolved
+  - deep_clean_instructions.md.resolved.0
+  - final_cleanup_report.md
+  - final_cleanup_report.md.metadata.json
+  - final_cleanup_report.md.resolved
+  - final_cleanup_report.md.resolved.0
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - implementation_plan.md.resolved.1
+  - implementation_plan.md.resolved.2
+  - mac_agent_briefing.md
+  - mac_agent_briefing.md.metadata.json
+  - mac_agent_briefing.md.resolved
+  - mac_agent_briefing.md.resolved.0
+  - mac_agent_briefing.md.resolved.1
+  - operation_deep_clean_briefing.md
+  - operation_deep_clean_briefing.md.metadata.json
+  - operation_deep_clean_briefing.md.resolved
+  - operation_deep_clean_briefing.md.resolved.0
+  - system_inventory.md
+  - system_inventory.md.metadata.json
+  - system_inventory.md.resolved
+  - system_inventory.md.resolved.0
+  - system_scan.md
+  - system_scan.md.metadata.json
+  - system_scan.md.resolved
+  - system_scan.md.resolved.0
+  - system_status.md
+  - system_status.md.metadata.json
+  - system_status.md.resolved
+  - system_status.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.2
+  - task.md.resolved.3
+  - task.md.resolved.4
+  - task.md.resolved.5
+  - uploaded_image_1766168857851.img
+  - uploaded_image_1766174606075.jpg
+- a33f106e-f1d7-49f1-9346-ddd4983f7333
+  - implementation_plan.md
+  - task.md
+  - walkthrough.md
+- a37df947-0c85-442d-896d-4febcbd36c77
+  - implementation_plan.md
+  - task.md
+  - walkthrough.md
+- a651329a-9f8e-4911-89df-78d25af21168
+  - (no files)
+- af3db87b-cab3-4611-8bcf-f970ce255697
+  - task.md
+- b32255f1-fc4d-473b-bf1f-f08a685a3a09
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.2
+  - task.md.resolved.3
+  - task.md.resolved.4
+  - task.md.resolved.5
+  - task.md.resolved.6
+  - walkthrough.md
+  - walkthrough.md.metadata.json
+  - walkthrough.md.resolved
+  - walkthrough.md.resolved.0
+  - walkthrough.md.resolved.1
+- b3db7620-1a9e-4942-9725-e6f675955864
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.2
+  - task.md.resolved.3
+  - task.md.resolved.4
+  - task.md.resolved.5
+- b64b29bb-d3b8-43dc-824f-dff898807821
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - walkthrough.md
+  - walkthrough.md.metadata.json
+  - walkthrough.md.resolved
+  - walkthrough.md.resolved.0
+- b842c335-5b59-461c-b229-edcce880a09d
+  - task.md
+- bc334b70-7153-41ea-b2d6-4329eda3d436
+  - implementation_plan.md
+  - implementation_plan.md.metadata.json
+  - implementation_plan.md.resolved
+  - implementation_plan.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.2
+  - walkthrough.md
+  - walkthrough.md.metadata.json
+  - walkthrough.md.resolved
+  - walkthrough.md.resolved.0
+  - walkthrough.md.resolved.1
+  - walkthrough.md.resolved.2
+- d0460a98-9684-4893-8270-667996246faf
+  - (no files)
+- d10f867d-739b-4c5e-a265-ade6341aec6c
+  - (no files)
+- d93fc699-c458-4fc6-9b72-4fabe245d7c2
+  - (no files)
+- df5ae705-0062-4857-9de9-9233acfecd52
+  - implementation_plan.md
+  - task.md
+- e04025b5-aa80-4c20-9b42-4667a11733a2
+  - (no files)
+- eb70130d-7264-4f3e-9a48-8fe24ab0ce4a
+  - CONTEXT_HANDOFF.md
+  - CONTEXT_HANDOFF.md.metadata.json
+  - CONTEXT_HANDOFF.md.resolved
+  - CONTEXT_HANDOFF.md.resolved.0
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+- f173ccaf-f4f2-4d5f-acd4-b507df5e39aa
+  - task.md
+  - task.md.metadata.json
+  - task.md.resolved
+  - task.md.resolved.0
+  - task.md.resolved.1
+  - task.md.resolved.2
+  - task.md.resolved.3
+  - task.md.resolved.4
+  - task.md.resolved.5
+  - task.md.resolved.6
+- f2e08f11-94bf-4e77-9ec5-d5d8ba22b404
+  - deployment_report.md
+  - final_report.md
+  - implementation_plan.md
+  - task.md
+  - walkthrough.md
+- f8a26d60-4f9b-49cd-bda7-a05632367e93
+  - (no files)
+- fd3110df-620a-4e11-b449-ec247fe6231c
+  - (no files)
