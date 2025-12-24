@@ -51,6 +51,8 @@
 
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
+| `nodriver_implementation` | **Browser Control Daemon** | ✅ Implemented | nodriver_daemon.py, ndc CLI, UV setup |
+| `arthur_tablet_setup` | **Arthur Tablet Setup** | 🔄 In Progress | ADB setup, Family Link, Tailscale |
 | `6afbab64-f024-...` | **Codex Context Handoff (Mac)** | ✅ Complete | Artifact index, session handoff, task + walkthrough |
 | `0866ee1f-5969-...` | **Unified Topology Setup** | ✅ Complete | MCP server, n8n guide, walkthrough |
 | `a1c2070a-d35e-...` | **Proxmox Network Reconnaissance** | 🔄 In Progress | System inventory, deep clean briefing |
@@ -102,6 +104,29 @@ Each conversation folder may contain:
 - [x] Check Tailscale IP
 - [x] Provide /etc/hosts configuration for Mac
 - [x] Verify connectivity from browser agent
+```
+
+### From `nodriver_implementation` (Browser Control) - IMPLEMENTED ✅
+
+```markdown
+- [x] Research browser control options (MCP, HTTP, Socket)
+- [x] Decide on Unix Socket Daemon approach
+- [x] Implement nodriver_daemon.py
+- [x] Implement ndc CLI client
+- [x] Set up UV package management
+- [x] Create start_chrome.sh and start_daemon.sh
+- [x] Document with README.md, INSTALL.md
+- [ ] Test with Antigravity agent <!-- PENDING USER ACTION -->
+```
+
+### From `arthur_tablet_setup` (Tablet Control) - IN PROGRESS 🔄
+
+```markdown
+- [x] Enable ADB over WiFi
+- [x] Configure Tailscale
+- [x] Set up Family Link
+- [/] Install Tasker and automation apps
+- [ ] Configure Home Assistant integration
 ```
 
 ### General Outstanding Items
