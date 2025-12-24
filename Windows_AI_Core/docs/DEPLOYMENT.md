@@ -91,7 +91,7 @@ docker compose up -d
 ### Environment Variables
 
 | Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
+| -------- | -------- | ------- | ----------- |
 | `TELEGRAM_BOT_TOKEN` | ✅ | - | Bot token from BotFather |
 | `INFERENCE_BASE_URL` | ❌ | `http://localhost:11434` | Inference API URL |
 | `INFERENCE_API_KEY` | ❌ | - | API key for inference |
@@ -114,7 +114,7 @@ Users can configure the bot directly in Telegram:
 The bot exposes HTTP endpoints for monitoring:
 
 | Endpoint | Purpose |
-|----------|---------|
+| -------- | ------- |
 | `GET /health` | Liveness probe |
 | `GET /ready` | Readiness probe |
 

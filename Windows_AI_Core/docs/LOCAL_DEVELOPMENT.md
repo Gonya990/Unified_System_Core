@@ -86,7 +86,7 @@ curl http://localhost:8080/health
 
 ## Project Structure
 
-```
+```plaintext
 Windows_AI_Core/
 ├── src/
 │   ├── __init__.py
