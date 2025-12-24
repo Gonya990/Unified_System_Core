@@ -326,29 +326,61 @@ Stop when: Page loaded or error after 30s
 |-------------|---------------------|
 | `echo "..." > file` (overwrites) | `echo "..." >> file` (appends) |
 | `write_to_file` with Overwrite=true | `replace_file_content` with targeted changes |
-| `git reset --hard` | `git stash` or ask user first |
+| `git reset --hard` | Ask user first, never auto-run |
+| `git stash` (hides others' work) | `WIP: commit` instead |
 | `rm -rf` on shared folders | Only delete files you created |
 
 ### Git Coordination
 
-**Before committing:**
+> ⚠️ **NEVER use `git stash`** in multi-agent environments. Stash is local-only and can cause other agents to lose access to uncommitted work.
+
+**Safe Git Workflow:**
 
 ```bash
-# Always pull and rebase first to get other agents' changes
+# Step 1: Commit YOUR changes first (even if WIP)
+git add <your-files>
+git commit -m "WIP: <agent-id> - <what you're working on>"
+
+# Step 2: Now pull others' changes
 git pull --rebase origin main
+
+# Step 3: Continue work or push
 ```
+
+**Why WIP commits instead of stash:**
+
+| Approach | Visibility | Recovery | Multi-Agent Safe |
+|----------|------------|----------|------------------|
+| `git stash` | ❌ Local only | ❌ Only by you | ❌ NO |
+| `WIP: commit` | ✅ Pushed to remote | ✅ Any agent can see | ✅ YES |
+
+**WIP Commit Format:**
+
+```
+WIP: <agent-id> - <brief description>
+WIP: mac-agent - updating AGENTS.md multi-agent rules
+WIP: windows-agent - nodriver daemon implementation
+```
+
+**If you see uncommitted changes you didn't make:**
+
+1. **DON'T stash them** — they belong to another agent
+2. Check `git log --oneline -5` for recent WIP commits
+3. Ask user: "I see uncommitted changes. Commit them as WIP before I proceed?"
 
 **If rebase conflicts occur:**
 
 1. Stop and notify user — don't force resolve
 2. Show conflict files: `git diff --name-only --diff-filter=U`
 3. Let user decide resolution strategy
+4. **Never:** `git rebase --skip` or `git checkout --theirs`
 
 **Commit scope rules:**
 
 - Only commit files YOU modified in this session
 - Use `git add <specific-files>` instead of `git add -A` if unsure
-- Include agent identifier in commit if helpful: `feat(agent-mac): ...`
+- Include agent identifier in commits: `feat(agent-mac): ...`
+- Use `WIP:` prefix for incomplete work that needs to be saved
 
 ### Process Safety
 
