@@ -27,7 +27,25 @@ echo "$(date -Iseconds) commit-push in progress" > .agent/.workflow-lock
 
 ---
 
-## Step 3: Pull latest changes (critical for multi-agent)
+## Step 3: Check for uncommitted changes before pulling
+
+```bash
+git status --short
+```
+
+If there are uncommitted changes:
+
+- **DON'T use `git stash`** — it hides work from other agents
+- Instead, commit as WIP first:
+
+```bash
+git add <your-files>
+git commit -m "WIP: <agent-id> - <brief description>"
+```
+
+---
+
+## Step 4: Pull latest changes (critical for multi-agent)
 
 ```bash
 git pull --rebase origin main
@@ -41,7 +59,7 @@ If rebase conflicts occur:
 
 ---
 
-## Step 4: Show status
+## Step 5: Show status
 
 ```bash
 git status --short
@@ -51,7 +69,7 @@ Review the output — only files YOU modified should be staged.
 
 ---
 
-## Step 5: Stage changes
+## Step 6: Stage changes
 
 Option A — Stage all (if you're the only active agent):
 
@@ -67,7 +85,7 @@ git add <file1> <file2> ...
 
 ---
 
-## Step 6: Commit with descriptive message
+## Step 7: Commit with descriptive message
 
 Commit message format:
 
@@ -83,7 +101,7 @@ Or with agent scope (helps identify which agent made changes):
 
 ---
 
-## Step 7: Push to origin
+## Step 8: Push to origin
 
 ```bash
 git push origin main
@@ -97,7 +115,7 @@ If push is rejected (another agent pushed first):
 
 ---
 
-## Step 8: Release workflow lock
+## Step 9: Release workflow lock
 
 ```bash
 rm -f .agent/.workflow-lock
