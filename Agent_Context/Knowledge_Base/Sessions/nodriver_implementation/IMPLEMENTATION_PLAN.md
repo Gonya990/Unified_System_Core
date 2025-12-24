@@ -19,11 +19,14 @@
 
 ## 📋 Implementation Status
 
-- [x] **nodriver installed**: `pip install nodriver` ✅
+- [x] **UV installed**: Fast Python package manager ✅
+- [x] **nodriver installed**: via `uv sync` ✅
 - [x] **Daemon created**: `nodriver_daemon.py` ✅
 - [x] **CLI client created**: `ndc` ✅
 - [x] **Config template**: `.env.example` ✅
 - [x] **Install guide**: `INSTALL.md` ✅
+- [x] **Start script**: `start_daemon.sh` ✅
+- [x] **Dependencies locked**: `uv.lock` ✅
 
 ---
 
@@ -53,18 +56,25 @@
 
 ---
 
-## ⚡ Quick Install
+## ⚡ Quick Start (UV)
 
 ```bash
-# 1. Copy files to home directory
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/nodriver_daemon.py ~/nodriver_daemon.py
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/ndc ~/ndc
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/.env.example ~/.nodriver.env
-chmod +x ~/ndc
+# 1. Navigate to project
+cd ~/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation
 
-# 2. (Optional) Add to PATH
-echo 'export PATH="$HOME:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+# 2. Dependencies already synced (uv.lock present)
+# If needed: source ~/.local/bin/env && uv sync
+
+# 3. Start Chrome with debugging
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --remote-debugging-port=9222
+
+# 4. Start daemon
+./start_daemon.sh
+
+# 5. Use CLI
+./ndc status
+./ndc goto "https://example.com"
+./ndc screenshot
 ```
 
 ---
