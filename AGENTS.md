@@ -72,16 +72,21 @@ After completing work, create `walkthrough.md` documenting:
 
 ## 3. Subagent Delegation
 
+> 💡 **Why Subagents?** Subagents run in separate context windows, saving tokens in the main conversation. Use them to offload work that doesn't need full session history.
+
 ### When to Use Subagents
 
-- Browser automation tasks
+- Browser automation tasks (clicking, navigating, screenshots)
 - Long-running processes that need monitoring
 - Parallel independent operations
+- Visual verification (capture UI state)
+- Tasks that can be described in <100 words
 
 ### Delegation Format
 
 ```
 Task: <Clear description of what to do>
+Context: <Minimal info needed - no session history>
 Return: <What information to report back>
 Stop when: <Clear termination condition>
 ```
@@ -91,10 +96,13 @@ Stop when: <Clear termination condition>
 - Security-sensitive operations
 - Destructive actions without user approval
 - Tasks requiring context not in the prompt
+- Decision-making that needs user clarification
 
 ---
 
 ## 4. Skill Creation
+
+> 💡 **Why Skills?** Skills reduce context by replacing inline explanations with stored procedures. A single `/workflow` command replaces 10+ tool calls.
 
 ### When to Create a Skill
 
@@ -103,14 +111,22 @@ Create reusable scripts/workflows when:
 - A task is repeated 3+ times
 - A manual process can be automated
 - A complex command sequence is needed
+- **You notice yourself typing similar commands repeatedly**
+
+### Skill Priority Order
+
+1. **Check if skill exists** — Run `/` to see available workflows
+2. **Use existing skill** — Prefer `/commit-push` over manual git commands
+3. **Create new skill** — If no skill exists and task will repeat
 
 ### Skill Locations
 
-| Type | Location |
-|------|----------|
-| Shell scripts | `Scripts/` |
-| Python utilities | `Agent_Context/Knowledge_Base/Scripts/` |
-| Workflows | `.agent/workflows/` |
+| Type | Location | Context Savings |
+|------|----------|----------------|
+| Workflows | `.agent/workflows/` | High (turbo auto-run) |
+| Shell scripts | `Scripts/` | Medium (single command) |
+| Expect scripts | `Scripts/*.exp` | High (interactive automation) |
+| Python utilities | `Agent_Context/Knowledge_Base/Scripts/` | Medium |
 
 ### Skill Format (Workflows)
 
@@ -120,8 +136,9 @@ description: Short description of what this does
 ---
 1. Step one instructions
 2. Step two instructions
-// turbo  <- Auto-run annotation
+// turbo  <- Auto-run annotation (agent can run without asking)
 3. Safe step to auto-run
+// turbo-all  <- Entire workflow auto-runs
 ```
 
 ---
@@ -179,6 +196,115 @@ Before starting work, check:
 - Deleting data
 - Changing configurations
 - External service integrations
+
+---
+
+## 8. Workflow Recommendations
+
+### Available Workflows
+
+| Workflow | Slash Command | When to Recommend |
+|----------|---------------|-------------------|
+| Commit & Push | `/commit-push` | After completing any implementation, fix, or documentation update |
+| Update Progress | `/update-progress` | Before committing, or when switching tasks mid-session |
+| System Status | `/status` | When debugging connectivity or checking system health |
+
+### Trigger Points — When to Suggest Workflows
+
+**After Implementation Completion:**
+> 🎯 *"Implementation complete. Ready to run `/commit-push` to save changes?"*
+
+**After Creating an Implementation Plan:**
+> 📋 *"Plan created. Proceed with implementation, or update progress with `/update-progress`?"*
+
+**When User Says "implement" or "do it":**
+
+1. Execute the implementation
+2. Then prompt: *"Done! Run `/commit-push` to commit and push these changes?"*
+
+**Before Ending a Session:**
+> 💾 *"Before we wrap up, should I run `/update-progress` to document current state?"*
+
+**After Multiple File Changes:**
+> 📦 *"Several files modified. Run `/update-progress` to stage and review before committing?"*
+
+### Proactive Recommendations
+
+Always suggest the relevant workflow when:
+
+- ✅ A task is marked complete in `task.md`
+- ✅ An implementation plan has been executed
+- ✅ Documentation has been created or updated
+- ✅ A bug fix has been verified
+- ✅ User explicitly approves work
+
+---
+
+## 9. Context Optimization
+
+### Use Skills to Minimize Context
+
+**Rule:** If a task can be done by a skill/script, use it instead of inline commands.
+
+| Instead of... | Use Skill |
+|---------------|-----------|
+| Manual git add/commit/push | `/commit-push` workflow |
+| Inline progress updates | `/update-progress` workflow |
+| Repeated SSH commands | `Scripts/*.exp` expect scripts |
+| Multi-step deployments | `Scripts/deploy_*.sh` scripts |
+
+**Benefits:**
+
+- Reduces token consumption
+- Ensures consistency
+- Allows turbo auto-run
+
+### Use Subagents to Offload Work
+
+**Delegate to subagents when:**
+
+| Scenario | Why Delegate |
+|----------|--------------|
+| Browser automation (clicking, scraping) | Subagent has specialized browser tools |
+| Long-running commands (builds, downloads) | Frees main context for other work |
+| Parallel verification tasks | Test multiple things simultaneously |
+| Visual verification (screenshots) | Subagent can capture and report |
+
+**Subagent Delegation Template:**
+
+```markdown
+**Task:** [Specific action to perform]
+**Context:** [Minimal info needed - URLs, credentials ref, etc.]
+**Return:** [Exact data/confirmation to report back]
+**Stop when:** [Clear exit condition]
+```
+
+**Example - Offload Browser Login Check:**
+
+```
+Task: Navigate to http://100.88.65.71:8123 and verify Home Assistant login page loads
+Context: Home Assistant on NODE-01
+Return: Screenshot + confirmation of page title
+Stop when: Page loaded or error after 30s
+```
+
+### When to Create New Skills
+
+**Auto-create a skill when:**
+
+1. You perform the same sequence 3+ times
+2. A user asks "how do I do X again?"
+3. A subagent task succeeds and may be reused
+4. A complex multi-step process works
+
+**Skill Locations:**
+
+| Type | Location | When to Use |
+|------|----------|-------------|
+| Workflows (agent guidance) | `.agent/workflows/*.md` | Repeatable multi-step procedures |
+| Shell scripts | `Scripts/*.sh` | System automation, deployments |
+| Expect scripts | `Scripts/*.exp` | Interactive SSH/CLI automation |
+| Python utilities | `Agent_Context/Knowledge_Base/Scripts/*.py` | Data processing, API calls |
 
 ---
 
