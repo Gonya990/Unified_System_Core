@@ -52,6 +52,7 @@
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
 | `nodriver_implementation` | **Browser Control Daemon** | ✅ Implemented | nodriver_daemon.py, ndc CLI, UV setup |
+| `workflow_design_c651` | **Multi-Agent Workflow Design** | ✅ Complete | WORKFLOW_DESIGN_DECISIONS.md, discuss-design workflow |
 | `arthur_tablet_setup` | **Arthur Tablet Setup** | 🔄 In Progress | ADB setup, Family Link, Tailscale |
 | `6afbab64-f024-...` | **Codex Context Handoff (Mac)** | ✅ Complete | Artifact index, session handoff, task + walkthrough |
 | `0866ee1f-5969-...` | **Unified Topology Setup** | ✅ Complete | MCP server, n8n guide, walkthrough |
