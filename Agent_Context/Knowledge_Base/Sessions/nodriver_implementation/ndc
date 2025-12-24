@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+"""
+ndc - Nodriver CLI Client
+Sends commands to nodriver_daemon via Unix Socket
+
+Usage:
+    ndc goto "https://example.com"
+    ndc screenshot
+    ndc click "Button Text"
+    ndc fill "input.selector" "text to type"
+    ndc js "document.title"
+    ndc status
+"""
+
+import json
+import os
+import socket
+import sys
+from pathlib import Path
+
+# Load config
+def get_socket_path():
+    env_paths = [
+        Path.home() / ".nodriver.env",
+        Path(__file__).parent / ".env",
+        Path.cwd() / ".env"
+    ]
+    
+    for env_path in env_paths:
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("SOCKET_PATH="):
+                        return line.split("=", 1)[1].strip()
+    
+    return "/tmp/nodriver.sock"
+
+SOCKET_PATH = os.getenv("SOCKET_PATH", get_socket_path())
+TIMEOUT = int(os.getenv("SOCKET_TIMEOUT", "5"))
+
+
+def send_command(cmd: dict) -> dict:
+    """Send command to daemon and return response"""
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(TIMEOUT)
+    
+    try:
+        sock.connect(SOCKET_PATH)
+        sock.send(json.dumps(cmd).encode())
+        response = sock.recv(65536)
+        return json.loads(response.decode())
+    except socket.error as e:
+        return {"ok": False, "error": f"Connection failed: {e}. Is daemon running?"}
+    except json.JSONDecodeError as e:
+        return {"ok": False, "error": f"Invalid response: {e}"}
+    finally:
+        sock.close()
+
+
+def print_result(result: dict):
+    """Print result in compact JSON"""
+    print(json.dumps(result, ensure_ascii=False))
+
+
+def print_help():
+    """Print usage help"""
+    help_text = """
+ndc - Nodriver CLI Client
+
+NAVIGATION:
+  ndc goto URL              Navigate to URL
+  ndc url                   Get current URL
+  ndc title                 Get page title
+
+INTERACTION:
+  ndc click "text"          Click element by text
+  ndc clicksel "selector"   Click element by CSS selector  
+  ndc fill "selector" "text" Fill input field
+  ndc type "selector" "text" Type with delay (human-like)
+  ndc scroll down|up [px]   Scroll page (default 500px)
+
+CONTENT:
+  ndc screenshot [path]     Save screenshot
+  ndc text "selector"       Get element text
+  ndc html                  Get page HTML
+  ndc js "code"             Execute JavaScript
+
+TABS:
+  ndc tabs                  List all tabs
+  ndc newtab [url]          Open new tab
+  ndc switchtab INDEX       Switch to tab
+  ndc closetab INDEX        Close tab
+
+WAITING:
+  ndc wait "selector" [sec] Wait for element (default 10s)
+
+DAEMON:
+  ndc status                Check daemon status
+  ndc stop                  Stop daemon
+
+EXAMPLES:
+  ndc goto "https://web.telegram.org"
+  ndc click "Saved Messages"
+  ndc fill "div.input-message" "Hello World"
+  ndc screenshot
+  ndc js "document.querySelectorAll('a').length"
+"""
+    print(help_text)
+
+
+def main():
+    if len(sys.argv) < 2:
+        print_help()
+        sys.exit(0)
+    
+    action = sys.argv[1].lower()
+    
+    # Help
+    if action in ["-h", "--help", "help"]:
+        print_help()
+        sys.exit(0)
+    
+    # Build command based on action
+    cmd = {"action": action}
+    
+    # Commands with URL
+    if action in ["goto", "newtab"]:
+        cmd["url"] = sys.argv[2] if len(sys.argv) > 2 else "about:blank"
+    
+    # Commands with text
+    elif action == "click":
+        if len(sys.argv) < 3:
+            print('{"ok":false,"error":"Usage: ndc click \\"text\\""}')
+            sys.exit(1)
+        cmd["text"] = sys.argv[2]
+    
+    # Commands with selector
+    elif action in ["clicksel", "text"]:
+        if len(sys.argv) < 3:
+            print(f'{{"ok":false,"error":"Usage: ndc {action} \\"selector\\""}}')
+            sys.exit(1)
+        cmd["selector"] = sys.argv[2]
+    
+    # Fill command
+    elif action == "fill":
+        if len(sys.argv) < 4:
+            print('{"ok":false,"error":"Usage: ndc fill \\"selector\\" \\"text\\""}')
+            sys.exit(1)
+        cmd["selector"] = sys.argv[2]
+        cmd["text"] = sys.argv[3]
+    
+    # Type command  
+    elif action == "type":
+        if len(sys.argv) < 4:
+            print('{"ok":false,"error":"Usage: ndc type \\"selector\\" \\"text\\" [delay_ms]"}')
+            sys.exit(1)
+        cmd["selector"] = sys.argv[2]
+        cmd["text"] = sys.argv[3]
+        if len(sys.argv) > 4:
+            cmd["delay"] = int(sys.argv[4])
+    
+    # JavaScript
+    elif action == "js":
+        if len(sys.argv) < 3:
+            print('{"ok":false,"error":"Usage: ndc js \\"code\\""}')
+            sys.exit(1)
+        cmd["code"] = sys.argv[2]
+    
+    # Screenshot
+    elif action == "screenshot":
+        if len(sys.argv) > 2:
+            cmd["path"] = sys.argv[2]
+    
+    # Scroll
+    elif action == "scroll":
+        cmd["direction"] = sys.argv[2] if len(sys.argv) > 2 else "down"
+        cmd["amount"] = int(sys.argv[3]) if len(sys.argv) > 3 else 500
+    
+    # Wait
+    elif action == "wait":
+        if len(sys.argv) < 3:
+            print('{"ok":false,"error":"Usage: ndc wait \\"selector\\" [timeout]"}')
+            sys.exit(1)
+        cmd["selector"] = sys.argv[2]
+        if len(sys.argv) > 3:
+            cmd["timeout"] = int(sys.argv[3])
+    
+    # Tab operations
+    elif action in ["closetab", "switchtab"]:
+        if len(sys.argv) < 3:
+            print(f'{{"ok":false,"error":"Usage: ndc {action} INDEX"}}')
+            sys.exit(1)
+        cmd["index"] = int(sys.argv[2])
+    
+    # Send command and print result
+    result = send_command(cmd)
+    print_result(result)
+    
+    # Exit with error code if failed
+    if not result.get("ok", False):
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
