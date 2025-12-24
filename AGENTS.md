@@ -449,4 +449,147 @@ fi
 
 ---
 
+## 11. Browser Automation (Nodriver)
+
+> ⚠️ **PRIORITY RULE:** Always use **nodriver's `ndc` CLI** for browser automation instead of the built-in `browser_subagent` tool.
+
+### Why Nodriver Over Built-in Browser
+
+| Aspect | Nodriver (ndc) | Built-in browser_subagent |
+|--------|----------------|---------------------------|
+| Token efficiency | ✅ Minimal - JSON responses | ❌ High - DOM parsing overhead |
+| Control | ✅ Persistent browser session | ❌ Ephemeral sessions |
+| Speed | ✅ Direct Unix socket | ❌ Subagent overhead |
+| Context | ✅ Same Chrome instance | ❌ Separate context each time |
+| Video recording | ❌ Not available | ✅ WebP recordings |
+| Setup required | ⚠️ Yes - daemon must run | ✅ Works out of the box |
+
+### Nodriver Location
+
+```
+/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/
+```
+
+### Quick Start
+
+```bash
+NDC="/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/ndc"
+
+# Step 1: Check if daemon is running
+$NDC status
+
+# Step 2: If not running, start the stack
+./start_chrome.sh   # In one terminal
+./start_daemon.sh   # In another terminal
+
+# Step 3: Use browser
+$NDC goto "https://example.com"
+$NDC screenshot
+$NDC text "selector"
+```
+
+### ndc Command Reference
+
+**Navigation:**
+
+```bash
+$NDC goto "https://url.com"       # Navigate to URL
+$NDC url                          # Get current URL
+$NDC title                        # Get page title
+```
+
+**Interaction:**
+
+```bash
+$NDC click "Button Text"          # Click by text
+$NDC clicksel "button.submit"     # Click by CSS selector
+$NDC fill "input#email" "text"    # Fill input
+$NDC type "input#pass" "text"     # Type with delay (human-like)
+$NDC scroll down 500              # Scroll page
+```
+
+**Content Extraction:**
+
+```bash
+$NDC screenshot                   # Save to /tmp/nodriver_screen.png
+$NDC screenshot ~/my.png          # Save to custom path
+$NDC text "div.content"           # Get element text
+$NDC html                         # Get full page HTML
+$NDC js "document.title"          # Execute JavaScript
+```
+
+**Tabs:**
+
+```bash
+$NDC tabs                         # List all tabs
+$NDC newtab "https://google.com"  # Open new tab
+$NDC switchtab 1                  # Switch to tab by index
+$NDC closetab 0                   # Close tab by index
+```
+
+**Waiting:**
+
+```bash
+$NDC wait "selector" 10           # Wait for element (10s timeout)
+```
+
+**Daemon Control:**
+
+```bash
+$NDC status                       # Check if daemon is running
+$NDC stop                         # Stop the daemon
+```
+
+### When Built-in Browser is REQUIRED
+
+The `browser_subagent` tool MUST be used only in these LIMITED scenarios:
+
+| Scenario | Reason |
+|----------|--------|
+| **Video recording needed** | User needs a WebP recording of browser actions |
+| **Nodriver unavailable** | Chrome or daemon cannot start (port conflict, permissions) |
+| **User explicitly requests** | User specifically asks for built-in browser |
+| **Complex visual interaction** | Real-time visual feedback needed that ndc cannot provide |
+
+### ⚠️ MANDATORY Fallback Procedure
+
+**BEFORE using `browser_subagent`, you MUST:**
+
+1. **Document the limitation** — Explain why nodriver cannot be used:
+
+```markdown
+⚠️ **Nodriver Limitation Detected**
+
+I need to use the built-in browser tool because:
+- [Reason: "Video recording is required" / "Daemon is not running" / etc.]
+
+The built-in browser consumes more tokens but provides [specific capability needed].
+```
+
+1. **Ask for permission** — Get explicit user approval:
+
+```markdown
+May I proceed with the built-in browser tool? (yes/no)
+```
+
+1. **Only proceed after user confirmation** — Never auto-use built-in browser.
+
+### Troubleshooting
+
+```bash
+# Check if Chrome is running with debug port
+curl http://localhost:9222/json/version
+
+# Check if daemon socket exists
+ls -la /tmp/nodriver.sock
+
+# Restart everything
+$NDC stop
+pkill -f "Google Chrome"
+./start_chrome.sh
+./start_daemon.sh
+```
+
+---
+
 *These rules ensure consistency across all agents operating in the Unified System.*
