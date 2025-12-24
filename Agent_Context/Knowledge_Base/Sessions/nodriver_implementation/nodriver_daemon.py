@@ -136,38 +136,58 @@ class BrowserDaemon:
                     return {"ok": True, "clicked": selector}
                 return {"ok": False, "error": f"Selector not found: {selector}"}
             
-            # Fill input
+            # Fill input (JS-based for better compatibility)
             elif action == "fill":
                 selector = cmd.get("selector", "")
                 text = cmd.get("text", "")
-                element = await self.page.select(selector)
-                if element:
-                    await element.clear()
-                    await element.send_keys(text)
-                    return {"ok": True, "filled": selector}
-                return {"ok": False, "error": f"Selector not found: {selector}"}
+                js_code = f"""
+                (() => {{
+                    const el = document.querySelector("{selector}");
+                    if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
+                    el.focus();
+                    el.value = "{text}";
+                    el.dispatchEvent(new Event('input', {{bubbles: true}}));
+                    el.dispatchEvent(new Event('change', {{bubbles: true}}));
+                    return {{ok: true, filled: "{selector}"}};
+                }})()
+                """
+                result = await self.page.evaluate(js_code)
+                return result if isinstance(result, dict) else {"ok": True, "filled": selector}
             
-            # Type with delay (human-like)
+            # Type with delay (human-like, JS-based)
             elif action == "type":
                 selector = cmd.get("selector", "")
                 text = cmd.get("text", "")
-                delay = cmd.get("delay", 50)  # ms between keys
-                element = await self.page.select(selector)
-                if element:
-                    for char in text:
-                        await element.send_keys(char)
-                        await asyncio.sleep(delay / 1000)
-                    return {"ok": True, "typed": len(text)}
-                return {"ok": False, "error": f"Selector not found: {selector}"}
+                delay = cmd.get("delay", 50)
+                # Use JS to simulate typing
+                js_code = f"""
+                (async () => {{
+                    const el = document.querySelector("{selector}");
+                    if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
+                    el.focus();
+                    for (const char of "{text}") {{
+                        el.value += char;
+                        el.dispatchEvent(new Event('input', {{bubbles: true}}));
+                        await new Promise(r => setTimeout(r, {delay}));
+                    }}
+                    return {{ok: true, typed: {len(text)}}};
+                }})()
+                """
+                result = await self.page.evaluate(js_code)
+                return result if isinstance(result, dict) else {"ok": True, "typed": len(text)}
             
             # Get element text
             elif action == "text":
                 selector = cmd.get("selector", "")
-                element = await self.page.select(selector)
-                if element:
-                    text = await element.text
-                    return {"ok": True, "text": text}
-                return {"ok": False, "error": f"Selector not found: {selector}"}
+                js_code = f"""
+                (() => {{
+                    const el = document.querySelector("{selector}");
+                    if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
+                    return {{ok: true, text: el.innerText || el.textContent || ""}};
+                }})()
+                """
+                result = await self.page.evaluate(js_code)
+                return result if isinstance(result, dict) else {"ok": False, "error": "Unknown error"}
             
             # Execute JavaScript
             elif action == "js":
@@ -249,11 +269,29 @@ class BrowserDaemon:
             elif action == "wait":
                 selector = cmd.get("selector", "")
                 timeout = cmd.get("timeout", CONFIG["element_timeout"])
+                # Use JS polling since nodriver doesn't have wait_for
+                js_code = f"""
+                new Promise((resolve) => {{
+                    const start = Date.now();
+                    const check = () => {{
+                        if (document.querySelector("{selector}")) {{
+                            resolve(true);
+                        }} else if (Date.now() - start > {timeout * 1000}) {{
+                            resolve(false);
+                        }} else {{
+                            setTimeout(check, 100);
+                        }}
+                    }};
+                    check();
+                }})
+                """
                 try:
-                    element = await self.page.wait_for(selector, timeout=timeout)
-                    return {"ok": True, "found": selector}
-                except:
+                    found = await self.page.evaluate(js_code)
+                    if found:
+                        return {"ok": True, "found": selector}
                     return {"ok": False, "error": f"Timeout waiting for: {selector}"}
+                except Exception as e:
+                    return {"ok": False, "error": f"Wait error: {str(e)}"}
             
             # Daemon status
             elif action == "status":
