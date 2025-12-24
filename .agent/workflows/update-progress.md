@@ -4,7 +4,11 @@ description: Update status and progress in docs, prepare for commit (no commit)
 
 # Update Progress & Status Workflow
 
+> ⚠️ **Multi-Agent Safe:** This workflow only modifies YOUR session folder. Shared files (CONTEXT_HANDOFF.md) are updated with append-only edits.
+
 This workflow updates all relevant documentation with current session progress and prepares changes for commit.
+
+**Your Session ID:** Use your conversation UUID to isolate your work from other agents.
 
 ---
 
@@ -101,11 +105,17 @@ Update the central handoff document with current state:
 
 **Location:** `Agent_Context/Knowledge_Base/Architecture/CONTEXT_HANDOFF.md`
 
+> ⚠️ **Multi-Agent Warning:** This is a SHARED file. Multiple agents may edit it.
+>
+> - **APPEND only** — add your session to tables, don't delete others
+> - **Use targeted edits** — don't overwrite the entire file
+> - **Check recent changes first:** `git diff Agent_Context/Knowledge_Base/Architecture/CONTEXT_HANDOFF.md`
+
 **Update these sections:**
 
-1. **Active Conversation Artifacts** table — add/update session status
-2. **ACTIVE TODOS & TASKS** — sync with task.md progress markers
-3. **HANDOFF CHECKLIST** — update verification items if needed
+1. **Active Conversation Artifacts** table — ADD a row for your session
+2. **ACTIVE TODOS & TASKS** — ADD your tasks in a new subsection
+3. **HANDOFF CHECKLIST** — append new items if needed
 
 ---
 

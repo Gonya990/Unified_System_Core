@@ -308,4 +308,113 @@ Stop when: Page loaded or error after 30s
 
 ---
 
+## 10. Multi-Agent Coordination
+
+> ⚠️ **Important:** Multiple agents may operate in this workspace simultaneously. Follow these rules to avoid conflicts and data loss.
+
+### File Safety
+
+**Before editing a file:**
+
+1. Check if file was recently modified: `git diff <file>` or `ls -la <file>`
+2. If another agent is working on the same file, coordinate or wait
+3. Never overwrite entire files — use targeted edits (`replace_file_content`)
+
+**Avoid overwriting other agents' work:**
+
+| ❌ Dangerous | ✅ Safe Alternative |
+|-------------|---------------------|
+| `echo "..." > file` (overwrites) | `echo "..." >> file` (appends) |
+| `write_to_file` with Overwrite=true | `replace_file_content` with targeted changes |
+| `git reset --hard` | `git stash` or ask user first |
+| `rm -rf` on shared folders | Only delete files you created |
+
+### Git Coordination
+
+**Before committing:**
+
+```bash
+# Always pull and rebase first to get other agents' changes
+git pull --rebase origin main
+```
+
+**If rebase conflicts occur:**
+
+1. Stop and notify user — don't force resolve
+2. Show conflict files: `git diff --name-only --diff-filter=U`
+3. Let user decide resolution strategy
+
+**Commit scope rules:**
+
+- Only commit files YOU modified in this session
+- Use `git add <specific-files>` instead of `git add -A` if unsure
+- Include agent identifier in commit if helpful: `feat(agent-mac): ...`
+
+### Process Safety
+
+**Never kill processes you didn't start:**
+
+| ❌ Dangerous | ✅ Safe Alternative |
+|-------------|---------------------|
+| `pkill -9 node` | Only kill YOUR process by PID |
+| `docker stop $(docker ps -q)` | `docker stop <specific-container>` |
+| `killall python` | Track your PIDs, kill only those |
+| `npm run dev` (if already running) | Check first: `lsof -i :PORT` |
+
+**Before starting servers/services:**
+
+```bash
+# Check if port is already in use
+lsof -i :3000 || npm run dev
+```
+
+### Session Artifacts
+
+**Use unique identifiers for your work:**
+
+- Session folders: `Sessions/<conversation-uuid>/`
+- Temp files: `tmp/<agent-id>-<timestamp>.txt`
+- Logs: Include timestamp in filename
+
+**Protected shared files — edit carefully:**
+
+| File | Risk Level | Coordination Required |
+|------|------------|----------------------|
+| `CONTEXT_HANDOFF.md` | 🟡 Medium | Append only, don't delete sections |
+| `AGENTS.md` | 🔴 High | Discuss with user first |
+| `.env` files | 🔴 High | Never overwrite, only add keys |
+| `package.json` | 🟡 Medium | Targeted edits only |
+
+### Conflict Resolution
+
+**If you detect another agent's work:**
+
+1. **Don't overwrite** — your changes aren't more important
+2. **Read their changes** — maybe they already did what you planned
+3. **Append, don't replace** — add your section/changes below theirs
+4. **Notify user** — "I see recent changes from another session. Proceed or review first?"
+
+### Workflow Lock Flags
+
+When running multi-step workflows, create a lock indicator:
+
+```bash
+# At workflow start
+echo "$(date -Iseconds) - workflow in progress" > .agent/.workflow-lock
+
+# At workflow end
+rm -f .agent/.workflow-lock
+```
+
+Before starting a workflow, check:
+
+```bash
+if [ -f .agent/.workflow-lock ]; then
+  echo "Another workflow in progress, waiting..."
+  # Either wait or notify user
+fi
+```
+
+---
+
 *These rules ensure consistency across all agents operating in the Unified System.*
