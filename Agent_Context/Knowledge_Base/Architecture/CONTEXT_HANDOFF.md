@@ -107,7 +107,7 @@ Each conversation folder may contain:
 - [x] Verify connectivity from browser agent
 ```
 
-### From `nodriver_implementation` (Browser Control) - IMPLEMENTED ✅
+### From `nodriver_implementation` (Browser Control) - COMPLETE ✅
 
 ```markdown
 - [x] Research browser control options (MCP, HTTP, Socket)
@@ -117,7 +117,9 @@ Each conversation folder may contain:
 - [x] Set up UV package management
 - [x] Create start_chrome.sh and start_daemon.sh
 - [x] Document with README.md, INSTALL.md
-- [ ] Test with Antigravity agent <!-- PENDING USER ACTION -->
+- [x] Test with Antigravity agent (all commands verified)
+- [x] Create browser skills (.agent/skills/browser/*)
+- [x] Fix JS-based fill, type, text, wait for SPA compatibility
 ```
 
 ### From `arthur_tablet_setup` (Tablet Control) - IN PROGRESS 🔄

@@ -32,10 +32,21 @@
 
 ## Phase 4: Testing <!-- id: 400 -->
 
-- [ ] User starts Chrome with start_chrome.sh <!-- id: 401 --> <!-- CURRENT FOCUS -->
-- [ ] User starts daemon with start_daemon.sh <!-- id: 402 -->
-- [ ] Test basic commands (goto, screenshot, click) <!-- id: 403 -->
-- [ ] Verify Antigravity agent can control browser via run_command <!-- id: 404 -->
+- [x] User starts Chrome with start_chrome.sh <!-- id: 401 -->
+- [x] User starts daemon with start_daemon.sh <!-- id: 402 -->
+- [x] Test basic commands (goto, screenshot, click) <!-- id: 403 -->
+- [x] Verify Antigravity agent can control browser via run_command <!-- id: 404 -->
+
+## Phase 5: Browser Skills <!-- id: 500 -->
+
+- [x] Create .agent/skills/browser/ directory <!-- id: 501 -->
+- [x] Implement google-search.sh skill <!-- id: 502 -->
+- [x] Implement navigate.sh skill <!-- id: 503 -->
+- [x] Implement fill-form.sh skill <!-- id: 504 -->
+- [x] Implement click-and-wait.sh skill <!-- id: 505 -->
+- [x] Implement login.sh skill <!-- id: 506 -->
+- [x] Fix daemon: JS-based fill, type, text, wait <!-- id: 507 -->
+- [x] Test full Google Search flow <!-- id: 508 -->
 
 ---
 
@@ -53,7 +64,8 @@
 | `README.md` | ✅ Complete |
 | `INSTALL.md` | ✅ Complete |
 | `IMPLEMENTATION_PLAN.md` | ✅ Complete |
+| `.agent/skills/browser/*` | ✅ Complete |
 
 ---
 
-*Last updated: 2025-12-24 14:00*
+*Last updated: 2025-12-24 16:33*
