@@ -1,54 +1,52 @@
 # 🚀 Nodriver Installation Guide
 
-> **Quick Setup for Unix Socket Browser Control**
+> **Quick Setup for Unix Socket Browser Control**  
+> **Uses UV for dependency management**
 
 ---
 
-## 📦 Files Created
+## 📦 Files
 
-| File | Location | Purpose |
-| ---- | -------- | ------- |
-| `nodriver_daemon.py` | This folder | Main daemon service |
-| `ndc` | This folder | CLI client |
-| `.env.example` | This folder | Configuration template |
+| File | Purpose |
+| ---- | ------- |
+| `nodriver_daemon.py` | Main daemon service |
+| `ndc` | CLI client |
+| `pyproject.toml` | UV dependencies |
+| `.env.example` | Configuration template |
 
 ---
 
-## ⚡ Quick Install (3 commands)
+## ⚡ Quick Install (UV)
 
 ```bash
-# 1. Install nodriver
-pip install nodriver
+# Navigate to project
+cd /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation
 
-# 2. Copy files to home directory
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/nodriver_daemon.py ~/nodriver_daemon.py
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/ndc ~/ndc
-cp /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/.env.example ~/.nodriver.env
-chmod +x ~/ndc
+# Sync dependencies (creates .venv automatically)
+uv sync
 
-# 3. Add to PATH (optional)
-echo 'export PATH="$HOME:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+# Copy CLI and config to home
+cp ndc ~/ndc && chmod +x ~/ndc
+cp .env.example ~/.nodriver.env
 ```
 
 ---
 
-## 🔧 Chrome Setup (One-Time)
+## 🔧 Chrome Setup
 
-**Option A: Start Chrome with debugging flag**
+**Start Chrome with Remote Debugging:**
 
 ```bash
-# Close existing Chrome first, then:
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --remote-debugging-port=9222
 ```
 
-**Option B: Create alias for easy startup**
+**Or create an alias:**
 
 ```bash
 echo 'alias chrome-debug="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --remote-debugging-port=9222"' >> ~/.zshrc
 source ~/.zshrc
 
-# Now just run:
+# Then just run:
 chrome-debug
 ```
 
@@ -60,16 +58,16 @@ chrome-debug
 
 ```bash
 chrome-debug
-# Or manually with the full command above
 ```
 
-### 2. Start the daemon
+### 2. Start daemon (using UV)
 
 ```bash
-python ~/nodriver_daemon.py
+cd /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation
+uv run python nodriver_daemon.py
 ```
 
-### 3. Control browser (from another terminal or via Antigravity)
+### 3. Control browser
 
 ```bash
 ~/ndc goto "https://web.telegram.org"
@@ -85,13 +83,13 @@ python ~/nodriver_daemon.py
 | Command | Example | Description |
 | ------- | ------- | ----------- |
 | **goto** | `ndc goto "url"` | Navigate |
-| **screenshot** | `ndc screenshot` | Capture → /tmp/nodriver_screen.png |
+| **screenshot** | `ndc screenshot` | → /tmp/nodriver_screen.png |
 | **click** | `ndc click "text"` | Click by text |
 | **clicksel** | `ndc clicksel "css"` | Click by selector |
 | **fill** | `ndc fill "sel" "text"` | Fill input |
 | **type** | `ndc type "sel" "text"` | Type human-like |
 | **text** | `ndc text "sel"` | Get element text |
-| **js** | `ndc js "code"` | Execute JS |
+| **js** | `ndc js "code"` | Execute JavaScript |
 | **html** | `ndc html` | Get page HTML |
 | **title** | `ndc title` | Get page title |
 | **url** | `ndc url` | Get current URL |
@@ -106,26 +104,22 @@ python ~/nodriver_daemon.py
 
 ---
 
-## ⚙️ Configuration (.nodriver.env)
+## ⚙️ Configuration
 
-Edit `~/.nodriver.env` to customize:
+Edit `~/.nodriver.env`:
 
 ```bash
 CHROME_DEBUG_PORT=9222
 CHROME_EXECUTABLE=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
 SOCKET_PATH=/tmp/nodriver.sock
 SCREENSHOT_PATH=/tmp/nodriver_screen.png
-AUTO_START_CHROME=false
 ```
 
 ---
 
-## 🔄 Auto-Start (Optional)
-
-If you want daemon to start automatically on login:
+## 🔄 Optional: Auto-Start
 
 ```bash
-# Create LaunchAgent
 cat > ~/Library/LaunchAgents/com.nodriver.daemon.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -135,24 +129,40 @@ cat > ~/Library/LaunchAgents/com.nodriver.daemon.plist << 'EOF'
     <string>com.nodriver.daemon</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/python3</string>
-        <string>/Users/macbook/nodriver_daemon.py</string>
+        <string>/Users/macbook/.local/bin/uv</string>
+        <string>run</string>
+        <string>--directory</string>
+        <string>/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation</string>
+        <string>python</string>
+        <string>nodriver_daemon.py</string>
     </array>
     <key>RunAtLoad</key>
-    <false/>
-    <key>KeepAlive</key>
     <false/>
 </dict>
 </plist>
 EOF
 
-# Load it
 launchctl load ~/Library/LaunchAgents/com.nodriver.daemon.plist
-
-# Start manually when needed
-launchctl start com.nodriver.daemon
 ```
 
 ---
 
-*Created: 2025-12-24*
+## 🧪 Quick Test
+
+```bash
+# Terminal 1: Start Chrome
+chrome-debug
+
+# Terminal 2: Start daemon
+cd /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation
+uv run python nodriver_daemon.py
+
+# Terminal 3: Test commands
+~/ndc status
+~/ndc goto "https://httpbin.org/user-agent"
+~/ndc screenshot
+```
+
+---
+
+*Created: 2025-12-24 | Package Manager: UV*
