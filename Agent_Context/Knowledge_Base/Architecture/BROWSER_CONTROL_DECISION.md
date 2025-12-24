@@ -1,8 +1,10 @@
 # 🌐 Browser Control Architecture Decision
 
 > **Created:** 2025-12-24  
-> **Status:** ✅ DECIDED  
-> **Decision:** Unix Socket Daemon + CLI
+> **Updated:** 2025-12-24  
+> **Status:** ✅ IMPLEMENTED  
+> **Decision:** Unix Socket Daemon + CLI  
+> **Package Manager:** UV
 
 ---
 
@@ -25,7 +27,7 @@ Enable Antigravity agent to control a **local Chrome browser** with:
 | **Must use existing tools** | `run_command`, `view_file`, etc. |
 | **Token efficiency** | Minimize tokens per browser action |
 | **Stealth** | Avoid CAPTCHA and bot detection |
-| **User profile** | Must use existing Chrome profile with logins |
+| **User profile** | Must use existing Chrome instance (no copy) |
 
 ---
 
@@ -66,50 +68,56 @@ Enable Antigravity agent to control a **local Chrome browser** with:
 
 ---
 
-## ✅ Decision: Unix Socket Daemon + CLI
+## ✅ Final Implementation
 
-### Why
+### Key Decisions Made
 
-1. **Token efficiency** - ~3-6x fewer tokens than MCP
-2. **Performance** - Browser stays open, no startup delay
-3. **Security** - Unix socket, no network exposure
-4. **Simplicity** - Short CLI commands
+| Decision | Value |
+| -------- | ----- |
+| **Profile approach** | NO copy — connect to existing Chrome via Remote Debugging |
+| **Configuration** | `.env` file at `~/.nodriver.env` |
+| **Auto-start** | Optional (manual by default) |
+| **Package manager** | UV (fast, lockfile) |
+| **Uses YOUR Chrome** | ✅ Same instance with all logins, tabs, extensions |
 
 ### Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Antigravity   │────▶│   ~/ndc CLI     │────▶│ nodriver_daemon │
-│     Agent       │     │ (run_command)   │     │  (persistent)   │
+│   Antigravity   │────▶│   ./ndc CLI     │────▶│ nodriver_daemon │
+│     Agent       │     │ (run_command)   │     │ (Unix Socket)   │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
-         │                      │                       │
-         │                      │                       ▼
-         │                      │              ┌─────────────────┐
-         │                      │              │  Your Chrome    │
-         │                      │              │  (with logins)  │
-         │                      └──────────────│                 │
-         │                    Unix Socket      └─────────────────┘
-         │                 /tmp/nodriver.sock
-         │
-         ▼
-    Screenshots at
-    /tmp/nodriver_screen.png
+                                                        │
+                                                        │ CDP WebSocket
+                                                        ▼
+                                               ┌─────────────────┐
+                                               │  YOUR Chrome    │
+                                               │ --remote-debug  │
+                                               │   port=9222     │
+                                               └─────────────────┘
 ```
 
 ---
 
-## 📋 Components to Implement
+## 📁 Project Location
 
-| Component | File | Purpose |
-| --------- | ---- | ------- |
-| **Daemon** | `~/nodriver_daemon.py` | Persistent browser controller |
-| **CLI Client** | `~/ndc` | Command-line interface |
-| **LaunchAgent** | `~/Library/LaunchAgents/com.nodriver.daemon.plist` | Auto-start on macOS |
-| **Profile Copy** | `~/nodriver_profile/` | Copy of Chrome profile |
+```
+Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/
+├── .venv/                  # UV virtual environment
+├── .env.example            # Config template
+├── .gitignore              # Python ignores
+├── IMPLEMENTATION_PLAN.md  # Full documentation
+├── INSTALL.md              # Quick setup guide
+├── ndc                     # CLI client (executable)
+├── nodriver_daemon.py      # Main daemon
+├── pyproject.toml          # UV dependencies
+├── start_daemon.sh         # Convenience starter
+└── uv.lock                 # Locked dependencies
+```
 
 ---
 
-## 🔧 CLI Commands Design
+## 🔧 CLI Commands
 
 | Command | Example | Description |
 | ------- | ------- | ----------- |
@@ -134,48 +142,53 @@ Enable Antigravity agent to control a **local Chrome browser** with:
 
 ---
 
-## 📁 File Locations
+## ⚡ Quick Start
 
-```
-~/
-├── nodriver_daemon.py          # Main daemon service
-├── ndc                         # CLI client (executable)
-├── nodriver_profile/           # Chrome profile copy
-└── Library/
-    └── LaunchAgents/
-        └── com.nodriver.daemon.plist  # Auto-start
+```bash
+# 1. Navigate to project
+cd ~/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation
+
+# 2. Dependencies are already synced (uv.lock present)
+# If needed: uv sync
+
+# 3. Start Chrome with debugging
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --remote-debugging-port=9222
+
+# 4. Start daemon
+./start_daemon.sh
+
+# 5. Use CLI
+./ndc status
+./ndc goto "https://example.com"
+./ndc screenshot
 ```
 
 ---
 
-## ⚠️ Open Questions
+## 📊 Token Efficiency
 
-1. **Chrome profile path** - Where is your Chrome profile located?
-   - Default macOS: `~/Library/Application Support/Google/Chrome/Default`
-   - Need to confirm
-
-2. **Chrome executable path** - Which Chrome to use?
-   - Default: `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
-   - Need to confirm
-
-3. **Auto-start on boot?** - Should daemon start automatically?
-   - If yes, create LaunchAgent
-   - If no, manual start
-
----
-
-## 📊 Token Usage Projection
-
-| Action | Estimated Tokens |
-| ------ | ---------------- |
+| Action | Tokens Used |
+| ------ | ----------- |
 | `ndc goto url` | ~40 |
 | `ndc screenshot` | ~30 |
 | `ndc click text` | ~35 |
-| Response parsing | ~20 |
 | **Total per action** | **~50-80** |
 
-**Savings vs MCP:** 3-6x fewer tokens
+**Savings vs MCP:** 3-6x fewer tokens ✅
 
 ---
 
-*Document created: 2025-12-24*
+## ✅ Implementation Checklist
+
+- [x] nodriver installed via UV
+- [x] Daemon created (`nodriver_daemon.py`)
+- [x] CLI client created (`ndc`)
+- [x] Config template (`.env.example`)
+- [x] Install guide (`INSTALL.md`)
+- [x] UV project setup (`pyproject.toml`, `uv.lock`)
+- [x] Start script (`start_daemon.sh`)
+- [ ] Test with Antigravity agent (pending user setup)
+
+---
+
+*Document created: 2025-12-24 | Last updated: 2025-12-24*
