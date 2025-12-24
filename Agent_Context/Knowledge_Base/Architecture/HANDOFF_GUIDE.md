@@ -17,7 +17,7 @@ Create one central repository containing all AI agent context from:
 
 ### Linux / WSL2 (Antigravity)
 
-```
+```plaintext
 ~/.gemini/antigravity/brain/           # Session artifacts
 ~/antigravity-mcp-server/              # MCP server
 ~/00_NAV/                              # Navigation docs
@@ -26,7 +26,7 @@ Create one central repository containing all AI agent context from:
 
 ### macOS (Claude/Antigravity)
 
-```
+```plaintext
 ~/.gemini/antigravity/brain/           # Session artifacts
 ~/Library/Application Support/Claude/  # Claude desktop data
 ~/.claude/                             # Claude CLI config
@@ -34,7 +34,7 @@ Create one central repository containing all AI agent context from:
 
 ### Windows (Antigravity)
 
-```
+```plaintext
 %USERPROFILE%\.gemini\antigravity\brain\   # Session artifacts
 %APPDATA%\Claude\                          # Claude desktop data
 ```
@@ -153,7 +153,7 @@ Write-Host "✅ Context from $MachineName pushed to repository"
 
 ## 📁 Unified Repository Structure
 
-```
+```plaintext
 Unified_System_Core/
 ├── Agent_Context/
 │   ├── README.md               # Folder overview
@@ -198,7 +198,7 @@ Unified_System_Core/
 ## 🖥️ Machine Collection Status
 
 | Machine | Platform | Status | Date | Sessions |
-|---------|----------|--------|------|----------|
+| ------- | -------- | ------ | ---- | -------- |
 | **igor-gaming-1** | Linux/WSL2 | ✅ Complete | 2025-12-22 | 18 |
 | igor-gaming | Windows | ✅ Complete | 2025-12-22 | 2 (LMStudio) |
 | MacBook-Air | macOS | ✅ Complete | 2025-12-22 | 14 |
@@ -245,4 +245,8 @@ After all machines are collected:
 
 ---
 
-*Last updated: 2025-12-22*
+---
+
+### Last Updated
+
+2025-12-22

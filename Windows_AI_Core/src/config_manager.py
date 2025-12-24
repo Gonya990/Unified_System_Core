@@ -7,6 +7,11 @@ import os
 import base64
 from pathlib import Path
 from typing import Optional
+
+# Load .env file automatically
+from dotenv import load_dotenv
+load_dotenv()
+
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -16,7 +21,7 @@ class ConfigManager:
     """Manages bot configuration with persistence and encryption."""
     
     CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "/data/bot_config.json"))
-    SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN"}
+    SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN", "GEMINI_API_KEY", "OPENAI_API_KEY"}
     
     def __init__(self):
         self._config: dict = {}
@@ -39,9 +44,22 @@ class ConfigManager:
     
     def _load_config(self) -> None:
         """Load configuration from file or environment."""
-        # Start with environment variables
+        # Start with environment variables - load ALL provider configurations
         self._config = {
             "TELEGRAM_BOT_TOKEN": os.environ.get("TELEGRAM_BOT_TOKEN", ""),
+            # Provider selection
+            "INFERENCE_PROVIDER": os.environ.get("INFERENCE_PROVIDER", "ollama"),
+            # Ollama settings
+            "OLLAMA_BASE_URL": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            "OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.2"),
+            # OpenAI settings
+            "OPENAI_BASE_URL": os.environ.get("OPENAI_BASE_URL", "https://api.openai.com"),
+            "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
+            "OPENAI_MODEL": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            # Gemini settings
+            "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", ""),
+            "GEMINI_MODEL": os.environ.get("GEMINI_MODEL", "gemini-1.5-flash"),
+            # Legacy settings (backwards compatibility)
             "INFERENCE_BASE_URL": os.environ.get("INFERENCE_BASE_URL", "http://localhost:11434"),
             "INFERENCE_API_KEY": os.environ.get("INFERENCE_API_KEY", ""),
             "MODEL_NAME": os.environ.get("MODEL_NAME", "llama3.2"),

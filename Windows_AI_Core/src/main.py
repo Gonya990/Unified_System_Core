@@ -104,8 +104,16 @@ async def cmd_setapikey(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         return
     
     api_key = context.args[0]
+    provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
+    
+    # Set both provider-specific and generic key for compatibility
+    if provider == "gemini":
+        config.set("GEMINI_API_KEY", api_key)
+    elif provider == "openai":
+        config.set("OPENAI_API_KEY", api_key)
     config.set("INFERENCE_API_KEY", api_key)
-    logger.info("API key updated", extra={"user_id": update.effective_user.id})
+    
+    logger.info(f"API key updated for provider: {provider}", extra={"user_id": update.effective_user.id})
     
     # Try to delete the message containing the API key
     try:
@@ -113,7 +121,7 @@ async def cmd_setapikey(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     except Exception:
         pass
     
-    await update.message.reply_text("✅ API key has been set and encrypted.")
+    await update.message.reply_text(f"✅ API key has been set for {provider.upper()} and encrypted.")
 
 
 async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
