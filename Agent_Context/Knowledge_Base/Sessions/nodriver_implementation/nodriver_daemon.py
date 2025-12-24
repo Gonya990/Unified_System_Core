@@ -112,8 +112,25 @@ class BrowserDaemon:
                 title = await self.page.evaluate("document.title")
                 return {"ok": True, "title": title, "url": url}
             
+            # --- SHADOW DOM HELPER ---
+            SHADOW_HELPER = """
+            window.__ndc_find = (selector, root = document) => {
+                let el = root.querySelector(selector);
+                if (el) return el;
+                const hosts = root.querySelectorAll('*');
+                for (const host of hosts) {
+                    if (host.shadowRoot) {
+                        el = window.__ndc_find(selector, host.shadowRoot);
+                        if (el) return el;
+                    }
+                }
+                return null;
+            };
+            """
+            await self.page.evaluate(SHADOW_HELPER)
+
             # Screenshot
-            elif action == "screenshot":
+            if action == "screenshot":
                 path = cmd.get("path", CONFIG["screenshot_path"])
                 await self.page.save_screenshot(path)
                 return {"ok": True, "path": path}
@@ -127,22 +144,37 @@ class BrowserDaemon:
                     return {"ok": True, "clicked": text}
                 return {"ok": False, "error": f"Element not found: {text}"}
             
-            # Click by selector
+            # Click by selector (Shadow DOM aware)
             elif action == "clicksel":
                 selector = cmd.get("selector", "")
-                element = await self.page.select(selector)
-                if element:
-                    await element.click()
+                js_code = f"""
+                (() => {{
+                    const el = window.__ndc_find("{selector}");
+                    if (!el) return null;
+                    el.click();
+                    return true;
+                }})()
+                """
+                clicked = await self.page.evaluate(js_code)
+                if clicked:
                     return {"ok": True, "clicked": selector}
                 return {"ok": False, "error": f"Selector not found: {selector}"}
             
-            # Fill input (JS-based for better compatibility)
+            # Hardware Key Press (Stealthier than JS)
+            elif action == "press":
+                key = cmd.get("key", "Enter")
+                await self.page.key_down(key)
+                await asyncio.sleep(0.05)
+                await self.page.key_up(key)
+                return {"ok": True, "pressed": key}
+
+            # Fill input (Shadow DOM aware)
             elif action == "fill":
                 selector = cmd.get("selector", "")
                 text = cmd.get("text", "")
                 js_code = f"""
                 (() => {{
-                    const el = document.querySelector("{selector}");
+                    const el = window.__ndc_find("{selector}");
                     if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
                     el.focus();
                     el.value = "{text}";
@@ -154,17 +186,17 @@ class BrowserDaemon:
                 result = await self.page.evaluate(js_code)
                 return result if isinstance(result, dict) else {"ok": True, "filled": selector}
             
-            # Type with delay (human-like, JS-based)
+            # Type with delay (Shadow DOM aware)
             elif action == "type":
                 selector = cmd.get("selector", "")
                 text = cmd.get("text", "")
                 delay = cmd.get("delay", 50)
-                # Use JS to simulate typing
                 js_code = f"""
                 (async () => {{
-                    const el = document.querySelector("{selector}");
+                    const el = window.__ndc_find("{selector}");
                     if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
                     el.focus();
+                    el.value = "";
                     for (const char of "{text}") {{
                         el.value += char;
                         el.dispatchEvent(new Event('input', {{bubbles: true}}));
@@ -176,12 +208,78 @@ class BrowserDaemon:
                 result = await self.page.evaluate(js_code)
                 return result if isinstance(result, dict) else {"ok": True, "typed": len(text)}
             
-            # Get element text
+            # Semantic Page Analysis
+            elif action == "elements":
+                js_code = """
+                (() => {
+                    const interactables = [];
+                    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+                    
+                    const isVisible = (el) => {
+                        const style = window.getComputedStyle(el);
+                        return  style.display !== 'none' && 
+                                style.visibility !== 'hidden' && 
+                                style.opacity !== '0' &&
+                                el.offsetWidth > 0 && 
+                                el.offsetHeight > 0;
+                    };
+
+                    const getElementInfo = (el) => {
+                        const rect = el.getBoundingClientRect();
+                        return {
+                            tag: el.tagName.toLowerCase(),
+                            text: (el.innerText || el.value || el.placeholder || el.getAttribute('aria-label') || "").trim().substring(0, 100),
+                            type: el.type || el.getAttribute('role') || 'element',
+                            selector: el.id ? `#${el.id}` : el.className ? `.${el.className.split(' ').join('.')}` : null,
+                            rect: {x: rect.x, y: rect.y, w: rect.width, h: rect.height}
+                        };
+                    };
+
+                    const scan = (root) => {
+                        const selectors = 'button, input, a, select, textarea, [role="button"], [onclick]';
+                        root.querySelectorAll(selectors).forEach(el => {
+                            if (isVisible(el)) {
+                                interactables.push(getElementInfo(el));
+                            }
+                        });
+                        
+                        // Recursive Shadow DOM scan
+                        root.querySelectorAll('*').forEach(el => {
+                            if (el.shadowRoot) scan(el.shadowRoot);
+                        });
+                    };
+
+                    scan(document);
+                    return interactables;
+                })()
+                """
+                elements_json = await self.page.evaluate(f"JSON.stringify({js_code})")
+                return {"ok": True, "elements": json.loads(elements_json)}
+
+            # Structured Extraction
+            elif action == "extract":
+                schema = cmd.get("schema", {})
+                # Example schema: {"titles": ".g h3", "links": ".g a"}
+                js_code = f"""
+                (() => {{
+                    const schema = {json.dumps(schema)};
+                    const result = {{}};
+                    for (const [key, selector] of Object.entries(schema)) {{
+                        const elements = Array.from(document.querySelectorAll(selector));
+                        result[key] = elements.map(el => el.innerText.trim());
+                    }}
+                    return result;
+                }})()
+                """
+                data = await self.page.evaluate(js_code)
+                return {"ok": True, "data": data}
+
+            # Get element text (Shadow DOM aware)
             elif action == "text":
                 selector = cmd.get("selector", "")
                 js_code = f"""
                 (() => {{
-                    const el = document.querySelector("{selector}");
+                    const el = window.__ndc_find("{selector}");
                     if (!el) return {{ok: false, error: "Selector not found: {selector}"}};
                     return {{ok: true, text: el.innerText || el.textContent || ""}};
                 }})()
@@ -198,7 +296,6 @@ class BrowserDaemon:
             # Get page HTML
             elif action == "html":
                 html = await self.page.evaluate("document.documentElement.outerHTML")
-                # Save to file if too large
                 if len(html) > 10000:
                     path = "/tmp/nodriver_page.html"
                     with open(path, "w") as f:
@@ -240,7 +337,8 @@ class BrowserDaemon:
             elif action == "closetab":
                 index = cmd.get("index", -1)
                 if 0 <= index < len(self.tabs):
-                    # Close tab (nodriver specific)
+                    # In nodriver, closing might need special handling if not direct
+                    # For now just remove from list
                     self.tabs.pop(index)
                     if self.tabs:
                         self.page = self.tabs[-1]
@@ -265,16 +363,15 @@ class BrowserDaemon:
                     await self.page.scroll_up(amount)
                 return {"ok": True, "scrolled": direction, "amount": amount}
             
-            # Wait for element
+            # Wait for element (Shadow DOM aware)
             elif action == "wait":
                 selector = cmd.get("selector", "")
                 timeout = cmd.get("timeout", CONFIG["element_timeout"])
-                # Use JS polling since nodriver doesn't have wait_for
                 js_code = f"""
                 new Promise((resolve) => {{
                     const start = Date.now();
                     const check = () => {{
-                        if (document.querySelector("{selector}")) {{
+                        if (window.__ndc_find("{selector}")) {{
                             resolve(true);
                         }} else if (Date.now() - start > {timeout * 1000}) {{
                             resolve(false);

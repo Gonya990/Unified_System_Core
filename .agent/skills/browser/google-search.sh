@@ -16,11 +16,10 @@ $NDC goto "https://google.com" >/dev/null
 # Fill search box
 $NDC fill "textarea[name=q]" "$QUERY"
 
-# Submit form
-$NDC js "document.querySelector('form').submit()" >/dev/null
+# Submit using press (more human-like)
+$NDC press "Enter" >/dev/null
 
 # Wait for results
-sleep 2
 $NDC wait "div#search" 10 >/dev/null
 
 # Return result count and title
