@@ -1,0 +1,28 @@
+# Virtual environment
+.venv/
+venv/
+
+# UV lock file (can be committed for reproducibility)
+# uv.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Screenshots (temporary)
+*.png
+
+# Logs
+*.log
