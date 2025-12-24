@@ -11,8 +11,9 @@
 
 - [x] Исследование: Web research для SVM, Above 4G, Re-size BAR <!-- id: 205 -->
 - [x] Документация: Создан BIOS_CONFIGURATION_GUIDE.md <!-- id: 206 -->
+- [x] Аудит оборудования: ASUS ROG STRIX X370-F GAMING, BIOS 5220, CPU Ryzen 5 3600X <!-- id: 207 -->
 - [/] Выполнение: Настройка через PiKVM <!-- id: 201 --> <!-- CURRENT FOCUS -->
-  - [ ] **BIOS Update:** Flash latest available version <!-- id: 201a -->
+  - [ ] **BIOS Update:** Flash version 6203 (Stable) <!-- id: 201a -->
   - [ ] **SVM Mode (CPU Features):** Enable (Advanced -> CPU -> SVM/AMD-V) <!-- id: 202 -->
   - [ ] **Above 4G Decoding:** Enable (Advanced -> PCI/Chipset) <!-- id: 203 -->
   - [ ] **Re-size BAR:** Auto/Enabled (REQUIRES CSM DISABLED) <!-- id: 203a -->

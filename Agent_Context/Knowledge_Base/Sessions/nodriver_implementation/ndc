@@ -78,6 +78,7 @@ INTERACTION:
   ndc clicksel "selector"   Click element by CSS selector  
   ndc fill "selector" "text" Fill input field
   ndc type "selector" "text" Type with delay (human-like)
+  ndc press KEY             Press keyboard key (e.g. Enter, Escape)
   ndc scroll down|up [px]   Scroll page (default 500px)
 
 CONTENT:
@@ -85,6 +86,8 @@ CONTENT:
   ndc text "selector"       Get element text
   ndc html                  Get page HTML
   ndc js "code"             Execute JavaScript
+  ndc extract SCHEMA        Extract data (SCHEMA is JSON string)
+  ndc elements              Get list of interactable elements
 
 TABS:
   ndc tabs                  List all tabs
@@ -103,6 +106,8 @@ EXAMPLES:
   ndc goto "https://web.telegram.org"
   ndc click "Saved Messages"
   ndc fill "div.input-message" "Hello World"
+  ndc press Enter
+  ndc extract '{"titles": "h3"}'
   ndc screenshot
   ndc js "document.querySelectorAll('a').length"
 """
@@ -160,6 +165,24 @@ def main():
         if len(sys.argv) > 4:
             cmd["delay"] = int(sys.argv[4])
     
+    # Press command
+    elif action == "press":
+        if len(sys.argv) < 3:
+            print('{"ok":false,"error":"Usage: ndc press KEY"}')
+            sys.exit(1)
+        cmd["key"] = sys.argv[2]
+
+    # Extract command
+    elif action == "extract":
+        if len(sys.argv) < 3:
+            print('{"ok":false,"error":"Usage: ndc extract \'{\\"key\\": \\"selector\\"}\'"}')
+            sys.exit(1)
+        try:
+            cmd["schema"] = json.loads(sys.argv[2])
+        except json.JSONDecodeError:
+            print('{"ok":false,"error":"Invalid JSON schema for extract"}')
+            sys.exit(1)
+
     # JavaScript
     elif action == "js":
         if len(sys.argv) < 3:

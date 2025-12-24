@@ -137,6 +137,7 @@ Each conversation folder may contain:
 - **📬 96 items** in `90_Inbox_ToSort/NEEDS_REVIEW` need attention
 - **PRJ-006_OpenCode** is paused, needs restart decision
 - **Google Cloud credentials** pending (credentials.json not yet obtained)
+- **BIOS Update (Proxmox):** Target 6203 (Stable) for ROG STRIX X370-F GAMING. Current 5220. USB at `/Volumes/Ventoy` (ExFAT).
 
 ---
 
@@ -322,6 +323,7 @@ For the next session, ensure:
 - [ ] Review any pending tasks in `90_Inbox_ToSort/`
 - [ ] Check for Proxmox upgrade completion status
 - [ ] Verify Tailscale connectivity
+- [ ] **BIOS Update:** Download version 6203. Put on `/Volumes/Ventoy`. Alert: ASUS EZ Flash 3 may require FAT32.
 
 ---
 
