@@ -104,7 +104,7 @@ A set of integration patterns to connect OpenAI/LLM capabilities with local tool
 - Emphasize separation of concerns: interface vs. implementation, control-plane vs. execution-plane
 - Favor incremental, testable building blocks over monolith behavior
 
-### DevOps & Infrastructure
+### DevOps & Infrastructure Experience
 
 - Operate and evolve home lab infrastructure (Proxmox, PiKVM) as a practical testbed
 - Ensure deployments are reproducible and recoverable (documented procedures, controlled changes)
