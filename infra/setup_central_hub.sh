@@ -28,6 +28,7 @@ echo "🔧 Cleaning and patching Dockerfile..."
 if grep -q "AS base" Dockerfile && grep -q "AS build" Dockerfile; then
     sed -i '1,45d' Dockerfile
 fi
+sed -i 's/useradd -m -u 1000 appuser/useradd -m -u 1000 appuser \&\& mkdir -p \/opt\/mcp-agent-mail\/data\/mailbox/g' Dockerfile
 sed -i 's/python:3.14/python:3.12/g' Dockerfile
 sed -i 's/uv sync --frozen --no-editable/uv sync --no-editable --extra postgres/g' Dockerfile
 sed -i 's/>=3.14/>=3.12/g' pyproject.toml
