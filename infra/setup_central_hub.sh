@@ -39,32 +39,21 @@ echo "📝 Writing docker-compose.yml..."
 cat > docker-compose.yml <<EOF
 version: '3.8'
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: agent_mail
-      POSTGRES_USER: agent
-      POSTGRES_PASSWORD: agent_pass
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
   server:
     build: .
     command: ["python", "-m", "mcp_agent_mail.cli", "serve-http", "--host", "0.0.0.0", "--port", "8765"]
     ports:
       - "8765:8765"
     environment:
-      DATABASE_URL: postgresql+asyncpg://agent:agent_pass@db:5432/agent_mail
+      # Use SQLite for better compatibility with asyncio loops in this environment
+      DATABASE_URL: sqlite+aiosqlite:////data/mailbox/agent_mail.db
       STORAGE_ROOT: /data/mailbox
       HTTP_HOST: 0.0.0.0
       HTTP_BEARER_TOKEN: ${AUTH_TOKEN}
     volumes:
       - mailbox_data:/data/mailbox
-    depends_on:
-      - db
     restart: unless-stopped
 volumes:
-  pgdata:
   mailbox_data:
 EOF
 
