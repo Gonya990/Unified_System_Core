@@ -7,7 +7,7 @@
 ## 🚀 Quick Navigation
 
 | 📂 Section | 🔗 Link | 📝 Description |
-|------------|---------|----------------|
+| --- | --- | --- |
 | **🧠 Knowledge Base** | [Agent_Context/Knowledge_Base/](Agent_Context/Knowledge_Base/) | Centralized AI context, sessions, and scripts |
 | **💻 Windows AI Core** | [Windows_AI_Core/](Windows_AI_Core/) | Telegram Bot + Ollama inference code |
 | **⚙️ Scripts** | [Scripts/](Scripts/) | Deployment, automation, expect scripts |
@@ -30,7 +30,7 @@ graph LR
 ```
 
 | Node | IP (Tailscale) | Role |
-|------|----------------|------|
+| --- | --- | --- |
 | **igor-gaming-1** | `100.88.65.71` | Primary AI workstation (WSL2) |
 | **igor-gaming** | `100.127.194.111` | Windows AI Core (GPU inference) |
 | **MacBook-Air** | `100.93.121.47` | Admin & development |
@@ -41,7 +41,7 @@ graph LR
 
 ## 📁 Repository Structure
 
-```
+```text
 Unified_System_Core/
 ├── Agent_Context/
 │   ├── Knowledge_Base/          # 🧠 Central knowledge store

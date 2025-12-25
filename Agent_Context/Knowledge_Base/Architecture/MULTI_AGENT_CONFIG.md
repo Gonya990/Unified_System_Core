@@ -1,6 +1,6 @@
 # 💍 Multi-Agent Orchestration: Antigravity & Kostya-Agent
 
-# 💍 Мульти-агентная оркестрация: Antigravity и Kostya-Agent
+## 💍 Мульти-агентная оркестрация: Antigravity и Kostya-Agent
 
 > **Concept:** Federated Swarm Coordination for Unified System.  
 > **Концепция:** Федеративное взаимодействие роя в рамках Unified System.
@@ -12,11 +12,17 @@
 - **Private Mesh:** Both agents communicate via **Tailscale**.
   - Antigravity IP: `100.93.121.47`
   - Kostya-Agent IP: [To be confirmed]
-- **Protocol:** REST API or MQTT. Agents provide endpoints for `/status`, `/task/delegate`, and `/resource/gpu`.
+- **Protocol:** **MCP Agent Mail** (HTTP/SSE via Private Mesh).
+  - Port: `8765`
+  - Endpoint: `/mcp/`
+  - Features: Multi-agent inbox, file leases, searchable threads.
 - **Private Mesh:** Оба агента общаются через **Tailscale**.
   - IP Antigravity: `100.93.121.47`
   - Kostya-Agent IP: [Уточняется]
-- **Протокол:** REST API или MQTT. Агенты предоставляют эндпоинты для `/status`, `/task/delegate` и `/resource/gpu`.
+- **Протокол:** **MCP Agent Mail** (HTTP/SSE через Private Mesh).
+  - Порт: `8765`
+  - Эндпоинт: `/mcp/`
+  - Функции: Инбоксы для агентов, аренда файлов (leases), поиск по веткам обсуждений.
 
 ---
 
@@ -33,16 +39,39 @@
 
 ## 3. 🤝 Collaborative Logic / Логика взаимодействия
 
-- **Resource Load Balancing:** If my Windows GPU (Ollama) is busy, I can request inference from Kostya’s Windows AI host.
-- **Unified Task Board:** A shared `TODO.yaml` where agents can pick up sub-tasks without human intervention.
-- **Sync Mechanism:** One agent acts as "Primary" for a specific project, while the other acts as "Assistant/Verifier".
-- **Балансировка нагрузки:** Если мой Windows GPU (Ollama) занят, я могу запросить инференс у хоста Кости.
-- **Общая доска задач:** Общий `TODO.yaml`, где агенты могут брать подзадачи без вмешательства человека.
-- **Синхронизация:** Один агент выступает как «Основной» в проекте, а другой — как «Ассистент/Проверяющий».
+- **Inter-Agent Communication (ACP/MCP):**
+  - Standard: **Agent Communication Protocol (ACP)** principles for messaging.
+  - Implementation: **MCP Agent Mail** (HTTP/SSE via Private Mesh).
+  - Features: Multi-agent inbox, file leases, searchable threads.
+- **Unified Task Board:** **Beads (.beads/)**.
+  - Tooling: `bd` (CLI) and `bv` (TUI/Robot).
+  - Workflow: Agents track dependencies and pick tasks.
+- **Sync Mechanism:** One agent acts as "Primary", another as "Verifier" using **Agent Mail threads**.
+- **Меж-агентное общение (ACP/MCP):**
+  - Стандарт: Принципы **Agent Communication Protocol (ACP)** для обмена сообщениями.
+  - Реализация: **MCP Agent Mail** (HTTP/SSE через Private Mesh).
+  - Функции: Инбоксы для агентов, аренда файлов (leases), поиск по веткам обсуждений.
+- **Общая доска задач:** **Beads (.beads/)**.
+  - Инструменты: `bd` (CLI) и `bv` (TUI/Robot).
+  - Рабочий процесс: Агенты отслеживают зависимости и выбирают задачи.
+- **Синхронизация:** Один агент выступает как «Основной», другой — как «Проверяющий», используя **ветки обсуждений в Agent Mail**.
 
 ---
 
-## 4. ⏭️ Immediate Next Steps / Следующие шаги
+## 4. 🚀 Centralized Coordination / Централизованная координация
+
+- **Single Hub Hosting:** All core agent messaging (`mcp_agent_mail`) and shared task status (`beads`) MUST be hosted on the **Service Node** (`100.88.65.71`) to act as the single source of truth.
+- **Unified Messaging:**
+  - Antigravity and Kostya-Agent use the same server to send and receive messages.
+  - Asynchronous coordination ensures tasks are never lost even if one agent node is offline.
+- **Централизованный хаб:** Весь основной обмен сообщениями (`mcp_agent_mail`) и общий статус задач (`beads`) ДОЛЖНЫ быть размещены на **Service Node** (`100.88.65.71`), который выступает единым источником истины.
+- **Единая система сообщений:**
+  - Antigravity и Kostya-Agent используют один и тот же сервер для отправки и получения сообщений.
+  - Асинхронная координация гарантирует, что задачи никогда не будут потеряны, даже если один из узлов агента находится в автономном режиме.
+
+---
+
+## 5. ⏭️ Immediate Next Steps / Следующие шаги
 
 1. Define the shared IP for Kostya's agent. (Определить общий IP агента Кости).
 2. Create the `Shared/` directory in the Knowledge Base. (Создать директорию `Shared/` в базе знаний).

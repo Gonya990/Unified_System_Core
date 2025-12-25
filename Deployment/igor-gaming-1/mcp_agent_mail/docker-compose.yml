@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: agent_mail
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-agent_pass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  server:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      DATABASE_URL: postgres+asyncpg://agent:${DATABASE_PASSWORD:-agent_pass}@db:5432/agent_mail
+      STORAGE_ROOT: /data/mailbox
+      HTTP_HOST: 0.0.0.0
+      HTTP_BEARER_TOKEN: ${AUTH_TOKEN:-antigravity_secret}
+    volumes:
+      - mailbox_data:/data/mailbox
+    depends_on:
+      - db
+volumes:
+  pgdata:
+  mailbox_data:
