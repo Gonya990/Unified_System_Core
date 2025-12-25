@@ -11,7 +11,7 @@
 Based on GitHub search by stars (sorted descending), here are the top 3 agentic workflow frameworks:
 
 | Rank | Repository | Stars | Language | Last Updated |
-|------|-----------|-------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 1 | [LangChain](https://github.com/langchain-ai/langchain) | **123k** ⭐ | Python | Hours ago |
 | 2 | [Microsoft AutoGen](https://github.com/microsoft/autogen) | **52.8k** ⭐ | Python | Hours ago |
 | 3 | [CrewAI](https://github.com/crewAIInc/crewAI) | **41.7k** ⭐ | Python | Hours ago |
@@ -36,7 +36,7 @@ Based on GitHub search by stars (sorted descending), here are the top 3 agentic 
 
 **Architecture:**
 
-```
+```text
 Agent → Tools → Memory → Chains → LLMs
            ↓
      LangGraph (for complex workflows)
@@ -74,7 +74,7 @@ Agent → Tools → Memory → Chains → LLMs
 
 **Architecture:**
 
-```
+```text
 AssistantAgent ←→ UserProxyAgent ←→ Human
        ↓
    ConversableAgent (base)
@@ -112,7 +112,7 @@ AssistantAgent ←→ UserProxyAgent ←→ Human
 
 **Architecture:**
 
-```
+```text
 Agent (role, goal, backstory)
    ↓
 Task (description, expected_output)
@@ -152,7 +152,7 @@ Based on your current architecture (from EXECUTIVE_SUMMARY):
 ### Recommendation: **CrewAI + LangGraph Hybrid**
 
 | Framework | Fit Score | Reasoning |
-|-----------|-----------|-----------|
+| --- | --- | --- |
 | **CrewAI** | ⭐⭐⭐⭐⭐ | Best match for multi-agent coordination, lightweight, no lock-in |
 | **LangGraph** | ⭐⭐⭐⭐ | Excellent for complex stateful workflows, state persistence |
 | **AutoGen** | ⭐⭐⭐ | Good for conversational agents but heavier, API transition |
