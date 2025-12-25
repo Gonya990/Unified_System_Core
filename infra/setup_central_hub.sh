@@ -21,7 +21,11 @@ fi
 
 cd "$HUB_DIR"
 
-# 2. Create optimized docker-compose.yml
+# 2. Patch Dockerfile for Postgres support
+echo "🔧 Patching Dockerfile for Postgres..."
+sed -i 's/uv sync --frozen --no-editable/uv sync --frozen --no-editable --extra postgres/g' Dockerfile
+
+# 3. Create optimized docker-compose.yml
 echo "📝 Writing docker-compose.yml..."
 cat > docker-compose.yml <<EOF
 version: '3.8'
