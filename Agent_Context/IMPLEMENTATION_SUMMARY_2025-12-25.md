@@ -98,11 +98,7 @@ After completion:
 
 ---
 
-## ✅ Task 2: Windows Archive Analyzer
-
-## ✅ Task 2: Windows Archive Analyzer
-
-## ✅ Задача 2: Анализатор архивов Windows
+## ✅ Task 2: Windows Archive Analyzer | Анализатор архивов Windows
 
 ### Implementation Details | Детали реализации
 
@@ -136,9 +132,9 @@ After completion:
    - Execute via SSH/Tailscale
    - Or run locally on Windows
 
-### Files Created | Созданные файлы
+### Archive Analyzer Files | Файлы анализатора архивов
 
-```
+```text
 Scripts/windows_archive_analyzer/
 ├── README.md                      # Full documentation
 ├── config.json                    # Configuration ⚙️
@@ -150,7 +146,7 @@ Scripts/windows_archive_analyzer/
 └── windows-archive-cleanup.md    # Workflow guide
 ```
 
-### How to Use | Как использовать
+### Windows Archive Usage | Использование анализатора архивов
 
 **Deploy to Windows PC | Развертывание на Windows PC:**
 
@@ -182,7 +178,7 @@ Get-Content reports\scan_*.json
 
 **Or via workflow | Или через рабочий процесс:**
 
-```
+```text
 /windows-archive-cleanup
 ```
 
@@ -207,19 +203,19 @@ Edit `config.json`:
 
 ### Expected Results | Ожидаемые результаты
 
-**Phase 1: Scan**
+#### Phase 1: Scan
 
 - Time: 10-30 minutes
 - Output: Complete catalog of archives
 - Report: Total count, size, locations
 
-**Phase 2: Analysis (manual review)**
+#### Phase 2: Analysis (manual review)
 
 - Review: Top largest archives
 - Identify: Duplicates, old files, junk
 - Categorize: Keep/Review/Delete
 
-**Phase 3: Cleanup**
+#### Phase 3: Cleanup
 
 - Preview: See what would be deleted
 - Execute: Remove approved items
@@ -244,7 +240,7 @@ Edit `config.json`:
 
 3. **Use Workflows | Использование рабочих процессов**
 
-   ```
+   ```text
    /openai-export
    /windows-archive-cleanup
    ```
