@@ -1,0 +1,102 @@
+{
+    "scan_settings": {
+        "drives": [
+            "G:",
+            "D:",
+            "F:",
+            "H:"
+        ],
+        "recursive": true,
+        "min_size_mb": 10,
+        "max_depth": 10,
+        "follow_symlinks": false
+    },
+    "file_types": {
+        "keep_always": [
+            ".doc",
+            ".docx",
+            ".pdf",
+            ".txt",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".raw",
+            ".mp4",
+            ".mov",
+            ".avi",
+            ".py",
+            ".js",
+            ".java",
+            ".cpp",
+            ".h",
+            ".zip",
+            ".7z",
+            ".rar",
+            ".psd",
+            ".ai",
+            ".sketch"
+        ],
+        "review_needed": [
+            ".tmp",
+            ".bak",
+            ".old",
+            ".log",
+            ".cache"
+        ],
+        "can_delete": [
+            ".temp",
+            ".~lock",
+            ".DS_Store",
+            "Thumbs.db"
+        ]
+    },
+    "exclusion_patterns": {
+        "folders": [
+            "**/node_modules/**",
+            "**/.git/**",
+            "**/Windows/**",
+            "**/Program Files/**",
+            "**/System Volume Information/**"
+        ],
+        "files": [
+            "backup_important_*",
+            "keep_*",
+            "*_donotdelete*"
+        ]
+    },
+    "age_thresholds": {
+        "recent_days": 180,
+        "old_days": 730,
+        "delete_if_duplicate_days": 365
+    },
+    "analysis": {
+        "check_duplicates": true,
+        "hash_algorithm": "sha256",
+        "detect_nested_archives": true,
+        "categorize_by_content": true,
+        "estimate_compression_benefit": true
+    },
+    "cleanup": {
+        "dry_run_by_default": true,
+        "require_confirmation": true,
+        "create_backup_metadata": true,
+        "backup_location": "./backups",
+        "max_delete_per_run_gb": 50,
+        "preserve_structure": false
+    },
+    "reporting": {
+        "output_format": "html",
+        "include_thumbnews": false,
+        "generate_statistics": true,
+        "save_file_list": true,
+        "output_directory": "./reports"
+    },
+    "windows_pc": {
+        "hostname": "windows-pc",
+        "username": "user",
+        "ssh_enabled": false,
+        "tailscale_ip": "",
+        "remote_script_path": "C:\\Users\\user\\archive_analyzer"
+    }
+}
