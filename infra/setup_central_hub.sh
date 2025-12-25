@@ -37,13 +37,14 @@ services:
     restart: unless-stopped
   server:
     build: .
+    command: ["python", "-m", "mcp_agent_mail.cli", "serve-http", "--host", "0.0.0.0", "--port", "8765"]
     ports:
       - "8765:8765"
     environment:
       DATABASE_URL: postgres+asyncpg://agent:agent_pass@db:5432/agent_mail
       STORAGE_ROOT: /data/mailbox
       HTTP_HOST: 0.0.0.0
-      HTTP_BEARER_TOKEN: \${AUTH_TOKEN}
+      HTTP_BEARER_TOKEN: ${AUTH_TOKEN}
     volumes:
       - mailbox_data:/data/mailbox
     depends_on:
