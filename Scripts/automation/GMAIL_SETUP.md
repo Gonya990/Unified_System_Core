@@ -1,6 +1,6 @@
 # Gmail Automation Agent Setup Guide
 
-# Руководство по настройке агента автоматизации Gmail
+## Руководство по настройке агента автоматизации Gmail
 
 ## Overview | Обзор
 
