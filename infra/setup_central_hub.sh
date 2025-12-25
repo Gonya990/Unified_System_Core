@@ -45,13 +45,13 @@ services:
     ports:
       - "8765:8765"
     environment:
-      # Use SQLite for better compatibility with asyncio loops in this environment
-      DATABASE_URL: sqlite+aiosqlite:////data/mailbox/agent_mail.db
-      STORAGE_ROOT: /data/mailbox
+      # Use internal data dir for correct permissions
+      DATABASE_URL: sqlite+aiosqlite:////opt/mcp-agent-mail/data/agent_mail.db
+      STORAGE_ROOT: /opt/mcp-agent-mail/data/mailbox
       HTTP_HOST: 0.0.0.0
       HTTP_BEARER_TOKEN: ${AUTH_TOKEN}
     volumes:
-      - mailbox_data:/data/mailbox
+      - mailbox_data:/opt/mcp-agent-mail/data
     restart: unless-stopped
 volumes:
   mailbox_data:
