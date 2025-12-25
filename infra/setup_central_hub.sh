@@ -28,7 +28,7 @@ if grep -q "AS base" Dockerfile && grep -q "AS build" Dockerfile; then
     sed -i '1,45d' Dockerfile
 fi
 sed -i 's/python:3.14/python:3.12/g' Dockerfile
-sed -i 's/uv sync --frozen --no-editable/uv sync --frozen --no-editable --extra postgres/g' Dockerfile
+sed -i 's/uv sync --frozen --no-editable/uv sync --no-editable --extra postgres/g' Dockerfile
 sed -i 's/>=3.14/>=3.12/g' pyproject.toml
 sed -i 's/py314/py312/g' pyproject.toml
 sed -i 's/"3.14"/"3.12"/g' pyproject.toml
