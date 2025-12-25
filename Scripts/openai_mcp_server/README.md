@@ -200,7 +200,7 @@ mcp.openai.sync_preferences_to_antigravity()
 | Bi-directional sync | ❌ No         | ✅ Yes          |
 | Auto-updates        | ❌ No         | ✅ Yes          |
 | Shared context      | ❌ No         | ✅ Yes          |
-| API limits | N/A | Check quotas |
+| API limits          | N/A           | Check quotas    |
 
 ## Security | Безопасность
 
