@@ -24,7 +24,7 @@ Instead of manually exporting ChatGPT data, this MCP server provides:
 
 ## Architecture | Архитектура
 
-```
+```text
 ┌─────────────────┐         MCP Protocol         ┌──────────────────┐
 │                 │◄───────────────────────────────│                  │
 │  Antigravity    │                                │  OpenAI MCP      │
@@ -194,12 +194,12 @@ mcp.openai.sync_preferences_to_antigravity()
 
 ### Benefits Over Manual Export | Преимущества перед ручным экспортом
 
-| Feature | Manual Export | MCP Integration |
-|---------|--------------|-----------------|
-| Real-time access | ❌ No | ✅ Yes |
-| Bi-directional sync | ❌ No | ✅ Yes |
-| Auto-updates | ❌ No | ✅ Yes |
-| Shared context | ❌ No | ✅ Yes |
+| Feature             | Manual Export | MCP Integration |
+| ------------------- | ------------- | --------------- |
+| Real-time access    | ❌ No         | ✅ Yes          |
+| Bi-directional sync | ❌ No         | ✅ Yes          |
+| Auto-updates        | ❌ No         | ✅ Yes          |
+| Shared context      | ❌ No         | ✅ Yes          |
 | API limits | N/A | Check quotas |
 
 ## Security | Безопасность
