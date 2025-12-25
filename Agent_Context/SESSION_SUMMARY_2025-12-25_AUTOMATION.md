@@ -1,6 +1,6 @@
 # Session Summary - Complete Automation System
 
-# Сводка сессии - Полная система автоматизации
+## Сводка сессии - Полная система автоматизации
 
 **Date:** 2025-12-25  
 **Agent:** Antigravity (Gemini)  
