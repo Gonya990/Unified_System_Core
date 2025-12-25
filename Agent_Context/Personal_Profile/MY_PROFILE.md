@@ -19,7 +19,7 @@
 ## 🌐 Contact & Links | Контакты
 
 - **GitHub:** [@Gonya990](https://github.com/Gonya990)
-- **Email:** <gar.yk227@yandex.ru>
+- **Email:** <garyk927@yandex.ru>
 - **LinkedIn:** [Profile](https://linkedin.com/in/igor-goncharenko)
 - **Languages:** English, Russian, Hebrew (Английский, Русский, עברית)
 
