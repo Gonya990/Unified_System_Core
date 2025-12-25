@@ -71,8 +71,25 @@
 
 ---
 
-## 5. ⏭️ Immediate Next Steps / Следующие шаги
+## 5. 📚 Onboarding & Registration
 
-1. Define the shared IP for Kostya's agent. (Определить общий IP агента Кости).
-2. Create the `Shared/` directory in the Knowledge Base. (Создать директорию `Shared/` в базе знаний).
-3. Implement a basic health-check script that "pings" the other agent's status. (Написать скрипт проверки связи, который «пингует» статус другого агента).
+**New agents:** See `Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md` for full integration guide.
+
+**Agent Registry:** `Agent_Context/agents/REGISTRY.md`
+
+**Agent Profiles:** `Agent_Context/agents/<agent-id>/STATUS.md`
+
+---
+
+## 6. ✅ Completed Setup / Выполненные шаги
+
+- [x] Create `Shared/` directory in Knowledge Base
+- [x] Create agent registry (`Agent_Context/agents/REGISTRY.md`)
+- [x] Create agent profiles (rocinante, gonya)
+- [x] Create onboarding documentation
+
+## 7. ⏭️ Remaining Steps / Оставшиеся шаги
+
+1. Confirm Tailscale IPs for all agents
+2. Deploy MCP Agent Mail server (if not running)
+3. Test cross-agent messaging

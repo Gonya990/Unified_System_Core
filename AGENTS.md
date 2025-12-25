@@ -2,6 +2,10 @@
 
 > Guidelines for AI agents working within the Unified System.
 
+**New agent?** Start with [`AGENT_ONBOARDING.md`](Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md) for integration guide.
+
+**Agent Registry:** [`Agent_Context/agents/REGISTRY.md`](Agent_Context/agents/REGISTRY.md)
+
 ---
 
 ## 1. Git Workflow
