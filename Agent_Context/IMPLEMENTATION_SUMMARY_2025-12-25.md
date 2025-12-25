@@ -43,7 +43,7 @@
 
 ### Files Created | Созданные файлы
 
-```
+```text
 Scripts/openai_data_integration/
 ├── README.md                      # Full documentation
 ├── SETUP_COMPLETE.md              # Setup summary
@@ -73,7 +73,7 @@ cd /Users/macbook/Documents/Unified_System/Scripts/openai_data_integration
 
 **Or via workflow | Или через рабочий процесс:**
 
-```
+```text
 /openai-export
 ```
 
@@ -100,15 +100,17 @@ After completion:
 
 ## ✅ Task 2: Windows Archive Analyzer
 
+## ✅ Task 2: Windows Archive Analyzer
+
 ## ✅ Задача 2: Анализатор архивов Windows
 
-### What Was Implemented | Что было реализовано
+### Implementation Details | Детали реализации
 
 **English:** PowerShell-based system to scan Windows PC drives (G/D/F/H) for large ZIP archives, analyze content, categorize by usefulness, and safely delete unnecessary files.
 
 **Russian:** Система на основе PowerShell для сканирования дисков Windows PC (G/D/F/H) на наличие больших ZIP архивов, анализа содержимого, категоризации по полезности и безопасного удаления ненужных файлов.
 
-### Key Features | Ключевые возможности
+### Main Features | Основные возможности
 
 1. **Multi-Drive Scanning | Сканирование нескольких дисков**
    - Scans G:, D:, F:, H: drives
