@@ -29,3 +29,6 @@ $RECYCLE.BIN/
 
 # bv (beads viewer) local config and caches
 .bv/
+
+# Agent identity (local to each runtime)
+.agent-identity
