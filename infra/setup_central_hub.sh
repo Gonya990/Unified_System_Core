@@ -51,6 +51,8 @@ services:
       STORAGE_ROOT: /opt/mcp-agent-mail/data/mailbox
       HTTP_HOST: 0.0.0.0
       HTTP_BEARER_TOKEN: ${AUTH_TOKEN}
+      HTTP_RATE_LIMIT_ENABLED: "false"
+      HTTP_RBAC_ENABLED: "false"
     volumes:
       - mailbox_data:/opt/mcp-agent-mail/data
     restart: unless-stopped
