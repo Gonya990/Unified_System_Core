@@ -41,7 +41,7 @@ services:
     ports:
       - "8765:8765"
     environment:
-      DATABASE_URL: postgres+asyncpg://agent:agent_pass@db:5432/agent_mail
+      DATABASE_URL: postgresql+asyncpg://agent:agent_pass@db:5432/agent_mail
       STORAGE_ROOT: /data/mailbox
       HTTP_HOST: 0.0.0.0
       HTTP_BEARER_TOKEN: ${AUTH_TOKEN}
