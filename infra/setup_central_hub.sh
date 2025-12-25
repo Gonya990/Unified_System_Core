@@ -20,6 +20,7 @@ else
 fi
 
 cd "$HUB_DIR"
+rm -f compose.yaml # Ensure our docker-compose.yml is used
 
 # 2. Patch Dockerfile for stability and Postgres support
 echo "🔧 Cleaning and patching Dockerfile..."
