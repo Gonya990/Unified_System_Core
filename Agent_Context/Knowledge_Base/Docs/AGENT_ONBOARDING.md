@@ -25,12 +25,29 @@ Each agent:
 
 ## 2. Your Identity
 
-### Required Configuration
+### Discover Your Agent ID
 
-Before operating, establish your identity:
+On startup, read `.agent-identity` in the repository root:
+
+```bash
+cat .agent-identity
+# Returns: rocinante (or gonya, etc.)
+```
+
+This file contains your agent ID. Use this for all coordination.
+
+**First time setup:** If `.agent-identity` doesn't exist, create it:
+
+```bash
+echo "your-agent-id" > .agent-identity
+```
+
+Note: This file is gitignored - each runtime maintains its own identity.
+
+### Configuration
 
 ```
-AGENT_ID=<your-unique-id>        # e.g., "rocinante", "gonya"
+AGENT_ID=$(cat .agent-identity)  # Read from identity file
 AGENT_MAIL_TOKEN=<auth-token>    # For MCP Agent Mail authentication
 ```
 
