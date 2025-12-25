@@ -16,7 +16,7 @@
 
 - **Имя:** Igor Goncharenko (Игорь Гончаренко)
 - **GitHub:** Gonya990
-- **Email:** <gar.yk227@yandex.ru>
+- **Email:** <garyk927@yandex.ru>
 - **Location:** Israel (ישראל)
 - **Languages:** English, Russian, Hebrew  (English, Русский, עברית)
 
@@ -95,7 +95,7 @@
 
 ## 📫 Contact & Links
 - GitHub: [@Gonya990](https://github.com/Gonya990)
-- Email: gar.yk227@yandex.ru
+- Email: garyk927@yandex.ru
 - LinkedIn: [Profile link if available]
 ```
 

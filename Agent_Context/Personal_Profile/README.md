@@ -3,7 +3,7 @@
 **Location:** Israel (ישראל)  
 **Languages:** English, Russian, Hebrew (English, Русский, עברית)  
 **GitHub:** [@Gonya990](https://github.com/Gonya990)  
-**Email:** <gar.yk227@yandex.ru>  
+**Email:** <garyk927@yandex.ru>  
 
 This folder contains my full professional profile and supporting artifacts for agent context.
 

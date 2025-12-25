@@ -12,7 +12,7 @@
 
 ### Цель
 
-- Читать и проверять почту <gar.yk227@yandex.ru>
+- Читать и проверять почту <garyk927@yandex.ru>
 - Сортировать по категориям
 - Отвечать на важные письма
 - Архивировать/удалять спам
@@ -307,7 +307,7 @@ Network:
 
 ```bash
 # Email
-YANDEX_EMAIL=gar.yk227@yandex.ru
+YANDEX_EMAIL=garyk927@yandex.ru
 YANDEX_APP_PASSWORD=<app-specific-password>
 
 # LinkedIn
