@@ -1,0 +1,51 @@
+# Unified System - Cron Automation Schedule
+# Унифицированная система - Расписание автоматизации Cron
+
+# ═══════════════════════════════════════════════════════════════
+# ChatGPT & GitHub Integration | Интеграция с ChatGPT и GitHub
+# ═══════════════════════════════════════════════════════════════
+
+# Run full automation every 6 hours
+# Запуск полной автоматизации каждые 6 часов
+0 */6 * * * /Users/macbook/Documents/Unified_System/Scripts/automation/run_all.sh >> /Users/macbook/Documents/Unified_System/logs/automation/cron.log 2>&1
+
+# Quick GitHub check every hour  
+# Быстрая проверка GitHub каждый час
+0 * * * * /Users/macbook/Documents/Unified_System/Scripts/automation/github_chatgpt_monitor.sh >> /Users/macbook/Documents/Unified_System/logs/automation/monitor.log 2>&1
+
+# CV sync check daily at 9 AM
+# Проверка синхронизации CV ежедневно в 9:00
+0 9 * * * /Users/macbook/Documents/Unified_System/Scripts/automation/cv_sync.sh --auto-update >> /Users/macbook/Documents/Unified_System/logs/automation/cv_sync.log 2>&1
+
+# ═══════════════════════════════════════════════════════════════
+# Installation Instructions | Инструкции по установке
+# ═══════════════════════════════════════════════════════════════
+#
+# To install this cron schedule:
+# Чтобы установить это расписание cron:
+#
+# 1. Open crontab editor:
+#    crontab -e
+#
+# 2. Add the lines above (without the # Installation section)
+#    Добавьте строки выше (без секции # Installation)
+#
+# 3. Save and exit
+#    Сохраните и выйдите
+#
+# 4. Verify installation:
+#    crontab -l
+#
+# ═══════════════════════════════════════════════════════════════
+# Schedule Summary | Сводка расписания
+# ═══════════════════════════════════════════════════════════════
+#
+# Full automation: Every 6 hours (00:00, 06:00, 12:00, 18:00)
+# GitHub monitor: Every hour
+# CV sync: Daily at 09:00
+#
+# Полная автоматизация: Каждые 6 часов (00:00, 06:00, 12:00, 18:00)
+# Монитор GitHub: Каждый час
+# Синхронизация CV: Ежедневно в 09:00
+#
+# ═══════════════════════════════════════════════════════════════
