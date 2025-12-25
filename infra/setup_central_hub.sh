@@ -22,7 +22,11 @@ fi
 cd "$HUB_DIR"
 
 # 2. Patch Dockerfile for stability and Postgres support
-echo "🔧 Patching Dockerfile..."
+echo "🔧 Cleaning and patching Dockerfile..."
+# Remove redundant first block if it exists
+if grep -q "AS base" Dockerfile && grep -q "AS build" Dockerfile; then
+    sed -i '1,45d' Dockerfile
+fi
 sed -i 's/python:3.14/python:3.12/g' Dockerfile
 sed -i 's/uv sync --frozen --no-editable/uv sync --frozen --no-editable --extra postgres/g' Dockerfile
 
