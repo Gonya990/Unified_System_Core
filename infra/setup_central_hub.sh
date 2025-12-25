@@ -21,8 +21,9 @@ fi
 
 cd "$HUB_DIR"
 
-# 2. Patch Dockerfile for Postgres support
-echo "🔧 Patching Dockerfile for Postgres..."
+# 2. Patch Dockerfile for stability and Postgres support
+echo "🔧 Patching Dockerfile..."
+sed -i 's/python:3.14-bookworm/python:3.12-bookworm/g' Dockerfile
 sed -i 's/uv sync --frozen --no-editable/uv sync --frozen --no-editable --extra postgres/g' Dockerfile
 
 # 3. Create optimized docker-compose.yml
