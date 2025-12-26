@@ -1,0 +1,47 @@
+{
+    "profiles": [
+        {
+            "name": "Gonya",
+            "email": "gonya90.gg@gmail.com",
+            "keywords": [
+                "Full Stack Developer",
+                "Python Developer",
+                "DevOps Engineer",
+                "AI Engineer",
+                "Automation Specialist"
+            ],
+            "locations": [
+                "Israel",
+                "Remote"
+            ],
+            "platforms": [
+                "linkedin"
+            ],
+            "enabled": true
+        },
+        {
+            "name": "Kostik",
+            "email": "gonya90.gg+kosta@gmail.com",
+            "keywords": [
+                "QA Engineer",
+                "Manual Tester",
+                "Automation Tester"
+            ],
+            "locations": [
+                "Israel",
+                "Remote"
+            ],
+            "platforms": [
+                "linkedin"
+            ],
+            "enabled": true
+        }
+    ],
+    "settings": {
+        "check_interval_hours": 6,
+        "headless": false,
+        "browser_args": [
+            "--no-sandbox"
+        ]
+    }
+}
