@@ -48,7 +48,7 @@ class ConfigManager:
         self._config = {
             "TELEGRAM_BOT_TOKEN": os.environ.get("TELEGRAM_BOT_TOKEN", ""),
             # Provider selection
-            "INFERENCE_PROVIDER": os.environ.get("INFERENCE_PROVIDER", "ollama"),
+            "INFERENCE_PROVIDER": os.environ.get("INFERENCE_PROVIDER", "gemini"),
             # Ollama settings
             "OLLAMA_BASE_URL": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
             "OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.2"),
@@ -57,8 +57,8 @@ class ConfigManager:
             "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
             "OPENAI_MODEL": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
             # Gemini settings
-            "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", ""),
-            "GEMINI_MODEL": os.environ.get("GEMINI_MODEL", "gemini-1.5-flash"),
+            "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", "")),
+            "GEMINI_MODEL": os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
             # Legacy settings (backwards compatibility)
             "INFERENCE_BASE_URL": os.environ.get("INFERENCE_BASE_URL", "http://localhost:11434"),
             "INFERENCE_API_KEY": os.environ.get("INFERENCE_API_KEY", ""),
@@ -107,8 +107,18 @@ class ConfigManager:
     
     def get_status(self) -> dict:
         """Get current configuration status (safe for display)."""
+        provider = self._config.get("INFERENCE_PROVIDER", "ollama").lower()
+        
+        # Check API key based on current provider
+        if provider == "gemini":
+            api_key_set = bool(self._config.get("GEMINI_API_KEY"))
+        elif provider == "openai":
+            api_key_set = bool(self._config.get("OPENAI_API_KEY"))
+        else:  # ollama
+            api_key_set = bool(self._config.get("INFERENCE_API_KEY"))
+        
         return {
             "inference_url": self._config.get("INFERENCE_BASE_URL", "not set"),
             "model": self._config.get("MODEL_NAME", "not set"),
-            "api_key_set": bool(self._config.get("INFERENCE_API_KEY")),
+            "api_key_set": api_key_set,
         }
