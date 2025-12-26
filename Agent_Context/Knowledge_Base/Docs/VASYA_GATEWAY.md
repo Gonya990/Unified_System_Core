@@ -4,7 +4,7 @@
 
 ## Architecture
 
-```
+```text
 ┌────────────────┐     ┌──────────────────────────────────────────┐
 │  User/Agent    │────▶│  Vasya Gateway (Docker :8080)            │
 │  MacBook       │     │  unified-home-core                       │
@@ -43,7 +43,7 @@ result = client.query("agent", "llm", {
 ## API Endpoints
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
+| ---------- | -------- | ------------- |
 | `/generate` | POST | Send query, get structured JSON |
 | `/health` | GET | Status, mode, providers |
 | `/docs` | GET | Swagger UI |
@@ -91,7 +91,7 @@ curl http://localhost:8080/health
 ## Environment Variables
 
 | Variable | Default | Description |
-|----------|---------|-------------|
+| ---------- | --------- | ------------- |
 | `OLLAMA_HOST` | 100.88.65.71 | Ollama server (igor-gaming-1) |
 | `OLLAMA_PORT` | 11434 | Ollama port |
 | `DEFAULT_MODEL` | qwen2:0.5b | Default LLM model |
@@ -111,7 +111,7 @@ async def vasya_query(prompt: str, model: str = "qwen2:0.5b") -> str:
 ## Files
 
 | Path | Description |
-|------|-------------|
+| ------ | ------------- |
 | `src/main.py` | FastAPI gateway |
 | `docker-compose.yml` | Container config |
 | `Dockerfile` | Build instructions |
@@ -119,4 +119,4 @@ async def vasya_query(prompt: str, model: str = "qwen2:0.5b") -> str:
 
 ---
 
-*Last updated: 2025-12-26*
+Last updated: 2025-12-26
