@@ -111,15 +111,47 @@ def categorize_email(subject, body, sender):
     return "info"
 
 
-def get_recent_emails(service, hours=24, max_results=50):
+import argparse
+from email.mime.text import MIMEText
+
+def send_email(service, to, subject, body):
     """
-    Get emails from last N hours
-    Получить письма за последние N часов
+    Send an email
+    Отправить письмо
     """
     try:
-        # Calculate timestamp
-        since = datetime.now() - timedelta(hours=hours)
-        query = f"after:{int(since.timestamp())}"
+        message = MIMEText(body)
+        message['to'] = to
+        message['from'] = 'me'
+        message['subject'] = subject
+        
+        raw = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+        body = {'raw': raw}
+        
+        message = service.users().messages().send(userId='me', body=body).execute()
+        print(f"✅ Email sent to {to} (ID: {message['id']})")
+        return message
+    except HttpError as error:
+        print(f"❌ Error sending email: {error}")
+        return None
+
+def get_unread_emails(service, max_results=50):
+    """
+    Get all unread emails
+    Получить все непрочитанные письма
+    """
+    return get_recent_emails(service, hours=24 * 7, max_results=max_results, query='is:unread')
+
+def get_recent_emails(service, hours=24, max_results=50, query=None):
+    """
+    Get emails from last N hours or custom query
+    Получить письма за последние N часов или по запросу
+    """
+    try:
+        if not query:
+            # Calculate timestamp
+            since = datetime.now() - timedelta(hours=hours)
+            query = f"after:{int(since.timestamp())}"
         
         results = service.users().messages().list(
             userId='me',
@@ -131,39 +163,43 @@ def get_recent_emails(service, hours=24, max_results=50):
         
         emails = []
         for msg in messages:
-            email_data = service.users().messages().get(
-                userId='me',
-                id=msg['id'],
-                format='full'
-            ).execute()
-            
-            headers = email_data['payload']['headers']
-            subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'No Subject')
-            sender = next((h['value'] for h in headers if h['name'] == 'From'), 'Unknown')
-            date = next((h['value'] for h in headers if h['name'] == 'Date'), '')
-            
-            # Get body
-            body = ''
-            if 'parts' in email_data['payload']:
-                for part in email_data['payload']['parts']:
-                    if part['mimeType'] == 'text/plain':
-                        if 'data' in part['body']:
-                            body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8')
-                            break
-            elif 'body' in email_data['payload'] and 'data' in email_data['payload']['body']:
-                body = base64.urlsafe_b64decode(email_data['payload']['body']['data']).decode('utf-8')
-            
-            # Categorize
-            category = categorize_email(subject, body[:500], sender)
-            
-            emails.append({
-                'id': msg['id'],
-                'subject': subject,
-                'sender': sender,
-                'date': date,
-                'category': category,
-                'body_preview': body[:200] if body else ''
-            })
+            try:
+                email_data = service.users().messages().get(
+                    userId='me',
+                    id=msg['id'],
+                    format='full'
+                ).execute()
+                
+                headers = email_data['payload']['headers']
+                subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'No Subject')
+                sender = next((h['value'] for h in headers if h['name'] == 'From'), 'Unknown')
+                date = next((h['value'] for h in headers if h['name'] == 'Date'), '')
+                
+                # Get body
+                body = ''
+                if 'parts' in email_data['payload']:
+                    for part in email_data['payload']['parts']:
+                        if part['mimeType'] == 'text/plain':
+                            if 'data' in part['body']:
+                                body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8')
+                                break
+                elif 'body' in email_data['payload'] and 'data' in email_data['payload']['body']:
+                    body = base64.urlsafe_b64decode(email_data['payload']['body']['data']).decode('utf-8')
+                
+                # Categorize
+                category = categorize_email(subject, body[:500], sender)
+                
+                emails.append({
+                    'id': msg['id'],
+                    'subject': subject,
+                    'sender': sender,
+                    'date': date,
+                    'category': category,
+                    'body_preview': body[:200] if body else ''
+                })
+            except Exception as e:
+                print(f"⚠️ Error processing message {msg['id']}: {e}")
+                continue
         
         return emails
     
@@ -247,9 +283,16 @@ def print_email_summary(emails):
             print(f"  Subject: {email['subject']}")
             print()
 
-
 def main():
     """Main execution"""
+    parser = argparse.ArgumentParser(description='Gmail Automation Agent')
+    parser.add_argument('--unread', action='store_true', help='Fetch all unread emails')
+    parser.add_argument('--send-to', help='Send email to address')
+    parser.add_argument('--subject', help='Subject for email sending')
+    parser.add_argument('--body', help='Body for email sending')
+    
+    args = parser.parse_args()
+
     print("Starting Gmail Automation Agent...")
     print("Запуск агента автоматизации Gmail...")
     print()
@@ -260,9 +303,24 @@ def main():
     print("✅ Authentication successful!")
     print()
     
-    # Fetch recent emails
-    print("📧 Fetching recent emails (last 24 hours)...")
-    emails = get_recent_emails(service, hours=24)
+    if args.send_to:
+        if not args.subject or not args.body:
+             print("❌ --subject and --body required for sending email")
+             sys.exit(1)
+        
+        print(f"📤 Sending email to {args.send_to}...")
+        send_email(service, args.send_to, args.subject, args.body)
+        print("✅ Done")
+        return
+
+    # Fetch emails
+    if args.unread:
+        print("📧 Fetching UNREAD emails...")
+        emails = get_unread_emails(service)
+    else:
+        print("📧 Fetching recent emails (last 24 hours)...")
+        emails = get_recent_emails(service, hours=24)
+
     print(f"✅ Found {len(emails)} emails")
     print()
     
@@ -279,7 +337,7 @@ def main():
         log_file = BASE_DIR / "logs" / "automation" / "gmail_agent.log"
         log_file.parent.mkdir(parents=True, exist_ok=True)
         with open(log_file, 'a') as f:
-            f.write(f"{datetime.now().isoformat()} - Processed {len(emails)} emails ({new_count} new)\n")
+            f.write(f"{datetime.now().isoformat()} - Processed {len(emails)} emails ({new_count} new) [Mode: {'Unread' if args.unread else 'Recent'}]\n")
     else:
         print("ℹ️  No new emails found")
     
