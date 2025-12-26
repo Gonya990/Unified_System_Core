@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d0d2a 100%);
@@ -18,7 +19,7 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-        
+
         #canvas-container {
             position: fixed;
             top: 0;
@@ -27,17 +28,17 @@
             height: 100%;
             z-index: 1;
         }
-        
+
         .overlay {
             position: relative;
             z-index: 10;
             pointer-events: none;
         }
-        
+
         .overlay * {
             pointer-events: auto;
         }
-        
+
         header {
             padding: 30px 40px;
             text-align: center;
@@ -45,7 +46,7 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(100, 150, 255, 0.2);
         }
-        
+
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
@@ -55,18 +56,18 @@
             background-clip: text;
             margin-bottom: 10px;
         }
-        
+
         .subtitle {
             color: #888;
             font-size: 1.1rem;
         }
-        
+
         .timestamp {
             color: #00d4ff;
             font-size: 0.9rem;
             margin-top: 10px;
         }
-        
+
         .controls {
             position: fixed;
             bottom: 20px;
@@ -81,7 +82,7 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(100, 150, 255, 0.3);
         }
-        
+
         .control-btn {
             background: linear-gradient(135deg, #1e1e3f, #2d2d5a);
             border: 1px solid rgba(100, 150, 255, 0.4);
@@ -93,17 +94,17 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        
+
         .control-btn:hover {
             background: linear-gradient(135deg, #7c3aed, #00d4ff);
             transform: scale(1.05);
             box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
         }
-        
+
         .control-btn.active {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
         }
-        
+
         .info-panel {
             position: fixed;
             right: 20px;
@@ -118,7 +119,7 @@
             border: 1px solid rgba(100, 150, 255, 0.2);
             z-index: 100;
         }
-        
+
         .info-panel h2 {
             font-size: 1.3rem;
             color: #00d4ff;
@@ -127,7 +128,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .info-panel h3 {
             font-size: 1rem;
             color: #7c3aed;
@@ -135,14 +136,14 @@
             border-bottom: 1px solid rgba(124, 58, 237, 0.3);
             padding-bottom: 5px;
         }
-        
+
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
-        
+
         .stat-item {
             background: rgba(30, 30, 60, 0.6);
             border-radius: 12px;
@@ -150,7 +151,7 @@
             text-align: center;
             border: 1px solid rgba(100, 150, 255, 0.1);
         }
-        
+
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
@@ -159,18 +160,18 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .stat-label {
             font-size: 0.75rem;
             color: #888;
             text-transform: uppercase;
             margin-top: 5px;
         }
-        
+
         .service-list {
             list-style: none;
         }
-        
+
         .service-list li {
             padding: 10px 15px;
             margin: 8px 0;
@@ -182,12 +183,12 @@
             align-items: center;
             transition: all 0.3s ease;
         }
-        
+
         .service-list li:hover {
             background: rgba(50, 50, 80, 0.6);
             transform: translateX(5px);
         }
-        
+
         .status-badge {
             padding: 4px 10px;
             border-radius: 15px;
@@ -195,25 +196,25 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        
+
         .status-online {
             background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.4);
         }
-        
+
         .status-offline {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: 1px solid rgba(239, 68, 68, 0.4);
         }
-        
+
         .status-idle {
             background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
             border: 1px solid rgba(251, 191, 36, 0.4);
         }
-        
+
         .node-tooltip {
             position: fixed;
             background: rgba(15, 15, 35, 0.98);
@@ -226,34 +227,41 @@
             display: none;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
-        
+
         .node-tooltip.visible {
             display: block;
             animation: tooltipFadeIn 0.3s ease;
         }
-        
+
         @keyframes tooltipFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .node-tooltip h4 {
             font-size: 1.2rem;
             color: #00d4ff;
             margin-bottom: 10px;
         }
-        
+
         .node-tooltip .ip {
             color: #7c3aed;
             font-family: monospace;
             font-size: 0.9rem;
             margin-bottom: 10px;
         }
-        
+
         .node-tooltip .services {
             margin-top: 10px;
         }
-        
+
         .node-tooltip .services span {
             display: inline-block;
             background: rgba(124, 58, 237, 0.2);
@@ -263,7 +271,7 @@
             font-size: 0.75rem;
             margin: 3px 3px 3px 0;
         }
-        
+
         .legend {
             position: fixed;
             left: 20px;
@@ -275,13 +283,13 @@
             border: 1px solid rgba(100, 150, 255, 0.2);
             z-index: 100;
         }
-        
+
         .legend h3 {
             font-size: 1rem;
             color: #00d4ff;
             margin-bottom: 15px;
         }
-        
+
         .legend-item {
             display: flex;
             align-items: center;
@@ -289,47 +297,51 @@
             margin: 10px 0;
             font-size: 0.85rem;
         }
-        
+
         .legend-color {
             width: 20px;
             height: 20px;
             border-radius: 50%;
         }
-        
+
         ::-webkit-scrollbar {
             width: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: rgba(20, 20, 40, 0.5);
             border-radius: 10px;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, #7c3aed, #00d4ff);
             border-radius: 10px;
         }
-        
+
         @media (max-width: 768px) {
-            .info-panel, .legend {
+
+            .info-panel,
+            .legend {
                 display: none;
             }
+
             h1 {
                 font-size: 1.8rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div id="canvas-container"></div>
-    
+
     <div class="overlay">
         <header>
             <h1>🌌 Unified System Infrastructure</h1>
             <p class="subtitle">Interactive 3D Network Topology & Service Map</p>
             <p class="timestamp">Generated: December 26, 2025 23:47 UTC+2</p>
         </header>
-        
+
         <div class="legend">
             <h3>🎨 Node Types</h3>
             <div class="legend-item">
@@ -357,10 +369,10 @@
                 <span>Offline Node</span>
             </div>
         </div>
-        
+
         <div class="info-panel">
             <h2>📊 System Overview</h2>
-            
+
             <div class="stat-grid">
                 <div class="stat-item">
                     <div class="stat-number">6</div>
@@ -379,7 +391,7 @@
                     <div class="stat-label">LLM Providers</div>
                 </div>
             </div>
-            
+
             <h3>🚀 Active Services</h3>
             <ul class="service-list">
                 <li>
@@ -407,7 +419,7 @@
                     <span class="status-badge status-online">Online</span>
                 </li>
             </ul>
-            
+
             <h3>⚖️ Vasya Load Balancing</h3>
             <ul class="service-list">
                 <li>
@@ -419,7 +431,7 @@
                     <span class="status-badge status-online">50%</span>
                 </li>
             </ul>
-            
+
             <h3>📁 Documentation</h3>
             <ul class="service-list">
                 <li>
@@ -432,7 +444,7 @@
                 </li>
             </ul>
         </div>
-        
+
         <div class="controls">
             <button class="control-btn active" onclick="setView('topology')">🌐 Topology</button>
             <button class="control-btn" onclick="setView('services')">⚙️ Services</button>
@@ -440,9 +452,9 @@
             <button class="control-btn" onclick="toggleRotation()">⏸️ Pause</button>
         </div>
     </div>
-    
+
     <div class="node-tooltip" id="tooltip"></div>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Infrastructure Data
@@ -544,7 +556,7 @@
                 position: { x: -5, y: 3, z: -2 }
             }
         ];
-        
+
         const connections = [
             { from: 'macbook', to: 'igor-gaming-1', type: 'primary', label: 'SSH/Control' },
             { from: 'macbook', to: 'igor-gaming', type: 'secondary', label: 'RDP' },
@@ -556,66 +568,237 @@
             { from: 'macbook', to: 'iphone', type: 'secondary', label: 'Tailscale' },
             { from: 'igor-gaming-1', to: 'smart', type: 'secondary', label: 'IoT Control' }
         ];
-        
+
         // Three.js Setup
         let scene, camera, renderer, nodeObjects = {}, lineObjects = [];
         let isRotating = true;
         let raycaster, mouse;
         let hoveredNode = null;
-        
+        let selectedNode = null; // For click-to-highlight
+        let highlightRing = null; // Highlight ring object
+        let connectionMap = {}; // Map node IDs to their connection lines
+
         function init() {
             scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x0a0a1a, 10, 50);
-            
+
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 5, 15);
             camera.lookAt(0, 0, 0);
-            
+
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.getElementById('canvas-container').appendChild(renderer.domElement);
-            
+
             // Lighting
             const ambientLight = new THREE.AmbientLight(0x404080, 0.5);
             scene.add(ambientLight);
-            
+
             const pointLight1 = new THREE.PointLight(0x00d4ff, 1, 50);
             pointLight1.position.set(10, 10, 10);
             scene.add(pointLight1);
-            
+
             const pointLight2 = new THREE.PointLight(0x7c3aed, 1, 50);
             pointLight2.position.set(-10, -10, -10);
             scene.add(pointLight2);
-            
+
             // Add grid
             const gridHelper = new THREE.GridHelper(20, 20, 0x1a1a3a, 0x1a1a3a);
             gridHelper.position.y = -4;
             scene.add(gridHelper);
-            
+
             // Create nodes
             nodes.forEach(node => createNode(node));
-            
+
             // Create connections
             createConnections();
-            
+
             // Create starfield
             createStarfield();
-            
+
             // Raycaster for interaction
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
-            
+
             // Events
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', onMouseMove);
-            
+            window.addEventListener('click', onMouseClick);
+
+            // Create highlight ring (initially hidden)
+            createHighlightRing();
+
+            // Build connection map for highlighting
+            buildConnectionMap();
+
             animate();
         }
-        
+
+        function createHighlightRing() {
+            const geometry = new THREE.RingGeometry(1.0, 1.2, 64);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0,
+                side: THREE.DoubleSide
+            });
+            highlightRing = new THREE.Mesh(geometry, material);
+            highlightRing.rotation.x = Math.PI / 2;
+            scene.add(highlightRing);
+        }
+
+        function buildConnectionMap() {
+            connections.forEach((conn, index) => {
+                if (!connectionMap[conn.from]) connectionMap[conn.from] = [];
+                if (!connectionMap[conn.to]) connectionMap[conn.to] = [];
+                connectionMap[conn.from].push({ line: lineObjects[index], target: conn.to });
+                connectionMap[conn.to].push({ line: lineObjects[index], target: conn.from });
+            });
+        }
+
+        function onMouseClick(event) {
+            // Don't trigger if clicking on UI elements
+            if (event.target.closest('.overlay')) return;
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            const meshes = Object.values(nodeObjects).map(group => group.children[0]);
+            const intersects = raycaster.intersectObjects(meshes);
+
+            if (intersects.length > 0) {
+                const node = intersects[0].object.parent.userData;
+
+                if (selectedNode === node.id) {
+                    // Clicking same node deselects it
+                    deselectNode();
+                } else {
+                    // Select new node
+                    selectNode(node.id);
+                }
+            } else {
+                // Click on empty space deselects
+                deselectNode();
+            }
+        }
+
+        function selectNode(nodeId) {
+            selectedNode = nodeId;
+            isRotating = false; // Pause rotation when selected
+
+            // Dim all nodes and connections
+            Object.values(nodeObjects).forEach(group => {
+                const isSelected = group.userData.id === nodeId;
+                const isConnected = connectionMap[nodeId]?.some(c => c.target === group.userData.id);
+
+                group.children.forEach(child => {
+                    if (child.material) {
+                        if (isSelected) {
+                            child.material.opacity = 1;
+                            child.material.emissiveIntensity = 0.8;
+                        } else if (isConnected) {
+                            child.material.opacity = 0.8;
+                        } else {
+                            child.material.opacity = 0.2;
+                        }
+                    }
+                });
+            });
+
+            // Highlight connected lines, dim others
+            lineObjects.forEach((line, index) => {
+                const conn = connections[index];
+                const isConnected = conn.from === nodeId || conn.to === nodeId;
+                line.material.opacity = isConnected ? 1 : 0.1;
+                if (isConnected) {
+                    line.material.linewidth = 3;
+                }
+            });
+
+            // Update UI
+            updateInfoPanel(nodeId);
+        }
+
+        function deselectNode() {
+            selectedNode = null;
+
+            // Restore all nodes
+            Object.values(nodeObjects).forEach(group => {
+                group.children.forEach(child => {
+                    if (child.material) {
+                        child.material.opacity = child.material.transparent ? 0.2 : 1;
+                        if (child.material.emissiveIntensity !== undefined) {
+                            child.material.emissiveIntensity = 0.3;
+                        }
+                    }
+                });
+            });
+
+            // Restore all lines
+            lineObjects.forEach(line => {
+                line.material.opacity = 0.6;
+            });
+
+            // Restore info panel
+            restoreInfoPanel();
+        }
+
+        function updateInfoPanel(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            document.querySelector('.info-panel h2').innerHTML = `🎯 Selected: ${node.name}`;
+
+            // Update stats to show node-specific info
+            const connectedCount = connectionMap[nodeId]?.length || 0;
+            document.querySelector('.stat-grid').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${connectedCount}</div>
+                    <div class="stat-label">Connections</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${node.services.length}</div>
+                    <div class="stat-label">Services</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${node.status === 'online' ? '✓' : '✗'}</div>
+                    <div class="stat-label">Status</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${node.type.charAt(0).toUpperCase()}</div>
+                    <div class="stat-label">${node.type}</div>
+                </div>
+            `;
+        }
+
+        function restoreInfoPanel() {
+            document.querySelector('.info-panel h2').innerHTML = '📊 System Overview';
+            document.querySelector('.stat-grid').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Total Nodes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Online</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Services</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">LLM Providers</div>
+                </div>
+            `;
+        }
+
         function createNode(node) {
             const group = new THREE.Group();
-            
+
             // Main sphere
             const geometry = new THREE.SphereGeometry(0.5, 32, 32);
             const material = new THREE.MeshPhongMaterial({
@@ -626,7 +809,7 @@
             });
             const sphere = new THREE.Mesh(geometry, material);
             group.add(sphere);
-            
+
             // Glow effect
             const glowGeometry = new THREE.SphereGeometry(0.7, 32, 32);
             const glowMaterial = new THREE.MeshBasicMaterial({
@@ -636,7 +819,7 @@
             });
             const glow = new THREE.Mesh(glowGeometry, glowMaterial);
             group.add(glow);
-            
+
             // Ring for online status
             if (node.status === 'online') {
                 const ringGeometry = new THREE.RingGeometry(0.8, 0.9, 32);
@@ -650,99 +833,99 @@
                 ring.rotation.x = Math.PI / 2;
                 group.add(ring);
             }
-            
+
             group.position.set(node.position.x, node.position.y, node.position.z);
             group.userData = node;
-            
+
             scene.add(group);
             nodeObjects[node.id] = group;
         }
-        
+
         function createConnections() {
             connections.forEach(conn => {
                 const fromNode = nodeObjects[conn.from];
                 const toNode = nodeObjects[conn.to];
-                
+
                 if (!fromNode || !toNode) return;
-                
+
                 const points = [];
                 points.push(fromNode.position.clone());
-                
+
                 // Add curve point
                 const midPoint = new THREE.Vector3().addVectors(fromNode.position, toNode.position).multiplyScalar(0.5);
                 midPoint.y += 1;
                 points.push(midPoint);
-                
+
                 points.push(toNode.position.clone());
-                
+
                 const curve = new THREE.QuadraticBezierCurve3(points[0], points[1], points[2]);
                 const curvePoints = curve.getPoints(50);
                 const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-                
+
                 let color;
-                switch(conn.type) {
+                switch (conn.type) {
                     case 'primary': color = 0x00d4ff; break;
                     case 'data': color = 0x22c55e; break;
                     case 'hosting': color = 0xf472b6; break;
                     default: color = 0x4b5563;
                 }
-                
+
                 const material = new THREE.LineBasicMaterial({
                     color: color,
                     transparent: true,
                     opacity: 0.6
                 });
-                
+
                 const line = new THREE.Line(geometry, material);
                 scene.add(line);
                 lineObjects.push(line);
             });
         }
-        
+
         function createStarfield() {
             const starGeometry = new THREE.BufferGeometry();
             const starCount = 1000;
             const positions = new Float32Array(starCount * 3);
-            
+
             for (let i = 0; i < starCount; i++) {
                 positions[i * 3] = (Math.random() - 0.5) * 100;
                 positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
                 positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
             }
-            
+
             starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            
+
             const starMaterial = new THREE.PointsMaterial({
                 color: 0xffffff,
                 size: 0.1,
                 transparent: true,
                 opacity: 0.8
             });
-            
+
             const stars = new THREE.Points(starGeometry, starMaterial);
             scene.add(stars);
         }
-        
+
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-        
+
         function onMouseMove(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            
+
             raycaster.setFromCamera(mouse, camera);
-            
+
             const meshes = Object.values(nodeObjects).map(group => group.children[0]);
             const intersects = raycaster.intersectObjects(meshes);
-            
+
             const tooltip = document.getElementById('tooltip');
-            
+
             if (intersects.length > 0) {
                 const node = intersects[0].object.parent.userData;
-                
+
                 tooltip.innerHTML = `
                     <h4>${getNodeEmoji(node.type)} ${node.name}</h4>
                     <div class="ip">${node.ip}</div>
@@ -753,18 +936,18 @@
                         ${node.services.map(s => `<span>${s}</span>`).join('')}
                     </div>
                 `;
-                
+
                 tooltip.style.left = (event.clientX + 20) + 'px';
                 tooltip.style.top = (event.clientY - 20) + 'px';
                 tooltip.classList.add('visible');
-                
+
                 hoveredNode = node.id;
             } else {
                 tooltip.classList.remove('visible');
                 hoveredNode = null;
             }
         }
-        
+
         function getNodeEmoji(type) {
             const emojis = {
                 'control': '💻',
@@ -778,47 +961,64 @@
             };
             return emojis[type] || '🔷';
         }
-        
+
         function animate() {
             requestAnimationFrame(animate);
-            
+
             if (isRotating) {
                 const time = Date.now() * 0.0005;
                 camera.position.x = Math.sin(time) * 15;
                 camera.position.z = Math.cos(time) * 15;
                 camera.lookAt(0, 0, 0);
             }
-            
+
             // Animate nodes
             Object.values(nodeObjects).forEach((group, i) => {
                 const time = Date.now() * 0.002;
                 group.position.y = group.userData.position.y + Math.sin(time + i) * 0.2;
-                
-                // Pulse effect for hovered node
-                if (hoveredNode === group.userData.id) {
+
+                // Scale effect for hovered/selected node
+                if (selectedNode === group.userData.id) {
+                    // Pulsing effect for selected node
+                    const pulse = 1.3 + Math.sin(time * 3) * 0.1;
+                    group.scale.set(pulse, pulse, pulse);
+                } else if (hoveredNode === group.userData.id) {
                     group.scale.set(1.2, 1.2, 1.2);
                 } else {
                     group.scale.set(1, 1, 1);
                 }
             });
-            
+
+            // Animate highlight ring around selected node
+            if (selectedNode && nodeObjects[selectedNode]) {
+                const selectedGroup = nodeObjects[selectedNode];
+                highlightRing.position.copy(selectedGroup.position);
+                highlightRing.material.opacity = 0.5 + Math.sin(Date.now() * 0.005) * 0.3;
+
+                // Rotate the ring
+                highlightRing.rotation.z += 0.02;
+            } else {
+                highlightRing.material.opacity = 0;
+            }
+
             renderer.render(scene, camera);
         }
-        
+
         function setView(view) {
             document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Camera transitions for different views could be added here
             console.log('Switching to view:', view);
         }
-        
+
         function toggleRotation() {
             isRotating = !isRotating;
             event.target.textContent = isRotating ? '⏸️ Pause' : '▶️ Play';
         }
-        
+
         init();
     </script>
 </body>
+
 </html>
