@@ -46,9 +46,9 @@ async def load_config():
 
 def get_llm():
     """Configure LLM based on environment"""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if api_key:
-        return ChatOpenAI(model="gpt-4o", api_key=api_key)
+    # api_key = os.getenv("OPENAI_API_KEY")
+    # if api_key:
+    #    pass # OpenAI Disabled due to permission errors
     
     gemini_key = os.getenv("GEMINI_API_KEY")
     if gemini_key:
@@ -74,69 +74,91 @@ def get_llm():
     logger.error("No valid API Key found (OPENAI_API_KEY or GEMINI_API_KEY)")
     return None
 
+# Job Hunter - Email Analysis Mode
+# Analyzes incoming Gmail vacancies against User CV
+
+import sys
+from gmail_agent import get_gmail_service, get_unread_emails
+
 async def process_profile(profile, llm):
-    if not Agent:
-        logger.error("browser-use library not installed!")
+    # 1. Load Real CV & Priority Skills
+    cv_path = BASE_DIR.parent.parent / "REAL_CV.txt"
+    skills_path = BASE_DIR.parent.parent / "NEW_SKILLS.txt"
+    
+    user_cv = ""
+    priority_skills = ""
+    
+    if cv_path.exists():
+        with open(cv_path, "r", encoding="utf-8") as f:
+            user_cv = f.read()
+            
+    if skills_path.exists():
+        with open(skills_path, "r", encoding="utf-8") as f:
+            priority_skills = f.read()
+
+    # 2. Fetch Emails
+    logger.info("Fetching unread emails from Gmail...")
+    try:
+        service = get_gmail_service()
+        emails = get_unread_emails(service, max_results=20)
+    except Exception as e:
+        logger.error(f"Gmail fetch failed: {e}")
         return
 
-    logger.info(f"Processing profile: {profile['name']}...")
+    # 3. Filter Job Emails
+    job_emails = [e for e in emails if e['category'] in ['work', 'linkedin', 'urgent']]
     
-    # Optimized prompt for Google Jobs
-    # We point directly to the jobs interface to save navigation steps
-    import urllib.parse
-    query = f"{profile['keywords'][0]} jobs in {profile['locations'][0]}"
-    encoded_query = urllib.parse.quote(query)
-    url = f"https://www.google.com/search?q={encoded_query}&ibp=htl;jobs"
+    if not job_emails:
+        logger.info("No new job-related emails found.")
+        send_telegram_message("ℹ️ Job Analyzer: No new job emails found.")
+        return
 
-    task_desc = (
-        f"Go to {url}. "
-        f"This is the Google Jobs interface. "
-        f"Scroll down to see the job list if needed. "
-        f"Read the titles and company names of the first 3 jobs. "
-        f"Return a text summary listing them (format: 'Title - Company'). "
-        f"Do not try to extract complex objects, just return the string."
-    )
+    logger.info(f"Analyzing {len(job_emails)} job emails...")
+    send_telegram_message(f"🔎 Job Analyzer: Found {len(job_emails)} potential job emails. Analyzing with Priority Skills...")
+
+    # 4. Analyze each
+    for email in job_emails:
+        description = f"Subject: {email['subject']}\nFrom: {email['sender']}\nBody: {email['body_preview']}..."
+        
+        prompt = (
+            f"Ты - Карьерный Аналитик. \n"
+            f"**Задача:** Проанализируй эту вакансию (из письма) на соответствие Резюме (CV) и Приоритетным Навыкам пользователя.\n"
+            f"**Письмо:**\n{description}\n\n"
+            f"**Резюме пользователя:**\n{user_cv[:2000]}\n\n"
+            f"**ПРИОРИТЕТНЫЕ НАВЫКИ (Критически важны):**\n{priority_skills[:1000]}\n\n"
+            f"**Формат ответа (НА РУССКОМ ЯЗЫКЕ):**\n"
+            f"Совпадение: [0-100]%\n"
+            f"Роль: [Название роли]\n"
+            f"Компания: [Название компании]\n"
+            f"Анализ: [1-2 предложения, почему подходит или нет. Обязательно упомяни, если есть Приоритетные Навыки]\n"
+            f"Действие: [Откликнуться / Игнорировать / Срочно]"
+        )
+        
+        try:
+            # Use invoke directly since we are just doing text analysis, no browser needed
+            response = llm.invoke(prompt)
+            analysis = response.content
             
-    logger.info(f"Starting Agent Task: {task_desc}")
-    
-    try:
-        agent = Agent(task=task_desc, llm=llm)
-        result = await agent.run()
-        
-        logger.info(f"Task Result: {result}")
-        
-        # Notify
-        msg = f"🔍 **Job Hunt Report for {profile['name']}**\n\n{result}"
-        send_telegram_message(msg)
-        
-    except Exception as e:
-        logger.error(f"Agent failed: {e}")
-        send_telegram_message(f"⚠️ Job Hunter Error for {profile['name']}: {e}")
+            # Send Report
+            msg = (
+                f"📧 **Анализ Вакансии**\n"
+                f"От: {email['sender']}\n"
+                f"{analysis}"
+            )
+            send_telegram_message(msg)
+            
+        except Exception as e:
+            logger.error(f"Analysis failed for {email['id']}: {e}")
 
 async def main():
-    config = await load_config()
-    if not config:
-        return
-    
+    config = await load_config() # Keep config loading just for structure
     llm = get_llm()
     if not llm:
-        logger.error("LLM not configured. Exiting.")
-        send_telegram_message("⚠️ Job Hunter failed: No LLM API Key found.")
         return
 
-    logger.info("Starting Job Hunter (Browser Use)...")
-    send_telegram_message("🚀 Job Hunter Agent Started")
-
-    try:
-        for profile in config['profiles']:
-            if not profile.get('enabled', True):
-                continue
-            await process_profile(profile, llm)
-                
-    except Exception as e:
-        logger.error(f"Critical Error: {e}")
-    finally:
-        logger.info("Job Hunter finished cycle.")
+    logger.info("Starting Job Analyzer (Email Mode)...")
+    await process_profile({"name": "User"}, llm)
+    logger.info("Analysis complete.")
 
 if __name__ == "__main__":
     asyncio.run(main())
