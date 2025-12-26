@@ -31,23 +31,79 @@ inference = InferenceClient(config)
 
 # System prompt for AI responses
 SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
-Ты работаешь на сервере `igor-gaming-1`.
+Ты работаешь на сервере `igor-gaming-1` и имеешь доступ к серверным командам.
 Твоя главная цель - быть полезным и исполнительным.
 
 У тебя есть доступ к следующим ИНСТРУМЕНТАМ (Tools):
-1. ПРОВЕРКА ВАКАНСИЙ: Если пользователь просит "проверить почту", "найти работу", "просканировать вакансии", "job hunt" - ты должен добавить в ответ специальный тег: [[RUN:SCAN]].
-2. СТАТУС СИСТЕМЫ: Если пользователь спрашивает "как дела", "статус", "мониторинг" - добавь тег: [[RUN:STATUS]].
+1. ПРОВЕРКА ВАКАНСИЙ: "проверить почту", "найти работу", "просканировать вакансии" → [[RUN:SCAN]]
+2. СТАТУС СИСТЕМЫ: "как дела", "статус", "мониторинг", "здоровье сервера" → [[RUN:STATUS]]
+3. КОМАНДЫ СЕРВЕРА: "выполни команду", "запусти на сервере", "проверь процессы" → [[RUN:CMD:<команда>]]
+4. СВЯЗЬ С ANTIGRAVITY: "спроси у Antigravity", "передай Antigravity", "нужна помощь агента" → [[ASK:ANTIGRAVITY:<вопрос>]]
 
 ПРИМЕРЫ:
 User: "Найди мне работу"
-AI: "Хорошо, запускаю анализ свежих вакансий через Job Hunter. [[RUN:SCAN]]"
+AI: "Хорошо, запускаю анализ свежих вакансий. [[RUN:SCAN]]"
 
-User: "Как там сервер?"
-AI: "Проверяю системы... [[RUN:STATUS]]"
+User: "Проверь, сколько памяти использует сервер"
+AI: "Проверяю использование памяти... [[RUN:CMD:free -h]]"
 
-В обычных разговорах просто отвечай на вопрос."""
+User: "Спроси у Antigravity, как настроить автозапуск"
+AI: "Передаю вопрос главному агенту... [[ASK:ANTIGRAVITY:Как настроить автозапуск службы?]]"
+
+ВАЖНО: Ты можешь выполнять ТОЛЬКО безопасные команды (чтение, статус). Никогда не удаляй файлы и не останавливай критические службы без подтверждения пользователя."""
+
+# Authorized users (Telegram User IDs)
+ALLOWED_USERS = [
+    708531393,    # Igor (Admin)
+    5569219290,   # Oksana
+]
+
+ADMIN_ID = 708531393  # Igor's ID for approval notifications
+
+def require_auth(func):
+    """Decorator to check if user is authorized."""
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.effective_user.id
+        if user_id not in ALLOWED_USERS:
+            user_name = update.effective_user.first_name or "Unknown"
+            username = update.effective_user.username or "no_username"
+            
+            logger.warning(f"Unauthorized access attempt from user {user_id} (@{username})")
+            
+            # Send approval request to admin
+            from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+            keyboard = [
+                [
+                    InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_{user_id}"),
+                    InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_{user_id}")
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            try:
+                await context.bot.send_message(
+                    chat_id=ADMIN_ID,
+                    text=f"🔔 **Запрос на доступ**\n\n"
+                         f"👤 Имя: {user_name}\n"
+                         f"🆔 User ID: `{user_id}`\n"
+                         f"📱 Username: @{username}\n\n"
+                         f"Одобрить доступ?",
+                    parse_mode="Markdown",
+                    reply_markup=reply_markup
+                )
+            except Exception as e:
+                logger.error(f"Failed to send approval request: {e}")
+            
+            await update.message.reply_text(
+                "⏳ Запрос на доступ отправлен администратору.\n\n"
+                "Пожалуйста, ожидайте одобрения."
+            )
+            return
+        return await func(update, context)
+    return wrapper
 
 
+@require_auth
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /start command."""
     await update.message.reply_text(
@@ -69,6 +125,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await cmd_start(update, context)
 
 
+@require_auth
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /status command - show current configuration."""
     status = config.get_status()
@@ -153,6 +210,7 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
 
 
+@require_auth
 async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /scan command - trigger Job Hunter."""
     user_id = update.effective_user.id
@@ -256,18 +314,29 @@ async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle regular text messages - send to AI."""
-    user_text = update.message.text
+    """Handle incoming text messages."""
     user_id = update.effective_user.id
+    
+    # Authorization check
+    if user_id not in ALLOWED_USERS:
+        logger.warning(f"Unauthorized access attempt from user {user_id}")
+        await update.message.reply_text(
+            "⛔ Доступ запрещён.\n\n"
+            "Этот бот доступен только авторизованным пользователям.\n"
+            "Если вы считаете, что это ошибка, свяжитесь с администратором."
+        )
+        return
+    
+    message_text = update.message.text
     user_name = update.effective_user.first_name or "User"
     
-    logger.info(f"Message from {user_name}: {user_text[:50]}...", extra={"user_id": user_id})
+    logger.info(f"Message from {user_name}: {message_text[:50]}...", extra={"user_id": user_id})
     
     # Send typing indicator
     await update.message.chat.send_action("typing")
     
     # Build message for AI
-    messages = [{"role": "user", "content": user_text}]
+    messages = [{"role": "user", "content": message_text}]
     
     # Get AI response
     response = await inference.chat(messages, system_prompt=SYSTEM_PROMPT)
@@ -277,9 +346,31 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Check for Tool Triggers
     trigger_scan = "[[RUN:SCAN]]" in response
     trigger_status = "[[RUN:STATUS]]" in response
+    trigger_cmd = "[[RUN:CMD:" in response
+    trigger_antigravity = "[[ASK:ANTIGRAVITY:" in response
     
     # Clean response
-    clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "").strip()
+    clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "")
+    
+    # Extract CMD if present
+    cmd_to_run = None
+    if trigger_cmd:
+        import re
+        match = re.search(r'\[\[RUN:CMD:(.+?)\]\]', response)
+        if match:
+            cmd_to_run = match.group(1)
+            clean_response = clean_response.replace(f"[[RUN:CMD:{cmd_to_run}]]", "")
+    
+    # Extract Antigravity question if present
+    antigravity_question = None
+    if trigger_antigravity:
+        import re
+        match = re.search(r'\[\[ASK:ANTIGRAVITY:(.+?)\]\]', response)
+        if match:
+            antigravity_question = match.group(1)
+            clean_response = clean_response.replace(f"[[ASK:ANTIGRAVITY:{antigravity_question}]]", "")
+    
+    clean_response = clean_response.strip()
     
     # Send response (handle long messages)
     if clean_response:
@@ -297,6 +388,104 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if trigger_status:
         logger.info("Executing Tool: STATUS")
         await cmd_status(update, context)
+    
+    if trigger_cmd and cmd_to_run:
+        logger.info(f"Executing Server Command: {cmd_to_run}")
+        # Whitelist safe commands
+        safe_commands = ['free', 'df', 'uptime', 'ps', 'systemctl status', 'journalctl', 'ls', 'cat', 'grep', 'tail', 'head']
+        is_safe = any(cmd_to_run.startswith(safe) for safe in safe_commands)
+        
+        if is_safe:
+            import subprocess
+            try:
+                result = subprocess.run(
+                    ['ssh', 'igor-gaming-1', cmd_to_run],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                output = result.stdout[:1000] if result.stdout else result.stderr[:1000]
+                await update.message.reply_text(f"```\n{output}\n```", parse_mode="Markdown")
+            except Exception as e:
+                await update.message.reply_text(f"❌ Ошибка: {e}")
+        else:
+            await update.message.reply_text("⚠️ Команда не в whitelist. Для безопасности отклонено.")
+    
+    if trigger_antigravity and antigravity_question:
+        logger.info(f"Forwarding to Antigravity: {antigravity_question}")
+        # TODO: Implement actual Antigravity API call
+        # For now, just acknowledge
+        await update.message.reply_text(
+            f"📨 Вопрос передан Antigravity Core:\n\"{antigravity_question}\"\n\n"
+            f"💡 Пока эта функция в разработке. Antigravity ответит через основной интерфейс."
+        )
+
+
+async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle approval/denial button clicks."""
+    query = update.callback_query
+    await query.answer()
+    
+    # Only admin can approve
+    if query.from_user.id != ADMIN_ID:
+        await query.edit_message_text("⛔ Только администратор может одобрять пользователей.")
+        return
+    
+    action, user_id_str = query.data.split("_")
+    user_id = int(user_id_str)
+    
+    if action == "approve":
+        if user_id not in ALLOWED_USERS:
+            ALLOWED_USERS.append(user_id)
+            
+            # Save to file for persistence
+            config_path = Path(__file__).parent.parent / ".env"
+            try:
+                with open(config_path, "a") as f:
+                    f.write(f"\n# Auto-approved user {user_id}\n")
+                logger.info(f"User {user_id} approved by admin")
+            except Exception as e:
+                logger.error(f"Failed to save approved user: {e}")
+            
+            await query.edit_message_text(
+                f"✅ **Пользователь одобрен**\n\n"
+                f"🆔 User ID: `{user_id}`\n\n"
+                f"Пользователь может теперь использовать бота.\n"
+                f"⚠️ Ему нужно будет установить свой API ключ через `/setapikey`",
+                parse_mode="Markdown"
+            )
+            
+            # Notify approved user
+            try:
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text="✅ **Доступ одобрен!**\n\n"
+                         "Вы можете использовать бота.\n\n"
+                         "⚠️ Для работы с AI моделями установите API ключ:\n"
+                         "`/setapikey ваш_ключ`\n\n"
+                         "Или используйте `/setprovider ollama` для локальной модели.",
+                    parse_mode="Markdown"
+                )
+            except Exception as e:
+                logger.error(f"Failed to notify approved user: {e}")
+        else:
+            await query.edit_message_text(f"ℹ️ Пользователь {user_id} уже в whitelist.")
+    
+    elif action == "deny":
+        await query.edit_message_text(
+            f"❌ **Доступ отклонён**\n\n"
+            f"🆔 User ID: `{user_id}`",
+            parse_mode="Markdown"
+        )
+        
+        # Notify denied user
+        try:
+            await context.bot.send_message(
+                chat_id=user_id,
+                text="❌ Доступ к боту отклонён администратором."
+            )
+        except Exception:
+            pass
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -400,6 +589,11 @@ def main() -> None:
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
     application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # Add callback query handler for approval buttons
+    from telegram.ext import CallbackQueryHandler
+    application.add_handler(CallbackQueryHandler(handle_approval_callback))
+    
     application.add_error_handler(error_handler)
     
     logger.info("✅ Bot is online and listening...")
