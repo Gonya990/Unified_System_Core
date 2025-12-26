@@ -81,12 +81,20 @@ async def process_profile(profile, llm):
 
     logger.info(f"Processing profile: {profile['name']}...")
     
-    # Simplified prompt for initial E2E test (LinkedIn often requires login)
+    # Optimized prompt for Google Jobs
+    # We point directly to the jobs interface to save navigation steps
+    import urllib.parse
+    query = f"{profile['keywords'][0]} jobs in {profile['locations'][0]}"
+    encoded_query = urllib.parse.quote(query)
+    url = f"https://www.google.com/search?q={encoded_query}&ibp=htl;jobs"
+
     task_desc = (
-        f"Go to google.com. "
-        f"Search for '{profile['keywords'][0]} jobs in {profile['locations'][0]}'. "
-        f"Identify 2 interesting job titles from the results. "
-        f"Return them as a simple string summary."
+        f"Go to {url}. "
+        f"This is the Google Jobs interface. "
+        f"Scroll down to see the job list if needed. "
+        f"Read the titles and company names of the first 3 jobs. "
+        f"Return a text summary listing them (format: 'Title - Company'). "
+        f"Do not try to extract complex objects, just return the string."
     )
             
     logger.info(f"Starting Agent Task: {task_desc}")
