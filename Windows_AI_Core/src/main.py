@@ -30,24 +30,37 @@ config = ConfigManager()
 inference = InferenceClient(config)
 
 # System prompt for AI responses
-SYSTEM_PROMPT = """You are Gonya, a smart and helpful AI assistant in the 'Unified System'.
-You run on a configurable inference backend (Ollama, OpenAI, or custom).
-Always answer helpfully and concisely.
-If asked about the system, mention you are a cloud-native Telegram bot."""
+SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
+Ты работаешь на сервере `igor-gaming-1`.
+Твоя главная цель - быть полезным и исполнительным.
+
+У тебя есть доступ к следующим ИНСТРУМЕНТАМ (Tools):
+1. ПРОВЕРКА ВАКАНСИЙ: Если пользователь просит "проверить почту", "найти работу", "просканировать вакансии", "job hunt" - ты должен добавить в ответ специальный тег: [[RUN:SCAN]].
+2. СТАТУС СИСТЕМЫ: Если пользователь спрашивает "как дела", "статус", "мониторинг" - добавь тег: [[RUN:STATUS]].
+
+ПРИМЕРЫ:
+User: "Найди мне работу"
+AI: "Хорошо, запускаю анализ свежих вакансий через Job Hunter. [[RUN:SCAN]]"
+
+User: "Как там сервер?"
+AI: "Проверяю системы... [[RUN:STATUS]]"
+
+В обычных разговорах просто отвечай на вопрос."""
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /start command."""
     await update.message.reply_text(
-        "👋 Hello! I'm your AI assistant.\n\n"
-        "Commands:\n"
-        "/status - Show current configuration\n"
-        "/models - List available models\n"
-        "/setprovider <name> - Set provider (ollama/openai/gemini)\n"
-        "/setendpoint <url> - Set inference API URL\n"
-        "/setapikey <key> - Set API key\n"
-        "/setmodel <name> - Set model name\n"
-        "/help - Show this help message"
+        "👋 Привет! Я твой AI ассистент Unified System.\n\n"
+        "Команды:\n"
+        "/scan - 🕵️‍♂️ Запустить поиск вакансий (Job Hunter)\n"
+        "/status - 📊 Статус системы\n"
+        "/models - 📋 Список моделей\n"
+        "/setprovider <name> - ⚙️ Выбрать AI (ollama/openai/gemini)\n"
+        "/setendpoint <url> - 🔗 Адрес API\n"
+        "/setapikey <key> - 🔑 Установить ключ\n"
+        "/setmodel <name> - 🧠 Выбрать модель\n"
+        "/help - ❓ Помощь"
     )
 
 
@@ -68,12 +81,12 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     health_emoji = "✅" if is_healthy else "❌"
     
     await update.message.reply_text(
-        f"📊 **Bot Status**\n\n"
-        f"🌐 Provider: `{provider}`\n"
-        f"🔗 Inference URL: `{inference.base_url}`\n"
-        f"🤖 Model: `{inference.model}`\n"
-        f"🔑 API Key: {'✅ Set' if status['api_key_set'] else '❌ Not set'}\n"
-        f"💚 Connection: {health_emoji} {'Online' if is_healthy else 'Offline'}",
+        f"📊 **Статус Бота**\n\n"
+        f"🌐 Провайдер: `{provider}`\n"
+        f"🔗 URL: `{inference.base_url}`\n"
+        f"🤖 Модель: `{inference.model}`\n"
+        f"🔑 API Ключ: {'✅ Установлен' if status['api_key_set'] else '❌ Не установлен'}\n"
+        f"💚 Связь: {health_emoji} {'Онлайн' if is_healthy else 'Оффлайн'}",
         parse_mode="Markdown"
     )
 
@@ -138,6 +151,36 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     logger.info(f"Model updated to: {model}", extra={"user_id": update.effective_user.id})
     
     await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
+
+
+async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /scan command - trigger Job Hunter."""
+    user_id = update.effective_user.id
+    logger.info(f"User {user_id} requested Job Scan", extra={"user_id": user_id})
+    await update.message.reply_text("🕵️‍♂️ Запускаю поиск вакансий (Job Hunter/Analyzer)... ожидай отчета.")
+    
+    # Path to job_hunter.py on the server
+    # We assume standard deployment path
+    script_path = "/home/gonya/Documents/Unified_System/Scripts/automation/job_hunter.py"
+    venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
+    
+    import subprocess
+    try:
+        # Run asynchronously in background so we don't block the bot
+        # But for simplicity here using subprocess.Popen or asyncio.create_subprocess_exec
+        process = await asyncio.create_subprocess_exec(
+            venv_python, script_path,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        # We don't wait for full completion here as it communicates via Telegram itself
+        # But we could wait a bit to check for immediate startup errors
+        # await process.communicate()
+        
+    except Exception as e:
+        logger.error(f"Failed to start Job Hunter: {e}")
+        await update.message.reply_text(f"❌ Ошибка запуска: {e}")
 
 
 async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -231,13 +274,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
     
+    # Check for Tool Triggers
+    trigger_scan = "[[RUN:SCAN]]" in response
+    trigger_status = "[[RUN:STATUS]]" in response
+    
+    # Clean response
+    clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "").strip()
+    
     # Send response (handle long messages)
-    if len(response) > 4000:
-        # Split into chunks
-        for i in range(0, len(response), 4000):
-            await update.message.reply_text(response[i:i+4000])
-    else:
-        await update.message.reply_text(response)
+    if clean_response:
+        if len(clean_response) > 4000:
+            for i in range(0, len(clean_response), 4000):
+                await update.message.reply_text(clean_response[i:i+4000])
+        else:
+            await update.message.reply_text(clean_response)
+
+    # Execute Triggers
+    if trigger_scan:
+        logger.info("Executing Tool: SCAN")
+        await cmd_scan(update, context)
+    
+    if trigger_status:
+        logger.info("Executing Tool: STATUS")
+        await cmd_status(update, context)
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -256,8 +315,47 @@ async def post_init(application: Application) -> None:
         BotCommand("setendpoint", "Set inference API URL"),
         BotCommand("setapikey", "Set API key"),
         BotCommand("setmodel", "Set model name"),
+        BotCommand("scan", "Run Job Hunter Analysis"),
     ]
     await application.bot.set_my_commands(commands)
+    
+    # Start Periodic Scheduler
+    asyncio.create_task(run_periodic_scan(application))
+
+
+async def run_periodic_scan(application: Application):
+    """Run Job Hunter every 4 hours automatically."""
+    interval_hours = 4
+    logger.info(f"⏰ Scheduler started. Will scan every {interval_hours} hours.")
+    
+    while True:
+        try:
+            # Wait first (don't run immediately on restart to avoid spam loop if crashing)
+            await asyncio.sleep(interval_hours * 3600)
+            
+            logger.info("⏰ Auto-Running Job Hunter...")
+            # We need a dummy update/context or just run the logic directly.
+            # cmd_scan expects (update, context) which we don't have.
+            # So we reproduce the cmd_scan logic here but formatted for broadcast/admin only.
+            
+            # Assuming we only notify the ADMIN (User ID from config or last known)
+            # For now, let's just log it or try to find a way to reuse cmd_scan.
+            # The easier way is to just call the script logic directly.
+            
+            script_path = "/home/gonya/Documents/Unified_System/Scripts/automation/job_hunter.py"
+            venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
+            
+            import subprocess
+            process = await asyncio.create_subprocess_exec(
+                venv_python, script_path,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            logger.info(f"⏰ Job Hunter launched via Scheduler (PID: {process.pid})")
+            
+        except Exception as e:
+            logger.error(f"Scheduler Error: {e}")
+            await asyncio.sleep(600) # Retry in 10 mins on error
 
 
 def get_health_info() -> dict:
@@ -275,7 +373,7 @@ def main() -> None:
     logger.info("=" * 60)
     
     # Start health server
-    start_health_server(port=8080, health_callback=get_health_info)
+    start_health_server(port=8085, health_callback=get_health_info)
     
     # Get bot token
     token = config.get("TELEGRAM_BOT_TOKEN")
@@ -300,6 +398,7 @@ def main() -> None:
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
+    application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_error_handler(error_handler)
     
