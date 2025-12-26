@@ -71,6 +71,8 @@ pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth
    - Application type: **Desktop app**
    - Name: **Gmail Automation Agent**
 5. Download JSON file
+   > [!IMPORTANT]
+   > **Client Secret Visibility:** Google now hides the Client Secret after creation. You must download the JSON file **immediately** upon creation. If you lose it, you must "Reset Secret" in the Cloud Console to generate a new one.
 
 ### Step 4: Install Credentials
 
@@ -284,6 +286,16 @@ ls -la /Users/macbook/Documents/Unified_System/Scripts/automation/.credentials/g
 
 # If not, re-download from Google Cloud Console
 ```
+
+### "Deleted Client" or "Client not found" (Error 401)
+
+This means the OAuth2 Client ID you are using has been deleted in the Google Cloud Console.
+
+1. Go to [Google Cloud Console - Credentials](https://console.cloud.google.com/apis/credentials)
+2. Check if your "Gmail Automation Agent" client ID exists.
+3. If not, create a new one (Desktop app).
+4. If it exists but you get this error, check `gmail_credentials.json` to ensure it matches the console.
+5. **Fix:** Download the new JSON, replace `gmail_credentials.json`, and delete `gmail_token.pickle` to re-authenticate.
 
 ### "Token expired"
 
