@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Unified System Infrastructure - 3D Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d0d2a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .overlay {
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .overlay * {
+            pointer-events: auto;
+        }
+        
+        header {
+            padding: 30px 40px;
+            text-align: center;
+            background: rgba(10, 10, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        
+        .timestamp {
+            color: #00d4ff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            background: rgba(20, 20, 40, 0.9);
+            padding: 15px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #1e1e3f, #2d2d5a);
+            border: 1px solid rgba(100, 150, 255, 0.4);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: linear-gradient(135deg, #7c3aed, #00d4ff);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+        }
+        
+        .control-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+        }
+        
+        .info-panel {
+            position: fixed;
+            right: 20px;
+            top: 120px;
+            width: 350px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            z-index: 100;
+        }
+        
+        .info-panel h2 {
+            font-size: 1.3rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-panel h3 {
+            font-size: 1rem;
+            color: #7c3aed;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(30, 30, 60, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(100, 150, 255, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        
+        .service-list {
+            list-style: none;
+        }
+        
+        .service-list li {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: rgba(30, 30, 60, 0.5);
+            border-radius: 10px;
+            border-left: 3px solid #00d4ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .service-list li:hover {
+            background: rgba(50, 50, 80, 0.6);
+            transform: translateX(5px);
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-online {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        
+        .status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        
+        .status-idle {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+        
+        .node-tooltip {
+            position: fixed;
+            background: rgba(15, 15, 35, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 150, 255, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 320px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .node-tooltip.visible {
+            display: block;
+            animation: tooltipFadeIn 0.3s ease;
+        }
+        
+        @keyframes tooltipFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .node-tooltip h4 {
+            font-size: 1.2rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .node-tooltip .ip {
+            color: #7c3aed;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .node-tooltip .services {
+            margin-top: 10px;
+        }
+        
+        .node-tooltip .services span {
+            display: inline-block;
+            background: rgba(124, 58, 237, 0.2);
+            color: #c4b5fd;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin: 3px 3px 3px 0;
+        }
+        
+        .legend {
+            position: fixed;
+            left: 20px;
+            top: 120px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            z-index: 100;
+        }
+        
+        .legend h3 {
+            font-size: 1rem;
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 20, 40, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #7c3aed, #00d4ff);
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .info-panel, .legend {
+                display: none;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="overlay">
+        <header>
+            <h1>🌌 Unified System Infrastructure</h1>
+            <p class="subtitle">Interactive 3D Network Topology & Service Map</p>
+            <p class="timestamp">Generated: December 26, 2025 23:47 UTC+2</p>
+        </header>
+        
+        <div class="legend">
+            <h3>🎨 Node Types</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #00d4ff;"></div>
+                <span>Control Plane (MacBook)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #7c3aed;"></div>
+                <span>AI Compute (GPU)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f472b6;"></div>
+                <span>Virtualization (Proxmox)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #22c55e;"></div>
+                <span>Cloud VM</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #fbbf24;"></div>
+                <span>Mobile Device</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #6b7280;"></div>
+                <span>Offline Node</span>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>📊 System Overview</h2>
+            
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Total Nodes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Online</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Services</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">LLM Providers</div>
+                </div>
+            </div>
+            
+            <h3>🚀 Active Services</h3>
+            <ul class="service-list">
+                <li>
+                    <span>🏠 Home Assistant</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+                <li>
+                    <span>🔄 N8N Automation</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+                <li>
+                    <span>🦙 Ollama LLM</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+                <li>
+                    <span>🤖 Vasya Gateway</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+                <li>
+                    <span>🌐 Chrome CDP</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+                <li>
+                    <span>📬 MCP Agent Mail</span>
+                    <span class="status-badge status-online">Online</span>
+                </li>
+            </ul>
+            
+            <h3>⚖️ Vasya Load Balancing</h3>
+            <ul class="service-list">
+                <li>
+                    <span>🦙 Ollama (Local)</span>
+                    <span class="status-badge status-online">50%</span>
+                </li>
+                <li>
+                    <span>☁️ Gemini (Cloud)</span>
+                    <span class="status-badge status-online">50%</span>
+                </li>
+            </ul>
+            
+            <h3>📁 Documentation</h3>
+            <ul class="service-list">
+                <li>
+                    <span>AGENTS.md</span>
+                    <span class="status-badge status-online">730 lines</span>
+                </li>
+                <li>
+                    <span>CONTEXT_HANDOFF.md</span>
+                    <span class="status-badge status-online">343 lines</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn active" onclick="setView('topology')">🌐 Topology</button>
+            <button class="control-btn" onclick="setView('services')">⚙️ Services</button>
+            <button class="control-btn" onclick="setView('dataflow')">🔄 Data Flow</button>
+            <button class="control-btn" onclick="toggleRotation()">⏸️ Pause</button>
+        </div>
+    </div>
+    
+    <div class="node-tooltip" id="tooltip"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Infrastructure Data
+        const nodes = [
+            {
+                id: 'macbook',
+                name: 'MacBook Air',
+                type: 'control',
+                ip: '100.93.121.47',
+                os: 'macOS',
+                status: 'online',
+                role: 'Control Plane',
+                services: ['Antigravity Agent', 'Git Workspace', 'Nodriver Daemon'],
+                color: 0x00d4ff,
+                position: { x: 0, y: 2, z: 0 }
+            },
+            {
+                id: 'igor-gaming-1',
+                name: 'igor-gaming-1',
+                type: 'compute',
+                ip: '100.88.65.71',
+                os: 'Linux/WSL2',
+                status: 'online',
+                role: 'AI Compute Node',
+                services: ['Ollama LLM', 'Home Assistant', 'N8N', 'Chrome CDP', 'MCP Server', 'MCP Agent Mail'],
+                color: 0x7c3aed,
+                position: { x: -4, y: 0, z: 3 }
+            },
+            {
+                id: 'igor-gaming',
+                name: 'igor-gaming',
+                type: 'windows',
+                ip: '100.127.194.111',
+                os: 'Windows 11',
+                status: 'online',
+                role: 'Windows AI Core',
+                services: ['RDP', 'GPU Compute', 'Gaming'],
+                color: 0x3b82f6,
+                position: { x: 4, y: 0, z: 3 }
+            },
+            {
+                id: 'pve',
+                name: 'Proxmox VE',
+                type: 'virtualization',
+                ip: '100.74.194.25',
+                os: 'Proxmox',
+                status: 'online',
+                role: 'Virtualization Host',
+                services: ['64GB RAM', 'VM Management', 'Container Host'],
+                color: 0xf472b6,
+                position: { x: 0, y: -2, z: 5 }
+            },
+            {
+                id: 'unified-home-core',
+                name: 'unified-home-core-cloud',
+                type: 'cloud-vm',
+                ip: '100.110.209.49',
+                os: 'Ubuntu 22.04',
+                status: 'online',
+                role: 'Cloud Gateway',
+                services: ['Vasya Gateway :8080', 'AIOS MCP Server', 'Docker'],
+                color: 0x22c55e,
+                position: { x: -3, y: -1, z: 6 }
+            },
+            {
+                id: 'smart',
+                name: 'Smart Home',
+                type: 'iot',
+                ip: '100.81.133.25',
+                os: 'Linux',
+                status: 'online',
+                role: 'IoT Hub',
+                services: ['Sensors', 'Automation'],
+                color: 0x06b6d4,
+                position: { x: 3, y: -1, z: 6 }
+            },
+            {
+                id: 'rocinante',
+                name: 'Rocinante',
+                type: 'deprecated',
+                ip: '100.127.166.76',
+                os: 'Linux',
+                status: 'offline',
+                role: 'Deprecated',
+                services: ['Offline 2d'],
+                color: 0x6b7280,
+                position: { x: 5, y: 3, z: -2 }
+            },
+            {
+                id: 'iphone',
+                name: 'iPhone 15 Pro',
+                type: 'mobile',
+                ip: '100.86.233.87',
+                os: 'iOS',
+                status: 'idle',
+                role: 'Mobile Client',
+                services: ['Tailscale VPN'],
+                color: 0xfbbf24,
+                position: { x: -5, y: 3, z: -2 }
+            }
+        ];
+        
+        const connections = [
+            { from: 'macbook', to: 'igor-gaming-1', type: 'primary', label: 'SSH/Control' },
+            { from: 'macbook', to: 'igor-gaming', type: 'secondary', label: 'RDP' },
+            { from: 'macbook', to: 'unified-home-core', type: 'primary', label: 'API Calls' },
+            { from: 'igor-gaming-1', to: 'unified-home-core', type: 'data', label: 'Ollama → Vasya' },
+            { from: 'igor-gaming-1', to: 'pve', type: 'secondary', label: 'VM Control' },
+            { from: 'pve', to: 'unified-home-core', type: 'hosting', label: 'VM Host' },
+            { from: 'unified-home-core', to: 'igor-gaming-1', type: 'data', label: 'LLM Queries' },
+            { from: 'macbook', to: 'iphone', type: 'secondary', label: 'Tailscale' },
+            { from: 'igor-gaming-1', to: 'smart', type: 'secondary', label: 'IoT Control' }
+        ];
+        
+        // Three.js Setup
+        let scene, camera, renderer, nodeObjects = {}, lineObjects = [];
+        let isRotating = true;
+        let raycaster, mouse;
+        let hoveredNode = null;
+        
+        function init() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x0a0a1a, 10, 50);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5, 15);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404080, 0.5);
+            scene.add(ambientLight);
+            
+            const pointLight1 = new THREE.PointLight(0x00d4ff, 1, 50);
+            pointLight1.position.set(10, 10, 10);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0x7c3aed, 1, 50);
+            pointLight2.position.set(-10, -10, -10);
+            scene.add(pointLight2);
+            
+            // Add grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x1a1a3a, 0x1a1a3a);
+            gridHelper.position.y = -4;
+            scene.add(gridHelper);
+            
+            // Create nodes
+            nodes.forEach(node => createNode(node));
+            
+            // Create connections
+            createConnections();
+            
+            // Create starfield
+            createStarfield();
+            
+            // Raycaster for interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            // Events
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onMouseMove);
+            
+            animate();
+        }
+        
+        function createNode(node) {
+            const group = new THREE.Group();
+            
+            // Main sphere
+            const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const material = new THREE.MeshPhongMaterial({
+                color: node.color,
+                emissive: node.color,
+                emissiveIntensity: 0.3,
+                shininess: 100
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            group.add(sphere);
+            
+            // Glow effect
+            const glowGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: node.color,
+                transparent: true,
+                opacity: 0.2
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            group.add(glow);
+            
+            // Ring for online status
+            if (node.status === 'online') {
+                const ringGeometry = new THREE.RingGeometry(0.8, 0.9, 32);
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: node.color,
+                    transparent: true,
+                    opacity: 0.6,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2;
+                group.add(ring);
+            }
+            
+            group.position.set(node.position.x, node.position.y, node.position.z);
+            group.userData = node;
+            
+            scene.add(group);
+            nodeObjects[node.id] = group;
+        }
+        
+        function createConnections() {
+            connections.forEach(conn => {
+                const fromNode = nodeObjects[conn.from];
+                const toNode = nodeObjects[conn.to];
+                
+                if (!fromNode || !toNode) return;
+                
+                const points = [];
+                points.push(fromNode.position.clone());
+                
+                // Add curve point
+                const midPoint = new THREE.Vector3().addVectors(fromNode.position, toNode.position).multiplyScalar(0.5);
+                midPoint.y += 1;
+                points.push(midPoint);
+                
+                points.push(toNode.position.clone());
+                
+                const curve = new THREE.QuadraticBezierCurve3(points[0], points[1], points[2]);
+                const curvePoints = curve.getPoints(50);
+                const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+                
+                let color;
+                switch(conn.type) {
+                    case 'primary': color = 0x00d4ff; break;
+                    case 'data': color = 0x22c55e; break;
+                    case 'hosting': color = 0xf472b6; break;
+                    default: color = 0x4b5563;
+                }
+                
+                const material = new THREE.LineBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                
+                const line = new THREE.Line(geometry, material);
+                scene.add(line);
+                lineObjects.push(line);
+            });
+        }
+        
+        function createStarfield() {
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const positions = new Float32Array(starCount * 3);
+            
+            for (let i = 0; i < starCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+            }
+            
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const starMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            const meshes = Object.values(nodeObjects).map(group => group.children[0]);
+            const intersects = raycaster.intersectObjects(meshes);
+            
+            const tooltip = document.getElementById('tooltip');
+            
+            if (intersects.length > 0) {
+                const node = intersects[0].object.parent.userData;
+                
+                tooltip.innerHTML = `
+                    <h4>${getNodeEmoji(node.type)} ${node.name}</h4>
+                    <div class="ip">${node.ip}</div>
+                    <div><strong>OS:</strong> ${node.os}</div>
+                    <div><strong>Role:</strong> ${node.role}</div>
+                    <div><strong>Status:</strong> <span class="status-badge status-${node.status}">${node.status}</span></div>
+                    <div class="services">
+                        ${node.services.map(s => `<span>${s}</span>`).join('')}
+                    </div>
+                `;
+                
+                tooltip.style.left = (event.clientX + 20) + 'px';
+                tooltip.style.top = (event.clientY - 20) + 'px';
+                tooltip.classList.add('visible');
+                
+                hoveredNode = node.id;
+            } else {
+                tooltip.classList.remove('visible');
+                hoveredNode = null;
+            }
+        }
+        
+        function getNodeEmoji(type) {
+            const emojis = {
+                'control': '💻',
+                'compute': '🖥️',
+                'windows': '🪟',
+                'virtualization': '📦',
+                'cloud-vm': '☁️',
+                'iot': '📡',
+                'mobile': '📱',
+                'deprecated': '💤'
+            };
+            return emojis[type] || '🔷';
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isRotating) {
+                const time = Date.now() * 0.0005;
+                camera.position.x = Math.sin(time) * 15;
+                camera.position.z = Math.cos(time) * 15;
+                camera.lookAt(0, 0, 0);
+            }
+            
+            // Animate nodes
+            Object.values(nodeObjects).forEach((group, i) => {
+                const time = Date.now() * 0.002;
+                group.position.y = group.userData.position.y + Math.sin(time + i) * 0.2;
+                
+                // Pulse effect for hovered node
+                if (hoveredNode === group.userData.id) {
+                    group.scale.set(1.2, 1.2, 1.2);
+                } else {
+                    group.scale.set(1, 1, 1);
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        function setView(view) {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Camera transitions for different views could be added here
+            console.log('Switching to view:', view);
+        }
+        
+        function toggleRotation() {
+            isRotating = !isRotating;
+            event.target.textContent = isRotating ? '⏸️ Pause' : '▶️ Play';
+        }
+        
+        init();
+    </script>
+</body>
+</html>
