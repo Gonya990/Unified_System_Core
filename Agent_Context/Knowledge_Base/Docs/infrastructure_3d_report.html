@@ -320,13 +320,129 @@
 
         @media (max-width: 768px) {
 
-            .info-panel,
+            .info-panel {
+                position: fixed;
+                right: 0;
+                left: 0;
+                bottom: 0;
+                top: auto;
+                width: 100%;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(calc(100% - 60px));
+                transition: transform 0.3s ease;
+            }
+
+            .info-panel.expanded {
+                transform: translateY(0);
+            }
+
+            .info-panel::before {
+                content: '⬆️ Tap to expand';
+                display: block;
+                text-align: center;
+                padding: 10px;
+                font-size: 0.8rem;
+                color: #888;
+                border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+                margin-bottom: 10px;
+            }
+
+            .info-panel.expanded::before {
+                content: '⬇️ Tap to collapse';
+            }
+
             .legend {
                 display: none;
             }
 
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            header {
+                padding: 15px 20px;
+            }
+
+            .controls {
+                gap: 8px;
+                padding: 10px 15px;
+                flex-wrap: wrap;
+                max-width: 95%;
+                bottom: auto;
+                top: 80px;
+            }
+
+            .control-btn {
+                padding: 10px 16px;
+                font-size: 0.75rem;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.65rem;
+            }
+
+            .service-list li {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .node-tooltip {
+                max-width: 90vw;
+                left: 5vw !important;
+                right: 5vw !important;
+            }
+        }
+
+        /* Touch hint for mobile */
+        .touch-hint {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1rem;
+            text-align: center;
+            z-index: 200;
+            animation: fadeOut 3s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .touch-hint {
+                display: block;
             }
         }
     </style>
@@ -454,6 +570,7 @@
     </div>
 
     <div class="node-tooltip" id="tooltip"></div>
+    <div class="touch-hint">👆 Tap nodes to see details<br>🔄 Drag to rotate</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -1016,6 +1133,21 @@
             isRotating = !isRotating;
             event.target.textContent = isRotating ? '⏸️ Pause' : '▶️ Play';
         }
+
+        // Mobile panel toggle
+        function setupMobilePanel() {
+            const infoPanel = document.querySelector('.info-panel');
+            if (infoPanel) {
+                infoPanel.addEventListener('click', function (e) {
+                    if (window.innerWidth <= 768) {
+                        infoPanel.classList.toggle('expanded');
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', setupMobilePanel);
 
         init();
     </script>
