@@ -37,7 +37,10 @@ SCOPES = [
 ]
 
 # Paths
-BASE_DIR = Path("/Users/macbook/Documents/Unified_System")
+# Determine BASE_DIR relative to this script location
+# Script is in: Unified_System/Scripts/automation/gmail_agent.py
+# Base should be: Unified_System/
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDS_DIR.mkdir(parents=True, exist_ok=True)
 
