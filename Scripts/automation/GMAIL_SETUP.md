@@ -119,6 +119,33 @@ Add to crontab:
 0 * * * * /usr/bin/python3 /Users/macbook/Documents/Unified_System/Scripts/automation/gmail_agent.py >> /Users/macbook/Documents/Unified_System/logs/automation/gmail_agent.log 2>&1
 ```
 
+### Server Deployment (e.g., Linux/Ubuntu)
+
+Since servers often lack a GUI, you must authenticate locally (on Mac) and transfer credentials.
+
+1. **Sync Code & Credentials:**
+
+    ```bash
+    # Copy from Mac to Server (example)
+    rsync -avz Scripts/automation/ user@server:Documents/Unified_System/Scripts/automation/
+    ```
+
+2. **Setup Virtual Environment (Server):**
+
+    ```bash
+    python3 -m venv Documents/Unified_System/venv
+    source Documents/Unified_System/venv/bin/activate
+    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+    ```
+
+3. **Cron (Server):**
+
+    ```bash
+    0 * * * * /path/to/venv/bin/python /path/to/script/gmail_agent.py >> /path/to/logs/gmail_agent.log 2>&1
+    ```
+
+```
+
 ---
 
 ## Output Example | Пример вывода
