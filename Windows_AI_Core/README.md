@@ -108,3 +108,16 @@ sudo systemctl start ai-bot
 
 ---
 Developed by Gonya for Unified System.
+
+## 🛡️ Monitoring (Watchdog)
+
+Для автоматического мониторинга здоровья бота используется `ai-watchdog.service`.
+Он проверяет `/health` endpoint каждые 60 секунд.
+
+**Установка:**
+```bash
+sudo cp Windows_AI_Core/config/ai-watchdog.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable ai-watchdog
+sudo systemctl start ai-watchdog
+```

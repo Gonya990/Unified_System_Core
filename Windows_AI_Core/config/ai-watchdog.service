@@ -1,0 +1,15 @@
+[Unit]
+Description=AI Watchdog Service
+After=network.target ai-bot.service
+
+[Service]
+Type=simple
+User=gonya
+WorkingDirectory=/home/gonya/Documents/Unified_System
+EnvironmentFile=/home/gonya/Documents/Unified_System/Windows_AI_Core/.env
+ExecStart=/home/gonya/Documents/Unified_System/venv/bin/python -m Windows_AI_Core.src.watchdog
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
