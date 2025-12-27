@@ -706,6 +706,60 @@ async def cmd_infra(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 @require_auth
+async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Create and send database backup."""
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        return
+
+    await update.message.chat.send_action("upload_document")
+    
+    import zipfile
+    import os
+    from datetime import datetime
+    
+    # Files to backup
+    files = ["tasks.db", "usage.db", "jobs.db", "windows_ai_core.json"]
+    backup_name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+    
+    # Resolve paths (assume current working dir is project root or src parent)
+    # We will search in current dir and known subdirs
+    
+    try:
+        with zipfile.ZipFile(backup_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            found = False
+            for file in files:
+                # Try relative path
+                if os.path.exists(file):
+                    zipf.write(file)
+                    found = True
+                # Try config/ or root/
+                elif os.path.exists(f"Windows_AI_Core/{file}"):
+                    zipf.write(f"Windows_AI_Core/{file}", arcname=file)
+                    found = True
+                elif os.path.exists(f"config/{file}"):
+                     zipf.write(f"config/{file}", arcname=file)
+                     found = True
+            
+            if not found:
+                await update.message.reply_text("⚠️ Не найдено файлов баз данных для бэкапа.")
+                os.remove(backup_name)
+                return
+
+        # Send file
+        await update.message.reply_document(
+            document=open(backup_name, "rb"),
+            caption=f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"
+        )
+        
+        # Cleanup
+        os.remove(backup_name)
+        
+    except Exception as e:
+        logger.error(f"Backup failed: {e}")
+        await update.message.reply_text(f"❌ Backup error: {e}")
+
+@require_auth
 async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
@@ -1124,6 +1178,7 @@ async def post_init(application: Application) -> None:
         BotCommand("todo", "📝 Задачи"),
         BotCommand("remind", "⏰ Напоминания"),
         BotCommand("infra", "🏗 Инфраструктура"),
+        BotCommand("backup", "📦 Бэкап"),
         BotCommand("update", "🔄 Обновить систему"),
         BotCommand("ha", "🏠 Умный дом"),
         BotCommand("clear", "🧹 Очистить контекст"),
@@ -1137,11 +1192,53 @@ async def post_init(application: Application) -> None:
     # Start Scheduler
     scheduler.set_application(application)
     scheduler.start()
+    
+    # Schedule Daily Backup (at 03:00 AM)
+    scheduler.scheduler.add_job(
+        run_auto_backup,
+        'cron',
+        hour=3,
+        minute=0,
+        args=[application]
+    )
 
     logger.info("Alice Skill & Scheduler started.")
     
     # Start Periodic Scheduler
     asyncio.create_task(run_periodic_scan(application))
+
+
+async def run_auto_backup(application: Application):
+    """Run automatic daily backup."""
+    # We need to send to admin
+    try:
+        # Re-use cmd_backup logic or perform simplified backup
+        # Since cmd_backup requires 'update' object, we write custom logic here 
+        # OR mock update object. Writing custom logic is cleaner.
+        
+        import zipfile
+        import os
+        from datetime import datetime
+        
+        files = ["tasks.db", "usage.db", "jobs.db"]
+        backup_name = f"daily_backup_{datetime.now().strftime('%Y%m%d')}.zip"
+        
+        with zipfile.ZipFile(backup_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file in files:
+                 if os.path.exists(file):
+                    zipf.write(file)
+        
+        # Send to Admin
+        if ADMIN_ID:
+             await application.bot.send_document(
+                chat_id=ADMIN_ID,
+                document=open(backup_name, "rb"),
+                caption="📦 Автоматический ежедневный бэкап"
+            )
+             os.remove(backup_name)
+             
+    except Exception as e:
+        logger.error(f"Auto-backup failed: {e}")
 
 
 async def run_periodic_scan(application: Application):
@@ -1227,6 +1324,7 @@ def main() -> None:
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))
+    application.add_handler(CommandHandler("backup", cmd_backup))
     application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
     

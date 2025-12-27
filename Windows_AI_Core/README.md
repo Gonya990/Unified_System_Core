@@ -16,6 +16,7 @@
 | **Infra Map** | Статус серверов и сервисов. | `/infra` |
 | **Vision** | Анализ изображений (Gemini Vision). | Отправь фото (+caption) |
 | **Auto-Update** | Самообновление (Git + Pip + Restart). | `/update` |
+| **Backup** | Бэкап баз данных в чат. | `/backup` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
