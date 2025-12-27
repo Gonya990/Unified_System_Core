@@ -1012,8 +1012,33 @@ async def process_text_request(text: str, user_id: int) -> str:
 
 
 async def post_init(application: Application) -> None:
+    """Post-initialization hook."""
+    # Set commands
+    commands = [
+        BotCommand("start", "🚀 Запустить бота"),
+        BotCommand("help", "❓ Помощь"),
+        BotCommand("status", "📊 Статус системы"),
+        BotCommand("models", "🧠 Выбор модели"),
+        BotCommand("scan", "🕵️‍♂️ Поиск вакансий"),
+        BotCommand("imagine", "🎨 Генерация картинок"),
+        BotCommand("search", "🌐 Поиск"),
+        BotCommand("todo", "📝 Задачи"),
+        BotCommand("remind", "⏰ Напоминания"),
+        BotCommand("infra", "🏗 Инфраструктура"),
+        BotCommand("ha", "🏠 Умный дом"),
+        BotCommand("clear", "🧹 Очистить контекст"),
     ]
     await application.bot.set_my_commands(commands)
+    
+    # Start Alice Skill
+    alice_skill.set_handler(process_text_request)
+    await alice_skill.start()
+    
+    # Start Scheduler
+    scheduler.set_application(application)
+    scheduler.start()
+
+    logger.info("Alice Skill & Scheduler started.")
     
     # Start Periodic Scheduler
     asyncio.create_task(run_periodic_scan(application))
