@@ -15,6 +15,7 @@
 | **Reminders** | Напоминания по времени. | `/remind 10m text` |
 | **Infra Map** | Статус серверов и сервисов. | `/infra` |
 | **Vision** | Анализ изображений (Gemini Vision). | Отправь фото (+caption) |
+| **Auto-Update** | Самообновление (Git + Pip + Restart). | `/update` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
@@ -115,6 +116,7 @@ Developed by Gonya for Unified System.
 Он проверяет `/health` endpoint каждые 60 секунд.
 
 **Установка:**
+
 ```bash
 sudo cp Windows_AI_Core/config/ai-watchdog.service /etc/systemd/system/
 sudo systemctl daemon-reload

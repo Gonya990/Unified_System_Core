@@ -47,6 +47,9 @@ alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
 scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jobs.db')}")
 infra_manager = InfrastructureManager()
 
+# Admin ID for sensitive commands (update)
+ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
+
 # System prompt for AI responses
 SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
 Ты управляешь сервером igor-gaming-1 и умным домом Home Assistant.
@@ -150,7 +153,9 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/todo <cmd> - 📝 Задачи (add/list/done)\n"
         "/remind <time> <text> - ⏰ Напоминание (10m, 1h)\n"
         "/infra - 🏗 Инфраструктура\n"
+        "/update - 🔄 Обновить бота\n"
         "/ha <cmd> - 🏠 Управление умным домом\n"
+         
          
         "/help - ❓ Помощь"
     )
@@ -701,6 +706,61 @@ async def cmd_infra(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 @require_auth
+async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /update command - self-update via git and restart."""
+    user_id = update.effective_user.id
+    
+    if user_id != ADMIN_ID:
+        await update.message.reply_text("❌ Только главный администратор может обновлять бота.")
+        return
+        
+    await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Pull...")
+    
+    import subprocess
+    try:
+        # 1. Git Pull
+        # Assume running in project root or src parent
+        project_dir = "/home/gonya/Documents/Unified_System"
+        
+        proc = await asyncio.create_subprocess_shell(
+            f"cd {project_dir} && git pull",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode != 0:
+            await update.message.reply_text(f"❌ Git Pull Failed:\n{stderr.decode()}")
+            return
+            
+        await update.message.reply_text(f"✅ Code updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Updating Dependencies...")
+        
+        # 2. Pip Install
+        venv_pip = f"{project_dir}/venv/bin/pip"
+        proc = await asyncio.create_subprocess_shell(
+            f"{venv_pip} install -r {project_dir}/Windows_AI_Core/requirements.txt",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode != 0:
+            await update.message.reply_text(f"⚠️ Pip Install Warning (continuing):\n{stderr.decode()[:300]}")
+        else:
+            await update.message.reply_text("✅ Dependencies updated.")
+            
+        # 3. Restart
+        await update.message.reply_text("♻️ Перезапускаю сервис (systemd)... Я вернусь через 5-10 секунд.")
+        
+        # We use the NOPASSWD sudo rule we configured earlier
+        subprocess.Popen(["sudo", "systemctl", "restart", "ai-bot"])
+        
+    except Exception as e:
+        logger.error(f"Update failed: {e}")
+        await update.message.reply_text(f"❌ Critical Update Error: {e}")
+
+
+@require_auth
 async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /todo command - manage tasks."""
     user_id = update.effective_user.id
@@ -1064,6 +1124,7 @@ async def post_init(application: Application) -> None:
         BotCommand("todo", "📝 Задачи"),
         BotCommand("remind", "⏰ Напоминания"),
         BotCommand("infra", "🏗 Инфраструктура"),
+        BotCommand("update", "🔄 Обновить систему"),
         BotCommand("ha", "🏠 Умный дом"),
         BotCommand("clear", "🧹 Очистить контекст"),
     ]
@@ -1166,6 +1227,7 @@ def main() -> None:
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))
+    application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
     
     # Handle voice messages
