@@ -18,6 +18,7 @@
 | **Auto-Update** | Самообновление (Git + Pip + Restart). | `/update` |
 | **Backup** | Бэкап баз данных в чат. | `/backup` |
 | **Dashboard** | Веб-панель управления и логов. | `http://<ip>:8096` |
+| **Linear** | Профессиональный таск-трекер. | `/linear me`, `/linear create` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |

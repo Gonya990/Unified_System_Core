@@ -31,6 +31,7 @@ from .scheduler_service import SchedulerService
 from .infrastructure import InfrastructureManager
 from .dashboard import DashboardService
 from .notification_manager import NotificationManager
+from .linear_client import LinearClient
 
 # Initialize logging first
 setup_logging()
@@ -49,6 +50,7 @@ alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
 scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jobs.db')}")
 infra_manager = InfrastructureManager()
 notify_manager = NotificationManager()  # Quiet hours: 23:00-08:00 by default
+linear_client = LinearClient()
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -916,6 +918,72 @@ async def cmd_notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_linear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Linear task management."""
+    if not linear_client.api_key:
+        await update.message.reply_text("❌ Linear API key not configured.")
+        return
+    
+    if not context.args:
+        await update.message.reply_text(
+            "📋 **Linear Commands:**\n\n"
+            "/linear me - мои задачи\n"
+            "/linear create <title> - создать задачу\n"
+            "/linear teams - список команд",
+            parse_mode="Markdown"
+        )
+        return
+    
+    cmd = context.args[0].lower()
+    
+    if cmd == "me":
+        issues = linear_client.get_my_issues(limit=10)
+        if not issues:
+            await update.message.reply_text("📭 У вас нет активных задач в Linear.")
+            return
+        
+        msg = "📋 **Ваши задачи в Linear:**\n\n"
+        for issue in issues:
+            priority_emoji = {0: "⚪", 1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢"}
+            emoji = priority_emoji.get(issue.get("priority", 0), "⚪")
+            msg += f"{emoji} [{issue['identifier']}]({issue['url']}) {issue['title']}\n"
+            msg += f"   └ {issue['state']['name']}\n\n"
+        
+        await update.message.reply_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
+    
+    elif cmd == "create":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /linear create <title>")
+            return
+        
+        title = " ".join(context.args[1:])
+        issue = linear_client.create_issue(title, priority=3)  # Normal priority
+        
+        if issue:
+            await update.message.reply_text(
+                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}",
+                parse_mode="Markdown"
+            )
+        else:
+            await update.message.reply_text("❌ Не удалось создать задачу.")
+    
+    elif cmd == "teams":
+        teams = linear_client.get_teams()
+        if not teams:
+            await update.message.reply_text("❌ Не удалось получить список команд.")
+            return
+        
+        msg = "👥 **Ваши команды в Linear:**\n\n"
+        for team in teams:
+            msg += f"• {team['name']} (`{team['key']}`)\n"
+        
+        await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    else:
+        await update.message.reply_text(f"Unknown command: {cmd}")
+
+
+@require_auth
 async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /todo command - manage tasks."""
     user_id = update.effective_user.id
@@ -1438,6 +1506,7 @@ def main() -> None:
     application.add_handler(CommandHandler("usage", cmd_usage))
     application.add_handler(CommandHandler("costs", cmd_costs))
     application.add_handler(CommandHandler("search", cmd_search))
+    application.add_handler(CommandHandler("linear", cmd_linear))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))

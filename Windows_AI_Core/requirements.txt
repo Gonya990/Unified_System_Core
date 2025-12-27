@@ -13,3 +13,4 @@ fastapi
 uvicorn
 jinja2
 google-search-results
+linear-sdk
