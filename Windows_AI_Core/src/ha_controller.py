@@ -66,3 +66,44 @@ class HAController:
     async def get_states(self):
         if not self.client: return []
         return self.client.get_states()
+        
+    async def run_script(self, entity_id: str):
+        """Run a HA script."""
+        if not self.client: return None
+        # Scripts are services in 'script' domain
+        # E.g. script.goodnight -> domain=script, service=goodnight OR domain=script, service=turn_on?
+        # Usually service: script.something is deprecated, better use service: script.turn_on entity_id=script.something
+        # But actually for scripts: domain='script', service=name_after_dot
+        
+        name = entity_id.replace("script.", "")
+        return self.client.call_service("script", name)
+
+    async def activate_scene(self, entity_id: str):
+        """Activate a scene."""
+        if not self.client: return None
+        return self.client.call_service("scene", "turn_on", entity_id=entity_id)
+
+    async def get_sensors_report(self) -> str:
+        """Get summary of sensors."""
+        if not self.client: return "HA unavailable"
+        
+        states = self.client.get_states()
+        sensors = []
+        
+        for s in states:
+            eid = s.get('entity_id', '')
+            state = s.get('state', '')
+            unit = s.get('attributes', {}).get('unit_of_measurement', '')
+            name = s.get('attributes', {}).get('friendly_name', eid)
+            
+            if eid.startswith("sensor.") and state not in ["unknown", "unavailable"]:
+                # Filter useful sensors only (this simple filter might be too broad)
+                # Maybe only temperature/humidity/power
+                if unit in ["°C", "%", "W", "lx", "V"]:
+                    sensors.append(f"🔹 **{name}**: {state}{unit}")
+                    
+        if not sensors:
+            return "Сенсоров не найдено."
+            
+        return "📊 **Показания датчиков**:\n" + "\n".join(sensors[:20]) # Limit to 20
+

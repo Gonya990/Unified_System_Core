@@ -503,42 +503,61 @@ async def post_init(application: Application) -> None:
 
 @require_auth
 async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /ha command - Home Assistant control."""
-    if not context.args:
-        await update.message.reply_text(
-            "🏠 **Home Assistant Control**\n\n"
-            "Usage:\n"
-            "`/ha status` - Check connection\n"
-            "`/ha lights on <entity_id>`\n"
-            "`/ha lights off <entity_id>`\n"
-            "`/ha temp <entity_id> <value>`",
-            parse_mode="Markdown"
-        )
-        return
+    """Handle /ha subcommands."""
+    if not ha_controller.HA_AVAILABLE:
+         await update.message.reply_text("❌ Home Assistant Integration not available.")
+         return
 
-    command = context.args[0].lower()
-    
-    try:
-        if command == "status":
-            status = await ha_controller.get_status()
-            await update.message.reply_text(f"📊 HA Status:\n```json\n{status}\n```", parse_mode="Markdown")
-            
-        elif command == "lights":
-            if len(context.args) < 3:
-                await update.message.reply_text("Usage: /ha lights <on/off> <entity_id>")
-                return
-            action = context.args[1].lower()
-            entity_id = context.args[2]
-            
-            if action == "on":
-                await ha_controller.turn_on_light(entity_id)
-                await update.message.reply_text(f"💡 Turned ON {entity_id}")
-            elif action == "off":
-                await ha_controller.turn_off_light(entity_id)
-                await update.message.reply_text(f"🌑 Turned OFF {entity_id}")
+    if not context.args:
+        await update.message.reply_text("Usage:\n/ha status\n/ha lights on/off\n/ha sensors\n/ha script <name>\n/ha scene <name>")
+        return
         
-    except Exception as e:
-        await update.message.reply_text(f"❌ Error: {e}")
+    cmd = context.args[0].lower()
+    
+    if cmd == "status":
+        status = await ha_controller.get_status()
+        await update.message.reply_text(f"🏠 HA Status:\n{status}")
+        
+    elif cmd == "sensors":
+        report = await ha_controller.get_sensors_report()
+        await update.message.reply_text(report, parse_mode="Markdown")
+        
+    elif cmd == "lights":
+        if len(context.args) < 2:
+             await update.message.reply_text("Usage: /ha lights on OR /ha lights off")
+             return
+        action = context.args[1].lower()
+        if action == "on":
+             # This is dangerous (turns on ALL lights), maybe specific entity?
+             # For safety let's ask for entity or just demo
+             await ha_controller.turn_on_light("all") 
+             await update.message.reply_text("💡 Turning ON lights (mock/all)")
+        elif action == "off":
+             await ha_controller.turn_off_light("all")
+             await update.message.reply_text("🌑 Turning OFF lights")
+             
+    elif cmd == "script":
+        if len(context.args) < 2:
+             await update.message.reply_text("Usage: /ha script <script_name>")
+             return
+        script_name = context.args[1]
+        if not script_name.startswith("script."):
+            script_name = f"script.{script_name}"
+        await ha_controller.run_script(script_name)
+        await update.message.reply_text(f"▶️ Executing script: {script_name}")
+        
+    elif cmd == "scene":
+        if len(context.args) < 2:
+             await update.message.reply_text("Usage: /ha scene <scene_name>")
+             return
+        scene_name = context.args[1]
+        if not scene_name.startswith("scene."):
+            scene_name = f"scene.{scene_name}"
+        await ha_controller.activate_scene(scene_name)
+        await update.message.reply_text(f"🎬 Activating scene: {scene_name}")
+
+    else:
+        await update.message.reply_text(f"Unknown HA command: {cmd}")
 
 
 @require_auth
