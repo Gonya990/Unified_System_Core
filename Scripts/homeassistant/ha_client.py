@@ -75,7 +75,13 @@ class HomeAssistantClient:
     
     def get_integrations(self) -> List[Dict]:
         """Get all integration entries"""
-        return self.get('config/config_entries')
+        # Note: This endpoint may not be available in all HA versions
+        # Alternative: parse .storage/core.config_entries directly
+        try:
+            return self.get('config_entries/entry')
+        except:
+            # Fallback: try to get from states
+            return []
     
     def get_homekit_integration(self) -> Optional[Dict]:
         """Get HomeKit Bridge integration details"""
