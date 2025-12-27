@@ -28,6 +28,7 @@ from .web_search import WebSearch
 from .task_manager import TaskManager
 from .alice_skill import AliceSkill
 from .scheduler_service import SchedulerService
+from .infrastructure import InfrastructureManager
 
 # Initialize logging first
 setup_logging()
@@ -44,10 +45,14 @@ web_search = WebSearch()
 task_manager = TaskManager(db_path=config.get("TASKS_DB_PATH", "tasks.db"))
 alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
 scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jobs.db')}")
+infra_manager = InfrastructureManager()
 
 # System prompt for AI responses
-SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
-Ты работаешь на сервере `igor-gaming-1` и имеешь доступ к серверным командам.
+SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
+Ты управляешь сервером igor-gaming-1 и умным домом Home Assistant.
+Твоя инфраструктура:
+{infra_manager.get_summary()}
+
 Твоя главная цель - быть полезным и исполнительным.
 
 У тебя есть доступ к следующим ИНСТРУМЕНТАМ (Tools):
@@ -144,7 +149,9 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/search <query> - 🌐 Поиск в интернете\n"
         "/todo <cmd> - 📝 Задачи (add/list/done)\n"
         "/remind <time> <text> - ⏰ Напоминание (10m, 1h)\n"
+        "/infra - 🏗 Инфраструктура\n"
         "/ha <cmd> - 🏠 Управление умным домом\n"
+         
         "/help - ❓ Помощь"
     )
 
@@ -647,6 +654,14 @@ async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_infra(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /infra command."""
+    await update.message.chat.send_action("typing")
+    report = await infra_manager.check_nodes()
+    await update.message.reply_text(report, parse_mode="Markdown")
+
+
+@require_auth
 async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /todo command - manage tasks."""
     user_id = update.effective_user.id
@@ -1086,6 +1101,7 @@ def main() -> None:
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
+    application.add_handler(CommandHandler("infra", cmd_infra))
     application.add_handler(CommandHandler("scan", cmd_scan))
     
     # Handle voice messages
