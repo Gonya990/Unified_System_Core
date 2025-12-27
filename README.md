@@ -95,9 +95,48 @@ cd Agent_Context/Knowledge_Base/mcp-server && npm start
 
 ## 📊 Stats
 
-- **Machines**: 5 nodes connected
-- **Sessions**: 32 AI conversation artifacts
-- **Last Sync**: 2025-12-22
+- **Machines**: 5 nodes connected via Tailscale
+- **AI Bot Features**: 25+ capabilities
+- **Integrations**: 10+ (Telegram, HA, Linear, Calendar, HomeKit, Alice, etc.)
+- **Lines of Code**: ~5,000+
+- **Last Major Update**: 2025-12-27 (v2.0.0 - MEGA UPDATE)
+
+---
+
+## ✨ Latest Features (v2.0.0)
+
+🎉 **7 Major Features Added in One Session:**
+
+- 🔔 Notification Manager (smart quiet hours)
+- 📊 Dashboard v2 (web UI with charts)
+- 💰 Cost Tracking Pro (detailed analytics)
+- 📋 Linear API (professional tasks)
+- 🌅 Daily Digest (morning summary)
+- 📅 Google Calendar integration
+- 🏠 HomeKit Bridge (Apple Home)
+
+See [CHANGELOG.md](CHANGELOG.md) for full details.
+
+---
+
+## 🤖 AI Bot Capabilities
+
+The Unified AI Bot is now a **complete life management system**:
+
+- 💬 Multi-model chat (Gemini, OpenAI, Ollama)
+- 🎨 Image generation (DALL-E 3)
+- 👁 Photo analysis (Gemini Vision)
+- 🎤 Voice transcription (Whisper)
+- 🏠 Smart home control (HA + HomeKit)
+- 📅 Calendar management (Google)
+- 📋 Task tracking (Linear + local)
+- 🔍 Web search (Google via SerpApi)
+- 🌅 Daily digest (automated)
+- 📦 Auto-backup (daily at 03:00)
+- 🔄 Self-update capability
+- 🗣 Voice control (Yandex Alice)
+
+**Quick Start**: See [Windows_AI_Core/README.md](Windows_AI_Core/README.md)
 
 ---
 
