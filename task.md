@@ -31,9 +31,10 @@
 - [x] **Yandex.Station:** Отсканировать QR-код для завершения авторизации.
 - [x] **SmartThings Guide:** Полное руководство по исправлению + автоматический скрипт.
 - [x] **iPhone HA Guide:** Инструкция по включению фонового обновления.
-- [ ] **SmartThings CLI:** Установить и запустить cleanup_smartthings.sh (требует sudo пароль).
+- [x] **Bluetooth Guide:** Инструкция по пробросу DBus в Docker.
+- [ ] **SmartThings CLI:** Запустить cleanup_smartthings_api.py (требует PAT).
+- [ ] **Bluetooth Fix:** Следовать инструкции из BLUETOOTH_FIX_GUIDE.md на хосте.
 - [ ] **iPhone HA App:** Следовать инструкции из IPHONE_HA_SETUP.md.
-- [ ] **Bluetooth:** Добавить DBus в Docker конфигурацию HA.
 - [ ] **Проверка:** Протестировать все новые функции (HomeKit, Calendar, Linear, Digest).
 - [ ] **Документация:** Обновить ALICE_SETUP.md с новыми командами.
 
