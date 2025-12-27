@@ -14,6 +14,7 @@
 | **Task Manager** | Простой список задач (SQLite). | `/todo add/list/done` |
 | **Reminders** | Напоминания по времени. | `/remind 10m text` |
 | **Infra Map** | Статус серверов и сервисов. | `/infra` |
+| **Vision** | Анализ изображений (Gemini Vision). | Отправь фото (+caption) |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |

@@ -275,7 +275,26 @@ class InferenceClient:
         except Exception as e:
             logger.error(f"Transcription failed: {e}")
             return f"[Error]: {str(e)}"
-    
+            
+    async def analyze_image(self, image_path: str, prompt: str = "Describe this image") -> str:
+        """Analyze image using Gemini Vision."""
+        if self.provider != "gemini":
+            return "❌ Image analysis is currently only supported with Gemini provider."
+            
+        try:
+            from PIL import Image
+            img = Image.open(image_path)
+            
+            client = await self._get_gemini_client()
+            response = client.models.generate_content(
+                model=self.model,
+                contents=[prompt, img]
+            )
+            return response.text
+        except Exception as e:
+            logger.error(f"Image analysis failed: {e}")
+            return f"❌ Vision Error: {str(e)}"
+
     async def health_check(self) -> bool:
         """Check if the inference endpoint is reachable."""
         provider = self.provider

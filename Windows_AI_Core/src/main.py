@@ -328,6 +328,45 @@ async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     await update.message.reply_text(msg, parse_mode="Markdown")
 @require_auth
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle incoming photos."""
+    user_id = update.effective_user.id
+    
+    # Get the largest photo
+    photo = update.message.photo[-1]
+    
+    # Get caption or default prompt
+    prompt = update.message.caption or "Что изображено на этой картинке? Опиши подробно."
+    
+    await update.message.chat.send_action("typing")
+    await update.message.reply_text("👀 Смотрю на фото...")
+    
+    try:
+        import os
+        import tempfile
+        
+        # Download photo
+        file = await photo.get_file()
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            temp_path = f.name
+            
+        await file.download_to_drive(temp_path)
+        
+        # Analyze
+        response = await inference.analyze_image(temp_path, prompt)
+        
+        # Cleanup
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+            
+        await update.message.reply_text(response, parse_mode="Markdown")
+        
+    except Exception as e:
+        logger.error(f"Photo handling failed: {e}")
+        await update.message.reply_text(f"❌ Ошибка анализа фото: {e}")
+
+
+@require_auth
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming voice messages."""
     user_id = update.effective_user.id
@@ -1131,6 +1170,9 @@ def main() -> None:
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    
+    # Handle photos
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
