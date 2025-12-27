@@ -21,6 +21,8 @@ from .inference_client import InferenceClient
 from .conversation_manager import ConversationManager
 from .health import start_health_server
 from .logging_config import setup_logging
+from .image_generator import ImageGenerator
+from .ha_controller import HAController
 
 # Initialize logging first
 setup_logging()
@@ -30,6 +32,8 @@ logger = logging.getLogger(__name__)
 config = ConfigManager()
 inference = InferenceClient(config)
 conv_manager = ConversationManager(storage_path="conversations")
+image_gen = ImageGenerator(config)
+ha_controller = HAController()
 
 # System prompt for AI responses
 SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
@@ -119,6 +123,10 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/setendpoint <url> - 🔗 Адрес API\n"
         "/setapikey <key> - 🔑 Установить ключ\n"
         "/setmodel <name> - 🧠 Выбрать модель\n"
+        "/setapikey <key> - 🔑 Установить ключ\n"
+        "/setmodel <name> - 🧠 Выбрать модель\n"
+        "/imagine <prompt> - 🎨 Создать изображение\n"
+        "/ha <cmd> - 🏠 Управление умным домом\n"
         "/help - ❓ Помощь"
     )
 
@@ -242,6 +250,67 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except Exception as e:
         logger.error(f"Failed to start Job Hunter: {e}")
         await update.message.reply_text(f"❌ Ошибка запуска: {e}")
+
+
+
+@require_auth
+async def cmd_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /imagine command - generate image."""
+    user_id = update.effective_user.id
+    if not context.args:
+        await update.message.reply_text("Usage: /imagine <description>\nExample: /imagine futuristic cyberpunk city")
+        return
+    
+    prompt = " ".join(context.args)
+    await update.message.reply_text(f"🎨 Generating image for: \"{prompt[:50]}...\"\n⏳ Please wait...")
+    
+    try:
+        image_path = await image_gen.generate(prompt, user_id)
+        if image_path:
+            await update.message.reply_photo(photo=open(image_path, 'rb'))
+    except Exception as e:
+        logger.error(f"Image generation failed: {e}")
+        await update.message.reply_text(f"❌ Image generation failed: {e}")
+
+
+@require_auth
+async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /ha command - Home Assistant control."""
+    if not context.args:
+        await update.message.reply_text(
+            "🏠 **Home Assistant Control**\n\n"
+            "Usage:\n"
+            "`/ha status` - Check connection\n"
+            "`/ha lights on <entity_id>`\n"
+            "`/ha lights off <entity_id>`\n"
+            "`/ha temp <entity_id> <value>`",
+            parse_mode="Markdown"
+        )
+        return
+
+    command = context.args[0].lower()
+    
+    try:
+        if command == "status":
+            status = await ha_controller.get_status()
+            await update.message.reply_text(f"📊 HA Status:\n```json\n{status}\n```", parse_mode="Markdown")
+            
+        elif command == "lights":
+            if len(context.args) < 3:
+                await update.message.reply_text("Usage: /ha lights <on/off> <entity_id>")
+                return
+            action = context.args[1].lower()
+            entity_id = context.args[2]
+            
+            if action == "on":
+                await ha_controller.turn_on_light(entity_id)
+                await update.message.reply_text(f"💡 Turned ON {entity_id}")
+            elif action == "off":
+                await ha_controller.turn_off_light(entity_id)
+                await update.message.reply_text(f"🌑 Turned OFF {entity_id}")
+        
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
 
 
 @require_auth
@@ -567,6 +636,10 @@ async def post_init(application: Application) -> None:
         BotCommand("setendpoint", "Set inference API URL"),
         BotCommand("setapikey", "Set API key"),
         BotCommand("setmodel", "Set model name"),
+        BotCommand("setapikey", "Set API key"),
+        BotCommand("setmodel", "Set model name"),
+        BotCommand("imagine", "Generate image"),
+        BotCommand("ha", "Home Assistant control"),
         BotCommand("scan", "Run Job Hunter Analysis"),
     ]
     await application.bot.set_my_commands(commands)
@@ -625,7 +698,7 @@ def main() -> None:
     logger.info("=" * 60)
     
     # Start health server
-    start_health_server(port=8085, health_callback=get_health_info)
+    start_health_server(port=8095, health_callback=get_health_info)
     
     # Get bot token
     token = config.get("TELEGRAM_BOT_TOKEN")
@@ -647,6 +720,8 @@ def main() -> None:
     application.add_handler(CommandHandler("status", cmd_status))
     application.add_handler(CommandHandler("models", cmd_models))
     application.add_handler(CommandHandler("clear", cmd_clear))
+    application.add_handler(CommandHandler("imagine", cmd_imagine))
+    application.add_handler(CommandHandler("ha", cmd_ha))
     application.add_handler(CommandHandler("setprovider", cmd_setprovider))
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))

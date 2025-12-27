@@ -172,32 +172,56 @@ class InferenceClient:
     async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> str:
         """Handle Gemini API calls using the SDK."""
         try:
-            model = _get_gemini_model(self.api_key, self.model)
-            if not model:
+            client = _get_gemini_client(self.api_key)
+            if not client:
                 return "[Error]: Gemini client not configured. Check API key."
             
-            # Build prompt from messages
-            prompt_parts = []
-            if system_prompt:
-                prompt_parts.append(f"System: {system_prompt}\n\n")
+            # Convert messages to Gemini format
+            # Gemini 2.0 / 1.5 uses 'contents' list with 'role' and 'parts'
+            # roles: 'user' or 'model' (not 'assistant')
+            gemini_contents = []
+            
+            # Add system prompt? 
+            # The new SDK supports 'config' with 'system_instruction'
             
             for msg in messages:
                 role = msg.get("role", "user")
                 content = msg.get("content", "")
-                if role == "user":
-                    prompt_parts.append(f"User: {content}\n")
-                elif role == "assistant":
-                    prompt_parts.append(f"Assistant: {content}\n")
-            
-            prompt = "".join(prompt_parts) + "Assistant:"
-            
-            logger.info(f"[gemini] Sending request with model {self.model}")
+                
+                # Map 'assistant' to 'model'
+                if role == "assistant":
+                    role = "model"
+                elif role == "system":
+                    # System prompt is handled separately in config, but if passed in messages list,
+                    # we might need to extract it or handle it. 
+                    # For now, simplistic handling:
+                    continue
+                
+                gemini_contents.append({
+                    "role": role,
+                    "parts": [{"text": content}]
+                })
+
+            logger.info(f"[{self.provider}] Sending request to Gemini with model {self.model}")
             
             # Gemini SDK is synchronous, run in executor
             import asyncio
-            loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(None, model.generate_content, prompt)
+            from google.genai.types import GenerateContentConfig
             
+            config = None
+            if system_prompt:
+                config = GenerateContentConfig(system_instruction=system_prompt)
+            
+            loop = asyncio.get_event_loop()
+            
+            def call_gemini():
+                return client.models.generate_content(
+                    model=self.model,
+                    contents=gemini_contents,
+                    config=config
+                )
+
+            response = await loop.run_in_executor(None, call_gemini)
             return response.text
             
         except Exception as e:
