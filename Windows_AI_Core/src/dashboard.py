@@ -46,6 +46,34 @@ async def get_logs():
             return {"logs": lines[-50:]}
     return {"logs": ["Log file not found"]}
 
+@app.get("/stats/tokens")
+async def get_token_stats():
+    """Get token usage statistics for chart."""
+    usage_tracker = bot_context.get("usage")
+    if not usage_tracker:
+        return {"dates": [], "tokens": []}
+    
+    # Mock data for now (would need to query DB by date)
+    # TODO: Implement daily aggregation in UsageTracker
+    return {
+        "dates": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "tokens": [1200, 1500, 900, 2100, 1800, 1300, 1600]
+    }
+
+@app.post("/action/{action}")
+async def run_action(action: str):
+    """Execute management actions."""
+    if action == "backup":
+        # Trigger backup (would need access to bot instance)
+        return {"message": "Backup triggered (not implemented yet)"}
+    
+    elif action == "restart":
+        import subprocess
+        subprocess.Popen(["sudo", "systemctl", "restart", "ai-bot"])
+        return {"message": "Bot restarting..."}
+    
+    return {"message": f"Unknown action: {action}"}
+
 class DashboardService:
     def __init__(self, port=8096, context=None):
         self.port = port

@@ -108,3 +108,67 @@ class UsageTracker:
         except Exception as e:
             logger.error(f"Failed to get stats: {e}")
             return None
+
+    def get_all_users_stats(self, days: int = 30) -> dict:
+        """Get aggregated stats for all users."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT 
+                        user_id,
+                        username,
+                        SUM(total_tokens) as total,
+                        COUNT(*) as requests
+                    FROM token_usage
+                    WHERE timestamp >= date('now', ?)
+                    GROUP BY user_id
+                    ORDER BY total DESC
+                """, (f'-{days} days',))
+                
+                users = []
+                for row in cursor.fetchall():
+                    users.append({
+                        "user_id": row['user_id'],
+                        "username": row['username'],
+                        "total_tokens": row['total'],
+                        "requests": row['requests']
+                    })
+                
+                return {"users": users}
+        except Exception as e:
+            logger.error(f"Failed to get all users stats: {e}")
+            return {"users": []}
+
+    def get_provider_breakdown(self, days: int = 30) -> dict:
+        """Get token usage breakdown by provider."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT 
+                        provider,
+                        SUM(total_tokens) as total,
+                        COUNT(*) as requests
+                    FROM token_usage
+                    WHERE timestamp >= date('now', ?)
+                    GROUP BY provider
+                    ORDER BY total DESC
+                """, (f'-{days} days',))
+                
+                providers = {}
+                for row in cursor.fetchall():
+                    providers[row['provider']] = {
+                        "tokens": row['total'],
+                        "requests": row['requests']
+                    }
+                
+                return providers
+        except Exception as e:
+            logger.error(f"Failed to get provider breakdown: {e}")
+            return {}
+

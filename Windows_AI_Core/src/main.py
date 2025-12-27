@@ -30,6 +30,7 @@ from .alice_skill import AliceSkill
 from .scheduler_service import SchedulerService
 from .infrastructure import InfrastructureManager
 from .dashboard import DashboardService
+from .notification_manager import NotificationManager
 
 # Initialize logging first
 setup_logging()
@@ -47,6 +48,7 @@ task_manager = TaskManager(db_path=config.get("TASKS_DB_PATH", "tasks.db"))
 alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
 scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jobs.db')}")
 infra_manager = InfrastructureManager()
+notify_manager = NotificationManager()  # Quiet hours: 23:00-08:00 by default
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -835,6 +837,85 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_costs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show detailed cost breakdown."""
+    user_id = update.effective_user.id
+    
+    # User's personal stats
+    user_stats = usage_tracker.get_user_stats(user_id, days=30)
+    
+    if not user_stats:
+        await update.message.reply_text("📊 Нет данных об использовании за последние 30 дней.")
+        return
+    
+    msg = "💰 **Детальная статистика (30 дней)**\n\n"
+    msg += f"📈 **Всего токенов**: {user_stats['total_tokens']:,}\n"
+    msg += f"📝 **Запросов**: {user_stats['requests']}\n\n"
+    
+    msg += "**По моделям:**\n"
+    for model, tokens in user_stats['by_model'].items():
+        msg += f"  • {model}: {tokens:,} токенов\n"
+    
+    # Provider breakdown (all users, admin only)
+    if user_id == ADMIN_ID:
+        msg += "\n🌐 **По провайдерам (все пользователи):**\n"
+        providers = usage_tracker.get_provider_breakdown(days=30)
+        for provider, data in providers.items():
+            msg += f"  • {provider}: {data['tokens']:,} токенов ({data['requests']} запросов)\n"
+        
+        # All users stats
+        all_users = usage_tracker.get_all_users_stats(days=30)
+        if all_users['users']:
+            msg += "\n👥 **По пользователям:**\n"
+            for u in all_users['users'][:5]:  # Top 5
+                msg += f"  • {u['username']}: {u['total_tokens']:,} токенов\n"
+    
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+@require_auth
+async def cmd_notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Manage notification settings."""
+    if not context.args:
+        quiet = notify_manager.is_quiet_hours()
+        status = "🌙 Тихий режим" if quiet else "🔔 Активный режим"
+        await update.message.reply_text(
+            f"{status}\n\n"
+            f"Тихие часы: {notify_manager.quiet_start.strftime('%H:%M')} - {notify_manager.quiet_end.strftime('%H:%M')}\n\n"
+            "Команды:\n"
+            "/notify status - текущий статус\n"
+            "/notify quiet HH:MM HH:MM - установить тихие часы"
+        )
+        return
+    
+    cmd = context.args[0].lower()
+    
+    if cmd == "status":
+        quiet = notify_manager.is_quiet_hours()
+        await update.message.reply_text("🌙 Сейчас тихие часы" if quiet else "🔔 Сейчас активный режим")
+    
+    elif cmd == "quiet":
+        if len(context.args) < 3:
+            await update.message.reply_text("Usage: /notify quiet 23:00 08:00")
+            return
+        
+        try:
+            from datetime import datetime
+            start_str = context.args[1]
+            end_str = context.args[2]
+            
+            start = datetime.strptime(start_str, "%H:%M").time()
+            end = datetime.strptime(end_str, "%H:%M").time()
+            
+            notify_manager.quiet_start = start
+            notify_manager.quiet_end = end
+            
+            await update.message.reply_text(f"✅ Тихие часы установлены: {start_str} - {end_str}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Ошибка формата времени: {e}")
+
+
+@require_auth
 async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /todo command - manage tasks."""
     user_id = update.effective_user.id
@@ -1199,6 +1280,7 @@ async def post_init(application: Application) -> None:
         BotCommand("remind", "⏰ Напоминания"),
         BotCommand("infra", "🏗 Инфраструктура"),
         BotCommand("backup", "📦 Бэкап"),
+        BotCommand("notify", "🔔 Уведомления"),
         BotCommand("update", "🔄 Обновить систему"),
         BotCommand("ha", "🏠 Умный дом"),
         BotCommand("clear", "🧹 Очистить контекст"),
@@ -1258,10 +1340,16 @@ async def run_auto_backup(application: Application):
         
         # Send to Admin
         if ADMIN_ID:
+             await notify_manager.send(
+                 application.bot,
+                 ADMIN_ID,
+                 "📦 Автоматический ежедневный бэкап",
+                 priority=NotificationManager.NORMAL  # Don't wake up at 3am
+             )
+             # Attach file separately (send doesn't support document)
              await application.bot.send_document(
                 chat_id=ADMIN_ID,
-                document=open(backup_name, "rb"),
-                caption="📦 Автоматический ежедневный бэкап"
+                document=open(backup_name, "rb")
             )
              os.remove(backup_name)
              
@@ -1348,11 +1436,13 @@ def main() -> None:
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
     application.add_handler(CommandHandler("usage", cmd_usage))
+    application.add_handler(CommandHandler("costs", cmd_costs))
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))
     application.add_handler(CommandHandler("backup", cmd_backup))
+    application.add_handler(CommandHandler("notify", cmd_notify))
     application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
     
