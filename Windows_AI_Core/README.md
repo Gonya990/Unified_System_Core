@@ -1,182 +1,106 @@
-# Настройка Windows ПК с NVIDIA RTX для работы с ИИ
+# Unified AI Bot (Gonya)
 
-## Обзор
+Мощный Telegram бот, объединяющий управление умным домом, задачи, генерацию контента и поиск информации. Работает на базе `python-telegram-bot` и интегрируется с Gemini, OpenAI, Ollama, Home Assistant и Yandex Alice.
 
-Этот набор скриптов поможет настроить Windows ПК с NVIDIA RTX для работы с ИИ приложениями через удалённое подключение с вашего Macbook Air M1.
+## 🚀 Функциональность
 
-## Архитектура решения
+| Feature | Описание | Команда / Инструмент |
+| :--- | :--- | :--- |
+| **AI Chat** | Умный диалог с поддержкой контекста. Поддержка Gemini 2.0, GPT-4, Llama 3. | Обычный текст |
+| **Image Gen** | Генерация изображений через DALL-E 3. | `/imagine <prompt>` |
+| **Home Control** | Управление светом и статусом Home Assistant. | `/ha status`, `/ha lights on/off` |
+| **Web Search** | Поиск информации в интернете (DuckDuckGo). | `/search <query>` |
+| **Task Manager** | Простой список задач (SQLite). | `/todo add/list/done` |
+| **Cost Tracking** | Учет использования токенов. | `/usage` |
+| **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
+| **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
 
-```
-Windows ML Runtime (ONNX Runtime)
-    ↓
-NVIDIA TensorRT для RTX (GPU Provider)
-    ↓
-NVIDIA RTX GPU
-```
+## 🛠 Установка и Запуск
 
-## Компоненты для установки
+### Требования
 
-1. **NVIDIA драйверы** - последние Game Ready или Studio Driver
-2. **CUDA Toolkit** - для поддержки GPU вычислений
-3. **cuDNN** - библиотека для глубокого обучения
-4. **TensorRT** - оптимизация inference на NVIDIA GPU
-5. **ONNX Runtime** - Windows ML Runtime с TensorRT провайдером
-6. **Python 3.10+** - для работы с Olive и примерами
-7. **Olive Toolkit** - оптимизация моделей для различного железа
+- Python 3.10+
+- `cloudflared` (для Алисы)
+- Redis (опционально для кэша)
 
-## Быстрый старт
+### 1. Установка зависимостей
 
-### 1. Подключение к Windows ПК с Mac
-
-#### Вариант A: Remote Desktop (RDP)
 ```bash
-# Установите Microsoft Remote Desktop на Mac
-brew install --cask microsoft-remote-desktop
-
-# Подключитесь через приложение Microsoft Remote Desktop
-# Введите IP адрес вашего Windows ПК
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-#### Вариант B: SSH (если настроен OpenSSH на Windows)
+### 2. Конфигурация (.env)
+
+Создайте файл `.env` в корне проекта:
+
+```ini
+TELEGRAM_BOT_TOKEN=your_token
+ALLOWED_USERS=12345678,87654321
+
+# Inference Providers
+INFERENCE_PROVIDER=gemini  # ollama / openai / gemini
+GEMINI_API_KEY=your_key
+OPENAI_API_KEY=your_key
+OLLAMA_BASE_URL=http://localhost:11434
+
+# Home Assistant
+HA_API_URL=http://homeassistant:8123
+HA_API_TOKEN=your_ha_token
+
+# Databases
+USAGE_DB_PATH=usage.db
+TASKS_DB_PATH=tasks.db
+```
+
+### 3. Запуск
+
 ```bash
-# Подключение через SSH
-ssh username@windows-pc-ip
+# Прямой запуск
+python -m src.main
 
-# Копирование файлов на Windows ПК
-scp -r windows-rtx-ai-setup username@windows-pc-ip:C:/Users/username/
+# Systemd (Linux)
+sudo systemctl start ai-bot
 ```
 
-### 2. Установка компонентов на Windows ПК
+## 🗣 Настройка Яндекс Алисы (Alice Skill)
 
-На Windows ПК запустите PowerShell **от имени администратора** и выполните:
+Бот запускает веб-сервер на порту `8090` для приема команд от Алисы.
 
-```powershell
-# Перейдите в папку со скриптами
-cd C:\Users\YourUsername\windows-rtx-ai-setup
+1. **Запустите туннель** (если сервер за NAT):
 
-# Разрешите выполнение скриптов
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```bash
+   cloudflared tunnel --url http://localhost:8090
+   ```
 
-# Запустите основной скрипт установки
-.\setup-rtx-ai-environment.ps1
-```
+2. **Создайте навык** в [Яндекс.Диалогах](https://dialogs.yandex.ru/developer).
+3. **Webhook URL**: Используйте URL от cloudflared + `/alice` (например, `https://xyz.trycloudflare.com/alice`).
+4. **Примеры фраз**:
+   - "Попроси Гоню включить свет на кухне"
+   - "Спроси у Гони статус сервера"
 
-### 3. Проверка установки
+## 📚 Команды Бота
 
-```powershell
-# Проверьте GPU
-.\verify-installation.ps1
-```
+- `/start` - Приветствие
+- `/help` - Помощь
+- `/status` - Статус системы и модели
+- `/models` - Выбор AI модели
+- `/setprovider` - Переключение провайдера (Gemini/Ollama/OpenAI)
+- `/setmodel` - Установка конкретной модели
+- `/imagine` - Генерация картинки
+- `/search` - Поиск в Google/DDG
+- `/todo` - Управление задачами
+- `/ha` - Управление Home Assistant
+- `/usage` - Статистика использования
+- `/scan` - Запуск Job Hunter
+- `/clear` - Очистка контекста диалога
 
-### 4. Оптимизация модели с Olive
+## 🔒 Безопасность
 
-```powershell
-# Установите Olive
-.\setup-olive.ps1
+- Доступ только для пользователей из `ALLOWED_USERS`.
+- Чувствительные команды (`[[RUN:CMD]]`) фильтруются через whitelist.
+- API ключи шифруются при сохранении (если настроено).
 
-# Оптимизируйте вашу ONNX модель
-python optimize-model-example.py --model path/to/your/model.onnx
-```
-
-## Структура проекта
-
-```
-windows-rtx-ai-setup/
-├── README.md                           # Этот файл
-├── setup-rtx-ai-environment.ps1       # Основной скрипт установки
-├── verify-installation.ps1            # Проверка установки
-├── setup-olive.ps1                    # Установка Olive Toolkit
-├── remote-connection-guide.md         # Руководство по удалённому подключению
-├── examples/
-│   ├── python/
-│   │   ├── onnx-runtime-basic.py     # Базовый пример ONNX Runtime
-│   │   ├── onnx-runtime-tensorrt.py  # Пример с TensorRT
-│   │   └── optimize-model-example.py  # Пример оптимизации с Olive
-│   └── csharp/
-│       ├── WindowsMLExample.csproj    # C# проект
-│       └── Program.cs                 # Пример на C#
-└── configs/
-    └── olive-config-example.json      # Пример конфигурации Olive
-```
-
-## Требования
-
-### На Windows ПК:
-- Windows 10/11 (64-bit)
-- NVIDIA RTX GPU (2000 серия или новее)
-- Минимум 8 GB RAM (рекомендуется 16 GB)
-- 20 GB свободного места на диске
-- Подключение к интернету
-
-### На Macbook Air M1:
-- macOS с установленным RDP клиентом или SSH
-- Сетевой доступ к Windows ПК
-
-## Полезные ссылки
-
-- [Windows ML Documentation](https://learn.microsoft.com/windows/ai/windows-ml/)
-- [ONNX Runtime Documentation](https://onnxruntime.ai/docs/)
-- [NVIDIA TensorRT](https://developer.nvidia.com/tensorrt)
-- [Olive Toolkit](https://github.com/microsoft/Olive)
-- [ONNX Model Zoo](https://github.com/onnx/models)
-
-## Поддержка
-
-При возникновении проблем:
-1. Проверьте логи в папке `logs/`
-2. Запустите `verify-installation.ps1` для диагностики
-3. Убедитесь, что все драйверы NVIDIA обновлены
-
-## Лицензия
-
-Этот набор скриптов предоставляется "как есть" для образовательных целей.
-
-<TargetFramework>net10.0</TargetFramework>
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
-
-# Загрузка небольшой модели для теста
-model_name = "microsoft/phi-2"  # 2.7B параметров - подходит для RTX 3080
-
-print("Загрузка модели...")
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    torch_dtype=torch.float16,  # FP16 для экономии памяти
-    device_map="cuda"  # Использовать GPU
-)
-
-print("Модель загружена на GPU!")
-
-# Генерация текста
-prompt = "What is artificial intelligence?"
-inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-
-outputs = model.generate(
-    **inputs,
-    max_length=100,
-    temperature=0.7
-)
-
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(f"\nPrompt: {prompt}")
-print(f"Response: {response}")
-
-# Более мощные модели (требуют больше VRAM)
-models = [
-    "microsoft/phi-3-mini-4k-instruct",  # 3.8B
-    "meta-llama/Llama-3.2-3B",          # 3B (нужен токен HF)
-    "google/gemma-2b",                   # 2B
-]
-
-# Модели с лучшей поддержкой русского:
-model_name = "bigscience/bloomz-560m"  # Меньше, но мультиязычная
-model_name = "facebook/opt-1.3b"        # Хорошо для диалогов
-
-# Интерактивный чат
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == "exit":
-        break
-    # ... генерация ответа
+---
+Developed by Gonya for Unified System.
