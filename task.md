@@ -28,10 +28,12 @@
 - [x] **HA Диагностика:** Полный аудит Home Assistant (329 сущностей, 32 интеграции).
 - [x] **HA Исправления:** Автоматические исправления (HACS cleanup, vacuum activation).
 - [x] **HA Скрипты:** Созданы инструменты диагностики (`quick_diag.py`, `fix_integrations.py`).
-- [ ] **Yandex.Station:** Отсканировать QR-код для завершения авторизации.
-- [ ] **SmartThings:** Очистить подписки на <https://smartthings.developer.samsung.com/>
+- [x] **Yandex.Station:** Отсканировать QR-код для завершения авторизации.
+- [x] **SmartThings Guide:** Полное руководство по исправлению + автоматический скрипт.
+- [x] **iPhone HA Guide:** Инструкция по включению фонового обновления.
+- [ ] **SmartThings CLI:** Установить и запустить cleanup_smartthings.sh (требует sudo пароль).
+- [ ] **iPhone HA App:** Следовать инструкции из IPHONE_HA_SETUP.md.
 - [ ] **Bluetooth:** Добавить DBus в Docker конфигурацию HA.
-- [ ] **iPhone HA App:** Включить фоновое обновление для сенсоров.
 - [ ] **Проверка:** Протестировать все новые функции (HomeKit, Calendar, Linear, Digest).
 - [ ] **Документация:** Обновить ALICE_SETUP.md с новыми командами.
 
