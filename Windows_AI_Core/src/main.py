@@ -27,6 +27,7 @@ from .usage_tracker import UsageTracker
 from .web_search import WebSearch
 from .task_manager import TaskManager
 from .alice_skill import AliceSkill
+from .scheduler_service import SchedulerService
 
 # Initialize logging first
 setup_logging()
@@ -42,6 +43,7 @@ usage_tracker = UsageTracker(db_path=config.get("USAGE_DB_PATH", "usage.db"))
 web_search = WebSearch()
 task_manager = TaskManager(db_path=config.get("TASKS_DB_PATH", "tasks.db"))
 alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
+scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jobs.db')}")
 
 # System prompt for AI responses
 SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
@@ -141,6 +143,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/usage - 📈 Статистика токенов\n"
         "/search <query> - 🌐 Поиск в интернете\n"
         "/todo <cmd> - 📝 Задачи (add/list/done)\n"
+        "/remind <time> <text> - ⏰ Напоминание (10m, 1h)\n"
         "/ha <cmd> - 🏠 Управление умным домом\n"
         "/help - ❓ Помощь"
     )
@@ -382,6 +385,10 @@ async def post_init(application: Application) -> None:
     # Start Alice Skill
     alice_skill.set_handler(process_text_request)
     await alice_skill.start()
+    
+    # Start Scheduler
+    scheduler.set_application(application)
+    scheduler.start()
 
     # Determine public URL (mock or real)
     logger.info("Alice Skill running on port 8090. Needs tunnel for public access.")
@@ -544,6 +551,43 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     except Exception as e:
         logger.error(f"Web search failed: {e}")
         await update.message.reply_text(f"❌ Ошибка при выполнении поиска: {e}")
+
+
+@require_auth
+async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /remind command."""
+    if len(context.args) < 2:
+        await update.message.reply_text("Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d")
+        return
+        
+    time_str = context.args[0].lower()
+    text = " ".join(context.args[1:])
+    user_id = update.effective_user.id
+    
+    # Parse time
+    import re
+    from datetime import datetime, timedelta
+    
+    match = re.match(r"^(\d+)([smhd])$", time_str)
+    if not match:
+        await update.message.reply_text("❌ Invalid time format. Use 10s, 5m, 1h, 2d")
+        return
+        
+    amount = int(match.group(1))
+    unit = match.group(2)
+    
+    delta = timedelta()
+    if unit == 's': delta = timedelta(seconds=amount)
+    elif unit == 'm': delta = timedelta(minutes=amount)
+    elif unit == 'h': delta = timedelta(hours=amount)
+    elif unit == 'd': delta = timedelta(days=amount)
+    
+    run_date = datetime.now() + delta
+    
+    if scheduler.add_reminder(user_id, text, run_date):
+        await update.message.reply_text(f"✅ Напоминание установлено на {run_date.strftime('%H:%M:%S')}")
+    else:
+        await update.message.reply_text("❌ Ошибка планировщика. Проверьте логи.")
 
 
 @require_auth
@@ -972,6 +1016,7 @@ def main() -> None:
     application.add_handler(CommandHandler("usage", cmd_usage))
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("todo", cmd_todo))
+    application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("scan", cmd_scan))
     
     # Handle voice messages
