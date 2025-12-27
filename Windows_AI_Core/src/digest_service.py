@@ -11,11 +11,12 @@ logger = logging.getLogger(__name__)
 class DigestService:
     """Generates daily digest reports."""
     
-    def __init__(self, usage_tracker, task_manager, linear_client, infra_manager):
+    def __init__(self, usage_tracker, task_manager, linear_client, infra_manager, calendar_client=None):
         self.usage_tracker = usage_tracker
         self.task_manager = task_manager
         self.linear_client = linear_client
         self.infra_manager = infra_manager
+        self.calendar_client = calendar_client
     
     async def generate_digest(self, user_id: int, username: str) -> str:
         """Generate daily digest for a user."""
@@ -83,7 +84,22 @@ class DigestService:
         except Exception as e:
             logger.error(f"Failed to get infra status for digest: {e}")
         
-        # 5. Motivational Quote
+        # 5. Calendar Events (Today)
+        if self.calendar_client:
+            try:
+                events = self.calendar_client.get_today_events()
+                if events:
+                    digest += f"📅 **События сегодня ({len(events)}):**\n"
+                    for event in events[:3]:
+                        formatted = self.calendar_client.format_event(event)
+                        digest += f"  • {formatted}\n"
+                    if len(events) > 3:
+                        digest += f"  ... и ещё {len(events) - 3}\n"
+                    digest += "\n"
+            except Exception as e:
+                logger.error(f"Failed to fetch calendar events for digest: {e}")
+        
+        # 6. Motivational Quote
         quotes = [
             "💪 Сегодня отличный день для продуктивности!",
             "🚀 Начни день с главной задачи!",

@@ -33,6 +33,7 @@ from .dashboard import DashboardService
 from .notification_manager import NotificationManager
 from .linear_client import LinearClient
 from .digest_service import DigestService
+from .calendar_client import CalendarClient
 
 # Initialize logging first
 setup_logging()
@@ -53,6 +54,7 @@ infra_manager = InfrastructureManager()
 notify_manager = NotificationManager()  # Quiet hours: 23:00-08:00 by default
 linear_client = LinearClient()
 digest_service = None  # Will be initialized after other services
+calendar_client = CalendarClient()
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -940,6 +942,54 @@ async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Calendar management."""
+    if not calendar_client.service:
+        await update.message.reply_text("❌ Google Calendar not configured.\n\nSet GOOGLE_CALENDAR_API_KEY in .env")
+        return
+    
+    if not context.args:
+        await update.message.reply_text(
+            "📅 **Calendar Commands:**\n\n"
+            "/calendar today - события сегодня\n"
+            "/calendar week - на неделю",
+            parse_mode="Markdown"
+        )
+        return
+    
+    cmd = context.args[0].lower()
+    
+    if cmd == "today":
+        events = calendar_client.get_today_events()
+        if not events:
+            await update.message.reply_text("📅 Сегодня нет событий.")
+            return
+        
+        msg = f"📅 **События сегодня ({len(events)}):**\n\n"
+        for event in events:
+            formatted = calendar_client.format_event(event)
+            msg += f"• {formatted}\n"
+        
+        await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    elif cmd == "week":
+        events = calendar_client.get_upcoming_events(days=7)
+        if not events:
+            await update.message.reply_text("📅 На этой неделе нет событий.")
+            return
+        
+        msg = f"📅 **События на неделю ({len(events)}):**\n\n"
+        for event in events:
+            formatted = calendar_client.format_event(event)
+            msg += f"• {formatted}\n"
+        
+        await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    else:
+        await update.message.reply_text(f"Unknown command: {cmd}")
+
+
+@require_auth
 async def cmd_linear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Linear task management."""
     if not linear_client.api_key:
@@ -1387,7 +1437,7 @@ async def post_init(application: Application) -> None:
     
     # Initialize Digest Service (needs other services)
     global digest_service
-    digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager)
+    digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager, calendar_client)
     
     # Schedule Daily Digest (at 09:00 AM)
     scheduler.scheduler.add_job(
@@ -1564,6 +1614,7 @@ def main() -> None:
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("linear", cmd_linear))
     application.add_handler(CommandHandler("digest", cmd_digest))
+    application.add_handler(CommandHandler("calendar", cmd_calendar))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))
