@@ -156,25 +156,81 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 @require_auth
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /status command - show current configuration."""
-    status = config.get_status()
+    """Handle /status command - show full system dashboard."""
+    user_id = update.effective_user.id
     
-    # Get provider info
-    provider = inference.provider.upper()
+    # Send "typing"
+    await update.message.chat.send_action("typing")
+    msg = await update.message.reply_text("🔍 Проверяю системы...")
     
-    # Check inference health
-    is_healthy = await inference.health_check()
-    health_emoji = "✅" if is_healthy else "❌"
+    # 1. System Metrics
+    import psutil
+    import time
+    from datetime import datetime, timedelta
     
-    await update.message.reply_text(
-        f"📊 **Статус Бота**\n\n"
-        f"🌐 Провайдер: `{provider}`\n"
-        f"🔗 URL: `{inference.base_url}`\n"
-        f"🤖 Модель: `{inference.model}`\n"
-        f"🔑 API Ключ: {'✅ Установлен' if status['api_key_set'] else '❌ Не установлен'}\n"
-        f"💚 Связь: {health_emoji} {'Онлайн' if is_healthy else 'Оффлайн'}",
-        parse_mode="Markdown"
+    cpu_usage = psutil.cpu_percent()
+    mem = psutil.virtual_memory()
+    uptime = time.time() - psutil.boot_time()
+    
+    def format_uptime(seconds):
+        days, remainder = divmod(seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{int(days)}d {int(hours)}h {int(minutes)}m"
+    
+    uptime_str = format_uptime(uptime)
+    
+    # 2. Inference Health
+    inf_status = "✅ OK" if await inference.health_check() else "❌ Error"
+    
+    # 3. HA Health
+    ha_status = "❓ Unknown"
+    try:
+        ha_res = await ha_controller.get_status()
+        if ha_res and ha_res.get("status") == "ok":
+            ha_status = f"✅ Online ({ha_res.get('version', 'unknown')})"
+        else:
+            ha_status = f"❌ Error: {ha_res.get('message', 'unknown')}"
+    except:
+        ha_status = "❌ Unreachable"
+
+    # 4. DB Stats
+    try:
+        # Check if DB files exist
+        import os
+        usage_db = config.get('USAGE_DB_PATH', 'usage.db')
+        tasks_db = config.get('TASKS_DB_PATH', 'tasks.db')
+        
+        usage_size = os.path.getsize(usage_db) / 1024 if os.path.exists(usage_db) else 0
+        tasks_size = os.path.getsize(tasks_db) / 1024 if os.path.exists(tasks_db) else 0
+        
+        db_status = f"✅ usage.db ({usage_size:.1f}KB), tasks.db ({tasks_size:.1f}KB)"
+    except Exception as e:
+        db_status = f"⚠️ Warning: {e}"
+
+    # 5. Build Message
+    dashboard = (
+        f"📊 **System Status**\n\n"
+        f"🖥 **Server**\n"
+        f"• CPU: `{cpu_usage}%`\n"
+        f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / {mem.total // 1024 // 1024}MB)\n"
+        f"• Uptime: `{uptime_str}`\n\n"
+        
+        f"🧠 **AI Core**\n"
+        f"• Provider: `{inference.provider}`\n"
+        f"• Model: `{inference.model}`\n"
+        f"• Status: {inf_status}\n\n"
+        
+        f"🏠 **Home Assistant**\n"
+        f"• Status: {ha_status}\n\n"
+        
+        f"🗄 **Databases**\n"
+        f"• {db_status}\n\n"
+        
+        f"🕒 Time: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
     )
+    
+    await msg.edit_text(dashboard, parse_mode="Markdown")
 
 
 async def cmd_setendpoint(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -870,7 +926,6 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             parse_mode="Markdown"
         )
         
-        # Notify denied user
         try:
             await context.bot.send_message(
                 chat_id=user_id,
@@ -880,9 +935,23 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             pass
 
 
-async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle errors."""
-    logger.error(f"Update {update} caused error: {context.error}")
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log the error and send a telegram message to notify the developer."""
+    logger.error(f"Exception while handling an update: {context.error}", exc_info=context.error)
+    
+    # Notify user if possible
+    if isinstance(update, Update) and update.effective_message:
+        text = "❌ Произошла внутренняя ошибка. Администратор уведомлен."
+        try:
+            await update.effective_message.reply_text(text)
+        except:
+            pass
+            
+    # Send traceback to admins (optional, maybe too noisy)
+    # import traceback
+    # tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+    # tb_string = "".join(tb_list)
+    # logger.error(tb_string)
 
 
 async def process_text_request(text: str, user_id: int) -> str:
