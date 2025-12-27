@@ -50,10 +50,10 @@ Implemented comprehensive GCP budget monitoring with Telegram alerts and Apple d
 ## Key URLs (Tailscale)
 
 | Service | URL |
-|---------|-----|
-| Home Assistant | <http://smart.tail5e8a72.ts.net:8123> |
-| Vasya API | <http://unified-home-core-cloud.tail5e8a72.ts.net:8080> |
-| Vasya Health | <http://unified-home-core-cloud.tail5e8a72.ts.net:8080/health> |
+| ------- | --- |
+| Home Assistant | `http://smart.tail5e8a72.ts.net:8123` |
+| Vasya API | `http://unified-home-core-cloud.tail5e8a72.ts.net:8080` |
+| Vasya Health | `http://unified-home-core-cloud.tail5e8a72.ts.net:8080/health` |
 
 ## Next Steps
 
