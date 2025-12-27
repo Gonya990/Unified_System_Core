@@ -18,16 +18,16 @@
 - [x] **Notification Manager:** Умные уведомления с тихими часами (`/notify`).
 - [x] **Dashboard v2:** Графики токенов, кнопки управления (Backup, Restart).
 - [x] **Cost Tracking Pro:** Детальная статистика по моделям и пользователям (`/costs`).
+- [x] **Linear API:** Интеграция с Linear.app для профессионального таск-менеджмента (`/linear`).
 
 ## 📋 Ближайшие шаги
 
 - [ ] **Проверка:** Вручную проверить работу Watchdog на `igor-gaming-1` (требует настройки sudo).
-- [ ] **Тестирование:** Протестировать все новые функции (Dashboard, SerpApi, HA sensors, /costs).
+- [ ] **Тестирование:** Протестировать все новые функции (Dashboard, Linear, /costs).
 
 ## 🔮 Будущее / Бэклог
 
 - [ ] Интеграция сопряжения HomeKit Bridge.
-- [ ] Настройка Linear API для продвинутого управления задачами.
 - [ ] BIOS Update для Proxmox Host (Re-size BAR, IOMMU).
 - [ ] Реализация Daily Digest (сводка дня в одном сообщении).
 - [ ] Интеграция с Календарем (Google Calendar / Outlook).
