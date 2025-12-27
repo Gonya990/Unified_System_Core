@@ -29,6 +29,7 @@ from .task_manager import TaskManager
 from .alice_skill import AliceSkill
 from .scheduler_service import SchedulerService
 from .infrastructure import InfrastructureManager
+from .dashboard import DashboardService
 
 # Initialize logging first
 setup_logging()
@@ -1206,6 +1207,14 @@ async def post_init(application: Application) -> None:
     
     # Start Periodic Scheduler
     asyncio.create_task(run_periodic_scan(application))
+    
+    # Start Web Dashboard
+    dashboard = DashboardService(port=8096, context={
+        "infra": infra_manager,
+        "usage": usage_tracker
+    })
+    dashboard.start()
+    logger.info("Web Dashboard started on port 8096")
 
 
 async def run_auto_backup(application: Application):
