@@ -34,6 +34,7 @@ from .notification_manager import NotificationManager
 from .linear_client import LinearClient
 from .digest_service import DigestService
 from .calendar_client import CalendarClient
+from .homekit_bridge import HomeKitBridge
 
 # Initialize logging first
 setup_logging()
@@ -55,6 +56,7 @@ notify_manager = NotificationManager()  # Quiet hours: 23:00-08:00 by default
 linear_client = LinearClient()
 digest_service = None  # Will be initialized after other services
 calendar_client = CalendarClient()
+homekit_bridge = None  # Optional, started on demand
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -942,6 +944,67 @@ async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_homekit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """HomeKit bridge management."""
+    global homekit_bridge
+    
+    if not context.args:
+        status = "🟢 Running" if homekit_bridge else "🔴 Stopped"
+        await update.message.reply_text(
+            f"🏠 **HomeKit Bridge Status:** {status}\n\n"
+            "/homekit start - запустить мост\n"
+            "/homekit stop - остановить\n"
+            "/homekit status - статус",
+            parse_mode="Markdown"
+        )
+        return
+    
+    cmd = context.args[0].lower()
+    
+    if cmd == "start":
+        if homekit_bridge:
+            await update.message.reply_text("⚠️ HomeKit bridge уже запущен.")
+            return
+        
+        try:
+            homekit_bridge = HomeKitBridge(ha_controller, port=51826)
+            homekit_bridge.start()
+            await update.message.reply_text(
+                "✅ **HomeKit Bridge запущен!**\n\n"
+                "📱 Откройте приложение Home на iPhone\n"
+                "➕ Нажмите '+' -> Добавить аксессуар\n"
+                "🔢 Код настройки: `123-45-678`\n\n"
+                "🏠 Устройства из Home Assistant будут добавлены автоматически.",
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            await update.message.reply_text(f"❌ Ошибка запуска: {e}")
+    
+    elif cmd == "stop":
+        if not homekit_bridge:
+            await update.message.reply_text("⚠️ HomeKit bridge не запущен.")
+            return
+        
+        homekit_bridge.stop()
+        homekit_bridge = None
+        await update.message.reply_text("✅ HomeKit bridge остановлен.")
+    
+    elif cmd == "status":
+        if homekit_bridge:
+            await update.message.reply_text(
+                "🟢 **HomeKit Bridge активен**\n\n"
+                "🔌 Port: 51826\n"
+                "🔢 Setup Code: 123-45-678",
+                parse_mode="Markdown"
+            )
+        else:
+            await update.message.reply_text("🔴 HomeKit bridge не запущен.")
+    
+    else:
+        await update.message.reply_text(f"Unknown command: {cmd}")
+
+
+@require_auth
 async def cmd_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Calendar management."""
     if not calendar_client.service:
@@ -1615,6 +1678,7 @@ def main() -> None:
     application.add_handler(CommandHandler("linear", cmd_linear))
     application.add_handler(CommandHandler("digest", cmd_digest))
     application.add_handler(CommandHandler("calendar", cmd_calendar))
+    application.add_handler(CommandHandler("homekit", cmd_homekit))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))

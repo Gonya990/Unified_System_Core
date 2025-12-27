@@ -20,6 +20,7 @@
 | **Dashboard** | Веб-панель управления и логов. | `http://<ip>:8096` |
 | **Linear** | Профессиональный таск-трекер. | `/linear me`, `/linear create` |
 | **Daily Digest** | Ежедневная сводка (09:00). | `/digest` |
+| **HomeKit Bridge** | Мост для Apple Home (lights, switches, sensors). | `/homekit start` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
