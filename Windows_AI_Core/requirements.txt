@@ -12,3 +12,4 @@ Pillow
 fastapi
 uvicorn
 jinja2
+google-search-results
