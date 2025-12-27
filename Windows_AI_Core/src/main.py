@@ -32,6 +32,7 @@ from .infrastructure import InfrastructureManager
 from .dashboard import DashboardService
 from .notification_manager import NotificationManager
 from .linear_client import LinearClient
+from .digest_service import DigestService
 
 # Initialize logging first
 setup_logging()
@@ -51,6 +52,7 @@ scheduler = SchedulerService(db_path=f"sqlite:///{config.get('JOBS_DB_PATH', 'jo
 infra_manager = InfrastructureManager()
 notify_manager = NotificationManager()  # Quiet hours: 23:00-08:00 by default
 linear_client = LinearClient()
+digest_service = None  # Will be initialized after other services
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -918,6 +920,26 @@ async def cmd_notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Generate and send daily digest."""
+    user_id = update.effective_user.id
+    username = update.effective_user.first_name or "User"
+    
+    if not digest_service:
+        await update.message.reply_text("❌ Digest service not initialized.")
+        return
+    
+    await update.message.chat.send_action("typing")
+    
+    try:
+        digest = await digest_service.generate_digest(user_id, username)
+        await update.message.reply_text(digest, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"Digest generation failed: {e}")
+        await update.message.reply_text(f"❌ Не удалось создать дайджест: {e}")
+
+
+@require_auth
 async def cmd_linear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Linear task management."""
     if not linear_client.api_key:
@@ -1363,6 +1385,19 @@ async def post_init(application: Application) -> None:
     scheduler.set_application(application)
     scheduler.start()
     
+    # Initialize Digest Service (needs other services)
+    global digest_service
+    digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager)
+    
+    # Schedule Daily Digest (at 09:00 AM)
+    scheduler.scheduler.add_job(
+        send_daily_digest,
+        'cron',
+        hour=9,
+        minute=0,
+        args=[application]
+    )
+    
     # Schedule Daily Backup (at 03:00 AM)
     scheduler.scheduler.add_job(
         run_auto_backup,
@@ -1384,6 +1419,27 @@ async def post_init(application: Application) -> None:
     })
     dashboard.start()
     logger.info("Web Dashboard started on port 8096")
+
+
+async def send_daily_digest(application: Application):
+    """Send daily digest to all users."""
+    try:
+        # Send to admin (or all allowed users)
+        if ADMIN_ID and digest_service:
+            # Get admin username from config or use default
+            username = "Admin"
+            digest = await digest_service.generate_digest(ADMIN_ID, username)
+            
+            await notify_manager.send(
+                application.bot,
+                ADMIN_ID,
+                digest,
+                priority=NotificationManager.NORMAL,
+                parse_mode="Markdown"
+            )
+            logger.info("Daily digest sent")
+    except Exception as e:
+        logger.error(f"Failed to send daily digest: {e}")
 
 
 async def run_auto_backup(application: Application):
@@ -1507,6 +1563,7 @@ def main() -> None:
     application.add_handler(CommandHandler("costs", cmd_costs))
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("linear", cmd_linear))
+    application.add_handler(CommandHandler("digest", cmd_digest))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("remind", cmd_remind))
     application.add_handler(CommandHandler("infra", cmd_infra))
