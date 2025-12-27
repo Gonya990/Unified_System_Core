@@ -1,0 +1,100 @@
+"""
+Daily Digest Service
+Generates and sends daily summary reports to users.
+"""
+import logging
+from datetime import datetime, timedelta
+from typing import Optional
+
+logger = logging.getLogger(__name__)
+
+class DigestService:
+    """Generates daily digest reports."""
+    
+    def __init__(self, usage_tracker, task_manager, linear_client, infra_manager):
+        self.usage_tracker = usage_tracker
+        self.task_manager = task_manager
+        self.linear_client = linear_client
+        self.infra_manager = infra_manager
+    
+    async def generate_digest(self, user_id: int, username: str) -> str:
+        """Generate daily digest for a user."""
+        
+        today = datetime.now().strftime("%d.%m.%Y")
+        day_name = datetime.now().strftime("%A")
+        
+        # Translate day name to Russian
+        days_ru = {
+            "Monday": "Понедельник",
+            "Tuesday": "Вторник", 
+            "Wednesday": "Среда",
+            "Thursday": "Четверг",
+            "Friday": "Пятница",
+            "Saturday": "Суббота",
+            "Sunday": "Воскресенье"
+        }
+        day_ru = days_ru.get(day_name, day_name)
+        
+        digest = f"🌅 **Доброе утро, {username}!**\n\n"
+        digest += f"📅 {day_ru}, {today}\n\n"
+        digest += "━━━━━━━━━━━━━━━━━━━━\n\n"
+        
+        # 1. Yesterday's Stats
+        stats = self.usage_tracker.get_user_stats(user_id, days=1)
+        if stats and stats.get('total_tokens', 0) > 0:
+            digest += "📊 **Вчера:**\n"
+            digest += f"  • Токенов: {stats['total_tokens']:,}\n"
+            digest += f"  • Запросов: {stats['requests']}\n\n"
+        
+        # 2. Tasks (Local)
+        tasks = self.task_manager.list_tasks(user_id)
+        if tasks:
+            digest += f"📝 **Задачи ({len(tasks)}):**\n"
+            for t in tasks[:3]:  # Top 3
+                digest += f"  • {t['text']}\n"
+            if len(tasks) > 3:
+                digest += f"  ... и ещё {len(tasks) - 3}\n"
+            digest += "\n"
+        
+        # 3. Linear Tasks
+        if self.linear_client.api_key:
+            try:
+                issues = self.linear_client.get_my_issues(limit=5)
+                if issues:
+                    digest += f"📋 **Linear ({len(issues)}):**\n"
+                    for issue in issues[:3]:
+                        digest += f"  • {issue['identifier']}: {issue['title'][:40]}...\n"
+                    if len(issues) > 3:
+                        digest += f"  ... и ещё {len(issues) - 3}\n"
+                    digest += "\n"
+            except Exception as e:
+                logger.error(f"Failed to fetch Linear issues for digest: {e}")
+        
+        # 4. Infrastructure Status
+        try:
+            health_summary = []
+            for node in self.infra_manager.data.get("nodes", []):
+                status = "🟢" if node.get("reachable") else "🔴"
+                health_summary.append(f"{status} {node['name']}")
+            
+            if health_summary:
+                digest += "🏗 **Инфраструктура:**\n"
+                digest += "  " + " | ".join(health_summary) + "\n\n"
+        except Exception as e:
+            logger.error(f"Failed to get infra status for digest: {e}")
+        
+        # 5. Motivational Quote
+        quotes = [
+            "💪 Сегодня отличный день для продуктивности!",
+            "🚀 Начни день с главной задачи!",
+            "⭐ Маленькие шаги ведут к большим целям!",
+            "🎯 Фокус на важном, а не срочном!",
+            "🌟 Ты можешь больше, чем думаешь!"
+        ]
+        import random
+        digest += quotes[random.randint(0, len(quotes) - 1)] + "\n\n"
+        
+        digest += "━━━━━━━━━━━━━━━━━━━━\n"
+        digest += "Хорошего дня! 😊"
+        
+        return digest
