@@ -9,3 +9,6 @@ apscheduler>=3.10.0
 psutil
 PyYAML
 Pillow
+fastapi
+uvicorn
+jinja2
