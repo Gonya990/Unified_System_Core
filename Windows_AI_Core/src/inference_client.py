@@ -102,11 +102,12 @@ class InferenceClient:
         if self._session and not self._session.closed:
             await self._session.close()
     
-    async def chat(self, messages: list[dict], system_prompt: str = "") -> str:
+    async def chat(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """
         Send chat completion request to configured endpoint.
         
         Supports Ollama, OpenAI-compatible, and Gemini APIs.
+        Returns: (response_text, usage_stats)
         """
         provider = self.provider
         
@@ -141,40 +142,51 @@ class InferenceClient:
                 "stream": False,
             }
         
+        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        
         try:
             logger.info(f"[{provider}] Sending request to {url} with model {self.model}")
             async with session.post(url, json=payload, timeout=60) as response:
                 if response.status != 200:
                     error_text = await response.text()
                     logger.error(f"Inference error {response.status}: {error_text}")
-                    return f"[Error {response.status}]: Failed to get response from AI"
+                    return f"[Error {response.status}]: Failed to get response from AI", usage
                 
                 data = await response.json()
                 
                 # Parse response based on API type
                 if "choices" in data:
                     # OpenAI format
-                    return data["choices"][0]["message"]["content"]
+                    text = data["choices"][0]["message"]["content"]
+                    if "usage" in data:
+                        usage = data["usage"]
+                    return text, usage
                 elif "message" in data:
                     # Ollama format
-                    return data["message"]["content"]
+                    text = data["message"]["content"]
+                    if "prompt_eval_count" in data:
+                         usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
+                         usage["completion_tokens"] = data.get("eval_count", 0)
+                         usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
+                    return text, usage
                 else:
                     logger.warning(f"Unknown response format: {data}")
-                    return str(data)
+                    return str(data), usage
                     
         except aiohttp.ClientError as e:
             logger.error(f"Connection error: {e}")
-            return f"[Connection Error]: Cannot reach inference server at {self.base_url}"
+            return f"[Connection Error]: Cannot reach inference server at {self.base_url}", usage
         except Exception as e:
             logger.exception(f"Unexpected error during inference: {e}")
-            return f"[Error]: {str(e)}"
+            return f"[Error]: {str(e)}", usage
     
-    async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> str:
+    async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """Handle Gemini API calls using the SDK."""
+        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         try:
             client = _get_gemini_client(self.api_key)
             if not client:
-                return "[Error]: Gemini client not configured. Check API key."
+                return "[Error]: Gemini client not configured. Check API key.", usage
             
             # Convert messages to Gemini format
             # Gemini 2.0 / 1.5 uses 'contents' list with 'role' and 'parts'
@@ -222,11 +234,18 @@ class InferenceClient:
                 )
 
             response = await loop.run_in_executor(None, call_gemini)
-            return response.text
+            
+            # Extract usage metadata if available
+            if hasattr(response, "usage_metadata"):
+                usage["prompt_tokens"] = response.usage_metadata.prompt_token_count
+                usage["completion_tokens"] = response.usage_metadata.candidates_token_count
+                usage["total_tokens"] = response.usage_metadata.total_token_count
+                
+            return response.text, usage
             
         except Exception as e:
             logger.exception(f"Gemini error: {e}")
-            return f"[Gemini Error]: {str(e)}"
+            return f"[Gemini Error]: {str(e)}", usage
     
     async def health_check(self) -> bool:
         """Check if the inference endpoint is reachable."""

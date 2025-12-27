@@ -23,6 +23,10 @@ from .health import start_health_server
 from .logging_config import setup_logging
 from .image_generator import ImageGenerator
 from .ha_controller import HAController
+from .usage_tracker import UsageTracker
+from .web_search import WebSearch
+from .task_manager import TaskManager
+from .alice_skill import AliceSkill
 
 # Initialize logging first
 setup_logging()
@@ -34,6 +38,10 @@ inference = InferenceClient(config)
 conv_manager = ConversationManager(storage_path="conversations")
 image_gen = ImageGenerator(config)
 ha_controller = HAController()
+usage_tracker = UsageTracker(db_path=config.get("USAGE_DB_PATH", "usage.db"))
+web_search = WebSearch()
+task_manager = TaskManager(db_path=config.get("TASKS_DB_PATH", "tasks.db"))
+alice_skill = AliceSkill(port=config.get("ALICE_PORT", 8090))
 
 # System prompt for AI responses
 SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
@@ -45,6 +53,7 @@ SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в 
 2. СТАТУС СИСТЕМЫ: "как дела", "статус", "мониторинг", "здоровье сервера" → [[RUN:STATUS]]
 3. КОМАНДЫ СЕРВЕРА: "выполни команду", "запусти на сервере", "проверь процессы" → [[RUN:CMD:<команда>]]
 4. СВЯЗЬ С ANTIGRAVITY: "спроси у Antigravity", "передай Antigravity", "нужна помощь агента" → [[ASK:ANTIGRAVITY:<вопрос>]]
+5. ПОИСК В ИНТЕРНЕТЕ: "погугли", "найди инфу", "кто такой...", "погода в..." → [[RUN:SEARCH:<запрос>]]
 
 ПРИМЕРЫ:
 User: "Найди мне работу"
@@ -55,6 +64,9 @@ AI: "Проверяю использование памяти... [[RUN:CMD:free 
 
 User: "Спроси у Antigravity, как настроить автозапуск"
 AI: "Передаю вопрос главному агенту... [[ASK:ANTIGRAVITY:Как настроить автозапуск службы?]]"
+
+User: "Погугли новости AI"
+AI: "Ищу новости... [[RUN:SEARCH:AI news]]"
 
 ВАЖНО: Ты можешь выполнять ТОЛЬКО безопасные команды (чтение, статус). Никогда не удаляй файлы и не останавливай критические службы без подтверждения пользователя."""
 
@@ -126,6 +138,9 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/setapikey <key> - 🔑 Установить ключ\n"
         "/setmodel <name> - 🧠 Выбрать модель\n"
         "/imagine <prompt> - 🎨 Создать изображение\n"
+        "/usage - 📈 Статистика токенов\n"
+        "/search <query> - 🌐 Поиск в интернете\n"
+        "/todo <cmd> - 📝 Задачи (add/list/done)\n"
         "/ha <cmd> - 🏠 Управление умным домом\n"
         "/help - ❓ Помощь"
     )
@@ -220,7 +235,32 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     
     await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
 
+    await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
 
+
+@require_auth
+async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /usage command - show token stats."""
+    user_id = update.effective_user.id
+    stats = usage_tracker.get_user_stats(user_id)
+    
+    if not stats:
+        await update.message.reply_text("📊 Статистики пока нет.")
+        return
+    
+    msg = (
+        f"📊 **Статистика за 30 дней**\n\n"
+        f"Всего запросов: `{stats['requests']}`\n"
+        f"Токенов всего: `{stats['total_tokens']}`\n"
+        f"Input: `{stats['prompt_tokens']}`\n"
+        f"Output: `{stats['completion_tokens']}`\n\n"
+        f"**По моделям:**\n"
+    )
+    
+    for model, tokens in stats["by_model"].items():
+        msg += f"- `{model}`: {tokens}\n"
+    
+    await update.message.reply_text(msg, parse_mode="Markdown")
 @require_auth
 async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /scan command - trigger Job Hunter."""
@@ -272,6 +312,30 @@ async def cmd_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         logger.error(f"Image generation failed: {e}")
         await update.message.reply_text(f"❌ Image generation failed: {e}")
 
+
+async def post_init(application: Application) -> None:
+    """Post-initialization hook."""
+    # Set commands
+    commands = [
+        BotCommand("start", "🚀 Запустить бота"),
+        BotCommand("help", "❓ Помощь"),
+        BotCommand("status", "📊 Статус системы"),
+        BotCommand("models", "🧠 Выбор модели"),
+        BotCommand("scan", "🕵️‍♂️ Поиск вакансий"),
+        BotCommand("imagine", "🎨 Генерация картинок"),
+        BotCommand("search", "🌐 Поиск"),
+        BotCommand("todo", "📝 Задачи"),
+        BotCommand("ha", "🏠 Умный дом"),
+        BotCommand("clear", "🧹 Очистить контекст"),
+    ]
+    await application.bot.set_my_commands(commands)
+    
+    # Start Alice Skill
+    alice_skill.set_handler(process_text_request)
+    await alice_skill.start()
+
+    # Determine public URL (mock or real)
+    logger.info("Alice Skill running on port 8090. Needs tunnel for public access.")
 
 @require_auth
 async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -412,6 +476,79 @@ async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     )
 
 
+@require_auth
+async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /search command - perform a web search."""
+    if not context.args:
+        await update.message.reply_text("Usage: /search <query>\nExample: /search latest AI news")
+        return
+    
+    query = " ".join(context.args)
+    await update.message.reply_text(f"🔍 Ищу: \"{query[:50]}...\"\n⏳ Пожалуйста, подождите...")
+    
+    try:
+        search_result = await web_search.search(query)
+        if search_result:
+            await update.message.reply_text(search_result, parse_mode="Markdown")
+        else:
+            await update.message.reply_text("❌ Не удалось найти результаты для вашего запроса.")
+    except Exception as e:
+        logger.error(f"Web search failed: {e}")
+        await update.message.reply_text(f"❌ Ошибка при выполнении поиска: {e}")
+
+
+@require_auth
+async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /todo command - manage tasks."""
+    user_id = update.effective_user.id
+    
+    if not context.args:
+        await update.message.reply_text(
+            "📝 **Task Manager**\n\n"
+            "Usage:\n"
+            "`/todo add <text>` - Add task\n"
+            "`/todo list` - List pending tasks\n"
+            "`/todo done <id>` - Complete task",
+            parse_mode="Markdown"
+        )
+        return
+
+    subcmd = context.args[0].lower()
+    
+    if subcmd == "add":
+        text = " ".join(context.args[1:])
+        if not text:
+            await update.message.reply_text("Usage: /todo add <text>")
+            return
+        
+        task_id = task_manager.add_task(user_id, text)
+        await update.message.reply_text(f"✅ Задача добавлена! ID: `{task_id}`", parse_mode="Markdown")
+        
+    elif subcmd == "list":
+        tasks = task_manager.list_tasks(user_id)
+        if not tasks:
+            await update.message.reply_text("📝 Задач нет. Отдыхай!")
+            return
+            
+        msg = "📋 **Твои задачи:**\n\n"
+        for t in tasks:
+            msg += f"• `#{t['id']}` {t['text']}\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+        
+    elif subcmd == "done":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /todo done <id>")
+            return
+        try:
+            task_id = int(context.args[1])
+            if task_manager.complete_task(user_id, task_id):
+                await update.message.reply_text(f"✅ Задача `#{task_id}` выполнена!", parse_mode="Markdown")
+            else:
+                await update.message.reply_text(f"❌ Не удалось найти или обновить задачу `#{task_id}`.")
+        except ValueError:
+            await update.message.reply_text("❌ ID должен быть числом.")
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming text messages."""
     user_id = update.effective_user.id
@@ -445,11 +582,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     conv_manager.add_message(user_id, "user", message_text)
     
     # Get AI response with conversation context
-    response = await inference.chat(messages, system_prompt=SYSTEM_PROMPT)
+    response, usage = await inference.chat(messages, system_prompt=SYSTEM_PROMPT)
     
     # Save assistant response to history
     conv_manager.add_message(user_id, "assistant", response)
     
+    # Log usage stats
+    if usage and usage.get("total_tokens", 0) > 0:
+        logger.info(f"Token Usage: {usage}", extra={"user_id": user_id})
+        # Persist usage
+        usage_tracker.log_usage(
+            user_id=user_id,
+            username=update.effective_user.username or user_name,
+            provider=inference.provider,
+            model=inference.model,
+            usage_stats=usage
+        )
+
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
     
     # Check for Tool Triggers
@@ -457,6 +606,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     trigger_status = "[[RUN:STATUS]]" in response
     trigger_cmd = "[[RUN:CMD:" in response
     trigger_antigravity = "[[ASK:ANTIGRAVITY:" in response
+    trigger_search = "[[RUN:SEARCH:" in response
     
     # Clean response
     clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "")
@@ -478,6 +628,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if match:
             antigravity_question = match.group(1)
             clean_response = clean_response.replace(f"[[ASK:ANTIGRAVITY:{antigravity_question}]]", "")
+            
+    # Extract Search query if present
+    search_query = None
+    if trigger_search:
+        import re
+        match = re.search(r'\[\[RUN:SEARCH:(.+?)\]\]', response)
+        if match:
+            search_query = match.group(1)
+            clean_response = clean_response.replace(f"[[RUN:SEARCH:{search_query}]]", "")
     
     clean_response = clean_response.strip()
     
@@ -528,6 +687,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             f"📨 Вопрос передан Antigravity Core:\n\"{antigravity_question}\"\n\n"
             f"💡 Пока эта функция в разработке. Antigravity ответит через основной интерфейс."
         )
+        
+    if trigger_search and search_query:
+        logger.info(f"Executing Search: {search_query}")
+        await update.message.reply_text(f"🔍 Ищу: {search_query}...")
+        search_result = await web_search.search(search_query)
+        await update.message.reply_text(search_result, parse_mode="Markdown")
+        
+        # Optional: Feed result back to AI?
+        # For now, just showing to user.
 
 
 async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -624,23 +792,49 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     logger.error(f"Update {update} caused error: {context.error}")
 
 
+async def process_text_request(text: str, user_id: int) -> str:
+    """Process a text request from any source (Telegram, Alice) and return response string."""
+    # 1. Get context
+    history = conv_manager.get_context_messages(user_id, limit=3) # Limit context for Alice
+    messages = history + [{"role": "user", "content": text}]
+    
+    # 2. Add to history
+    conv_manager.add_message(user_id, "user", text)
+    
+    # 3. Inference
+    response, usage = await inference.chat(messages, system_prompt=SYSTEM_PROMPT)
+    
+    # 4. Save response
+    conv_manager.add_message(user_id, "assistant", response)
+    
+    # 5. Log Usage
+    if usage and usage.get("total_tokens", 0) > 0:
+        logger.info(f"Token Usage: {usage}", extra={"user_id": user_id})
+        usage_tracker.log_usage(user_id, "AliceUser", inference.provider, inference.model, usage)
+
+    # 6. Process Triggers (Simplified for Alice)
+    clean_response = response
+    
+    if "[[RUN:SCAN]]" in response:
+        clean_response = clean_response.replace("[[RUN:SCAN]]", "").strip()
+        # Alice can't see the scan result immediately if it's async, allow simple ack
+        clean_response += "\n(Запускаю сканирование...)"
+        # Fire and forget scan
+        # We need 'update' object for cmd_scan, which we don't have here. 
+        # So skips scanning implementation for Alice for now or mock it.
+        
+    if "[[RUN:STATUS]]" in response:
+         clean_response = clean_response.replace("[[RUN:STATUS]]", "").strip()
+         status = config.get_status()
+         clean_response += f"\nСтатус: {status}"
+
+    # Handle HA commands via text intent if possible (not implemented fully via generic chat yet)
+    # But if user says "vkluchi light", AI might output text description.
+    
+    return clean_response
+
+
 async def post_init(application: Application) -> None:
-    """Set up bot commands after initialization."""
-    commands = [
-        BotCommand("start", "Start the bot"),
-        BotCommand("help", "Show help message"),
-        BotCommand("status", "Show current configuration"),
-        BotCommand("models", "List available models"),
-        BotCommand("clear", "Clear conversation history"),
-        BotCommand("setprovider", "Set provider (ollama/openai/gemini)"),
-        BotCommand("setendpoint", "Set inference API URL"),
-        BotCommand("setapikey", "Set API key"),
-        BotCommand("setmodel", "Set model name"),
-        BotCommand("setapikey", "Set API key"),
-        BotCommand("setmodel", "Set model name"),
-        BotCommand("imagine", "Generate image"),
-        BotCommand("ha", "Home Assistant control"),
-        BotCommand("scan", "Run Job Hunter Analysis"),
     ]
     await application.bot.set_my_commands(commands)
     
@@ -726,6 +920,9 @@ def main() -> None:
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
+    application.add_handler(CommandHandler("usage", cmd_usage))
+    application.add_handler(CommandHandler("search", cmd_search))
+    application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
