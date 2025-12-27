@@ -18,6 +18,7 @@ from telegram.ext import (
 
 from .config_manager import ConfigManager
 from .inference_client import InferenceClient
+from .conversation_manager import ConversationManager
 from .health import start_health_server
 from .logging_config import setup_logging
 
@@ -28,6 +29,7 @@ logger = logging.getLogger(__name__)
 # Global instances
 config = ConfigManager()
 inference = InferenceClient(config)
+conv_manager = ConversationManager(storage_path="conversations")
 
 # System prompt for AI responses
 SYSTEM_PROMPT = """Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
@@ -111,7 +113,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "Команды:\n"
         "/scan - 🕵️‍♂️ Запустить поиск вакансий (Job Hunter)\n"
         "/status - 📊 Статус системы\n"
-        "/models - 📋 Список моделей\n"
+        "/models - 📋 Список моделей (с быстрым переключением)\n"
+        "/clear - 🧹 Очистить историю диалога\n"
         "/setprovider <name> - ⚙️ Выбрать AI (ollama/openai/gemini)\n"
         "/setendpoint <url> - 🔗 Адрес API\n"
         "/setapikey <key> - 🔑 Установить ключ\n"
@@ -241,6 +244,23 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(f"❌ Ошибка запуска: {e}")
 
 
+@require_auth
+async def cmd_clear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /clear command - clear conversation history."""
+    user_id = update.effective_user.id
+    
+    if conv_manager.clear_history(user_id):
+        await update.message.reply_text(
+            "🧹 История диалогов очищена!\n\n"
+            "Следующее сообщение начнёт новый контекст."
+        )
+        logger.info(f"Cleared conversation history for user {user_id}")
+    else:
+        await update.message.reply_text(
+            "ℹ️ История диалогов уже пуста."
+        )
+
+
 async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setprovider command - set inference provider."""
     providers = ["ollama", "openai", "gemini"]
@@ -286,7 +306,7 @@ async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /models command - list available models from provider."""
+    """Handle /models command - list available models with quick-switch buttons."""
     await update.message.reply_text("🔍 Fetching available models...")
     
     models = await inference.list_models()
@@ -300,16 +320,26 @@ async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         )
         return
     
-    # Format models list (limit to 30 for readability)
-    models_display = models[:30]
-    models_text = "\n".join([f"• `{m}`" for m in models_display])
+    # Get current model
+    current_model = inference.model
     
-    if len(models) > 30:
-        models_text += f"\n\n_...and {len(models) - 30} more_"
+    # Create inline keyboard buttons for quick switching
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+    
+    buttons = []
+    for model in models[:20]:  # Limit to 20 to avoid keyboard overflow
+        indicator = "✅" if model == current_model else "🔄"
+        button_text = f"{indicator} {model}"
+        buttons.append([InlineKeyboardButton(button_text, callback_data=f"model:{model}")])
+    
+    keyboard = InlineKeyboardMarkup(buttons)
     
     await update.message.reply_text(
-        f"📋 **Available Models ({len(models)})**\n\n{models_text}",
-        parse_mode="Markdown"
+        f"📋 **Available Models** ({len(models)})\n\n"
+        f"Current: `{current_model}`\n\n"
+        f"Click to switch:",
+        parse_mode="Markdown",
+        reply_markup=keyboard
     )
 
 
@@ -335,11 +365,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Send typing indicator
     await update.message.chat.send_action("typing")
     
-    # Build message for AI
-    messages = [{"role": "user", "content": message_text}]
+    # Get conversation history for context
+    history = conv_manager.get_context_messages(user_id, limit=5)
     
-    # Get AI response
+    # Add current message
+    current_message = {"role": "user", "content": message_text}
+    messages = history + [current_message]
+    
+    # Save user message to history
+    conv_manager.add_message(user_id, "user", message_text)
+    
+    # Get AI response with conversation context
     response = await inference.chat(messages, system_prompt=SYSTEM_PROMPT)
+    
+    # Save assistant response to history
+    conv_manager.add_message(user_id, "assistant", response)
     
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
     
@@ -422,11 +462,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle approval/denial button clicks."""
+    """Handle approval/denial button clicks AND model switching."""
     query = update.callback_query
     await query.answer()
     
-    # Only admin can approve
+    # Handle model switching
+    if query.data.startswith("model:"):
+        model = query.data.split(":", 1)[1]
+        provider = inference.provider
+        
+        # Set model based on provider
+        if provider == "gemini":
+            config.set("GEMINI_MODEL", model)
+        elif provider == "openai":
+            config.set("OPENAI_MODEL", model)
+        else:  # ollama
+            config.set("OLLAMA_MODEL", model)
+        
+        config.set("MODEL_NAME", model)
+        
+        await query.edit_message_text(
+            f"✅ **Model switched to:**\n\n`{model}`",
+            parse_mode="Markdown"
+        )
+        logger.info(f"User {query.from_user.id} switched to model: {model}")
+        return
+    
+    # Only admin can approve users
     if query.from_user.id != ADMIN_ID:
         await query.edit_message_text("⛔ Только администратор может одобрять пользователей.")
         return
@@ -500,6 +562,7 @@ async def post_init(application: Application) -> None:
         BotCommand("help", "Show help message"),
         BotCommand("status", "Show current configuration"),
         BotCommand("models", "List available models"),
+        BotCommand("clear", "Clear conversation history"),
         BotCommand("setprovider", "Set provider (ollama/openai/gemini)"),
         BotCommand("setendpoint", "Set inference API URL"),
         BotCommand("setapikey", "Set API key"),
@@ -583,6 +646,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", cmd_help))
     application.add_handler(CommandHandler("status", cmd_status))
     application.add_handler(CommandHandler("models", cmd_models))
+    application.add_handler(CommandHandler("clear", cmd_clear))
     application.add_handler(CommandHandler("setprovider", cmd_setprovider))
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
