@@ -21,7 +21,7 @@
 			<key>WFWorkflowActionParameters</key>
 			<dict>
 				<key>WFURL</key>
-				<string>http://100.110.209.49:8080/shortcut/ask</string>
+				<string>http://unified-home-core-cloud.tail5e8a72.ts.net:8080/shortcut/ask</string>
 				<key>WFHTTPMethod</key>
 				<string>POST</string>
 				<key>WFHTTPBodyType</key>
