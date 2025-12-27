@@ -262,6 +262,55 @@ async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     await update.message.reply_text(msg, parse_mode="Markdown")
 @require_auth
+async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle incoming voice messages."""
+    user_id = update.effective_user.id
+    
+    # Send typing action
+    await update.message.chat.send_action("typing")
+    await update.message.reply_text("🎤 Слушаю...")
+    
+    try:
+        # Get voice file
+        voice_file = await update.message.voice.get_file()
+        
+        # Download to temp file
+        import os
+        import tempfile
+        
+        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+            temp_path = f.name
+        
+        await voice_file.download_to_drive(temp_path)
+        
+        # Transcribe
+        transcript = await inference.transcribe_audio(temp_path)
+        
+        # Cleanup
+        os.remove(temp_path)
+        
+        if not transcript or "[Error" in transcript:
+            await update.message.reply_text(f"❌ Не удалось распознать речь: {transcript}")
+            return
+            
+        await update.message.reply_text(f"🗣 Распознано: \"_{transcript}_\"", parse_mode="Markdown")
+        
+        # Process as text command
+        response = await process_text_request(transcript, user_id)
+        
+        # Split and send response
+        if len(response) > 4000:
+            for i in range(0, len(response), 4000):
+                await update.message.reply_text(response[i:i+4000])
+        else:
+            await update.message.reply_text(response)
+            
+    except Exception as e:
+        logger.error(f"Voice handling failed: {e}")
+        await update.message.reply_text("❌ Ошибка обработки голосового сообщения.")
+
+
+@require_auth
 async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /scan command - trigger Job Hunter."""
     user_id = update.effective_user.id
@@ -924,6 +973,10 @@ def main() -> None:
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("todo", cmd_todo))
     application.add_handler(CommandHandler("scan", cmd_scan))
+    
+    # Handle voice messages
+    application.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     # Add callback query handler for approval buttons
