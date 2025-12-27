@@ -4,17 +4,17 @@
 
 ## 🚀 Функциональность
 
-| Feature      | Описание | Команда / Инструмент |
-| :---         | :---     | :---                 |
-| **AI Chat**  | Умный диалог с поддержкой контекста. Поддержка Gemini 2.0, GPT-4, Llama 3. | Обычный текст |
-| **Voice Msgs** | Распознавание речи (Whisper) и ответ текстом. | Голосовое сообщение |
-| **Image Gen** | Генерация изображений через DALL-E 3. | `/imagine <prompt>` |
-| **Home Control** | Управление светом и статусом Home Assistant. | `/ha status`, `/ha lights on/off` |
+| Feature | Description | Usage |
+| --- | --- | --- |
+| **Chat** | Ответы на вопросы (Ollama/OpenAI/Gemini). | Просто напиши сообщение |
+| **Image Gen** | Генерация картинок (DALL-E 3). | `/imagine <prompt>` |
 | **Web Search** | Поиск информации в интернете (DuckDuckGo). | `/search <query>` |
 | **Task Manager** | Простой список задач (SQLite). | `/todo add/list/done` |
 | **Reminders** | Напоминания по времени. | `/remind 10m text` |
 | **Infra Map** | Статус серверов и сервисов. | `/infra` |
 | **Vision** | Анализ изображений (Gemini Vision). | Отправь фото (+caption) |
+| **Voice Msgs** | Распознавание речи (Whisper) и ответ текстом. | Голосовое сообщение |
+| **Home Control** | Управление светом и статусом Home Assistant. | `/ha status`, `/ha lights on/off` |
 | **Auto-Update** | Самообновление (Git + Pip + Restart). | `/update` |
 | **Backup** | Бэкап баз данных в чат. | `/backup` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
