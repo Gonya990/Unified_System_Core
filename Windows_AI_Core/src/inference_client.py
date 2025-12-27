@@ -246,6 +246,35 @@ class InferenceClient:
         except Exception as e:
             logger.exception(f"Gemini error: {e}")
             return f"[Gemini Error]: {str(e)}", usage
+            
+    async def transcribe_audio(self, file_path: str) -> str:
+        """Transcribe audio file using OpenAI Whisper API."""
+        # Use OpenAI Key (either specific or generic)
+        api_key = self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY"))
+        if not api_key:
+            return "[Error]: No OpenAI API key found for transcription."
+            
+        url = "https://api.openai.com/v1/audio/transcriptions"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        
+        try:
+            data = aiohttp.FormData()
+            data.add_field("model", "whisper-1")
+            data.add_field("file", open(file_path, "rb"))
+            
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.post(url, data=data) as response:
+                    if response.status != 200:
+                        text = await response.text()
+                        logger.error(f"Whisper error: {text}")
+                        return f"[Error {response.status}]: Transcription failed"
+                        
+                    result = await response.json()
+                    return result.get("text", "")
+                    
+        except Exception as e:
+            logger.error(f"Transcription failed: {e}")
+            return f"[Error]: {str(e)}"
     
     async def health_check(self) -> bool:
         """Check if the inference endpoint is reachable."""
