@@ -11,10 +11,10 @@ nodes:
         port: 11434
       - name: home-assistant
         type: docker
-  
+
   - id: unified-home-core
     name: Proxmox Host
-    ip: 100.100.100.100 # Placeholder, need real IP
+    ip: 100.110.209.49
     type: hypervisor
     os: proxmox
     services:
