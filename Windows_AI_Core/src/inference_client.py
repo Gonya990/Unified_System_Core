@@ -15,15 +15,18 @@ logger = logging.getLogger(__name__)
 _gemini_client = None
 
 
-def _get_gemini_model(api_key: str, model_name: str):
-    """Lazy load and configure Gemini client."""
+def _get_gemini_client(api_key: str):
+    """Lazy load and configure Gemini client using new SDK."""
     global _gemini_client
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
-        return genai.GenerativeModel(model_name)
+        from google import genai
+        from google.genai.types import GenerateContentConfig
+        
+        if not _gemini_client or _gemini_client.api_key != api_key:
+            _gemini_client = genai.Client(api_key=api_key)
+        return _gemini_client
     except ImportError:
-        logger.error("google-generativeai not installed. Run: pip install google-generativeai")
+        logger.error("google-genai not installed. Run: pip install google-genai")
         return None
     except Exception as e:
         logger.error(f"Failed to configure Gemini: {e}")
@@ -226,13 +229,14 @@ class InferenceClient:
         models = []
         
         if provider == "gemini":
-            # Return known Gemini models
+            # Return known Gemini models from Google AI Studio
             return [
+                "gemini-2.0-flash-exp",
+                "gemini-exp-1206",
                 "gemini-1.5-flash",
                 "gemini-1.5-flash-8b", 
                 "gemini-1.5-pro",
                 "gemini-1.0-pro",
-                "gemini-2.0-flash-exp",
             ]
         
         session = await self._get_session()
