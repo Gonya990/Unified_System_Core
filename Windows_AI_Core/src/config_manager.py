@@ -72,13 +72,20 @@ class ConfigManager:
                 with open(self.CONFIG_FILE, "r") as f:
                     stored = json.load(f)
                     for key, value in stored.items():
-                        if key in self.SENSITIVE_KEYS and value:
+                        # Skip empty values to preserve Environment Variables precedence if config is broken
+                        if not value:
+                            continue
+
+                        if key in self.SENSITIVE_KEYS:
                             # Decrypt sensitive values
                             try:
                                 value = self._fernet.decrypt(value.encode()).decode()
                             except Exception:
                                 pass  # Use as-is if decryption fails
-                        self._config[key] = value
+                        
+                        # Update config only if we have a valid value
+                        if value:
+                            self._config[key] = value
             except Exception:
                 pass  # Use defaults if file is corrupted
     
