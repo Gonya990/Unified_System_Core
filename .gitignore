@@ -32,3 +32,4 @@ $RECYCLE.BIN/
 
 # Agent identity (local to each runtime)
 .agent-identity
+secrets/
