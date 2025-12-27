@@ -12,6 +12,7 @@
 | **Home Control** | Управление светом и статусом Home Assistant. | `/ha status`, `/ha lights on/off` |
 | **Web Search** | Поиск информации в интернете (DuckDuckGo). | `/search <query>` |
 | **Task Manager** | Простой список задач (SQLite). | `/todo add/list/done` |
+| **Reminders** | Напоминания по времени. | `/remind 10m text` |
 | **Cost Tracking** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
 | **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
