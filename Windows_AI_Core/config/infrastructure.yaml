@@ -1,0 +1,39 @@
+nodes:
+  - id: igor-gaming-1
+    name: Gaming PC / AI Server
+    ip: 100.88.65.71
+    type: server
+    os: linux (ubuntu)
+    services:
+      - name: ai-bot
+        type: systemd
+      - name: ollama
+        port: 11434
+      - name: home-assistant
+        type: docker
+  
+  - id: unified-home-core
+    name: Proxmox Host
+    ip: 100.100.100.100 # Placeholder, need real IP
+    type: hypervisor
+    os: proxmox
+    services:
+      - name: adguard-home
+      - name: plex
+
+  - id: macbook-air
+    name: MacBook Air
+    type: client
+    os: macos
+
+networks:
+  - name: tailscale
+    cidr: 100.64.0.0/10
+
+apps:
+  - name: Telegram Bot
+    location: igor-gaming-1
+  - name: Job Hunter
+    location: igor-gaming-1
+  - name: Vasya
+    location: unified-home-core
