@@ -1,0 +1,7 @@
+{
+    // Markdown lint configuration
+    // Disable table alignment rule as it's too strict
+    "MD060": false,
+    // Allow inline HTML for badges and special formatting
+    "MD033": false
+}

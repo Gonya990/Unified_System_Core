@@ -364,14 +364,17 @@ WEBHOOK_URL=http://localhost:5678/
 
 ## ⚠️ Issues & Recommendations
 
-| Issue | Location | Severity | Fix |
-|-------|----------|----------|-----|
-| Telegram token hardcoded | `bot_config.py:4` | Medium | Remove, use .env only |
-| HA token hardcoded | `ha_client.py:17` | Medium | Move to .env |
-| OpenRouter key 3x duplicate | `antigravity-mcp/.env` | Low | Clean up |
-| Gmail OAuth incomplete | `config/` | Medium | Run OAuth flow |
-| ACFS token weak | `acfs-hub/` | Low | Generate strong token |
-| Linear key unused | `.env` | Info | Either use or remove |
+| Issue                       | Location              | Severity | Status      |
+|-----------------------------|----------------------|----------|-------------|
+| Telegram token hardcoded    | `bot_config.py:4`    | Medium   | ✅ FIXED    |
+| HA token hardcoded          | `ha_client.py:17`    | Medium   | ✅ FIXED    |
+| OpenRouter key 3x duplicate | `antigravity-mcp/.env` | Low    | ✅ FIXED    |
+| Default provider was gemini | `.env`               | High     | ✅ FIXED    |
+| ai-watchdog crashing        | `.env`               | Medium   | ✅ FIXED    |
+| Gemini API enabled          | GCP                  | High     | ✅ DISABLED |
+| Gmail OAuth incomplete      | `config/`            | Medium   | Pending     |
+| ACFS token weak             | `acfs-hub/`          | Low      | Pending     |
+| Linear key unused           | `.env`               | Info     | Pending     |
 
 ---
 
