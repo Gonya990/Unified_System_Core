@@ -59,7 +59,7 @@
 
 ## Краткая инструкция (5 минут)
 
-```
+```bash
 1. console.cloud.google.com → New Project → "Unified-System-Bot"
 2. APIs & Services → Library → Gmail API → Enable
 3. OAuth consent screen → External → Create → Gonya Bot

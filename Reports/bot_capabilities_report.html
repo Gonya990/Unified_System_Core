@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Gonya Bot - Возможности</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #ff00ff, #00d4ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            font-size: 1.8rem;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-desc {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .card-examples {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .card-examples code {
+            color: #22c55e;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-admin {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+
+        .badge-all {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+
+        .badge-config {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid;
+        }
+
+        .admin-box {
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .user-box {
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        .box-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list .check {
+            color: #22c55e;
+        }
+
+        .feature-list .cross {
+            color: #ef4444;
+        }
+
+        .note {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .note-title {
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🤖 Gonya Bot</h1>
+        <p class="subtitle">Полный список возможностей | 28 декабря 2025</p>
+
+        <!-- Comparison -->
+        <div class="comparison">
+            <div class="comparison-box admin-box">
+                <div class="box-title">👑 Администратор (Igor)</div>
+                <ul class="feature-list">
+                    <li><span class="check">✅</span> Все AI разговоры</li>
+                    <li><span class="check">✅</span> Gmail - чтение почты</li>
+                    <li><span class="check">✅</span> Home Assistant - полный контроль</li>
+                    <li><span class="check">✅</span> Яндекс Станция - TTS</li>
+                    <li><span class="check">✅</span> Google Calendar</li>
+                    <li><span class="check">✅</span> Notion - заметки</li>
+                    <li><span class="check">✅</span> Health Tracking</li>
+                    <li><span class="check">✅</span> Веб-поиск</li>
+                    <li><span class="check">✅</span> Сканирование вакансий</li>
+                    <li><span class="check">✅</span> Инфраструктура - мониторинг</li>
+                    <li><span class="check">✅</span> /update - обновление бота</li>
+                    <li><span class="check">✅</span> Одобрение новых пользователей</li>
+                </ul>
+            </div>
+
+            <div class="comparison-box user-box">
+                <div class="box-title">👤 Авторизованные пользователи</div>
+                <ul class="feature-list">
+                    <li><span class="check">✅</span> AI разговоры (общий Gemini)</li>
+                    <li><span class="cross">❌</span> Gmail (требует личную авторизацию)</li>
+                    <li><span class="check">✅</span> Home Assistant - просмотр</li>
+                    <li><span class="check">✅</span> Яндекс Станция - TTS</li>
+                    <li><span class="cross">❌</span> Google Calendar (личный)</li>
+                    <li><span class="cross">❌</span> Notion (требует токен)</li>
+                    <li><span class="check">✅</span> Health Tracking (личные данные)</li>
+                    <li><span class="check">✅</span> Веб-поиск</li>
+                    <li><span class="cross">❌</span> Сканирование вакансий</li>
+                    <li><span class="cross">❌</span> Инфраструктура</li>
+                    <li><span class="cross">❌</span> /update</li>
+                    <li><span class="cross">❌</span> Одобрение пользователей</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- All Features -->
+        <div class="section" style="margin-top: 40px;">
+            <div class="section-title"><span class="icon">⚡</span> Все возможности бота</div>
+
+            <div class="cards">
+                <!-- AI Chat -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🧠</div>
+                        <div class="card-title">AI Чат</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Умный ассистент на базе Gemini/GPT/Ollama. Понимает контекст и естественный
+                        язык.</p>
+                    <div class="card-examples">
+                        <code>"Напиши код на Python"</code><br>
+                        <code>"Объясни квантовую физику"</code>
+                    </div>
+                </div>
+
+                <!-- Gmail -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">📧</div>
+                        <div class="card-title">Gmail</div>
+                    </div>
+                    <span class="badge badge-admin">Только Admin</span>
+                    <p class="card-desc">Чтение почты, поиск писем, сводка непрочитанных.</p>
+                    <div class="card-examples">
+                        <code>"Что нового в почте?"</code><br>
+                        <code>"Найди письма от Kosta"</code><br>
+                        <code>/mail search invoice</code>
+                    </div>
+                </div>
+
+                <!-- Home Assistant -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">🏠</div>
+                        <div class="card-title">Home Assistant</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Управление умным домом: свет, климат, сенсоры, сцены.</p>
+                    <div class="card-examples">
+                        <code>"Включи свет в спальне"</code><br>
+                        <code>"Какая температура дома?"</code><br>
+                        <code>/ha sensors</code>
+                    </div>
+                </div>
+
+                <!-- Yandex TTS -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🔊</div>
+                        <div class="card-title">Яндекс Станция</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Голосовые сообщения через умную колонку.</p>
+                    <div class="card-examples">
+                        <code>"Скажи через Алису: Обед готов!"</code><br>
+                        <code>/say Привет всем!</code>
+                    </div>
+                </div>
+
+                <!-- Voice -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🎤</div>
+                        <div class="card-title">Голосовые сообщения</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Отправь голосовое — бот расшифрует и ответит.</p>
+                    <div class="card-examples">
+                        <code>🎤 [Голосовое сообщение]</code><br>
+                        <code>/speak Текст для озвучки</code>
+                    </div>
+                </div>
+
+                <!-- Health -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">🩺</div>
+                        <div class="card-title">Здоровье</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Трекинг шагов, сна, веса. Персональные данные для каждого.</p>
+                    <div class="card-examples">
+                        <code>"Мои шаги за сегодня"</code><br>
+                        <code>/health add steps 5000</code>
+                    </div>
+                </div>
+
+                <!-- Web Search -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">🔍</div>
+                        <div class="card-title">Веб-поиск</div>
+                    </div>
+                    <span class="badge badge-all">Все</span>
+                    <p class="card-desc">Поиск информации в интернете в реальном времени.</p>
+                    <div class="card-examples">
+                        <code>"Погугли новости AI"</code><br>
+                        <code>"Какая погода в Киеве?"</code>
+                    </div>
+                </div>
+
+                <!-- Infrastructure -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #64748b, #475569);">🖥️</div>
+                        <div class="card-title">Инфраструктура</div>
+                    </div>
+                    <span class="badge badge-admin">Только Admin</span>
+                    <p class="card-desc">Мониторинг серверов, статус системы, обновления.</p>
+                    <div class="card-examples">
+                        <code>/status</code><br>
+                        <code>/infra</code><br>
+                        <code>/update</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Note -->
+        <div class="note">
+            <div class="note-title">💡 Примечание для авторизованных пользователей</div>
+            <p>Пользователи без личных API ключей используют общий Gemini API администратора.
+                Личные данные (здоровье, история чата) хранятся отдельно для каждого пользователя.
+                Gmail и Calendar требуют отдельной OAuth авторизации для каждого пользователя.</p>
+        </div>
+    </div>
+</body>
+
+</html>
