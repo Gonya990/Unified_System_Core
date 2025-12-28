@@ -1980,6 +1980,55 @@ def main() -> None:
         .build()
     )
     
+    # Autonomous background tasks
+    async def tailscale_heartbeat():
+        """Keep the Tailscale tunnel hot between smart and server."""
+        target_ip = "100.81.133.25" # 'smart'
+        # Log location
+        log_dir = "/home/gonya/Documents/Unified_System/Reports"
+        log_file = os.path.join(log_dir, "network_health.log")
+        os.makedirs(log_dir, exist_ok=True)
+        
+        while True:
+            try:
+                import subprocess
+                # Run ping to keep-alive the direct session
+                # Use absolute path for snap-installed tailscale
+                proc = await asyncio.create_subprocess_shell(
+                    f"/snap/bin/tailscale ping -c 1 {target_ip}",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                stdout, stderr = await proc.communicate()
+                
+                status = "DIRECT" if b"direct" in stdout else "RELAY"
+                latency = "unknown"
+                for line in stdout.decode().split('\n'):
+                     if "ms" in line:
+                         latency = line.split()[-1]
+                         break
+                
+                with open(log_file, "a") as f:
+                    from datetime import datetime
+                    f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {status} - {latency}\n")
+                
+                # Truncate log if too big
+                with open(log_file, "r") as f:
+                    lines = f.readlines()
+                if len(lines) > 500:
+                    with open(log_file, "w") as f:
+                        f.writelines(lines[-500:])
+                        
+            except Exception as e:
+                logger.error(f"Heartbeat task error: {e}")
+                
+            await asyncio.sleep(30) # Tick every 30s
+    
+    # Register background task
+    import threading
+    loop = asyncio.get_event_loop()
+    loop.create_task(tailscale_heartbeat())
+    
     # Add handlers
     application.add_handler(CommandHandler("start", cmd_start))
     application.add_handler(CommandHandler("help", cmd_help))
