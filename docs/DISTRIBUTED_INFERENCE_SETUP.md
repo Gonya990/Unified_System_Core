@@ -2,7 +2,8 @@
 
 ## 🎯 Goal
 
-Offload heavy AI tasks (DeepSeek R1, Llama 3) from `igor-gaming-1` to `pve-antigravity-1` to improve production server stability and response time.
+Offload heavy AI tasks (DeepSeek R1, Llama 3) from `igor-gaming-1`
+to `pve-antigravity-1` to improve production server stability and response time.
 
 ## 🏗️ Architecture
 
