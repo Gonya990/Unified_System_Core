@@ -13,7 +13,7 @@ from dataclasses import dataclass
 @dataclass
 class HAConfig:
     """Home Assistant configuration"""
-    url: str = "http://192.168.1.216:8123"
+    url: str = "http://100.81.133.25:8123"
     token: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhYWQ3YjJiN2M4NDg0NWEzODA0YTU4MWUwYWYyNjk3MyIsImlhdCI6MTc2Njg0NTEyNywiZXhwIjoyMDgyMjA1MTI3fQ.H4iTu7T_IYaom9ecHVA5EVBJ-cFBXyFXwkgykPdDcjc"
     timeout: int = 30
 

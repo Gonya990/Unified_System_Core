@@ -543,7 +543,8 @@ async def post_init(application: Application) -> None:
         'interval',
         minutes=10,
         id='ha_monitor',
-        replace_existing=True
+        replace_existing=True,
+        jobstore='memory'
     )
     logger.info("Device Monitoring started (interval: 10m)")
 
@@ -1666,7 +1667,8 @@ async def post_init(application: Application) -> None:
         'cron',
         hour=9,
         minute=0,
-        args=[application]
+        args=[application],
+        jobstore='memory'
     )
     
     # Schedule Daily Backup (at 03:00 AM)
@@ -1675,7 +1677,8 @@ async def post_init(application: Application) -> None:
         'cron',
         hour=3,
         minute=0,
-        args=[application]
+        args=[application],
+        jobstore='memory'
     )
 
     logger.info("Alice Skill & Scheduler started.")
