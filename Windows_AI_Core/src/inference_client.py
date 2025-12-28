@@ -220,28 +220,43 @@ class InferenceClient:
             import asyncio
             from google.genai.types import GenerateContentConfig
             
-            config = None
-            if system_prompt:
-                config = GenerateContentConfig(system_instruction=system_prompt)
+            config = GenerateContentConfig(
+                system_instruction=system_prompt,
+                temperature=0.7,
+                max_output_tokens=1000
+            ) if system_prompt else GenerateContentConfig(temperature=0.7, max_output_tokens=1000)
             
             loop = asyncio.get_event_loop()
             
             def call_gemini():
-                return client.models.generate_content(
-                    model=self.model,
-                    contents=gemini_contents,
-                    config=config
-                )
-
-            response = await loop.run_in_executor(None, call_gemini)
+                try:
+                    return client.models.generate_content(
+                        model=self.model,
+                        contents=gemini_contents,
+                        config=config
+                    )
+                except Exception as inner_e:
+                    logger.error(f"Error inside call_gemini: {inner_e}")
+                    raise
             
-            # Extract usage metadata if available
-            if hasattr(response, "usage_metadata"):
-                usage["prompt_tokens"] = response.usage_metadata.prompt_token_count
-                usage["completion_tokens"] = response.usage_metadata.candidates_token_count
-                usage["total_tokens"] = response.usage_metadata.total_token_count
+            try:
+                # Add a wrapper for the executor call with a local timeout if needed
+                response = await loop.run_in_executor(None, call_gemini)
                 
-            return response.text, usage
+                # Extract usage metadata if available
+                if hasattr(response, "usage_metadata") and response.usage_metadata:
+                    usage["prompt_tokens"] = response.usage_metadata.prompt_token_count
+                    usage["completion_tokens"] = response.usage_metadata.candidates_token_count
+                    usage["total_tokens"] = response.usage_metadata.total_token_count
+                    
+                if not response.text:
+                    logger.warning("Gemini returned empty text")
+                    return "[Error]: Gemini вернул пустой ответ", usage
+                    
+                return response.text, usage
+            except asyncio.TimeoutError:
+                logger.error("Gemini request timed out in executor")
+                return "[Error]: Превышено время ожидания ответа от Gemini", usage
             
         except Exception as e:
             logger.exception(f"Gemini error: {e}")
