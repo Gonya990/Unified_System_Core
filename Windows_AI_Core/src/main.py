@@ -35,6 +35,7 @@ from .linear_client import LinearClient
 from .digest_service import DigestService
 from .calendar_client import CalendarClient
 from .homekit_bridge import HomeKitBridge
+from .notion_client import NotionClient
 
 # Initialize logging first
 setup_logging()
@@ -57,6 +58,7 @@ linear_client = LinearClient()
 digest_service = None  # Will be initialized after other services
 calendar_client = CalendarClient()
 homekit_bridge = None  # Optional, started on demand
+notion_client = NotionClient()
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -795,6 +797,30 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     except Exception as e:
         logger.error(f"Backup failed: {e}")
         await update.message.reply_text(f"❌ Backup error: {e}")
+
+@require_auth
+async def cmd_note(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /note command - create a Notion page."""
+    if not context.args:
+        await update.message.reply_text("Usage: /note <title> [| content]\nExample: /note Meeting Notes | Discussed project X")
+        return
+        
+    full_text = " ".join(context.args)
+    if "|" in full_text:
+        title, content = full_text.split("|", 1)
+        title = title.strip()
+        content = content.strip()
+    else:
+        title = full_text
+        content = ""
+        
+    await update.message.chat.send_action("typing")
+    
+    url = await notion_client.create_page(title, content)
+    if url:
+        await update.message.reply_text(f"✅ Created Note: [{title}]({url})", parse_mode="Markdown")
+    else:
+        await update.message.reply_text("❌ Failed to create note. Check logs/config.")
 
 @require_auth
 async def cmd_speak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1711,6 +1737,7 @@ def main() -> None:
     application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(CommandHandler("speak", cmd_speak))
+    application.add_handler(CommandHandler("note", cmd_note))
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
