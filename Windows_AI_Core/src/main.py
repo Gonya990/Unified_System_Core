@@ -752,6 +752,21 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @require_auth
+async def cmd_say(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /say command - speak via Yandex Station."""
+    if not context.args:
+        await update.message.reply_text("Usage: /say <текст>\nПример: /say Привет, я Гоня!")
+        return
+        
+    message = " ".join(context.args)
+    await update.message.chat.send_action("typing")
+    
+    if await ha_controller.speak_via_yandex(message):
+        await update.message.reply_text(f"🔊 Алиса скажет: \"{message[:50]}...\"")
+    else:
+        await update.message.reply_text("❌ Не удалось отправить сообщение на Яндекс Станцию.")
+
+@require_auth
 async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /health command - view stats or set manual entry."""
     user_id = update.effective_user.id
@@ -1850,6 +1865,7 @@ def main() -> None:
     application.add_handler(CommandHandler("speak", cmd_speak))
     application.add_handler(CommandHandler("note", cmd_note))
     application.add_handler(CommandHandler("health", cmd_health))
+    application.add_handler(CommandHandler("say", cmd_say))
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))

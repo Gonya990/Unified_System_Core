@@ -117,3 +117,24 @@ class HAController:
         if not self.client: return None
         return self.client.reload_integration(entry_id)
 
+    async def speak_via_yandex(self, message: str, entity_id: str = "media_player.yandex_station_c00tc40000wq8k"):
+        """Send TTS message via Yandex Station."""
+        if not self.client:
+            return False
+        try:
+            self.client.call_service("tts", "yandex_station_say", entity_id=entity_id, message=message)
+            return True
+        except Exception as e:
+            logger.error(f"Yandex TTS failed: {e}")
+            # Try alternative method via media_player
+            try:
+                self.client.call_service("media_player", "play_media", 
+                    entity_id=entity_id,
+                    media_content_type="text",
+                    media_content_id=message
+                )
+                return True
+            except Exception as e2:
+                logger.error(f"Yandex TTS fallback failed: {e2}")
+                return False
+
