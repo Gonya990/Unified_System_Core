@@ -29,7 +29,10 @@ class HAController:
     Controller for Home Assistant integration.
     Wraps the ha_client.py with bot-specific logic.
     """
+    HA_AVAILABLE = HA_AVAILABLE  # Class-level attribute
+    
     def __init__(self):
+        self.HA_AVAILABLE = HA_AVAILABLE  # Instance attribute
         if not HA_AVAILABLE:
             logger.warning("Home Assistant Client not available")
             self.client = None
