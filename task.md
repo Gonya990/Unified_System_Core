@@ -36,7 +36,7 @@
 - [ ] **Bluetooth Fix:** Следовать инструкции из BLUETOOTH_FIX_GUIDE.md на хосте.
 - [ ] **iPhone HA App:** Следовать инструкции из IPHONE_HA_SETUP.md.
 - [ ] **Проверка:** Протестировать все новые функции (HomeKit, Calendar, Linear, Digest).
-- [ ] **Документация:** Обновить ALICE_SETUP.md с новыми командами.
+- [x] **Документация:** Обновить ALICE_SETUP.md с новыми командами.
 
 ## 🔮 Будущее / Бэклог
 
