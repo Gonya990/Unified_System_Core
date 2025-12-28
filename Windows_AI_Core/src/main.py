@@ -36,6 +36,7 @@ from .digest_service import DigestService
 from .calendar_client import CalendarClient
 from .homekit_bridge import HomeKitBridge
 from .notion_client import NotionClient
+from .device_monitor import DeviceMonitor
 
 # Initialize logging first
 setup_logging()
@@ -59,6 +60,7 @@ digest_service = None  # Will be initialized after other services
 calendar_client = CalendarClient()
 homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
+device_monitor = None # Will init in post_init or after ha_controller
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -517,6 +519,32 @@ async def post_init(application: Application) -> None:
          # For now, simplistic approach
          scheduler.add_daily_digest_job(user_id, digest_service.generate_digest, user_id, "Master")
 
+    # Initialize Device Monitor
+    global device_monitor
+    
+    # Callback for notifications
+    async def monitor_notify(msg):
+        for uid in config.get("ALLOWED_USER_IDS", []):
+             await application.bot.send_message(chat_id=uid, text=msg, parse_mode="Markdown")
+
+    device_monitor = DeviceMonitor(ha_controller, notify_callback=monitor_notify)
+    
+    # Add Critical Entities (Example list, should be configurable)
+    # Adding known critical switches/sensors
+    device_monitor.add_entity("switch.tv_ir_sender")
+    device_monitor.add_entity("switch.spalnia_ik")
+    device_monitor.add_entity("sensor.iphone_igor_battery_level") 
+    
+    # Schedule check every 10 minutes
+    scheduler.scheduler.add_job(
+        device_monitor.run_check,
+        'interval',
+        minutes=10,
+        id='ha_monitor',
+        replace_existing=True
+    )
+    logger.info("Device Monitoring started (interval: 10m)")
+
     # Determine public URL (mock or real)
     logger.info("Alice Skill running on port 8090. Needs tunnel for public access.")
 
@@ -841,6 +869,9 @@ async def cmd_speak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except Exception as e:
         logger.error(f"TTS command failed: {e}")
         await update.message.reply_text(f"❌ Error: {e}")
+
+@require_auth
+async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
     
