@@ -797,7 +797,24 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.message.reply_text(f"❌ Backup error: {e}")
 
 @require_auth
-async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def cmd_speak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /speak command - text to speech."""
+    if not context.args:
+        await update.message.reply_text("Usage: /speak <text>\nExample: /speak Hello world")
+        return
+        
+    text = " ".join(context.args)
+    await update.message.chat.send_action("record_voice")
+    
+    try:
+        audio_data = await inference.generate_speech(text)
+        if audio_data:
+            await update.message.reply_voice(voice=audio_data, caption=text[:100])
+        else:
+             await update.message.reply_text("❌ TTS generation failed (check logs/api key).")
+    except Exception as e:
+        logger.error(f"TTS command failed: {e}")
+        await update.message.reply_text(f"❌ Error: {e}")
     """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
     
@@ -1693,6 +1710,7 @@ def main() -> None:
     application.add_handler(CommandHandler("notify", cmd_notify))
     application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
+    application.add_handler(CommandHandler("speak", cmd_speak))
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
