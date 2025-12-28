@@ -1,0 +1,11 @@
+Total entities: 331
+  conversation.home_assistant: 2025-12-11T22:37:48.132681+00:00
+  event.backup_automatic_backup: unknown
+  sensor.backup_backup_manager_state: idle
+  sensor.backup_next_scheduled_automatic_backup: unknown
+  sensor.backup_last_successful_automatic_backup: unknown
+  sensor.backup_last_attempted_automatic_backup: unknown
+  script.good_morning: off
+  script.good_night: off
+  script.turn_off_everything: off
+  script.ventilation: off

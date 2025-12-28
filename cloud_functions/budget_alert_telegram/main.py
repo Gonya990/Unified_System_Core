@@ -78,6 +78,11 @@ def budget_alert_to_telegram(event, context):
         emoji = "📊"
         urgency = "ВНИМАНИЕ"
     else:
+        # Skip alert if 0% usage to avoid spam
+        if percentage == 0:
+            print("Budget is 0%, skipping notification")
+            return "Skipped (0%)", 200
+            
         emoji = "ℹ️"
         urgency = "ИНФОРМАЦИЯ"
     
