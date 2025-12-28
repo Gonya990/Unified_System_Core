@@ -56,11 +56,64 @@ class HAController:
 
     async def turn_on_light(self, entity_id: str):
         if not self.client: return None
-        return self.client.turn_on_light(entity_id)
+        
+        # Try exact match first
+        # If entity_id not found in states, try fuzzy match
+        states = self.client.get_states()
+        entity_ids = [s['entity_id'] for s in states]
+        
+        target = entity_id
+        if target not in entity_ids:
+            # Fuzzy match
+            import difflib
+            # Filter for lights/switches
+            candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
+            # Try to match simple name (e.g. "corridor" against "light.corridor_switch_1")
+            
+            # 1. Check if 'target' is part of entity_id
+            simple_matches = [e for e in candidates if target.lower() in e.lower()]
+            if simple_matches:
+                target = simple_matches[0]
+                logger.info(f"Exact partial match found: {entity_id} -> {target}")
+            else:
+                # 2. Difflib match
+                matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                if matches:
+                    target = matches[0]
+                    logger.info(f"Fuzzy match found: {entity_id} -> {target}")
+                else:
+                    logger.warning(f"No match found for {entity_id}")
+                    
+        return self.client.turn_on_light(target)
         
     async def turn_off_light(self, entity_id: str):
         if not self.client: return None
-        return self.client.turn_off_light(entity_id)
+        
+        # Try exact match first
+        states = self.client.get_states()
+        entity_ids = [s['entity_id'] for s in states]
+        
+        target = entity_id
+        if target not in entity_ids:
+            # Fuzzy match
+            import difflib
+            candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
+            
+            # 1. Check if 'target' is part of entity_id
+            simple_matches = [e for e in candidates if target.lower() in e.lower()]
+            if simple_matches:
+                target = simple_matches[0]
+                logger.info(f"Exact partial match found: {entity_id} -> {target}")
+            else:
+                # 2. Difflib match
+                matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                if matches:
+                    target = matches[0]
+                    logger.info(f"Fuzzy match found: {entity_id} -> {target}")
+                else:
+                    logger.warning(f"No match found for {entity_id}")
+
+        return self.client.turn_off_light(target)
         
     async def set_temperature(self, entity_id: str, temp: float):
         if not self.client: return None
