@@ -41,7 +41,7 @@
 ## 🔮 Будущее / Бэклог
 
 - [ ] BIOS Update для Proxmox Host (Re-size BAR, IOMMU).
-- [ ] Голосовые ответы (Text-to-Speech для Алисы).
+- [x] Голосовые ответы (Text-to-Speech через `/speak`).
 - [ ] Интеграция с Notion для заметок.
 - [ ] Мониторинг здоровья (интеграция с Apple Health / Google Fit).
 - [ ] Настройка мониторинга доступности устройств HA.

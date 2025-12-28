@@ -275,6 +275,34 @@ class InferenceClient:
         except Exception as e:
             logger.error(f"Transcription failed: {e}")
             return f"[Error]: {str(e)}"
+
+    async def generate_speech(self, text: str, voice: str = "alloy") -> Optional[bytes]:
+        """Generate speech from text using OpenAI TTS."""
+        api_key = self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY"))
+        if not api_key:
+            logger.error("No OpenAI API key found for TTS.")
+            return None
+            
+        url = "https://api.openai.com/v1/audio/speech"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        payload = {
+            "model": "tts-1",
+            "input": text,
+            "voice": voice
+        }
+        
+        try:
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.post(url, json=payload) as response:
+                    if response.status == 200:
+                        return await response.read()
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"TTS Error {response.status}: {error_text}")
+                        return None
+        except Exception as e:
+            logger.error(f"TTS Failed: {e}")
+            return None
             
     async def analyze_image(self, image_path: str, prompt: str = "Describe this image") -> str:
         """Analyze image using Gemini Vision."""
