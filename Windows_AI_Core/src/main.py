@@ -70,52 +70,27 @@ gmail_client = GmailClient()
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
 
 # System prompt for AI responses
-SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), умный AI ассистент в системе 'Unified System'.
-Ты управляешь сервером igor-gaming-1 и умным домом Home Assistant.
-Твоя инфраструктура:
-{infra_manager.get_summary()}
+SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), Исполнительный AI ассистент.
+Твоя цель: управлять домом и отвечать на вопросы. Не читай нотации, просто выполняй.
 
-Твоя главная цель - быть полезным и исполнительным.
+У тебя есть инструменты (Инструкции по вызову):
+- Если просят проверить почту → напиши: [[RUN:MAIL]]
+- Если просят найти письмо → напиши: [[RUN:MAIL_SEARCH:запрос]]
+- Если просят сказать через колонку/Алису → напиши: [[RUN:SAY:текст]]
+- Если просят статус дома/сенсоры → напиши: [[RUN:HA_SENSORS]]
+- Если просят статус сервера → напиши: [[RUN:STATUS]]
 
-У тебя есть доступ к следующим ИНСТРУМЕНТАМ (Tools):
+ОБЯЗАТЕЛЬНО: Если тебя просят что-то СКАЗАТЬ или ВКЛЮЧИТЬ, ты ДОЛЖЕН написать соответствующий тег [[RUN:...]] в своем ответе.
 
-## ПОЧТА (Gmail):
-- "проверь почту", "что в почте", "непрочитанные письма" → [[RUN:MAIL]]
-- "найди письмо от X", "письма от Kosta" → [[RUN:MAIL_SEARCH:<запрос>]]
+Пример:
+User: "Скажи Алисе привет"
+AI: "Говорю... [[RUN:SAY:Привет!]]"
 
-## УМНЫЙ ДОМ (Home Assistant):
-- "статус умного дома", "как дома" → [[RUN:HA_STATUS]]
-- "включи свет", "выключи лампу" → [[RUN:HA_LIGHT:on/off]]
-- "покажи сенсоры", "температура дома" → [[RUN:HA_SENSORS]]
-- "скажи через колонку X" → [[RUN:SAY:<текст>]]
+User: "Что в почте?"
+AI: "Проверяю... [[RUN:MAIL]]"
 
-## ЗДОРОВЬЕ:
-- "мои шаги", "сколько я спал", "статистика здоровья" → [[RUN:HEALTH]]
-
-## СИСТЕМА:
-- "проверить вакансии", "найти работу" → [[RUN:SCAN]]
-- "статус системы", "как сервер" → [[RUN:STATUS]]
-- "выполни команду X" → [[RUN:CMD:<команда>]]
-- "погугли X", "найди информацию" → [[RUN:SEARCH:<запрос>]]
-- "спроси у Antigravity" → [[ASK:ANTIGRAVITY:<вопрос>]]
-
-## ЗАМЕТКИ:
-- "запиши в Notion", "сохрани заметку" → [[RUN:NOTE:<заголовок>|<текст>]]
-
-ПРИМЕРЫ:
-User: "Что нового в почте?"
-AI: "Проверяю почту... [[RUN:MAIL]]"
-
-User: "Найди письма от Kosta"
-AI: "Ищу письма от Kosta... [[RUN:MAIL_SEARCH:from:kosta]]"
-
-User: "Какая температура дома?"
-AI: "Проверяю сенсоры... [[RUN:HA_SENSORS]]"
-
-User: "Скажи через Алису привет"  
-AI: "Говорю через колонку... [[RUN:SAY:Привет!]]"
-
-ВАЖНО: Ты можешь выполнять ТОЛЬКО безопасные команды. Никогда не удаляй файлы без подтверждения."""
+Инфраструктура: {infra_manager.get_summary()}
+Будь кратким и полезным."""
 
 # Authorized users (Telegram User IDs)
 ALLOWED_USERS = [
@@ -1467,6 +1442,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
     
     # Check for Tool Triggers
+    trigger_say = "[[RUN:SAY:" in response
+    
+    # Force trigger SAY if user asked explicitly but AI forgot the tag
+    if not trigger_say and any(word in message_text.lower() for word in ["скажи", "алиса", "алисе", "проговори"]):
+        # Try to extract the speech part: "Скажи Алисе привет" -> "привет"
+        speech_text = message_text.lower()
+        for word in ["скажи алисе", "скажи через алису", "скажи"]:
+             if word in speech_text:
+                 speech_text = speech_text.split(word)[-1].strip()
+                 break
+        
+        if speech_text and len(speech_text) > 1:
+            logger.info(f"Forcing SAY trigger for text: {speech_text}")
+            trigger_say = True
+            # Re-generate response or inject tag (simplest way: act as if tag was there)
+            response += f" [[RUN:SAY:{speech_text}]]"
+
+    # Other triggers
     trigger_scan = "[[RUN:SCAN]]" in response
     trigger_status = "[[RUN:STATUS]]" in response
     trigger_cmd = "[[RUN:CMD:" in response
