@@ -32,6 +32,8 @@
 - [x] **SmartThings Guide:** Полное руководство по исправлению + автоматический скрипт.
 - [x] **iPhone HA Guide:** Инструкция по включению фонового обновления.
 - [x] **Bluetooth Guide:** Инструкция по пробросу DBus в Docker.
+- [x] **Code Refactoring:** Оптимизация структуры проекта (перенос модулей в src/, очистка корня).
+- [ ] **Distributed AI:** Настроить pve-antigravity-1 как Ollama Worker (см. docs/DISTRIBUTED_INFERENCE_SETUP.md).
 - [ ] **SmartThings CLI:** Запустить cleanup_smartthings_api.py (требует PAT).
 - [ ] **Bluetooth Fix:** Следовать инструкции из BLUETOOTH_FIX_GUIDE.md на хосте.
 - [ ] **iPhone HA App:** Следовать инструкции из IPHONE_HA_SETUP.md.
