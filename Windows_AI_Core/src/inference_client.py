@@ -146,11 +146,13 @@ class InferenceClient:
         
         try:
             logger.info(f"[{provider}] Sending request to {url} with model {self.model}")
-            async with session.post(url, json=payload, timeout=60) as response:
+            # Set a generous timeout for inference
+            timeout = aiohttp.ClientTimeout(total=60)
+            async with session.post(url, json=payload, timeout=timeout) as response:
                 if response.status != 200:
                     error_text = await response.text()
                     logger.error(f"Inference error {response.status}: {error_text}")
-                    return f"[Error {response.status}]: Failed to get response from AI", usage
+                    return f"[Error {response.status}]: Failed to get response from AI ({error_text[:100]})", usage
                 
                 data = await response.json()
                 
@@ -173,12 +175,15 @@ class InferenceClient:
                     logger.warning(f"Unknown response format: {data}")
                     return str(data), usage
                     
+        except asyncio.TimeoutError:
+            logger.error(f"Inference timeout (60s) for {url}")
+            return f"[Timeout Error]: AI server at {self.base_url} did not respond within 60s", usage
         except aiohttp.ClientError as e:
             logger.error(f"Connection error: {e}")
-            return f"[Connection Error]: Cannot reach inference server at {self.base_url}", usage
+            return f"[Connection Error]: Cannot reach inference server at {self.base_url} ({str(e)})", usage
         except Exception as e:
             logger.exception(f"Unexpected error during inference: {e}")
-            return f"[Error]: {str(e)}", usage
+            return f"[Error]: {type(e).__name__}: {str(e)}", usage
     
     async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """Handle Gemini API calls using the SDK."""

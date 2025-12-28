@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 class ConfigManager:
     """Manages bot configuration with persistence and encryption."""
     
-    CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "/data/bot_config.json"))
+    CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "config/bot_config.json"))
     SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN", "GEMINI_API_KEY", "OPENAI_API_KEY"}
     
     def __init__(self):
