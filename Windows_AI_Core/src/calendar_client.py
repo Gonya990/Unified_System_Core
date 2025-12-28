@@ -1,90 +1,60 @@
+"""
+Google Calendar Client
+Simplified integration for viewing and creating calendar events.
+"""
 import os
 import logging
-import pickle
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
-# Scopes required for calendar access
-SCOPES = ['https://www.googleapis.com/auth/calendar']
-
 class CalendarClient:
-    """Client for Google Calendar API with OAuth support."""
+    """Client for Google Calendar API."""
     
     def __init__(self):
-        self.creds = None
+        self.api_key = os.getenv("GOOGLE_CALENDAR_API_KEY")
+        self.calendar_id = os.getenv("GOOGLE_CALENDAR_ID", "primary")
         self.service = None
-        self.calendar_id = 'primary'
         
-        self.credentials_path = "credentials.json"
-        self.token_path = "token.pickle"
-        
-        self.authenticate()
-
-    def authenticate(self):
-        """Authenticate with Google Calendar API."""
+        # Try to initialize service
         try:
-            # Load existing token
-            if os.path.exists(self.token_path):
-                with open(self.token_path, 'rb') as token:
-                    self.creds = pickle.load(token)
+            from googleapiclient.discovery import build
             
-            # Refresh or create new token
-            if not self.creds or not self.creds.valid:
-                if self.creds and self.creds.expired and self.creds.refresh_token:
-                    self.creds.refresh(Request())
-                else:
-                    if os.path.exists(self.credentials_path):
-                        flow = InstalledAppFlow.from_client_secrets_file(
-                            self.credentials_path, SCOPES)
-                        # This might require a browser flow, which is tricky on a headless server
-                        # Ideally, this runs once locally to generate token.pickle
-                        logger.warning("Need to authenticate via browser. Credentials found but no valid token.")
-                        # self.creds = flow.run_local_server(port=0)
-                    else:
-                        logger.warning("No credentials.json found.")
-                        return
-
-                # Save the credentials for the next run
-                if self.creds:
-                    with open(self.token_path, 'wb') as token:
-                        pickle.dump(self.creds, token)
-
-            # Build service
-            if self.creds:
-                self.service = build('calendar', 'v3', credentials=self.creds)
-                logger.info("Calendar service initialized successfully with OAuth")
+            if self.api_key:
+                # API Key method (read-only, public calendars)
+                self.service = build('calendar', 'v3', developerKey=self.api_key)
+                logger.info("Calendar service initialized with API key")
+            else:
+                logger.warning("Google Calendar API key not configured")
         except Exception as e:
-            logger.error(f"Failed to authenticate Calendar: {e}")
-
+            logger.error(f"Failed to initialize Calendar service: {e}")
+    
     def get_today_events(self) -> List[Dict]:
         """Get today's events."""
         if not self.service:
             return []
         
         try:
+            # Get events for today
             now = datetime.utcnow()
-            # Start of day
-            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-            end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+            start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
+            end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0).isoformat() + 'Z'
             
             events_result = self.service.events().list(
                 calendarId=self.calendar_id,
-                timeMin=start.isoformat() + 'Z',
-                timeMax=end.isoformat() + 'Z',
+                timeMin=start_of_day,
+                timeMax=end_of_day,
                 singleEvents=True,
                 orderBy='startTime'
             ).execute()
             
-            return events_result.get('items', [])
+            events = events_result.get('items', [])
+            return events
         except Exception as e:
-            logger.error(f"Failed to fetch today events: {e}")
+            logger.error(f"Failed to fetch calendar events: {e}")
             return []
-
+    
     def get_upcoming_events(self, days: int = 7) -> List[Dict]:
         """Get upcoming events for next N days."""
         if not self.service:
@@ -107,31 +77,33 @@ class CalendarClient:
         except Exception as e:
             logger.error(f"Failed to fetch upcoming events: {e}")
             return []
-            
+    
     def format_event(self, event: Dict) -> str:
         """Format event for display."""
         start = event['start'].get('dateTime', event['start'].get('date'))
         summary = event.get('summary', 'No Title')
         
+        # Parse time
         try:
-            # Helper to parse ISO format
-            if 'T' in start:
-                dt = datetime.fromisoformat(str(start).replace('Z', '+00:00'))
-                # Localize if needed, for simplicity show time
+            if 'T' in start:  # DateTime
+                dt = datetime.fromisoformat(start.replace('Z', '+00:00'))
                 time_str = dt.strftime('%H:%M')
-            else:
+            else:  # All-day event
                 time_str = "Весь день"
         except:
             time_str = "?"
-            
+        
         return f"{time_str} - {summary}"
-
+    
     def create_event(self, summary: str, start_time: datetime, duration_minutes: int = 60) -> Optional[Dict]:
-        """Create a new calendar event."""
+        """
+        Create a new calendar event.
+        Note: Requires OAuth, not API key.
+        """
         if not self.service:
-            logger.error("Service not initialized")
+            logger.error("Calendar service not initialized")
             return None
-            
+        
         try:
             end_time = start_time + timedelta(minutes=duration_minutes)
             
@@ -139,11 +111,11 @@ class CalendarClient:
                 'summary': summary,
                 'start': {
                     'dateTime': start_time.isoformat(),
-                    'timeZone': 'UTC', # Consider using user's timezone
+                    'timeZone': 'Europe/Kiev',
                 },
                 'end': {
                     'dateTime': end_time.isoformat(),
-                    'timeZone': 'UTC',
+                    'timeZone': 'Europe/Kiev',
                 },
             }
             
@@ -152,7 +124,6 @@ class CalendarClient:
                 body=event
             ).execute()
             
-            logger.info(f"Created event: {created_event.get('htmlLink')}")
             return created_event
         except Exception as e:
             logger.error(f"Failed to create event: {e}")
