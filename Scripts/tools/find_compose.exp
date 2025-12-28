@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh -o StrictHostKeyChecking=no gonya@100.81.133.25 "find /home/gonya -name docker-compose.yml -maxdepth 3 2>/dev/null"
+expect {
+    "password:" {
+        send "GarYk6550\r"
+        exp_continue
+    }
+    eof
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/expect -f
+set timeout 5
+set host "gonya@100.81.133.25"
+set passwords {
+    "Gonya990"
+    "6550"
+    "Garyk6550"
+    "GarYk-6550"
+    "igor"
+    "password"
+    "123456"
+}
+
+foreach pass $passwords {
+    send_user "\nATTEMPT Trying password: $pass\n"
+    spawn ssh -o StrictHostKeyChecking=no $host "echo SUCCESS_LOGIN"
+    expect {
+        "password:" {
+            send "$pass\r"
+            expect {
+                "SUCCESS_LOGIN" {
+                    send_user "\nSUCCESS Password found: $pass\n"
+                    exit 0
+                }
+                "Permission denied" {
+                    send_user "\nFAIL Incorrect password\n"
+                }
+                timeout {
+                    send_user "\nTIMEOUT\n"
+                }
+            }
+        }
+        "SUCCESS_LOGIN" {
+            send_user "\nSUCCESS Logged in without password (Key)!\n"
+            exit 0
+        }
+    }
+    wait
+}
+
+send_user "\nFAILURE No passwords worked.\n"
+exit 1
