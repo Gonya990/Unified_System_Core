@@ -40,8 +40,10 @@
 - [x] **Bluetooth Guide:** Инструкция по пробросу DBus в Docker.
 - [x] **Code Refactoring:** Оптимизация структуры проекта
       (перенос модулей в src/, очистка корня).
-- [ ] **Distributed AI:** Настроить pve-antigravity-1 как Ollama Worker
-      (см. docs/DISTRIBUTED_INFERENCE_SETUP.md).
+- [x] **Distributed AI:** Настроить pve-antigravity-1 как Ollama Worker
+      (Config Applied ✅, Validation Pending via Bot).
+- [x] **Budget Duplicate Fix:** Исправлена логика Cloud Function
+      (удален DISABLED блок).
 - [ ] **SmartThings CLI:** Запустить cleanup_smartthings_api.py
       (требует PAT).
 - [ ] **Bluetooth Fix:** Следовать инструкции из BLUETOOTH_FIX_GUIDE.md на хосте.
