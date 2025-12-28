@@ -603,6 +603,27 @@ async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await ha_controller.activate_scene(scene_name)
         await update.message.reply_text(f"🎬 Activating scene: {scene_name}")
 
+    elif cmd == "integrations":
+        integrations = await ha_controller.get_integrations()
+        if not integrations:
+             await update.message.reply_text("❌ No integrations found or not supported.")
+             return
+             
+        msg = "🧩 **HA Integrations**:\n\n"
+        for i in integrations:
+            title = i.get('title', 'Unknown')
+            domain = i.get('domain', 'unknown')
+            entry_id = i.get('entry_id', '')
+            state = i.get('state', 'unknown')
+            msg += f"• **{title}** (`{domain}`)\n  Status: {state}, ID: `{entry_id}`\n"
+            
+        # Split message if too long
+        if len(msg) > 4000:
+             await update.message.reply_text(msg[:4000], parse_mode="Markdown")
+             await update.message.reply_text(msg[4000:], parse_mode="Markdown")
+        else:
+             await update.message.reply_text(msg, parse_mode="Markdown")
+
     else:
         await update.message.reply_text(f"Unknown HA command: {cmd}")
 

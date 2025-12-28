@@ -19,6 +19,7 @@ class DeviceMonitor:
         # Configuration
         self.monitored_entities: Set[str] = set()
         self.ignored_entities: Set[str] = set()
+        self.recovery_map: Dict[str, str] = {}
         
         # State tracking
         self.unavailable_entities: Set[str] = set()
@@ -76,12 +77,37 @@ class DeviceMonitor:
             
             self.unavailable_entities = current_failures
             
+            # Check for recovery actions
+            if new_failures:
+                await self.attempt_recovery(new_failures)
+                
             return new_failures
             
         except Exception as e:
             logger.error(f"Device check failed: {e}")
             return []
             
+    async def attempt_recovery(self, failures: List[str]):
+        """Attempt to recover failed devices by reloading integrations."""
+        reloaded_integrations = set()
+        
+        for entity_id in failures:
+            integration_id = self.recovery_map.get(entity_id)
+            if integration_id and integration_id not in reloaded_integrations:
+                logger.info(f"Attempting recovery for {entity_id}: Reloading integration {integration_id}")
+                if self.notify_callback:
+                     await self.notify_callback(f"🔧 Пытаюсь восстановить `{entity_id}` (Reload Integration)...")
+                
+                try:
+                    await self.ha.reload_integration(integration_id)
+                    reloaded_integrations.add(integration_id)
+                except Exception as e:
+                    logger.error(f"Recovery failed for {entity_id}: {e}")
+
+    def set_recovery_action(self, entity_id: str, integration_id: str):
+        """Map entity failure to integration reload."""
+        self.recovery_map[entity_id] = integration_id
+
     async def run_check(self):
         """Periodic check method."""
         failures = await self.check_devices()
