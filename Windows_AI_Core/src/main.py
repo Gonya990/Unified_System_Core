@@ -37,6 +37,7 @@ from .calendar_client import CalendarClient
 from .homekit_bridge import HomeKitBridge
 from .notion_client import NotionClient
 from .device_monitor import DeviceMonitor
+from .health_integration import HealthIntegration
 
 # Initialize logging first
 setup_logging()
@@ -61,6 +62,7 @@ calendar_client = CalendarClient()
 homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None # Will init in post_init or after ha_controller
+health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -747,6 +749,60 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         logger.error(f"Web search failed: {e}")
         await update.message.reply_text(f"❌ Ошибка при выполнении поиска: {e}")
 
+
+@require_auth
+async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /health command - view stats or set manual entry."""
+    user_id = update.effective_user.id
+    
+    if not context.args:
+        stats = health_integration.get_today_stats(user_id)
+        msg = (
+            "🩺 **Твое здоровье (Сегодня):**\n\n"
+            f"👣 Шаги: `{stats.get('steps', 0):,.0f}`\n"
+            f"⚖️ Вес: `{stats.get('weight', 0):.1f} kg`\n"
+            f"😴 Сон: `{stats.get('sleep', 0):.1f} h`\n\n"
+            "Команды:\n"
+            "`/health add <metric> <value>`\n"
+            "`/health goal <metric> <value>`"
+        )
+        await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+        
+    cmd = context.args[0].lower()
+    
+    if cmd == "add":
+        if len(context.args) < 3:
+            await update.message.reply_text("Usage: /health add <steps|weight|sleep> <value>")
+            return
+            
+        metric = context.args[1].lower()
+        try:
+            val = float(context.args[2])
+        except ValueError:
+            await update.message.reply_text("❌ Значение должно быть числом.")
+            return
+            
+        unit = "count"
+        if metric == "weight": unit = "kg"
+        elif metric == "sleep": unit = "hours"
+        
+        if health_integration.add_metric(user_id, metric, val, unit, "manual"):
+            await update.message.reply_text(f"✅ Записано: {metric} = {val}")
+        else:
+            await update.message.reply_text("❌ Ошибка записи.")
+            
+    elif cmd == "goal":
+         if len(context.args) < 3:
+            await update.message.reply_text("Usage: /health goal <steps|weight|sleep> <value>")
+            return
+         metric = context.args[1].lower()
+         try:
+            val = float(context.args[2])
+            health_integration.set_goal(user_id, metric, val)
+            await update.message.reply_text(f"🎯 Цель обновлена: {metric} = {val}")
+         except ValueError:
+             await update.message.reply_text("❌ Значение должно быть числом.")
 
 @require_auth
 async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1790,6 +1846,7 @@ def main() -> None:
     application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(CommandHandler("speak", cmd_speak))
     application.add_handler(CommandHandler("note", cmd_note))
+    application.add_handler(CommandHandler("health", cmd_health))
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))

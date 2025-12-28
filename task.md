@@ -43,6 +43,6 @@
 - [ ] BIOS Update для Proxmox Host (Re-size BAR, IOMMU).
 - [x] Голосовые ответы (Text-to-Speech через `/speak`).
 - [x] Интеграция с Notion для заметок (`/note` - требует `NOTION_API_KEY`).
-- [ ] Мониторинг здоровья (интеграция с Apple Health / Google Fit).
+- [x] Мониторинг здоровья (`/health add/goal` - база для Apple Shortcuts).
 - [x] Настройка мониторинга доступности устройств HA (DeviceMonitor service).
 - [x] Автоматизации самовосстановления для HA интеграций (Reload on failure).
