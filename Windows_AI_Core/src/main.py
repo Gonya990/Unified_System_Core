@@ -78,26 +78,44 @@ SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), умный AI ассистент в
 Твоя главная цель - быть полезным и исполнительным.
 
 У тебя есть доступ к следующим ИНСТРУМЕНТАМ (Tools):
-1. ПРОВЕРКА ВАКАНСИЙ: "проверить почту", "найти работу", "просканировать вакансии" → [[RUN:SCAN]]
-2. СТАТУС СИСТЕМЫ: "как дела", "статус", "мониторинг", "здоровье сервера" → [[RUN:STATUS]]
-3. КОМАНДЫ СЕРВЕРА: "выполни команду", "запусти на сервере", "проверь процессы" → [[RUN:CMD:<команда>]]
-4. СВЯЗЬ С ANTIGRAVITY: "спроси у Antigravity", "передай Antigravity", "нужна помощь агента" → [[ASK:ANTIGRAVITY:<вопрос>]]
-5. ПОИСК В ИНТЕРНЕТЕ: "погугли", "найди инфу", "кто такой...", "погода в..." → [[RUN:SEARCH:<запрос>]]
+
+## ПОЧТА (Gmail):
+- "проверь почту", "что в почте", "непрочитанные письма" → [[RUN:MAIL]]
+- "найди письмо от X", "письма от Kosta" → [[RUN:MAIL_SEARCH:<запрос>]]
+
+## УМНЫЙ ДОМ (Home Assistant):
+- "статус умного дома", "как дома" → [[RUN:HA_STATUS]]
+- "включи свет", "выключи лампу" → [[RUN:HA_LIGHT:on/off]]
+- "покажи сенсоры", "температура дома" → [[RUN:HA_SENSORS]]
+- "скажи через колонку X" → [[RUN:SAY:<текст>]]
+
+## ЗДОРОВЬЕ:
+- "мои шаги", "сколько я спал", "статистика здоровья" → [[RUN:HEALTH]]
+
+## СИСТЕМА:
+- "проверить вакансии", "найти работу" → [[RUN:SCAN]]
+- "статус системы", "как сервер" → [[RUN:STATUS]]
+- "выполни команду X" → [[RUN:CMD:<команда>]]
+- "погугли X", "найди информацию" → [[RUN:SEARCH:<запрос>]]
+- "спроси у Antigravity" → [[ASK:ANTIGRAVITY:<вопрос>]]
+
+## ЗАМЕТКИ:
+- "запиши в Notion", "сохрани заметку" → [[RUN:NOTE:<заголовок>|<текст>]]
 
 ПРИМЕРЫ:
-User: "Найди мне работу"
-AI: "Хорошо, запускаю анализ свежих вакансий. [[RUN:SCAN]]"
+User: "Что нового в почте?"
+AI: "Проверяю почту... [[RUN:MAIL]]"
 
-User: "Проверь, сколько памяти использует сервер"
-AI: "Проверяю использование памяти... [[RUN:CMD:free -h]]"
+User: "Найди письма от Kosta"
+AI: "Ищу письма от Kosta... [[RUN:MAIL_SEARCH:from:kosta]]"
 
-User: "Спроси у Antigravity, как настроить автозапуск"
-AI: "Передаю вопрос главному агенту... [[ASK:ANTIGRAVITY:Как настроить автозапуск службы?]]"
+User: "Какая температура дома?"
+AI: "Проверяю сенсоры... [[RUN:HA_SENSORS]]"
 
-User: "Погугли новости AI"
-AI: "Ищу новости... [[RUN:SEARCH:AI news]]"
+User: "Скажи через Алису привет"  
+AI: "Говорю через колонку... [[RUN:SAY:Привет!]]"
 
-ВАЖНО: Ты можешь выполнять ТОЛЬКО безопасные команды (чтение, статус). Никогда не удаляй файлы и не останавливай критические службы без подтверждения пользователя."""
+ВАЖНО: Ты можешь выполнять ТОЛЬКО безопасные команды. Никогда не удаляй файлы без подтверждения."""
 
 # Authorized users (Telegram User IDs)
 ALLOWED_USERS = [
@@ -1452,9 +1470,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     trigger_cmd = "[[RUN:CMD:" in response
     trigger_antigravity = "[[ASK:ANTIGRAVITY:" in response
     trigger_search = "[[RUN:SEARCH:" in response
+    trigger_mail = "[[RUN:MAIL]]" in response
+    trigger_mail_search = "[[RUN:MAIL_SEARCH:" in response
+    trigger_ha_status = "[[RUN:HA_STATUS]]" in response
+    trigger_ha_sensors = "[[RUN:HA_SENSORS]]" in response
+    trigger_say = "[[RUN:SAY:" in response
+    trigger_health = "[[RUN:HEALTH]]" in response
     
     # Clean response
     clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "")
+    clean_response = clean_response.replace("[[RUN:MAIL]]", "").replace("[[RUN:HA_STATUS]]", "")
+    clean_response = clean_response.replace("[[RUN:HA_SENSORS]]", "").replace("[[RUN:HEALTH]]", "")
     
     # Extract CMD if present
     cmd_to_run = None
@@ -1482,6 +1508,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if match:
             search_query = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:SEARCH:{search_query}]]", "")
+    
+    # Extract Mail search query if present
+    mail_search_query = None
+    if trigger_mail_search:
+        import re
+        match = re.search(r'\[\[RUN:MAIL_SEARCH:(.+?)\]\]', response)
+        if match:
+            mail_search_query = match.group(1)
+            clean_response = clean_response.replace(f"[[RUN:MAIL_SEARCH:{mail_search_query}]]", "")
+    
+    # Extract SAY message if present
+    say_message = None
+    if trigger_say:
+        import re
+        match = re.search(r'\[\[RUN:SAY:(.+?)\]\]', response)
+        if match:
+            say_message = match.group(1)
+            clean_response = clean_response.replace(f"[[RUN:SAY:{say_message}]]", "")
     
     clean_response = clean_response.strip()
     
@@ -1539,8 +1583,63 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         search_result = await web_search.search(search_query)
         await update.message.reply_text(search_result, parse_mode="Markdown")
         
-        # Optional: Feed result back to AI?
-        # For now, just showing to user.
+    # NEW: Mail trigger
+    if trigger_mail:
+        logger.info("Executing Tool: MAIL")
+        summary = gmail_client.get_email_summary()
+        await update.message.reply_text(summary, parse_mode="Markdown")
+    
+    # NEW: Mail search trigger
+    if trigger_mail_search and mail_search_query:
+        logger.info(f"Executing Mail Search: {mail_search_query}")
+        emails = gmail_client.search_emails(mail_search_query, max_results=5)
+        if not emails:
+            await update.message.reply_text(f"🔍 По запросу \"{mail_search_query}\" ничего не найдено.")
+        else:
+            msg = f"🔍 **Результаты: \"{mail_search_query}\"**\n\n"
+            for email in emails:
+                sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+                msg += f"• **{sender}**\n  {email['subject'][:50]}...\n\n"
+            await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    # NEW: HA Status trigger
+    if trigger_ha_status:
+        logger.info("Executing Tool: HA_STATUS")
+        try:
+            ha_res = await ha_controller.get_status()
+            if ha_res.get("status") == "ok":
+                msg = f"🏠 Home Assistant: **Online**\n• Версия: {ha_res.get('version')}\n• Сущностей: {ha_res.get('entities_count')}"
+            else:
+                msg = f"❌ Home Assistant: {ha_res.get('message', 'Error')}"
+            await update.message.reply_text(msg, parse_mode="Markdown")
+        except Exception as e:
+            await update.message.reply_text(f"❌ HA Error: {e}")
+    
+    # NEW: HA Sensors trigger
+    if trigger_ha_sensors:
+        logger.info("Executing Tool: HA_SENSORS")
+        report = await ha_controller.get_sensors_report()
+        await update.message.reply_text(report, parse_mode="Markdown")
+    
+    # NEW: Say trigger (Yandex Station TTS)
+    if trigger_say and say_message:
+        logger.info(f"Executing SAY: {say_message}")
+        if await ha_controller.speak_via_yandex(say_message):
+            await update.message.reply_text(f"🔊 Сказано: \"{say_message}\"")
+        else:
+            await update.message.reply_text("❌ Не удалось произнести через колонку.")
+    
+    # NEW: Health trigger
+    if trigger_health:
+        logger.info("Executing Tool: HEALTH")
+        stats = health_integration.get_today_stats(update.effective_user.id)
+        msg = (
+            "🩺 **Твоё здоровье:**\n\n"
+            f"👣 Шаги: `{stats.get('steps', 0):,.0f}`\n"
+            f"⚖️ Вес: `{stats.get('weight', 0):.1f} kg`\n"
+            f"😴 Сон: `{stats.get('sleep', 0):.1f} h`"
+        )
+        await update.message.reply_text(msg, parse_mode="Markdown")
 
 
 async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
