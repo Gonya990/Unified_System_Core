@@ -19,3 +19,6 @@ google-auth-httplib2
 google-auth-oauthlib
 HAP-python[QRCode]
 notion-client
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client

@@ -38,6 +38,7 @@ from .homekit_bridge import HomeKitBridge
 from .notion_client import NotionClient
 from .device_monitor import DeviceMonitor
 from .health_integration import HealthIntegration
+from .gmail_client import GmailClient
 
 # Initialize logging first
 setup_logging()
@@ -63,6 +64,7 @@ homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
+gmail_client = GmailClient()
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -750,6 +752,54 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         logger.error(f"Web search failed: {e}")
         await update.message.reply_text(f"❌ Ошибка при выполнении поиска: {e}")
 
+
+@require_auth
+async def cmd_mail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /mail command - check Gmail."""
+    if not gmail_client.authenticated:
+        await update.message.reply_text(
+            "❌ Gmail не подключен.\n\n"
+            "Для подключения запусти бота локально для OAuth авторизации."
+        )
+        return
+    
+    await update.message.chat.send_action("typing")
+    
+    if not context.args:
+        # Default: show summary
+        summary = gmail_client.get_email_summary()
+        await update.message.reply_text(summary, parse_mode="Markdown")
+        return
+    
+    cmd = context.args[0].lower()
+    
+    if cmd == "unread":
+        count = gmail_client.get_unread_count()
+        await update.message.reply_text(f"📬 Непрочитанных писем: **{count}**", parse_mode="Markdown")
+    
+    elif cmd == "search":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /mail search <query>")
+            return
+        query = " ".join(context.args[1:])
+        emails = gmail_client.search_emails(query, max_results=5)
+        if not emails:
+            await update.message.reply_text(f"🔍 По запросу \"{query}\" ничего не найдено.")
+            return
+        msg = f"🔍 **Результаты по: \"{query}\"**\n\n"
+        for email in emails:
+            sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+            msg += f"• **{sender}**\n  {email['subject'][:40]}...\n\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    else:
+        await update.message.reply_text(
+            "📧 **Gmail Commands:**\n\n"
+            "`/mail` - сводка непрочитанных\n"
+            "`/mail unread` - количество непрочитанных\n"
+            "`/mail search <query>` - поиск",
+            parse_mode="Markdown"
+        )
 
 @require_auth
 async def cmd_say(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1866,6 +1916,7 @@ def main() -> None:
     application.add_handler(CommandHandler("note", cmd_note))
     application.add_handler(CommandHandler("health", cmd_health))
     application.add_handler(CommandHandler("say", cmd_say))
+    application.add_handler(CommandHandler("mail", cmd_mail))
     
     # Handle voice messages
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
