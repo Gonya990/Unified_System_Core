@@ -46,7 +46,12 @@ class InferenceClient:
     @property
     def provider(self) -> str:
         """Get current inference provider."""
-        return self.config.get("INFERENCE_PROVIDER", "ollama").lower()
+        prov = self.config.get("INFERENCE_PROVIDER", "ollama").lower()
+        if prov == "gemini" and not self.config.get("GEMINI_API_KEY"):
+            # Fallback to Ollama if Gemini key is missing
+            logger.warning("Gemini API key missing, falling back to Ollama")
+            return "ollama"
+        return prov
     
     @property
     def base_url(self) -> str:
