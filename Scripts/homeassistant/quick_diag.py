@@ -8,7 +8,7 @@ import json
 from collections import Counter
 
 # HA Configuration
-HA_URL = "http://192.168.1.216:8123"
+HA_URL = "http://100.81.133.25:8123"
 HA_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhYWQ3YjJiN2M4NDg0NWEzODA0YTU4MWUwYWYyNjk3MyIsImlhdCI6MTc2Njg0NTEyNywiZXhwIjoyMDgyMjA1MTI3fQ.H4iTu7T_IYaom9ecHVA5EVBJ-cFBXyFXwkgykPdDcjc"
 
 headers = {

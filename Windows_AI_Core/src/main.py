@@ -507,6 +507,13 @@ async def post_init(application: Application) -> None:
     # Start Scheduler
     scheduler.set_application(application)
     scheduler.start()
+    
+    # Schedule Daily Digest for Admin/Allowed users
+    # We iterate over allowed users to schedule individual digests
+    for user_id in config.get("ALLOWED_USER_IDS", []):
+         # We need a username, default to "User" or fetch??
+         # For now, simplistic approach
+         scheduler.add_daily_digest_job(user_id, digest_service.generate_digest, user_id, "Master")
 
     # Determine public URL (mock or real)
     logger.info("Alice Skill running on port 8090. Needs tunnel for public access.")

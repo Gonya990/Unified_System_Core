@@ -12,8 +12,8 @@ Pillow
 fastapi
 uvicorn
 jinja2
-google-search-results
-linear-sdk
+google-search-results==2.4.2
+linear-api
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
