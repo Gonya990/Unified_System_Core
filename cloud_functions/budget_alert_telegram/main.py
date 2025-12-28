@@ -25,16 +25,6 @@ def send_telegram_message(chat_id: int, text: str, bot_token: str) -> bool:
 def budget_alert_to_telegram(event, context):
     """
     Cloud Function triggered by Pub/Sub budget alerts.
-    
-    DISABLED: Notifications turned off per user request
-    """
-    import logging
-    logging.info("Budget alert received but notifications disabled per user request")
-    logging.info(f"Event data: {event.get('data', 'N/A')}")
-    return "Notifications disabled", 200
-
-    """
-    Cloud Function triggered by Pub/Sub budget alert.
     Forwards budget notifications to Telegram.
     """
     # Get config from environment

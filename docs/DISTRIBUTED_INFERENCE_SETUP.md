@@ -34,7 +34,7 @@ docker exec ollama ollama pull mistral
 ```ini
 # INFERENCE PROVIDER CONFIGURATION
 # Set remote Ollama instance
-OLLAMA_BASE_URL=http://100.127.194.111:11434
+OLLAMA_BASE_URL=http://100.74.137.122:11434
 INFERENCE_PROVIDER=ollama
 MODEL_NAME=llama3
 ```

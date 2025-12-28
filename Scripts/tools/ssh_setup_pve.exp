@@ -1,0 +1,50 @@
+#!/usr/bin/expect -f
+set timeout 10
+set host "root@100.74.137.122"
+set id_file "/home/gonya/.ssh/id_ed25519"
+set passwords {
+    "GarYk6550"
+    "Gonya990"
+    "6550"
+    "Garyk6550"
+    "GarYk-6550"
+    "igor"
+    "password"
+}
+
+foreach pass $passwords {
+    send_user "\nATTEMPT Trying password: $pass\n"
+    spawn ssh-copy-id -o StrictHostKeyChecking=no -i $id_file $host
+    expect {
+        "password:" {
+            send "$pass\r"
+            expect {
+                "Number of key(s) added" {
+                    send_user "\nSUCCESS Key added with password: $pass\n"
+                    exit 0
+                }
+                "Permission denied" {
+                    send_user "\nFAIL Incorrect password\n"
+                }
+                "INFO: 1 key(s) remain" {
+                    exp_continue
+                }
+                eof {
+                    # Check exit status? 
+                    # Usually ssh-copy-id exits 0 on success.
+                }
+            }
+        }
+        "All keys were skipped" {
+             send_user "\nINFO Key already installed.\n"
+             exit 0
+        }
+        timeout {
+            send_user "\nTIMEOUT\n"
+        }
+    }
+    wait
+}
+
+send_user "\nFAILURE All passwords exhausted.\n"
+exit 1
