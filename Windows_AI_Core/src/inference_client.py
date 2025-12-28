@@ -110,16 +110,94 @@ class InferenceClient:
     async def chat(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """
         Send chat completion request to configured endpoint.
-        
-        Supports Ollama, OpenAI-compatible, and Gemini APIs.
-        Returns: (response_text, usage_stats)
         """
         provider = self.provider
+        
+        # Council Mode (Parallel Ensemble)
+        if provider == "council":
+            return await self._chat_council(messages, system_prompt)
         
         # Handle Gemini separately (uses SDK)
         if provider == "gemini":
             return await self._chat_gemini(messages, system_prompt)
         
+        # Generic HTTP (Ollama/OpenAI)
+        return await self._chat_generic(provider, messages, system_prompt)
+
+    async def _chat_council(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
+        """
+        Carpathian Council: Query multiple models in parallel.
+        Maximize Logic (Gemini/Cloud) + Reliability (Ollama/Local).
+        Strategy: Race them, prefer Gemini if successful and fast.
+        """
+        import asyncio
+        
+        # Define tasks
+        tasks = []
+        providers = []
+        
+        # 1. Gemini Task (The Brain - Free Tier)
+        if self.config.get("GEMINI_API_KEY"):
+            tasks.append(self._chat_gemini(messages, system_prompt))
+            providers.append("gemini")
+            
+        # 2. OpenAI Task (The Sage - Paid Tier)
+        # We add it to the council if key exists
+        if self.config.get("OPENAI_API_KEY"):
+            # Use generic handler but with specific provider
+            tasks.append(self._chat_generic("openai", messages, system_prompt))
+            providers.append("openai")
+            
+        # 3. Ollama Task (The Soul/Backup - Local)
+        tasks.append(self._chat_generic("ollama", messages, system_prompt))
+        providers.append("ollama")
+        
+        if not tasks:
+            return "[Error]: No providers available for Council.", {}
+            
+        logger.info(f"🦾 Council Assembled: {providers}. Thinking...")
+        
+        # Race/Gather
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        combined_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        responses = {}
+        
+        for i, res in enumerate(results):
+            prov = providers[i]
+            if isinstance(res, Exception):
+                logger.error(f"Council Member {prov} failed: {res}")
+                responses[prov] = None
+            else:
+                text, usage = res
+                responses[prov] = text
+                for k in combined_usage:
+                    combined_usage[k] += usage.get(k, 0)
+
+        # Decision Strategy: Hierarchy of Intelligence
+        
+        # 1. OpenAI (Most capable for logic, if available)
+        openai_resp = responses.get("openai")
+        if openai_resp and not openai_resp.startswith("[Error]"):
+            logger.info("🏆 Council Decision: OpenAI selected (Best Logic).")
+            return openai_resp, combined_usage
+
+        # 2. Gemini (Strong logic, free tier)
+        gemini_resp = responses.get("gemini")
+        if gemini_resp and not gemini_resp.startswith("[Error]"):
+            logger.info("🥈 Council Decision: Gemini selected.")
+            return gemini_resp, combined_usage
+            
+        # 3. Ollama (Local backup)
+        ollama_resp = responses.get("ollama")
+        if ollama_resp:
+            logger.info("🛡️ Council Decision: Falling back to Ollama.")
+            return ollama_resp, combined_usage
+            
+        return "[Error]: Council failed to reach a consensus (All models failed).", combined_usage
+
+    async def _chat_generic(self, provider: str, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
+        """Generic HTTP handler for Ollama/OpenAI."""
         session = await self._get_session()
         
         # Build messages list with system prompt
@@ -128,21 +206,42 @@ class InferenceClient:
             full_messages.append({"role": "system", "content": system_prompt})
         full_messages.extend(messages)
         
-        # Detect endpoint type and build request
-        if provider == "openai" or "openai" in self.base_url.lower() or self.api_key:
-            # OpenAI-compatible API
-            url = f"{self.base_url.rstrip('/')}/v1/chat/completions"
+        # Detect endpoint parameters
+        if provider == "openai":
+            base_url = self.config.get("OPENAI_BASE_URL", "https://api.openai.com")
+            url = f"{base_url.rstrip('/')}/v1/chat/completions"
+            model = self.config.get("OPENAI_MODEL", "gpt-4o-mini")
+            headers = {"Authorization": f"Bearer {self.config.get('OPENAI_API_KEY')}"}
             payload = {
-                "model": self.model,
+                "model": model,
                 "messages": full_messages,
                 "temperature": 0.7,
                 "max_tokens": 500,
             }
-        else:
-            # Ollama API
-            url = f"{self.base_url.rstrip('/')}/api/chat"
+        elif provider == "openrouter":
+            base_url = "https://openrouter.ai/api"
+            url = f"{base_url}/v1/chat/completions"
+            # Default to a smart cheap model if not specified, e.g. Claude 3 Haiku or similar
+            model = self.config.get("OPENROUTER_MODEL", "anthropic/claude-3-haiku") 
+            headers = {
+                "Authorization": f"Bearer {self.config.get('OPENROUTER_API_KEY')}",
+                "HTTP-Referer": "https://unified-system.bot",
+                "X-Title": "Unified System Bot"
+            }
             payload = {
-                "model": self.model,
+                "model": model,
+                "messages": full_messages,
+                "temperature": 0.7,
+                # OpenRouter specific handling
+            }
+        else: # ollama
+            base_url = self.config.get("OLLAMA_BASE_URL", "http://localhost:11434")
+            # ... existing ollama code ...
+            url = f"{base_url.rstrip('/')}/api/chat"
+            model = self.config.get("OLLAMA_MODEL", "llama3.2")
+            headers = {}
+            payload = {
+                "model": model,
                 "messages": full_messages,
                 "stream": False,
             }
@@ -150,26 +249,22 @@ class InferenceClient:
         usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         
         try:
-            logger.info(f"[{provider}] Sending request to {url} with model {self.model}")
-            # Set a generous timeout for inference
+            # logger.info(f"[{provider}] Request -> {model}") # Reduced spam
             timeout = aiohttp.ClientTimeout(total=60)
-            async with session.post(url, json=payload, timeout=timeout) as response:
+            async with session.post(url, json=payload, headers=headers, timeout=timeout) as response:
                 if response.status != 200:
                     error_text = await response.text()
-                    logger.error(f"Inference error {response.status}: {error_text}")
-                    return f"[Error {response.status}]: Failed to get response from AI ({error_text[:100]})", usage
+                    logger.error(f"[{provider}] Error {response.status}: {error_text}")
+                    return f"[Error {response.status}]: {provider} failed", usage
                 
                 data = await response.json()
                 
-                # Parse response based on API type
+                # Parse
                 if "choices" in data:
-                    # OpenAI format
                     text = data["choices"][0]["message"]["content"]
-                    if "usage" in data:
-                        usage = data["usage"]
+                    if "usage" in data: usage = data["usage"]
                     return text, usage
                 elif "message" in data:
-                    # Ollama format
                     text = data["message"]["content"]
                     if "prompt_eval_count" in data:
                          usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
@@ -177,18 +272,11 @@ class InferenceClient:
                          usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
                     return text, usage
                 else:
-                    logger.warning(f"Unknown response format: {data}")
                     return str(data), usage
                     
-        except asyncio.TimeoutError:
-            logger.error(f"Inference timeout (60s) for {url}")
-            return f"[Timeout Error]: AI server at {self.base_url} did not respond within 60s", usage
-        except aiohttp.ClientError as e:
-            logger.error(f"Connection error: {e}")
-            return f"[Connection Error]: Cannot reach inference server at {self.base_url} ({str(e)})", usage
         except Exception as e:
-            logger.exception(f"Unexpected error during inference: {e}")
-            return f"[Error]: {type(e).__name__}: {str(e)}", usage
+            logger.error(f"[{provider}] Exception: {e}")
+            return f"[Error]: {str(e)}", usage
     
     async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """Handle Gemini API calls using the SDK."""

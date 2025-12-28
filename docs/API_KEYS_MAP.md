@@ -16,18 +16,19 @@
 │  │                    SYSTEMD SERVICES (Native)                          │   │
 │  ├─────────────────────────────────────────────────────────────────────┤   │
 │  │  ai-bot.service ──────> EnvironmentFile=.env                          │   │
-│  │  ollama.service ──────> OLLAMA_HOST=0.0.0.0:11434 (no API key)       │   │
+│  │  ollama.service ──────> OLLAMA_HOST=0.0.0.0:11434 (no keys)          │   │
 │  │  gcp-metrics.service ─> GOOGLE_APPLICATION_CREDENTIALS=json file     │   │
-│  │  nodered.service ─────> PATH only (keys stored in Node-RED flows)    │   │
+│  │  nodered.service ─────> PATH only (keys in flows)                    │   │
+│  │                                                                          │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │                    DOCKER CONTAINERS                                   │   │
+│  │                    DOCKER CONTAINERS                                  │   │
 │  ├─────────────────────────────────────────────────────────────────────┤   │
-│  │  acfs-hub-server-1 ───> HTTP_BEARER_TOKEN env var                     │   │
-│  │  n8n ─────────────────> WEBHOOK_URL (credentials in n8n UI)           │   │
-│  │  chrome-headless ─────> No credentials                                 │   │
-│  │  postgres:16 ─────────> Internal DB for acfs-hub                       │   │
+│  │  acfs-hub-server-1 ───> BEARER_TOKEN env var                          │   │
+│  │  n8n ─────────────────> WEBHOOK_URL (creds in n8n UI)                 │   │
+│  │  chrome-headless ─────> No creds                                     │   │
+│  │  postgres:16 ─────────> Internal DB                                   │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -43,9 +44,9 @@
 |----------|-------|
 | **Type** | systemd (system) |
 | **Status** | ✅ Running |
-| **WorkingDirectory** | `/home/gonya/Documents/Unified_System/Windows_AI_Core` |
+| **WorkingDir** | `/home/gonya/Documents/.../Windows_AI_Core` |
 | **ExecStart** | `python -m src.main` |
-| **EnvironmentFile** | `/home/gonya/Documents/Unified_System/Windows_AI_Core/.env` |
+| **EnvFile** | `/home/gonya/Documents/.../Windows_AI_Core/.env` |
 
 #### Environment Variables (from /proc)
 
@@ -78,7 +79,7 @@ token = bot_config.BOT_TOKEN  # ← Uses hardcoded version!
 
 ```python
 # config_manager.py
-"GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
+"GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", os.environ.get("GOOGLE"))
 
 # inference_client.py
 def api_key(self) -> str:
@@ -95,7 +96,7 @@ client = genai.Client(api_key=api_key)  # Line 26
 # inference_client.py
 def api_key(self) -> str:
     if provider == "openai":
-        return self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY", ""))
+        return self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE"))
 
 # Used in:
 headers = {"Authorization": f"Bearer {current_key}"}  # Line 95
@@ -163,7 +164,7 @@ def base_url(self) -> str:
 
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=/home/gonya/gcp-monitoring-key.json
-GCP_PROJECT_ID=my-home-435112
+GCP_PROJECT_ID=my-home-435112 (Infrastructure & Budget Alerts)
 ```
 
 #### GCP Keys Usage
@@ -175,9 +176,22 @@ GCP_PROJECT_ID=my-home-435112
 
 client = monitoring_v3.MetricServiceClient()  # Line 116
 # Client auto-loads credentials from GOOGLE_APPLICATION_CREDENTIALS
-
-client.create_time_series(...)  # Line 130
 ```
+
+### 3a. **Gemini API Project** (Generative AI)
+
+| Property | Value |
+|----------|-------|
+| **Project ID** | `gen-lang-client-0982257437` |
+| **Purpose** | Backend for `GEMINI_API_KEY` |
+| **Usage** | Tracks Token Usage (Input + Output) |
+| **Billing** | Linked to Billing Account `011CFE-33CC55-CEFB8F` |
+
+**Token Usage Explanation:**
+
+- **Input Tokens**: Text you send + Chat History + System Prompt.
+- **Output Tokens**: Text the AI generates.
+- **Cost**: Charged against this project if free tier is exceeded.
 
 ---
 
@@ -334,7 +348,7 @@ WEBHOOK_URL=http://localhost:5678/
 │         │                                                                    │
 │         ▼ (injects into process env)                                        │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  os.environ now contains:                                              │   │
+│  │  os.environ now contains: TELEGRAM_BOT_TOKEN...                        │   │
 │  │    TELEGRAM_BOT_TOKEN, GEMINI_API_KEY, OPENAI_API_KEY, etc.           │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │         │                                                                    │

@@ -16,7 +16,8 @@
 - Audio Output
 - Geocoded Location
 
-**Причина:** Приложение Home Assistant Companion на iPhone не обновляет данные в фоновом режиме.
+**Причина:** Приложение Home Assistant Companion на iPhone не обновляет данные
+в фоновом режиме.
 
 ---
 
@@ -252,7 +253,8 @@ automation:
     action:
       - service: notify.telegram
         data:
-          message: "⚠️ iPhone заряд: {{ states('sensor.iphone_igor_battery_level') }}%"
+          message: >-
+            ⚠️ iPhone заряд: {{ states('sensor.iphone_igor_battery_level') }}%
 ```
 
 ---
