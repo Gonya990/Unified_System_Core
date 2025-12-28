@@ -107,3 +107,13 @@ class HAController:
             
         return "📊 **Показания датчиков**:\n" + "\n".join(sensors[:20]) # Limit to 20
 
+    async def get_integrations(self):
+        """Get list of integrations."""
+        if not self.client: return []
+        return self.client.get_integrations()
+
+    async def reload_integration(self, entry_id: str):
+        """Reload an integration."""
+        if not self.client: return None
+        return self.client.reload_integration(entry_id)
+
