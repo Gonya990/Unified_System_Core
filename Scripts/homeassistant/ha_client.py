@@ -207,7 +207,7 @@ def main():
     elif command == 'states':
         result = client.get_states()
         print(f"Total entities: {len(result)}")
-        for state in result[:10]:  # Show first 10
+        for state in result:  # Show all
             print(f"  {state['entity_id']}: {state['state']}")
     
     elif command == 'integrations':
