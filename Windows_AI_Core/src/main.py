@@ -1040,26 +1040,28 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.message.reply_text("❌ Только главный администратор может обновлять бота.")
         return
         
-    await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Pull...")
+    await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)...")
     
     import subprocess
     try:
-        # 1. Git Pull
-        # Assume running in project root or src parent
+        # 1. Force Git Update
         project_dir = "/home/gonya/Documents/Unified_System"
         
+        # We use fetch + reset --hard to avoid any merge conflicts on the server
+        git_command = f"cd {project_dir} && git fetch origin && git reset --hard origin/main"
+        
         proc = await asyncio.create_subprocess_shell(
-            f"cd {project_dir} && git pull",
+            git_command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
         stdout, stderr = await proc.communicate()
         
         if proc.returncode != 0:
-            await update.message.reply_text(f"❌ Git Pull Failed:\n{stderr.decode()}")
+            await update.message.reply_text(f"❌ Git Update Failed:\n{stderr.decode()}")
             return
             
-        await update.message.reply_text(f"✅ Code updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Updating Dependencies...")
+        await update.message.reply_text(f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Updating Dependencies...")
         
         # 2. Pip Install
         venv_pip = f"{project_dir}/venv/bin/pip"
