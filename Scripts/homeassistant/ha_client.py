@@ -4,17 +4,18 @@ Home Assistant API Client
 Provides full programmatic control over HA integrations, entities, and services.
 """
 
+import os
 import requests
 import json
 from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class HAConfig:
-    """Home Assistant configuration"""
-    url: str = "http://100.81.133.25:8123"
-    token: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhYWQ3YjJiN2M4NDg0NWEzODA0YTU4MWUwYWYyNjk3MyIsImlhdCI6MTc2Njg0NTEyNywiZXhwIjoyMDgyMjA1MTI3fQ.H4iTu7T_IYaom9ecHVA5EVBJ-cFBXyFXwkgykPdDcjc"
+    """Home Assistant configuration - loads from environment variables"""
+    url: str = field(default_factory=lambda: os.environ.get("HA_URL", "http://100.81.133.25:8123"))
+    token: str = field(default_factory=lambda: os.environ.get("HA_TOKEN", ""))
     timeout: int = 30
 
 
