@@ -157,6 +157,7 @@ class HomeAssistantClient:
             hk_status = self.get_homekit_status()
             
             return {
+                "status": "ok",
                 "healthy": True,
                 "version": config.get('version'),
                 "location_name": config.get('location_name'),
@@ -165,7 +166,9 @@ class HomeAssistantClient:
             }
         except Exception as e:
             return {
+                "status": "error",
                 "healthy": False,
+                "message": str(e),
                 "error": str(e)
             }
 
