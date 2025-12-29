@@ -63,9 +63,10 @@
 
 ## 🟢 Низкий приоритет / Low Priority
 
-- [ ] Shopping integrations (Amazon, eBay, AliExpress) - Будущее
-- [ ] Bank integrations IL (הפועלים, לאומי) - Будущее
-- [ ] Gov Services IL (gov.il) - Будущее
+- [x] **Email Integrations** - ✅ gmail_agent.py extended with Shopping/Banks/Gov/Payments
+- [ ] Shopping integrations (Amazon, eBay, AliExpress) - Парсеры в разработке
+- [ ] Bank integrations IL (הפועלים, לאומי) - Категоризация готова ✅
+- [ ] Gov Services IL (gov.il) - Категоризация готова ✅
 - [ ] ChromeOS Flex setup - Для Артура
 - [x] GCP Алерты - Отменены по запросу
 
