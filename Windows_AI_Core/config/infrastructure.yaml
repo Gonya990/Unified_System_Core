@@ -1,9 +1,22 @@
+# Unified System Infrastructure
+# Updated: 2025-12-29
+
 nodes:
+  - id: macbook-air
+    name: MacBook Air
+    ip: 100.93.121.47
+    type: control
+    os: macos
+    services:
+      - name: Antigravity Agent
+      - name: Git Workspace
+      - name: Nodriver Daemon
+
   - id: igor-gaming-1
-    name: Gaming PC / AI Server
+    name: AI Server (WSL2)
     ip: 100.88.65.71
-    type: server
-    os: linux (ubuntu)
+    type: compute
+    os: ubuntu-wsl2
     services:
       - name: ai-bot
         type: systemd
@@ -11,29 +24,90 @@ nodes:
         port: 11434
       - name: home-assistant
         type: docker
+        port: 8123
+      - name: n8n
+        port: 5678
 
-  - id: unified-home-core
-    name: Proxmox Host
-    ip: 100.110.209.49
+  - id: igor-gaming
+    name: Windows PC
+    ip: 100.127.194.111
+    type: windows
+    os: windows11
+    services:
+      - name: Sunshine/Moonlight
+        port: 47989
+      - name: SSH (OpenSSH)
+        port: 22
+      - name: RDP
+        port: 3389
+
+  - id: proxmox
+    name: Proxmox VE
+    ip: 100.74.194.25
     type: hypervisor
     os: proxmox
     services:
-      - name: adguard-home
-      - name: plex
+      - name: Proxmox Web UI
+        port: 8006
+      - name: VM Host
+      - name: LXC Containers
 
-  - id: macbook-air
-    name: MacBook Air
-    type: client
-    os: macos
+  - id: unified-home-core-cloud
+    name: Cloud Gateway (GCP)
+    ip: 100.110.209.49
+    type: cloud
+    os: debian
+    services:
+      - name: Vasya Gateway
+        port: 8080
+      - name: AIOS MCP
+      - name: Docker
+
+  - id: smart
+    name: Smart Home Hub
+    ip: 100.81.133.25
+    type: iot
+    os: debian
+    services:
+      - name: Sensors
+      - name: Automation
+
+  - id: iphone
+    name: iPhone 15 Pro
+    ip: 100.86.233.87
+    type: mobile
+    os: ios
+    services:
+      - name: Tailscale VPN
+      - name: Termius
+
+  - id: lenovo-tab
+    name: Lenovo Tab P11 (Artur)
+    ip: 100.114.27.103
+    type: mobile
+    os: android
+    services:
+      - name: Family Link
+      - name: ADB
+      - name: GPS Tracker
 
 networks:
   - name: tailscale
     cidr: 100.64.0.0/10
+    description: Mesh VPN connecting all nodes
 
 apps:
   - name: Telegram Bot
     location: igor-gaming-1
+    port: 8095
   - name: Job Hunter
     location: igor-gaming-1
-  - name: Vasya
-    location: unified-home-core
+  - name: Vasya Gateway
+    location: unified-home-core-cloud
+    port: 8080
+  - name: Dashboard
+    location: igor-gaming-1
+    port: 8096
+  - name: Home Assistant
+    location: igor-gaming-1
+    port: 8123
