@@ -325,12 +325,22 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         return
     
     model = context.args[0]
-    config.set("MODEL_NAME", model)
-    logger.info(f"Model updated to: {model}", extra={"user_id": update.effective_user.id})
     
-    await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
-
-    await update.message.reply_text(f"✅ Model set to: `{model}`", parse_mode="Markdown")
+    # Update global generic
+    config.set("MODEL_NAME", model)
+    
+    # Update provider-specific to override env/defaults
+    provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
+    if provider == "gemini":
+        config.set("GEMINI_MODEL", model)
+    elif provider == "openai":
+        config.set("OPENAI_MODEL", model)
+    elif provider == "ollama":
+        config.set("OLLAMA_MODEL", model)
+        
+    logger.info(f"Model updated to: {model} (Provider: {provider})", extra={"user_id": update.effective_user.id})
+    
+    await update.message.reply_text(f"✅ Model set to: `{model}` ({provider})", parse_mode="Markdown")
 
 
 @require_auth

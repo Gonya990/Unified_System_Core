@@ -348,7 +348,7 @@ WEBHOOK_URL=http://localhost:5678/
 │         │                                                                    │
 │         ▼ (injects into process env)                                        │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  os.environ now contains: TELEGRAM_BOT_TOKEN...                        │   │
+│  │  os.environ has: TELEGRAM_BOT_TOKEN...                                │   │
 │  │    TELEGRAM_BOT_TOKEN, GEMINI_API_KEY, OPENAI_API_KEY, etc.           │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │         │                                                                    │
