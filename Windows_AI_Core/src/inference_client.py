@@ -13,17 +13,19 @@ logger = logging.getLogger(__name__)
 
 # Lazy import for Gemini
 _gemini_client = None
+_gemini_client_key = None
 
 
 def _get_gemini_client(api_key: str):
     """Lazy load and configure Gemini client using new SDK."""
-    global _gemini_client
+    global _gemini_client, _gemini_client_key
     try:
         from google import genai
         from google.genai.types import GenerateContentConfig
         
-        if not _gemini_client or _gemini_client.api_key != api_key:
+        if not _gemini_client or _gemini_client_key != api_key:
             _gemini_client = genai.Client(api_key=api_key)
+            _gemini_client_key = api_key
         return _gemini_client
     except ImportError:
         logger.error("google-genai not installed. Run: pip install google-genai")
