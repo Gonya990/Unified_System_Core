@@ -33,9 +33,10 @@ class HealthHandler(BaseHTTPRequestHandler):
     def _handle_health(self):
         """Return health status."""
         status = {"status": "healthy"}
-        if self.health_callback:
+        if HealthHandler.health_callback:
             try:
-                status.update(self.health_callback())
+                callback = HealthHandler.health_callback
+                status.update(callback())
             except Exception as e:
                 status["error"] = str(e)
         
