@@ -47,34 +47,74 @@ class InfrastructureManager:
         return summary
     
     async def check_nodes(self) -> str:
-        """Ping nodes to check availability."""
+        """Ping nodes to check availability using Tailscale ping."""
         import platform
-        import subprocess
         
         report = "📡 **Network Status**\n\n"
         
         for node in self.data.get("nodes", []):
             ip = node.get("ip")
+            node_name = node.get("name", node["id"])
+            
             if not ip or ip == "N/A" or "Placeholder" in str(ip):
-                report += f"⚪️ `{node['id']}` (No IP)\n"
+                report += f"⚪️ {node_name} (No IP)\n"
                 continue
-                
-            # Ping
-            param = "-n" if platform.system().lower() == "windows" else "-c"
-            command = ["ping", param, "1", str(ip)]
             
             try:
-                # Async ping check would be better, but subprocess is ok for quick check
-                proc = await asyncio.create_subprocess_exec(
-                    "ping", param, "1", str(ip),
-                    stdout=asyncio.subprocess.DEVNULL,
-                    stderr=asyncio.subprocess.DEVNULL
+                # Try Tailscale ping first (more reliable for mesh VPN)
+                proc = await asyncio.wait_for(
+                    asyncio.create_subprocess_exec(
+                        "/snap/bin/tailscale", "ping", "-c", "1", str(ip),
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.DEVNULL
+                    ),
+                    timeout=5.0
                 )
-                await proc.wait()
+                stdout, _ = await proc.communicate()
                 
-                status = "🟢 Online" if proc.returncode == 0 else "🔴 Offline"
-                report += f"{status} `{node['id']}` ({ip})\n"
+                if proc.returncode == 0:
+                    # Check if it's a direct connection
+                    is_direct = b"direct" in stdout
+                    status = "🟢 Online" + (" (direct)" if is_direct else " (relay)")
+                    report += f"{status} {node_name} ({ip})\n"
+                else:
+                    # Fallback to regular ping
+                    param = "-c" if platform.system().lower() != "windows" else "-n"
+                    proc2 = await asyncio.wait_for(
+                        asyncio.create_subprocess_exec(
+                            "ping", param, "1", str(ip),
+                            stdout=asyncio.subprocess.DEVNULL,
+                            stderr=asyncio.subprocess.DEVNULL
+                        ),
+                        timeout=3.0
+                    )
+                    await proc2.wait()
+                    
+                    if proc2.returncode == 0:
+                        report += f"🟢 Online {node_name} ({ip})\n"
+                    else:
+                        report += f"🔴 Offline {node_name} ({ip})\n"
+                        
+            except asyncio.TimeoutError:
+                report += f"⏱ Timeout {node_name} ({ip})\n"
+            except FileNotFoundError:
+                # Tailscale not found, use regular ping
+                try:
+                    param = "-c" if platform.system().lower() != "windows" else "-n"
+                    proc = await asyncio.wait_for(
+                        asyncio.create_subprocess_exec(
+                            "ping", param, "1", str(ip),
+                            stdout=asyncio.subprocess.DEVNULL,
+                            stderr=asyncio.subprocess.DEVNULL
+                        ),
+                        timeout=3.0
+                    )
+                    await proc.wait()
+                    status = "🟢 Online" if proc.returncode == 0 else "🔴 Offline"
+                    report += f"{status} {node_name} ({ip})\n"
+                except Exception:
+                    report += f"❌ Error {node_name} ({ip})\n"
             except Exception as e:
-                 report += f"❌ `{node['id']}` (Ping error)\n"
+                report += f"❌ {node_name}: {str(e)[:30]}\n"
                  
         return report

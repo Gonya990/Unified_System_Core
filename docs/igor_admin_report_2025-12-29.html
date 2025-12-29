@@ -45,7 +45,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -70,11 +69,17 @@
         }
 
         @keyframes bgMove {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-5%, -5%) rotate(5deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-5%, -5%) rotate(5deg);
+            }
         }
 
-        /* Floating particles */
         .particles {
             position: fixed;
             top: 0;
@@ -95,10 +100,25 @@
         }
 
         @keyframes floatParticle {
-            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
         }
 
         .container {
@@ -109,7 +129,6 @@
             z-index: 1;
         }
 
-        /* Hero Header - Creator Style */
         .hero {
             text-align: center;
             padding: 4rem 2rem;
@@ -134,8 +153,15 @@
         }
 
         @keyframes gradientMove {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .hero-crown {
@@ -146,8 +172,15 @@
         }
 
         @keyframes crownFloat {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
         }
 
         .hero h1 {
@@ -178,7 +211,6 @@
             color: var(--accent-gold);
         }
 
-        /* Stats Dashboard - Enhanced for Admin */
         .stats-dashboard {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -239,7 +271,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Achievement Banner */
         .achievement-banner {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
             border: 2px solid rgba(139, 92, 246, 0.4);
@@ -279,11 +310,10 @@
         .achievement-banner .detail {
             color: var(--text-secondary);
             font-size: 1.1rem;
-            max-width: 700px;
+            max-width: 800px;
             margin: 1rem auto 0;
         }
 
-        /* Section Cards */
         .section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -344,21 +374,20 @@
             padding: 2rem;
         }
 
-        /* Infrastructure Nodes Grid */
         .nodes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
         }
 
         .node-card {
             background: var(--bg-tertiary);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 1.5rem;
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
             transition: all 0.3s ease;
         }
 
@@ -375,67 +404,88 @@
         }
 
         .node-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
 
-        .node-icon.control { background: linear-gradient(135deg, #00d4ff, #0099cc); }
-        .node-icon.compute { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
-        .node-icon.windows { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-        .node-icon.proxmox { background: linear-gradient(135deg, #f472b6, #db2777); }
-        .node-icon.cloud { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .node-icon.control {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+        }
+
+        .node-icon.compute {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+        }
+
+        .node-icon.windows {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .node-icon.proxmox {
+            background: linear-gradient(135deg, #f472b6, #db2777);
+        }
+
+        .node-icon.cloud {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+        }
+
+        .node-icon.mobile {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .node-icon.iot {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
 
         .node-info h4 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
         }
 
         .node-info .role {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .node-ip {
             font-family: monospace;
             color: var(--accent-cyan);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             background: rgba(6, 182, 212, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
         }
 
         .node-services {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .service-tag {
-            padding: 0.3rem 0.8rem;
+            padding: 0.2rem 0.6rem;
             background: rgba(139, 92, 246, 0.15);
             color: var(--accent-purple);
-            border-radius: 20px;
-            font-size: 0.75rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
-        /* Feature Grid */
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
         }
 
         .feature-card {
             background: var(--bg-tertiary);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             display: flex;
             gap: 1rem;
             border: 1px solid var(--border-color);
@@ -448,22 +498,127 @@
         }
 
         .feature-card .check-icon {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             flex-shrink: 0;
         }
 
         .feature-card .content h5 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .feature-card .content p {
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
-        /* Timeline */
+        .ring-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .ring {
+            position: relative;
+            width: 350px;
+            height: 350px;
+        }
+
+        .ring-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-gold);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 60px rgba(251, 191, 36, 0.6);
+            }
+        }
+
+        .ring-node {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .ring-node:hover {
+            transform: scale(1.2) !important;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+
+        /* 8 nodes around the ring */
+        .ring-node:nth-child(2) {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ring-node:nth-child(3) {
+            top: 15%;
+            right: 5%;
+        }
+
+        .ring-node:nth-child(4) {
+            top: 50%;
+            right: -10px;
+            transform: translateY(-50%);
+        }
+
+        .ring-node:nth-child(5) {
+            bottom: 15%;
+            right: 5%;
+        }
+
+        .ring-node:nth-child(6) {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ring-node:nth-child(7) {
+            bottom: 15%;
+            left: 5%;
+        }
+
+        .ring-node:nth-child(8) {
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
+        }
+
+        .ring-node:nth-child(9) {
+            top: 15%;
+            left: 5%;
+        }
+
         .timeline {
             position: relative;
             padding-left: 3rem;
@@ -482,7 +637,7 @@
 
         .timeline-item {
             position: relative;
-            padding-bottom: 2rem;
+            padding-bottom: 1.5rem;
         }
 
         .timeline-item::before {
@@ -490,8 +645,8 @@
             position: absolute;
             left: -2rem;
             top: 0.5rem;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: var(--accent-gold);
             border: 3px solid var(--bg-secondary);
@@ -500,114 +655,16 @@
 
         .timeline-item .time {
             color: var(--accent-gold);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-family: monospace;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .timeline-item .event {
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
-        /* Token Chart Placeholder */
-        .chart-container {
-            background: var(--bg-tertiary);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            height: 200px;
-        }
-
-        .chart-bar {
-            width: 40px;
-            background: linear-gradient(180deg, var(--accent-gold), var(--accent-orange));
-            border-radius: 8px 8px 0 0;
-            animation: growBar 1s ease-out forwards;
-            transform-origin: bottom;
-        }
-
-        @keyframes growBar {
-            from { transform: scaleY(0); }
-            to { transform: scaleY(1); }
-        }
-
-        /* Ring of Resilience Visualization */
-        .ring-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem;
-        }
-
-        .ring {
-            position: relative;
-            width: 300px;
-            height: 300px;
-        }
-
-        .ring-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            box-shadow: var(--glow-gold);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-            50% { box-shadow: 0 0 60px rgba(251, 191, 36, 0.6); }
-        }
-
-        .ring-node {
-            position: absolute;
-            width: 70px;
-            height: 70px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--accent-cyan);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .ring-node:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
-        }
-
-        .ring-node.online { border-color: var(--accent-green); }
-        .ring-node.offline { border-color: var(--accent-red); opacity: 0.5; }
-
-        .ring-node:nth-child(2) { top: -10px; left: 50%; transform: translateX(-50%); }
-        .ring-node:nth-child(3) { top: 50%; right: -10px; transform: translateY(-50%); }
-        .ring-node:nth-child(4) { bottom: -10px; left: 50%; transform: translateX(-50%); }
-        .ring-node:nth-child(5) { top: 50%; left: -10px; transform: translateY(-50%); }
-
-        /* Footer */
         .footer {
             text-align: center;
             padding: 3rem;
@@ -632,37 +689,53 @@
             margin-top: 1rem;
         }
 
-        /* Responsive */
         @media (max-width: 1200px) {
-            .stats-dashboard { grid-template-columns: repeat(3, 1fr); }
+            .stats-dashboard {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .hero h1 { font-size: 2rem; }
-            .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
-            .nodes-grid { grid-template-columns: 1fr; }
-            .feature-grid { grid-template-columns: 1fr; }
+            .container {
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .stats-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nodes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ring {
+                width: 280px;
+                height: 280px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="bg-animation"></div>
-    
-    <!-- Floating Particles -->
     <div class="particles">
         <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 35%; animation-delay: 4s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 6s;"></div>
-        <div class="particle" style="left: 65%; animation-delay: 8s;"></div>
-        <div class="particle" style="left: 80%; animation-delay: 10s;"></div>
-        <div class="particle" style="left: 90%; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 55%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 10s;"></div>
     </div>
 
     <div class="container">
-        <!-- Hero Section -->
         <section class="hero">
             <div class="hero-crown">👑</div>
             <h1>Игорь — Админ-Создатель</h1>
@@ -673,21 +746,20 @@
             </div>
         </section>
 
-        <!-- Core Stats -->
         <section class="stats-dashboard">
             <div class="stat-card highlight">
                 <span class="icon">🖥️</span>
-                <span class="value">6</span>
+                <span class="value">8</span>
                 <span class="label">Узлов в сети</span>
             </div>
             <div class="stat-card">
                 <span class="icon">🤖</span>
-                <span class="value">25+</span>
+                <span class="value">30+</span>
                 <span class="label">Функций бота</span>
             </div>
             <div class="stat-card">
                 <span class="icon">🔗</span>
-                <span class="value">10+</span>
+                <span class="value">15+</span>
                 <span class="label">Интеграций</span>
             </div>
             <div class="stat-card">
@@ -697,26 +769,24 @@
             </div>
             <div class="stat-card">
                 <span class="icon">✅</span>
-                <span class="value">32</span>
+                <span class="value">35</span>
                 <span class="label">Выполнено задач</span>
             </div>
         </section>
 
-        <!-- Achievement Banner -->
         <section class="achievement-banner">
             <h3>🎉 Главное достижение Q4 2025</h3>
             <span class="achievement-text">MEGA UPDATE v2.0.0 — 7 функций за одну сессию!</span>
             <p class="detail">
-                Notification Manager • Dashboard v2 • Cost Tracking Pro • Linear API • 
-                Daily Digest • Google Calendar • HomeKit Bridge
+                🔔 Notification Manager • 📊 Dashboard v2 • 💰 Cost Tracking Pro • 📋 Linear API •
+                🌅 Daily Digest • 📅 Google Calendar • 🏠 HomeKit Bridge
             </p>
         </section>
 
-        <!-- Infrastructure Overview -->
         <section class="section">
             <div class="section-header">
                 <h2><span class="icon">🌐</span> Инфраструктура Tailscale Mesh</h2>
-                <span class="badge badge-success">4 Онлайн</span>
+                <span class="badge badge-success">8 Онлайн</span>
             </div>
             <div class="section-content">
                 <div class="nodes-grid">
@@ -730,8 +800,8 @@
                         </div>
                         <div class="node-ip">100.93.121.47</div>
                         <div class="node-services">
-                            <span class="service-tag">Antigravity Agent</span>
-                            <span class="service-tag">Git Workspace</span>
+                            <span class="service-tag">Antigravity</span>
+                            <span class="service-tag">Git</span>
                             <span class="service-tag">Nodriver</span>
                         </div>
                     </div>
@@ -746,11 +816,10 @@
                         </div>
                         <div class="node-ip">100.88.65.71</div>
                         <div class="node-services">
-                            <span class="service-tag">Ollama LLM</span>
-                            <span class="service-tag">Home Assistant</span>
+                            <span class="service-tag">Ollama</span>
+                            <span class="service-tag">HA</span>
                             <span class="service-tag">N8N</span>
-                            <span class="service-tag">Telegram Bot</span>
-                            <span class="service-tag">MCP Server</span>
+                            <span class="service-tag">Bot</span>
                         </div>
                     </div>
 
@@ -781,8 +850,8 @@
                         <div class="node-ip">100.74.194.25</div>
                         <div class="node-services">
                             <span class="service-tag">64GB RAM</span>
-                            <span class="service-tag">VM Management</span>
-                            <span class="service-tag">Container Host</span>
+                            <span class="service-tag">VMs</span>
+                            <span class="service-tag">LXC</span>
                         </div>
                     </div>
 
@@ -796,15 +865,15 @@
                         </div>
                         <div class="node-ip">100.110.209.49</div>
                         <div class="node-services">
-                            <span class="service-tag">Vasya Gateway :8080</span>
-                            <span class="service-tag">AIOS MCP</span>
+                            <span class="service-tag">Vasya :8080</span>
+                            <span class="service-tag">MCP</span>
                             <span class="service-tag">Docker</span>
                         </div>
                     </div>
 
                     <div class="node-card">
                         <div class="node-header">
-                            <div class="node-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">🏠</div>
+                            <div class="node-icon iot">🏠</div>
                             <div class="node-info">
                                 <h4>Smart Home Hub</h4>
                                 <span class="role">IoT Gateway</span>
@@ -816,37 +885,70 @@
                             <span class="service-tag">Automation</span>
                         </div>
                     </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon mobile">📱</div>
+                            <div class="node-info">
+                                <h4>iPhone 15 Pro</h4>
+                                <span class="role">Mobile Commander</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.86.233.87</div>
+                        <div class="node-services">
+                            <span class="service-tag">Tailscale VPN</span>
+                            <span class="service-tag">Termius</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon mobile">📟</div>
+                            <div class="node-info">
+                                <h4>Lenovo Tab P11 (Артур)</h4>
+                                <span class="role">Детский планшет</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.114.27.103</div>
+                        <div class="node-services">
+                            <span class="service-tag">Family Link</span>
+                            <span class="service-tag">ADB</span>
+                            <span class="service-tag">GPS</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Ring of Resilience -->
         <section class="section">
             <div class="section-header">
                 <h2><span class="icon">💎</span> Ring of Resilience</h2>
-                <span class="badge badge-gold">Активен</span>
+                <span class="badge badge-gold">Все активны</span>
             </div>
             <div class="section-content">
                 <div class="ring-container">
                     <div class="ring">
                         <div class="ring-center">👑</div>
-                        <div class="ring-node online" title="MacBook">💻</div>
-                        <div class="ring-node online" title="igor-gaming-1">🧠</div>
-                        <div class="ring-node online" title="Proxmox">📦</div>
-                        <div class="ring-node online" title="Cloud VM">☁️</div>
+                        <div class="ring-node" title="MacBook">💻</div>
+                        <div class="ring-node" title="igor-gaming-1">🧠</div>
+                        <div class="ring-node" title="Windows">🪟</div>
+                        <div class="ring-node" title="Proxmox">📦</div>
+                        <div class="ring-node" title="Cloud">☁️</div>
+                        <div class="ring-node" title="Smart">🏠</div>
+                        <div class="ring-node" title="iPhone">📱</div>
+                        <div class="ring-node" title="Lenovo Tab">📟</div>
                     </div>
                 </div>
                 <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem;">
-                    Все ключевые узлы работают. Резервирование на уровне Tailscale mesh обеспечивает отказоустойчивость.
+                    Все 8 узлов активны. Tailscale mesh обеспечивает отказоустойчивость и прямые соединения.
                 </p>
             </div>
         </section>
 
-        <!-- Bot Capabilities -->
         <section class="section">
             <div class="section-header">
                 <h2><span class="icon">🤖</span> Возможности AI Бота v2.0</h2>
-                <span class="badge badge-info">25+ функций</span>
+                <span class="badge badge-info">30+ функций</span>
             </div>
             <div class="section-content">
                 <div class="feature-grid">
@@ -854,7 +956,7 @@
                         <span class="check-icon">✅</span>
                         <div class="content">
                             <h5>Multi-Model Chat</h5>
-                            <p>Gemini, OpenAI, Ollama — переключение одной кнопкой</p>
+                            <p>Gemini, OpenAI, Ollama — переключение</p>
                         </div>
                     </div>
                     <div class="feature-card">
@@ -881,36 +983,64 @@
                     <div class="feature-card">
                         <span class="check-icon">✅</span>
                         <div class="content">
+                            <h5>🔔 Notification Manager</h5>
+                            <p>Умные тихие часы (23:00-08:00)</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>📊 Dashboard v2</h5>
+                            <p>Web UI с графиками на :8096</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>💰 Cost Tracking Pro</h5>
+                            <p>Детальная аналитика по моделям</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>📋 Linear API</h5>
+                            <p>Профессиональный таск-менеджмент</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>🌅 Daily Digest</h5>
+                            <p>Автоматическая сводка в 09:00</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>📅 Google Calendar</h5>
+                            <p>Синхронизация событий</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>🏠 HomeKit Bridge</h5>
+                            <p>Интеграция с Apple Home</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
                             <h5>Smart Home Control</h5>
-                            <p>Home Assistant + HomeKit Bridge</p>
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <span class="check-icon">✅</span>
-                        <div class="content">
-                            <h5>Calendar Integration</h5>
-                            <p>Google Calendar синхронизация</p>
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <span class="check-icon">✅</span>
-                        <div class="content">
-                            <h5>Task Management</h5>
-                            <p>Linear API + локальный /todo</p>
+                            <p>Home Assistant + Yandex Alice</p>
                         </div>
                     </div>
                     <div class="feature-card">
                         <span class="check-icon">✅</span>
                         <div class="content">
                             <h5>Web Search</h5>
-                            <p>Google SerpApi с Knowledge Graph</p>
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <span class="check-icon">✅</span>
-                        <div class="content">
-                            <h5>Daily Digest</h5>
-                            <p>Автоматическая сводка в 09:00</p>
+                            <p>Google SerpApi + Knowledge Graph</p>
                         </div>
                     </div>
                     <div class="feature-card">
@@ -934,11 +1064,24 @@
                             <p>Через Yandex Alice Skill</p>
                         </div>
                     </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Vasya Gateway</h5>
+                            <p>Load balancing Ollama + Gemini</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Access Control</h5>
+                            <p>Авторизация + Guest Mode</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Recent Activity Timeline -->
         <section class="section">
             <div class="section-header">
                 <h2><span class="icon">📅</span> История активности (декабрь 2025)</h2>
@@ -947,19 +1090,19 @@
                 <div class="timeline">
                     <div class="timeline-item">
                         <div class="time">29.12.2025</div>
-                        <div class="event">📄 Генерация HTML резюме, исправление RTL форматирования</div>
+                        <div class="event">📄 HTML отчёты, резюме, исправление бота (SO_REUSEADDR)</div>
                     </div>
                     <div class="timeline-item">
                         <div class="time">28.12.2025</div>
-                        <div class="event">🔧 Исправление Gemini моделей, Google Auth research, Security improvements</div>
+                        <div class="event">🔧 Gemini models fix, Google Auth research, Security</div>
                     </div>
                     <div class="timeline-item">
                         <div class="time">27.12.2025</div>
-                        <div class="event">🚀 MEGA UPDATE v2.0.0 — 7 новых функций за одну сессию!</div>
+                        <div class="event">🚀 MEGA UPDATE v2.0.0 — 7 новых функций!</div>
                     </div>
                     <div class="timeline-item">
                         <div class="time">26.12.2025</div>
-                        <div class="event">🌐 3D Infrastructure Report, Vasya Gateway с балансировкой</div>
+                        <div class="event">🌐 3D Infrastructure Report, Vasya Gateway</div>
                     </div>
                     <div class="timeline-item">
                         <div class="time">25.12.2025</div>
@@ -969,40 +1112,6 @@
             </div>
         </section>
 
-        <!-- Pending Tasks -->
-        <section class="section">
-            <div class="section-header">
-                <h2><span class="icon">📋</span> Ожидающие задачи</h2>
-                <span class="badge badge-gold">3 задачи</span>
-            </div>
-            <div class="section-content">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <span class="check-icon">⏳</span>
-                        <div class="content">
-                            <h5>SmartThings CLI</h5>
-                            <p>Запустить cleanup_smartthings_api.py (требует PAT)</p>
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <span class="check-icon">⏳</span>
-                        <div class="content">
-                            <h5>Bluetooth Fix</h5>
-                            <p>Следовать инструкции BLUETOOTH_FIX_GUIDE.md</p>
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <span class="check-icon">⏳</span>
-                        <div class="content">
-                            <h5>iPhone HA App</h5>
-                            <p>Следовать инструкции IPHONE_HA_SETUP.md</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
         <footer class="footer">
             <div class="footer-logo">🌌</div>
             <p>Unified System Core</p>
@@ -1011,46 +1120,17 @@
                 <span>Создано для Игоря-Админа</span>
             </div>
             <p style="margin-top: 1rem; font-size: 0.85rem;">
-                Powered by Antigravity Agent 🚀 | Дата отчёта: 29.12.2025
+                Powered by Antigravity Agent 🚀 | 29.12.2025
             </p>
         </footer>
     </div>
 
     <script>
-        // Add interactive hover effects
         document.querySelectorAll('.ring-node').forEach(node => {
-            node.addEventListener('mouseenter', () => {
-                node.style.transform = 'scale(1.3)';
-            });
-            node.addEventListener('mouseleave', () => {
-                node.style.transform = '';
-            });
+            node.addEventListener('mouseenter', () => { node.style.transform = 'scale(1.3)'; });
+            node.addEventListener('mouseleave', () => { node.style.transform = ''; });
         });
-
-        // Animate stats on scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.stat-card, .node-card, .feature-card').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Mobile panel toggle
-        const infoPanel = document.querySelector('.info-panel');
-        if (infoPanel) {
-            infoPanel.addEventListener('click', function() {
-                this.classList.toggle('expanded');
-            });
-        }
-
-        // Console easter egg
         console.log('%c👑 Unified System - Admin Report', 'font-size: 24px; color: #fbbf24; font-weight: bold;');
-        console.log('%cCreated with ❤️ by Antigravity Agent', 'font-size: 12px; color: #888;');
     </script>
 </body>
 
