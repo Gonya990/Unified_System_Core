@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Отчёт для Игоря-Админа-Создателя | 29.12.2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: linear-gradient(135deg, #1a1f35 0%, #0f172a 100%);
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --accent-gold: #fbbf24;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
+            --glow-green: 0 0 40px rgba(16, 185, 129, 0.3);
+            --glow-purple: 0 0 40px rgba(139, 92, 246, 0.3);
+            --glow-gold: 0 0 40px rgba(251, 191, 36, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle at 30% 30%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(5deg); }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+            border-radius: 50%;
+            animation: floatParticle 15s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Header - Creator Style */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 100%);
+            border-radius: 32px;
+            margin-bottom: 3rem;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange), var(--accent-pink), var(--accent-purple), var(--accent-blue));
+            background-size: 300% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-crown {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: crownFloat 3s ease-in-out infinite;
+            text-shadow: 0 0 60px rgba(251, 191, 36, 0.8);
+        }
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero .date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 2rem;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-radius: 50px;
+            font-size: 1rem;
+            color: var(--accent-gold);
+        }
+
+        /* Stats Dashboard - Enhanced for Admin */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--glow-gold);
+        }
+
+        .stat-card.highlight {
+            border: 2px solid var(--accent-gold);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, #0f172a 100%);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange));
+        }
+
+        .stat-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-card .value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Achievement Banner */
+        .achievement-banner {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 32px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-banner::before {
+            content: '🏆';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.1;
+            right: -3rem;
+            top: -3rem;
+        }
+
+        .achievement-banner h3 {
+            font-size: 1.8rem;
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+        }
+
+        .achievement-banner .achievement-text {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-banner .detail {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 1rem auto 0;
+        }
+
+        /* Section Cards */
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-header h2 .icon {
+            font-size: 1.8rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-gold {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--accent-gold);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        /* Infrastructure Nodes Grid */
+        .nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .node-card {
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .node-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-5px);
+            box-shadow: var(--glow-gold);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .node-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .node-icon.control { background: linear-gradient(135deg, #00d4ff, #0099cc); }
+        .node-icon.compute { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .node-icon.windows { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .node-icon.proxmox { background: linear-gradient(135deg, #f472b6, #db2777); }
+        .node-icon.cloud { background: linear-gradient(135deg, #22c55e, #15803d); }
+
+        .node-info h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .node-info .role {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .node-ip {
+            font-family: monospace;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .node-services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .service-tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-card {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-green);
+            transform: translateX(5px);
+        }
+
+        .feature-card .check-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feature-card .content h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-card .content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent-gold), var(--accent-purple), var(--accent-green));
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            border: 3px solid var(--bg-secondary);
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+        }
+
+        .timeline-item .time {
+            color: var(--accent-gold);
+            font-size: 0.85rem;
+            font-family: monospace;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item .event {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        /* Token Chart Placeholder */
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            height: 200px;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(180deg, var(--accent-gold), var(--accent-orange));
+            border-radius: 8px 8px 0 0;
+            animation: growBar 1s ease-out forwards;
+            transform-origin: bottom;
+        }
+
+        @keyframes growBar {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        /* Ring of Resilience Visualization */
+        .ring-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .ring {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .ring-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: var(--glow-gold);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+            50% { box-shadow: 0 0 60px rgba(251, 191, 36, 0.6); }
+        }
+
+        .ring-node {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .ring-node:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+        }
+
+        .ring-node.online { border-color: var(--accent-green); }
+        .ring-node.offline { border-color: var(--accent-red); opacity: 0.5; }
+
+        .ring-node:nth-child(2) { top: -10px; left: 50%; transform: translateX(-50%); }
+        .ring-node:nth-child(3) { top: 50%; right: -10px; transform: translateY(-50%); }
+        .ring-node:nth-child(4) { bottom: -10px; left: 50%; transform: translateX(-50%); }
+        .ring-node:nth-child(5) { top: 50%; left: -10px; transform: translateY(-50%); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer .creator-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 50px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-dashboard { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 2rem; }
+            .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+            .nodes-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 35%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 65%; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 12s;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-crown">👑</div>
+            <h1>Игорь — Админ-Создатель</h1>
+            <p class="subtitle">Персональный отчёт о системе Unified System Core</p>
+            <div class="date-badge">
+                <span>📅</span>
+                <span>29 декабря 2025 | Q4 Итоги</span>
+            </div>
+        </section>
+
+        <!-- Core Stats -->
+        <section class="stats-dashboard">
+            <div class="stat-card highlight">
+                <span class="icon">🖥️</span>
+                <span class="value">6</span>
+                <span class="label">Узлов в сети</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">🤖</span>
+                <span class="value">25+</span>
+                <span class="label">Функций бота</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">🔗</span>
+                <span class="value">10+</span>
+                <span class="label">Интеграций</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">📝</span>
+                <span class="value">5K+</span>
+                <span class="label">Строк кода</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">✅</span>
+                <span class="value">32</span>
+                <span class="label">Выполнено задач</span>
+            </div>
+        </section>
+
+        <!-- Achievement Banner -->
+        <section class="achievement-banner">
+            <h3>🎉 Главное достижение Q4 2025</h3>
+            <span class="achievement-text">MEGA UPDATE v2.0.0 — 7 функций за одну сессию!</span>
+            <p class="detail">
+                Notification Manager • Dashboard v2 • Cost Tracking Pro • Linear API • 
+                Daily Digest • Google Calendar • HomeKit Bridge
+            </p>
+        </section>
+
+        <!-- Infrastructure Overview -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">🌐</span> Инфраструктура Tailscale Mesh</h2>
+                <span class="badge badge-success">4 Онлайн</span>
+            </div>
+            <div class="section-content">
+                <div class="nodes-grid">
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon control">💻</div>
+                            <div class="node-info">
+                                <h4>MacBook Air</h4>
+                                <span class="role">Control Plane / Admin</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.93.121.47</div>
+                        <div class="node-services">
+                            <span class="service-tag">Antigravity Agent</span>
+                            <span class="service-tag">Git Workspace</span>
+                            <span class="service-tag">Nodriver</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon compute">🧠</div>
+                            <div class="node-info">
+                                <h4>igor-gaming-1 (WSL2)</h4>
+                                <span class="role">AI Compute Node</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.88.65.71</div>
+                        <div class="node-services">
+                            <span class="service-tag">Ollama LLM</span>
+                            <span class="service-tag">Home Assistant</span>
+                            <span class="service-tag">N8N</span>
+                            <span class="service-tag">Telegram Bot</span>
+                            <span class="service-tag">MCP Server</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon windows">🪟</div>
+                            <div class="node-info">
+                                <h4>igor-gaming (Windows)</h4>
+                                <span class="role">Windows AI Core</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.127.194.111</div>
+                        <div class="node-services">
+                            <span class="service-tag">RTX GPU</span>
+                            <span class="service-tag">RDP</span>
+                            <span class="service-tag">Gaming</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon proxmox">📦</div>
+                            <div class="node-info">
+                                <h4>Proxmox VE</h4>
+                                <span class="role">Virtualization Host</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.74.194.25</div>
+                        <div class="node-services">
+                            <span class="service-tag">64GB RAM</span>
+                            <span class="service-tag">VM Management</span>
+                            <span class="service-tag">Container Host</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon cloud">☁️</div>
+                            <div class="node-info">
+                                <h4>unified-home-core-cloud</h4>
+                                <span class="role">Cloud Gateway (GCP)</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.110.209.49</div>
+                        <div class="node-services">
+                            <span class="service-tag">Vasya Gateway :8080</span>
+                            <span class="service-tag">AIOS MCP</span>
+                            <span class="service-tag">Docker</span>
+                        </div>
+                    </div>
+
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">🏠</div>
+                            <div class="node-info">
+                                <h4>Smart Home Hub</h4>
+                                <span class="role">IoT Gateway</span>
+                            </div>
+                        </div>
+                        <div class="node-ip">100.81.133.25</div>
+                        <div class="node-services">
+                            <span class="service-tag">Sensors</span>
+                            <span class="service-tag">Automation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ring of Resilience -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">💎</span> Ring of Resilience</h2>
+                <span class="badge badge-gold">Активен</span>
+            </div>
+            <div class="section-content">
+                <div class="ring-container">
+                    <div class="ring">
+                        <div class="ring-center">👑</div>
+                        <div class="ring-node online" title="MacBook">💻</div>
+                        <div class="ring-node online" title="igor-gaming-1">🧠</div>
+                        <div class="ring-node online" title="Proxmox">📦</div>
+                        <div class="ring-node online" title="Cloud VM">☁️</div>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem;">
+                    Все ключевые узлы работают. Резервирование на уровне Tailscale mesh обеспечивает отказоустойчивость.
+                </p>
+            </div>
+        </section>
+
+        <!-- Bot Capabilities -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">🤖</span> Возможности AI Бота v2.0</h2>
+                <span class="badge badge-info">25+ функций</span>
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Multi-Model Chat</h5>
+                            <p>Gemini, OpenAI, Ollama — переключение одной кнопкой</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Image Generation</h5>
+                            <p>DALL-E 3 для генерации изображений</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Vision Analysis</h5>
+                            <p>Gemini Vision для анализа фото</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Voice Transcription</h5>
+                            <p>OpenAI Whisper для голоса</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Smart Home Control</h5>
+                            <p>Home Assistant + HomeKit Bridge</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Calendar Integration</h5>
+                            <p>Google Calendar синхронизация</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Task Management</h5>
+                            <p>Linear API + локальный /todo</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Web Search</h5>
+                            <p>Google SerpApi с Knowledge Graph</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Daily Digest</h5>
+                            <p>Автоматическая сводка в 09:00</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Auto-Backup</h5>
+                            <p>Ежедневный бэкап в 03:00</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Self-Update</h5>
+                            <p>Команда /update для обновления</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">✅</span>
+                        <div class="content">
+                            <h5>Voice Control</h5>
+                            <p>Через Yandex Alice Skill</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity Timeline -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">📅</span> История активности (декабрь 2025)</h2>
+            </div>
+            <div class="section-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="time">29.12.2025</div>
+                        <div class="event">📄 Генерация HTML резюме, исправление RTL форматирования</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">28.12.2025</div>
+                        <div class="event">🔧 Исправление Gemini моделей, Google Auth research, Security improvements</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">27.12.2025</div>
+                        <div class="event">🚀 MEGA UPDATE v2.0.0 — 7 новых функций за одну сессию!</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">26.12.2025</div>
+                        <div class="event">🌐 3D Infrastructure Report, Vasya Gateway с балансировкой</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">25.12.2025</div>
+                        <div class="event">🔐 Bot Security, Access Control, Guest Mode</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pending Tasks -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">📋</span> Ожидающие задачи</h2>
+                <span class="badge badge-gold">3 задачи</span>
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="check-icon">⏳</span>
+                        <div class="content">
+                            <h5>SmartThings CLI</h5>
+                            <p>Запустить cleanup_smartthings_api.py (требует PAT)</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">⏳</span>
+                        <div class="content">
+                            <h5>Bluetooth Fix</h5>
+                            <p>Следовать инструкции BLUETOOTH_FIX_GUIDE.md</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">⏳</span>
+                        <div class="content">
+                            <h5>iPhone HA App</h5>
+                            <p>Следовать инструкции IPHONE_HA_SETUP.md</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">🌌</div>
+            <p>Unified System Core</p>
+            <div class="creator-badge">
+                <span>👑</span>
+                <span>Создано для Игоря-Админа</span>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">
+                Powered by Antigravity Agent 🚀 | Дата отчёта: 29.12.2025
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Add interactive hover effects
+        document.querySelectorAll('.ring-node').forEach(node => {
+            node.addEventListener('mouseenter', () => {
+                node.style.transform = 'scale(1.3)';
+            });
+            node.addEventListener('mouseleave', () => {
+                node.style.transform = '';
+            });
+        });
+
+        // Animate stats on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.stat-card, .node-card, .feature-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Mobile panel toggle
+        const infoPanel = document.querySelector('.info-panel');
+        if (infoPanel) {
+            infoPanel.addEventListener('click', function() {
+                this.classList.toggle('expanded');
+            });
+        }
+
+        // Console easter egg
+        console.log('%c👑 Unified System - Admin Report', 'font-size: 24px; color: #fbbf24; font-weight: bold;');
+        console.log('%cCreated with ❤️ by Antigravity Agent', 'font-size: 12px; color: #888;');
+    </script>
+</body>
+
+</html>
