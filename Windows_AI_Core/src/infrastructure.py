@@ -49,8 +49,33 @@ class InfrastructureManager:
     async def check_nodes(self) -> str:
         """Ping nodes to check availability using Tailscale ping."""
         import platform
+        import socket
         
         report = "📡 **Network Status**\n\n"
+        
+        # Get local IPs and hostname to detect self
+        local_ips = set()
+        local_hostname = ""
+        try:
+            local_hostname = socket.gethostname().lower()
+            # Get all local IPs
+            for info in socket.getaddrinfo(local_hostname, None):
+                local_ips.add(info[4][0])
+            # Also try to get Tailscale IP (may fail in WSL2)
+            try:
+                proc = await asyncio.create_subprocess_exec(
+                    "/snap/bin/tailscale", "ip", "-4",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.DEVNULL
+                )
+                stdout, _ = await proc.communicate()
+                if proc.returncode == 0:
+                    local_ips.add(stdout.decode().strip())
+            except FileNotFoundError:
+                # Tailscale CLI not available (e.g., WSL2 uses Windows Tailscale)
+                pass
+        except Exception:
+            pass
         
         for node in self.data.get("nodes", []):
             ip = node.get("ip")
@@ -58,6 +83,21 @@ class InfrastructureManager:
             
             if not ip or ip == "N/A" or "Placeholder" in str(ip):
                 report += f"⚪️ {node_name} (No IP)\n"
+                continue
+            
+            # Check if this is the local machine (self)
+            # Match by IP or by hostname pattern (for WSL2 where Tailscale runs on Windows)
+            node_id = node.get("id", "").lower()
+            is_self = ip in local_ips
+            # Also check if node id matches hostname pattern (e.g., igor-gaming-1 matches Igor-Gaming)
+            if local_hostname and (
+                local_hostname in node_id or 
+                node_id.replace("-1", "").replace("-", "") in local_hostname.replace("-", "")
+            ):
+                is_self = True
+            
+            if is_self:
+                report += f"🟢 Online (self) {node_name} ({ip})\n"
                 continue
             
             try:
