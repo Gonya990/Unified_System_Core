@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Kostya's System Report | December 29, 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: linear-gradient(135deg, #1a1f35 0%, #0f172a 100%);
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --accent-teal: #14b8a6;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
+            --glow-green: 0 0 40px rgba(16, 185, 129, 0.3);
+            --glow-purple: 0 0 40px rgba(139, 92, 246, 0.3);
+            --glow-cyan: 0 0 40px rgba(6, 182, 212, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-5%, -5%) rotate(5deg);
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 50%;
+            animation: floatParticle 15s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero - Kostya Style (Cyan/Blue theme) */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 32px;
+            margin-bottom: 3rem;
+            border: 2px solid rgba(6, 182, 212, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple), var(--accent-pink));
+            background-size: 300% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hero-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: rocketFloat 3s ease-in-out infinite;
+            text-shadow: 0 0 60px rgba(6, 182, 212, 0.8);
+        }
+
+        @keyframes rocketFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero .date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 2rem;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            border-radius: 50px;
+            font-size: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .stat-card.highlight {
+            border: 2px solid var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, #0f172a 100%);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+        }
+
+        .stat-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-card .value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 32px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '🎮';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.1;
+            right: -3rem;
+            top: -3rem;
+        }
+
+        .welcome-banner h3 {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-banner .welcome-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-banner .detail {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 1rem auto 0;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-header h2 .icon {
+            font-size: 1.8rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-cyan {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-card {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        .feature-card .check-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feature-card .content h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-card .content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Command List */
+        .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .command-card {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .command-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-3px);
+        }
+
+        .command-card .command {
+            font-family: monospace;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .command-card .desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Node visualization (simplified) */
+        .nodes-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 2rem;
+        }
+
+        .node-bubble {
+            width: 120px;
+            height: 120px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .node-bubble:hover {
+            transform: scale(1.1);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .node-bubble .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-bubble .name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 50px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .stats-dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .command-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 55%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 10s;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-icon">🚀</div>
+            <h1>Welcome, Kostya!</h1>
+            <p class="subtitle">Your Personal Unified System Overview</p>
+            <div class="date-badge">
+                <span>📅</span>
+                <span>December 29, 2025</span>
+            </div>
+        </section>
+
+        <!-- Core Stats -->
+        <section class="stats-dashboard">
+            <div class="stat-card highlight">
+                <span class="icon">🤖</span>
+                <span class="value">3</span>
+                <span class="label">AI Models</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">🎨</span>
+                <span class="value">∞</span>
+                <span class="label">Image Generation</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">🏠</span>
+                <span class="value">Yes</span>
+                <span class="label">Smart Home</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">📊</span>
+                <span class="value">24/7</span>
+                <span class="label">Always Online</span>
+            </div>
+        </section>
+
+        <!-- Welcome Banner -->
+        <section class="welcome-banner">
+            <h3>🎮 What Can You Do?</h3>
+            <span class="welcome-text">Chat, Create, Control — All in Telegram!</span>
+            <p class="detail">
+                Use the @GonyaHomeBot to chat with AI, generate images,
+                control smart home devices, and much more!
+            </p>
+        </section>
+
+        <!-- Available Features -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">✨</span> Available Features</h2>
+                <span class="badge badge-success">All Active</span>
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="check-icon">💬</span>
+                        <div class="content">
+                            <h5>AI Chat</h5>
+                            <p>Talk with Gemini, GPT-4, or local Ollama models</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">🎨</span>
+                        <div class="content">
+                            <h5>Image Generation</h5>
+                            <p>Create images with DALL-E 3</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">👁</span>
+                        <div class="content">
+                            <h5>Photo Analysis</h5>
+                            <p>Send a photo and ask questions about it</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">🎤</span>
+                        <div class="content">
+                            <h5>Voice Messages</h5>
+                            <p>Send voice messages — bot will transcribe them</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">🏠</span>
+                        <div class="content">
+                            <h5>Smart Home</h5>
+                            <p>Control lights and devices at home</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">🔍</span>
+                        <div class="content">
+                            <h5>Web Search</h5>
+                            <p>Ask to search something on Google</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Commands -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">⌨️</span> Quick Commands</h2>
+                <span class="badge badge-cyan">Telegram Bot</span>
+            </div>
+            <div class="section-content">
+                <div class="command-list">
+                    <div class="command-card">
+                        <div class="command">/start</div>
+                        <div class="desc">Start or restart the bot</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command">/help</div>
+                        <div class="desc">View all available commands</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command">/model</div>
+                        <div class="desc">Switch AI model (Gemini, GPT, Ollama)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command">/imagine [prompt]</div>
+                        <div class="desc">Generate an image with DALL-E</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command">/ha</div>
+                        <div class="desc">Home Assistant quick menu</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command">/clear</div>
+                        <div class="desc">Clear conversation history</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Nodes -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">🌐</span> System Nodes</h2>
+                <span class="badge badge-info">Behind the Scenes</span>
+            </div>
+            <div class="section-content">
+                <div class="nodes-visual">
+                    <div class="node-bubble">
+                        <span class="emoji">💻</span>
+                        <span class="name">MacBook<br>Control</span>
+                    </div>
+                    <div class="node-bubble">
+                        <span class="emoji">🧠</span>
+                        <span class="name">AI Server<br>WSL2</span>
+                    </div>
+                    <div class="node-bubble">
+                        <span class="emoji">🖥️</span>
+                        <span class="name">Windows<br>GPU</span>
+                    </div>
+                    <div class="node-bubble">
+                        <span class="emoji">☁️</span>
+                        <span class="name">Cloud<br>Gateway</span>
+                    </div>
+                    <div class="node-bubble">
+                        <span class="emoji">🏠</span>
+                        <span class="name">Smart<br>Home</span>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem;">
+                    All systems connected via secure Tailscale VPN mesh.
+                </p>
+            </div>
+        </section>
+
+        <!-- Tips -->
+        <section class="section">
+            <div class="section-header">
+                <h2><span class="icon">💡</span> Pro Tips</h2>
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="check-icon">📱</span>
+                        <div class="content">
+                            <h5>Use Inline Buttons</h5>
+                            <p>Tap the buttons under messages for quick actions</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">🔄</span>
+                        <div class="content">
+                            <h5>Switch Models Easily</h5>
+                            <p>Use the buttons to try different AI models</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="check-icon">📷</span>
+                        <div class="content">
+                            <h5>Photo + Question</h5>
+                            <p>Send a photo with a caption to ask about it</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">🌌</div>
+            <p>Unified System Core</p>
+            <div class="user-badge">
+                <span>👤</span>
+                <span>Report for Kostya</span>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">
+                Created by Igor (Admin) 👑 | Powered by Antigravity Agent 🚀
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelectorAll('.node-bubble').forEach(node => {
+            node.addEventListener('mouseenter', () => { node.style.transform = 'scale(1.1)'; });
+            node.addEventListener('mouseleave', () => { node.style.transform = ''; });
+        });
+
+        console.log('%c🚀 Unified System - Kostya Report', 'font-size: 24px; color: #06b6d4; font-weight: bold;');
+    </script>
+</body>
+
+</html>
