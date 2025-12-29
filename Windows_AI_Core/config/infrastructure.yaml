@@ -22,6 +22,8 @@ nodes:
         type: systemd
       - name: ollama
         port: 11434
+      - name: Claude (OpenRouter)
+        type: api
       - name: home-assistant
         type: docker
         port: 8123
