@@ -23,7 +23,8 @@ except ImportError as e:
     GMAIL_AVAILABLE = False
 
 # If modifying these scopes, delete the token.pickle file
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+# If modifying these scopes, delete the token.pickle file
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly', 'openid']
 
 class GmailClient:
     """Client for reading Gmail messages."""
@@ -39,7 +40,7 @@ class GmailClient:
         # Default paths
         config_dir = Path(__file__).parent.parent / "config"
         self.credentials_path = credentials_path or str(config_dir / "gmail_credentials.json")
-        self.token_path = token_path or str(config_dir / "gmail_token.pickle")
+        self.token_path = token_path or str(config_dir / "gmail_token_v2.pickle") # Force re-auth for new scopes
         
         self._authenticate()
     
@@ -54,7 +55,10 @@ class GmailClient:
         # Load existing token
         if os.path.exists(self.token_path):
             with open(self.token_path, 'rb') as token:
-                creds = pickle.load(token)
+                try:
+                    creds = pickle.load(token)
+                except Exception:
+                    logger.warning("Failed to load existing token, will re-auth")
         
         # If no valid credentials, authenticate
         if not creds or not creds.valid:
@@ -69,7 +73,11 @@ class GmailClient:
                 try:
                     flow = InstalledAppFlow.from_client_secrets_file(
                         self.credentials_path, SCOPES)
-                    creds = flow.run_local_server(port=0)
+                    # Security Bundle: Request auth_time in ID Token
+                    creds = flow.run_local_server(
+                        port=0,
+                        claims='{"id_token":{"auth_time":{"essential":true}}}'
+                    )
                 except Exception as e:
                     logger.error(f"Gmail authentication failed: {e}")
                     return
