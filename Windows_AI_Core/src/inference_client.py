@@ -463,15 +463,33 @@ class InferenceClient:
         models = []
         
         if provider == "gemini":
-            # Return known Gemini models from Google AI Studio
+            try:
+                # Use the client to fetch actual available models
+                client = _get_gemini_client(self.api_key)
+                if client:
+                    # Sync call in async context (should be wrapped, but fast enough for now)
+                    all_models = list(client.models.list())
+                    
+                    # Filter for generateContent support and clean names
+                    valid_models = []
+                    for m in all_models:
+                        if "generateContent" in (m.supported_generation_methods or []):
+                            # Name is usually 'models/gemini-1.5-flash'
+                            # We strip 'models/' prefix for user convenience
+                            name = m.name.split("/")[-1]
+                            valid_models.append(name)
+                    
+                    if valid_models:
+                        return sorted(valid_models, reverse=True)
+            except Exception as e:
+                logger.error(f"Failed to list Gemini models dynamically: {e}")
+            
+            # Fallback if dynamic fails
             return [
                 "gemini-2.0-flash-exp",
-                "gemini-exp-1206",
                 "gemini-1.5-flash",
-                "gemini-1.5-flash-8b",
+                "gemini-1.5-flash-8b", 
                 "gemini-1.5-pro",
-                "gemini-1.5-flash-002",
-                "gemini-1.5-pro-002",
                 "gemini-1.0-pro",
             ]
         
