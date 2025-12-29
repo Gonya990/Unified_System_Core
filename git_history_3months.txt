@@ -1,0 +1,229 @@
+* 9127406 chore: update image tag to aea3e322f9e1154926e9290adc783d4a7d6e732e
+* aea3e32 feat: Implement dynamic Gemini model fetching via google-genai SDK
+* b94ebe1 chore: update image tag to 3897e455cf8b042785b5de6e291edd9b7b2fdf8b
+* 3897e45 feat: Implement Google Security Bundle in Gmail Client - Add 'openid' scope - Request 'auth_time' claim - Use 'gmail_token_v2.pickle' to force ecosystem re-auth fix: Gemini legacy SDK support in inference_client.py
+* 1b92247 fix: Resolve AttributeError in Gemini client key tracking
+* b21be81 chore: update image tag to dd6cb7359139933c4e1aa4919861b8a30d7b8659
+* dd6cb73 feat: Expand Gemini models (supported all variants 002/Pro/Flash) feat: Upgrade /setmodel command for provider-specific config docs: Add Google OAuth & iOS integration research (Russian) fix: Linting line length in API_KEYS_MAP.md
+* 66347fa chore: update image tag to f95a5ef6851429e3ba0d0444dfa5fd826b36e1c8
+* f95a5ef docs: Session Update (SmartThings, iPhone, Termius) fix: Bluetooth on 'smart' (DBus volume) fix: Ollama connection on 'smart' (IP update) docs: Linting fixes in API_KEYS_MAP and IPHONE_HA_SETUP
+* 0295f3e fix(bot): add auto-fallback to Ollama if Gemini key missing
+* 07ab13a feat(bot): add fuzzy matching for HA entities and robust config logic
+* 5810016 fix(gcp): update manual setup guide with delete command and fix budget alert function
+* 7073725 docs: Fix markdown linting errors (line length)
+* 1c1410d docs: Update task status with Code Refactoring and Distributed AI
+* 28fcc59 docs: Add Distributed AI Inference setup guide
+* 0c8db17 chore: update image tag to a99129c43816598a9c07aec6774a41a3fec1b554
+* a99129c refactor: Optimize project structure and cleanup main.py
+* 4cab481 docs: Добавлен русский визуальный отчёт администратора
+* 3ccc50d docs: Add visual admin report for 2025-12-28 session
+* 42af40d chore: update image tag to d5dd22646bdec883030d4b0f3718617a956922bb
+* d5dd226 feat: Add Kostya to allowed users, fix security vulnerabilities
+* 35e0967 docs: Update API_KEYS_MAP with fix status, add markdownlint config
+* d4ba657 security: Remove hardcoded credentials, improve configuration
+* daadfc0 docs: Add comprehensive API Keys Map, fix budget alert function
+* 82ba729 chore: update image tag to 17d301455681223e83951826d7fa30bdebe8fa1d
+* 17d3014 fix: Ensure verbatim text for Alice's SAY command
+* 4045dfe chore: update image tag to 031584d5f86e7cce4db749df7343096308a1a7a3
+* 031584d feat: Autonomous network heartbeat and log rotation
+* e9b986d chore: update image tag to 082f41cc70dabff2c45bebfd3cdfe1c32ca38c19
+* 082f41c fix: Add hardcoded fallback for Alice TTS and simplify system prompt
+* 9a65135 chore: update image tag to 8f2f498e768015d9a42df44f0694685bcdc446e3
+* 8f2f498 fix: Resolve Gemini timeout and config override issues
+* 0e16c72 chore: update image tag to 1b2b22073cdb260ededf248f7eeecaa371928a34
+* 1b2b220 fix: Robust /update command with git reset --hard
+* fd7d905 chore: update image tag to b2b614da70684978523f531e846098f78dec235a
+* b2b614d fix(inference): Improve Gemini error handling and add timeouts
+* d467fed chore: update image tag to 35cb06f40043f31924d6cbbb98f78a1cd07264d8
+* 35cb06f feat: Add natural language understanding for mail, HA, TTS, health tools
+* 6593819 chore: update image tag to 3eb221eea8825d369f976a851d16e1bb953a8dae
+* 3eb221e fix: Add status field to ha_client check_health
+* fa8c7ae chore: update image tag to 3ebd5a1028e67da05b5002594df91c834d58ec97
+* 3ebd5a1 feat: Add Gmail integration with OAuth
+* f173f8f chore: update image tag to d1cabb6f34465c963811a575d25cd22dee760e22
+* d1cabb6 fix: Add HA_AVAILABLE as class attribute
+* c7d2ca1 chore: update image tag to 139dfbd7467ff2be3a85eaf9975499eca5fb2924
+* 139dfbd feat: Add /say command for Yandex Station TTS
+* af5b3ad chore: update image tag to c478bad30d4a8d7a433fe4593ca3979b8b9f74c7
+* c478bad fix: Update HA client URL to Tailscale IP
+* b8a0c34 chore: update image tag to a1581d74a1383a023bc564a7991537bd43264495
+* a1581d7 feat: Add Health integration (SQLite + Webhook/Manual)
+* d5dddf3 chore: update image tag to e1679a6823cc8244651b75a04a6ab708a89999d3
+* e1679a6 feat: Implement HA auto-reload self-healing
+* 67b55b2 chore: update image tag to c6eb64880023871461eb476acac685e0d5ac1065
+* c6eb648 docs: Mark HA monitoring as complete
+* a31d11f chore: update image tag to 21e4b2ba03f7f2d12d138b9b2e1883f9c5e056a8
+* 21e4b2b feat: Add Notion integration (v1)
+* bb5f855 chore: update image tag to a180751126f53afded0866203a2155068068df47
+* a180751 feat: Add TTS support and /speak command
+* 408911f chore: update image tag to a7bd594761e2895f728c8f050b3dccd25f8a7640
+* a7bd594 feat: Update bot dependencies, scheduler, and task list
+* 8da3dc5 docs: Update ALICE_SETUP.md and task.md
+* 960c91a docs: add bluetooth fix guide and update task list
+* 8c0fbf4 feat: python smartthings cleanup script (cli alternative)
+* 6573031 docs: complete iphone ha app setup guide
+* 224d299 docs: comprehensive smartthings troubleshooting guide
+* e3d61bc feat: complete HA diagnostics and automated fixes
+* b5e6dad docs: complete HA audit and fix plan
+* 5cddc40 docs: final step-by-step yandex station setup guide
+* 2bafc87 docs: add yandex station installation guide for smart host
+* b51fb20 feat: yandex station duo max integration guide + auto-install script
+* 666befa docs: comprehensive changelog + updated main README
+* 9e93059 feat: alice skill automation - cloudflare tunnel scripts + quick setup guide
+* 511cfcd feat: COMPLETE SYSTEM - homekit bridge + 7 major features in one session
+* 0c1c86a feat: google calendar integration + complete feature set
+* 0b22fef feat: daily digest with stats, tasks, and motivation
+* f1fda1a feat: linear api integration for professional task management
+* 70e3801 feat: notification manager, dashboard v2, detailed cost tracking
+* 1777168 feat(ha): add sensors, scripts, scenes support + dashboard improvements
+* c30737e feat(web): add fastapi dashboard
+* f6f8c6b docs: fix readme table formatting
+* 8ea4ce6 docs: update Alice skill capabilities
+* 110b334 feat(backup): add database backup command and scheduler
+* 2a25736 feat(bot): add self-update command
+* 2191862 feat(ops): add watchdog service for auto-recovery
+* 1ebf4b3 feat(bot): add vision capabilities (photo analysis)
+* bea654e fix(bot): fix post_init syntax and dependencies
+* b3925d1 config: update proxmox host ip
+* 05e3ff5 feat(bot): add infrastructure monitoring and context
+* cf0bb26 feat(bot): add system monitoring dashboard and error handling
+* 22d8e15 feat(bot): add reminder system using APScheduler
+* 212ffdf feat(bot): add voice message support using Whisper API
+* 6fef52c docs: update readme and add setup guide; test: add core tests
+* 0d83369 feat(bot): add web search, task manager, alice skill, usage tracking
+* 28580a1 chore: update image tag to 8fe4bad6c28150d2390ebd41ea79599ca1729b9a
+* 8fe4bad fix(bot): fix config loading logic to prefer env vars over empty config values
+* aee56ec chore: update image tag to 800661378f2523394ba7b1f7683c1410aa7ea12e
+* 8006613 feat(bot): add image generation and HA control
+* e4b4379 chore: update image tag to 91ebb6e1a36a882cfe0685462127617d9cf27927
+* 91ebb6e feat(bot): add requirements.txt for easy deployment
+* f0ad249 chore: update image tag to 2cdab2cd764f3bad76f280bb77d4ce14195ed1bc
+* 2cdab2c feat(bot): add conversation history, /clear, and quick-switch models
+* af0998f chore: update image tag to ecd01b079d0b51af8c16405a21ec27bddace245f
+* ecd01b0 feat(bot): add conversation history manager and disable budget alerts
+* 2878c93 feat(bot): migrate Gemini to new google-genai SDK
+* d73af9b feat(ha): add Home Assistant API client with full control
+* a6dbf72 refactor: move ai-bot.service to infra/
+* d981fbc refactor(scripts): organize scripts into logical categories
+* 6df1398 fix(css): add standard background-clip property for compatibility
+* 18d054e docs: add comprehensive visual system report (Oct→Dec evolution)
+* b0d1515 fix(docs): MD060 table column style lint warnings
+* 063e784 docs(session): GCP monitoring & Apple integration progress
+* 7e27747 fix(shortcuts): use Tailscale MagicDNS for mobile network access
+* a6dec1b feat(apple): add Vasya shortcut and HomeKit Bridge integration
+* c58f821 feat(alerts): add Telegram budget alerts via Cloud Function
+* d720d5e feat(monitoring): add GCP metrics collector for igor-gaming-1
+* 33fff58 feat: mobile-optimize 3D infrastructure report
+* 68dde87 feat: add click-to-highlight node selection in 3D visualization
+* 5330a17 docs: add interactive 3D infrastructure visualization report
+* a130d6a docs: полная русская документация VASYA_GATEWAY с визуализацией
+* 0a22018 fix: resolve markdown lint warnings in VASYA_GATEWAY.md
+* 4d4dab6 docs: add VASYA_GATEWAY.md documentation
+* 980d79d Vasya-Online Gateway Complete - AIOS MCP Tool Registered, End-to-End Verified
+* 7abba53 AIOS Nodriver Migration Complete - Resolved Kernel Startup & Dependency Blockers
+* a879b3e chore: update image tag to f393fffc0643eeafaf35c5a437df3d75aa440f8e
+* f393fff chore: sync and integration cleanup
+* cf45477 feat: add AIOS remote client for Antigravity integration
+* 7c9d9f6 chore: update image tag to b9bbc4cde422048841ea3dca6b0bc8aadc98039e
+* b9bbc4c feat: autonomous AI job hunter with interactive Telegram bot
+* 6e7fa73 feat: implement job hunter and telegram integration
+* 6157850 feat: implement job hunter and telegram integration
+* c42d016 feat: implement job hunter base and profiles
+* a041c74 feat: enhance gmail agent with unread mode and email sending
+* a7fc622 feat: deploy gmail agent to server and enable cron
+* c6cfb9e docs: update Gmail setup guide with deleted_client troubleshooting
+* a3e7e40 feat: add Gmail OAuth2 quick setup workflow
+* c4c499a fix: resolve duplicate H1 heading in session summary (MD025)
+* 46c5993 docs: add comprehensive session summary for automation system
+* df96618 chore: add CV hash files for change tracking
+* 7e6dfb9 chore: auto-sync PROFILE.md after CV changes
+* 5ed7b87 fix: resolve duplicate H1 heading in GMAIL_SETUP.md (MD025)
+* 3e21ca6 feat: complete automation system with Gmail agent
+* 7309132 fix: update email to garyk927@yandex.ru; add GPT-5 acknowledgement
+* 57b8f47 fix: resolve duplicate heading in PROFILE.md (MD024)
+* 1de862f feat: Add comprehensive user profile and automated tasks
+* 2a7e50b fix: resolve final markdown linting warnings
+* 741ac1d fix: resolve all markdown linting warnings
+* 03be8d0 fix: table alignment in README (MD060)
+* fd70754 fix: markdown linting issues in OpenAI MCP server README
+* 7c86321 feat: OpenAI MCP Gateway Server for seamless ChatGPT integration
+* 9d3fb21 feat: Windows archive analyzer and cleanup system
+* 77d1e76 feat: OpenAI data integration system with bilingual support
+* c27f525 docs: Add family presentation prompts and MCP Agent Mail access guide
+* bffd6ff feat: add .agent-identity for runtime agent identification
+* 04b995c chore: update image tag to 949dca73d7c52dc1e8080a2f0519fdff141787c7
+* 949dca7 fix(security): update aiohttp to >=3.11.0 and cryptography to >=43.0.0 to address Dependabot vulnerabilities
+* c7b805e feat: add multi-agent onboarding system
+* 6746583 chore(submodule): update mcp_agent_mail with local config changes
+* 7ef8fc5 docs: add comprehensive central hub integration guide
+* a90f2d9 feat: enhance mission_sync.sh with MCP Agent Mail integration
+* 10a4534 docs: add central hub deployment status and documentation
+* d9dc4db feat: complete central hub deployment with dynamic agent registration
+* 0663fe9 fix: disable rate limiting and rbac for coordinator
+* e493c73 fix: ensure data directories exist in dockerfile
+* 285aeaa fix: use internal data dir for correct permissions
+* b32dd25 fix: switch to sqlite for stability
+* 16e3317 fix: remove compose.yaml to avoid conflict
+* 63e4bf4 fix: remove --frozen from uv sync to allow 3.12
+* 577217b fix: patch pyproject.toml for python 3.12 support
+* a08a6f1 fix: clean up redundant dockerfile block
+* 3d8784b fix: correctly patch all python 3.14 strings
+* d9cd0a5 fix: downgrade to python 3.12 for stability
+* 9beee4e fix: include postgres extras in docker build
+* 42a2f12 fix: use postgresql dialect for sqlalchemy
+* 2dac301 fix: use correct server command in central hub setup
+* fe122af feat: add centralized hub infra and local agent wrappers
+* ed40078 feat: add partner agent integration prompt
+* 8c0c576 docs: add multi-agent coordination guide for hybrid swarm
+* 8bb121f WIP: Pause BIOS update plan, documented hardware and flash requirements
+* fd8c78e research: Agentic workflow frameworks comparison (LangChain, AutoGen, CrewAI)
+* 2a189a3 docs: add Browser Automation (Nodriver) rules to AGENTS.md
+* edc7a30 docs: update progress - nodriver_implementation complete with browser skills
+* 79eb8a1 feat: add browser skills and fix nodriver JS-based interactions
+* 1440360 docs: restructure executive summary with overview, features, and next steps
+* 505496e docs: add executive summary report (Russian) for Dec 24 changes
+* 203a38e context: mark workflow_design_c651 session complete
+* 1995a65 context: add workflow design session with ADR and discuss-design workflow
+* 4d8f270 docs: prohibit git stash, add WIP commit strategy for multi-agent safety
+* f47cf56 docs: add multi-agent coordination rules and workflow safety
+* 4524c9c docs: update progress for nodriver_implementation session
+* 6578425 docs: add workflow recommendations, context optimization, and subagent guidance to AGENTS.md
+* 1271b0f feat: add start_chrome.sh and comprehensive README
+* 36bf345 workflows: add update-progress workflow for status tracking
+* 75bb6e7 docs: update browser control docs with final implementation status
+* 794894e feat: add UV support for nodriver daemon
+* 1696cd0 docs: update implementation plan with final decisions
+* cf85f76 feat: add nodriver Unix Socket daemon for browser control
+* cae2ddc chore: update image tag to f876e442912179c42dcfbb3490c064ba529db4d8
+* f876e44 fix: resolve markdown lint warnings across documentation files
+* bf5060b chore: update image tag to 4010faa26994c5e115572eff8dfdb91f439d296d
+* 4010faa feat: add Gemini API support and /setprovider command
+* 3816468 chore: update image tag to 7e095de9974cc162b74cb6697f16dfeec90ed460
+* 7e095de feat: настройка планшета Артура с Tailscale + Family Link
+* 43fb7c5 chore: update image tag to f4feca27122efb30184fbe30a9989c52410af89c
+* f4feca2 feat: add /models command and fix API key session bug
+* c9509db chore: update image tag to d6a3d146247efa394859160cb54696e38633cfa7
+* d6a3d14 feat: AI Telegram Bot deployment infrastructure
+* 652453e docs: add agent restrictions for Proxmox VMs 100/101
+* 300813f feat: add smart Fedora machine info, Moonlight configured
+* 2fd99b9 security: update SixLabors.ImageSharp 3.1.0 → 3.1.6 (fixes 7 CVEs)
+* fc6c131 fix: update status workflow - exclude rocinante, add all active nodes
+* 0d528f0 feat: Add .agent/workflows for Antigravity slash commands
+* a626383 docs: Move AGENT_RULES to AGENTS.md in repo root
+* 3b32408 docs: Add agent operating rules for consistency across AI agents
+* 7c855f6 docs: Add comprehensive README with navigation and deep links
+* b586d01 cleanup: Remove root architecture files (already moved to Knowledge_Base)
+* af59445 refactor: restructure Agent_Context into a unified logical Knowledge Base
+* 289bc8a context: Finalize iPhone-15-pro as System Commander node
+* cf4f2b5 scripts: Add iOS iCloud sync script for auto-collection
+* 8064ba6 context: Add iOS iphone-15-pro with manual export instructions
+* 42d34b0 context: Add full context from igor-gaming-1 WSL2 (20251222_162404)
+* 9d1697b context: Add PVE machine info (no AI context - hypervisor only)
+* e636b40 context: Add context from igor-gaming Windows (20251222_161050)
+* 285cf2d docs: Mark MacBook-Air handoff as complete
+* a7d2fe2 context: Add context from MacBook-Air (20251222_155310)
+* 8f6a8a1 Add system scripts and architecture documentation
+* 173ea94 context: Add all 18 brain sessions + multi-machine handoff guide
+* 062f42e feat: Add Agent_Context folder with complete context handoff documentation
+* 3561a7a Sync Unified System
+* b947ba2 Initial commit: Unified System with Windows AI Core and Home Assistant
