@@ -21,7 +21,7 @@
 
 - [x] **Bluetooth Fix для HA** - ✅ DBus mounted in Docker (`/run/dbus:/run/dbus:ro`)
 - [x] **SmartThings** - Guide exists (SMARTTHINGS_FIX_GUIDE.md), needs manual PAT
-- [ ] **Алиса → Home Assistant** - Решение найдено! (см. ниже)
+- [x] **Алиса → Home Assistant** - ✅ Подключена через Yaha Cloud!
 - [~] **BIOS Update для Proxmox** - Назначено Косте (Rocinante)
 
 ### 🎯 Алиса → HA: Решение
