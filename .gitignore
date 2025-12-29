@@ -33,3 +33,5 @@ $RECYCLE.BIN/
 # Agent identity (local to each runtime)
 .agent-identity
 secrets/
+Agent_Context/Personal_Profile/RESUME_VARIANTS.md
+logs/automation/resume_attachments/
