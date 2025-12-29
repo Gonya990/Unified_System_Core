@@ -21,7 +21,7 @@ class ConfigManager:
     """Manages bot configuration with persistence and encryption."""
     
     CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "config/bot_config.json"))
-    SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN", "GEMINI_API_KEY", "OPENAI_API_KEY"}
+    SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN", "GEMINI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"}
     
     def __init__(self):
         self._config: dict = {}
@@ -59,6 +59,10 @@ class ConfigManager:
             # Gemini settings
             "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", "")),
             "GEMINI_MODEL": os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+            # OpenRouter settings
+            "OPENROUTER_API_KEY": os.environ.get("OPENROUTER_API_KEY", ""),
+            "OPENROUTER_BASE_URL": os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            "OPENROUTER_MODEL": os.environ.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"),
             # Legacy settings (backwards compatibility)
             "INFERENCE_BASE_URL": os.environ.get("INFERENCE_BASE_URL", "http://localhost:11434"),
             "INFERENCE_API_KEY": os.environ.get("INFERENCE_API_KEY", ""),
@@ -121,6 +125,8 @@ class ConfigManager:
             api_key_set = bool(self._config.get("GEMINI_API_KEY"))
         elif provider == "openai":
             api_key_set = bool(self._config.get("OPENAI_API_KEY"))
+        elif provider == "openrouter":
+            api_key_set = bool(self._config.get("OPENROUTER_API_KEY"))
         else:  # ollama
             api_key_set = bool(self._config.get("INFERENCE_API_KEY"))
         

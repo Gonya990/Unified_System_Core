@@ -38,7 +38,7 @@ def _get_gemini_client(api_key: str):
 class InferenceClient:
     """Unified client for multiple LLM backends."""
     
-    PROVIDERS = ["ollama", "openai", "gemini"]
+    PROVIDERS = ["ollama", "openai", "gemini", "openrouter"]
     
     def __init__(self, config: ConfigManager):
         self.config = config
@@ -63,6 +63,8 @@ class InferenceClient:
             return self.config.get("OPENAI_BASE_URL", self.config.get("INFERENCE_BASE_URL", "https://api.openai.com"))
         elif provider == "gemini":
             return "https://generativelanguage.googleapis.com"
+        elif provider == "openrouter":
+            return self.config.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
         else:  # ollama
             return self.config.get("OLLAMA_BASE_URL", self.config.get("INFERENCE_BASE_URL", "http://localhost:11434"))
     
@@ -74,6 +76,8 @@ class InferenceClient:
             return self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY", ""))
         elif provider == "gemini":
             return self.config.get("GEMINI_API_KEY", self.config.get("INFERENCE_API_KEY", ""))
+        elif provider == "openrouter":
+            return self.config.get("OPENROUTER_API_KEY", "")
         else:  # ollama
             return self.config.get("INFERENCE_API_KEY", "")
     
@@ -85,6 +89,8 @@ class InferenceClient:
             return self.config.get("OPENAI_MODEL", self.config.get("MODEL_NAME", "gpt-4o-mini"))
         elif provider == "gemini":
             return self.config.get("GEMINI_MODEL", self.config.get("MODEL_NAME", "gemini-1.5-flash"))
+        elif provider == "openrouter":
+            return self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
         else:  # ollama
             return self.config.get("OLLAMA_MODEL", self.config.get("MODEL_NAME", "llama3.2"))
     
@@ -138,6 +144,11 @@ class InferenceClient:
         tasks = []
         providers = []
         
+        # 0. OpenRouter Task (Claude - The Supreme Judge)
+        if self.config.get("OPENROUTER_API_KEY"):
+            tasks.append(self._chat_generic("openrouter", messages, system_prompt))
+            providers.append("openrouter")
+            
         # 1. Gemini Task (The Brain - Free Tier)
         if self.config.get("GEMINI_API_KEY"):
             tasks.append(self._chat_gemini(messages, system_prompt))
@@ -177,6 +188,12 @@ class InferenceClient:
                     combined_usage[k] += usage.get(k, 0)
 
         # Decision Strategy: Hierarchy of Intelligence
+        
+        # 0. OpenRouter (Claude 3.5 Sonnet - Supreme Intelligence)
+        or_resp = responses.get("openrouter")
+        if or_resp and not or_resp.startswith("[Error]"):
+            logger.info("👑 Council Decision: Claude (OpenRouter) selected (Supreme Intelligence).")
+            return or_resp, combined_usage
         
         # 1. OpenAI (Most capable for logic, if available)
         openai_resp = responses.get("openai")
@@ -221,21 +238,21 @@ class InferenceClient:
                 "max_tokens": 500,
             }
         elif provider == "openrouter":
-            base_url = "https://openrouter.ai/api"
-            url = f"{base_url}/v1/chat/completions"
-            # Default to a smart cheap model if not specified, e.g. Claude 3 Haiku or similar
-            model = self.config.get("OPENROUTER_MODEL", "anthropic/claude-3-haiku") 
+            base_url = self.config.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+            url = f"{base_url.rstrip('/')}/chat/completions"
+            model = self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
             headers = {
                 "Authorization": f"Bearer {self.config.get('OPENROUTER_API_KEY')}",
-                "HTTP-Referer": "https://unified-system.bot",
+                "HTTP-Referer": "https://github.com/Gonya990/Unified_System_Core",
                 "X-Title": "Unified System Bot"
             }
             payload = {
                 "model": model,
                 "messages": full_messages,
                 "temperature": 0.7,
-                # OpenRouter specific handling
+                "max_tokens": 1000,
             }
+
         else: # ollama
             base_url = self.config.get("OLLAMA_BASE_URL", "http://localhost:11434")
             # ... existing ollama code ...
@@ -284,7 +301,9 @@ class InferenceClient:
         """Handle Gemini API calls using the SDK."""
         usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         try:
-            client = _get_gemini_client(self.api_key)
+            # Always fetch key from config, don't rely on self.api_key (which fails in Council mode)
+            api_key = self.config.get("GEMINI_API_KEY")
+            client = _get_gemini_client(api_key)
             if not client:
                 return "[Error]: Gemini client not configured. Check API key.", usage
             
@@ -330,8 +349,10 @@ class InferenceClient:
             
             def call_gemini():
                 try:
+                    # Determine model name explicitly
+                    model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
                     return client.models.generate_content(
-                        model=self.model,
+                        model=model_name,
                         contents=gemini_contents,
                         config=config
                     )
