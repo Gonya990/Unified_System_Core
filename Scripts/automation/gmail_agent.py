@@ -48,13 +48,66 @@ TOKEN_PATH = CREDS_DIR / "gmail_token.pickle"
 CREDENTIALS_PATH = CREDS_DIR / "gmail_credentials.json"
 EMAIL_DB_PATH = BASE_DIR / "logs" / "automation" / "email_database.json"
 
-# Email categories
+# Email categories with sender patterns for better matching
 CATEGORIES = {
-    "urgent": {"keywords": ["urgent", "asap", "important", "срочно", "важно", "דחוף"], "icon": "🔴"},
-    "work": {"keywords": ["interview", "job", "position", "vacancy", "работа", "вакансия", "משרה"], "icon": "💼"},
-    "github": {"keywords": ["github", "pull request", "commit", "repository"], "icon": "🐙"},
-    "linkedin": {"keywords": ["linkedin", "connection", "invitation", "network"], "icon": "💼"},
-    "spam": {"keywords": ["unsubscribe", "lottery", "winner", "prize", "click here", "спам"], "icon": "⚪"}
+    # Priority categories
+    "urgent": {
+        "keywords": ["urgent", "asap", "important", "срочно", "важно", "דחוף", "מיידי"],
+        "icon": "🔴",
+        "senders": []
+    },
+    "work": {
+        "keywords": ["interview", "job", "position", "vacancy", "работа", "вакансия", "משרה", "schindler"],
+        "icon": "💼",
+        "senders": ["@schindler"]
+    },
+    
+    # Shopping
+    "shopping": {
+        "keywords": ["order", "shipped", "delivered", "tracking", "заказ", "доставка", "משלוח", "הזמנה"],
+        "icon": "🛒",
+        "senders": ["@amazon", "@ebay", "@aliexpress", "@rozetka", "@shein", "@asos", "@zara", "@hm.com", "@ikea"]
+    },
+    
+    # Banks IL
+    "bank": {
+        "keywords": ["transaction", "העברה", "יתרה", "חיוב", "זיכוי", "כרטיס אשראי", "bank", "בנק", "פעולה"],
+        "icon": "🏦",
+        "senders": ["@bankhapoalim", "@poalim", "@leumi", "@discountbank", "@mizrahi-tefahot", "@fibi", "@isracard", "@max.co.il", "@cal-online", "@visa", "@mastercard"]
+    },
+    
+    # Government IL
+    "gov": {
+        "keywords": ["gov.il", "ביטוח לאומי", "משרד הפנים", "מס הכנסה", "עירייה", "מינהל", "רשות", "משרד"],
+        "icon": "🏛️",
+        "senders": ["@gov.il", "@btl.gov.il", "@taxes.gov.il", "@justice.gov.il", "@health.gov.il", "@moin.gov.il"]
+    },
+    
+    # Payments IL
+    "payment": {
+        "keywords": ["bit", "paybox", "pepper", "העברה", "קיבלת", "שילמת", "תשלום"],
+        "icon": "💳",
+        "senders": ["@bit.co.il", "@paybox", "@pepper.co.il", "@paypal", "@wise.com"]
+    },
+    
+    # Tech/Dev
+    "github": {
+        "keywords": ["github", "pull request", "commit", "repository", "issue", "merge"],
+        "icon": "🐙",
+        "senders": ["@github.com", "@gitlab"]
+    },
+    "linkedin": {
+        "keywords": ["linkedin", "connection", "invitation", "network", "job alert"],
+        "icon": "💼",
+        "senders": ["@linkedin.com"]
+    },
+    
+    # Low priority
+    "spam": {
+        "keywords": ["unsubscribe", "lottery", "winner", "prize", "click here", "спам", "הסר מרשימה"],
+        "icon": "⚪",
+        "senders": []
+    }
 }
 
 
@@ -98,11 +151,22 @@ def get_gmail_service():
 
 def categorize_email(subject, body, sender):
     """
-    Categorize email based on content
-    Категоризация письма на основе содержимого
-    """
-    content = f"{subject} {body} {sender}".lower()
+    Categorize email based on sender and content
+    Категоризация письма на основе отправителя и содержимого
     
+    Priority: sender patterns > keywords
+    """
+    sender_lower = sender.lower()
+    
+    # Check sender patterns first (more reliable)
+    for category, data in CATEGORIES.items():
+        senders = data.get("senders", [])
+        for sender_pattern in senders:
+            if sender_pattern in sender_lower:
+                return category
+    
+    # Then check keywords in content
+    content = f"{subject} {body}".lower()
     for category, data in CATEGORIES.items():
         for keyword in data["keywords"]:
             if keyword in content:
@@ -279,6 +343,46 @@ def print_email_summary(emails):
         print("💼 WORK-RELATED:")
         print()
         for email in work[:5]:
+            print(f"  From: {email['sender']}")
+            print(f"  Subject: {email['subject']}")
+            print()
+    
+    # Show shopping
+    shopping = [e for e in emails if e['category'] == 'shopping']
+    if shopping:
+        print("🛒 SHOPPING / ORDERS:")
+        print()
+        for email in shopping[:5]:
+            print(f"  From: {email['sender']}")
+            print(f"  Subject: {email['subject']}")
+            print()
+    
+    # Show bank notifications
+    bank = [e for e in emails if e['category'] == 'bank']
+    if bank:
+        print("🏦 BANK NOTIFICATIONS:")
+        print()
+        for email in bank[:5]:
+            print(f"  From: {email['sender']}")
+            print(f"  Subject: {email['subject']}")
+            print()
+    
+    # Show government notifications
+    gov = [e for e in emails if e['category'] == 'gov']
+    if gov:
+        print("🏛️ GOVERNMENT / GOV.IL:")
+        print()
+        for email in gov[:5]:
+            print(f"  From: {email['sender']}")
+            print(f"  Subject: {email['subject']}")
+            print()
+    
+    # Show payment notifications
+    payment = [e for e in emails if e['category'] == 'payment']
+    if payment:
+        print("💳 PAYMENTS (Bit/PayBox/etc):")
+        print()
+        for email in payment[:5]:
             print(f"  From: {email['sender']}")
             print(f"  Subject: {email['subject']}")
             print()
