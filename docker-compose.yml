@@ -1,0 +1,125 @@
+version: "3.8"
+
+# Unified System Core - All Services
+# Usage:
+#   docker compose up -d                    # Start core services
+#   docker compose --profile all up -d      # Start all services including optional
+#   docker compose --profile monitoring up -d  # Include monitoring
+
+services:
+  # ===========================================
+  # AI Telegram Bot - Main Bot Service
+  # ===========================================
+  telegram-bot:
+    build: ./Windows_AI_Core
+    image: ghcr.io/gonya990/ai-telegram-bot:${VERSION:-latest}
+    container_name: ai-telegram-bot
+    restart: unless-stopped
+    volumes:
+      - bot-data:/data
+      - ./Windows_AI_Core/.env:/app/.env:ro
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - INFERENCE_BASE_URL=${INFERENCE_BASE_URL:-http://host.docker.internal:11434}
+      - INFERENCE_API_KEY=${INFERENCE_API_KEY:-}
+      - INFERENCE_PROVIDER=${INFERENCE_PROVIDER:-ollama}
+      - MODEL_NAME=${MODEL_NAME:-llama3.2}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # OpenRouter config
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    ports:
+      - "8080:8080"
+    networks:
+      - unified-network
+
+  # ===========================================
+  # Metrics Collector - System Monitoring
+  # ===========================================
+  metrics-collector:
+    profiles:
+      - monitoring
+      - all
+    build: ./Scripts/monitoring
+    container_name: metrics-collector
+    restart: unless-stopped
+    privileged: true  # Required for GPU metrics via nvidia-smi
+    environment:
+      - GCP_PROJECT=${GCP_PROJECT:-gen-lang-client-0982257437}
+      - INSTANCE_NAME=${INSTANCE_NAME:-igor-gaming-1}
+      - COLLECTION_INTERVAL=${COLLECTION_INTERVAL:-60}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS:-708531393,1881720235}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - gcp-credentials:/root/.config/gcloud:ro
+    networks:
+      - unified-network
+
+  # ===========================================
+  # OpenAI MCP Server - AI Gateway
+  # ===========================================
+  mcp-server:
+    profiles:
+      - mcp
+      - all
+    build: ./Scripts/openai_mcp_server
+    container_name: openai-mcp-server
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8766
+    ports:
+      - "8766:8766"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8766)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - unified-network
+
+  # ===========================================
+  # LLM Council - Multi-Model AI Council (Library/CLI)
+  # ===========================================
+  llm-council:
+    profiles:
+      - council
+      - all
+    build: ./LLM_Council
+    container_name: llm-council
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+    ports:
+      - "8767:8767"
+    networks:
+      - unified-network
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  bot-data:
+    name: unified-bot-data
+  gcp-credentials:
+    name: unified-gcp-credentials
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  unified-network:
+    driver: bridge
+    name: unified-system-network
