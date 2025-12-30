@@ -3,7 +3,7 @@
 
 # 1. Proxmox Host (Virtualization Base)
 Host proxmox-pve
-    HostName 100.74.194.25
+    HostName 100.78.145.67
     User root
     IdentityFile /Users/macbook/Documents/Unified_System/Sandbox/id_rsa_proxmox
     StrictHostKeyChecking no

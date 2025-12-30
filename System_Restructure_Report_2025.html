@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified System Report & Restructuring Plan</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --success: #238636;
+            --error: #da3633;
+            --warning: #d29922;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .status-banner {
+            background: rgba(210, 153, 34, 0.15);
+            border: 1px solid var(--warning);
+            color: #e3b341;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .online {
+            background-color: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        .offline {
+            background-color: var(--error);
+            box-shadow: 0 0 5px var(--error);
+        }
+
+        .warning {
+            background-color: var(--warning);
+            box-shadow: 0 0 5px var(--warning);
+        }
+
+        #network-graph {
+            height: 500px;
+            border: 1px solid #30363d;
+            background-color: #010409;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        th {
+            color: var(--text-secondary);
+        }
+
+        .action-item {
+            background: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .action-urgent {
+            background: rgba(218, 54, 51, 0.1);
+            border-left: 4px solid var(--error);
+        }
+
+        code {
+            background-color: rgba(110, 118, 129, 0.4);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Unified System Report</h1>
+            <p>System Analysis, Status Check & Restructuring Plan</p>
+            <div class="status-banner">
+                ⚠️ ACTION REQUIRED: 2 Nodes Offline, IP Configuration Mismatch Detected
+            </div>
+        </header>
+
+        <!-- Network Visualization -->
+        <div class="card">
+            <h3>🌐 Network Topology Visualization</h3>
+            <div id="network-graph"></div>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9em;">
+                Dynamic visualization of your current Tailscale mesh. Drag nodes to rearrange.
+            </p>
+        </div>
+
+        <!-- Node Status Breakdown -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>📊 Agent & Node Status</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Node Name</th>
+                        <th>Role / Agent</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MacBook Air</td>
+                        <td><strong>Controller / User</strong></td>
+                        <td>100.93.121.47</td>
+                        <td><span class="status-dot online"></span>Online</td>
+                        <td>Primary Interface</td>
+                    </tr>
+                    <tr>
+                        <td>igor-gaming-1</td>
+                        <td><strong>AI Server (WSL2)</strong></td>
+                        <td>100.78.144.50</td>
+                        <td><span class="status-dot online"></span>Online</td>
+                        <td>AI Agent Host, Docker</td>
+                    </tr>
+                    <tr>
+                        <td>100.78.145.67 (pve)</td>
+                        <td><strong>Proxmox Host</strong></td>
+                        <td>100.78.145.67</td>
+                        <td><span class="status-dot online"></span>Online</td>
+                        <td><strong>✅ ACTIVE NODE</strong> (Use this IP!)</td>
+                    </tr>
+                    <tr>
+                        <td>pve-antigravity</td>
+                        <td>Proxmox (Stale)</td>
+                        <td>100.74.x.x</td>
+                        <td><span class="status-dot offline"></span>Offline</td>
+                        <td>❌ Dead/Stale Entry (Delete)</td>
+                    </tr>
+                    <tr>
+                        <td>igor-gaming</td>
+                        <td><strong>Windows PC</strong></td>
+                        <td>100.127.194.111</td>
+                        <td><span class="status-dot online"></span>Online</td>
+                        <td>Compute / Gaming</td>
+                    </tr>
+                    <tr>
+                        <td>Lenovo Tab P11</td>
+                        <td><strong>Dashboard Display</strong></td>
+                        <td>100.114.27.103</td>
+                        <td><span class="status-dot offline"></span>Offline</td>
+                        <td>💤 Sleep Mode / Bat Saver</td>
+                    </tr>
+                    <tr>
+                        <td>Cloud Gateway</td>
+                        <td><strong>GCP Gateway</strong></td>
+                        <td>100.110.209.49</td>
+                        <td><span class="status-dot online"></span>Online</td>
+                        <td>External Ingress</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid" style="margin-top: 40px;">
+            <!-- Agent Analysis -->
+            <div class="card">
+                <h3>🧠 Agent Architecture Analysis</h3>
+                <p><strong>1. Controller Agent (MacBook):</strong> Orchestrates tasks, development environment, VS Code
+                    remote controller.</p>
+                <p><strong>2. Inference Agent (WSL2/Linux):</strong> Host for heavy Python scripts, LLM clients
+                    (Gemini/Ollama), and automation containers. This is the "Brain" logic.</p>
+                <p><strong>3. Infrastructure Agent (Proxmox):</strong> Should manage VMs/LXC. Currently fragmented.
+                    Needs to be the stable backbone.</p>
+                <p><strong>4. Interface Agent (Tablet):</strong> Passive display. Currently failing due to power
+                    management policies.</p>
+            </div>
+
+            <!-- Restructuring Plan -->
+            <div class="card">
+                <h3>🛠️ Restructuring Plan (Immediate Actions)</h3>
+
+                <div class="action-item action-urgent">
+                    <strong>1. Fix Proxmox Access</strong><br>
+                    You are trying to connect to a dead IP. The server IS Online.<br>
+                    <strong>Action:</strong> Connect to <code style="color: white">100.78.145.67</code>
+                    (https://100.78.145.67:8006).<br>
+                    Update your browser bookmarks and SSH config.
+                </div>
+
+                <div class="action-item action-urgent">
+                    <strong>2. Fix Lenovo Tablet</strong><br>
+                    The tablet kills the VPN connection to save battery.<br>
+                    <strong>Action on Tablet:</strong>
+                    <ul>
+                        <li>Open Settings > Apps > Tailscale > Battery</li>
+                        <li>Select <strong>"Unrestricted"</strong> (Not Optimized)</li>
+                        <li>Lock the app in the "Recent Apps" view so it can't be closed.</li>
+                    </ul>
+                </div>
+
+                <div class="action-item">
+                    <strong>3. Clean Up Tailscale (Restructure)</strong><br>
+                    Go to <a href="https://login.tailscale.com/admin/machines" target="_blank">Tailscale Admin</a>:<br>
+                    <ul>
+                        <li>Locate the offline `pve` (100.74...) node.</li>
+                        <li>Click "..." -> <strong>Remove machine</strong>.</li>
+                        <li>Rename active `pve` (100.78...) to <code>proxmox-main</code> to avoid confusion.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Data for the graphic
+        var nodes = new vis.DataSet([
+            { id: 1, label: 'MacBook Air\n(Controller)', group: 'mac', shape: 'box' },
+            { id: 2, label: 'Cloud Gateway\n(GCP)', group: 'cloud', shape: 'cloud' },
+            { id: 3, label: 'Windows PC\n(Compute)', group: 'pc', shape: 'box' },
+            { id: 4, label: 'AI Server (WSL)\n(The Brain)', group: 'linux', shape: 'box' },
+            { id: 5, label: 'Proxmox VE\n(Infrastructure)', group: 'server', shape: 'database' },
+            { id: 6, label: 'Smart Home\n(IoT)', group: 'linux', shape: 'dot' },
+            { id: 7, label: 'IPhone\n(Mobile)', group: 'mobile', shape: 'icon' },
+            { id: 8, label: 'Lenovo Tablet\n(Display)', group: 'mobile', shape: 'box', color: '#da3633' } // Red for offline
+        ]);
+
+        var edges = new vis.DataSet([
+            { from: 1, to: 2, dashes: true, label: 'Internet' },
+            { from: 2, to: 4, label: 'Tunnel' },
+            { from: 1, to: 3 },
+            { from: 3, to: 4, label: 'Host' },
+            { from: 1, to: 5, label: 'Target: 100.78...' },
+            { from: 4, to: 6, label: 'Automation' },
+            { from: 7, to: 1 },
+            { from: 8, to: 6, label: 'Dashboard', dashes: true }
+        ]);
+
+        var container = document.getElementById('network-graph');
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var options = {
+            nodes: {
+                borderWidth: 2,
+                font: { color: '#c9d1d9', face: 'arial' }
+            },
+            groups: {
+                mac: { color: { background: '#2da44e', border: '#2da44e' } },
+                cloud: { color: { background: '#0969da', border: '#0969da' } },
+                pc: { color: { background: '#1f6feb', border: '#1f6feb' } },
+                linux: { color: { background: '#d29922', border: '#d29922' } },
+                server: { color: { background: '#8957e5', border: '#8957e5' } },
+                mobile: { color: { background: '#a371f7', border: '#a371f7' } }
+            },
+            layout: {
+                hierarchical: false
+            },
+            physics: {
+                stabilization: true,
+                barnesHut: {
+                    gravitationalConstant: -8000
+                }
+            },
+            interaction: { hover: true }
+        };
+        var network = new vis.Network(container, data, options);
+    </script>
+</body>
+
+</html>

@@ -23,7 +23,7 @@
 ### 3. Proxmox Virtual Environment
 
 - **Device**: Server (Virtualization)
-- **Tailscale IP**: `100.74.194.25` (Active, SSH Open)
+- **Tailscale IP**: `100.78.145.67` (Active, IP Updated)
 - **Role**: Host for VMs and Containers.
 - **Components**:
   - **RAM**: ✅ **64GB Verified** (62Gi Total available).
@@ -35,7 +35,7 @@
 ### 4. Планшет Артура (Контроль ребёнка)
 
 - **Device**: Lenovo TB-J606F (Tab P11)
-- **Tailscale IP**: `100.114.27.103`
+- **Tailscale IP**: `100.114.27.103` (Offline/Sleep)
 - **Local IP**: `192.168.190.111`
 - **Role**: Детский планшет с родительским контролем
 - **User**: Артур (<arturgoncarenko92@gmail.com>)
@@ -44,7 +44,7 @@
   - **Family Link**: ✅ Активен (родительский контроль)
   - **ADB (5555)**: ✅ Открыт через Tailscale
   - **Geolocation**: ✅ HIGH_ACCURACY
-  - **Tailscale VPN**: ✅ Постоянно подключен
+  - **Tailscale VPN**: ⚠️ Battery Optimization must be DISABLED
 
 ## Software Resources (Программные Ресурсы)
 

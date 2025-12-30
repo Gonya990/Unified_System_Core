@@ -36,8 +36,9 @@ class BudgetMonitor:
                     # For now, just reacting to presence of high alert in top 3
                     logger.warning(f"Budget Alert Found: {subject}")
                     
+                    # User requested to stop receiving these notifications (2025-12-30)
                     if not self.alert_sent:
-                        send_alert(f"💰 **БЮДЖЕТ ПРЕВЫШЕН!**\nНайдено уведомление: {subject}\n\n⚡ **ПЕРЕКЛЮЧАЮ НА OLLAMA**")
+                        # send_alert(f"💰 **БЮДЖЕТ ПРЕВЫШЕН!**\nНайдено уведомление: {subject}\n\n⚡ **ПЕРЕКЛЮЧАЮ НА OLLAMA**")
                         self.enforce_ollama()
                         self.alert_sent = True
                         

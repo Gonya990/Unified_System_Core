@@ -34,7 +34,7 @@ graph LR
 | **igor-gaming-1** | `100.88.65.71` | Primary AI workstation (WSL2) |
 | **igor-gaming** | `100.127.194.111` | Windows AI Core (GPU inference) |
 | **MacBook-Air** | `100.93.121.47` | Admin & development |
-| **pve** | `100.74.194.25` | Proxmox hypervisor |
+| **pve** | `100.78.145.67` | Proxmox hypervisor |
 | **iphone-15-pro** | `100.86.233.87` | Mobile commander (Termius) |
 
 ---

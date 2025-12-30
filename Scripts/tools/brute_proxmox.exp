@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 set timeout 5
-set host "root@100.74.194.25"
+set host "root@100.78.145.67"
 set passwords {
     "GarYk6550"
     "Gonya990"
