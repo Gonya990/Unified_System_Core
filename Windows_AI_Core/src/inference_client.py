@@ -38,7 +38,7 @@ def _get_gemini_client(api_key: str):
 class InferenceClient:
     """Unified client for multiple LLM backends."""
     
-    PROVIDERS = ["ollama", "openai", "gemini", "openrouter"]
+    PROVIDERS = ["ollama", "openai", "gemini", "openrouter", "council"]
     
     def __init__(self, config: ConfigManager):
         self.config = config
