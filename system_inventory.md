@@ -7,11 +7,13 @@
 - **Device**: MacBook
 - **Role**: Management & Control Plane (Рабочая зона управления)
 - **User**: igor/gonya
+- **FQDN**: `macbook-air.tail5e8a72.ts.net`
 - **Tailscale IP**: `100.93.121.47` (MacBook Air)
 
 ### 2. Windows AI Host (igor-gaming)
 
 - **Device**: Windows PC (RTX AI Core)
+- **FQDN**: `igor-gaming.tail5e8a72.ts.net`
 - **Tailscale IP**: `100.127.194.111` (Active, Direct Connection)
 - **Role**: AI Inference, N8N, & Computation.
 - **Components**:
@@ -23,6 +25,7 @@
 ### 3. Proxmox Virtual Environment
 
 - **Device**: Server (Virtualization)
+- **FQDN**: `pve.myth-rudd.ts.net`
 - **Tailscale IP**: `100.78.145.67` (Active, IP Updated)
 - **Role**: Host for VMs and Containers.
 - **Components**:
@@ -35,6 +38,7 @@
 ### 4. Планшет Артура (Контроль ребёнка)
 
 - **Device**: Lenovo TB-J606F (Tab P11)
+- **FQDN**: `lenovo-tb-j606f.tail5e8a72.ts.net`
 - **Tailscale IP**: `100.114.27.103` (Offline/Sleep)
 - **Local IP**: `192.168.190.111`
 - **Role**: Детский планшет с родительским контролем
