@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 Unified System - Отчёт Администратора | 30.12.2025</title>
+    <title>🏠 Unified System - Отчёт Администратора | 30.12.2025 (Scan 2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0a0e17;
-            --bg-secondary: #111827;
-            --bg-tertiary: #1f2937;
-            --bg-card: linear-gradient(135deg, #1a1f35 0%, #0f172a 100%);
+            --bg-secondary: #0f172a;
+            --bg-tertiary: #1e293b;
+            --bg-card: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             --accent-green: #10b981;
             --accent-blue: #3b82f6;
             --accent-purple: #8b5cf6;
@@ -20,12 +20,11 @@
             --accent-orange: #f59e0b;
             --accent-red: #ef4444;
             --accent-cyan: #06b6d4;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
-            --glow-green: 0 0 40px rgba(16, 185, 129, 0.3);
-            --glow-purple: 0 0 40px rgba(139, 92, 246, 0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
+            --glow-green: 0 0 30px rgba(16, 185, 129, 0.2);
         }
 
         * {
@@ -50,91 +49,74 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-            animation: bgMove 20s ease-in-out infinite;
-        }
-
-        @keyframes bgMove {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-5%, -5%) rotate(5deg); }
+            background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
+            padding: 3rem 1rem;
         }
 
         .hero {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem;
             background: var(--bg-card);
-            border-radius: 32px;
-            margin-bottom: 3rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
             border: 1px solid var(--border-color);
             position: relative;
-            overflow: hidden;
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #94a3b8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .date-badge {
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 2rem;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 50px;
-            font-size: 1rem;
-            color: var(--accent-blue);
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
         }
 
-        .stats-dashboard {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
+            background: var(--bg-secondary);
             padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s ease;
         }
 
-        .stat-card:hover { transform: translateY(-8px); box-shadow: var(--glow-blue); }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
 
         .stat-card .value {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent-blue);
+            display: block;
         }
 
         .stat-card .label {
@@ -142,62 +124,74 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 0.5rem;
         }
 
         .section {
             background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
             border-radius: 24px;
+            border: 1px solid var(--border-color);
             margin-bottom: 2rem;
             overflow: hidden;
         }
 
         .section-header {
             padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
             background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            font-size: 1.2rem;
         }
 
-        .section-content { padding: 2rem; }
-
-        .code-block {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            color: #d1d5db;
+        .section-content {
+            padding: 2rem;
         }
 
-        .status-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
         }
 
-        .status-table th, .status-table td {
-            text-align: left;
+        th,
+        td {
             padding: 1rem;
+            text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .status-table th { color: var(--text-secondary); font-weight: 600; }
-
-        .badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        th {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
         }
 
-        .badge-online { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
-        .badge-offline { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+        .badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
 
+        .badge-online {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .code-snippet {
+            background: #000;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+            overflow-x: auto;
+        }
     </style>
 </head>
 
@@ -205,115 +199,132 @@
     <div class="bg-animation"></div>
     <div class="container">
         <header class="hero">
-            <h1>🛡️ Unified System - Отчёт Администратора</h1>
-            <div class="subtitle">Полная проверка систем и параллельных подключений</div>
-            <div class="date-badge">30 декабря 2025, 21:15</div>
+            <h1>🛡️ Unified System | Экспресс-скан</h1>
+            <div class="status-badge">● Система стабильна</div>
+            <div style="color: var(--text-secondary); margin-top: 1rem;">30 декабря 2025, 21:20</div>
         </header>
 
-        <div class="stats-dashboard">
+        <div class="stats-grid">
             <div class="stat-card">
-                <div class="value">10</div>
-                <div class="label">Узлов в сети</div>
+                <span class="value">67</span>
+                <span class="label">Параллельных соединений</span>
             </div>
             <div class="stat-card">
-                <div class="value">70</div>
-                <div class="label">Параллельных подключений</div>
+                <span class="value">29ms</span>
+                <span class="label">Ping до Proxmox</span>
             </div>
             <div class="stat-card">
-                <div class="value">51%</div>
-                <div class="label">Загрузка диска</div>
+                <span class="value">33.3%</span>
+                <span class="label">Pik CPU (Renderer)</span>
             </div>
             <div class="stat-card">
-                <div class="value">61%</div>
-                <div class="label">Пиковая нагрузка ЦП</div>
+                <span class="value">OK</span>
+                <span class="label">Статус Git</span>
             </div>
         </div>
 
         <section class="section">
-            <div class="section-header">
-                <h2>🌐 Статус узлов (Tailscale)</h2>
-            </div>
+            <div class="section-header">🖥️ Узлы и Доступность</div>
             <div class="section-content">
-                <table class="status-table">
+                <table>
                     <thead>
                         <tr>
-                            <th>Имя узла</th>
-                            <th>IP Адрес</th>
+                            <th>Узел</th>
+                            <th>IP</th>
                             <th>ОС</th>
                             <th>Статус</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>macbook-air</td><td>100.93.121.47</td><td>macOS</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>igor-gaming-1</td><td>100.78.144.50</td><td>linux</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>igor-gaming</td><td>100.127.194.111</td><td>windows</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>pve-antigravity-1</td><td>100.74.137.122</td><td>linux</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>pve.myth-rudd.ts.net</td><td>100.78.145.67</td><td>linux</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>smart</td><td>100.81.133.25</td><td>linux</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>iphone-15-pro</td><td>100.86.233.87</td><td>iOS</td><td><span class="badge badge-online">ONLINE</span></td></tr>
-                        <tr><td>lenovo-tb-j606f</td><td>100.114.27.103</td><td>android</td><td><span class="badge badge-offline">OFFLINE</span></td></tr>
-                        <tr><td>rocinante</td><td>100.127.166.76</td><td>linux</td><td><span class="badge badge-offline">OFFLINE</span></td></tr>
+                        <tr>
+                            <td>macbook-air</td>
+                            <td>100.93.121.47</td>
+                            <td>macOS</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>igor-gaming-1</td>
+                            <td>100.78.144.50</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>pve-antigravity-1</td>
+                            <td>100.74.137.122</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>pve (main)</td>
+                            <td>100.78.145.67</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>smart</td>
+                            <td>100.81.133.25</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>igor-gaming (pc)</td>
+                            <td>100.127.194.111</td>
+                            <td>windows</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
         <section class="section">
-            <div class="section-header">
-                <h2>📊 Активные TCP соединения</h2>
-            </div>
+            <div class="section-header">�️ Состояние Репозитория</div>
             <div class="section-content">
-                <div class="code-block">
-                    <pre>
-Google     4001 macbook   31u  IPv4 TCP macbook-air:61050->pve:8006 (ESTABLISHED)
-Google     4001 macbook   50u  IPv4 TCP macbook-air:61197->pve-antigravity-1:8006 (ESTABLISHED)
-Antigravi  7280 macbook   33u  IPv4 TCP localhost:60573->localhost:60722 (ESTABLISHED)
-Telegram   95823 macbook  36u  IPv4 TCP macbook-air:59578->149.154.167.92:443 (ESTABLISHED)
-... + 66 других соединений
-                    </pre>
+                <div class="code-snippet">
+                    On branch main<br>
+                    Your branch is up to date with 'origin/main'.<br>
+                    Nothing to commit, working tree clean
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <div class="section-header">
-                <h2>⚙️ Топ процессов по ресурсам</h2>
-            </div>
+            <div class="section-header">🚀 Топ Процессов</div>
             <div class="section-content">
-                <table class="status-table">
+                <table>
                     <thead>
                         <tr>
                             <th>CPU %</th>
-                            <th>MEM %</th>
                             <th>Команда</th>
+                            <th>Категория</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>61.4</td><td>3.2</td><td>Antigravity Helper (Renderer)</td></tr>
-                        <tr><td>48.3</td><td>1.6</td><td>Antigravity Helper (Plugin)</td></tr>
-                        <tr><td>32.0</td><td>0.4</td><td>WindowServer</td></tr>
-                        <tr><td>7.7</td><td>1.5</td><td>Electron</td></tr>
-                        <tr><td>7.6</td><td>0.8</td><td>Telegram</td></tr>
+                        <tr>
+                            <td>33.3</td>
+                            <td>Antigravity Helper (Renderer)</td>
+                            <td>AI Agent Core</td>
+                        </tr>
+                        <tr>
+                            <td>21.5</td>
+                            <td>WindowServer</td>
+                            <td>OS System</td>
+                        </tr>
+                        <tr>
+                            <td>14.8</td>
+                            <td>language_server_macos_arm</td>
+                            <td>Development</td>
+                        </tr>
+                        <tr>
+                            <td>11.5</td>
+                            <td>Antigravity Helper (GPU)</td>
+                            <td>Hardware Accel</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2>🌳 Состояние Git (Unified_System)</h2>
-            </div>
-            <div class="section-content">
-                <div class="code-block">
-                    <pre>
-On branch main
-Your branch is behind 'origin/main' by 1 commit.
-Nothing to commit, working tree clean.
-                    </pre>
-                </div>
-            </div>
-        </section>
-
     </div>
 </body>
+
 </html>
