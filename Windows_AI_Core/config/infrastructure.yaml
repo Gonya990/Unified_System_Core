@@ -4,6 +4,7 @@
 nodes:
   - id: macbook-air
     name: MacBook Air
+    fqdn: macbook-air.tail5e8a72.ts.net
     ip: 100.93.121.47
     type: control
     os: macos
@@ -14,7 +15,8 @@ nodes:
 
   - id: igor-gaming-1
     name: AI Server (WSL2)
-    ip: 100.88.65.71
+    fqdn: igor-gaming-1.tail5e8a72.ts.net
+    ip: 100.78.144.50
     type: compute
     os: ubuntu-wsl2
     services:
@@ -32,6 +34,7 @@ nodes:
 
   - id: igor-gaming
     name: Windows PC
+    fqdn: igor-gaming.tail5e8a72.ts.net
     ip: 100.127.194.111
     type: windows
     os: windows11
@@ -45,6 +48,7 @@ nodes:
 
   - id: proxmox
     name: Proxmox VE
+    fqdn: pve.myth-rudd.ts.net
     ip: 100.78.145.67
     type: hypervisor
     os: proxmox
@@ -56,6 +60,7 @@ nodes:
 
   - id: unified-home-core-cloud
     name: Cloud Gateway (GCP)
+    fqdn: unified-home-core-cloud.tail5e8a72.ts.net
     ip: 100.110.209.49
     type: cloud
     os: debian
@@ -76,6 +81,7 @@ nodes:
 
   - id: smart
     name: Smart Home Hub
+    fqdn: smart.tail5e8a72.ts.net
     ip: 100.81.133.25
     type: iot
     os: debian
@@ -85,6 +91,7 @@ nodes:
 
   - id: iphone
     name: iPhone 15 Pro
+    fqdn: iphone-15-pro.tail5e8a72.ts.net
     ip: 100.86.233.87
     type: mobile
     os: ios
@@ -94,6 +101,7 @@ nodes:
 
   - id: lenovo-tab
     name: Lenovo Tab P11 (Artur)
+    fqdn: lenovo-tb-j606f.tail5e8a72.ts.net
     ip: 100.114.27.103
     type: mobile
     os: android
