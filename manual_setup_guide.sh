@@ -10,34 +10,8 @@ echo "1. Deploy Budget Alert Fix (GCP)"
 echo "2. Setup SSH for Distributed AI (PVE)"
 echo ""
 
-# --- Step 1: GCP Deployment ---
-echo "--- Step 1: Fixed Budget Alert Deployment ---"
-echo "Attempting to deploy from correct path..."
-echo ""
-read -p "Press Enter to run deployment command..."
+# --- Step 1: REMOVED (Budget Alert Automation Deleted) ---
 
-echo "Deleting conflicting Gen 2 function if exists..."
-gcloud functions delete budget_alert_telegram --region=us-central1 --quiet || echo "Function did not exist or delete failed (continuing)"
-
-DEPLOY_CMD="gcloud functions deploy budget_alert_telegram \
-  --runtime python311 \
-  --trigger-topic budget-alerts \
-  --entry-point budget_alert_telegram \
-  --no-gen2 \
-  --source Unified_System/cloud_functions/budget_alert_telegram"
-
-echo "Running: $DEPLOY_CMD"
-$DEPLOY_CMD
-
-if [ $? -eq 0 ]; then
-    echo "✅ Deployment Successful!"
-else
-    echo "❌ Deployment Failed. Please check the error above."
-fi
-
-echo ""
-echo "---------------------------------------------"
-echo ""
 
 # --- Step 2: SSH Setup ---
 echo "--- Step 2: SSH Setup for Distributed AI ---"
