@@ -65,6 +65,15 @@ nodes:
       - name: AIOS MCP
       - name: Docker
 
+  - id: external-ai-cloud
+    name: AI Providers Cloud
+    type: cloud
+    services:
+      - name: OpenRouter (Claude)
+      - name: Google Gemini
+      - name: SerpApi (Search)
+      - name: LLM Council 🏛️
+
   - id: smart
     name: Smart Home Hub
     ip: 100.81.133.25
