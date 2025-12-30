@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Единый Системный Отчет и План Реструктуризации</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --success: #238636;
+            --error: #da3633;
+            --warning: #d29922;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .status-banner {
+            background: rgba(210, 153, 34, 0.15);
+            border: 1px solid var(--warning);
+            color: #e3b341;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .online {
+            background-color: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        .offline {
+            background-color: var(--error);
+            box-shadow: 0 0 5px var(--error);
+        }
+
+        .warning {
+            background-color: var(--warning);
+            box-shadow: 0 0 5px var(--warning);
+        }
+
+        #network-graph {
+            height: 500px;
+            border: 1px solid #30363d;
+            background-color: #010409;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        th {
+            color: var(--text-secondary);
+        }
+
+        .action-item {
+            background: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .action-urgent {
+            background: rgba(218, 54, 51, 0.1);
+            border-left: 4px solid var(--error);
+        }
+
+        code {
+            background-color: rgba(110, 118, 129, 0.4);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Единый Системный Отчет</h1>
+            <p>Системный анализ, проверка статуса и план реструктуризации</p>
+            <div class="status-banner">
+                ⚠️ ТРЕБУЕТСЯ ДЕЙСТВИЕ: 2 узла оффлайн, обнаружено несоответствие IP
+            </div>
+        </header>
+
+        <!-- Network Visualization -->
+        <div class="card">
+            <h3>🌐 Визуализация топологии сети</h3>
+            <div id="network-graph"></div>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9em;">
+                Динамическая визуализация вашей текущей сети Tailscale. Перетаскивайте узлы, чтобы перестроить.
+            </p>
+        </div>
+
+        <!-- Node Status Breakdown -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>📊 Статус агентов и узлов</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Имя узла</th>
+                        <th>Роль / Агент</th>
+                        <th>IP адрес</th>
+                        <th>Статус</th>
+                        <th>Заметки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MacBook Air</td>
+                        <td><strong>Контроллер / Пользователь</strong></td>
+                        <td>100.93.121.47</td>
+                        <td><span class="status-dot online"></span>Онлайн</td>
+                        <td>Основной интерфейс</td>
+                    </tr>
+                    <tr>
+                        <td>igor-gaming-1</td>
+                        <td><strong>AI Сервер (WSL2)</strong></td>
+                        <td>100.78.144.50</td>
+                        <td><span class="status-dot online"></span>Онлайн</td>
+                        <td>AI хост агента, Docker</td>
+                    </tr>
+                    <tr>
+                        <td>100.78.145.67 (pve)</td>
+                        <td><strong>Proxmox Хост</strong></td>
+                        <td>100.78.145.67</td>
+                        <td><span class="status-dot online"></span>Онлайн</td>
+                        <td><strong>✅ АКТИВНЫЙ УЗЕЛ</strong> (Используйте этот IP!)</td>
+                    </tr>
+                    <tr>
+                        <td>pve-antigravity</td>
+                        <td>Proxmox (Устарел)</td>
+                        <td>100.74.x.x</td>
+                        <td><span class="status-dot offline"></span>Оффлайн</td>
+                        <td>❌ Мертвая запись (Удалить)</td>
+                    </tr>
+                    <tr>
+                        <td>igor-gaming</td>
+                        <td><strong>Windows ПК</strong></td>
+                        <td>100.127.194.111</td>
+                        <td><span class="status-dot online"></span>Онлайн</td>
+                        <td>Вычисления / Гейминг</td>
+                    </tr>
+                    <tr>
+                        <td>Lenovo Tab P11</td>
+                        <td><strong>Дисплей событий</strong></td>
+                        <td>100.114.27.103</td>
+                        <td><span class="status-dot offline"></span>Оффлайн</td>
+                        <td>💤 Спящий режим / Экономия</td>
+                    </tr>
+                    <tr>
+                        <td>Cloud Gateway</td>
+                        <td><strong>GCP Шлюз</strong></td>
+                        <td>100.110.209.49</td>
+                        <td><span class="status-dot online"></span>Онлайн</td>
+                        <td>Внешний вход</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid" style="margin-top: 40px;">
+            <!-- Agent Analysis -->
+            <div class="card">
+                <h3>🧠 Анализ архитектуры агентов</h3>
+                <p><strong>1. Агент-Контроллер (MacBook):</strong> Организует задачи, среду разработки, удаленный
+                    контроллер VS Code.</p>
+                <p><strong>2. Агент-Инференс (WSL2/Linux):</strong> Хостит тяжелые скрипты Python, клиенты LLM
+                    (Gemini/Ollama) и контейнеры автоматизации. Это логический "Мозг".</p>
+                <p><strong>3. Агент-Инфраструктура (Proxmox):</strong> Должен управлять VM/LXC. В настоящее время
+                    фрагментирован. Должен стать стабильной основой.</p>
+                <p><strong>4. Агент-Интерфейс (Планшет):</strong> Пассивный дисплей. В настоящее время отключается из-за
+                    политик энергосбережения.</p>
+            </div>
+
+            <!-- Restructuring Plan -->
+            <div class="card">
+                <h3>🛠️ План реструктуризации (Срочные действия)</h3>
+
+                <div class="action-item action-urgent">
+                    <strong>1. Исправить доступ к Proxmox</strong><br>
+                    Вы пытаетесь подключиться к мертвому IP. Сервер ОНЛАЙН.<br>
+                    <strong>Действие:</strong> Подключитесь к <code style="color: white">100.78.145.67</code>
+                    (https://100.78.145.67:8006).<br>
+                    Обновите закладки браузера и SSH конфиг.
+                </div>
+
+                <div class="action-item action-urgent">
+                    <strong>2. Исправить Lenovo Планшет</strong><br>
+                    Планшет убивает VPN соединение для экономии батареи.<br>
+                    <strong>Действие на планшете:</strong>
+                    <ul>
+                        <li>Открыть Настройки > Приложения > Tailscale > Батарея</li>
+                        <li>Выбрать <strong>"Не ограничено"</strong> (Not Optimized)</li>
+                        <li>Закрепить приложение в меню "Недавние", чтобы оно не закрывалось.</li>
+                    </ul>
+                </div>
+
+                <div class="action-item">
+                    <strong>3. Очистить Tailscale (Реструктуризация)</strong><br>
+                    Перейдите в <a href="https://login.tailscale.com/admin/machines" target="_blank">Tailscale
+                        Admin</a>:<br>
+                    <ul>
+                        <li>Найдите оффлайн узел `pve` (100.74...).</li>
+                        <li>Нажмите "..." -> <strong>Remove machine</strong>.</li>
+                        <li>Переименуйте активный `pve` (100.78...) в <code>proxmox-main</code> чтобы избежать путаницы.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Data for the graphic
+        var nodes = new vis.DataSet([
+            { id: 1, label: 'MacBook Air\n(Контроллер)', group: 'mac', shape: 'box' },
+            { id: 2, label: 'Cloud Gateway\n(GCP)', group: 'cloud', shape: 'cloud' },
+            { id: 3, label: 'Windows PC\n(Вычисления)', group: 'pc', shape: 'box' },
+            { id: 4, label: 'AI Server (WSL)\n(Мозг)', group: 'linux', shape: 'box' },
+            { id: 5, label: 'Proxmox VE\n(Инфраструктура)', group: 'server', shape: 'database' },
+            { id: 6, label: 'Smart Home\n(IoT)', group: 'linux', shape: 'dot' },
+            { id: 7, label: 'IPhone\n(Мобильный)', group: 'mobile', shape: 'icon' },
+            { id: 8, label: 'Lenovo Tablet\n(Дисплей)', group: 'mobile', shape: 'box', color: '#da3633' } // Red for offline
+        ]);
+
+        var edges = new vis.DataSet([
+            { from: 1, to: 2, dashes: true, label: 'Интернет' },
+            { from: 2, to: 4, label: 'Туннель' },
+            { from: 1, to: 3 },
+            { from: 3, to: 4, label: 'Хост' },
+            { from: 1, to: 5, label: 'Target: 100.78...' },
+            { from: 4, to: 6, label: 'Автоматизация' },
+            { from: 7, to: 1 },
+            { from: 8, to: 6, label: 'Дашборд', dashes: true }
+        ]);
+
+        var container = document.getElementById('network-graph');
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var options = {
+            nodes: {
+                borderWidth: 2,
+                font: { color: '#c9d1d9', face: 'arial' }
+            },
+            groups: {
+                mac: { color: { background: '#2da44e', border: '#2da44e' } },
+                cloud: { color: { background: '#0969da', border: '#0969da' } },
+                pc: { color: { background: '#1f6feb', border: '#1f6feb' } },
+                linux: { color: { background: '#d29922', border: '#d29922' } },
+                server: { color: { background: '#8957e5', border: '#8957e5' } },
+                mobile: { color: { background: '#a371f7', border: '#a371f7' } }
+            },
+            layout: {
+                hierarchical: false
+            },
+            physics: {
+                stabilization: true,
+                barnesHut: {
+                    gravitationalConstant: -8000
+                }
+            },
+            interaction: { hover: true }
+        };
+        var network = new vis.Network(container, data, options);
+    </script>
+</body>
+
+</html>
