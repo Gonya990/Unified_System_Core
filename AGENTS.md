@@ -727,3 +727,19 @@ Parse: `file:line:col` → location | 💡 → how to fix | Exit 0/1 → pass/fa
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+## OpenAI ChatGPT Conversations Knowledge Base
+
+**Location:** `Agent_Context/Knowledge_Base/OpenAI_Conversations/`
+
+**Description:**
+- **English:** Historical ChatGPT conversations imported from OpenAI export
+- **Russian:** Исторические разговоры ChatGPT, импортированные из экспорта OpenAI
+
+**Last Updated:** 2025-12-30 14:42:43
+
+**Contents:** 50 conversation files
+
+**Purpose:** Reference material for continuity, context, and learning from past interactions.
+
+---

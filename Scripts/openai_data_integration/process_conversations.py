@@ -41,6 +41,32 @@ def parse_conversation(conv: Dict) -> Dict:
     # Extract title
     title = conv.get('title', 'Untitled Conversation')
     
+    # Check for scraper format (simplified)
+    if 'messages' in conv and isinstance(conv.get('messages'), list):
+        # Scraper format
+        for msg in conv['messages']:
+            role = msg.get('role', 'unknown')
+            content = msg.get('content', '')
+            if content:
+                messages.append({
+                    'role': role,
+                    'content': content,
+                    'timestamp': None
+                })
+        
+        # Date is unknown for scraped data, use generic fallback or extract from title if possible?
+        # For now, default to None/Unknown
+        date_str = "Unknown_Date"
+        time_str = "00:00:00"
+        
+        return {
+            'title': title,
+            'date': date_str,
+            'time': time_str,
+            'messages': messages,
+            'id': conv.get('conversation_id', 'unknown')
+        }
+
     # Extract creation time
     create_time = conv.get('create_time')
     if create_time:
@@ -51,7 +77,7 @@ def parse_conversation(conv: Dict) -> Dict:
         date_str = 'Unknown'
         time_str = 'Unknown'
     
-    # Extract messages
+    # Extract messages (official export format)
     mapping = conv.get('mapping', {})
     
     # Build conversation tree
