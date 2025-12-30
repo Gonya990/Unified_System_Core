@@ -667,7 +667,7 @@ async def cmd_clear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setprovider command - set inference provider."""
-    providers = ["ollama", "openai", "gemini"]
+    providers = ["ollama", "openai", "gemini", "openrouter", "council"]
     current = config.get("INFERENCE_PROVIDER", "ollama")
     
     # If arguments provided, use them (legacy mode)
@@ -1503,6 +1503,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     trigger_status = "[[RUN:STATUS]]" in response
     trigger_cmd = "[[RUN:CMD:" in response
     trigger_antigravity = "[[ASK:ANTIGRAVITY:" in response
+    trigger_agent_kosta = "[[ASK:AGENT_KOSTA:" in response
     trigger_search = "[[RUN:SEARCH:" in response
     trigger_mail = "[[RUN:MAIL]]" in response
     trigger_mail_search = "[[RUN:MAIL_SEARCH:" in response
@@ -1533,6 +1534,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if match:
             antigravity_question = match.group(1)
             clean_response = clean_response.replace(f"[[ASK:ANTIGRAVITY:{antigravity_question}]]", "")
+            
+    # Extract Agent Kosta question if present
+    agent_kosta_question = None
+    if trigger_agent_kosta:
+        import re
+        match = re.search(r'\[\[ASK:AGENT_KOSTA:(.+?)\]\]', response)
+        if match:
+            agent_kosta_question = match.group(1)
+            clean_response = clean_response.replace(f"[[ASK:AGENT_KOSTA:{agent_kosta_question}]]", "")
             
     # Extract Search query if present
     search_query = None
@@ -1609,6 +1619,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.message.reply_text(
             f"📨 Вопрос передан Antigravity Core:\n\"{antigravity_question}\"\n\n"
             f"💡 Пока эта функция в разработке. Antigravity ответит через основной интерфейс."
+        )
+
+    if trigger_agent_kosta and agent_kosta_question:
+        logger.info(f"Forwarding to Agent Kosta: {agent_kosta_question}")
+        # Route to MCP Agent Mail if possible
+        await update.message.reply_text(
+            f"📨 Передаю запрос Агенту Кости:\n\"{agent_kosta_question}\"\n\n"
+            f"🔄 Коннект через MCP Agent Mail... (в процессе)"
         )
         
     if trigger_search and search_query:
@@ -1720,6 +1738,10 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             hint = "Set API key: /setapikey"
         elif provider == "gemini":
             hint = "Set API key: /setapikey"
+        elif provider == "openrouter":
+            hint = "High-Quality Claude 3.5"
+        elif provider == "council":
+            hint = "Multi-AI Deliberation Mode 🏛️"
         else:
             hint = "Local Ollama"
 
