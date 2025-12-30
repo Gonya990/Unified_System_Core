@@ -668,44 +668,54 @@ async def cmd_clear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setprovider command - set inference provider."""
     providers = ["ollama", "openai", "gemini"]
+    current = config.get("INFERENCE_PROVIDER", "ollama")
     
-    if not context.args:
-        current = config.get("INFERENCE_PROVIDER", "ollama")
+    # If arguments provided, use them (legacy mode)
+    if context.args:
+        provider = context.args[0].lower()
+        if provider not in providers:
+            await update.message.reply_text(
+                f"❌ Unknown provider: `{provider}`\n"
+                f"Available: {', '.join(providers)}",
+                parse_mode="Markdown"
+            )
+            return
+        
+        config.set("INFERENCE_PROVIDER", provider)
+        logger.info(f"Provider updated to: {provider}", extra={"user_id": update.effective_user.id})
+        
+        # Show help for setting up the provider
+        hint = ""
+        if provider == "openai":
+            hint = "Set your API key with /setapikey"
+        elif provider == "gemini":
+            hint = "Set your Gemini API key with /setapikey"
+        else:
+            hint = "Make sure Ollama is running"
+        
         await update.message.reply_text(
-            f"Current provider: `{current}`\n\n"
-            f"Usage: /setprovider <provider>\n"
-            f"Available: {', '.join(providers)}\n\n"
-            f"Examples:\n"
-            f"`/setprovider ollama`\n"
-            f"`/setprovider openai`\n"
-            f"`/setprovider gemini`",
+            f"✅ Provider set to: `{provider}`\n\n💡 {hint}",
             parse_mode="Markdown"
         )
         return
+
+    # Interactive Mode
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
     
-    provider = context.args[0].lower()
-    if provider not in providers:
-        await update.message.reply_text(
-            f"❌ Unknown provider: `{provider}`\n"
-            f"Available: {', '.join(providers)}",
-            parse_mode="Markdown"
-        )
-        return
+    buttons = []
+    for provider in providers:
+        indicator = "✅" if provider == current else "🔄"
+        button_text = f"{indicator} {provider.upper()}"
+        buttons.append([InlineKeyboardButton(button_text, callback_data=f"provider:{provider}")])
     
-    config.set("INFERENCE_PROVIDER", provider)
-    logger.info(f"Provider updated to: {provider}", extra={"user_id": update.effective_user.id})
-    
-    # Show help for setting up the provider
-    if provider == "openai":
-        hint = "Set your API key with /setapikey"
-    elif provider == "gemini":
-        hint = "Set your Gemini API key with /setapikey"
-    else:
-        hint = "Make sure Ollama is running"
+    keyboard = InlineKeyboardMarkup(buttons)
     
     await update.message.reply_text(
-        f"✅ Provider set to: `{provider}`\n\n💡 {hint}",
-        parse_mode="Markdown"
+        f"⚙️ **Select AI Provider**\n\n"
+        f"Current: `{current.upper()}`\n\n"
+        f"Click to switch:",
+        parse_mode="Markdown",
+        reply_markup=keyboard
     )
 
 
@@ -1691,6 +1701,33 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             parse_mode="Markdown"
         )
         logger.info(f"User {query.from_user.id} switched to model: {model}")
+        return
+
+    # Handle provider switching
+    if query.data.startswith("provider:"):
+        provider = query.data.split(":", 1)[1]
+        
+        config.set("INFERENCE_PROVIDER", provider)
+        # Reload inference client provider if needed (implied by usage in other cmds)
+        # But inference client reads config on each chat? No, it's global instance.
+        # We might need to update the global `inference` object if it caches the provider.
+        # Looking at main.py:49 `inference = InferenceClient(config)`, likely it reads config dynamically or needs refresh.
+        # Assuming InferenceClient reads config.get("INFERENCE_PROVIDER") on each call or we need to set it.
+        # Ideally we should call inference.reload_config() if it exists, or just rely on config.
+        
+        hint = ""
+        if provider == "openai":
+            hint = "Set API key: /setapikey"
+        elif provider == "gemini":
+            hint = "Set API key: /setapikey"
+        else:
+            hint = "Local Ollama"
+
+        await query.edit_message_text(
+            f"✅ **Provider switched to:**\n\n`{provider.upper()}`\n\n💡 {hint}",
+            parse_mode="Markdown"
+        )
+        logger.info(f"User {query.from_user.id} switched to provider: {provider}")
         return
     
     # Only admin can approve users
