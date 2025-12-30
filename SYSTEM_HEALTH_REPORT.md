@@ -2,15 +2,12 @@
 
 ## 🚦 Overall Status: **STABLE**
 
-| Component | FQDN | Status | Note |
-|-----------|------|--------|------|
-| **AI Telegram Bot** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | Active & Running |
-| **Ollama** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | Llama 3.2 ready |
-| **n8n Automation** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | Docker container active |
-| **Chrome Headless** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | Docker container active |
-| **ACFS Database** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | Up for 47+ hours |
-| **Antigravity Agent** | `macbook-air.tail5e8a72.ts.net` | ✅ UP | Main controller functional |
-| **Nodriver Daemon** | `macbook-air.tail5e8a72.ts.net` | ✅ UP | Browser automation ready |
+| Node | FQDN | Status | Role | Note |
+|-----------|------|--------|------|------|
+| **Proxmox** | `pve.myth-rudd.ts.net` | ✅ UP | Hypervisor | **Updated (BIOS & PVE Latest)** |
+| **AI Workstation** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | AI & n8n | Active & Running |
+| **Ollama** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | AI Inference | Llama 3.2 ready |
+| **MacBook Air** | `macbook-air.tail5e8a72.ts.net` | ✅ UP | Control Plane | Main controller functional |
 
 ---
 
