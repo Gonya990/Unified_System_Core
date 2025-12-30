@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Unified System Architecture - Visual Report</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #network {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(45, 45, 45, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid #444;
+            transform: translateX(350px);
+            transition: transform 0.3s ease;
+        }
+
+        #info-panel.visible {
+            transform: translateX(0);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #4caf50;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 5px;
+        }
+
+        .status-online {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .status-offline {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .service-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn-close {
+            cursor: pointer;
+            float: right;
+            color: #aaa;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+
+<body>
+
+    <div id="network"></div>
+
+    <div id="info-panel">
+        <span class="btn-close" onclick="closePanel()">✖</span>
+        <h2 id="panel-title">Node Details</h2>
+        <div id="panel-content">Select a node to view details.</div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="dot" style="background: #4caf50;"></div>Active / Online
+        </div>
+        <div class="legend-item">
+            <div class="dot" style="background: #f44336;"></div>Offline / Error
+        </div>
+        <div class="legend-item">
+            <div class="dot" style="background: #2196f3;"></div>Gateway / Router
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // System Data - To be populated dynamically or static for now
+        const nodes = new vis.DataSet([
+            { id: 1, label: 'Igor-MacBook\n(Admin)', group: 'admin', title: 'Controller', status: 'Online' },
+            { id: 2, label: 'Unified-Core\n(Proxmox)', group: 'server', title: '192.168.1.100', status: 'Online' },
+            { id: 3, label: 'Igor-Gaming-1\n(WSL/Win)', group: 'compute', title: '192.168.1.139', status: 'Online' },
+            { id: 4, label: 'Smart\n(Home Assistant)', group: 'iot', title: '192.168.1.216', status: 'Online' },
+            { id: 5, label: 'Vasya-Gateway\n(FastAPI)', group: 'service', title: 'AI Gateway', status: 'Online' },
+            { id: 6, label: 'Ollama\n(Local AI)', group: 'service', title: 'Inference Engine', status: 'Online' },
+            { id: 7, label: 'Gemini API\n(Cloud)', group: 'cloud', title: 'Google Cloud', status: 'Online' },
+            { id: 8, label: 'Igor-Creator', shape: 'image', image: 'https://ui-avatars.com/api/?name=Igor+Creator&background=random', size: 40, group: 'user' }
+        ]);
+
+        const edges = new vis.DataSet([
+            { from: 8, to: 1, arrows: 'to', dashes: true, label: 'Control' },
+            { from: 1, to: 2, arrows: 'to', label: 'SSH' },
+            { from: 1, to: 3, arrows: 'to', label: 'SSH' },
+            { from: 1, to: 4, arrows: 'to', label: 'HTTP/SSH' },
+            { from: 2, to: 5, arrows: 'to', label: 'Hosts' },
+            { from: 5, to: 6, arrows: 'to', label: 'Local API' },
+            { from: 5, to: 7, arrows: 'to', label: 'Cloud API' },
+            { from: 3, to: 5, arrows: 'to', label: 'Load Balance' }
+        ]);
+
+        // Container
+        const container = document.getElementById('network');
+
+        // Data
+        const data = { nodes: nodes, edges: edges };
+
+        // Options
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 20,
+                font: { size: 14, color: '#ffffff' },
+                borderWidth: 2,
+                shadow: true
+            },
+            edges: {
+                width: 2,
+                color: { color: '#848484', highlight: '#4caf50' },
+                smooth: { type: 'continuous' }
+            },
+            groups: {
+                admin: { color: { background: '#9c27b0', border: '#7b1fa2' } },
+                server: { color: { background: '#2196f3', border: '#1976d2' } },
+                compute: { color: { background: '#ff9800', border: '#f57c00' } },
+                iot: { color: { background: '#4caf50', border: '#388e3c' } },
+                service: { shape: 'box', color: { background: '#3f51b5', border: '#303f9f' } },
+                cloud: { shape: 'cloud', color: { background: '#fff', border: '#ccc' }, font: { color: '#333' } },
+                user: { shape: 'circularImage' }
+            },
+            physics: {
+                stabilization: false,
+                barnesHut: { gravitationalConstant: -2000, springCreate: 0.04 }
+            },
+            interaction: { hover: true, tooltipDelay: 200 }
+        };
+
+        // Network
+        const network = new vis.Network(container, data, options);
+
+        // Node Details Data
+        const nodeDetails = {
+            1: { cpu: 'M1 Pro', ram: '16GB', services: ['Terminal', 'Browser', 'Agent'] },
+            2: { cpu: 'Ryzen 5 3600X', ram: '64GB', services: ['Proxmox VE', 'Docker', 'LXC Containers'] },
+            3: { cpu: 'Unknown', ram: 'Unknown', services: ['acfs-hub', 'n8n', 'chrome-headless'] },
+            4: { cpu: 'Rpi/NUC', ram: '4GB', services: ['Home Assistant', 'Zigbee2MQTT'] },
+            5: { cpu: 'vCPU', ram: '2GB', services: ['FastAPI Gateway', 'Redis'] },
+            6: { cpu: 'GPU', ram: 'VRAM', services: ['Llama3', 'Phi-3'] },
+            7: { cpu: 'Cloud', ram: 'Auto', services: ['Gemini 1.5 Pro', 'Gemini 1.5 Flash'] }
+        };
+
+        // Events
+        network.on("click", function (params) {
+            if (params.nodes.length > 0) {
+                const nodeId = params.nodes[0];
+                const info = nodeDetails[nodeId];
+                const node = nodes.get(nodeId);
+
+                document.getElementById('panel-title').innerText = node.label.replace('\n', ' ');
+
+                let content = `<p><span class="${node.status === 'Online' ? 'status-online' : 'status-offline'}">● ${node.status || 'Unknown'}</span></p>`;
+
+                if (info) {
+                    content += `<h3>Resources</h3>
+                            <div class="service-item"><span>CPU:</span> <span>${info.cpu}</span></div>
+                            <div class="service-item"><span>RAM:</span> <span>${info.ram}</span></div>
+                            <h3>Active Services</h3>
+                            <ul class="service-list">`;
+                    info.services.forEach(s => {
+                        content += `<li class="service-item"><span>${s}</span> <span style="color:#4caf50">✔</span></li>`;
+                    });
+                    content += `</ul>`;
+                }
+
+                document.getElementById('panel-content').innerHTML = content;
+                document.getElementById('info-panel').classList.add('visible');
+            } else {
+                closePanel();
+            }
+        });
+
+        function closePanel() {
+            document.getElementById('info-panel').classList.remove('visible');
+        }
+
+    </script>
+</body>
+
+</html>
