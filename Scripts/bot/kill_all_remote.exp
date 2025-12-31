@@ -1,0 +1,28 @@
+#!/usr/bin/expect
+set timeout 20
+set password "GarYk6550"
+
+puts "Stopping all remote bots..."
+
+# Windows
+spawn ssh -o StrictHostKeyChecking=no gonya@100.127.194.111 "taskkill /F /IM python.exe /T"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+
+# PVE
+spawn ssh -o StrictHostKeyChecking=no gonya@100.78.145.67 "sudo pkill -9 -f python"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+
+# WSL
+spawn ssh -o StrictHostKeyChecking=no gonya@100.78.144.50 "sudo pkill -9 -f python"
+expect {
+    "password:" { send "$password\r"; exp_continue }
+    eof
+}
+
+puts "All remote bots stopped."

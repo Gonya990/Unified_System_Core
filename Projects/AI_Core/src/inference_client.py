@@ -7,7 +7,10 @@ import logging
 from typing import Optional
 import aiohttp
 
-from .config_manager import ConfigManager
+try:
+    from .config_manager import ConfigManager
+except ImportError:
+    from config_manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 
