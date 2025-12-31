@@ -23,8 +23,15 @@ from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
 
+# Debugging
+print(f"DEBUG: CWD: {os.getcwd()}")
+print(f"DEBUG: ENV TOKEN: {os.environ.get('TELEGRAM_BOT_TOKEN')}")
+print(f"DEBUG: ENV KEY: {os.environ.get('TELEGRAM_BOT_TOKEN_KEY')}")
+
 # Configuration
 config = ConfigManager()
+print(f"DEBUG: CONFIG LOADED TOKEN: {config.get('TELEGRAM_BOT_TOKEN')}")
+
 inference = InferenceClient(config)
 db = UserContextDB()
 auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
