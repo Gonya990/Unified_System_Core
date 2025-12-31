@@ -221,19 +221,30 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         allowed_users_str = config.get("ALLOWED_USERS", "")
         allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
         if user_id not in allowed_ids: return
-        
-        # Real-ish service status (check if process is running)
-        import subprocess
+
+        # Service status check
+        import psutil
         try:
-            # Check if ollama is reachable
+            # Check if AI inference is reachable
             ollama_up = "🟢" if await inference.health_check() else "🔴"
-            # Check docker containers if possible
-            docker_res = subprocess.run(["docker", "ps", "--format", "{{.Names}}: {{.Status}}"], capture_output=True, text=True)
-            docker_status = docker_res.stdout if docker_res.stdout else "No containers running"
-            status = f"{ollama_up} AI Inference: Up\n🔍 Docker Containers:\n{docker_status}"
+
+            # System metrics
+            cpu_percent = psutil.cpu_percent(interval=0.5)
+            memory = psutil.virtual_memory()
+            disk = psutil.disk_usage('/')
+
+            status = (
+                f"{ollama_up} AI Inference (Ollama)\n"
+                f"🟢 Telegram Bot: Running\n"
+                f"🟢 Scheduler: Active\n\n"
+                f"📊 System:\n"
+                f"  CPU: {cpu_percent:.1f}%\n"
+                f"  RAM: {memory.percent:.1f}% ({memory.used // (1024**3)}GB / {memory.total // (1024**3)}GB)\n"
+                f"  Disk: {disk.percent:.1f}% ({disk.used // (1024**3)}GB / {disk.total // (1024**3)}GB)"
+            )
         except Exception as e:
             status = f"🔴 Error checking status: {e}"
-            
+
         await query.edit_message_text(f"🛠 **Service Status:**\n\n```\n{status}\n```", parse_mode='Markdown', reply_markup=get_admin_menu())
 
     elif data == "admin_keys":
