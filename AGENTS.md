@@ -2,9 +2,12 @@
 
 > Guidelines for AI agents working within the Unified System.
 
-**New agent?** Start with [`AGENT_ONBOARDING.md`](Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md) for integration guide.
+**New agent?** Start with
+[`AGENT_ONBOARDING.md`](Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md)
+for integration guide.
 
-**Agent Registry:** [`Agent_Context/agents/REGISTRY.md`](Agent_Context/agents/REGISTRY.md)
+**Agent Registry:**
+[`Agent_Context/agents/REGISTRY.md`](Agent_Context/agents/REGISTRY.md)
 
 ---
 
@@ -44,6 +47,7 @@ git push origin main
 ### Use Beads for Task Tracking
 
 **Beads** is the primary task management system. Use it for:
+
 - Multi-session work that needs persistence
 - Tasks with dependencies
 - Discovered work that emerges during implementation
@@ -101,7 +105,9 @@ After completing significant work, create `walkthrough.md` documenting:
 
 ## 3. Subagent Delegation
 
-> 💡 **Why Subagents?** Subagents run in separate context windows, saving tokens in the main conversation. Use them to offload work that doesn't need full session history.
+> 💡 **Why Subagents?** Subagents run in separate context windows, saving tokens
+> in the main conversation. Use them to offload work that doesn't need full
+> session history.
 
 ### When to Use Subagents
 
@@ -131,7 +137,8 @@ Stop when: <Clear termination condition>
 
 ## 4. Skill Creation
 
-> 💡 **Why Skills?** Skills reduce context by replacing inline explanations with stored procedures. A single `/workflow` command replaces 10+ tool calls.
+> 💡 **Why Skills?** Skills reduce context by replacing inline explanations with
+> stored procedures. A single `/workflow` command replaces 10+ tool calls.
 
 ### When to Create a Skill
 
@@ -234,9 +241,9 @@ Before starting work, check:
 
 | Workflow | Slash Command | When to Recommend |
 | --- | --- | --- |
-| Commit & Push | `/commit-push` | After completing any implementation, fix, or documentation update |
-| Update Progress | `/update-progress` | Before committing, or when switching tasks mid-session |
-| System Status | `/status` | When debugging connectivity or checking system health |
+| Commit & Push | `/commit-push` | After implementation, fix, or docs update |
+| Update Progress | `/update-progress` | Before committing or switching tasks |
+| System Status | `/status` | Connectivity or system health checks |
 
 ### Trigger Points — When to Suggest Workflows
 
@@ -244,7 +251,8 @@ Before starting work, check:
 > 🎯 *"Implementation complete. Ready to run `/commit-push` to save changes?"*
 
 **After Creating an Implementation Plan:**
-> 📋 *"Plan created. Proceed with implementation, or update progress with `/update-progress`?"*
+> 📋 *"Plan created. Proceed with implementation, or update progress with
+> `/update-progress`?"*
 
 **When User Says "implement" or "do it":**
 
@@ -252,10 +260,12 @@ Before starting work, check:
 2. Then prompt: *"Done! Run `/commit-push` to commit and push these changes?"*
 
 **Before Ending a Session:**
-> 💾 *"Before we wrap up, should I run `/update-progress` to document current state?"*
+> 💾 *"Before we wrap up, should I run `/update-progress` to document
+> current state?"*
 
 **After Multiple File Changes:**
-> 📦 *"Several files modified. Run `/update-progress` to stage and review before committing?"*
+> 📦 *"Several files modified. Run `/update-progress` to stage and review
+> before committing?"*
 
 ### Proactive Recommendations
 
@@ -273,7 +283,8 @@ Always suggest the relevant workflow when:
 
 ### Use Skills to Minimize Context
 
-**Rule:** If a task can be done by a skill/script, use it instead of inline commands.
+**Rule:** If a task can be done by a skill/script, use it instead of
+inline commands.
 
 | Instead of... | Use Skill |
 | --- | --- |
@@ -294,8 +305,8 @@ Always suggest the relevant workflow when:
 
 | Scenario | Why Delegate |
 | --- | --- |
-| Browser automation (clicking, scraping) | Subagent has specialized browser tools |
-| Long-running commands (builds, downloads) | Frees main context for other work |
+| Browser automation | Subagent has specialized browser tools |
+| Long-running commands | Frees main context for other work |
 | Parallel verification tasks | Test multiple things simultaneously |
 | Visual verification (screenshots) | Subagent can capture and report |
 
@@ -311,7 +322,9 @@ Always suggest the relevant workflow when:
 **Example - Offload Browser Login Check:**
 
 ```text
-Task: Navigate to http://100.88.65.71:8123 and verify Home Assistant login page loads
+Task: Navigate to http://100.88.65.71:8123 and verify Home Assistant login
+page loads
+
 Context: Home Assistant on NODE-01
 Return: Screenshot + confirmation of page title
 Stop when: Page loaded or error after 30s
@@ -330,16 +343,18 @@ Stop when: Page loaded or error after 30s
 
 | Type | Location | When to Use |
 | --- | --- | --- |
-| Workflows (agent guidance) | `.agent/workflows/*.md` | Repeatable multi-step procedures |
+| Workflows | `.agent/workflows/*.md` | Repeatable multi-step procedures |
+
 | Shell scripts | `Scripts/*.sh` | System automation, deployments |
 | Expect scripts | `Scripts/*.exp` | Interactive SSH/CLI automation |
-| Python utilities | `Agent_Context/Knowledge_Base/Scripts/*.py` | Data processing, API calls |
+| Python Utils | `.../Scripts/*.py` | Data processing, API calls |
 
 ---
 
 ## 10. Multi-Agent Coordination
 
-> ⚠️ **Important:** Multiple agents may operate in this workspace simultaneously. Follow these rules to avoid conflicts and data loss.
+> ⚠️ **Important:** Multiple agents may operate in this workspace
+> simultaneously. Follow these rules to avoid conflicts and data loss.
 
 ### File Safety
 
@@ -354,14 +369,16 @@ Stop when: Page loaded or error after 30s
 | ❌ Dangerous | ✅ Safe Alternative |
 | --- | --- |
 | `echo "..." > file` (overwrites) | `echo "..." >> file` (appends) |
-| `write_to_file` with Overwrite=true | `replace_file_content` with targeted changes |
+| `write_to_file` Overwrite=true | `replace_file_content` targeted edits |
+
 | `git reset --hard` | Ask user first, never auto-run |
 | `git stash` (hides others' work) | `WIP: commit` instead |
 | `rm -rf` on shared folders | Only delete files you created |
 
 ### Git Coordination
 
-> ⚠️ **NEVER use `git stash`** in multi-agent environments. Stash is local-only and can cause other agents to lose access to uncommitted work.
+> ⚠️ **NEVER use `git stash`** in multi-agent environments. Stash is local-only
+> and can cause other agents to lose access to uncommitted work.
 
 **Safe Git Workflow:**
 
@@ -453,7 +470,8 @@ lsof -i :3000 || npm run dev
 1. **Don't overwrite** — your changes aren't more important
 2. **Read their changes** — maybe they already did what you planned
 3. **Append, don't replace** — add your section/changes below theirs
-4. **Notify user** — "I see recent changes from another session. Proceed or review first?"
+4. **Notify user** — "I see recent changes from another session. Proceed or
+   review first?"
 
 ### Workflow Lock Flags
 
@@ -480,13 +498,15 @@ fi
 
 ## 11. Browser Automation (Nodriver)
 
-> ⚠️ **PRIORITY RULE:** Always use **nodriver's `ndc` CLI** for browser automation instead of the built-in `browser_subagent` tool.
+> ⚠️ **PRIORITY RULE:** Always use **nodriver's `ndc` CLI** for browser
+> automation instead of the built-in `browser_subagent` tool.
 
 ### Why Nodriver Over Built-in Browser
 
 | Aspect | Nodriver (ndc) | Built-in browser_subagent |
 | --- | --- | --- |
-| Token efficiency | ✅ Minimal - JSON responses | ❌ High - DOM parsing overhead |
+| Token efficiency | ✅ Minimal - JSON | ❌ High - DOM parsing overhead |
+
 | Control | ✅ Persistent browser session | ❌ Ephemeral sessions |
 | Speed | ✅ Direct Unix socket | ❌ Subagent overhead |
 | Context | ✅ Same Chrome instance | ❌ Separate context each time |
@@ -577,9 +597,10 @@ The `browser_subagent` tool MUST be used only in these LIMITED scenarios:
 | Scenario | Reason |
 | --- | --- |
 | **Video recording needed** | User needs a WebP recording of browser actions |
-| **Nodriver unavailable** | Chrome or daemon cannot start (port conflict, permissions) |
+| **Nodriver fail** | Chrome or daemon cannot start (port/permissions) |
+
 | **User explicitly requests** | User specifically asks for built-in browser |
-| **Complex visual interaction** | Real-time visual feedback needed that ndc cannot provide |
+| **Visual Interaction** | Feedback needed that ndc cannot provide |
 
 ### ⚠️ MANDATORY Fallback Procedure
 
@@ -609,27 +630,38 @@ pkill -f chrome
 
 ## 12. Merge Preparedness
 
-> ⚠️ **Goal:** Ensure smooth synchronization between agents and minimize merge conflicts through proactive coordination.
+> ⚠️ **Goal:** Ensure smooth synchronization between agents and minimize merge
+> conflicts through proactive coordination.
 
 ### Intent Signaling
 
-1. **Announce Major Changes**: Before starting a task that affects >5 files or core architecture, send a message via `mcp_agent_mail` (or update `Shared/intent.log` if mail is offline) describing your scope.
-2. **Check for Intentions**: Before starting your own task, check for messages or logs from other agents to see if they are touching the same files.
+1. **Announce Major Changes**: Before starting a task that affects >5 files or
+   core architecture, send a message via `mcp_agent_mail` (or update
+   `Shared/intent.log` if mail is offline) describing your scope.
+2. **Check for Intentions**: Before starting your own task, check for messages
+   or logs from other agents to see if they are touching the same files.
 
 ### File Reservations (Leases)
 
-1. **Acquire Leases**: For critical files (config, core logic), use `mcp_agent_mail` to acquire a lease.
-2. **Respect Leases**: If a file has an active lease from another agent, DO NOT edit it unless you coordinate via messaging or wait for the lease to expire.
+1. **Acquire Leases**: For critical files (config, core logic), use
+   `mcp_agent_mail` to acquire a lease.
+2. **Respect Leases**: If a file has an active lease from another agent, DO NOT
+   edit it unless you coordinate via messaging or wait for the lease to expire.
 
 ### Pre-Merge Quality Gates (UBS)
 
-1. **UBS Mandatory**: Run `ubs <changed-files>` before EVERY commit. If UBS fails, you are NOT prepared to merge/commit.
-2. **No Syntax Errors**: Never push code that breaks the build or has obvious syntax errors.
+1. **UBS Mandatory**: Run `ubs <changed-files>` before EVERY commit. If UBS
+   fails, you are NOT prepared to merge/commit.
+2. **No Syntax Errors**: Never push code that breaks the build or has obvious
+   syntax errors.
 
 ### Clean Commit History
 
-1. **Squash WIP**: When moving from "Working" to "Done", prefer squashing your `WIP:` commits into a single clean `feat:` or `fix:` commit.
-2. **Pull Before Merge**: Always `git pull --rebase` immediately before pushing to ensure you are merging on top of the latest state.
+1. **Squash WIP**: When moving from "Working" to "Done", prefer squashing your
+   `WIP:` commits into a single clean `feat:` or `fix:` commit.
+2. **Pull Before Merge**: Always `git pull --rebase` immediately before pushing
+   to ensure you are merging on top of the latest state.
+
 3. **Preparedness Check**: Before the final push, ask yourself:
    - Have I run UBS?
    - Have I notified other agents (if task is shared)?
@@ -641,39 +673,55 @@ pkill -f chrome
 
 ### Service Centralization
 
-1. **The Hub**: The `mcp_agent_mail` server and Beads task board MUST be hosted on the **Service Node** (`100.88.65.71`).
-2. **Unified Access**: All agents connect to this single hub via Tailscale. This ensures that the message "source of truth" is never split across nodes.
+1. **The Hub**: The `mcp_agent_mail` server and Beads task board MUST be
+   hosted on the **Service Node** (`100.88.65.71`).
+2. **Unified Access**: All agents connect to this single hub via Tailscale.
+   This ensures that the message "source of truth" is never split across nodes.
 
 ### New Service Deployments
 
 **Default host for new services:** `igor-gaming-1`
 
-When deploying new services (AI Telegram Bot, new automation tools, etc.), use `igor-gaming-1` as the default target unless there's a specific reason to use another host.
+When deploying new services (AI Telegram Bot, new tools, etc.), use
+`igor-gaming-1` as the default target unless there's a specific reason.
 
 ### Cross-Agent Communication (ACP Compliance)
 
 1. **Mutual Messaging**:
-   - **Antigravity** and **Kostya-Agent** have permanent permission to send/receive messages to each other's identities via the shared mesh.
-   - All communication should aim for **ACP (Agent Communication Protocol)** interoperability: structured payloads, clear intent signaling, and asynchronous delivery.
-2. **Mailbox Access**: Agents MUST be configured to check the **Service Node** (`100.88.65.71`) mailbox regularly to ensure coordination even if their primary workstation is offline.
-3. **Task Visibility**: The Beads task board on the Service Node is the shared source of truth for current project status.
+   - **Antigravity** and **Kostya-Agent** have permanent permission to send/
+     receive messages to each other via the shared mesh.
+   - All communication should aim for **ACP** (Agent Communication Protocol)
+     interoperability: structured payloads, clear intent, and async delivery.
+2. **Mailbox Access**: Agents MUST check the **Service Node** (`100.88.65.71`)
+   mailbox regularly to ensure coordination even if workstation is offline.
+3. **Task Visibility**: The Beads task board on the Service Node is the shared
+   source of truth for current project status.
 
 ### Emergency Handoff
 
-1. **State Persistence**: All critical session state (WIP commits, Beads issues) must be pushed to a shared remote or host (`Shared/`) to ensure the other agent can take over if one node goes dark.
+1. **State Persistence**: All critical session state (WIP commits, Beads) must
+   be pushed to a shared remote or host (`Shared/`) to ensure the other agent
+   can take over if one node goes dark.
 
 ---
 
-*These rules ensure consistency across all agents operating in the Unified System.*
+*These rules ensure consistency across all agents operating in the
+Unified System.*
 
 ````markdown
 ## UBS Quick Reference for AI Agents
 
-UBS stands for "Ultimate Bug Scanner": **The AI Coding Agent's Secret Weapon: Flagging Likely Bugs for Fixing Early On**
+UBS stands for "Ultimate Bug Scanner": **The AI Coding Agent's Secret Weapon:
+Flagging Likely Bugs for Fixing Early On**
 
-**Install:** `curl -sSL https://raw.githubusercontent.com/Dicklesworthstone/ultimate_bug_scanner/main/install.sh | bash`
 
-**Golden Rule:** `ubs <changed-files>` before every commit. Exit 0 = safe. Exit >0 = fix & re-run.
+**Install:** `curl -sSL https://raw.githubusercontent.com/Dicklesworthstone/\
+ultimate_bug_scanner/main/install.sh | bash`
+
+
+**Golden Rule:** `ubs <changed-files>` before every commit. Exit 0 = safe.
+Exit >0 = fix & re-run.
+
 
 **Commands:**
 ```bash
@@ -683,7 +731,8 @@ ubs --only=js,python src/               # Language filter (3-5x faster)
 ubs --ci --fail-on-warning .            # CI mode — before PR
 ubs --help                              # Full command reference
 ubs sessions --entries 1                # Tail the latest install session log
-ubs .                                   # Whole project (ignores things like .venv and node_modules automatically)
+ubs .                                   # Whole project (ignores .venv, etc.)
+
 ```
 
 **Output Format:**
@@ -703,10 +752,14 @@ Parse: `file:line:col` → location | 💡 → how to fix | Exit 0/1 → pass/fa
 5. Re-run `ubs <file>` → exit 0
 6. Commit
 
-**Speed Critical:** Scope to changed files. `ubs src/file.ts` (< 1s) vs `ubs .` (30s). Never full scan for small edits.
+**Speed Critical:** Scope to changed files. `ubs src/file.ts` (< 1s) vs
+`ubs .` (30s). Never full scan for small edits.
+
 
 **Bug Severity:**
-- **Critical** (always fix): Null safety, XSS/injection, async/await, memory leaks
+- **Critical** (always fix): Null safety, XSS/injection, async/await,
+  memory leaks
+
 - **Important** (production): Type narrowing, division-by-zero, resource leaks
 - **Contextual** (judgment): TODO/FIXME, console logs
 
@@ -718,11 +771,14 @@ Parse: `file:line:col` → location | 💡 → how to fix | Exit 0/1 → pass/fa
 
 ## Landing the Plane (Session Completion)
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+**When ending a work session**, you MUST complete ALL steps below. Work is NOT
+complete until `git push` succeeds.
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **File issues for remaining work** - Create issues for anything that needs
+   follow-up
+
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
@@ -750,13 +806,16 @@ Parse: `file:line:col` → location | 💡 → how to fix | Exit 0/1 → pass/fa
 **Location:** `Agent_Context/Knowledge_Base/OpenAI_Conversations/`
 
 **Description:**
+
 - **English:** Historical ChatGPT conversations imported from OpenAI export
-- **Russian:** Исторические разговоры ChatGPT, импортированные из экспорта OpenAI
+- **Russian:** Исторические разговоры ChatGPT, импортированные из экспорта
+  OpenAI
 
 **Last Updated:** 2025-12-30 14:42:43
 
 **Contents:** 50 conversation files
 
-**Purpose:** Reference material for continuity, context, and learning from past interactions.
+**Purpose:** Reference material for continuity, context, and learning from
+past interactions.
 
 ---
