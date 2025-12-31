@@ -33,8 +33,8 @@ ENV_PATH = BASE_DIR / ".env"
 
 # Load Env
 load_dotenv(ENV_PATH)
-# Also try to load from Windows_AI_Core locations if on server
-load_dotenv(BASE_DIR.parent.parent / "Windows_AI_Core" / ".env")
+# Also try to load from Projects/AI_Core locations if on server
+load_dotenv(BASE_DIR.parent.parent / "Projects" / "AI_Core" / ".env")
 
 
 async def load_config():

@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 # Add project root to path
-sys.path.append("/home/gonya/Documents/Unified_System/Windows_AI_Core")
+sys.path.append("/home/gonya/Documents/Unified_System/Projects/AI_Core")
 
 from src.web_search import WebSearch
 from src.inference_client import InferenceClient

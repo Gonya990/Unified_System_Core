@@ -969,8 +969,8 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                     zipf.write(file)
                     found = True
                 # Try config/ or root/
-                elif os.path.exists(f"Windows_AI_Core/{file}"):
-                    zipf.write(f"Windows_AI_Core/{file}", arcname=file)
+                elif os.path.exists(f"Projects/AI_Core/{file}"):
+                    zipf.write(f"Projects/AI_Core/{file}", arcname=file)
                     found = True
                 elif os.path.exists(f"config/{file}"):
                      zipf.write(f"config/{file}", arcname=file)
@@ -1073,7 +1073,7 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         # 2. Pip Install
         venv_pip = f"{project_dir}/venv/bin/pip"
         proc = await asyncio.create_subprocess_shell(
-            f"{venv_pip} install -r {project_dir}/Windows_AI_Core/requirements.txt",
+            f"{venv_pip} install -r {project_dir}/Projects/AI_Core/requirements.txt",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )

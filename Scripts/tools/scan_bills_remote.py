@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # Add project root to path
-sys.path.append("/home/gonya/Documents/Unified_System/Windows_AI_Core")
+sys.path.append("/home/gonya/Documents/Unified_System/Projects/AI_Core")
 
 from src.gmail_client import GmailClient
 from src.config_manager import ConfigManager

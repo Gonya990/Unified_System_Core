@@ -54,7 +54,7 @@ check_dir() {
 echo "1. Хост: $(hostname)"
 echo "2. Проверка рабочих зон:"
 
-check_dir "$SYSTEM_ROOT/Windows_AI_Core" "Windows AI Core"
+check_dir "$SYSTEM_ROOT/Projects/AI_Core" "AI Core (Unified)"
 check_dir "$SYSTEM_ROOT/Home_Assistant_Config" "Home Assistant"
 check_dir "$SYSTEM_ROOT/Sandbox" "Песочница"
 
