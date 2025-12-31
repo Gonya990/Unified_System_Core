@@ -4,10 +4,10 @@
 
 | Node | FQDN | Status | Role | Latency |
 |-----------|------|--------|------|---------|
-| **Proxmox** | `pve-antigravity-1.tail5e8a72.ts.net` | ✅ UP | Hypervisor | ~5s (slow) |
-| **AI Workstation** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | AI & n8n | 7ms |
-| **Ollama** | `igor-gaming-1.tail5e8a72.ts.net` | ✅ UP | AI Inference | Active |
-| **MacBook Air** | `macbook-air.tail5e8a72.ts.net` | ✅ UP | Control Plane | Local |
+| **Proxmox** | `pve-antigravity-1` | ✅ UP | Hypervisor | ~5s |
+| **AI Workstation** | `igor-gaming-1` | ✅ UP | AI & n8n | 7ms |
+| **Ollama** | `igor-gaming-1` | ✅ UP | AI Inference | Active |
+| **MacBook Air** | `macbook-air` | ✅ UP | Control Plane | Local |
 | **Smart Home** | `smart.tail5e8a72.ts.net` | ✅ UP | Home Assistant | 12ms |
 | **Cloud Hub** | `unified-home-core-cloud` | ✅ UP | LLM Council | 37ms |
 
