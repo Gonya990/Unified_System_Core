@@ -12,7 +12,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, BotCommand
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.constants import ChatAction
 from config_manager import ConfigManager
@@ -77,11 +77,13 @@ def get_calendar_client(user_id: int) -> Optional[CalendarClient]:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat_id = update.effective_chat.id
-    
+
+    logger.info(f"[CMD] /start from {user.id} (@{user.username})")
+
     # 1. Register User & Update Interaction
     db.add_user(user.id, user.username, user.full_name)
     db.update_last_interaction(user.id)
-    logger.info(f"User {user.id} ({user.username}) started the bot.")
+    logger.info(f"[CMD] User {user.id} registered/updated in DB")
 
     # 2. Check Auth/Approval
     if not db.is_approved(user.id):
@@ -202,7 +204,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_memory_context(query, context)
         
     elif data == "settings_cb":
-        await query.edit_message_text("⚙️ **Settings**\n\nNotifications: ON\nProactive Nudge: ON (3 days)\nAI Model: " + bot_config.MODEL_NAME, parse_mode='Markdown')
+        await query.edit_message_text("⚙️ **Settings**\n\nNotifications: ON\nProactive Nudge: ON (3 days)\nAI Model: " + config.get("MODEL_NAME", "unknown"), parse_mode='Markdown')
 
     # Admin Handlers
     elif data == "admin_services":
@@ -290,12 +292,17 @@ async def show_advanced_help(update_or_query, context, edit=False):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+    user_text = update.message.text if update.message else None
+    username = update.effective_user.username if update.effective_user else "unknown"
+
+    logger.info(f"[MESSAGE] Received from {user_id} (@{username}): {user_text}")
+
     if not db.is_approved(user_id):
+        logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
         return
 
     db.update_last_interaction(user_id)
-    user_text = update.message.text
-    logger.info(f"Query from {user_id}: {user_text}")
+    logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
     
     if user_text.strip().startswith("4/"):
         await update.message.reply_text("🔄 Verifying code...")
@@ -476,20 +483,29 @@ async def digest_chat_memory(user_id: int):
         logger.error(f"Failed to digest memory JSON: {e}")
 
 async def query_ollama_with_context(user_id: int, prompt: str) -> str:
+    logger.info(f"[AI] Querying AI for user {user_id}, prompt length: {len(prompt)}")
+
     # 1. Get Long-term memories
     memories = db.get_memories(user_id, limit=5)
     mem_text = "\n".join([f"- {m['fact_full']}" for m in memories])
-    
+    logger.debug(f"[AI] Found {len(memories)} memories for user {user_id}")
+
     # 2. Get short-term history
     history = conv_manager.get_context_messages(user_id, limit=10)
-    
+    logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
+
     system_prompt = (
         "You are a helpful personal assistant. Here is what you know about the user:\n"
         + mem_text + "\n\nProvide short, helpful and professional answers."
     )
-    
-    response_text, _ = await inference.chat(history + [{"role": "user", "content": prompt}], system_prompt=system_prompt)
-    return response_text
+
+    try:
+        response_text, _ = await inference.chat(history + [{"role": "user", "content": prompt}], system_prompt=system_prompt)
+        logger.info(f"[AI] Got response for user {user_id}, length: {len(response_text)}")
+        return response_text
+    except Exception as e:
+        logger.error(f"[AI] Error querying AI for user {user_id}: {e}")
+        raise
 
 async def query_ollama(prompt: str, system: str = None) -> str:
     """Legacy wrapper, now uses InferenceClient."""
@@ -498,9 +514,61 @@ async def query_ollama(prompt: str, system: str = None) -> str:
     return response
 
 async def post_init(application: Application) -> None:
+    # Register bot commands in Telegram menu
+    commands = [
+        BotCommand("start", "Start the bot / Main menu"),
+        BotCommand("help", "Show help and available commands"),
+        BotCommand("brief", "Get your daily calendar brief"),
+        BotCommand("memory", "View your saved memories"),
+        BotCommand("newtask", "Create a new task or event"),
+    ]
+    await application.bot.set_my_commands(commands)
+    logger.info("Bot commands registered.")
+
     scheduler = DailyScheduler(application, db, inference=inference)
     asyncio.create_task(scheduler.start())
     logger.info("DailyScheduler background task started via post_init.")
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /help command."""
+    logger.info(f"[CMD] /help from {update.effective_user.id}")
+    await show_advanced_help(update, context)
+
+async def brief_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /brief command."""
+    user_id = update.effective_user.id
+    logger.info(f"[CMD] /brief from {user_id}")
+    if not db.is_approved(user_id):
+        logger.warning(f"[CMD] /brief denied - user {user_id} not approved")
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+    db.update_last_interaction(user_id)
+    await show_daily_brief(update, context)
+
+async def memory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /memory command."""
+    user_id = update.effective_user.id
+    logger.info(f"[CMD] /memory from {user_id}")
+    if not db.is_approved(user_id):
+        logger.warning(f"[CMD] /memory denied - user {user_id} not approved")
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+    db.update_last_interaction(user_id)
+    await show_memory_context(update, context)
+
+async def newtask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /newtask command."""
+    user_id = update.effective_user.id
+    logger.info(f"[CMD] /newtask from {user_id}")
+    if not db.is_approved(user_id):
+        logger.warning(f"[CMD] /newtask denied - user {user_id} not approved")
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+    db.update_last_interaction(user_id)
+    await update.message.reply_text(
+        "📝 What would you like to schedule?\n\n"
+        "Example: 'Meeting with Sara tomorrow at 10am'"
+    )
 
 async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -542,20 +610,50 @@ async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log errors caused by updates."""
+    logger.error(f"[ERROR] Exception while handling an update: {context.error}")
+    import traceback
+    tb_str = ''.join(traceback.format_exception(None, context.error, context.error.__traceback__))
+    logger.error(f"[ERROR] Traceback:\n{tb_str}")
+
+    # Try to notify the user
+    if update and hasattr(update, 'effective_chat') and update.effective_chat:
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="❌ An error occurred while processing your request. Please try again."
+            )
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to send error message to user: {e}")
+
 def main():
     token = config.get("TELEGRAM_BOT_TOKEN")
     if not token:
+        logger.error("[STARTUP] TELEGRAM_BOT_TOKEN not set!")
         print("Error: TELEGRAM_BOT_TOKEN not set!")
         return
 
+    logger.info("[STARTUP] Building application...")
     application = Application.builder().token(token).post_init(post_init).build()
-    
+
+    # Register error handler
+    application.add_error_handler(error_handler)
+    logger.info("[STARTUP] Error handler registered")
+
+    # Register command handlers
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CommandHandler('brief', brief_command))
+    application.add_handler(CommandHandler('memory', memory_command))
+    application.add_handler(CommandHandler('newtask', newtask_command))
     application.add_handler(CommandHandler('set_key', set_key))
     application.add_handler(CommandHandler('approve', approve_user))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
+    logger.info("[STARTUP] All handlers registered")
+
+    logger.info("[STARTUP] Starting polling...")
     print(f'Bot V2 (AI_Core) is running...')
     application.run_polling(drop_pending_updates=True)
 
