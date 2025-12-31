@@ -16,6 +16,7 @@
 ## 🐳 Docker Services Status
 
 ### igor-gaming-1 (WSL)
+
 | Container | Status | Uptime |
 |-----------|--------|--------|
 | ai_telegram_bot | ✅ Running | Active |
@@ -25,6 +26,7 @@
 | n8n | ✅ Running | 2 days |
 
 ### Smart (Home Assistant Server)
+
 | Container | Status | Uptime |
 |-----------|--------|--------|
 | homeassistant | ✅ Running | 2 days |
@@ -47,6 +49,7 @@
 | Home Assistant | ✅ OK | HTTP 200 |
 
 ### Available Ollama Models
+
 - qwen3:4b (4.0B, Q4_K_M)
 - llama3:8b (8.0B, Q4_0)
 - qwen2:0.5b (494M, Q4_0)
@@ -73,15 +76,24 @@
 2. ✅ **datetime.utcnow() deprecation** - Fixed in logging_config.py
 3. ✅ **SSH Config** - Added root access for smart, pve-antigravity-1, pve
 4. ✅ **ChatGPT Integration** - Ran sync automation
-5. ✅ **Proxmox Monitoring** - Created monitoring script for N8N
+5. ✅ **Docker Bot Rebuild** - Telegram bot rebuilt with fixes
 
 ---
 
-## ⚠️ Remaining Actions
+## 📊 Existing Monitoring
 
-1. [ ] **Tailscale Cleanup** - Remove rocinante (offline 7+ days) from Tailscale admin
-2. [ ] **Lenovo Tablet** - Check battery/Wi-Fi when available
-3. [ ] **N8N Workflow** - Configure scheduled Proxmox monitoring
+- **metrics_collector.py** - Already handles GCP + Telegram alerts for igor-gaming-1
+- **Telegram Bot** - `/status` command for manual checks
+- **Proxmox built-in** - Native monitoring and email alerts
+
+> N8N monitoring deemed **not necessary** - existing solutions sufficient.
+
+---
+
+## ℹ️ Notes
+
+- **rocinante** - Admin node #2, keep in Tailscale
+- **Lenovo Tablet** - Sleep mode, normal behavior
 
 ---
 
