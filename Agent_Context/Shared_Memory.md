@@ -11,13 +11,17 @@
 
 - **Status:** In Progress
 - **Key Milestones:**
-  - [x] US-001: Google Auth & Onboarding Research
-  - [x] US-002: Calendar Integration Structure
-  - [/] US-005: AI Memory Integration (ConversationManager) - *Implementation Pending*
-  - [ ] US-007: Admin Panel (Docker/API Keys)
+  - [x] US-001: Google Auth & Onboarding
+  - [x] US-002: Calendar Integration
+  - [x] US-003: Smart Event Context (Contextual Daily Brief)
+  - [x] US-004: Proactive Nudge (AI-powered re-engagement)
+  - [x] US-005: AI Memory (Fact Extraction & Context Injection)
+  - [x] US-007: Service Management (Docker/Ollama Status)
+  - [x] US-008: Admin Panel (API Key Management)
 - **Recent Updates:**
-  - Researched Google Cloud OAuth limits and Security Bundles.
-  - Integrated OpenAI historical data into the local knowledge base.
+  - Refactored `ai_telegram_bot_v2.py` to use a unified `InferenceClient`.
+  - Added contextual nudges referencing user memories.
+  - Implemented secure API key management via Telegram.
 
 ### 2. OpenAI Data Integration
 
@@ -52,6 +56,6 @@
 
 ## 📝 Next Actions for Antigravity | Следующие действия для Antigravity
 
-1. Implement `ConversationManager` to store chat history in JSON.
-2. Implement `UserContextDB` for storing facts and memory (SQLite).
-3. Set up Admin commands for API key management directly from Telegram.
+1. Implement US-010: More rich interactive UX (choice buttons for event conflicts, etc.).
+2. Refine "Memory Digest" logic to be more frequent and accurate.
+3. Test the Google Calendar event creation flow with real user input.

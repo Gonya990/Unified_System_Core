@@ -10,9 +10,10 @@ import json
 logger = logging.getLogger(__name__)
 
 class DailyScheduler:
-    def __init__(self, application: Application, db: UserContextDB):
+    def __init__(self, application: Application, db: UserContextDB, inference=None):
         self.application = application
         self.db = db
+        self.inference = inference
         self.running = False
 
     async def start(self):
@@ -37,16 +38,29 @@ class DailyScheduler:
         for user in inactive_users:
             try:
                 user_id = user['user_id']
-                # Don't nudge if we nudged recently (store nudge state in KV or another table)
-                # For now, just a simple nudge
-                nudge_text = (
-                    f"Hi {user['full_name']}! 👋 We haven't spoken in a few days. "
-                    "Ready to resume our work or check your calendar?"
-                )
+                
+                # Get some context for a better nudge
+                memories = self.db.get_memories(user_id, limit=3)
+                mem_text = "\n".join([f"- {m['fact_full']}" for m in memories])
+                
+                if self.inference and mem_text:
+                    prompt = (
+                        f"The user {user['full_name']} hasn't interacted for 3 days. "
+                        f"Here is what we know about them:\n{mem_text}\n\n"
+                        "Generate a short, friendly nudge (1-2 sentences) to re-engage them, "
+                        "referencing one of the facts if possible. Be professional yet warm."
+                    )
+                    nudge_text, _ = await self.inference.chat([{"role": "user", "content": prompt}], system_prompt="You are a helpful assistant.")
+                else:
+                    nudge_text = (
+                        f"Hi {user['full_name']}! 👋 We haven't spoken in a few days. "
+                        "Ready to resume our work or check your calendar?"
+                    )
+
                 await self.application.bot.send_message(chat_id=user_id, text=nudge_text)
                 # Update last interaction so we don't spam
                 self.db.update_last_interaction(user_id)
-                logger.info(f"Sent nudge to user {user_id}")
+                logger.info(f"Sent contextual nudge to user {user_id}")
             except Exception as e:
                 logger.error(f"Failed to nudge user {user['user_id']}: {e}")
 
