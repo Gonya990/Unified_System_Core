@@ -17,7 +17,7 @@
     
     <!-- Для работы с изображениями -->
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
 
 </Project>
