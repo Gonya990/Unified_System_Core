@@ -133,3 +133,12 @@ class UserContextDB:
             cursor = conn.cursor()
             cursor.execute("UPDATE users SET is_approved = ? WHERE user_id = ?", (1 if approve else 0, user_id))
             conn.commit()
+
+    def add_event_context(self, user_id: int, event_title: str, context_description: str, event_time: datetime):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO event_contexts (user_id, event_title, context_description, event_time, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, event_title, context_description, event_time, datetime.now()))
+            conn.commit()
