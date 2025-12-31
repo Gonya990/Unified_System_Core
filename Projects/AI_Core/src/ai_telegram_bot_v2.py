@@ -1,10 +1,17 @@
 import logging
 import os
+import sys
 import asyncio
 import aiohttp
 import json
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
+
+# Ensure we can import sibling modules irrespective of execution context
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.constants import ChatAction
