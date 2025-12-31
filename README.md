@@ -29,13 +29,13 @@ graph LR
     D --> G[🏠 Home Assistant]
 ```
 
-| Node | FQDN (MagicDNS) | IP (Tailscale) | Role |
+| Node | MagicDNS | IP (TS) | Role |
 | --- | --- | --- | --- |
-| **igor-gaming-1** | `igor-gaming-1.tail5e8a72.ts.net` | `100.78.144.50` | Primary AI workstation (WSL2) |
-| **igor-gaming** | `igor-gaming.tail5e8a72.ts.net` | `100.127.194.111` | Projects/AI_Core (GPU inference) |
-| **MacBook-Air** | `macbook-air.tail5e8a72.ts.net` | `100.93.121.47` | Admin & development |
-| **pve** | `pve.myth-rudd.ts.net` | `100.78.145.67` | Proxmox hypervisor |
-| **iphone-15-pro** | `iphone-15-pro.tail5e8a72.ts.net` | `100.86.233.87` | Mobile commander (Termius) |
+| **igor-gaming-1** | `igor-1...` | `100.78...` | Primary AI Workstation |
+| **igor-gaming** | `igor...` | `100.127...` | AI Core / GPU |
+| **MacBook-Air** | `mac...` | `100.93...` | Admin & Dev |
+| **pve** | `pve...` | `100.78.145.67` | Hypervisor |
+| **iphone-15** | `iph...` | `100.86...` | Mobile |
 
 ---
 

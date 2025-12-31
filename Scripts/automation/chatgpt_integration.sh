@@ -136,6 +136,13 @@ if [ -f "$SHARED_MEMORY" ]; then
     fi
 fi
 
+# 5. Autosave all other changes
+echo ""
+echo "💾 Running global autosave..."
+echo "💾 Запуск глобального автосохранения..."
+echo ""
+"$SCRIPT_DIR/autosave_changes.sh"
+
 # 5. Generate summary report
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
@@ -146,6 +153,7 @@ echo "✅ CV Change Detection: Active"
 echo "✅ GitHub Sync: Active"
 echo "✅ OpenAI Export Check: Active"
 echo "✅ Shared Memory Sync: Active"
+echo "✅ Global Autosave: Active"
 echo ""
 echo "📁 Monitored locations:"
 echo "   - Personal Profile: $PROFILE_DIR"
