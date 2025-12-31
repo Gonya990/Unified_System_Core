@@ -131,11 +131,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user_id)
 
     if data == "connect_google":
-        auth_url = auth_manager.get_auth_url()
+        auth_url = auth_manager.get_auth_url(user_id=user_id)
         if auth_url:
             await query.edit_message_text(
-                f"Please visit this link to authorize:\n{auth_url}\n\n"
-                "After authorizing, copy the code and send it here (starting with 4/)."
+                f"🔗 **Connect Google Calendar**\n\n"
+                f"1. Click this link:\n{auth_url}\n\n"
+                f"2. Authorize access to your calendar\n\n"
+                f"3. You'll be redirected to a page (it may show an error - that's OK!)\n\n"
+                f"4. Copy the `code=` value from the URL and paste it here.\n\n"
+                f"Example: if URL is `http://localhost:8085/oauth2callback?code=4/0ABC...` "
+                f"then paste: `4/0ABC...`",
+                parse_mode='Markdown'
             )
         else:
             await query.edit_message_text("❌ Error: `client_secret.json` is missing on the server. Please contact Admin.")
@@ -308,9 +314,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
     
+    # Handle OAuth code - can start with "4/" or be a full URL
+    auth_code = None
     if user_text.strip().startswith("4/"):
+        auth_code = user_text.strip()
+    elif "code=" in user_text:
+        # Extract code from URL like http://localhost:8085/oauth2callback?code=4/0ABC...
+        import re
+        match = re.search(r'code=([^&\s]+)', user_text)
+        if match:
+            auth_code = match.group(1)
+
+    if auth_code:
         await update.message.reply_text("🔄 Verifying code...")
-        credentials = auth_manager.exchange_code(user_text.strip())
+        credentials = auth_manager.exchange_code(auth_code, user_id=user_id)
         if credentials:
             import sqlite3
             with sqlite3.connect("user_context.db") as conn:
