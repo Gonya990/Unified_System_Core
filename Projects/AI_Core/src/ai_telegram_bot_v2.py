@@ -22,6 +22,7 @@ from google_auth import GoogleAuthManager
 from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
+from telegram_schema_expert import TelegramSchemaExpert
 
 # Configuration
 config = ConfigManager()
@@ -30,6 +31,8 @@ inference = InferenceClient(config)
 db = UserContextDB()
 auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
 conv_manager = ConversationManager()
+tl_expert = TelegramSchemaExpert()
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -528,8 +531,12 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
 
     system_prompt = (
         "You are a helpful personal assistant. Here is what you know about the user:\n"
-        + mem_text + "\n\nProvide short, helpful and professional answers."
+        + mem_text + "\n\n"
+        "You also have access to the Telegram MTProto TL Schema. If the user asks technical questions "
+        "about Telegram types or methods, you can provide expert details. Suggest using the `/tl` command "
+        "for raw technical documentation. Provide short, helpful and professional answers."
     )
+
 
     try:
         response_text, _ = await inference.chat(history + [{"role": "user", "content": prompt}], system_prompt=system_prompt)
@@ -553,6 +560,7 @@ async def post_init(application: Application) -> None:
         BotCommand("brief", "Get your daily calendar brief"),
         BotCommand("memory", "View your saved memories"),
         BotCommand("newtask", "Create a new task or event"),
+        BotCommand("tl", "Lookup Telegram TL Schema (MTProto)"),
     ]
     await application.bot.set_my_commands(commands)
     logger.info("Bot commands registered.")
@@ -642,6 +650,19 @@ async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
+async def tl_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /tl [query] command."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id): return
+    
+    if not context.args:
+        await update.message.reply_text("Usage: `/tl [predicate|id|type]`\nExample: `/tl user` or `/tl 34280482`", parse_mode='Markdown')
+        return
+        
+    query = " ".join(context.args)
+    result = tl_expert.lookup(query)
+    await update.message.reply_text(result, parse_mode='Markdown')
+
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
     logger.error(f"[ERROR] Exception while handling an update: {context.error}")
@@ -679,6 +700,7 @@ def main():
     application.add_handler(CommandHandler('brief', brief_command))
     application.add_handler(CommandHandler('memory', memory_command))
     application.add_handler(CommandHandler('newtask', newtask_command))
+    application.add_handler(CommandHandler('tl', tl_command))
     application.add_handler(CommandHandler('set_key', set_key))
     application.add_handler(CommandHandler('approve', approve_user))
     application.add_handler(CallbackQueryHandler(button_handler))
