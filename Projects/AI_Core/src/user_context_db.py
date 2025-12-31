@@ -1,0 +1,83 @@
+import sqlite3
+import json
+import logging
+from datetime import datetime
+from typing import Optional, Dict, Any, List
+
+logger = logging.getLogger(__name__)
+
+class UserContextDB:
+    def __init__(self, db_path="user_context.db"):
+        self.db_path = db_path
+        self._init_db()
+
+    def _init_db(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            # Users table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id INTEGER PRIMARY KEY,
+                    username TEXT,
+                    full_name TEXT,
+                    is_approved BOOLEAN DEFAULT 0,
+                    is_google_connected BOOLEAN DEFAULT 0,
+                    google_creds TEXT,
+                    created_at TIMESTAMP
+                )
+            ''')
+            # Events context table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS event_contexts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    event_title TEXT,
+                    context_description TEXT,
+                    event_time TIMESTAMP,
+                    created_at TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(user_id)
+                )
+            ''')
+            # Key Value Store for random persistence
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS kv_store (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                )
+            ''')
+            conn.commit()
+
+    def add_user(self, user_id: int, username: str, full_name: str):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT OR IGNORE INTO users (user_id, username, full_name, created_at)
+                VALUES (?, ?, ?, ?)
+            ''', (user_id, username, full_name, datetime.now()))
+            conn.commit()
+
+    def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def set_google_connected(self, user_id: int, connected: bool = True):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET is_google_connected = ? WHERE user_id = ?", (1 if connected else 0, user_id))
+            conn.commit()
+
+    def is_approved(self, user_id: int) -> bool:
+        user = self.get_user(user_id)
+        if user:
+            return bool(user['is_approved'])
+        return False
+
+    def approve_user(self, user_id: int, approve: bool = True):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET is_approved = ? WHERE user_id = ?", (1 if approve else 0, user_id))
+            conn.commit()
