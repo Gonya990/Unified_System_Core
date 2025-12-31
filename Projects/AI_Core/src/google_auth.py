@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 # Scopes required
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
-# Port for the OAuth callback server
-OAUTH_CALLBACK_PORT = 8085
-REDIRECT_URI = f'http://localhost:{OAUTH_CALLBACK_PORT}/oauth2callback'
+# Redirect URI - must match what's configured in Google Cloud Console
+# Using http://localhost (no port, no path) as it's pre-authorized for desktop apps
+REDIRECT_URI = 'http://localhost'
 
 
 class OAuthCallbackHandler(BaseHTTPRequestHandler):
