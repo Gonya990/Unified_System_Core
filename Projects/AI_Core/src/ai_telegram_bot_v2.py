@@ -89,11 +89,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not db.is_approved(user.id):
         # Auto-approve if in ALLOWED_USERS
         allowed_users_str = config.get("ALLOWED_USERS", "")
+        logger.info(f"[CMD] ALLOWED_USERS config: '{allowed_users_str}'")
         allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        
+        logger.info(f"[CMD] Parsed allowed IDs: {allowed_ids}, checking user {user.id}")
+
         if user.id in allowed_ids:
             db.approve_user(user.id, True)
+            logger.info(f"[CMD] Auto-approved user {user.id}")
         else:
+            logger.warning(f"[CMD] User {user.id} not in ALLOWED_USERS, denying access")
             await update.message.reply_text(f"⛔️ Access Denied. Your ID `{user.id}` is pending approval.", parse_mode='Markdown')
             return
 
