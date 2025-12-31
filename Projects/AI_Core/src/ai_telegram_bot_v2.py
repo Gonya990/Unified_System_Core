@@ -8,7 +8,8 @@ from typing import Optional, List, Dict
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.constants import ChatAction
-import bot_config
+from config_manager import ConfigManager
+from inference_client import InferenceClient
 from user_context_db import UserContextDB
 from google_auth import GoogleAuthManager
 from calendar_client import CalendarClient
@@ -16,7 +17,8 @@ from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
 
 # Configuration
-OLLAMA_URL = "http://localhost:11434/api/generate"
+config = ConfigManager()
+inference = InferenceClient(config)
 db = UserContextDB()
 auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
 conv_manager = ConversationManager()
@@ -39,7 +41,9 @@ def get_main_menu(user_id: int):
         ["📅 Daily Brief", "➕ New Task"],
         ["🧠 Memory/Context", "❓ Help"]
     ]
-    if user_id in bot_config.ALLOWED_USER_IDS:
+    allowed_users_str = config.get("ALLOWED_USERS", "")
+    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+    if user_id in allowed_ids:
         keyboard.append(["🛠 Admin Panel"])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
 
@@ -189,21 +193,49 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Admin Handlers
     elif data == "admin_services":
-        if user_id not in bot_config.ALLOWED_USER_IDS: return
-        status = "🟢 ollama: Up 2 hours\n🟢 telegram-bot: Up 30 mins\n🟡 postgres: Restarting"
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+        
+        # Real-ish service status (check if process is running)
+        import subprocess
+        try:
+            # Check if ollama is reachable
+            ollama_up = "🟢" if await inference.health_check() else "🔴"
+            # Check docker containers if possible
+            docker_res = subprocess.run(["docker", "ps", "--format", "{{.Names}}: {{.Status}}"], capture_output=True, text=True)
+            docker_status = docker_res.stdout if docker_res.stdout else "No containers running"
+            status = f"{ollama_up} AI Inference: Up\n🔍 Docker Containers:\n{docker_status}"
+        except Exception as e:
+            status = f"🔴 Error checking status: {e}"
+            
         await query.edit_message_text(f"🛠 **Service Status:**\n\n```\n{status}\n```", parse_mode='Markdown', reply_markup=get_admin_menu())
 
     elif data == "admin_keys":
-        if user_id not in bot_config.ALLOWED_USER_IDS: return
-        await query.edit_message_text("🔑 **Key Management:**\n\n- OLLAMA_URL: Set\n- TELEGRAM_TOKEN: Set\n- GOOGLE_CLIENT_ID: Set", reply_markup=get_admin_menu())
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+        
+        status = config.get_status()
+        resp = (
+            "🔑 **Key Management**\n\n"
+            f"Provider: `{config.get('INFERENCE_PROVIDER')}`\n"
+            f"Model: `{config.get('MODEL_NAME')}`\n"
+            f"API Key set: `{'✅' if status['api_key_set'] else '❌'}`\n\n"
+            "To set a key, use: `/set_key [NAME] [VALUE]`\n"
+            "Example: `/set_key OPENAI_API_KEY sk-...`"
+        )
+        await query.edit_message_text(resp, parse_mode='Markdown', reply_markup=get_admin_menu())
 
     elif data == "admin_users":
-        if user_id not in bot_config.ALLOWED_USER_IDS: return
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
         users = db.get_inactive_users(hours=0) # Get all users
         resp = "👥 **User Management:**\n\n"
         for u in users:
             status = "✅" if u['is_approved'] else "⏳"
-            resp += f"{status} {u['full_name']} (@{u['username']})\n"
+            resp += f"{status} {u['full_name']} (@{u['username']}) - `{u['user_id']}`\n"
         await query.edit_message_text(resp, reply_markup=get_admin_menu())
 
 async def show_advanced_help(update_or_query, context, edit=False):
@@ -368,9 +400,25 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not events:
         await update.effective_message.reply_text("You have no events scheduled for today. Ready for new tasks!")
     else:
+        # Get stored contexts
+        import sqlite3
+        with sqlite3.connect("user_context.db") as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT event_title, context_description FROM event_contexts WHERE user_id = ?", (user_id,))
+            contexts = {row['event_title']: row['context_description'] for row in cursor.fetchall()}
+
         resp = "📅 **Your Daily Brief:**\n\n"
         for e in events:
-            resp += f"• {client.format_event(e)}\n"
+            title = e.get('summary', 'Untitled')
+            time_formatted = client.format_event(e)
+            ctx = contexts.get(title)
+            
+            resp += f"• {time_formatted}"
+            if ctx:
+                resp += f"\n  💡 *Context:* {ctx}"
+            resp += "\n"
+            
         await update.effective_message.reply_text(resp, parse_mode='Markdown')
 
 async def digest_chat_memory(user_id: int):
@@ -403,53 +451,82 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
     mem_text = "\n".join([f"- {m['fact_full']}" for m in memories])
     
     # 2. Get short-term history
-    history = conv_manager.get_history(user_id, limit=5)
-    hist_text = "\n".join([f"{m['role']}: {m['content']}" for m in history[-5:]])
+    history = conv_manager.get_context_messages(user_id, limit=10)
     
-    full_prompt = (
+    system_prompt = (
         "You are a helpful personal assistant. Here is what you know about the user:\n"
-        + mem_text + "\n\nRecent context:\n" + hist_text + "\n\nUser: " + prompt + "\nAssistant:"
+        + mem_text + "\n\nProvide short, helpful and professional answers."
     )
     
-    return await query_ollama(full_prompt)
+    response_text, _ = await inference.chat(history + [{"role": "user", "content": prompt}], system_prompt=system_prompt)
+    return response_text
 
 async def query_ollama(prompt: str, system: str = None) -> str:
-    system_prompt = system or "You are a helpful personal assistant bot. You manage the user's Google Calendar and provide insights. Be concise and professional."
-    full_prompt = f"{system_prompt}\n\nUser: {prompt}\nAssistant:"
-    
-    try:
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "model": bot_config.MODEL_NAME, 
-                "prompt": full_prompt,
-                "stream": False
-            }
-            async with session.post(OLLAMA_URL, json=payload) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return data.get("response", "No response from model.")
-                else:
-                    return f"Error from Ollama: {response.status}"
-    except Exception as e:
-        return f"Ollama Connection Error: {e}"
+    """Legacy wrapper, now uses InferenceClient."""
+    system_prompt = system or "You are a helpful assistant."
+    response, _ = await inference.chat([{"role": "user", "content": prompt}], system_prompt=system_prompt)
+    return response
 
 async def post_init(application: Application) -> None:
-    scheduler = DailyScheduler(application, db)
+    scheduler = DailyScheduler(application, db, inference=inference)
     asyncio.create_task(scheduler.start())
     logger.info("DailyScheduler background task started via post_init.")
 
+async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    allowed_users_str = config.get("ALLOWED_USERS", "")
+    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+    if user_id not in allowed_ids: return
+
+    if not context.args or len(context.args) < 2:
+        await update.message.reply_text("Usage: `/set_key NAME VALUE`", parse_mode='Markdown')
+        return
+
+    key_name = context.args[0].upper()
+    key_value = context.args[1]
+    
+    config.set(key_name, key_value)
+    
+    try:
+        await update.message.delete()
+    except:
+        pass
+
+    await update.message.reply_text(f"✅ Key `{key_name}` updated and encrypted.", parse_mode='Markdown')
+
+async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    allowed_users_str = config.get("ALLOWED_USERS", "")
+    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+    if user_id not in allowed_ids: return
+
+    if not context.args:
+        await update.message.reply_text("Usage: `/approve USER_ID`")
+        return
+
+    try:
+        target_id = int(context.args[0])
+        db.approve_user(target_id, True)
+        await update.message.reply_text(f"✅ User {target_id} approved.")
+        await context.bot.send_message(chat_id=target_id, text="🚀 Your access has been approved! Send /start to begin.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
 def main():
-    if not bot_config.BOT_TOKEN:
+    token = config.get("TELEGRAM_BOT_TOKEN")
+    if not token:
         print("Error: TELEGRAM_BOT_TOKEN not set!")
         return
 
-    application = Application.builder().token(bot_config.BOT_TOKEN).post_init(post_init).build()
+    application = Application.builder().token(token).post_init(post_init).build()
     
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('set_key', set_key))
+    application.add_handler(CommandHandler('approve', approve_user))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    print(f'Bot V2 (AI_Core) is running... Allowed Users: {bot_config.ALLOWED_USER_IDS}')
+    print(f'Bot V2 (AI_Core) is running...')
     application.run_polling()
 
 if __name__ == '__main__':
