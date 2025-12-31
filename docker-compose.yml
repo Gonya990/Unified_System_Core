@@ -51,11 +51,16 @@ services:
     restart: unless-stopped
     privileged: true  # Required for GPU metrics via nvidia-smi
     environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - GCP_PROJECT=${GCP_PROJECT:-gen-lang-client-0982257437}
       - INSTANCE_NAME=${INSTANCE_NAME:-igor-gaming-1}
       - COLLECTION_INTERVAL=${COLLECTION_INTERVAL:-60}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS:-708531393,1881720235}
+      - THRESHOLD_CPU=${THRESHOLD_CPU:-90}
+      - THRESHOLD_MEMORY=${THRESHOLD_MEMORY:-85}
+      - THRESHOLD_DISK=${THRESHOLD_DISK:-90}
+      - THRESHOLD_GPU_TEMP=${THRESHOLD_GPU_TEMP:-80}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - gcp-credentials:/root/.config/gcloud:ro
@@ -73,6 +78,7 @@ services:
     container_name: openai-mcp-server
     restart: unless-stopped
     environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - MCP_HOST=0.0.0.0
       - MCP_PORT=8766
@@ -98,6 +104,7 @@ services:
     container_name: llm-council
     restart: unless-stopped
     environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
