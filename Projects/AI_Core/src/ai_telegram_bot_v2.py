@@ -38,21 +38,21 @@ logger = logging.getLogger(__name__)
 # keyboards
 def get_main_menu(user_id: int):
     keyboard = [
-        ["📅 Daily Brief", "➕ New Task"],
-        ["🧠 Memory/Context", "❓ Help"]
+        ["📅 Обзор дня", "➕ Новая задача"],
+        ["🧠 Память/Контекст", "❓ Помощь"]
     ]
     allowed_users_str = config.get("ALLOWED_USERS", "")
     allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
     if user_id in allowed_ids:
-        keyboard.append(["🛠 Admin Panel"])
+        keyboard.append(["🛠 Админ-панель"])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
 
 def get_admin_menu():
     keyboard = [
-        [InlineKeyboardButton("📊 Service Status", callback_data="admin_services")],
-        [InlineKeyboardButton("🔑 Manage Keys", callback_data="admin_keys")],
-        [InlineKeyboardButton("👥 User Management", callback_data="admin_users")],
-        [InlineKeyboardButton("🔙 Back", callback_data="show_help")]
+        [InlineKeyboardButton("📊 Статус сервисов", callback_data="admin_services")],
+        [InlineKeyboardButton("🔑 Управление ключами", callback_data="admin_keys")],
+        [InlineKeyboardButton("👥 Пользователи", callback_data="admin_users")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="show_help")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -129,45 +129,47 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("confirm_event_"):
         pending = context.user_data.get('pending_event')
         if not pending:
-            await query.edit_message_text("❌ No pending event found or session expired.")
+            await query.edit_message_text("❌ Событие не найдено или сессия истекла.")
             return
         
         client = get_calendar_client(user_id)
         if not client:
-            await query.edit_message_text("❌ Calendar not connected. Please run /start.")
+            await query.edit_message_text("❌ Календарь не подключен. Используйте /start.")
             return
         
         # Parse time
         try:
             start_time = datetime.fromisoformat(pending['time'].replace('Z', '+00:00'))
         except:
-            start_time = datetime.now() + timedelta(hours=1) # Default
+            start_time = datetime.now() + timedelta(hours=1) 
             
-        success = client.create_event(
-            summary=pending['summary'],
-            start_time=start_time,
-            description=pending.get('context', '')
-        )
+        # Conflict detection
+        existing_events = client.get_upcoming_events(days=1)
+        conflict = None
+        for e in existing_events:
+            e_start_str = e.get('start', {}).get('dateTime') or e.get('start', {}).get('date')
+            if e_start_str:
+                # Simplistic check
+                if pending['time'] in e_start_str:
+                    conflict = e['summary']
+                    break
         
-        if success:
-            import sqlite3
-            with sqlite3.connect("user_context.db") as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    "INSERT INTO event_contexts (user_id, event_title, context_description, event_time, created_at) VALUES (?, ?, ?, ?, ?)",
-                    (user_id, pending['summary'], pending.get('context', ''), start_time, datetime.now())
-                )
-                conn.commit()
-            
-            await query.edit_message_text(f"✅ Scheduled: **{pending['summary']}**\nTime: {pending['time']}", parse_mode='Markdown')
-        else:
-            await query.edit_message_text("❌ Failed to create event in Google Calendar.")
-        
-        context.user_data.pop('pending_event', None)
+        if conflict:
+            await query.edit_message_text(f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\nВсё равно добавить?", parse_mode='Markdown', 
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✅ Да, добавить", callback_data=f"force_confirm_event")], [InlineKeyboardButton("❌ Отмена", callback_data="cancel_event")]]))
+            return
+
+        await process_event_creation(query, user_id, client, pending, start_time)
+
+    elif data == "force_confirm_event":
+        pending = context.user_data.get('pending_event')
+        client = get_calendar_client(user_id)
+        start_time = datetime.fromisoformat(pending['time'].replace('Z', '+00:00'))
+        await process_event_creation(query, user_id, client, pending, start_time)
 
     elif data == "cancel_event":
         context.user_data.pop('pending_event', None)
-        await query.edit_message_text("❌ Event creation cancelled.")
+        await query.edit_message_text("❌ Создание события отменено.")
     
     elif data == "edit_context":
         await query.edit_message_text("Feature coming soon! For now, try adding the event again with more details.")
@@ -238,20 +240,35 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             resp += f"{status} {u['full_name']} (@{u['username']}) - `{u['user_id']}`\n"
         await query.edit_message_text(resp, reply_markup=get_admin_menu())
 
+async def process_event_creation(query, user_id, client, pending, start_time):
+    success = client.create_event(
+        summary=pending['summary'],
+        start_time=start_time,
+        description=pending.get('context', '')
+    )
+    
+    if success:
+        db.add_event_context(user_id, pending['summary'], pending.get('context', ''), start_time)
+        await query.edit_message_text(f"✅ Запланировано: **{pending['summary']}**\nВремя: {pending['time']}", parse_mode='Markdown')
+    else:
+        await query.edit_message_text("❌ Не удалось создать событие в Google Calendar.")
+    
+    query.context.user_data.pop('pending_event', None)
+
 async def show_advanced_help(update_or_query, context, edit=False):
     text = (
-        "🤖 **Digital Assistant Help**\n\n"
-        "I can help you with:\n"
-        "• **Calendar**: Connect your Google account to manage events.\n"
-        "• **Memory**: I remember key facts from our chats to help you better.\n"
-        "• **Insights**: Ask me 'What did we decide about X?' to recall context.\n"
-        "• **Proactivity**: I'll nudge you if we haven't spoken in a while.\n\n"
-        "**Quick Actions:**"
+        "🤖 **Помощь цифрового ассистента**\n\n"
+        "Я могу помочь вам с:\n"
+        "• **Календарь**: Подключите Google аккаунт для управления встречами.\n"
+        "• **Память**: Я запоминаю важные факты, чтобы лучше помогать.\n"
+        "• **Контекст**: Спрашивайте 'Что мы решили по проекту X?', чтобы вспомнить детали.\n"
+        "• **Проактивность**: Я напомню о себе, если мы давно не общались.\n\n"
+        "**Быстрые действия:**"
     )
     keyboard = [
-        [InlineKeyboardButton("📅 Today's Brief", callback_data="daily_brief_cb")],
-        [InlineKeyboardButton("🧠 My Memories", callback_data="show_memories_cb")],
-        [InlineKeyboardButton("⚙️ Settings", callback_data="settings_cb")]
+        [InlineKeyboardButton("📅 Обзор на сегодня", callback_data="daily_brief_cb")],
+        [InlineKeyboardButton("🧠 Мои воспоминания", callback_data="show_memories_cb")],
+        [InlineKeyboardButton("⚙️ Настройки", callback_data="settings_cb")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -288,22 +305,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Invalid code or connection failed. Try again.")
             return
 
-    if user_text == "📅 Daily Brief":
+    if user_text == "📅 Обзор дня":
         await show_daily_brief(update, context)
         return
-    elif user_text == "➕ New Task":
-        await update.message.reply_text("What should I schedule? (e.g., 'Meeting with Sarah tomorrow at 10am')")
+    elif user_text == "➕ Новая задача":
+        await update.message.reply_text("Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')")
         return
-    elif user_text == "🧠 Memory/Context":
+    elif user_text == "🧠 Память/Контекст":
         await show_memory_context(update, context)
         return
-    elif user_text == "🛠 Admin Panel":
-        if user_id in bot_config.ALLOWED_USER_IDS:
-            await update.message.reply_text("🛠 **Admin Control Center**", reply_markup=get_admin_menu())
+    elif user_text == "🛠 Админ-панель":
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id in allowed_ids:
+            await update.message.reply_text("🛠 **Центр управления админа**", reply_markup=get_admin_menu())
         else:
-            await update.message.reply_text("⛔️ Access Denied.")
+            await update.message.reply_text("⛔️ Доступ запрещен.")
         return
-    elif user_text == "❓ Help":
+    elif user_text == "❓ Помощь":
         await show_advanced_help(update, context)
         return
 
