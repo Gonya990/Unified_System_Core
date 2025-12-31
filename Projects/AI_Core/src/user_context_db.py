@@ -23,6 +23,7 @@ class UserContextDB:
                     is_approved BOOLEAN DEFAULT 0,
                     is_google_connected BOOLEAN DEFAULT 0,
                     google_creds TEXT,
+                    last_interaction TIMESTAMP,
                     created_at TIMESTAMP
                 )
             ''')
@@ -51,10 +52,27 @@ class UserContextDB:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT OR IGNORE INTO users (user_id, username, full_name, created_at)
-                VALUES (?, ?, ?, ?)
-            ''', (user_id, username, full_name, datetime.now()))
+                INSERT OR IGNORE INTO users (user_id, username, full_name, last_interaction, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, username, full_name, datetime.now(), datetime.now()))
             conn.commit()
+
+    def update_last_interaction(self, user_id: int):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET last_interaction = ? WHERE user_id = ?", (datetime.now(), user_id))
+            conn.commit()
+
+    def get_inactive_users(self, hours: int = 72) -> List[Dict[str, Any]]:
+        """Find users who haven't interacted for more than N hours."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM users WHERE last_interaction < datetime('now', '-' || ? || ' hours') AND is_approved = 1",
+                (hours,)
+            )
+            return [dict(row) for row in cursor.fetchall()]
 
     def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
         with sqlite3.connect(self.db_path) as conn:
