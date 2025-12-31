@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Unified System Infrastructure Map v2</title>
+    <style>
+        :root {
+            --bg: #05060f;
+            --card-bg: rgba(20, 22, 45, 0.7);
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --accent: #ff007a;
+            --text: #e0e6ed;
+            --subtext: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 40%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        .header {
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--subtext);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Logic Bridge / Mesh Visualization */
+        .mesh-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .node-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .node-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .node-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0.5;
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .node-title h2 {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .node-ip {
+            font-family: monospace;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .os-badge {
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.7rem;
+            color: var(--subtext);
+        }
+
+        .process-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .process-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .process-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 242, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .process-info {
+            flex: 1;
+        }
+
+        .process-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .process-meta {
+            font-size: 0.75rem;
+            color: var(--subtext);
+        }
+
+        .process-status {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .m-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .m-label {
+            font-size: 0.7rem;
+            color: var(--subtext);
+            text-transform: uppercase;
+        }
+
+        /* Infrastructure Map Visual */
+        .svg-map {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .connection-line {
+            stroke: var(--primary);
+            stroke-width: 1;
+            stroke-dasharray: 4;
+            animation: move-dash 10s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes move-dash {
+            to {
+                stroke-dashoffset: 100;
+            }
+        }
+
+        .node-dot {
+            fill: var(--primary);
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+
+        .cloud-node {
+            fill: var(--accent);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .tag {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 0, 122, 0.2);
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        .tag-docker {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>UNIFIED SYSTEM TOPOLOGY</h1>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="pulse"></div> 5 Active Nodes
+            </div>
+            <div class="status-item">Tailscale VPN mesh</div>
+            <div class="status-item">Last Sync: 20:01</div>
+        </div>
+    </div>
+
+    <!-- Infrastructure Visualization Layer -->
+    <svg class="svg-map" viewBox="0 0 1000 300">
+        <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%y1=" 100%">
+                <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:var(--secondary);stop-opacity:1" />
+            </linearGradient>
+        </defs>
+
+        <!-- Connection Lines -->
+        <path d="M500,150 L200,80" class="connection-line" />
+        <path d="M500,150 L800,80" class="connection-line" />
+        <path d="M500,150 L200,220" class="connection-line" />
+        <path d="M500,150 L800,220" class="connection-line" />
+
+        <!-- Nodes -->
+        <circle cx="500" cy="150" r="12" class="node-dot" /> <!-- SMART -->
+        <text x="470" y="180" fill="white" font-size="14" font-weight="bold">SMART SERVER</text>
+
+        <circle cx="200" cy="80" r="8" class="node-dot" /> <!-- MBA -->
+        <text x="140" y="65" fill="var(--subtext)" font-size="12">MACBOOK AIR</text>
+
+        <circle cx="800" cy="80" r="8" class="node-dot" /> <!-- Gaming -->
+        <text x="760" y="65" fill="var(--subtext)" font-size="12">GAMING PC</text>
+
+        <circle cx="200" cy="220" r="8" class="node-dot cloud-node" /> <!-- Cloud -->
+        <text x="140" y="245" fill="var(--accent)" font-size="12">CLOUD HUB</text>
+
+        <circle cx="800" cy="220" r="8" class="node-dot" /> <!-- iPhone -->
+        <text x="760" y="245" fill="var(--subtext)" font-size="12">IPHONE 15 PRO</text>
+    </svg>
+
+    <div class="mesh-container">
+        <!-- NODE 1: SMART SERVER -->
+        <div class="node-card">
+            <div class="node-header">
+                <div class="node-title">
+                    <h2>🖥️ SMART SERVER</h2>
+                    <div class="node-ip">100.81.133.25</div>
+                </div>
+                <div class="os-badge">FEDORA 41</div>
+            </div>
+
+            <div class="process-list">
+                <div class="process-item">
+                    <div class="process-icon">🤖</div>
+                    <div class="process-info">
+                        <div class="process-name">AI Telegram Bot <span class="tag tag-docker">V2_CORE</span></div>
+                        <div class="process-meta">Python 3.13 • @GonyaHomeBot</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon">🏠</div>
+                    <div class="process-info">
+                        <div class="process-name">Home Assistant <span class="tag tag-docker">DOCKER</span></div>
+                        <div class="process-meta">735MB RAM • Core Automation</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon">🔄</div>
+                    <div class="process-info">
+                        <div class="process-name">n8n / Node-RED <span class="tag tag-docker">FLOWS</span></div>
+                        <div class="process-meta">Port 5678, 1880 • Active</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon">📡</div>
+                    <div class="process-info">
+                        <div class="process-name">Zigbee2MQTT <span class="tag tag-docker">BRIDGE</span></div>
+                        <div class="process-meta">MOSQUITTO Active</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-box">
+                    <div class="m-value">49%</div>
+                    <div class="m-label">RAM USAGE</div>
+                </div>
+                <div class="metric-box">
+                    <div class="m-value">20d</div>
+                    <div class="m-label">UPTIME</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NODE 2: MACBOOK AIR -->
+        <div class="node-card">
+            <div class="node-header">
+                <div class="node-title">
+                    <h2>💻 MACBOOK AIR</h2>
+                    <div class="node-ip">100.93.121.47</div>
+                </div>
+                <div class="os-badge">MACOS TAHOE</div>
+            </div>
+
+            <div class="process-list">
+                <div class="process-item">
+                    <div class="process-icon">🧠</div>
+                    <div class="process-info">
+                        <div class="process-name">Antigravity Agent</div>
+                        <div class="process-meta">VSCode Extension Host</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon">🌐</div>
+                    <div class="process-info">
+                        <div class="process-name">Chrome (System Debug)</div>
+                        <div class="process-meta">Remote DevTools Active</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon">💬</div>
+                    <div class="process-info">
+                        <div class="process-name">WhatsApp Desktop</div>
+                        <div class="process-meta">Communications</div>
+                    </div>
+                    <div class="process-status"></div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-box">
+                    <div class="m-value">16GB</div>
+                    <div class="m-label">PHYSICAL RAM</div>
+                </div>
+                <div class="metric-box">
+                    <div class="m-value">6%</div>
+                    <div class="m-label">SSD LOAD</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NODE 3: CLOUD INFRA -->
+        <div class="node-card" style="border-right: 2px solid var(--accent)">
+            <div class="node-header">
+                <div class="node-title">
+                    <h2 style="color: var(--accent)">☁️ CLOUD HUB</h2>
+                    <div class="node-ip">100.110.209.49</div>
+                </div>
+                <div class="os-badge">UBUNTU LTS</div>
+            </div>
+
+            <div class="process-list">
+                <div class="process-item">
+                    <div class="process-icon" style="color: var(--accent)">🛰️</div>
+                    <div class="process-info">
+                        <div class="process-name">Central MCP Hub</div>
+                        <div class="process-meta">Agent Communication Bridge</div>
+                    </div>
+                    <div class="process-status" style="background: var(--accent)"></div>
+                </div>
+
+                <div class="process-item">
+                    <div class="process-icon" style="color: var(--accent)">🗄️</div>
+                    <div class="process-info">
+                        <div class="process-name">Global DB Store</div>
+                        <div class="process-meta">SQLite Aiosqlite</div>
+                    </div>
+                    <div class="process-status" style="background: var(--accent)"></div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-box">
+                    <div class="m-value">ONLINE</div>
+                    <div class="m-label">HUB STATUS</div>
+                </div>
+                <div class="metric-box">
+                    <div class="m-value">SECURED</div>
+                    <div class="m-label">AUTH TOKEN</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
