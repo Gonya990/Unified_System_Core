@@ -27,9 +27,12 @@ from conversation_manager import ConversationManager
 print(f"DEBUG: CWD: {os.getcwd()}")
 print(f"DEBUG: ENV TOKEN: {os.environ.get('TELEGRAM_BOT_TOKEN')}")
 print(f"DEBUG: ENV KEY: {os.environ.get('TELEGRAM_BOT_TOKEN_KEY')}")
+print(f"DEBUG: CONFIG PATH ENV: {os.environ.get('CONFIG_PATH')}")
 
 # Configuration
 config = ConfigManager()
+print(f"DEBUG: CONFIG FILE PATH: {config.CONFIG_FILE}")
+print(f"DEBUG: CONFIG FILE EXISTS: {config.CONFIG_FILE.exists()}")
 print(f"DEBUG: CONFIG LOADED TOKEN: {config.get('TELEGRAM_BOT_TOKEN')}")
 
 inference = InferenceClient(config)
