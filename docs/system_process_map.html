@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,56 +12,64 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
             color: #fff;
+            overflow: hidden;
         }
-        
+
         .header {
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            padding: 20px 40px;
+            padding: 15px 30px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 70px;
         }
-        
+
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: linear-gradient(90deg, #00d2ff, #3a7bd5);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .timestamp {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
-        
+
         .container {
             display: grid;
             grid-template-columns: 1fr 350px;
             gap: 20px;
             padding: 20px;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 70px);
         }
-        
+
         #network {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            width: 100%;
         }
-        
+
         .sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            height: 100%;
+            overflow: hidden;
         }
-        
+
         .card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -68,117 +77,121 @@
             padding: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .card h3 {
-            font-size: 1rem;
-            margin-bottom: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
             color: #00d2ff;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
         }
-        
+
         .legend-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
         }
-        
-        .dot-server { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .dot-container { background: linear-gradient(135deg, #11998e, #38ef7d); }
-        .dot-service { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .dot-process { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .dot-offline { background: linear-gradient(135deg, #636363, #a2a2a2); }
-        
+
+        .dot-server {
+            background: #764ba2;
+        }
+
+        .dot-container {
+            background: #11998e;
+        }
+
+        .dot-service {
+            background: #f5576c;
+        }
+
+        .dot-process {
+            background: #4facfe;
+        }
+
+        .dot-offline {
+            background: #636363;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
-        
+
         .stat {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
+
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #00d2ff;
         }
-        
+
         .stat-label {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 5px;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
         }
-        
+
         #details {
             flex: 1;
             overflow-y: auto;
         }
-        
-        .detail-title {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        
+
         .detail-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
-        
+
         .detail-key {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .detail-value {
-            color: #00d2ff;
+            color: #fff;
+            font-weight: 500;
         }
-        
+
         .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
         }
-        
+
         .status-active {
             background: rgba(56, 239, 125, 0.2);
             color: #38ef7d;
         }
-        
-        .status-offline {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>🗺️ Картография процессов системы</h1>
-        <div class="timestamp">Обновлено: 2025-12-31 19:55 (IST)</div>
+        <div class="timestamp">Обновлено: 2025-12-31 20:01 (IST)</div>
     </div>
-    
+
     <div class="container">
         <div id="network"></div>
-        
         <div class="sidebar">
             <div class="card">
                 <h3>📊 Статистика</h3>
@@ -189,11 +202,11 @@
                     </div>
                     <div class="stat">
                         <div class="stat-value">5</div>
-                        <div class="stat-label">Docker контейнеров</div>
+                        <div class="stat-label">Контейнеров</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">4</div>
-                        <div class="stat-label">Systemd сервисов</div>
+                        <div class="stat-label">Сервисов</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">2</div>
@@ -201,282 +214,130 @@
                     </div>
                 </div>
             </div>
-            
             <div class="card">
                 <h3>🎨 Легенда</h3>
                 <div class="legend-item">
-                    <div class="legend-dot dot-server"></div>
-                    <span>Физический сервер / Устройство</span>
+                    <div class="legend-dot dot-server"></div><span>Сервер / Узел</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-dot dot-container"></div>
-                    <span>Docker контейнер</span>
+                    <div class="legend-dot dot-container"></div><span>Docker Контейнер</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-dot dot-service"></div>
-                    <span>Systemd сервис</span>
+                    <div class="legend-dot dot-service"></div><span>Systemd Сервис</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-dot dot-process"></div>
-                    <span>Ключевой процесс</span>
+                    <div class="legend-dot dot-process"></div><span>Процесс</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-dot dot-offline"></div>
-                    <span>Оффлайн / Недоступен</span>
+                    <div class="legend-dot dot-offline"></div><span>Оффлайн</span>
                 </div>
             </div>
-            
             <div class="card" id="details">
                 <h3>ℹ️ Детали</h3>
-                <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">
-                    Кликните на элемент для просмотра деталей
-                </p>
+                <p id="hint" style="color: rgba(255,255,255,0.4); font-size: 0.8rem;">Выберите узел на карте</p>
+                <div id="details-content"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const nodes = new vis.DataSet([
-            // Main Servers
-            { id: 1, label: '🖥️ SMART\n100.81.133.25', group: 'server', title: 'Home Server - Fedora Linux\nUptime: 20 days\nRAM: 7.3/15 GB\nDisk: 65%' },
-            { id: 2, label: '💻 MacBook Air\n100.93.121.47', group: 'server', title: 'Apple M1, 16GB\nmacOS Tahoe\nLocal workstation' },
-            { id: 3, label: '🎮 Gaming PC\n100.127.194.111', group: 'server', title: 'Windows PC\nSSH requires password' },
-            { id: 4, label: '☁️ Cloud Hub\n100.110.209.49', group: 'server', title: 'Unified Home Core Cloud\nOracle Cloud' },
-            { id: 5, label: '📱 iPhone 15 Pro\n100.86.233.87', group: 'device', title: 'Mobile Device\nTailscale connected' },
-            
-            // Offline
-            { id: 6, label: '🚀 Rocinante\n100.127.166.76', group: 'offline', title: 'Offline 7 days' },
-            { id: 7, label: '📱 Lenovo Tablet\n100.114.27.103', group: 'offline', title: 'Offline' },
-            
-            // Docker Containers on SMART
-            { id: 10, label: '🏠 Home Assistant', group: 'container', title: 'homeassistant\nUp 2 days\nPython process using 735MB RAM' },
-            { id: 11, label: '🔄 n8n', group: 'container', title: 'n8n workflow automation\nUp 2 weeks\nNode.js, 455MB RAM' },
-            { id: 12, label: '🔴 Node-RED', group: 'container', title: 'nodered\nUp 2 weeks (healthy)\nPort: 1880' },
-            { id: 13, label: '📡 Zigbee2MQTT', group: 'container', title: 'zigbee2mqtt\nUp 2 weeks\nPort: 8080' },
-            { id: 14, label: '🦟 Mosquitto', group: 'container', title: 'MQTT Broker\nUp 2 weeks\nPorts: 1883, 9001' },
-            
-            // Systemd Services on SMART
-            { id: 20, label: '🤖 AI Telegram Bot', group: 'service', title: 'ai-telegram-bot.service\n@GonyaHomeBot\nPython 3.13' },
-            { id: 21, label: '🐋 Docker Engine', group: 'service', title: 'docker.service\nRunning' },
-            { id: 22, label: '🔐 SSH Server', group: 'service', title: 'sshd.service\nOpenSSH' },
-            { id: 23, label: '🌐 Tailscale', group: 'service', title: 'tailscaled.service\nVPN mesh network' },
-            
-            // Key Processes on SMART
-            { id: 30, label: '🖥️ Plasma Desktop', group: 'process', title: 'plasmashell\nKDE Plasma\n579 MB RAM' },
-            { id: 31, label: '🌐 Chrome Browser', group: 'process', title: 'Google Chrome\nMultiple tabs\n~2.5 GB total RAM' },
-            
-            // MacBook processes
-            { id: 40, label: '💬 WhatsApp', group: 'process', title: 'WhatsApp Desktop\nmacOS' },
-            { id: 41, label: '🌐 Chrome (Agent)', group: 'process', title: 'Antigravity Browser\nRemote debugging' },
-        ]);
+        // Data nodes and edges
+        const nodes = [
+            { id: 1, label: '🖥️ SMART\n100.81.133.25', group: 'server', level: 0 },
+            { id: 2, label: '💻 MacBook Air\n100.93.121.47', group: 'server', level: 0 },
+            { id: 3, label: '🎮 Gaming PC\n100.127.194.111', group: 'server', level: 1 },
+            { id: 4, label: '☁️ Cloud Hub\n100.110.209.49', group: 'server', level: 1 },
+            { id: 5, label: '📱 iPhone 15 Pro', group: 'device', level: 1 },
+            { id: 6, label: '🚀 Rocinante', group: 'offline', level: 2 },
+            { id: 7, label: '📱 Lenovo Tablet', group: 'offline', level: 2 },
+            { id: 10, label: '🏠 Home Assistant', group: 'container', level: 1 },
+            { id: 11, label: '🔄 n8n', group: 'container', level: 1 },
+            { id: 12, label: '🔴 Node-RED', group: 'container', level: 1 },
+            { id: 13, label: '📡 Zigbee2MQTT', group: 'container', level: 1 },
+            { id: 14, label: '🦟 Mosquitto', group: 'container', level: 1 },
+            { id: 20, label: '🤖 AI Bot', group: 'service', level: 1 },
+            { id: 21, label: '🐋 Docker', group: 'service', level: 1 },
+            { id: 30, label: '🖥️ Plasma', group: 'process', level: 1 },
+            { id: 31, label: '🌐 Chrome', group: 'process', level: 1 }
+        ];
 
-        const edges = new vis.DataSet([
-            // Tailscale VPN connections
-            { from: 1, to: 2, dashes: true, color: { color: '#00d2ff', opacity: 0.5 }, title: 'Tailscale VPN' },
-            { from: 1, to: 3, dashes: true, color: { color: '#00d2ff', opacity: 0.5 }, title: 'Tailscale VPN' },
-            { from: 1, to: 4, dashes: true, color: { color: '#00d2ff', opacity: 0.5 }, title: 'Tailscale VPN' },
-            { from: 2, to: 3, dashes: true, color: { color: '#00d2ff', opacity: 0.3 }, title: 'Tailscale VPN' },
-            { from: 2, to: 5, dashes: true, color: { color: '#00d2ff', opacity: 0.3 }, title: 'Tailscale VPN' },
-            
-            // Docker containers to SMART
-            { from: 1, to: 10, color: '#38ef7d', width: 2 },
-            { from: 1, to: 11, color: '#38ef7d', width: 2 },
-            { from: 1, to: 12, color: '#38ef7d', width: 2 },
-            { from: 1, to: 13, color: '#38ef7d', width: 2 },
-            { from: 1, to: 14, color: '#38ef7d', width: 2 },
-            
-            // Systemd services to SMART
-            { from: 1, to: 20, color: '#f5576c', width: 2 },
-            { from: 1, to: 21, color: '#f5576c', width: 2 },
-            { from: 1, to: 22, color: '#f5576c', width: 2 },
-            { from: 1, to: 23, color: '#f5576c', width: 2 },
-            
-            // Processes on SMART
-            { from: 1, to: 30, color: '#4facfe', width: 1 },
-            { from: 1, to: 31, color: '#4facfe', width: 1 },
-            
-            // MacBook processes
-            { from: 2, to: 40, color: '#4facfe', width: 1 },
-            { from: 2, to: 41, color: '#4facfe', width: 1 },
-            
-            // MQTT connections
-            { from: 10, to: 14, color: '#f5576c', width: 1, title: 'MQTT' },
-            { from: 12, to: 14, color: '#f5576c', width: 1, title: 'MQTT' },
-            { from: 13, to: 14, color: '#f5576c', width: 1, title: 'MQTT' },
-            
-            // n8n to HA
-            { from: 11, to: 10, color: '#f5576c', width: 1, title: 'API' },
-        ]);
+        const edges = [
+            { from: 1, to: 2, dashes: true }, { from: 1, to: 3, dashes: true }, { from: 1, to: 4, dashes: true },
+            { from: 1, to: 10 }, { from: 1, to: 11 }, { from: 1, to: 12 }, { from: 1, to: 13 }, { from: 1, to: 14 },
+            { from: 1, to: 20 }, { from: 1, to: 21 }, { from: 1, to: 30 }, { from: 1, to: 31 },
+            { from: 10, to: 14 }, { from: 13, to: 14 }
+        ];
 
-        const container = document.getElementById('network');
-        const data = { nodes, edges };
-        
-        const options = {
-            groups: {
-                server: {
-                    shape: 'box',
-                    color: {
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        border: '#9b59b6',
-                        highlight: { background: '#9b59b6', border: '#8e44ad' }
-                    },
-                    font: { color: '#fff', size: 14, face: 'Segoe UI' },
-                    borderWidth: 2,
-                    borderWidthSelected: 4,
-                    shadow: true
-                },
-                device: {
-                    shape: 'box',
-                    color: {
-                        background: '#667eea',
-                        border: '#764ba2'
-                    },
-                    font: { color: '#fff', size: 12 },
+        function initNetwork() {
+            const container = document.getElementById('network');
+            const data = {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    size: 20,
+                    font: { size: 12, color: '#ffffff', face: 'Segoe UI' },
                     borderWidth: 2,
                     shadow: true
                 },
-                container: {
-                    shape: 'box',
-                    color: {
-                        background: '#11998e',
-                        border: '#38ef7d',
-                        highlight: { background: '#38ef7d', border: '#11998e' }
-                    },
-                    font: { color: '#fff', size: 12 },
-                    borderWidth: 2,
-                    shadow: true
+                edges: {
+                    width: 2,
+                    color: { color: 'rgba(255,255,255,0.2)', highlight: '#00d2ff' },
+                    smooth: { type: 'continuous' }
                 },
-                service: {
-                    shape: 'ellipse',
-                    color: {
-                        background: '#f093fb',
-                        border: '#f5576c',
-                        highlight: { background: '#f5576c', border: '#f093fb' }
-                    },
-                    font: { color: '#fff', size: 12 },
-                    borderWidth: 2,
-                    shadow: true
+                groups: {
+                    server: { color: { background: '#764ba2', border: '#9b59b6' }, size: 30 },
+                    device: { color: { background: '#667eea', border: '#764ba2' } },
+                    container: { color: { background: '#11998e', border: '#38ef7d' }, shape: 'diamond' },
+                    service: { color: { background: '#f5576c', border: '#f093fb' }, shape: 'triangle' },
+                    process: { color: { background: '#4facfe', border: '#00f2fe' }, shape: 'star' },
+                    offline: { color: { background: '#444', border: '#666' }, shape: 'square' }
                 },
-                process: {
-                    shape: 'diamond',
-                    color: {
-                        background: '#4facfe',
-                        border: '#00f2fe',
-                        highlight: { background: '#00f2fe', border: '#4facfe' }
-                    },
-                    font: { color: '#fff', size: 11 },
-                    borderWidth: 2,
-                    shadow: true
-                },
-                offline: {
-                    shape: 'box',
-                    color: {
-                        background: '#636363',
-                        border: '#a2a2a2'
-                    },
-                    font: { color: '#aaa', size: 12 },
-                    borderWidth: 1,
-                    shapeProperties: { borderDashes: [5, 5] }
+                physics: {
+                    enabled: true,
+                    stabilization: { enabled: true, iterations: 100 },
+                    solver: 'forceAtlas2Based'
                 }
-            },
-            physics: {
-                stabilization: true,
-                barnesHut: {
-                    gravitationalConstant: -4000,
-                    centralGravity: 0.3,
-                    springLength: 150,
-                    springConstant: 0.04
-                }
-            },
-            interaction: {
-                hover: true,
-                tooltipDelay: 200
-            }
-        };
+            };
 
-        const network = new vis.Network(container, data, options);
-        
-        // Node details on click
-        const nodeDetails = {
-            1: {
-                title: 'SMART Home Server',
-                items: [
-                    { key: 'IP', value: '100.81.133.25' },
-                    { key: 'OS', value: 'Fedora Linux' },
-                    { key: 'Uptime', value: '20 days' },
-                    { key: 'RAM', value: '7.3 / 15 GB (49%)' },
-                    { key: 'Disk', value: '142 / 222 GB (65%)' },
-                    { key: 'Load', value: '0.48, 0.53, 0.64' },
-                    { key: 'Status', value: 'active', isStatus: true }
-                ]
-            },
-            2: {
-                title: 'MacBook Air M1',
-                items: [
-                    { key: 'IP', value: '100.93.121.47' },
-                    { key: 'Chip', value: 'Apple M1' },
-                    { key: 'RAM', value: '16 GB' },
-                    { key: 'OS', value: 'macOS Tahoe 26.3' },
-                    { key: 'Disk', value: '11 / 460 GB (6%)' },
-                    { key: 'Status', value: 'active', isStatus: true }
-                ]
-            },
-            10: {
-                title: 'Home Assistant',
-                items: [
-                    { key: 'Container', value: 'homeassistant' },
-                    { key: 'Status', value: 'Up 2 days' },
-                    { key: 'RAM', value: '735 MB' },
-                    { key: 'Port', value: '8123' },
-                    { key: 'URL', value: 'http://100.81.133.25:8123' }
-                ]
-            },
-            20: {
-                title: 'AI Telegram Bot',
-                items: [
-                    { key: 'Service', value: 'ai-telegram-bot.service' },
-                    { key: 'Bot', value: '@GonyaHomeBot' },
-                    { key: 'Runtime', value: 'Python 3.13' },
-                    { key: 'Status', value: 'active', isStatus: true }
-                ]
-            }
-        };
-        
-        network.on('click', function(params) {
-            if (params.nodes.length > 0) {
-                const nodeId = params.nodes[0];
-                const details = nodeDetails[nodeId];
-                const detailsDiv = document.getElementById('details');
-                
-                if (details) {
-                    let html = `<h3 class="detail-title">${details.title}</h3>`;
-                    details.items.forEach(item => {
-                        if (item.isStatus) {
-                            html += `
-                                <div class="detail-item">
-                                    <span class="detail-key">${item.key}</span>
-                                    <span class="status-badge ${item.value === 'active' ? 'status-active' : 'status-offline'}">${item.value}</span>
-                                </div>
-                            `;
-                        } else {
-                            html += `
-                                <div class="detail-item">
-                                    <span class="detail-key">${item.key}</span>
-                                    <span class="detail-value">${item.value}</span>
-                                </div>
-                            `;
-                        }
-                    });
-                    detailsDiv.innerHTML = html;
-                } else {
-                    const node = nodes.get(nodeId);
-                    detailsDiv.innerHTML = `
-                        <h3 class="detail-title">${node.label.replace('\n', ' ')}</h3>
-                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; white-space: pre-line;">${node.title || 'No details available'}</p>
+            const network = new vis.Network(container, data, options);
+
+            network.on("click", function (params) {
+                const hint = document.getElementById('hint');
+                const content = document.getElementById('details-content');
+                if (params.nodes.length > 0) {
+                    hint.style.display = 'none';
+                    const node = nodes.find(n => n.id === params.nodes[0]);
+                    content.innerHTML = `
+                        <div style="font-weight:bold; color:#00d2ff; margin-bottom:10px;">${node.label.replace('\n', ' ')}</div>
+                        <div class="detail-item"><span class="detail-key">Type</span><span class="detail-value">${node.group}</span></div>
+                        <div class="detail-item"><span class="detail-key">Status</span><span class="status-badge status-active">Online</span></div>
                     `;
+                } else {
+                    hint.style.display = 'block';
+                    content.innerHTML = '';
                 }
-            }
-        });
+            });
+
+            // Force redraw after a short delay
+            setTimeout(() => network.fit(), 500);
+        }
+
+        // Wait for library to load
+        if (typeof vis !== 'undefined') {
+            initNetwork();
+        } else {
+            const script = document.querySelector('script[src*="vis-network"]');
+            script.onload = initNetwork;
+        }
     </script>
 </body>
+
+</html>
+
+</body>
+
 </html>
