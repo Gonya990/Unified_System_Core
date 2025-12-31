@@ -23,7 +23,8 @@
 
 - **Status:** Operational
 - **Location:** `Scripts/openai_data_integration`
-- **Goal:** Keep ChatGPT conversations synced with the local workspace to maintain continuity.
+- **Goal:** Keep ChatGPT conversations synced with the local workspace to
+  maintain continuity.
 
 ---
 
@@ -31,9 +32,12 @@
 
 **To ChatGPT/Gemini:**
 
-- We are currently building a unified system. All code is stored in `Projects/AI_Core`.
-- Use `Agent_Context/Knowledge_Base/OpenAI_Conversations` to understand past decisions.
-- **Goal:** Synchronize our context via this `Shared_Memory.md` file. Before starting any task, please READ this file to get the latest state.
+- We are currently building a unified system. All code is stored in
+  `Projects/AI_Core`.
+- Use `Agent_Context/Knowledge_Base/OpenAI_Conversations` to understand past
+  decisions.
+- **Goal:** Synchronize our context via this `Shared_Memory.md` file. Before
+  starting any task, please READ this file to get the latest state.
 
 ---
 
