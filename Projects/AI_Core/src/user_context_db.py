@@ -46,6 +46,18 @@ class UserContextDB:
                     value TEXT
                 )
             ''')
+            # Chat memory/facts extracted by AI
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS chat_memories (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    fact_short TEXT,
+                    fact_full TEXT,
+                    source_date TIMESTAMP,
+                    created_at TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(user_id)
+                )
+            ''')
             conn.commit()
 
     def add_user(self, user_id: int, username: str, full_name: str):
@@ -55,6 +67,28 @@ class UserContextDB:
                 INSERT OR IGNORE INTO users (user_id, username, full_name, last_interaction, created_at)
                 VALUES (?, ?, ?, ?, ?)
             ''', (user_id, username, full_name, datetime.now(), datetime.now()))
+            conn.commit()
+
+    def add_memory(self, user_id: int, fact_short: str, fact_full: str):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO chat_memories (user_id, fact_short, fact_full, source_date, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, fact_short, fact_full, datetime.now(), datetime.now()))
+            conn.commit()
+
+    def get_memories(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM chat_memories WHERE user_id = ? ORDER BY created_at DESC LIMIT ?", (user_id, limit))
+            return [dict(row) for row in cursor.fetchall()]
+
+    def clear_memories(self, user_id: int):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM chat_memories WHERE user_id = ?", (user_id,))
             conn.commit()
 
     def update_last_interaction(self, user_id: int):

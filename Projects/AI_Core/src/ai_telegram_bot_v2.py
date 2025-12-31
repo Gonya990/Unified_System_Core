@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 import json
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List, Dict
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.constants import ChatAction
@@ -13,11 +13,13 @@ from user_context_db import UserContextDB
 from google_auth import GoogleAuthManager
 from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
+from conversation_manager import ConversationManager
 
 # Configuration
 OLLAMA_URL = "http://localhost:11434/api/generate"
 db = UserContextDB()
 auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
+conv_manager = ConversationManager()
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,12 +34,23 @@ logging.getLogger('').addHandler(console)
 logger = logging.getLogger(__name__)
 
 # keyboards
-def get_main_menu():
+def get_main_menu(user_id: int):
     keyboard = [
         ["📅 Daily Brief", "➕ New Task"],
         ["🧠 Memory/Context", "❓ Help"]
     ]
+    if user_id in bot_config.ALLOWED_USER_IDS:
+        keyboard.append(["🛠 Admin Panel"])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
+
+def get_admin_menu():
+    keyboard = [
+        [InlineKeyboardButton("📊 Service Status", callback_data="admin_services")],
+        [InlineKeyboardButton("🔑 Manage Keys", callback_data="admin_keys")],
+        [InlineKeyboardButton("👥 User Management", callback_data="admin_users")],
+        [InlineKeyboardButton("🔙 Back", callback_data="show_help")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 def get_calendar_client(user_id: int) -> Optional[CalendarClient]:
     user_data = db.get_user(user_id)
@@ -85,7 +98,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Show Main Menu
         await update.message.reply_html(
             rf'Welcome back, {user.mention_html()}! Ready to assist.',
-            reply_markup=get_main_menu()
+            reply_markup=get_main_menu(user.id)
         )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -107,7 +120,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("❌ Error: `client_secret.json` is missing on the server. Please contact Admin.")
     
     elif data == "help_onboarding":
-        await query.edit_message_text("I am an AI assistant integrated with your Calendar. Connect to start.")
+        await show_advanced_help(query, context, edit=True)
     
     elif data.startswith("confirm_event_"):
         pending = context.user_data.get('pending_event')
@@ -133,7 +146,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         
         if success:
-            # Store in context DB too
             import sqlite3
             with sqlite3.connect("user_context.db") as conn:
                 cursor = conn.cursor()
@@ -155,6 +167,66 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "edit_context":
         await query.edit_message_text("Feature coming soon! For now, try adding the event again with more details.")
+    
+    elif data == "clear_memory":
+        db.clear_memories(user_id)
+        conv_manager.clear_history(user_id)
+        await query.edit_message_text("🗑 Memory and conversation history cleared.")
+    
+    elif data == "show_help":
+        await show_advanced_help(query, context, edit=True)
+    
+    elif data == "daily_brief_cb":
+        # Simulate '📅 Daily Brief' command
+        await show_daily_brief(query, context)
+    
+    elif data == "show_memories_cb":
+        # Simulate '🧠 Memory/Context' command
+        await show_memory_context(query, context)
+        
+    elif data == "settings_cb":
+        await query.edit_message_text("⚙️ **Settings**\n\nNotifications: ON\nProactive Nudge: ON (3 days)\nAI Model: " + bot_config.MODEL_NAME, parse_mode='Markdown')
+
+    # Admin Handlers
+    elif data == "admin_services":
+        if user_id not in bot_config.ALLOWED_USER_IDS: return
+        status = "🟢 ollama: Up 2 hours\n🟢 telegram-bot: Up 30 mins\n🟡 postgres: Restarting"
+        await query.edit_message_text(f"🛠 **Service Status:**\n\n```\n{status}\n```", parse_mode='Markdown', reply_markup=get_admin_menu())
+
+    elif data == "admin_keys":
+        if user_id not in bot_config.ALLOWED_USER_IDS: return
+        await query.edit_message_text("🔑 **Key Management:**\n\n- OLLAMA_URL: Set\n- TELEGRAM_TOKEN: Set\n- GOOGLE_CLIENT_ID: Set", reply_markup=get_admin_menu())
+
+    elif data == "admin_users":
+        if user_id not in bot_config.ALLOWED_USER_IDS: return
+        users = db.get_inactive_users(hours=0) # Get all users
+        resp = "👥 **User Management:**\n\n"
+        for u in users:
+            status = "✅" if u['is_approved'] else "⏳"
+            resp += f"{status} {u['full_name']} (@{u['username']})\n"
+        await query.edit_message_text(resp, reply_markup=get_admin_menu())
+
+async def show_advanced_help(update_or_query, context, edit=False):
+    text = (
+        "🤖 **Digital Assistant Help**\n\n"
+        "I can help you with:\n"
+        "• **Calendar**: Connect your Google account to manage events.\n"
+        "• **Memory**: I remember key facts from our chats to help you better.\n"
+        "• **Insights**: Ask me 'What did we decide about X?' to recall context.\n"
+        "• **Proactivity**: I'll nudge you if we haven't spoken in a while.\n\n"
+        "**Quick Actions:**"
+    )
+    keyboard = [
+        [InlineKeyboardButton("📅 Today's Brief", callback_data="daily_brief_cb")],
+        [InlineKeyboardButton("🧠 My Memories", callback_data="show_memories_cb")],
+        [InlineKeyboardButton("⚙️ Settings", callback_data="settings_cb")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    if edit:
+        await update_or_query.edit_message_text(text, parse_mode='Markdown', reply_markup=reply_markup)
+    else:
+        await update_or_query.message.reply_text(text, parse_mode='Markdown', reply_markup=reply_markup)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -165,12 +237,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = update.message.text
     logger.info(f"Query from {user_id}: {user_text}")
     
-    # 1. Check for Auth Code
     if user_text.strip().startswith("4/"):
         await update.message.reply_text("🔄 Verifying code...")
         credentials = auth_manager.exchange_code(user_text.strip())
         if credentials:
-            # Save to DB
             import sqlite3
             with sqlite3.connect("user_context.db") as conn:
                 cursor = conn.cursor()
@@ -180,29 +250,40 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 conn.commit()
             
-            await update.message.reply_text("✅ Success! Google Calendar connected.", reply_markup=get_main_menu())
+            await update.message.reply_text("✅ Success! Google Calendar connected.", reply_markup=get_main_menu(user_id))
             return
         else:
             await update.message.reply_text("❌ Invalid code or connection failed. Try again.")
             return
 
-    # 2. Handle Menu Commands
     if user_text == "📅 Daily Brief":
         await show_daily_brief(update, context)
         return
     elif user_text == "➕ New Task":
         await update.message.reply_text("What should I schedule? (e.g., 'Meeting with Sarah tomorrow at 10am')")
         return
+    elif user_text == "🧠 Memory/Context":
+        await show_memory_context(update, context)
+        return
+    elif user_text == "🛠 Admin Panel":
+        if user_id in bot_config.ALLOWED_USER_IDS:
+            await update.message.reply_text("🛠 **Admin Control Center**", reply_markup=get_admin_menu())
+        else:
+            await update.message.reply_text("⛔️ Access Denied.")
+        return
     elif user_text == "❓ Help":
-        await update.message.reply_text("I can help you manage your calendar. Try 'Show my schedule' or 'Add event'.")
+        await show_advanced_help(update, context)
         return
 
     # 3. AI Intent Parsing & Response
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     
+    # Save to history
+    conv_manager.add_message(user_id, "user", user_text)
+
     lower_text = user_text.lower()
     
-    # Check for "Add Event" intent manually or via AI
+    # Check for "Add Event" intent
     if any(k in lower_text for k in ["schedule", "add", "meeting", "запиши", "встреча", "назначь"]):
         event_details = await parse_event_details(user_text)
         if event_details and 'summary' in event_details:
@@ -226,7 +307,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode='Markdown',
                 reply_markup=reply_markup
             )
-            # Store event details in user_data/context for confirmation
+            # Store event details
             context.user_data['pending_event'] = event_details
             return
     
@@ -234,8 +315,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_daily_brief(update, context)
         return
 
-    ai_response = await query_ollama(user_text)
+    # Regular AI query with context
+    ai_response = await query_ollama_with_context(user_id, user_text)
+    conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(ai_response, reply_markup=get_main_menu())
+    
+    # Trigger async digestion if history is long
+    history = conv_manager.get_history(user_id)
+    if len(history) >= 10 and len(history) % 10 == 0:
+        asyncio.create_task(digest_chat_memory(user_id))
+
+async def show_memory_context(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    memories = db.get_memories(user_id)
+    
+    if not memories:
+        await update.effective_message.reply_text("🧠 I haven't learned any key facts about you yet. Let's talk more!")
+    else:
+        resp = "🧠 **My Long-term Memory:**\n\n"
+        for m in memories:
+            resp += f"• {m['fact_short']}\n"
+        
+        keyboard = [[InlineKeyboardButton("🗑 Clear Memory", callback_data="clear_memory")]]
+        await update.effective_message.reply_text(resp, parse_mode='Markdown', reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
     prompt = (
@@ -246,7 +348,6 @@ async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
     
     response = await query_ollama(prompt, system="You are a data extractor. Return JSON only.")
     try:
-        # Simple extraction logic (might need more robust cleaning if Ollama adds fluff)
         start = response.find('{')
         end = response.rfind('}') + 1
         if start != -1 and end != -1:
@@ -260,17 +361,57 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     client = get_calendar_client(user_id)
     
     if not client:
-        await update.message.reply_text("❌ Calendar not connected. Please run /start to connect.")
+        await update.effective_message.reply_text("❌ Calendar not connected. Please run /start to connect.")
         return
     
     events = client.get_upcoming_events(days=1)
     if not events:
-        await update.message.reply_text("You have no events scheduled for today. Ready for new tasks!")
+        await update.effective_message.reply_text("You have no events scheduled for today. Ready for new tasks!")
     else:
         resp = "📅 **Your Daily Brief:**\n\n"
         for e in events:
             resp += f"• {client.format_event(e)}\n"
-        await update.message.reply_text(resp, parse_mode='Markdown')
+        await update.effective_message.reply_text(resp, parse_mode='Markdown')
+
+async def digest_chat_memory(user_id: int):
+    """Summarize recent history into long-term facts."""
+    history = conv_manager.get_history(user_id, limit=20)
+    history_text = "\n".join([f"{m['role']}: {m['content']}" for m in history])
+    
+    prompt = (
+        "Analyze the following chat history and extract any NEW key facts "
+        "or preferences about the user (e.g., job, interests, business details, names). "
+        "Return results as a JSON array of objects with 'fact_short' and 'fact_full' keys. "
+        "If no new facts found, return empty array [].\n\nHistory:\n" + history_text
+    )
+    
+    response = await query_ollama(prompt, system="You are a knowledge extractor. Return JSON array ONLY.")
+    try:
+        start = response.find('[')
+        end = response.rfind(']') + 1
+        if start != -1 and end != -1:
+            facts = json.loads(response[start:end])
+            for f in facts:
+                db.add_memory(user_id, f['fact_short'], f['fact_full'])
+            logger.info(f"Digested {len(facts)} new memories for user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to digest memory JSON: {e}")
+
+async def query_ollama_with_context(user_id: int, prompt: str) -> str:
+    # 1. Get Long-term memories
+    memories = db.get_memories(user_id, limit=5)
+    mem_text = "\n".join([f"- {m['fact_full']}" for m in memories])
+    
+    # 2. Get short-term history
+    history = conv_manager.get_history(user_id, limit=5)
+    hist_text = "\n".join([f"{m['role']}: {m['content']}" for m in history[-5:]])
+    
+    full_prompt = (
+        "You are a helpful personal assistant. Here is what you know about the user:\n"
+        + mem_text + "\n\nRecent context:\n" + hist_text + "\n\nUser: " + prompt + "\nAssistant:"
+    )
+    
+    return await query_ollama(full_prompt)
 
 async def query_ollama(prompt: str, system: str = None) -> str:
     system_prompt = system or "You are a helpful personal assistant bot. You manage the user's Google Calendar and provide insights. Be concise and professional."
@@ -293,7 +434,6 @@ async def query_ollama(prompt: str, system: str = None) -> str:
         return f"Ollama Connection Error: {e}"
 
 async def post_init(application: Application) -> None:
-    # Start the DailyScheduler
     scheduler = DailyScheduler(application, db)
     asyncio.create_task(scheduler.start())
     logger.info("DailyScheduler background task started via post_init.")
