@@ -419,7 +419,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Regular AI query with context
     ai_response = await query_ollama_with_context(user_id, user_text)
     conv_manager.add_message(user_id, "assistant", ai_response)
-    await update.message.reply_text(ai_response, reply_markup=get_main_menu())
+    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
     
     # Trigger async digestion if history is long
     history = conv_manager.get_history(user_id)
