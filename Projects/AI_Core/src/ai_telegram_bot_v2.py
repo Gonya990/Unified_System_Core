@@ -207,11 +207,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "daily_brief_cb":
         # Simulate '📅 Daily Brief' command
-        await show_daily_brief(query, context)
+        await show_daily_brief(update, context)
     
     elif data == "show_memories_cb":
         # Simulate '🧠 Memory/Context' command
-        await show_memory_context(query, context)
+        await show_memory_context(update, context)
         
     elif data == "settings_cb":
         await query.edit_message_text("⚙️ **Settings**\n\nNotifications: ON\nProactive Nudge: ON (3 days)\nAI Model: " + config.get("MODEL_NAME", "unknown"), parse_mode='Markdown')
