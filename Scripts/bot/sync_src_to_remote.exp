@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+set timeout 60
+set password "GarYk6550"
+set host "gonya@100.127.194.111"
+
+puts "Syncing AI Core source to remote..."
+
+# List of files to sync
+set files {
+    "config_manager.py"
+    "inference_client.py"
+    "ai_telegram_bot_v2.py"
+    "user_context_db.py"
+    "conversation_manager.py"
+    "daily_scheduler.py"
+    "calendar_client.py"
+}
+
+foreach file $files {
+    spawn scp -o StrictHostKeyChecking=no Projects/AI_Core/src/$file $host:Desktop/Windows_AI_Core/src/
+    expect {
+        "password:" { send "$password\r"; exp_continue }
+        eof
+    }
+}
+
+puts "Sync complete."
