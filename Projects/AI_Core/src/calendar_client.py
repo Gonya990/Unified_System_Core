@@ -1,60 +1,48 @@
 """
 Google Calendar Client
-Simplified integration for viewing and creating calendar events.
+Integrates with Google Calendar API using OAuth 2.0 credentials.
 """
-import os
 import logging
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 
 logger = logging.getLogger(__name__)
 
 class CalendarClient:
-    """Client for Google Calendar API."""
+    """Client for Google Calendar API per user."""
     
-    def __init__(self):
-        self.api_key = os.getenv("GOOGLE_CALENDAR_API_KEY")
-        self.calendar_id = os.getenv("GOOGLE_CALENDAR_ID", "primary")
+    def __init__(self, credentials_json: str = None, credentials_dict: Dict = None):
+        """
+        Initialize with user credentials.
+        :param credentials_json: JSON string of credentials
+        :param credentials_dict: Dictionary of credentials
+        """
         self.service = None
+        self.creds = None
         
-        # Try to initialize service
         try:
-            from googleapiclient.discovery import build
+            if credentials_dict:
+                self.creds = Credentials.from_authorized_user_info(credentials_dict)
+            elif credentials_json:
+                # Assuming credentials_json is a JSON string compatible with from_authorized_user_info
+                import json
+                info = json.loads(credentials_json)
+                self.creds = Credentials.from_authorized_user_info(info)
             
-            if self.api_key:
-                # API Key method (read-only, public calendars)
-                self.service = build('calendar', 'v3', developerKey=self.api_key)
-                logger.info("Calendar service initialized with API key")
+            if self.creds:
+                self.service = build('calendar', 'v3', credentials=self.creds)
+                logger.debug("Calendar service initialized with OAuth credentials")
             else:
-                logger.warning("Google Calendar API key not configured")
+                logger.warning("No credentials provided to CalendarClient")
+        
         except Exception as e:
             logger.error(f"Failed to initialize Calendar service: {e}")
-    
-    def get_today_events(self) -> List[Dict]:
-        """Get today's events."""
-        if not self.service:
-            return []
-        
-        try:
-            # Get events for today
-            now = datetime.utcnow()
-            start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
-            end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0).isoformat() + 'Z'
-            
-            events_result = self.service.events().list(
-                calendarId=self.calendar_id,
-                timeMin=start_of_day,
-                timeMax=end_of_day,
-                singleEvents=True,
-                orderBy='startTime'
-            ).execute()
-            
-            events = events_result.get('items', [])
-            return events
-        except Exception as e:
-            logger.error(f"Failed to fetch calendar events: {e}")
-            return []
-    
+
+    def is_valid(self) -> bool:
+        return self.service is not None
+
     def get_upcoming_events(self, days: int = 7) -> List[Dict]:
         """Get upcoming events for next N days."""
         if not self.service:
@@ -65,7 +53,7 @@ class CalendarClient:
             end = (datetime.utcnow() + timedelta(days=days)).isoformat() + 'Z'
             
             events_result = self.service.events().list(
-                calendarId=self.calendar_id,
+                calendarId='primary',
                 timeMin=now,
                 timeMax=end,
                 maxResults=10,
@@ -89,16 +77,15 @@ class CalendarClient:
                 dt = datetime.fromisoformat(start.replace('Z', '+00:00'))
                 time_str = dt.strftime('%H:%M')
             else:  # All-day event
-                time_str = "Весь день"
+                time_str = "All Day"
         except:
             time_str = "?"
         
         return f"{time_str} - {summary}"
     
-    def create_event(self, summary: str, start_time: datetime, duration_minutes: int = 60) -> Optional[Dict]:
+    def create_event(self, summary: str, start_time: datetime, duration_minutes: int = 60, description: str = "") -> Optional[Dict]:
         """
         Create a new calendar event.
-        Note: Requires OAuth, not API key.
         """
         if not self.service:
             logger.error("Calendar service not initialized")
@@ -109,22 +96,25 @@ class CalendarClient:
             
             event = {
                 'summary': summary,
+                'description': description,
                 'start': {
                     'dateTime': start_time.isoformat(),
-                    'timeZone': 'Europe/Kiev',
+                    'timeZone': 'UTC', # Should optimally be user's timezone
                 },
                 'end': {
                     'dateTime': end_time.isoformat(),
-                    'timeZone': 'Europe/Kiev',
+                    'timeZone': 'UTC',
                 },
             }
             
             created_event = self.service.events().insert(
-                calendarId=self.calendar_id,
+                calendarId='primary',
                 body=event
             ).execute()
             
+            logger.info(f"Created event: {created_event.get('htmlLink')}")
             return created_event
         except Exception as e:
             logger.error(f"Failed to create event: {e}")
             return None
+
