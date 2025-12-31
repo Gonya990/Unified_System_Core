@@ -3,7 +3,7 @@ set timeout 20
 set password "GarYk6550"
 set host "gonya@100.127.194.111"
 
-spawn scp -o StrictHostKeyChecking=no /Users/macbook/Documents/Unified_System/Windows_AI_Core/src/bot_config_live.py $host:Desktop/Windows_AI_Core/src/bot_config.py
+spawn scp -o StrictHostKeyChecking=no /Users/macbook/Documents/Unified_System/Projects/AI_Core/src/bot_config_live.py $host:Desktop/Windows_AI_Core/src/bot_config.py
 expect {
     "password:" {
         send "$password\r"

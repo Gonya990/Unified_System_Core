@@ -59,7 +59,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv, find_dotenv
     # Try to find .env in parent or specific locations
     load_dotenv(find_dotenv(usecwd=True)) 
-    # Also look in Windows_AI_Core for dev setup
-    load_dotenv("/Users/macbook/Documents/Unified_System/Windows_AI_Core/.env")
+    # Also look in Projects/AI_Core for dev setup
+    load_dotenv("/Users/macbook/Documents/Unified_System/Projects/AI_Core/.env")
     
     send_telegram_message("🔔 Test notification from Job Hunter Agent")

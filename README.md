@@ -9,7 +9,7 @@
 | 📂 Section | 🔗 Link | 📝 Description |
 | --- | --- | --- |
 | **🧠 Knowledge Base** | [Agent_Context/Knowledge_Base/](Agent_Context/Knowledge_Base/) | Centralized AI context, sessions, and scripts |
-| **💻 Windows AI Core** | [Windows_AI_Core/](Windows_AI_Core/) | Telegram Bot + Ollama inference code |
+| **💻 AI Core (Main)** | [Projects/AI_Core/](Projects/AI_Core/) | Telegram Bot + Ollama inference code |
 | **⚙️ Scripts** | [Scripts/](Scripts/) | Deployment, automation, expect scripts |
 | **🏗 Architecture** | [Architecture Docs](Agent_Context/Knowledge_Base/Architecture/) | System design and handoff guides |
 
@@ -21,7 +21,7 @@
 graph LR
     subgraph Tailscale Mesh
         A[📱 iPhone Commander] --> B[💻 MacBook Admin]
-        B --> C[🖥️ Windows AI Core]
+        B --> C[🖥️ AI Core (Main)]
         B --> D[🐧 igor-gaming-1 WSL2]
         B --> E[📦 Proxmox PVE]
     end
@@ -32,7 +32,7 @@ graph LR
 | Node | FQDN (MagicDNS) | IP (Tailscale) | Role |
 | --- | --- | --- | --- |
 | **igor-gaming-1** | `igor-gaming-1.tail5e8a72.ts.net` | `100.78.144.50` | Primary AI workstation (WSL2) |
-| **igor-gaming** | `igor-gaming.tail5e8a72.ts.net` | `100.127.194.111` | Windows AI Core (GPU inference) |
+| **igor-gaming** | `igor-gaming.tail5e8a72.ts.net` | `100.127.194.111` | Projects/AI_Core (GPU inference) |
 | **MacBook-Air** | `macbook-air.tail5e8a72.ts.net` | `100.93.121.47` | Admin & development |
 | **pve** | `pve.myth-rudd.ts.net` | `100.78.145.67` | Proxmox hypervisor |
 | **iphone-15-pro** | `iphone-15-pro.tail5e8a72.ts.net` | `100.86.233.87` | Mobile commander (Termius) |
@@ -42,16 +42,9 @@ graph LR
 ## 📁 Repository Structure
 
 ```text
-Unified_System_Core/
-├── Agent_Context/
-│   ├── Knowledge_Base/          # 🧠 Central knowledge store
-│   │   ├── Sessions/            # 32 AI conversation artifacts
-│   │   ├── Architecture/        # System docs & handoff guides
-│   │   ├── Docs/                # Navigation, rules, projects
-│   │   ├── Scripts/             # Python & shell utilities
-│   │   └── Configs/             # Service configurations
-│   └── machines/                # Per-host metadata only
-├── Windows_AI_Core/             # Telegram bot source
+├── Projects/
+│   ├── AI_Core/                 # Telegram bot source
+│   └── telegram_bot/            # Documentation & plans
 ├── Scripts/                     # Deployment & automation
 └── README.md                    # ← You are here
 ```
@@ -136,7 +129,7 @@ The Unified AI Bot is now a **complete life management system**:
 - 🔄 Self-update capability
 - 🗣 Voice control (Yandex Alice)
 
-**Quick Start**: See [Windows_AI_Core/README.md](Windows_AI_Core/README.md)
+**Quick Start**: See [Projects/AI_Core/README.md](Projects/AI_Core/README.md)
 
 ---
 
