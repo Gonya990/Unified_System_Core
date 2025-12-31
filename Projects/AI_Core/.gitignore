@@ -36,3 +36,9 @@ bot_config.json
 
 # Docker
 .docker/
+
+# Credentials (sensitive)
+credentials/
+google_token.json
+client_secret.json
+*.credentials.json
