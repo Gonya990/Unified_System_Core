@@ -55,3 +55,7 @@
 1. Fill `TBD` fields in `docs/owners_matrix.md`
 2. Complete Linear onboarding (5 days plan)
 3. Schedule All-Hands for v2.0.0 demo
+4. **[V2 Bot]** Add "🤔 Thinking..." message before AI processing (UX improvement from V1)
+5. **[V2 Bot]** Add configurable AI persona/name (e.g., "Gonya") instead of generic assistant
+6. **[V2 Bot]** Add Windows console encoding fix (`sys.stdout.reconfigure(encoding='utf-8')`)
+7. **[V2 Bot]** Consider adding local GPU inference option to `InferenceClient` (low priority)

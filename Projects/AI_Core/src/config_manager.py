@@ -68,6 +68,8 @@ class ConfigManager:
             "INFERENCE_API_KEY": os.environ.get("INFERENCE_API_KEY", ""),
             "MODEL_NAME": os.environ.get("MODEL_NAME", "llama3.2"),
             "LOG_LEVEL": os.environ.get("LOG_LEVEL", "INFO"),
+            # User management
+            "ALLOWED_USERS": os.environ.get("ALLOWED_USERS", ""),
         }
         
         # Override with persisted config if exists
