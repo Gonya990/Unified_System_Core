@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # Implementation Plan & User Stories
 
 ## Goal Description
