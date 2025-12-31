@@ -85,11 +85,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 2. Check Auth/Approval
     if not db.is_approved(user.id):
-        # Auto-approve if in ALLOWED_USER_IDS
-        if user.id in bot_config.ALLOWED_USER_IDS:
+        # Auto-approve if in ALLOWED_USERS
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        
+        if user.id in allowed_ids:
             db.approve_user(user.id, True)
         else:
-            await update.message.reply_text("⛔️ Access Denied. Your ID is pending approval.")
+            await update.message.reply_text(f"⛔️ Access Denied. Your ID `{user.id}` is pending approval.", parse_mode='Markdown')
             return
 
     # 3. Check Google Connection
