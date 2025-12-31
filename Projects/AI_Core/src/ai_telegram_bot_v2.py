@@ -53,7 +53,7 @@ def get_main_menu(user_id: int):
     allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
     if user_id in allowed_ids:
         keyboard.append(["🛠 Админ-панель"])
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_admin_menu():
     keyboard = [
