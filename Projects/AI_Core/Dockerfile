@@ -1,30 +1,22 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
+
+# Install UV for fast dependency management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies using uv
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Compile bytecode for faster startup, install to system since we are in a container
+RUN uv pip install --system --no-cache -r requirements.txt
 
 # Copy source code
 COPY src/ ./src/
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+# Copy config/credential templates if needed (actual files mounted via volume)
 
-# Create data volume mount point
-VOLUME /data
+# Environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
-# Environment variables (override at runtime)
-ENV TELEGRAM_BOT_TOKEN=""
-ENV INFERENCE_BASE_URL="http://localhost:11434"
-ENV INFERENCE_API_KEY=""
-ENV MODEL_NAME="llama3.2"
-ENV LOG_LEVEL="INFO"
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" || exit 1
-
-EXPOSE 8080
-
-ENTRYPOINT ["./entrypoint.sh"]
+# Run the bot
+CMD ["python", "-m", "src.ai_telegram_bot_v2"]

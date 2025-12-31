@@ -1,33 +1,26 @@
-version: "3.8"
-
 services:
-  telegram-bot:
-    build: .
-    image: ghcr.io/gonya990/ai-telegram-bot:${VERSION:-latest}
-    container_name: ai-telegram-bot
-    restart: unless-stopped
+  ai-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-telegram-bot:v2
+    container_name: ai_telegram_bot
+    restart: always
+    env_file:
+      - .env
     volumes:
-      - bot-data:/data
+      # Logs
+      - ./bot.log:/app/bot.log
+      # Persistence (DB, Conversations)
+      - ./user_context.db:/app/user_context.db
+      - ./conversations:/app/conversations
+      # Credentials (if not in env)
+      - ./client_secret.json:/app/client_secret.json
     environment:
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - INFERENCE_BASE_URL=${INFERENCE_BASE_URL:-http://host.docker.internal:11434}
-      - INFERENCE_API_KEY=${INFERENCE_API_KEY:-}
-      - MODEL_NAME=${MODEL_NAME:-llama3.2}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    ports:
-      - "8080:8080"
-    networks:
-      - bot-network
-
-volumes:
-  bot-data:
-
-networks:
-  bot-network:
-    driver: bridge
+      - PYTHONUNBUFFERED=1
+    # Ensure logs are accessible via docker logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

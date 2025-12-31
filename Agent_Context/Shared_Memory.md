@@ -1,7 +1,8 @@
 # 🧠 Shared Agent Memory | Общая память агента
 >
 > **Last Updated:** 2025-12-31 15:32:00
-> **Current Focus:** v2.0.0 Release Implementation & Agent Coordination
+> **Current Focus:** Docker Migration & Deployment Stability
+> **Standard:** Use Docker Compose + uv for all services.
 
 ---
 
@@ -9,7 +10,7 @@
 
 ### 1. Telegram Personal Assistant (AI Core)
 
-- **Status:** ✅ Completed (v2.0.0 Released)
+- **Status:** 🟡 In Progress (Dockerizing)
 - **Key Milestones:**
   - [x] US-001: Google Auth & Onboarding
   - [x] US-002: Calendar Integration
