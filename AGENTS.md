@@ -41,32 +41,57 @@ git push origin main
 
 ## 2. Planning & Task Management
 
+### Use Beads for Task Tracking
+
+**Beads** is the primary task management system. Use it for:
+- Multi-session work that needs persistence
+- Tasks with dependencies
+- Discovered work that emerges during implementation
+- Anything that should survive context switches
+
+### Beads Workflow
+
+```bash
+# Find available work
+bd ready                              # Show issues ready to work (no blockers)
+bd list --status=open                 # All open issues
+
+# Create and manage issues
+bd create --title="..." --type=task|bug|feature --priority=2
+bd update <id> --status=in_progress   # Claim work
+bd close <id>                         # Mark complete
+bd close <id1> <id2> ...              # Close multiple at once
+
+# Dependencies
+bd dep add <issue> <depends-on>       # Add dependency
+bd blocked                            # Show blocked issues
+
+# Sync with remote
+bd sync                               # Run at session end
+```
+
+### Priority Levels
+
+| Priority | Use for |
+| --- | --- |
+| P0 | Critical - blocks everything |
+| P1 | High - urgent work |
+| P2 | Medium - standard tasks |
+| P3 | Low - nice to have |
+| P4 | Backlog - future work |
+
 ### Use Implementation Plans
 
 For complex tasks (>5 tool calls):
 
-1. Create `implementation_plan.md` with:
-   - Goal description
-   - Proposed changes (grouped by component)
-   - Verification plan
-2. Request user approval via `notify_user`
-3. Execute only after approval
-
-### Track Progress with task.md
-
-```markdown
-# Task: [Task Name]
-
-- [ ] Pending item
-- [/] In progress
-- [x] Completed
-```
-
-Update `task.md` as you work. Mark items `[/]` when starting, `[x]` when done.
+1. Create a beads issue with clear scope
+2. Break into sub-tasks if needed (use dependencies)
+3. Request user approval before major changes
+4. Execute and close issues as you complete them
 
 ### Create Walkthroughs
 
-After completing work, create `walkthrough.md` documenting:
+After completing significant work, create `walkthrough.md` documenting:
 
 - What was changed
 - What was tested
@@ -471,13 +496,14 @@ fi
 ### Nodriver Location
 
 ```text
-/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/
+External_Tools/nodriver/
 ```
 
 ### Quick Start
 
 ```bash
-NDC="/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/Sessions/nodriver_implementation/ndc"
+# Set NDC path (adjust to your system)
+NDC="./External_Tools/nodriver/ndc"
 
 # Step 1: Check if daemon is running
 $NDC status
@@ -497,51 +523,51 @@ $NDC text "selector"
 **Navigation:**
 
 ```bash
-$NDC goto "https://url.com"       # Navigate to URL
-$NDC url                          # Get current URL
-$NDC title                        # Get page title
+ndc goto "https://url.com"       # Navigate to URL
+ndc url                          # Get current URL
+ndc title                        # Get page title
 ```
 
 **Interaction:**
 
 ```bash
-$NDC click "Button Text"          # Click by text
-$NDC clicksel "button.submit"     # Click by CSS selector
-$NDC fill "input#email" "text"    # Fill input
-$NDC type "input#pass" "text"     # Type with delay (human-like)
-$NDC scroll down 500              # Scroll page
+ndc click "Button Text"          # Click by text
+ndc clicksel "button.submit"     # Click by CSS selector
+ndc fill "input#email" "text"    # Fill input
+ndc type "input#pass" "text"     # Type with delay (human-like)
+ndc scroll down 500              # Scroll page
 ```
 
 **Content Extraction:**
 
 ```bash
-$NDC screenshot                   # Save to /tmp/nodriver_screen.png
-$NDC screenshot ~/my.png          # Save to custom path
-$NDC text "div.content"           # Get element text
-$NDC html                         # Get full page HTML
-$NDC js "document.title"          # Execute JavaScript
+ndc screenshot                   # Save to /tmp/nodriver_screen.png
+ndc screenshot /path/to/file.png # Save to custom path
+ndc text "div.content"           # Get element text
+ndc html                         # Get full page HTML
+ndc js "document.title"          # Execute JavaScript
 ```
 
 **Tabs:**
 
 ```bash
-$NDC tabs                         # List all tabs
-$NDC newtab "https://google.com"  # Open new tab
-$NDC switchtab 1                  # Switch to tab by index
-$NDC closetab 0                   # Close tab by index
+ndc tabs                         # List all tabs
+ndc newtab "https://google.com"  # Open new tab
+ndc switchtab 1                  # Switch to tab by index
+ndc closetab 0                   # Close tab by index
 ```
 
 **Waiting:**
 
 ```bash
-$NDC wait "selector" 10           # Wait for element (10s timeout)
+ndc wait "selector" 10           # Wait for element (10s timeout)
 ```
 
 **Daemon Control:**
 
 ```bash
-$NDC status                       # Check if daemon is running
-$NDC stop                         # Stop the daemon
+ndc status                       # Check if daemon is running
+ndc stop                         # Stop the daemon
 ```
 
 ### When Built-in Browser is REQUIRED
@@ -559,24 +585,9 @@ The `browser_subagent` tool MUST be used only in these LIMITED scenarios:
 
 **BEFORE using `browser_subagent`, you MUST:**
 
-1. **Document the limitation** — Explain why nodriver cannot be used:
-
-```markdown
-⚠️ **Nodriver Limitation Detected**
-
-I need to use the built-in browser tool because:
-- [Reason: "Video recording is required" / "Daemon is not running" / etc.]
-
-The built-in browser consumes more tokens but provides [specific capability needed].
-```
-
-1. **Ask for permission** — Get explicit user approval:
-
-```markdown
-May I proceed with the built-in browser tool? (yes/no)
-```
-
-1. **Only proceed after user confirmation** — Never auto-use built-in browser.
+1. **Document the limitation** — Explain why nodriver cannot be used
+2. **Ask for permission** — Get explicit user approval
+3. **Only proceed after user confirmation** — Never auto-use built-in browser
 
 ### Troubleshooting
 
@@ -588,8 +599,8 @@ curl http://localhost:9222/json/version
 ls -la /tmp/nodriver.sock
 
 # Restart everything
-$NDC stop
-pkill -f "Google Chrome"
+ndc stop
+pkill -f chrome
 ./start_chrome.sh
 ./start_daemon.sh
 ```
@@ -632,6 +643,12 @@ pkill -f "Google Chrome"
 
 1. **The Hub**: The `mcp_agent_mail` server and Beads task board MUST be hosted on the **Service Node** (`100.88.65.71`).
 2. **Unified Access**: All agents connect to this single hub via Tailscale. This ensures that the message "source of truth" is never split across nodes.
+
+### New Service Deployments
+
+**Default host for new services:** `igor-gaming-1`
+
+When deploying new services (AI Telegram Bot, new automation tools, etc.), use `igor-gaming-1` as the default target unless there's a specific reason to use another host.
 
 ### Cross-Agent Communication (ACP Compliance)
 
