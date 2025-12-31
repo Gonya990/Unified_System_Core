@@ -35,3 +35,6 @@ $RECYCLE.BIN/
 secrets/
 Agent_Context/Personal_Profile/RESUME_VARIANTS.md
 logs/automation/resume_attachments/
+venv_mac/
+Projects/AI_Core/venv_mac/
+*.db
