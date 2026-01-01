@@ -262,7 +262,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Parse time
         try:
             start_time = datetime.fromisoformat(pending['time'].replace('Z', '+00:00'))
-        except:
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Failed to parse event time '{pending.get('time')}': {e}, using default")
             start_time = datetime.now() + timedelta(hours=1) 
             
         # Conflict detection
@@ -373,6 +374,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             resp += f"{status} {u['full_name']} (@{u['username']}) - `{u['user_id']}`\n"
         await query.edit_message_text(resp, reply_markup=get_admin_menu())
 
+    # Model selection callback
+    elif data.startswith("model:"):
+        model_name = data.split(":", 1)[1]
+        config.set("MODEL_NAME", model_name)
+        inference.model = model_name
+        logger.info(f"[CALLBACK] User {user_id} switched model to: {model_name}")
+        await query.edit_message_text(
+            f"✅ Модель изменена на: `{model_name}`",
+            parse_mode="Markdown"
+        )
+
+    # Provider selection callback
+    elif data.startswith("provider:"):
+        provider_name = data.split(":", 1)[1]
+        config.set("INFERENCE_PROVIDER", provider_name)
+        inference.provider = provider_name
+        logger.info(f"[CALLBACK] User {user_id} switched provider to: {provider_name}")
+        await query.edit_message_text(
+            f"✅ Провайдер изменён на: `{provider_name.upper()}`",
+            parse_mode="Markdown"
+        )
+
 async def process_event_creation(query, user_id, client, pending, start_time):
     success = client.create_event(
         summary=pending['summary'],
@@ -439,15 +462,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🔄 Verifying code...")
         credentials = auth_manager.exchange_code(auth_code, user_id=user_id)
         if credentials:
-            import sqlite3
-            with sqlite3.connect("user_context.db") as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
-                    (credentials.to_json(), user_id)
-                )
-                conn.commit()
-            
+            # Use Firestore/SQLite abstraction
+            if hasattr(db, 'use_firestore') and db.use_firestore:
+                db.db.collection("users").document(str(user_id)).update({
+                    "google_creds": credentials.to_json(),
+                    "is_google_connected": True
+                })
+            else:
+                import sqlite3
+                with sqlite3.connect("user_context.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+                        (credentials.to_json(), user_id)
+                    )
+                    conn.commit()
+
             await update.message.reply_text("✅ Success! Google Calendar connected.", reply_markup=get_main_menu(user_id))
             return
         else:
@@ -584,13 +614,8 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not events:
         await update.effective_message.reply_text("You have no events scheduled for today. Ready for new tasks!")
     else:
-        # Get stored contexts
-        import sqlite3
-        with sqlite3.connect("user_context.db") as conn:
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute("SELECT event_title, context_description FROM event_contexts WHERE user_id = ?", (user_id,))
-            contexts = {row['event_title']: row['context_description'] for row in cursor.fetchall()}
+        # Get stored contexts using db abstraction
+        contexts = db.get_event_contexts(user_id)
 
         resp = "📅 **Your Daily Brief:**\n\n"
         for e in events:
@@ -748,8 +773,8 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await update.message.delete()
-    except:
-        pass
+    except Exception as e:
+        logger.debug(f"Could not delete message: {e}")
 
     await update.message.reply_text(f"✅ Key `{key_name}` updated and encrypted.", parse_mode='Markdown')
 
@@ -1061,7 +1086,8 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     ha_status = f"✅ Online"
                 else:
                     ha_status = "❌ Error"
-            except:
+            except Exception as e:
+                logger.debug(f"HA status check failed: {e}")
                 ha_status = "❌ Unreachable"
 
         dashboard = (
