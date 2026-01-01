@@ -23,6 +23,7 @@ from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
 from telegram_schema_expert import TelegramSchemaExpert
+from agent_orchestrator import AgentOrchestrator, PIPELINES
 
 # Configuration
 config = ConfigManager()
@@ -32,6 +33,7 @@ db = UserContextDB()
 auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
+agent_orchestrator = AgentOrchestrator(inference)
 
 
 logging.basicConfig(
@@ -557,9 +559,11 @@ async def post_init(application: Application) -> None:
     commands = [
         BotCommand("start", "Start the bot / Main menu"),
         BotCommand("help", "Show help and available commands"),
+        BotCommand("agent", "Run AI agent (code-explorer, reviewer...)"),
+        BotCommand("pipeline", "Run agent pipeline (feature, bugfix...)"),
         BotCommand("brief", "Get your daily calendar brief"),
+        BotCommand("img", "Generate image with DALL-E 3"),
         BotCommand("memory", "View your saved memories"),
-        BotCommand("newtask", "Create a new task or event"),
         BotCommand("tl", "Lookup Telegram TL Schema (MTProto)"),
     ]
     await application.bot.set_my_commands(commands)
@@ -654,14 +658,253 @@ async def tl_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /tl [query] command."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id): return
-    
+
     if not context.args:
         await update.message.reply_text("Usage: `/tl [predicate|id|type]`\nExample: `/tl user` or `/tl 34280482`", parse_mode='Markdown')
         return
-        
+
     query = " ".join(context.args)
     result = tl_expert.lookup(query)
     await update.message.reply_text(result, parse_mode='Markdown')
+
+async def agent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /agent [name] [task] command - run specialized AI agent."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        # Show available agents
+        agents_help = (
+            "🤖 **AI Агенты**\n\n"
+            "Использование: `/agent <имя> <задача>`\n\n"
+            "**Discovery:**\n"
+            "• `code-explorer` - исследовать код\n"
+            "• `api-discoverer` - найти API endpoints\n"
+            "• `dependency-mapper` - карта зависимостей\n\n"
+            "**Architecture:**\n"
+            "• `code-architect` - спроектировать решение\n"
+            "• `performance-optimizer` - оптимизация\n\n"
+            "**Implementation:**\n"
+            "• `implementer` - реализовать фичу\n"
+            "• `bug-fixer` - исправить баг\n\n"
+            "**Review:**\n"
+            "• `code-reviewer` - ревью кода\n\n"
+            "**Примеры:**\n"
+            "`/agent code-explorer Найди паттерны аутентификации`\n"
+            "`/agent code-reviewer Проверь последние изменения`"
+        )
+        await update.message.reply_text(agents_help, parse_mode='Markdown')
+        return
+
+    agent_name = context.args[0]
+    task = " ".join(context.args[1:]) if len(context.args) > 1 else ""
+
+    if not task:
+        await update.message.reply_text(
+            f"❌ Укажите задачу для агента `{agent_name}`\n\n"
+            f"Пример: `/agent {agent_name} Опиши архитектуру проекта`",
+            parse_mode='Markdown'
+        )
+        return
+
+    # Check if agent exists
+    agent = agent_orchestrator.get_agent(agent_name)
+    if not agent:
+        available = ", ".join(list(agent_orchestrator.agents.keys())[:10])
+        await update.message.reply_text(
+            f"❌ Агент `{agent_name}` не найден.\n\n"
+            f"Доступные: `{available}...`\n\n"
+            f"Используйте `/agent` для списка.",
+            parse_mode='Markdown'
+        )
+        return
+
+    logger.info(f"[AGENT] User {user_id} running {agent_name}: {task[:50]}...")
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    await update.message.reply_text(
+        f"🤖 Запускаю агента `{agent_name}`...\n"
+        f"⏱ Это может занять 20-40 секунд.",
+        parse_mode='Markdown'
+    )
+
+    try:
+        result = await agent_orchestrator.run(agent_name, task)
+
+        # Split long messages
+        if len(result) > 4000:
+            chunks = [result[i:i+4000] for i in range(0, len(result), 4000)]
+            for i, chunk in enumerate(chunks):
+                await update.message.reply_text(
+                    f"📄 Часть {i+1}/{len(chunks)}:\n\n{chunk}",
+                    parse_mode='Markdown'
+                )
+        else:
+            await update.message.reply_text(
+                f"✅ **{agent_name}** завершил:\n\n{result}",
+                parse_mode='Markdown'
+            )
+
+        logger.info(f"[AGENT] {agent_name} completed for user {user_id}")
+
+    except Exception as e:
+        logger.error(f"[AGENT] Error running {agent_name}: {e}")
+        await update.message.reply_text(f"❌ Ошибка агента: {str(e)}")
+
+
+async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /pipeline [type] [task] command - run agent pipeline."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        pipelines_help = (
+            "🔄 **Пайплайны агентов**\n\n"
+            "Использование: `/pipeline <тип> <задача>`\n\n"
+            "**Доступные пайплайны:**\n"
+            "• `feature` - разработка фичи\n"
+            "  (explorer → architect → implementer → reviewer)\n\n"
+            "• `bugfix` - исправление бага\n"
+            "  (explorer → bug-fixer → reviewer)\n\n"
+            "• `refactor` - рефакторинг\n"
+            "  (explorer → architect → implementer → reviewer)\n\n"
+            "• `security` - проверка безопасности\n"
+            "  (explorer → security-worker → reviewer)\n\n"
+            "**Пример:**\n"
+            "`/pipeline feature Добавить кэширование в API`\n"
+            "`/pipeline bugfix Ошибка в парсинге дат`"
+        )
+        await update.message.reply_text(pipelines_help, parse_mode='Markdown')
+        return
+
+    pipeline_type = context.args[0].lower()
+    task = " ".join(context.args[1:]) if len(context.args) > 1 else ""
+
+    if pipeline_type not in PIPELINES:
+        available = ", ".join(PIPELINES.keys())
+        await update.message.reply_text(
+            f"❌ Пайплайн `{pipeline_type}` не найден.\n\n"
+            f"Доступные: `{available}`",
+            parse_mode='Markdown'
+        )
+        return
+
+    if not task:
+        await update.message.reply_text(
+            f"❌ Укажите задачу для пайплайна `{pipeline_type}`\n\n"
+            f"Пример: `/pipeline {pipeline_type} Описание задачи`",
+            parse_mode='Markdown'
+        )
+        return
+
+    logger.info(f"[PIPELINE] User {user_id} running {pipeline_type}: {task[:50]}...")
+
+    pipeline_stages = PIPELINES[pipeline_type]
+    stage_names = " → ".join([s[0] for s in pipeline_stages])
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    status_msg = await update.message.reply_text(
+        f"🔄 Запускаю пайплайн `{pipeline_type}`\n\n"
+        f"Этапы: {stage_names}\n\n"
+        f"⏱ Это может занять 2-5 минут...",
+        parse_mode='Markdown'
+    )
+
+    try:
+        # Prepare tasks with the user's task description
+        tasks = [(agent, f"{desc}: {task}") for agent, desc in pipeline_stages]
+
+        results = await agent_orchestrator.run_pipeline(tasks)
+
+        # Format results
+        response = f"✅ **Пайплайн `{pipeline_type}` завершён**\n\n"
+
+        for agent_name, result in results.items():
+            # Truncate each result for readability
+            short_result = result[:800] + "..." if len(result) > 800 else result
+            response += f"**{agent_name}:**\n{short_result}\n\n---\n\n"
+
+        # Split if too long
+        if len(response) > 4000:
+            chunks = [response[i:i+4000] for i in range(0, len(response), 4000)]
+            for i, chunk in enumerate(chunks):
+                await update.message.reply_text(
+                    f"📄 Часть {i+1}/{len(chunks)}:\n\n{chunk}",
+                    parse_mode='Markdown'
+                )
+        else:
+            await update.message.reply_text(response, parse_mode='Markdown')
+
+        logger.info(f"[PIPELINE] {pipeline_type} completed for user {user_id}")
+
+    except Exception as e:
+        logger.error(f"[PIPELINE] Error running {pipeline_type}: {e}")
+        await update.message.reply_text(f"❌ Ошибка пайплайна: {str(e)}")
+
+
+async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /img [prompt] command - generate image using DALL-E 3."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        await update.message.reply_text(
+            "🎨 **Генерация изображений (DALL-E 3)**\n\n"
+            "Использование: `/img <описание>`\n\n"
+            "Примеры:\n"
+            "• `/img Новогодняя открытка 2026 со снежинками`\n"
+            "• `/img Футуристический город на закате`\n"
+            "• `/img Милый котик в шапке Санты`",
+            parse_mode='Markdown'
+        )
+        return
+
+    prompt = " ".join(context.args)
+    logger.info(f"[IMG] User {user_id} requested image: {prompt[:50]}...")
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO)
+    await update.message.reply_text("🎨 Генерирую изображение... (��то может занять до 30 секунд)")
+
+    try:
+        image_url = await inference.generate_image(prompt)
+
+        if image_url:
+            # Download and send as photo
+            async with aiohttp.ClientSession() as session:
+                async with session.get(image_url) as resp:
+                    if resp.status == 200:
+                        image_data = await resp.read()
+                        from io import BytesIO
+                        await update.message.reply_photo(
+                            photo=BytesIO(image_data),
+                            caption=f"🎨 {prompt[:200]}"
+                        )
+                        logger.info(f"[IMG] Successfully sent image to user {user_id}")
+                    else:
+                        await update.message.reply_text(f"❌ Не удалось загрузить изображение. URL: {image_url}")
+        else:
+            await update.message.reply_text(
+                "❌ Не удалось сгенерировать изображение.\n\n"
+                "Возможные причины:\n"
+                "• Не установлен OPENAI_API_KEY\n"
+                "• Превышен лимит API\n"
+                "• Промпт нарушает правила контента"
+            )
+    except Exception as e:
+        logger.error(f"[IMG] Error generating image: {e}")
+        await update.message.reply_text(f"❌ Ошибка: {str(e)}")
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
@@ -700,6 +943,9 @@ def main():
     application.add_handler(CommandHandler('brief', brief_command))
     application.add_handler(CommandHandler('memory', memory_command))
     application.add_handler(CommandHandler('newtask', newtask_command))
+    application.add_handler(CommandHandler('agent', agent_command))
+    application.add_handler(CommandHandler('pipeline', pipeline_command))
+    application.add_handler(CommandHandler('img', img_command))
     application.add_handler(CommandHandler('tl', tl_command))
     application.add_handler(CommandHandler('set_key', set_key))
     application.add_handler(CommandHandler('approve', approve_user))

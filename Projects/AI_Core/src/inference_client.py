@@ -443,6 +443,45 @@ class InferenceClient:
             logger.error(f"TTS Failed: {e}")
             return None
             
+    async def generate_image(self, prompt: str, size: str = "1024x1024", quality: str = "standard") -> Optional[str]:
+        """
+        Generate image using OpenAI DALL-E 3.
+        Returns URL of generated image or None on failure.
+        """
+        api_key = self.config.get("OPENAI_API_KEY")
+        if not api_key:
+            logger.error("No OpenAI API key found for image generation.")
+            return None
+
+        url = "https://api.openai.com/v1/images/generations"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "dall-e-3",
+            "prompt": prompt,
+            "n": 1,
+            "size": size,
+            "quality": quality
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=120)) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        image_url = data.get("data", [{}])[0].get("url")
+                        logger.info(f"Image generated successfully: {image_url[:50]}...")
+                        return image_url
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"DALL-E Error {response.status}: {error_text}")
+                        return None
+        except Exception as e:
+            logger.error(f"Image generation failed: {e}")
+            return None
+
     async def analyze_image(self, image_path: str, prompt: str = "Describe this image") -> str:
         """Analyze image using Gemini Vision."""
         if self.provider != "gemini":
