@@ -96,8 +96,9 @@ except ImportError:
 
 try:
     from digest_service import DigestService
-    digest_service = DigestService()
+    _DIGEST_AVAILABLE = True
 except ImportError:
+    _DIGEST_AVAILABLE = False
     digest_service = None
 
 # Setup logging first
@@ -130,6 +131,13 @@ auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
 agent_orchestrator = AgentOrchestrator(inference)
+
+# Initialize digest service (requires other services)
+if _DIGEST_AVAILABLE and usage_tracker and task_manager:
+    digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager)
+    logger.info("Digest service initialized")
+else:
+    digest_service = None
 
 # Admin ID
 ADMIN_ID = int(config.get("ALLOWED_USERS", "708531393").split(",")[0])

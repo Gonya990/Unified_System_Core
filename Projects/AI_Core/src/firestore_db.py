@@ -137,14 +137,31 @@ class FirestoreDB:
             self._sqlite.set_google_connected(user_id, connected)
 
     def get_inactive_users(self, hours: int = 72) -> List[Dict[str, Any]]:
-        """Get users who haven't interacted for N hours."""
+        """Get users who haven't interacted for N hours.
+
+        Note: For hours=0, returns all users (for admin panel).
+        """
         if self.use_firestore:
-            cutoff = datetime.now() - timedelta(hours=hours)
-            docs = self.db.collection("users")\
-                .where("is_approved", "==", True)\
-                .where("last_interaction", "<", cutoff)\
-                .stream()
-            return [doc.to_dict() for doc in docs]
+            # Simple query to avoid needing composite index
+            if hours == 0:
+                # Return all users (admin panel use case)
+                docs = self.db.collection("users").stream()
+                return [doc.to_dict() for doc in docs]
+            else:
+                # Filter client-side to avoid composite index requirement
+                cutoff = datetime.now() - timedelta(hours=hours)
+                docs = self.db.collection("users").stream()
+                results = []
+                for doc in docs:
+                    data = doc.to_dict()
+                    if data.get("is_approved") and data.get("last_interaction"):
+                        last_int = data["last_interaction"]
+                        # Handle Firestore timestamp
+                        if hasattr(last_int, 'timestamp'):
+                            last_int = datetime.fromtimestamp(last_int.timestamp())
+                        if last_int < cutoff:
+                            results.append(data)
+                return results
         else:
             return self._sqlite.get_inactive_users(hours)
 
