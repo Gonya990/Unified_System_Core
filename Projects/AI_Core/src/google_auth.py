@@ -8,8 +8,14 @@ from google.oauth2.credentials import Credentials
 
 logger = logging.getLogger(__name__)
 
-# Scopes required
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+# Scopes required - must match OAuth consent screen configuration
+SCOPES = [
+    'https://www.googleapis.com/auth/calendar',
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/gmail.compose',
+    'https://www.googleapis.com/auth/gmail.settings.basic',
+    'openid'
+]
 
 # Redirect URI - must match what's configured in Google Cloud Console
 # Using http://localhost (no port, no path) as it's pre-authorized for desktop apps
