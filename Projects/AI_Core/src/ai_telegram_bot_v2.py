@@ -54,9 +54,9 @@ except ImportError:
 
 try:
     from gmail_client import GmailClient
-    gmail_client = GmailClient()
+    GMAIL_AVAILABLE = True
 except ImportError:
-    gmail_client = None
+    GMAIL_AVAILABLE = False
 
 try:
     from notion_client import NotionClient
@@ -171,6 +171,19 @@ def get_calendar_client(user_id: int) -> Optional[CalendarClient]:
             return CalendarClient(credentials_dict=creds_dict)
         except Exception as e:
             logger.error(f"Failed to create CalendarClient for {user_id}: {e}")
+    return None
+
+def get_gmail_client(user_id: int) -> Optional[GmailClient]:
+    """Get Gmail client for user using their OAuth credentials from Firestore."""
+    if not GMAIL_AVAILABLE:
+        return None
+    user_data = db.get_user(user_id)
+    if user_data and user_data['is_google_connected'] and user_data['google_creds']:
+        try:
+            creds_dict = json.loads(user_data['google_creds'])
+            return GmailClient(credentials_dict=creds_dict)
+        except Exception as e:
+            logger.error(f"Failed to create GmailClient for {user_id}: {e}")
     return None
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1535,30 +1548,33 @@ async def speak_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /mail command - check Gmail."""
+    """Handle /mail command - check Gmail using per-user OAuth credentials."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    if not gmail_client or not gmail_client.authenticated:
+    # Get per-user Gmail client
+    gmail = get_gmail_client(user_id)
+    if not gmail or not gmail.is_valid():
         await update.message.reply_text(
             "❌ Gmail не подключен.\n\n"
-            "Для подключения запусти бота локально для OAuth авторизации."
+            "Используйте /start → 🔗 Connect Google для подключения.\n"
+            "(Gmail использует те же OAuth credentials, что и Calendar)"
         )
         return
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     if not context.args:
-        summary = gmail_client.get_email_summary()
+        summary = gmail.get_email_summary()
         await update.message.reply_text(summary, parse_mode="Markdown")
         return
 
     cmd = context.args[0].lower()
 
     if cmd == "unread":
-        count = gmail_client.get_unread_count()
+        count = gmail.get_unread_count()
         await update.message.reply_text(f"📬 Непрочитанных писем: **{count}**", parse_mode="Markdown")
 
     elif cmd == "search":
@@ -1566,22 +1582,124 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("Usage: /mail search <query>")
             return
         query = " ".join(context.args[1:])
-        emails = gmail_client.search_emails(query, max_results=5)
+        emails = gmail.search_emails(query, max_results=5)
         if not emails:
             await update.message.reply_text(f"🔍 По запросу \"{query}\" ничего не найдено.")
             return
         msg = f"🔍 **Результаты по: \"{query}\"**\n\n"
         for email in emails:
             sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
-            msg += f"• **{sender}**\n  {email['subject'][:40]}...\n\n"
+            subj = email['subject'][:40]
+            if len(email['subject']) > 40:
+                subj += "..."
+            msg += f"• **{sender}**\n  {subj}\n\n"
         await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif cmd == "send":
+        # /mail send email@example.com | Subject | Body text
+        if len(context.args) < 2:
+            await update.message.reply_text(
+                "📤 **Отправка письма:**\n\n"
+                "`/mail send email@example.com | Тема | Текст письма`\n\n"
+                "Пример:\n"
+                "`/mail send test@gmail.com | Привет! | Это тестовое письмо.`"
+            , parse_mode="Markdown")
+            return
+
+        # Parse: /mail send email | subject | body
+        full_text = " ".join(context.args[1:])
+        parts = full_text.split("|")
+        if len(parts) < 3:
+            await update.message.reply_text("❌ Формат: `/mail send email | тема | текст`", parse_mode="Markdown")
+            return
+
+        to_email = parts[0].strip()
+        subject = parts[1].strip()
+        body = "|".join(parts[2:]).strip()  # In case body contains |
+
+        result = gmail.send_email(to=to_email, subject=subject, body=body)
+        if result:
+            await update.message.reply_text(f"✅ Письмо отправлено на {to_email}")
+        else:
+            await update.message.reply_text("❌ Ошибка отправки письма. Проверьте права OAuth.")
+
+    elif cmd == "read":
+        # /mail read <message_id> - read full email
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /mail read <message_id>")
+            return
+        msg_id = context.args[1]
+        body = gmail.get_email_body(msg_id)
+        if body:
+            # Truncate if too long
+            if len(body) > 3000:
+                body = body[:3000] + "\n\n... (обрезано)"
+            await update.message.reply_text(f"📧 **Содержимое письма:**\n\n{body[:4000]}")
+            gmail.mark_as_read(msg_id)
+        else:
+            await update.message.reply_text("❌ Не удалось прочитать письмо.")
+
+    elif cmd == "list":
+        # /mail list [count] - list recent emails with IDs
+        count = 5
+        if len(context.args) > 1:
+            try:
+                count = int(context.args[1])
+                count = min(count, 10)  # Max 10
+            except ValueError:
+                pass
+
+        emails = gmail.get_recent_emails(max_results=count)
+        if not emails:
+            await update.message.reply_text("📭 Нет писем в ящике.")
+            return
+
+        msg = f"📬 **Последние {len(emails)} писем:**\n\n"
+        for i, email in enumerate(emails, 1):
+            sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+            status = "🔵" if email.get('unread') else "⚪"
+            subj = email['subject'][:35]
+            if len(email['subject']) > 35:
+                subj += "..."
+            msg += f"{status} **{i}. {sender}**\n"
+            msg += f"   {subj}\n"
+            msg += f"   `ID: {email['id'][:20]}...`\n\n"
+
+        msg += "_Используйте_ `/mail read <ID>` _для чтения_"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif cmd == "archive":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /mail archive <message_id>")
+            return
+        if gmail.archive_email(context.args[1]):
+            await update.message.reply_text("✅ Письмо архивировано.")
+        else:
+            await update.message.reply_text("❌ Ошибка архивации.")
+
+    elif cmd == "trash":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /mail trash <message_id>")
+            return
+        if gmail.trash_email(context.args[1]):
+            await update.message.reply_text("🗑️ Письмо удалено.")
+        else:
+            await update.message.reply_text("❌ Ошибка удаления.")
 
     else:
         await update.message.reply_text(
             "📧 **Gmail Commands:**\n\n"
+            "**Чтение:**\n"
             "`/mail` - сводка непрочитанных\n"
             "`/mail unread` - количество непрочитанных\n"
-            "`/mail search <query>` - поиск",
+            "`/mail list [N]` - список N последних писем\n"
+            "`/mail read <ID>` - прочитать письмо\n"
+            "`/mail search <query>` - поиск\n\n"
+            "**Отправка:**\n"
+            "`/mail send email | тема | текст`\n\n"
+            "**Управление:**\n"
+            "`/mail archive <ID>` - архивировать\n"
+            "`/mail trash <ID>` - удалить",
             parse_mode="Markdown"
         )
 
