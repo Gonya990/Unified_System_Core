@@ -238,7 +238,7 @@ class InferenceClient:
                 "model": model,
                 "messages": full_messages,
                 "temperature": 0.7,
-                "max_tokens": 500,
+                "max_completion_tokens": 500,
             }
         elif provider == "openrouter":
             base_url = self.config.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")

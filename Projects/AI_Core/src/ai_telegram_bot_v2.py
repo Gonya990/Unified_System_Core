@@ -232,15 +232,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "connect_google":
         auth_url = auth_manager.get_auth_url(user_id=user_id)
         if auth_url:
+            # Use HTML parse mode to avoid Markdown breaking URLs with underscores
             await query.edit_message_text(
-                f"🔗 **Connect Google Calendar**\n\n"
+                f"🔗 <b>Connect Google Calendar</b>\n\n"
                 f"1. Click this link:\n{auth_url}\n\n"
                 f"2. Authorize access to your calendar\n\n"
                 f"3. You'll be redirected to a page (it may show an error - that's OK!)\n\n"
-                f"4. Copy the `code=` value from the URL and paste it here.\n\n"
-                f"Example: if URL is `http://localhost:8085/oauth2callback?code=4/0ABC...` "
-                f"then paste: `4/0ABC...`",
-                parse_mode='Markdown'
+                f"4. Copy the <code>code=</code> value from the URL and paste it here.\n\n"
+                f"Example: if URL is <code>http://localhost/...?code=4/0ABC...</code> "
+                f"then paste: <code>4/0ABC...</code>",
+                parse_mode='HTML'
             )
         else:
             await query.edit_message_text("❌ Error: `client_secret.json` is missing on the server. Please contact Admin.")
