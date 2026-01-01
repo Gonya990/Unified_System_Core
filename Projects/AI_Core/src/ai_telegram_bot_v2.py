@@ -296,13 +296,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✅ Да, добавить", callback_data=f"force_confirm_event")], [InlineKeyboardButton("❌ Отмена", callback_data="cancel_event")]]))
             return
 
-        await process_event_creation(query, user_id, client, pending, start_time)
+        await process_event_creation(query, user_id, client, pending, start_time, context)
 
     elif data == "force_confirm_event":
         pending = context.user_data.get('pending_event')
         client = get_calendar_client(user_id)
         start_time = datetime.fromisoformat(pending['time'].replace('Z', '+00:00'))
-        await process_event_creation(query, user_id, client, pending, start_time)
+        await process_event_creation(query, user_id, client, pending, start_time, context)
 
     elif data == "cancel_event":
         context.user_data.pop('pending_event', None)
@@ -410,7 +410,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown"
         )
 
-async def process_event_creation(query, user_id, client, pending, start_time):
+async def process_event_creation(query, user_id, client, pending, start_time, context):
     success = client.create_event(
         summary=pending['summary'],
         start_time=start_time,
@@ -423,7 +423,7 @@ async def process_event_creation(query, user_id, client, pending, start_time):
     else:
         await query.edit_message_text("❌ Не удалось создать событие в Google Calendar.")
     
-    query.context.user_data.pop('pending_event', None)
+    context.user_data.pop('pending_event', None)
 
 async def show_advanced_help(update_or_query, context, edit=False):
     text = (
