@@ -5,24 +5,30 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, Any
 
-# Add Scripts/homeassistant to path to import ha_client
-# Assuming structure: Unified_System/Windows_AI_Core/src/ha_controller.py
-# Target: Unified_System/Scripts/homeassistant/ha_client.py
-current_dir = Path(__file__).resolve().parent
-scripts_dir = current_dir.parent.parent / "Scripts" / "homeassistant"
-
-if str(scripts_dir) not in sys.path:
-    sys.path.append(str(scripts_dir))
-
 logger = logging.getLogger(__name__)
 
+# Ensure current directory is in path for sibling imports
+current_dir = Path(__file__).resolve().parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+
+# Try to import ha_client from same directory first (Docker), then from Scripts
 try:
     from ha_client import HomeAssistantClient, HAConfig
     HA_AVAILABLE = True
-except ImportError as e:
-    logger.error(f"Failed to import HomeAssistantClient: {e}")
-    HA_AVAILABLE = False
-    HomeAssistantClient = None
+except ImportError:
+    # Fallback: Add Scripts/homeassistant to path
+    current_dir = Path(__file__).resolve().parent
+    scripts_dir = current_dir.parent.parent / "Scripts" / "homeassistant"
+    if str(scripts_dir) not in sys.path:
+        sys.path.append(str(scripts_dir))
+    try:
+        from ha_client import HomeAssistantClient, HAConfig
+        HA_AVAILABLE = True
+    except ImportError as e:
+        logger.error(f"Failed to import HomeAssistantClient: {e}")
+        HA_AVAILABLE = False
+        HomeAssistantClient = None
 
 class HAController:
     """
