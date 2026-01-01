@@ -17,7 +17,15 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 from telegram.constants import ChatAction
 from config_manager import ConfigManager
 from inference_client import InferenceClient
-from user_context_db import UserContextDB
+
+# Try Firestore first, fallback to SQLite
+try:
+    from firestore_db import FirestoreDB
+    _USE_FIRESTORE = True
+except ImportError:
+    from user_context_db import UserContextDB
+    _USE_FIRESTORE = False
+
 from google_auth import GoogleAuthManager
 from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
@@ -25,17 +33,74 @@ from conversation_manager import ConversationManager
 from telegram_schema_expert import TelegramSchemaExpert
 from agent_orchestrator import AgentOrchestrator, PIPELINES
 
-# Configuration
-config = ConfigManager()
+# Optional imports with fallbacks
+try:
+    from ha_controller import HAController
+    ha_controller = HAController()
+except ImportError:
+    ha_controller = None
 
-inference = InferenceClient(config)
-db = UserContextDB()
-auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
-conv_manager = ConversationManager()
-tl_expert = TelegramSchemaExpert()
-agent_orchestrator = AgentOrchestrator(inference)
+try:
+    from web_search import WebSearch
+    web_search = WebSearch()
+except ImportError:
+    web_search = None
 
+try:
+    from infrastructure import InfrastructureManager
+    infra_manager = InfrastructureManager()
+except ImportError:
+    infra_manager = None
 
+try:
+    from gmail_client import GmailClient
+    gmail_client = GmailClient()
+except ImportError:
+    gmail_client = None
+
+try:
+    from notion_client import NotionClient
+    notion_client = NotionClient()
+except ImportError:
+    notion_client = None
+
+try:
+    from linear_client import LinearClient
+    linear_client = LinearClient()
+except ImportError:
+    linear_client = None
+
+try:
+    from health_integration import HealthIntegration
+    health_integration = HealthIntegration()
+except ImportError:
+    health_integration = None
+
+try:
+    from usage_tracker import UsageTracker
+    usage_tracker = UsageTracker()
+except ImportError:
+    usage_tracker = None
+
+try:
+    from task_manager import TaskManager
+    task_manager = TaskManager()
+except ImportError:
+    task_manager = None
+
+try:
+    from notify_manager import NotifyManager
+    notify_manager = NotifyManager()
+except ImportError:
+    notify_manager = None
+
+try:
+    from digest_service import DigestService
+    digest_service = DigestService()
+except ImportError:
+    digest_service = None
+
+# Setup logging first
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO,
@@ -47,6 +112,27 @@ console.setLevel(logging.INFO)
 logging.getLogger('').addHandler(console)
 
 logger = logging.getLogger(__name__)
+
+# Configuration
+config = ConfigManager()
+
+inference = InferenceClient(config)
+
+# Initialize database (Firestore or SQLite fallback)
+if _USE_FIRESTORE:
+    db = FirestoreDB()
+    logger.info("Using Firestore database")
+else:
+    db = UserContextDB()
+    logger.info("Using SQLite database (local mode)")
+
+auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
+conv_manager = ConversationManager()
+tl_expert = TelegramSchemaExpert()
+agent_orchestrator = AgentOrchestrator(inference)
+
+# Admin ID
+ADMIN_ID = int(config.get("ALLOWED_USERS", "708531393").split(",")[0])
 
 # keyboards
 def get_main_menu(user_id: int):
@@ -388,9 +474,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conv_manager.add_message(user_id, "user", user_text)
 
     lower_text = user_text.lower()
-    
+
+    # Multilingual intent keywords (English / Russian / Hebrew)
+    EVENT_KEYWORDS = [
+        # English
+        "schedule", "add", "meeting", "appointment", "reminder", "event", "book",
+        # Russian
+        "запиши", "встреча", "назначь", "добавь", "напомни", "событие", "запланируй",
+        # Hebrew
+        "תזכיר", "פגישה", "הוסף", "קבע", "תזמן", "אירוע", "הזכר"
+    ]
+
     # Check for "Add Event" intent
-    if any(k in lower_text for k in ["schedule", "add", "meeting", "запиши", "встреча", "назначь"]):
+    if any(k in lower_text for k in EVENT_KEYWORDS):
         event_details = await parse_event_details(user_text)
         if event_details and 'summary' in event_details:
             summary = event_details['summary']
@@ -417,7 +513,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data['pending_event'] = event_details
             return
     
-    if any(k in lower_text for k in ["schedule", "brief", "plan", "план"]):
+    # Multilingual brief/schedule keywords
+    BRIEF_KEYWORDS = [
+        "schedule", "brief", "plan", "today", "agenda",  # English
+        "план", "расписание", "сегодня", "повестка",  # Russian
+        "לוח", "היום", "תוכנית", "סדר יום"  # Hebrew
+    ]
+    if any(k in lower_text for k in BRIEF_KEYWORDS):
         await show_daily_brief(update, context)
         return
 
@@ -532,11 +634,18 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
     system_prompt = (
-        "You are a helpful personal assistant. Here is what you know about the user:\n"
+        "You are a helpful multilingual personal assistant named Gonya. "
+        "You fluently understand and respond in English, Russian (русский), and Hebrew (עברית). "
+        "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you. "
+        "If user writes in Hebrew - respond in Hebrew. If in Russian - respond in Russian. If in English - respond in English.\n\n"
+        "Here is what you know about the user:\n"
         + mem_text + "\n\n"
-        "You also have access to the Telegram MTProto TL Schema. If the user asks technical questions "
-        "about Telegram types or methods, you can provide expert details. Suggest using the `/tl` command "
-        "for raw technical documentation. Provide short, helpful and professional answers."
+        "You have access to:\n"
+        "- Calendar management (events, reminders)\n"
+        "- Image generation with `/img` command\n"
+        "- AI agents with `/agent` command\n"
+        "- Telegram MTProto TL Schema with `/tl` command\n\n"
+        "Provide short, helpful and professional answers in the user's language."
     )
 
 
@@ -906,6 +1015,1002 @@ async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"[IMG] Error generating image: {e}")
         await update.message.reply_text(f"❌ Ошибка: {str(e)}")
 
+async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /status command - show system status."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    msg = await update.message.reply_text("🔍 Проверяю системы...")
+
+    import psutil
+    import time
+
+    try:
+        cpu_usage = psutil.cpu_percent()
+        mem = psutil.virtual_memory()
+        uptime = time.time() - psutil.boot_time()
+
+        def format_uptime(seconds):
+            days, remainder = divmod(seconds, 86400)
+            hours, remainder = divmod(remainder, 3600)
+            minutes, _ = divmod(remainder, 60)
+            return f"{int(days)}d {int(hours)}h {int(minutes)}m"
+
+        uptime_str = format_uptime(uptime)
+
+        # AI Health
+        inf_status = "✅ OK" if await inference.health_check() else "❌ Error"
+
+        # HA Health
+        ha_status = "❓ Not configured"
+        if ha_controller:
+            try:
+                ha_res = await ha_controller.get_status()
+                if ha_res and ha_res.get("status") == "ok":
+                    ha_status = f"✅ Online"
+                else:
+                    ha_status = "❌ Error"
+            except:
+                ha_status = "❌ Unreachable"
+
+        dashboard = (
+            f"📊 **System Status**\n\n"
+            f"🖥 **Server**\n"
+            f"• CPU: `{cpu_usage}%`\n"
+            f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / {mem.total // 1024 // 1024}MB)\n"
+            f"• Uptime: `{uptime_str}`\n\n"
+            f"🧠 **AI Core**\n"
+            f"• Provider: `{inference.provider}`\n"
+            f"• Model: `{inference.model}`\n"
+            f"• Status: {inf_status}\n\n"
+            f"🏠 **Home Assistant**\n"
+            f"• Status: {ha_status}\n\n"
+            f"🕒 Time: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
+        )
+
+        await msg.edit_text(dashboard, parse_mode="Markdown")
+
+    except Exception as e:
+        await msg.edit_text(f"❌ Error: {e}")
+
+
+async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /search command - web search."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not web_search:
+        await update.message.reply_text("❌ Web search not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /search <query>\nExample: /search latest AI news")
+        return
+
+    query = " ".join(context.args)
+    await update.message.reply_text(f"🔍 Searching: \"{query[:50]}...\"\n⏳ Please wait...")
+
+    try:
+        result = await web_search.search(query)
+        if result:
+            await update.message.reply_text(result, parse_mode="Markdown")
+        else:
+            await update.message.reply_text("❌ No results found.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Search error: {e}")
+
+
+async def ha_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /ha command - Home Assistant control."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not ha_controller:
+        await update.message.reply_text("❌ Home Assistant not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "🏠 **Home Assistant Commands:**\n\n"
+            "/ha status - статус\n"
+            "/ha sensors - датчики\n"
+            "/ha lights on/off - свет\n"
+            "/ha script <name> - скрипт\n"
+            "/ha scene <name> - сцена",
+            parse_mode="Markdown"
+        )
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "status":
+        status = await ha_controller.get_status()
+        await update.message.reply_text(f"🏠 HA Status:\n{status}")
+
+    elif cmd == "sensors":
+        report = await ha_controller.get_sensors_report()
+        await update.message.reply_text(report, parse_mode="Markdown")
+
+    elif cmd == "lights":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /ha lights on OR /ha lights off")
+            return
+        action = context.args[1].lower()
+        if action == "on":
+            await ha_controller.turn_on_light("all")
+            await update.message.reply_text("💡 Turning ON lights")
+        elif action == "off":
+            await ha_controller.turn_off_light("all")
+            await update.message.reply_text("🌑 Turning OFF lights")
+
+    elif cmd == "script":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /ha script <script_name>")
+            return
+        script_name = context.args[1]
+        if not script_name.startswith("script."):
+            script_name = f"script.{script_name}"
+        await ha_controller.run_script(script_name)
+        await update.message.reply_text(f"▶️ Executing script: {script_name}")
+
+    elif cmd == "scene":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /ha scene <scene_name>")
+            return
+        scene_name = context.args[1]
+        if not scene_name.startswith("scene."):
+            scene_name = f"scene.{scene_name}"
+        await ha_controller.activate_scene(scene_name)
+        await update.message.reply_text(f"🎬 Activating scene: {scene_name}")
+
+    else:
+        await update.message.reply_text(f"Unknown HA command: {cmd}")
+
+
+async def models_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /models command - list available models."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    await update.message.reply_text("🔍 Fetching available models...")
+
+    models = await inference.list_models()
+
+    if not models:
+        await update.message.reply_text("❌ Could not fetch models. Check endpoint configuration.")
+        return
+
+    current_model = inference.model
+
+    buttons = []
+    for model in models[:20]:
+        indicator = "✅" if model == current_model else "🔄"
+        buttons.append([InlineKeyboardButton(f"{indicator} {model}", callback_data=f"model:{model}")])
+
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    await update.message.reply_text(
+        f"📋 **Available Models** ({len(models)})\n\n"
+        f"Current: `{current_model}`\n\n"
+        f"Click to switch:",
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
+
+
+async def clear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /clear command - clear conversation history."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    conv_manager.clear_history(user_id)
+    await update.message.reply_text(
+        "🧹 История диалога очищена!\n\n"
+        "Следующее сообщение начнёт новый контекст."
+    )
+
+
+async def infra_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /infra command - infrastructure status."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not infra_manager:
+        await update.message.reply_text("❌ Infrastructure manager not configured.")
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    report = await infra_manager.check_nodes()
+    await update.message.reply_text(report, parse_mode="Markdown")
+
+
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle incoming photos - analyze with AI."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    photo = update.message.photo[-1]
+    prompt = update.message.caption or "Что изображено на этой картинке? Опиши подробно."
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    await update.message.reply_text("👀 Analyzing photo...")
+
+    try:
+        import tempfile
+        file = await photo.get_file()
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            temp_path = f.name
+
+        await file.download_to_drive(temp_path)
+        response = await inference.analyze_image(temp_path, prompt)
+
+        os.remove(temp_path)
+        await update.message.reply_text(response, parse_mode="Markdown")
+
+    except Exception as e:
+        logger.error(f"Photo handling failed: {e}")
+        await update.message.reply_text(f"❌ Error analyzing photo: {e}")
+
+
+async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle incoming voice messages - transcribe and process."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    await update.message.reply_text("🎤 Transcribing...")
+
+    try:
+        import tempfile
+        voice_file = await update.message.voice.get_file()
+        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+            temp_path = f.name
+
+        await voice_file.download_to_drive(temp_path)
+        transcript = await inference.transcribe_audio(temp_path)
+
+        os.remove(temp_path)
+
+        if not transcript or "[Error" in transcript:
+            await update.message.reply_text(f"❌ Could not transcribe: {transcript}")
+            return
+
+        await update.message.reply_text(f"🗣 Transcribed: \"_{transcript}_\"", parse_mode="Markdown")
+
+        # Process as text
+        ai_response = await query_ollama_with_context(user_id, transcript)
+        await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
+
+    except Exception as e:
+        logger.error(f"Voice handling failed: {e}")
+        await update.message.reply_text("❌ Error processing voice message.")
+
+
+async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /setprovider command - set inference provider."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    providers = ["ollama", "openai", "gemini", "openrouter", "council"]
+    current = config.get("INFERENCE_PROVIDER", "ollama")
+
+    if context.args:
+        provider = context.args[0].lower()
+        if provider not in providers:
+            await update.message.reply_text(
+                f"❌ Unknown provider: `{provider}`\n"
+                f"Available: {', '.join(providers)}",
+                parse_mode="Markdown"
+            )
+            return
+
+        config.set("INFERENCE_PROVIDER", provider)
+        logger.info(f"Provider updated to: {provider}")
+
+        hint = ""
+        if provider == "openai":
+            hint = "Set your API key with /set_key OPENAI_API_KEY <key>"
+        elif provider == "gemini":
+            hint = "Set your Gemini API key with /set_key GEMINI_API_KEY <key>"
+        else:
+            hint = "Make sure Ollama is running"
+
+        await update.message.reply_text(
+            f"✅ Provider set to: `{provider}`\n\n💡 {hint}",
+            parse_mode="Markdown"
+        )
+        return
+
+    buttons = []
+    for provider in providers:
+        indicator = "✅" if provider == current else "🔄"
+        buttons.append([InlineKeyboardButton(f"{indicator} {provider.upper()}", callback_data=f"provider:{provider}")])
+
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    await update.message.reply_text(
+        f"⚙️ **Select AI Provider**\n\n"
+        f"Current: `{current.upper()}`\n\n"
+        f"Click to switch:",
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
+
+
+async def usage_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /usage command - show usage stats."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not usage_tracker:
+        await update.message.reply_text("❌ Usage tracker not configured.")
+        return
+
+    stats = usage_tracker.get_user_stats(user_id, days=30)
+
+    if not stats:
+        await update.message.reply_text("📊 Нет данных об использовании за последние 30 дней.")
+        return
+
+    msg = (
+        f"📊 **Статистика использования (30 дней)**\n\n"
+        f"📈 Всего токенов: `{stats.get('total_tokens', 0):,}`\n"
+        f"📝 Запросов: `{stats.get('requests', 0)}`\n\n"
+        f"**По моделям:**\n"
+    )
+
+    for model, tokens in stats.get('by_model', {}).items():
+        msg += f"  • {model}: {tokens:,} токенов\n"
+
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+async def costs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /costs command - show cost breakdown."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not usage_tracker:
+        await update.message.reply_text("❌ Usage tracker not configured.")
+        return
+
+    user_stats = usage_tracker.get_user_stats(user_id, days=30)
+
+    if not user_stats:
+        await update.message.reply_text("📊 Нет данных об использовании за последние 30 дней.")
+        return
+
+    msg = "💰 **Детальная статистика (30 дней)**\n\n"
+    msg += f"📈 **Всего токенов**: {user_stats.get('total_tokens', 0):,}\n"
+    msg += f"📝 **Запросов**: {user_stats.get('requests', 0)}\n\n"
+
+    msg += "**По моделям:**\n"
+    for model, tokens in user_stats.get('by_model', {}).items():
+        msg += f"  • {model}: {tokens:,} токенов\n"
+
+    if user_id == ADMIN_ID:
+        msg += "\n🌐 **По провайдерам (все пользователи):**\n"
+        providers = usage_tracker.get_provider_breakdown(days=30) if hasattr(usage_tracker, 'get_provider_breakdown') else {}
+        for provider, data in providers.items():
+            msg += f"  • {provider}: {data.get('tokens', 0):,} токенов ({data.get('requests', 0)} запросов)\n"
+
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+async def imagine_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /imagine command - generate image (alias for /img)."""
+    await img_command(update, context)
+
+
+async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /scan command - trigger Job Hunter."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    await update.message.reply_text("🕵️‍♂️ Запускаю поиск вакансий (Job Hunter/Analyzer)... ожидай отчета.")
+
+    script_path = "/home/gonya/Documents/Unified_System/Scripts/automation/job_hunter.py"
+    venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
+
+    try:
+        process = await asyncio.create_subprocess_exec(
+            venv_python, script_path,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        logger.info(f"[SCAN] Job Hunter started for user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to start Job Hunter: {e}")
+        await update.message.reply_text(f"❌ Ошибка запуска: {e}")
+
+
+async def say_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /say command - speak via Yandex Station."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not ha_controller:
+        await update.message.reply_text("❌ Home Assistant not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /say <текст>\nПример: /say Привет, я Гоня!")
+        return
+
+    message = " ".join(context.args)
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+    try:
+        if await ha_controller.speak_via_yandex(message):
+            await update.message.reply_text(f"🔊 Алиса скажет: \"{message[:50]}...\"")
+        else:
+            await update.message.reply_text("❌ Не удалось отправить сообщение на Яндекс Станцию.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def speak_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /speak command - text to speech."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /speak <text>\nExample: /speak Hello world")
+        return
+
+    text = " ".join(context.args)
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.RECORD_VOICE)
+
+    try:
+        audio_data = await inference.generate_speech(text)
+        if audio_data:
+            await update.message.reply_voice(voice=audio_data, caption=text[:100])
+        else:
+            await update.message.reply_text("❌ TTS generation failed (check logs/api key).")
+    except Exception as e:
+        logger.error(f"TTS command failed: {e}")
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /mail command - check Gmail."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not gmail_client or not gmail_client.authenticated:
+        await update.message.reply_text(
+            "❌ Gmail не подключен.\n\n"
+            "Для подключения запусти бота локально для OAuth авторизации."
+        )
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+    if not context.args:
+        summary = gmail_client.get_email_summary()
+        await update.message.reply_text(summary, parse_mode="Markdown")
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "unread":
+        count = gmail_client.get_unread_count()
+        await update.message.reply_text(f"📬 Непрочитанных писем: **{count}**", parse_mode="Markdown")
+
+    elif cmd == "search":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /mail search <query>")
+            return
+        query = " ".join(context.args[1:])
+        emails = gmail_client.search_emails(query, max_results=5)
+        if not emails:
+            await update.message.reply_text(f"🔍 По запросу \"{query}\" ничего не найдено.")
+            return
+        msg = f"🔍 **Результаты по: \"{query}\"**\n\n"
+        for email in emails:
+            sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+            msg += f"• **{sender}**\n  {email['subject'][:40]}...\n\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    else:
+        await update.message.reply_text(
+            "📧 **Gmail Commands:**\n\n"
+            "`/mail` - сводка непрочитанных\n"
+            "`/mail unread` - количество непрочитанных\n"
+            "`/mail search <query>` - поиск",
+            parse_mode="Markdown"
+        )
+
+
+async def notify_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /notify command - manage notification settings."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not notify_manager:
+        await update.message.reply_text("❌ Notify manager not configured.")
+        return
+
+    if not context.args:
+        quiet = notify_manager.is_quiet_hours()
+        status = "🌙 Тихий режим" if quiet else "🔔 Активный режим"
+        await update.message.reply_text(
+            f"{status}\n\n"
+            f"Тихие часы: {notify_manager.quiet_start.strftime('%H:%M')} - {notify_manager.quiet_end.strftime('%H:%M')}\n\n"
+            "Команды:\n"
+            "/notify status - текущий статус\n"
+            "/notify quiet HH:MM HH:MM - установить тихие часы"
+        )
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "status":
+        quiet = notify_manager.is_quiet_hours()
+        await update.message.reply_text("🌙 Сейчас тихие часы" if quiet else "🔔 Сейчас активный режим")
+
+    elif cmd == "quiet":
+        if len(context.args) < 3:
+            await update.message.reply_text("Usage: /notify quiet 23:00 08:00")
+            return
+
+        try:
+            start_str = context.args[1]
+            end_str = context.args[2]
+            start = datetime.strptime(start_str, "%H:%M").time()
+            end = datetime.strptime(end_str, "%H:%M").time()
+            notify_manager.quiet_start = start
+            notify_manager.quiet_end = end
+            await update.message.reply_text(f"✅ Тихие часы установлены: {start_str} - {end_str}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Ошибка формата времени: {e}")
+
+
+async def remind_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /remind command - set a reminder."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if len(context.args) < 2:
+        await update.message.reply_text("Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d")
+        return
+
+    import re
+    time_str = context.args[0].lower()
+    text = " ".join(context.args[1:])
+
+    match = re.match(r"^(\d+)([smhd])$", time_str)
+    if not match:
+        await update.message.reply_text("❌ Invalid time format. Use 10s, 5m, 1h, 2d")
+        return
+
+    amount = int(match.group(1))
+    unit = match.group(2)
+
+    delta = timedelta()
+    if unit == 's': delta = timedelta(seconds=amount)
+    elif unit == 'm': delta = timedelta(minutes=amount)
+    elif unit == 'h': delta = timedelta(hours=amount)
+    elif unit == 'd': delta = timedelta(days=amount)
+
+    run_date = datetime.now() + delta
+
+    # Schedule reminder (simplified - stores in context for now)
+    context.job_queue.run_once(
+        lambda ctx: ctx.bot.send_message(chat_id=user_id, text=f"⏰ Напоминание: {text}"),
+        when=delta,
+        name=f"remind_{user_id}_{run_date.timestamp()}"
+    )
+
+    await update.message.reply_text(f"✅ Напоминание установлено на {run_date.strftime('%H:%M:%S')}")
+
+
+async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /note command - create a Notion page."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not notion_client:
+        await update.message.reply_text("❌ Notion not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /note <title> [| content]\nExample: /note Meeting Notes | Discussed project X")
+        return
+
+    full_text = " ".join(context.args)
+    if "|" in full_text:
+        title, content = full_text.split("|", 1)
+        title = title.strip()
+        content = content.strip()
+    else:
+        title = full_text
+        content = ""
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+    try:
+        url = await notion_client.create_page(title, content)
+        if url:
+            await update.message.reply_text(f"✅ Created Note: [{title}]({url})", parse_mode="Markdown")
+        else:
+            await update.message.reply_text("❌ Failed to create note. Check logs/config.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /digest command - generate daily digest."""
+    user_id = update.effective_user.id
+    username = update.effective_user.first_name or "User"
+
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not digest_service:
+        await update.message.reply_text("❌ Digest service not initialized.")
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+    try:
+        digest = await digest_service.generate_digest(user_id, username)
+        await update.message.reply_text(digest, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"Digest generation failed: {e}")
+        await update.message.reply_text(f"❌ Не удалось создать дайджест: {e}")
+
+
+async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /backup command - create and send database backup."""
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        await update.message.reply_text("⛔️ Admin only command.")
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_DOCUMENT)
+
+    import zipfile
+
+    files = ["tasks.db", "usage.db", "jobs.db", "user_context.db", "windows_ai_core.json"]
+    backup_name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+
+    try:
+        with zipfile.ZipFile(backup_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            found = False
+            for file in files:
+                if os.path.exists(file):
+                    zipf.write(file)
+                    found = True
+                elif os.path.exists(f"Projects/AI_Core/{file}"):
+                    zipf.write(f"Projects/AI_Core/{file}", arcname=file)
+                    found = True
+
+            if not found:
+                await update.message.reply_text("⚠️ Не найдено файлов баз данных для бэкапа.")
+                os.remove(backup_name)
+                return
+
+        await update.message.reply_document(
+            document=open(backup_name, "rb"),
+            caption=f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"
+        )
+        os.remove(backup_name)
+
+    except Exception as e:
+        logger.error(f"Backup failed: {e}")
+        await update.message.reply_text(f"❌ Backup error: {e}")
+
+
+async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /update command - self-update via git and restart."""
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        await update.message.reply_text("❌ Только главный администратор может обновлять бота.")
+        return
+
+    await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)...")
+
+    import subprocess
+    try:
+        project_dir = "/home/gonya/Documents/Unified_System"
+        git_command = f"cd {project_dir} && git fetch origin && git reset --hard origin/main"
+
+        proc = await asyncio.create_subprocess_shell(
+            git_command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode != 0:
+            await update.message.reply_text(f"❌ Git Update Failed:\n{stderr.decode()}")
+            return
+
+        await update.message.reply_text(f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Restarting service...")
+
+        await update.message.reply_text("♻️ Перезапускаю сервис (systemd)... Я вернусь через 5-10 секунд.")
+        subprocess.Popen(["sudo", "systemctl", "restart", "ai-bot"])
+
+    except Exception as e:
+        logger.error(f"Update failed: {e}")
+        await update.message.reply_text(f"❌ Critical Update Error: {e}")
+
+
+async def health_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /health command - view health stats."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not health_integration:
+        await update.message.reply_text("❌ Health integration not configured.")
+        return
+
+    if not context.args:
+        stats = health_integration.get_today_stats(user_id)
+        msg = (
+            "🩺 **Твое здоровье (Сегодня):**\n\n"
+            f"👣 Шаги: `{stats.get('steps', 0):,.0f}`\n"
+            f"⚖️ Вес: `{stats.get('weight', 0):.1f} kg`\n"
+            f"😴 Сон: `{stats.get('sleep', 0):.1f} h`\n\n"
+            "Команды:\n"
+            "`/health add <metric> <value>`\n"
+            "`/health goal <metric> <value>`"
+        )
+        await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "add":
+        if len(context.args) < 3:
+            await update.message.reply_text("Usage: /health add <steps|weight|sleep> <value>")
+            return
+
+        metric = context.args[1].lower()
+        try:
+            val = float(context.args[2])
+        except ValueError:
+            await update.message.reply_text("❌ Значение должно быть числом.")
+            return
+
+        unit = "count"
+        if metric == "weight": unit = "kg"
+        elif metric == "sleep": unit = "hours"
+
+        if health_integration.add_metric(user_id, metric, val, unit, "manual"):
+            await update.message.reply_text(f"✅ Записано: {metric} = {val}")
+        else:
+            await update.message.reply_text("❌ Ошибка записи.")
+
+    elif cmd == "goal":
+        if len(context.args) < 3:
+            await update.message.reply_text("Usage: /health goal <steps|weight|sleep> <value>")
+            return
+        metric = context.args[1].lower()
+        try:
+            val = float(context.args[2])
+            health_integration.set_goal(user_id, metric, val)
+            await update.message.reply_text(f"🎯 Цель обновлена: {metric} = {val}")
+        except ValueError:
+            await update.message.reply_text("❌ Значение должно быть числом.")
+
+
+async def calendar_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /calendar command - calendar management."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    client = get_calendar_client(user_id)
+    if not client:
+        await update.message.reply_text("❌ Google Calendar not configured.\n\nUse /start to connect.")
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "📅 **Calendar Commands:**\n\n"
+            "/calendar today - события сегодня\n"
+            "/calendar week - на неделю",
+            parse_mode="Markdown"
+        )
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "today":
+        events = client.get_upcoming_events(days=1)
+        if not events:
+            await update.message.reply_text("📅 Сегодня нет событий.")
+            return
+
+        msg = f"📅 **События сегодня ({len(events)}):**\n\n"
+        for event in events:
+            formatted = client.format_event(event)
+            msg += f"• {formatted}\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif cmd == "week":
+        events = client.get_upcoming_events(days=7)
+        if not events:
+            await update.message.reply_text("📅 На этой неделе нет событий.")
+            return
+
+        msg = f"📅 **События на неделю ({len(events)}):**\n\n"
+        for event in events:
+            formatted = client.format_event(event)
+            msg += f"• {formatted}\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    else:
+        await update.message.reply_text(f"Unknown command: {cmd}")
+
+
+async def linear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /linear command - Linear task management."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not linear_client or not linear_client.api_key:
+        await update.message.reply_text("❌ Linear API key not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "📋 **Linear Commands:**\n\n"
+            "/linear me - мои задачи\n"
+            "/linear create <title> - создать задачу\n"
+            "/linear teams - список команд",
+            parse_mode="Markdown"
+        )
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "me":
+        issues = linear_client.get_my_issues(limit=10)
+        if not issues:
+            await update.message.reply_text("📭 У вас нет активных задач в Linear.")
+            return
+
+        msg = "📋 **Ваши задачи в Linear:**\n\n"
+        for issue in issues:
+            priority_emoji = {0: "⚪", 1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢"}
+            emoji = priority_emoji.get(issue.get("priority", 0), "⚪")
+            msg += f"{emoji} [{issue['identifier']}]({issue['url']}) {issue['title']}\n"
+            msg += f"   └ {issue['state']['name']}\n\n"
+        await update.message.reply_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif cmd == "create":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /linear create <title>")
+            return
+
+        title = " ".join(context.args[1:])
+        issue = linear_client.create_issue(title, priority=3)
+
+        if issue:
+            await update.message.reply_text(
+                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}",
+                parse_mode="Markdown"
+            )
+        else:
+            await update.message.reply_text("❌ Не удалось создать задачу.")
+
+    elif cmd == "teams":
+        teams = linear_client.get_teams()
+        if not teams:
+            await update.message.reply_text("❌ Не удалось получить список команд.")
+            return
+
+        msg = "👥 **Ваши команды в Linear:**\n\n"
+        for team in teams:
+            msg += f"• {team['name']} (`{team['key']}`)\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    else:
+        await update.message.reply_text(f"Unknown command: {cmd}")
+
+
+async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /todo command - manage tasks."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not task_manager:
+        await update.message.reply_text("❌ Task manager not configured.")
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "📝 **Task Manager**\n\n"
+            "Usage:\n"
+            "`/todo add <text>` - Add task\n"
+            "`/todo list` - List pending tasks\n"
+            "`/todo done <id>` - Complete task",
+            parse_mode="Markdown"
+        )
+        return
+
+    subcmd = context.args[0].lower()
+
+    if subcmd == "add":
+        text = " ".join(context.args[1:])
+        if not text:
+            await update.message.reply_text("Usage: /todo add <text>")
+            return
+
+        task_id = task_manager.add_task(user_id, text)
+        await update.message.reply_text(f"✅ Задача добавлена! ID: `{task_id}`", parse_mode="Markdown")
+
+    elif subcmd == "list":
+        tasks = task_manager.list_tasks(user_id)
+        if not tasks:
+            await update.message.reply_text("📝 Задач нет. Отдыхай!")
+            return
+
+        msg = "📋 **Твои задачи:**\n\n"
+        for t in tasks:
+            msg += f"• `#{t['id']}` {t['text']}\n"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif subcmd == "done":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /todo done <id>")
+            return
+        try:
+            task_id = int(context.args[1])
+            if task_manager.complete_task(user_id, task_id):
+                await update.message.reply_text(f"✅ Задача `#{task_id}` выполнена!", parse_mode="Markdown")
+            else:
+                await update.message.reply_text(f"❌ Не удалось найти или обновить задачу `#{task_id}`.")
+        except ValueError:
+            await update.message.reply_text("❌ ID должен быть числом.")
+
+
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
     logger.error(f"[ERROR] Exception while handling an update: {context.error}")
@@ -949,7 +2054,33 @@ def main():
     application.add_handler(CommandHandler('tl', tl_command))
     application.add_handler(CommandHandler('set_key', set_key))
     application.add_handler(CommandHandler('approve', approve_user))
+    application.add_handler(CommandHandler('status', status_command))
+    application.add_handler(CommandHandler('search', search_command))
+    application.add_handler(CommandHandler('ha', ha_command))
+    application.add_handler(CommandHandler('models', models_command))
+    application.add_handler(CommandHandler('clear', clear_command))
+    application.add_handler(CommandHandler('infra', infra_command))
+    application.add_handler(CommandHandler('setprovider', setprovider_command))
+    application.add_handler(CommandHandler('usage', usage_command))
+    application.add_handler(CommandHandler('costs', costs_command))
+    application.add_handler(CommandHandler('imagine', imagine_command))
+    application.add_handler(CommandHandler('scan', scan_command))
+    application.add_handler(CommandHandler('say', say_command))
+    application.add_handler(CommandHandler('speak', speak_command))
+    application.add_handler(CommandHandler('mail', mail_command))
+    application.add_handler(CommandHandler('notify', notify_command))
+    application.add_handler(CommandHandler('remind', remind_command))
+    application.add_handler(CommandHandler('note', note_command))
+    application.add_handler(CommandHandler('digest', digest_command))
+    application.add_handler(CommandHandler('backup', backup_command))
+    application.add_handler(CommandHandler('update', update_command))
+    application.add_handler(CommandHandler('health', health_command))
+    application.add_handler(CommandHandler('calendar', calendar_command))
+    application.add_handler(CommandHandler('linear', linear_command))
+    application.add_handler(CommandHandler('todo', todo_command))
     application.add_handler(CallbackQueryHandler(button_handler))
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    application.add_handler(MessageHandler(filters.VOICE, handle_voice))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     logger.info("[STARTUP] All handlers registered")
 

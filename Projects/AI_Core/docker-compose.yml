@@ -18,8 +18,12 @@ services:
       - ./conversations:/app/conversations
       # Credentials (if not in env)
       - ./client_secret.json:/app/client_secret.json
+      # GCP Service Account for Firestore (optional)
+      - ./gcp-service-account.json:/app/gcp-service-account.json:ro
     environment:
       - PYTHONUNBUFFERED=1
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
+      - GCP_PROJECT_ID=my-home-435112
     # Ensure logs are accessible via docker logs
     logging:
       driver: "json-file"
