@@ -51,4 +51,4 @@ devenv.local.yaml
 .pre-commit-config.yaml
 
 # Beads database (track in git)
-!beads.db
+!.beads/beads.db

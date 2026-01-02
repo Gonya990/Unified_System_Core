@@ -159,6 +159,19 @@ def get_admin_menu():
         [InlineKeyboardButton("📊 Статус сервисов", callback_data="admin_services")],
         [InlineKeyboardButton("🔑 Управление ключами", callback_data="admin_keys")],
         [InlineKeyboardButton("👥 Пользователи", callback_data="admin_users")],
+        [InlineKeyboardButton("⏳ Заявки на доступ", callback_data="admin_pending")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="show_help")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+def get_settings_menu():
+    """Settings menu with model/provider options."""
+    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
+    current_model = config.get("MODEL_NAME", "unknown")
+    keyboard = [
+        [InlineKeyboardButton(f"🤖 Модель: {current_model}", callback_data="settings_model")],
+        [InlineKeyboardButton(f"🔌 Провайдер: {current_provider.upper()}", callback_data="settings_provider")],
+        [InlineKeyboardButton("📊 Статистика", callback_data="settings_usage")],
         [InlineKeyboardButton("🔙 Назад", callback_data="show_help")]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -210,7 +223,35 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"[CMD] Auto-approved user {user.id}")
         else:
             logger.warning(f"[CMD] User {user.id} not in ALLOWED_USERS, denying access")
-            await update.message.reply_text(f"⛔️ Access Denied. Your ID `{user.id}` is pending approval.", parse_mode='Markdown')
+            await update.message.reply_text(
+                f"⛔️ **Доступ ограничен**\n\n"
+                f"Ваш ID: `{user.id}`\n"
+                f"Заявка отправлена администратору.\n\n"
+                f"Ожидайте одобрения.",
+                parse_mode='Markdown'
+            )
+            # Notify admin about new user request with approve button
+            try:
+                keyboard = InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(f"✅ Одобрить", callback_data=f"approve_user:{user.id}"),
+                        InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_user:{user.id}")
+                    ]
+                ])
+                await context.bot.send_message(
+                    chat_id=ADMIN_ID,
+                    text=(
+                        f"🆕 **Новая заявка на доступ**\n\n"
+                        f"👤 {user.full_name}\n"
+                        f"📱 @{user.username or 'нет username'}\n"
+                        f"🆔 `{user.id}`"
+                    ),
+                    parse_mode="Markdown",
+                    reply_markup=keyboard
+                )
+                logger.info(f"[CMD] Sent approval request to admin {ADMIN_ID} for user {user.id}")
+            except Exception as e:
+                logger.error(f"[CMD] Failed to notify admin about new user: {e}")
             return
 
     # 3. Check Google Connection
@@ -328,7 +369,85 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_memory_context(update, context)
         
     elif data == "settings_cb":
-        await query.edit_message_text("⚙️ **Settings**\n\nNotifications: ON\nProactive Nudge: ON (3 days)\nAI Model: " + config.get("MODEL_NAME", "unknown"), parse_mode='Markdown')
+        current_provider = config.get("INFERENCE_PROVIDER", "ollama")
+        current_model = config.get("MODEL_NAME", "unknown")
+        await query.edit_message_text(
+            f"⚙️ **Настройки AI**\n\n"
+            f"🤖 Модель: `{current_model}`\n"
+            f"🔌 Провайдер: `{current_provider.upper()}`\n\n"
+            f"Выберите опцию для изменения:",
+            parse_mode='Markdown',
+            reply_markup=get_settings_menu()
+        )
+
+    elif data == "settings_model":
+        # Show model selection
+        await query.edit_message_text("🔍 Загружаю список моделей...")
+        models = await inference.list_models()
+        if not models:
+            await query.edit_message_text(
+                "❌ Не удалось загрузить модели. Проверьте подключение к провайдеру.",
+                reply_markup=get_settings_menu()
+            )
+            return
+        current_model = inference.model
+        buttons = []
+        for model in models[:15]:  # Limit to 15 models
+            indicator = "✅" if model == current_model else "🔄"
+            buttons.append([InlineKeyboardButton(f"{indicator} {model}", callback_data=f"model:{model}")])
+        buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")])
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(
+            f"🤖 **Выбор модели**\n\n"
+            f"Текущая: `{current_model}`\n"
+            f"Провайдер: `{config.get('INFERENCE_PROVIDER', 'ollama').upper()}`\n\n"
+            f"Нажмите для переключения:",
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
+
+    elif data == "settings_provider":
+        # Show provider selection
+        providers = ["ollama", "openai", "gemini", "openrouter", "council"]
+        current = config.get("INFERENCE_PROVIDER", "ollama")
+        buttons = []
+        provider_info = {
+            "ollama": "🦙 Локальный (бесплатно)",
+            "openai": "🧠 OpenAI GPT-4o",
+            "gemini": "💎 Google Gemini",
+            "openrouter": "🌐 Claude/GPT через OpenRouter",
+            "council": "👥 Совет всех AI (ансамбль)"
+        }
+        for provider in providers:
+            indicator = "✅" if provider == current else "🔄"
+            info = provider_info.get(provider, provider)
+            buttons.append([InlineKeyboardButton(f"{indicator} {info}", callback_data=f"provider:{provider}")])
+        buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")])
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(
+            f"🔌 **Выбор провайдера**\n\n"
+            f"Текущий: `{current.upper()}`\n\n"
+            f"Нажмите для переключения:",
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
+
+    elif data == "settings_usage":
+        # Show usage stats
+        if usage_tracker:
+            stats = usage_tracker.get_user_stats(user_id, days=30)
+            if stats:
+                msg = (
+                    f"📊 **Статистика (30 дней)**\n\n"
+                    f"📈 Токенов: `{stats.get('total_tokens', 0):,}`\n"
+                    f"📝 Запросов: `{stats.get('requests', 0)}`\n"
+                )
+            else:
+                msg = "📊 Нет данных об использовании."
+        else:
+            msg = "📊 Трекер использования не настроен."
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")]])
+        await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=keyboard)
 
     # Admin Handlers
     elif data == "admin_services":
@@ -387,6 +506,92 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             status = "✅" if u['is_approved'] else "⏳"
             resp += f"{status} {u['full_name']} (@{u['username']}) - `{u['user_id']}`\n"
         await query.edit_message_text(resp, reply_markup=get_admin_menu())
+
+    elif data == "admin_pending":
+        # Show pending approval requests with inline buttons
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+
+        users = db.get_inactive_users(hours=0)  # Get all users
+        pending_users = [u for u in users if not u['is_approved']]
+
+        if not pending_users:
+            await query.edit_message_text(
+                "✅ **Нет ожидающих заявок**\n\nВсе пользователи одобрены.",
+                parse_mode="Markdown",
+                reply_markup=get_admin_menu()
+            )
+            return
+
+        resp = f"⏳ **Заявки на доступ ({len(pending_users)}):**\n\n"
+        buttons = []
+        for u in pending_users[:10]:  # Limit to 10
+            resp += f"👤 {u['full_name']} (@{u['username']})\n   ID: `{u['user_id']}`\n\n"
+            buttons.append([
+                InlineKeyboardButton(f"✅ Одобрить {u['full_name']}", callback_data=f"approve_user:{u['user_id']}"),
+                InlineKeyboardButton("❌", callback_data=f"deny_user:{u['user_id']}")
+            ])
+        buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="show_admin")])
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(resp, parse_mode="Markdown", reply_markup=keyboard)
+
+    elif data.startswith("approve_user:"):
+        # Approve user via inline button
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+
+        target_id = int(data.split(":")[1])
+        db.approve_user(target_id, True)
+        logger.info(f"[ADMIN] User {user_id} approved user {target_id} via inline button")
+
+        # Notify the approved user
+        try:
+            await context.bot.send_message(
+                chat_id=target_id,
+                text="🎉 **Доступ одобрен!**\n\nВаша заявка была одобрена администратором.\n\nОтправьте /start чтобы начать.",
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            logger.warning(f"Could not notify user {target_id}: {e}")
+
+        await query.edit_message_text(
+            f"✅ Пользователь `{target_id}` одобрен!",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]])
+        )
+
+    elif data.startswith("deny_user:"):
+        # Deny user access
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+
+        target_id = int(data.split(":")[1])
+        logger.info(f"[ADMIN] User {user_id} denied user {target_id}")
+
+        # Notify the denied user
+        try:
+            await context.bot.send_message(
+                chat_id=target_id,
+                text="❌ Ваша заявка на доступ была отклонена.",
+            )
+        except Exception as e:
+            logger.warning(f"Could not notify user {target_id}: {e}")
+
+        await query.edit_message_text(
+            f"❌ Пользователь `{target_id}` отклонён.",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]])
+        )
+
+    elif data == "show_admin":
+        # Return to admin menu
+        allowed_users_str = config.get("ALLOWED_USERS", "")
+        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+        if user_id not in allowed_ids: return
+        await query.edit_message_text("🛠 **Центр управления админа**", parse_mode="Markdown", reply_markup=get_admin_menu())
 
     # Model selection callback
     elif data.startswith("model:"):
@@ -715,12 +920,15 @@ async def post_init(application: Application) -> None:
     commands = [
         BotCommand("start", "Start the bot / Main menu"),
         BotCommand("help", "Show help and available commands"),
+        BotCommand("settings", "AI model & provider settings"),
+        BotCommand("models", "List and switch AI models"),
+        BotCommand("setprovider", "Switch AI provider"),
+        BotCommand("beads", "Git-native task tracking"),
         BotCommand("agent", "Run AI agent (code-explorer, reviewer...)"),
         BotCommand("pipeline", "Run agent pipeline (feature, bugfix...)"),
         BotCommand("brief", "Get your daily calendar brief"),
         BotCommand("img", "Generate image with DALL-E 3"),
         BotCommand("memory", "View your saved memories"),
-        BotCommand("tl", "Lookup Telegram TL Schema (MTProto)"),
     ]
     await application.bot.set_my_commands(commands)
     logger.info("Bot commands registered.")
@@ -2164,6 +2372,187 @@ async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ ID должен быть числом.")
 
 
+async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /beads command - Git-native issue tracking with Beads."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    # Beads working directory
+    beads_dir = "/Users/macbook/Documents/Unified_System"
+
+    if not context.args:
+        await update.message.reply_text(
+            "📿 **Beads - Git-native Issue Tracker**\n\n"
+            "**Команды:**\n"
+            "`/beads list` - Активные задачи\n"
+            "`/beads create <title>` - Создать задачу\n"
+            "`/beads show <id>` - Детали задачи\n"
+            "`/beads start <id>` - Начать работу\n"
+            "`/beads done <id>` - Завершить задачу\n"
+            "`/beads sync` - Синхронизировать\n\n"
+            "💡 Beads хранит задачи прямо в репозитории!",
+            parse_mode="Markdown"
+        )
+        return
+
+    subcmd = context.args[0].lower()
+
+    try:
+        if subcmd == "list":
+            # List active tasks
+            process = await asyncio.create_subprocess_exec(
+                "bd", "list", "--status", "in_progress,todo",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
+                return
+
+            output = stdout.decode().strip()
+            if not output or "No issues found" in output:
+                await update.message.reply_text("📭 Нет активных задач в Beads.")
+                return
+
+            # Parse and format output
+            lines = output.split('\n')
+            msg = "📿 **Активные задачи Beads:**\n\n"
+            for line in lines[:15]:  # Limit to 15
+                if line.strip():
+                    # Format: ID | Status | Title
+                    msg += f"• `{line.strip()}`\n"
+            await update.message.reply_text(msg, parse_mode="Markdown")
+
+        elif subcmd == "create":
+            if len(context.args) < 2:
+                await update.message.reply_text("Usage: `/beads create <title>`", parse_mode="Markdown")
+                return
+
+            title = " ".join(context.args[1:])
+            process = await asyncio.create_subprocess_exec(
+                "bd", "create", title,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
+                return
+
+            output = stdout.decode().strip()
+            await update.message.reply_text(f"✅ Задача создана!\n\n`{output}`", parse_mode="Markdown")
+
+        elif subcmd == "show":
+            if len(context.args) < 2:
+                await update.message.reply_text("Usage: `/beads show <issue-id>`", parse_mode="Markdown")
+                return
+
+            issue_id = context.args[1]
+            process = await asyncio.create_subprocess_exec(
+                "bd", "show", issue_id,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Задача не найдена: {stderr.decode()}")
+                return
+
+            output = stdout.decode().strip()
+            await update.message.reply_text(f"📿 **Детали задачи:**\n\n```\n{output[:3000]}\n```", parse_mode="Markdown")
+
+        elif subcmd == "start":
+            if len(context.args) < 2:
+                await update.message.reply_text("Usage: `/beads start <issue-id>`", parse_mode="Markdown")
+                return
+
+            issue_id = context.args[1]
+            process = await asyncio.create_subprocess_exec(
+                "bd", "update", issue_id, "--status", "in_progress",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
+                return
+
+            await update.message.reply_text(f"▶️ Задача `{issue_id}` в работе!", parse_mode="Markdown")
+
+        elif subcmd == "done":
+            if len(context.args) < 2:
+                await update.message.reply_text("Usage: `/beads done <issue-id>`", parse_mode="Markdown")
+                return
+
+            issue_id = context.args[1]
+            process = await asyncio.create_subprocess_exec(
+                "bd", "update", issue_id, "--status", "done",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
+                return
+
+            await update.message.reply_text(f"✅ Задача `{issue_id}` завершена!", parse_mode="Markdown")
+
+        elif subcmd == "sync":
+            await update.message.reply_text("🔄 Синхронизирую...")
+            process = await asyncio.create_subprocess_exec(
+                "bd", "sync",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=beads_dir
+            )
+            stdout, stderr = await process.communicate()
+
+            if process.returncode != 0:
+                await update.message.reply_text(f"❌ Ошибка синхронизации: {stderr.decode()}")
+                return
+
+            await update.message.reply_text("✅ Beads синхронизирован с репозиторием!")
+
+        else:
+            await update.message.reply_text(f"❌ Неизвестная команда: `{subcmd}`\n\nИспользуйте /beads для справки.", parse_mode="Markdown")
+
+    except Exception as e:
+        logger.error(f"[BEADS] Error: {e}")
+        await update.message.reply_text(f"❌ Ошибка Beads: {str(e)}")
+
+
+async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /settings command - show settings menu."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
+    current_model = config.get("MODEL_NAME", "unknown")
+    await update.message.reply_text(
+        f"⚙️ **Настройки AI**\n\n"
+        f"🤖 Модель: `{current_model}`\n"
+        f"🔌 Провайдер: `{current_provider.upper()}`\n\n"
+        f"Выберите опцию для изменения:",
+        parse_mode='Markdown',
+        reply_markup=get_settings_menu()
+    )
+
+
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
     logger.error(f"[ERROR] Exception while handling an update: {context.error}")
@@ -2231,6 +2620,8 @@ def main():
     application.add_handler(CommandHandler('calendar', calendar_command))
     application.add_handler(CommandHandler('linear', linear_command))
     application.add_handler(CommandHandler('todo', todo_command))
+    application.add_handler(CommandHandler('beads', beads_command))
+    application.add_handler(CommandHandler('settings', settings_command))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
