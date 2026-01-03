@@ -68,6 +68,20 @@
         <h1>🤖 Unified Bot Control Center <span class="status-badge">{{ bot_status }}</span></h1>
 
         <div class="card">
+            <h2>🔎 Search Notes</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="searchInput" placeholder="Search knowledge base..."
+                    onkeypress="if(event.key === 'Enter') searchNotes()"
+                    style="flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <button onclick="searchNotes()"
+                    style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Search
+                </button>
+            </div>
+            <div id="searchResults" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="card">
             <h2>Infrastructure</h2>
             <table>
                 <thead>
@@ -151,6 +165,34 @@
                 });
             } catch (e) {
                 console.error("Token stats fetch failed", e);
+            }
+        }
+
+        async function searchNotes() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = 'Searching...';
+
+            try {
+                const response = await fetch(`/search/notes?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const list = data.results.map(item => `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <a href="${item.url}" target="_blank" style="text-decoration: none; color: #007bff; font-weight: bold;">
+                                ${item.title || 'Untitled'}
+                            </a>
+                        </div>
+                    `).join('');
+                    resultsDiv.innerHTML = list;
+                } else {
+                    resultsDiv.innerHTML = '<div style="color: #666;">No results found.</div>';
+                }
+            } catch (e) {
+                resultsDiv.innerHTML = `<div style="color: red;">Error: ${e.message}</div>`;
             }
         }
 
