@@ -60,6 +60,16 @@ async def get_token_stats():
         "tokens": [1200, 1500, 900, 2100, 1800, 1300, 1600]
     }
 
+@app.get("/search/notes")
+async def search_notes(q: str):
+    """Search Notion notes."""
+    notion = bot_context.get("notion")
+    if not notion:
+        return {"results": []}
+    
+    results = await notion.search_pages(q)
+    return {"results": results}
+
 @app.post("/action/{action}")
 async def run_action(action: str):
     """Execute management actions."""

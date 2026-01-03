@@ -1936,7 +1936,8 @@ async def post_init(application: Application) -> None:
     # Start Web Dashboard
     dashboard = DashboardService(port=8096, context={
         "infra": infra_manager,
-        "usage": usage_tracker
+        "usage": usage_tracker,
+        "notion": notion_client
     })
     dashboard.start()
     logger.info("Web Dashboard started on port 8096")
