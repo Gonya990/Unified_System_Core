@@ -42,3 +42,4 @@ credentials/
 google_token.json
 client_secret.json
 *.credentials.json
+watchtower-config.json

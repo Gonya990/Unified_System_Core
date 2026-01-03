@@ -9,7 +9,7 @@
 | 📂 Section | 🔗 Link | 📝 Description |
 | --- | --- | --- |
 | **🧠 Knowledge Base** | [Agent_Context/Knowledge_Base/](Agent_Context/Knowledge_Base/) | Centralized AI context, sessions, and scripts |
-| **💻 AI Core (Main)** | [Projects/AI_Core/](Projects/AI_Core/) | Telegram Bot + Ollama inference code |
+| **💻 AI Core (Main)** | [Projects/AI_Core/](Projects/AI_Core/) | Gonya Telegram Bot — personal AI assistant with smart home, calendar, tasks & multi-model chat |
 | **⚙️ Scripts** | [Scripts/](Scripts/) | Deployment, automation, expect scripts |
 | **🏗 Architecture** | [Architecture Docs](Agent_Context/Knowledge_Base/Architecture/) | System design and handoff guides |
 
