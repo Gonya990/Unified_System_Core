@@ -32,11 +32,20 @@ pip install -r Projects/AI_Core/requirements.txt
 
 echo "♻️  Restarting Service..."
 # Assuming systemd user service named ai-bot as per infrastructure.yaml
-if systemctl --user list-units --full -all | grep -Fq "ai-bot.service"; then
-    systemctl --user restart ai-bot
-    echo "✅ Service ai-bot restarted."
+SERVICE_NAME="ai-bot"
+
+if systemctl --user list-units --full -all | grep -Fq "$SERVICE_NAME.service"; then
+    echo "🔄 Restarting existing service..."
+    systemctl --user restart $SERVICE_NAME
 else
-    echo "⚠️  Service 'ai-bot' not found. Please ensure systemd user service is set up."
+    echo "⚙️  Service not found. Installing..."
+    mkdir -p ~/.config/systemd/user
+    cp Projects/AI_Core/scripts/ai-bot.service ~/.config/systemd/user/
+    systemctl --user daemon-reload
+    systemctl --user enable $SERVICE_NAME
+    systemctl --user start $SERVICE_NAME
+    echo "✅ Service installed and started!"
 fi
 
 echo "✅ Deployment Script Finished!"
+systemctl --user status $SERVICE_NAME --no-pager
