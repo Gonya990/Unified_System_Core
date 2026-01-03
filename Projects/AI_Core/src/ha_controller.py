@@ -159,15 +159,19 @@ class HAController:
             name = s.get('attributes', {}).get('friendly_name', eid)
             
             if eid.startswith("sensor.") and state not in ["unknown", "unavailable"]:
-                # Filter useful sensors only (this simple filter might be too broad)
-                # Maybe only temperature/humidity/power
-                if unit in ["°C", "%", "W", "lx", "V"]:
-                    sensors.append(f"🔹 **{name}**: {state}{unit}")
+                # Filter useful sensors but be more inclusive
+                # Standard physical measurements
+                important_units = ["°C", "%", "W", "lx", "V", "A", "kWh", "ppm", "m/s", "mm", "hPa", "dB"]
+                if unit in important_units or "battery" in eid:
+                    sensors.append(f"🔹 **{name}**: {state} {unit}")
                     
         if not sensors:
             return "Сенсоров не найдено."
             
-        return "📊 **Показания датчиков**:\n" + "\n".join(sensors[:20]) # Limit to 20
+        # Sort by name
+        sensors.sort()
+            
+        return "📊 **Показания датчиков**:\n" + "\n".join(sensors)
 
     async def get_integrations(self):
         """Get list of integrations."""
