@@ -1593,8 +1593,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if trigger_cmd and cmd_to_run:
         logger.info(f"Executing Server Command: {cmd_to_run}")
         # Whitelist safe commands
-        safe_commands = ['free', 'df', 'uptime', 'ps', 'systemctl status', 'journalctl', 'ls', 'cat', 'grep', 'tail', 'head']
-        is_safe = any(cmd_to_run.startswith(safe) for safe in safe_commands)
+        # Whitelist safe commands
+        safe_commands = ['free', 'df', 'uptime', 'ps', 'systemctl', 'journalctl', 'ls', 'cat', 'grep', 'tail', 'head', 'sysctl', 'top', 'htop']
+        
+        # Allow Admin to bypass whitelist or check against expanded list
+        is_safe = (user_id == ADMIN_ID) or any(cmd_to_run.startswith(safe) for safe in safe_commands)
         
         if is_safe:
             import subprocess
