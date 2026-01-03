@@ -1,32 +1,62 @@
+# Common configuration shared between pre-built and local-build services
+x-ai-bot-common: &ai-bot-common
+  container_name: ai_telegram_bot
+  restart: always
+  env_file:
+    - .env
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    - ./bot.log:/app/bot.log
+    - ./user_context.db:/app/user_context.db
+    - ./conversations:/app/conversations
+    - ./client_secret.json:/app/client_secret.json
+    - ./gcp-service-account.json:/app/gcp-service-account.json:ro
+  environment:
+    - PYTHONUNBUFFERED=1
+    - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
+    - GCP_PROJECT_ID=my-home-435112
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
+
 services:
+  # Pre-built image (default)
+  # Usage: docker compose up -d
   ai-bot:
+    <<: *ai-bot-common
+    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Local build (optional)
+  # Usage: docker compose --profile local up -d ai-bot-local
+  ai-bot-local:
+    <<: *ai-bot-common
+    profiles: ["local"]
     build:
       context: .
       dockerfile: Dockerfile
-    image: ai-telegram-bot:v2
-    container_name: ai_telegram_bot
+    image: ai-telegram-bot:local
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
     restart: always
-    env_file:
-      - .env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
-      # Logs
-      - ./bot.log:/app/bot.log
-      # Persistence (DB, Conversations)
-      - ./user_context.db:/app/user_context.db
-      - ./conversations:/app/conversations
-      # Credentials (if not in env)
-      - ./client_secret.json:/app/client_secret.json
-      # GCP Service Account for Firestore (optional)
-      - ./gcp-service-account.json:/app/gcp-service-account.json:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - PYTHONUNBUFFERED=1
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
-      - GCP_PROJECT_ID=my-home-435112
-    # Ensure logs are accessible via docker logs
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - DOCKER_CONFIG=/run/secrets
+    secrets:
+      - source: watchtower-config
+        target: config.json
+    command: --interval 300
+
+secrets:
+  watchtower-config:
+    file: ./watchtower-config.json
