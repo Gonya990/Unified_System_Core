@@ -48,14 +48,11 @@ nodes:
 
   - id: proxmox
     name: Proxmox VE
-    fqdn: pve.myth-rudd.ts.net
-    ip: 100.78.145.67
-    type: hypervisor
-    os: proxmox
+    fqdn: pve-antigravity-1.tail5e8a72.ts.net
+    ip: 100.74.137.122
+    type: server
+    os: proxmox-ve
     services:
-      - name: Proxmox Web UI
-        port: 8006
-      - name: VM Host
       - name: LXC Containers
 
   - id: unified-home-core-cloud
