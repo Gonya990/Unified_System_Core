@@ -94,16 +94,20 @@ class CalendarClient:
         try:
             end_time = start_time + timedelta(minutes=duration_minutes)
             
+            # Use Israel timezone (configurable via TZ env var)
+            import os
+            user_tz = os.environ.get('TZ', 'Asia/Jerusalem')
+            
             event = {
                 'summary': summary,
                 'description': description,
                 'start': {
                     'dateTime': start_time.isoformat(),
-                    'timeZone': 'UTC', # Should optimally be user's timezone
+                    'timeZone': user_tz,
                 },
                 'end': {
                     'dateTime': end_time.isoformat(),
-                    'timeZone': 'UTC',
+                    'timeZone': user_tz,
                 },
             }
             
