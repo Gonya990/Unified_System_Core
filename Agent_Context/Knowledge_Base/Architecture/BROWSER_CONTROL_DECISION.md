@@ -1,9 +1,9 @@
 # 🌐 Browser Control Architecture Decision
 
 > **Created:** 2025-12-24  
-> **Updated:** 2025-12-24  
-> **Status:** ✅ IMPLEMENTED  
-> **Decision:** Unix Socket Daemon + CLI  
+> **Updated:** 2026-01-03
+> **Status:** 🚫 DEPRECATED / REVERTED
+> **Decision:** Revert to builtin `browser_subagent` (User Request)
 > **Package Manager:** UV
 
 ---

@@ -820,23 +820,34 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
                     
                     # Store emails in context specifically for AI to analyze
-                    email_context = "EMAILS_LIST:\n"
-                    for email in emails[:50]: # Provide AI with up to 50 emails
-                         email_context += f"ID: {email['id']}, From: {email['from']}, Subject: {email['subject']}, Snippet: {email['snippet']}\n"
+                    email_context = "EMAILS_SNAPSHOT (Top 20 most recent):\n"
+                    # Limit to top 20 and truncate content to fit context window
+                    for email in emails[:20]: 
+                         snippet = (email.get('snippet', '') or '')[:300].replace('\n', ' ')
+                         email_context += f"- ID: {email['id']}\n  From: {email['from']}\n  Subject: {email['subject']}\n  Summary: {snippet}\n\n"
                     
-                    conv_manager.add_message(user_id, "user", f"[SYSTEM: User asked for vacancies. Here are the found emails data for analysis]\n{email_context}")
+                    conv_manager.add_message(user_id, "user", f"[SYSTEM DATA]\n{email_context}")
                     
                     # Trigger analysis
                     analysis_prompt = (
-                        f"Я нашел {len(emails)} писем с вакансиями. "
-                        "Основываясь на моем РЕЗЮМЕ (которое было отправлено ранее) и этом списке писем, "
-                        "выбери топ-10 самых подходящих вакансий. "
-                        "Для каждой напиши: почему подходит и ссылку (если есть в сниппете) или ID. "
-                        "Если текста в сниппете мало, суди по теме и отправителю."
+                        "Проанализируй эти письма (выше) и выбери 5-7 самых подходящих вакансий для меня. "
+                        "Моё резюме должно быть у тебя в памяти (если нет - просто ищи руководящие/технические позиции). "
+                        "Формат ответа:\n"
+                        "1. **Название/Тема** (Отправитель)\n"
+                        "   Почему подходит: ...\n"
                     )
-                    ai_response = await query_ollama_with_context(user_id, analysis_prompt)
-                    conv_manager.add_message(user_id, "assistant", ai_response)
-                    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
+                    
+                    try:
+                        ai_response = await query_ollama_with_context(user_id, analysis_prompt)
+                        if ai_response and ai_response.strip():
+                            conv_manager.add_message(user_id, "assistant", ai_response)
+                            await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
+                        else:
+                             await update.message.reply_text("🤔 Я изучил письма, но затрудняюсь выделить конкретные вакансии. Попробуйте уточнить критерии поиска.", reply_markup=get_main_menu(user_id))
+                    except Exception as e:
+                        logger.error(f"AI Analysis failed: {e}")
+                        await update.message.reply_text("❌ Произошла ошибка при анализе писем. Попробуйте уменьшить выборку (`/mail search query`).", reply_markup=get_main_menu(user_id))
+
 
                 else:
                     await update.message.reply_text("📭 Писем о вакансиях не найдено.", reply_markup=get_main_menu(user_id))

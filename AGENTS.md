@@ -496,139 +496,7 @@ fi
 
 ---
 
-## 11. Browser Automation (Nodriver)
-
-> ⚠️ **PRIORITY RULE:** Always use **nodriver's `ndc` CLI** for browser
-> automation instead of the built-in `browser_subagent` tool.
-
-### Why Nodriver Over Built-in Browser
-
-| Aspect | Nodriver (ndc) | Built-in browser_subagent |
-| --- | --- | --- |
-| Token efficiency | ✅ Minimal - JSON | ❌ High - DOM parsing overhead |
-
-| Control | ✅ Persistent browser session | ❌ Ephemeral sessions |
-| Speed | ✅ Direct Unix socket | ❌ Subagent overhead |
-| Context | ✅ Same Chrome instance | ❌ Separate context each time |
-| Video recording | ❌ Not available | ✅ WebP recordings |
-| Setup required | ⚠️ Yes - daemon must run | ✅ Works out of the box |
-
-### Nodriver Location
-
-```text
-External_Tools/nodriver/
-```
-
-### Quick Start
-
-```bash
-# Set NDC path (adjust to your system)
-NDC="./External_Tools/nodriver/ndc"
-
-# Step 1: Check if daemon is running
-$NDC status
-
-# Step 2: If not running, start the stack
-./start_chrome.sh   # In one terminal
-./start_daemon.sh   # In another terminal
-
-# Step 3: Use browser
-$NDC goto "https://example.com"
-$NDC screenshot
-$NDC text "selector"
-```
-
-### ndc Command Reference
-
-**Navigation:**
-
-```bash
-ndc goto "https://url.com"       # Navigate to URL
-ndc url                          # Get current URL
-ndc title                        # Get page title
-```
-
-**Interaction:**
-
-```bash
-ndc click "Button Text"          # Click by text
-ndc clicksel "button.submit"     # Click by CSS selector
-ndc fill "input#email" "text"    # Fill input
-ndc type "input#pass" "text"     # Type with delay (human-like)
-ndc scroll down 500              # Scroll page
-```
-
-**Content Extraction:**
-
-```bash
-ndc screenshot                   # Save to /tmp/nodriver_screen.png
-ndc screenshot /path/to/file.png # Save to custom path
-ndc text "div.content"           # Get element text
-ndc html                         # Get full page HTML
-ndc js "document.title"          # Execute JavaScript
-```
-
-**Tabs:**
-
-```bash
-ndc tabs                         # List all tabs
-ndc newtab "https://google.com"  # Open new tab
-ndc switchtab 1                  # Switch to tab by index
-ndc closetab 0                   # Close tab by index
-```
-
-**Waiting:**
-
-```bash
-ndc wait "selector" 10           # Wait for element (10s timeout)
-```
-
-**Daemon Control:**
-
-```bash
-ndc status                       # Check if daemon is running
-ndc stop                         # Stop the daemon
-```
-
-### When Built-in Browser is REQUIRED
-
-The `browser_subagent` tool MUST be used only in these LIMITED scenarios:
-
-| Scenario | Reason |
-| --- | --- |
-| **Video recording needed** | User needs a WebP recording of browser actions |
-| **Nodriver fail** | Chrome or daemon cannot start (port/permissions) |
-
-| **User explicitly requests** | User specifically asks for built-in browser |
-| **Visual Interaction** | Feedback needed that ndc cannot provide |
-
-### ⚠️ MANDATORY Fallback Procedure
-
-**BEFORE using `browser_subagent`, you MUST:**
-
-1. **Document the limitation** — Explain why nodriver cannot be used
-2. **Ask for permission** — Get explicit user approval
-3. **Only proceed after user confirmation** — Never auto-use built-in browser
-
-### Troubleshooting
-
-```bash
-# Check if Chrome is running with debug port
-curl http://localhost:9222/json/version
-
-# Check if daemon socket exists
-ls -la /tmp/nodriver.sock
-
-# Restart everything
-ndc stop
-pkill -f chrome
-./start_chrome.sh
-./start_daemon.sh
-```
-
----
-
-## 12. Merge Preparedness
+## 11. Merge Preparedness
 
 > ⚠️ **Goal:** Ensure smooth synchronization between agents and minimize merge
 > conflicts through proactive coordination.
@@ -669,7 +537,7 @@ pkill -f chrome
 
 ---
 
-## 13. Centralized Coordination Hub
+## 12. Centralized Coordination Hub
 
 ### Service Centralization
 
@@ -702,6 +570,25 @@ When deploying new services (AI Telegram Bot, new tools, etc.), use
 1. **State Persistence**: All critical session state (WIP commits, Beads) must
    be pushed to a shared remote or host (`Shared/`) to ensure the other agent
    can take over if one node goes dark.
+
+---
+
+## 13. System Health & Maintenance
+
+### Regular Checks
+
+Perform these checks at the start of significant sessions:
+
+1. **Disk Space**: `df -h` (Ensure >10% free)
+2. **Docker Health**: `docker ps` (Ensure critical containers are UP)
+3. **Network**: `tailscale status` (Ensure mesh connectivity)
+
+### Log Rotation
+
+- Check `nohup.out` and other log files.
+- If >100MB, rotate or truncate: `> nohup.out`
+
+---
 
 ---
 
