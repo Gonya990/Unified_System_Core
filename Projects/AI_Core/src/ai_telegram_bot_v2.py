@@ -780,6 +780,98 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_daily_brief(update, context)
         return
 
+    # Email keywords - fetch emails automatically
+    EMAIL_KEYWORDS = [
+        "mail", "email", "inbox", "письма", "почта", "почту", "почте", "входящие", "письмо",
+        "מייל", "דואר", "הודעות", "вакансий", "вакансии", "vacancy", "vacancies", "резюме"
+    ]
+    if any(k in lower_text for k in EMAIL_KEYWORDS) and GMAIL_AVAILABLE:
+        logger.info(f"Email keywords detected in: {lower_text}")
+        gmail = get_gmail_client(user_id)
+        if gmail and gmail.is_valid():
+            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+            
+            # Detect vacancy-related queries
+            VACANCY_KEYWORDS = ["вакансий", "вакансии", "вакансия", "vacancy", "vacancies", "job", "работа", "работу", "предложения", "резюме"]
+            is_vacancy_query = any(v in lower_text for v in VACANCY_KEYWORDS)
+            
+            # Extract count if mentioned (e.g., "30 вакансий")
+            import re
+            count_match = re.search(r'(\d+)\s*(вакансий|писем|emails?|messages?)', lower_text)
+            requested_count = int(count_match.group(1)) if count_match else 10
+            max_count = min(requested_count, 100)  # Increase cap to 100
+            
+            if is_vacancy_query:
+                # Search for job-related emails
+                query = "(vacancy OR job OR вакансия OR предложение OR recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
+                logger.info(f"Searching vacancies with query: {query}, limit: {max_count}")
+                emails = gmail.search_emails(query, max_results=max_count)
+                if emails:
+                    msg = f"💼 **Найдено {len(emails)} писем о вакансиях** (показаны последние {min(len(emails), 30)}):\n\n"
+                    # Show only top 30 to avoid hitting limits
+                    for i, email in enumerate(emails[:30], 1):
+                        sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+                        subj = email['subject'][:60]
+                        if len(email['subject']) > 60:
+                            subj += "..."
+                        msg += f"{i}. **{sender}**\n   {subj}\n\n"
+                    
+                    msg += "_Анализирую содержимое для подбора лучших..._"
+                    await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
+                    
+                    # Store emails in context specifically for AI to analyze
+                    email_context = "EMAILS_LIST:\n"
+                    for email in emails[:50]: # Provide AI with up to 50 emails
+                         email_context += f"ID: {email['id']}, From: {email['from']}, Subject: {email['subject']}, Snippet: {email['snippet']}\n"
+                    
+                    conv_manager.add_message(user_id, "user", f"[SYSTEM: User asked for vacancies. Here are the found emails data for analysis]\n{email_context}")
+                    
+                    # Trigger analysis
+                    analysis_prompt = (
+                        f"Я нашел {len(emails)} писем с вакансиями. "
+                        "Основываясь на моем РЕЗЮМЕ (которое было отправлено ранее) и этом списке писем, "
+                        "выбери топ-10 самых подходящих вакансий. "
+                        "Для каждой напиши: почему подходит и ссылку (если есть в сниппете) или ID. "
+                        "Если текста в сниппете мало, суди по теме и отправителю."
+                    )
+                    ai_response = await query_ollama_with_context(user_id, analysis_prompt)
+                    conv_manager.add_message(user_id, "assistant", ai_response)
+                    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
+
+                else:
+                    await update.message.reply_text("📭 Писем о вакансиях не найдено.", reply_markup=get_main_menu(user_id))
+                return
+
+            
+            # Check if user wants to search
+            if any(w in lower_text for w in ["найди", "поиск", "search", "find", "ищи"]):
+                # Extract search query (words after search keyword)
+                for kw in ["найди", "поиск", "search", "find", "ищи"]:
+                    if kw in lower_text:
+                        query = lower_text.split(kw, 1)[-1].strip()
+                        if query:
+                            emails = gmail.search_emails(query, max_results=10)
+                            if emails:
+                                msg = f"🔍 **Найдено по '{query}':**\n\n"
+                                for email in emails:
+                                    sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+                                    msg += f"• **{sender}**\n  {email['subject'][:50]}\n\n"
+                                await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
+                            else:
+                                await update.message.reply_text(f"📭 По запросу '{query}' ничего не найдено.", reply_markup=get_main_menu(user_id))
+                            return
+            
+            # Default: show email summary
+            summary = gmail.get_email_summary()
+            await update.message.reply_text(summary, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
+            return
+        else:
+            await update.message.reply_text(
+                "📧 Gmail не подключен. Используйте /start → 🔗 Connect Google",
+                reply_markup=get_main_menu(user_id)
+            )
+            return
+
     # Regular AI query with context
     ai_response = await query_ollama_with_context(user_id, user_text)
     
@@ -891,18 +983,44 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
     system_prompt = (
-        "You are a helpful multilingual personal assistant named Gonya. "
+        "You are Gonya, a powerful multilingual personal AI assistant. "
         "You fluently understand and respond in English, Russian (русский), and Hebrew (עברית). "
-        "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you. "
-        "If user writes in Hebrew - respond in Hebrew. If in Russian - respond in Russian. If in English - respond in English.\n\n"
-        "Here is what you know about the user:\n"
+        "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you.\n\n"
+        
+        "=== YOUR CAPABILITIES ===\n"
+        "You have REAL access to the user's data and can perform actions:\n\n"
+        
+        "📧 EMAIL (Gmail):\n"
+        "- Read emails: /mail or /mail list [count]\n"
+        "- Search: /mail search <query>\n"
+        "- Send: /mail send email | subject | body\n"
+        "- Archive/Delete: /mail archive/trash <id>\n"
+        "When user asks about emails, tell them to use /mail commands or offer to explain how.\n\n"
+        
+        "📅 CALENDAR (Google):\n"
+        "- View events: /calendar or /brief\n"
+        "- Create events: user can say 'добавь встречу на 15:00 название'\n"
+        "- You can parse natural language requests for calendar events.\n\n"
+        
+        "🏠 HOME ASSISTANT:\n"
+        "- Control smart home: /ha status, /ha lights on/off\n"
+        "- User can ask about home status or control devices.\n\n"
+        
+        "🔍 OTHER TOOLS:\n"
+        "- Web search: /search <query>\n"
+        "- Image generation: /img <prompt>\n"
+        "- AI agents: /agent <name> <task>\n"
+        "- System status: /status\n"
+        "- Memory/context: /memory\n\n"
+        
+        "=== USER CONTEXT ===\n"
         + mem_text + "\n\n"
-        "You have access to:\n"
-        "- Calendar management (events, reminders)\n"
-        "- Image generation with `/img` command\n"
-        "- AI agents with `/agent` command\n"
-        "- Telegram MTProto TL Schema with `/tl` command\n\n"
-        "Provide short, helpful and professional answers in the user's language."
+        
+        "=== INSTRUCTIONS ===\n"
+        "1. Be proactive - if user asks about mail/calendar, guide them to use commands.\n"
+        "2. Remember: timezone is Asia/Jerusalem (IST).\n"
+        "3. Give short, helpful answers in user's language.\n"
+        "4. If you can help with a task directly, do it or explain how."
     )
 
 
@@ -1558,8 +1676,62 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
 
     except Exception as e:
-        logger.error(f"Voice handling failed: {e}")
-        await update.message.reply_text("❌ Error processing voice message.")
+        logger.error(f"Error handling voice: {e}")
+        await update.message.reply_text("❌ Ошибка обработки голосового сообщения.")
+
+
+async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle document uploads."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    document = update.message.document
+    file_name = document.file_name
+    
+    await update.message.reply_text(f"📂 Получил файл: `{file_name}`.", parse_mode="Markdown")
+    
+    # Text-based files processing
+    text_extensions = ('.txt', '.md', '.py', '.json', '.yaml', '.yml', '.csv', '.log', '.rtf')
+    if file_name.lower().endswith(text_extensions):
+        try:
+            # Check size (max 2MB for text)
+            if document.file_size > 2 * 1024 * 1024:
+                await update.message.reply_text("⚠️ Файл слишком большой для чтения текста (>2MB).")
+                return
+
+            new_file = await document.get_file()
+            file_content_byte = await new_file.download_as_bytearray()
+            text_content = file_content_byte.decode('utf-8', errors='ignore')
+            
+            # Basic RTF cleanup (remove {} and control words)
+            if file_name.lower().endswith('.rtf'):
+                import re
+                text_content = re.sub(r'[{}\\]', '', text_content)  # Very basic cleanup
+                text_content = re.sub(r'\\[a-z]+\d*', ' ', text_content) # Remove control words like \par
+            
+            # Save to context
+            conv_manager.add_message(user_id, "user", f"[User uploaded file {file_name} content]:\n{text_content}")
+            
+            await update.message.reply_text("✅ Текст файла сохранен в контексте диалога.")
+            
+            # Trigger AI analysis immediately with specific prompt
+            prompt = f"Я отправил файл {file_name}. Проанализируй его содержимое."
+            ai_response = await query_ollama_with_context(user_id, prompt)
+            
+            conv_manager.add_message(user_id, "assistant", ai_response)
+            await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
+            
+        except Exception as e:
+            logger.error(f"Failed to read document {file_name}: {e}")
+            await update.message.reply_text("❌ Не удалось прочитать текст файла.")
+
+    elif file_name.lower().endswith(('.pdf', '.docx', '.doc')):
+         await update.message.reply_text("ℹ️ PDF/DOCX пока не поддерживаются для чтения. Пожалуйста, скопируйте текст или сохраните как .txt")
+    else:
+        # Just notify about receipt for other types
+        conv_manager.add_message(user_id, "user", f"[User uploaded file {file_name}, type: {document.mime_type}]")
+        await update.message.reply_text("📦 Файл получен. Я запомнил, что вы его прислали.")
 
 
 async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2630,6 +2802,7 @@ def main():
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     logger.info("[STARTUP] All handlers registered")
 
