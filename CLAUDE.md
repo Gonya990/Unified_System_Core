@@ -4,9 +4,19 @@ This is the central routing guide for the Modern Software Engineering skills and
 
 ---
 
+## Communication Guidelines
+
+**Primary Preference**:
+
+- **Bilingual Responses**: Answer in **Russian** and duplicate in **English**.
+- **Context**: Ensure technical terms are clear in both.
+
+---
+
 ## Quick Navigation
 
 ### Skills Framework
+
 **Location**: `skills/`
 
 | Pillar | Purpose | Skills |
@@ -22,6 +32,7 @@ This is the central routing guide for the Modern Software Engineering skills and
 ---
 
 ### Agent Framework
+
 **Location**: `.claude/agents/`
 
 | Category | Agents |
@@ -41,6 +52,7 @@ This is the central routing guide for the Modern Software Engineering skills and
 ---
 
 ### Orchestration Guidelines
+
 **Location**: `docs/agent-guidelines/`
 
 | Document | Purpose |
@@ -60,6 +72,7 @@ This is the central routing guide for the Modern Software Engineering skills and
 ---
 
 ### Programming Patterns
+
 **Location**: `docs/patterns/`
 
 | Category | Patterns |
@@ -73,18 +86,21 @@ This is the central routing guide for the Modern Software Engineering skills and
 ## Subagent Orchestration
 
 ### Level 0: Direct Tools (< 5 seconds)
+
 ```bash
 Read file              # Direct Read tool
 Grep pattern          # Direct Grep tool
 ```
 
 ### Level 1: Single Subagent (< 60 seconds)
+
 ```yaml
 Task: "Find authentication patterns"
 Agent: code-explorer
 ```
 
 ### Level 2: Sequential Pipeline (< 180 seconds)
+
 ```yaml
 Pipeline:
   1. code-explorer → understand patterns
@@ -94,6 +110,7 @@ Pipeline:
 ```
 
 ### Level 3: Parallel Execution (< 90 seconds)
+
 ```yaml
 Parallel:
   - code-explorer(module=auth)
@@ -102,6 +119,7 @@ Then: Synthesize results
 ```
 
 ### Level 4: Hierarchical Coordination (< 300 seconds)
+
 ```yaml
 Flow:
   1. code-quality-coordinator discovers scope
