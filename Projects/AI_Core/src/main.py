@@ -93,7 +93,8 @@ SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), искусственный инте
 Используй эти теги для действий. Не говори о них, просто используй.
 - [[RUN:STATUS]] - показать статус систем.
 - [[RUN:MAIL]] - проверить почту.
-- [[RUN:CMD:<команда>]] - выполнить команду bash.
+- [[HA:light_on:<name>]] - включить устройство (свет/розетку).
+- [[HA:light_off:<name>]] - выключить устройство.
 - [[RUN:SAY:<текст>]] - сказать через Яндекс.Алису.
 - [[RUN:HA_STATUS]] - статус умного дома.
 - [[RUN:HA_SENSORS]] - датчики дома.
@@ -1517,6 +1518,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     trigger_ha_sensors = "[[RUN:HA_SENSORS]]" in response
     trigger_say = "[[RUN:SAY:" in response
     trigger_health = "[[RUN:HEALTH]]" in response
+    trigger_ha_light_on = "[[HA:light_on:" in response
+    trigger_ha_light_off = "[[HA:light_off:" in response
     
     # Clean response
     clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "")
@@ -1576,6 +1579,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if match:
             say_message = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:SAY:{say_message}]]", "")
+
+    # Extract HA Light On
+    ha_light_on_target = None
+    if trigger_ha_light_on:
+        import re
+        match = re.search(r'\[\[HA:light_on:(.+?)\]\]', response)
+        if match:
+            ha_light_on_target = match.group(1)
+            clean_response = clean_response.replace(f"[[HA:light_on:{ha_light_on_target}]]", "")
+
+    # Extract HA Light Off
+    ha_light_off_target = None
+    if trigger_ha_light_off:
+        import re
+        match = re.search(r'\[\[HA:light_off:(.+?)\]\]', response)
+        if match:
+            ha_light_off_target = match.group(1)
+            clean_response = clean_response.replace(f"[[HA:light_off:{ha_light_off_target}]]", "")
     
     clean_response = clean_response.strip()
     
@@ -1689,6 +1710,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             await update.message.reply_text(f"🔊 Сказано: \"{say_message}\"")
         else:
             await update.message.reply_text("❌ Не удалось произнести через колонку.")
+    
+    # NEW: HA Light On trigger
+    if trigger_ha_light_on and ha_light_on_target:
+        logger.info(f"Executing HA: Turn ON {ha_light_on_target}")
+        await update.message.reply_text(f"💡 Включаю: {ha_light_on_target}...")
+        try:
+             await ha_controller.turn_on_light(ha_light_on_target)
+        except Exception as e:
+             await update.message.reply_text(f"❌ Ошибка HA: {e}")
+
+    # NEW: HA Light Off trigger
+    if trigger_ha_light_off and ha_light_off_target:
+        logger.info(f"Executing HA: Turn OFF {ha_light_off_target}")
+        await update.message.reply_text(f"🌑 Выключаю: {ha_light_off_target}...")
+        try:
+             await ha_controller.turn_off_light(ha_light_off_target)
+        except Exception as e:
+             await update.message.reply_text(f"❌ Ошибка HA: {e}")
     
     # NEW: Health trigger
     if trigger_health:
