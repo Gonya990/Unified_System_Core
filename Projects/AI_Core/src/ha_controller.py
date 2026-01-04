@@ -76,19 +76,37 @@ class HAController:
             candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
             # Try to match simple name (e.g. "corridor" against "light.corridor_switch_1")
             
-            # 1. Check if 'target' is part of entity_id
-            simple_matches = [e for e in candidates if target.lower() in e.lower()]
-            if simple_matches:
-                target = simple_matches[0]
-                logger.info(f"Exact partial match found: {entity_id} -> {target}")
+            # 1. Search by Friendly Name (Russian/Exact)
+            # Create map of name -> entity_id
+            name_map = {}
+            for s in states:
+                eid = s['entity_id']
+                if eid.startswith('light.') or eid.startswith('switch.'):
+                    fname = s.get('attributes', {}).get('friendly_name', '').lower()
+                    if fname:
+                        name_map[fname] = eid
+            
+            # Check for partial match in friendly names
+            target_lower = target.lower()
+            for fname, eid in name_map.items():
+                if target_lower in fname:
+                    target = eid
+                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    break
             else:
-                # 2. Difflib match
-                matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
-                if matches:
-                    target = matches[0]
-                    logger.info(f"Fuzzy match found: {entity_id} -> {target}")
+                # 2. Check if 'target' is part of entity_id
+                simple_matches = [e for e in candidates if target_lower in e.lower()]
+                if simple_matches:
+                    target = simple_matches[0]
+                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
                 else:
-                    logger.warning(f"No match found for {entity_id}")
+                    # 3. Difflib match on entity_ids
+                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    if matches:
+                        target = matches[0]
+                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                    else:
+                        logger.warning(f"No match found for {entity_id}")
                     
         return self.client.turn_on_light(target)
         
@@ -105,19 +123,37 @@ class HAController:
             import difflib
             candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
             
-            # 1. Check if 'target' is part of entity_id
-            simple_matches = [e for e in candidates if target.lower() in e.lower()]
-            if simple_matches:
-                target = simple_matches[0]
-                logger.info(f"Exact partial match found: {entity_id} -> {target}")
+            # 1. Search by Friendly Name (Russian/Exact)
+            # Create map of name -> entity_id
+            name_map = {}
+            for s in states:
+                eid = s['entity_id']
+                if eid.startswith('light.') or eid.startswith('switch.'):
+                    fname = s.get('attributes', {}).get('friendly_name', '').lower()
+                    if fname:
+                        name_map[fname] = eid
+            
+            # Check for partial match in friendly names
+            target_lower = target.lower()
+            for fname, eid in name_map.items():
+                if target_lower in fname:
+                    target = eid
+                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    break
             else:
-                # 2. Difflib match
-                matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
-                if matches:
-                    target = matches[0]
-                    logger.info(f"Fuzzy match found: {entity_id} -> {target}")
+                # 2. Check if 'target' is part of entity_id
+                simple_matches = [e for e in candidates if target_lower in e.lower()]
+                if simple_matches:
+                    target = simple_matches[0]
+                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
                 else:
-                    logger.warning(f"No match found for {entity_id}")
+                    # 3. Difflib match on entity_ids
+                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    if matches:
+                        target = matches[0]
+                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                    else:
+                        logger.warning(f"No match found for {entity_id}")
 
         return self.client.turn_off_light(target)
         
