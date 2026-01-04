@@ -146,7 +146,7 @@ ADMIN_ID = int(config.get("ALLOWED_USERS", "708531393").split(",")[0])
 def get_main_menu(user_id: int):
     keyboard = [
         ["📅 Обзор дня", "➕ Новая задача"],
-        ["🧠 Память/Контекст", "❓ Помощь"]
+        ["🧠 Память/Контекст", "⚙️ Настройки", "❓ Помощь"]
     ]
     allowed_users_str = config.get("ALLOWED_USERS", "")
     allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
@@ -890,8 +890,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not ai_response or not ai_response.strip():
         ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз или смените провайдер через /settings."
     
+    # --- PROCESSS AI COMMANDS ([[TAG:args]]) ---
+    import re
+    
+    # 1. ALICE TTS
+    alice_matches = re.findall(r'\[\[ALICE:(.*?)\]\]', ai_response)
+    for text_to_say in alice_matches:
+        if ha_controller:
+            await ha_controller.speak_via_yandex(text_to_say)
+            logger.info(f"[HA] Alice spoke: {text_to_say}")
+        ai_response = ai_response.replace(f"[[ALICE:{text_to_say}]]", f"🔊 _(Озвучено Алисой: {text_to_say})_")
+
+    # 2. HA LIGHTS
+    ha_matches = re.findall(r'\[\[HA:(.*?):(.*?)\]\]', ai_response)
+    for action, entity_name in ha_matches:
+        if ha_controller:
+            if action == 'light_on':
+                await ha_controller.turn_on_light(entity_name)
+                ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"💡 _(Включаю: {entity_name})_")
+            elif action == 'light_off':
+                await ha_controller.turn_off_light(entity_name)
+                ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"🌑 _(Выключаю: {entity_name})_")
+        else:
+             ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"❌ _(HA недоступен)_")
+
     conv_manager.add_message(user_id, "assistant", ai_response)
-    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
+    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
     
     # Trigger async digestion if history is long
     history = conv_manager.get_history(user_id)
@@ -1013,9 +1037,13 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         "- Create events: user can say 'добавь встречу на 15:00 название'\n"
         "- You can parse natural language requests for calendar events.\n\n"
         
-        "🏠 HOME ASSISTANT:\n"
-        "- Control smart home: /ha status, /ha lights on/off\n"
-        "- User can ask about home status or control devices.\n\n"
+        "🏠 HOME ASSISTANT & ALICE:\n"
+        "- Control smart home: You can output COMMANDS to control devices.\n"
+        "  Format: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
+        "  Example: If user says 'turn on kitchen light', you output: 'Turning it on... [[HA:light_on:kitchen]]'\n"
+        "- Yandex Alice TTS: If user asks to SAY something via Alice/station.\n"
+        "  Format: [[ALICE:text_to_say]]\n"
+        "  Example: [[ALICE:Спокойной ночи!]]\n\n"
         
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
@@ -1063,6 +1091,7 @@ async def post_init(application: Application) -> None:
         BotCommand("brief", "Get your daily calendar brief"),
         BotCommand("img", "Generate image with DALL-E 3"),
         BotCommand("memory", "View your saved memories"),
+        BotCommand("msg", "Message another user"),
     ]
     await application.bot.set_my_commands(commands)
     logger.info("Bot commands registered.")
@@ -2758,6 +2787,66 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
 
+async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /settings command."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+    
+    current_model = inference.model
+    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
+    
+    await update.message.reply_text(
+        f"⚙️ **Настройки AI**\n\n"
+        f"🤖 Модель: `{current_model}`\n"
+        f"🔌 Провайдер: `{current_provider.upper()}`\n\n"
+        f"Используйте меню ниже для изменения:",
+        parse_mode='Markdown',
+        reply_markup=get_settings_menu()
+    )
+
+async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /msg <user_id|username> <text> command."""
+    sender_id = update.effective_user.id
+    sender_name = update.effective_user.username or update.effective_user.full_name
+    
+    if not db.is_approved(sender_id):
+        return
+
+    if not context.args or len(context.args) < 2:
+        await update.message.reply_text("Usage: `/msg <id|username> <message>`", parse_mode='Markdown')
+        return
+
+    target = context.args[0]
+    message = " ".join(context.args[1:])
+    
+    target_id = None
+    
+    # Try to resolve target
+    if target.isdigit():
+        target_id = int(target)
+    else:
+        # Simple scan of inactive users (all users in DB)
+        all_users = db.get_inactive_users(hours=0) 
+        target_clean = target.lstrip('@')
+        for u in all_users:
+            if u.get('username') == target_clean:
+                target_id = u['user_id']
+                break
+    
+    if target_id:
+        try:
+            await context.bot.send_message(
+                chat_id=target_id,
+                text=f"📩 **Сообщение от @{sender_name}:**\n\n{message}",
+                parse_mode='Markdown'
+            )
+            await update.message.reply_text(f"✅ Отправлено пользователю `{target_id}`")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Не удалось отправить (пользователь заблокировал бота?): {e}")
+    else:
+        await update.message.reply_text(f"❌ Пользователь `{target}` не найден.")
+
 def main():
     token = config.get("TELEGRAM_BOT_TOKEN")
     if not token:
@@ -2778,6 +2867,7 @@ def main():
     application.add_handler(CommandHandler('brief', brief_command))
     application.add_handler(CommandHandler('memory', memory_command))
     application.add_handler(CommandHandler('newtask', newtask_command))
+    application.add_handler(CommandHandler('msg', msg_command))
     application.add_handler(CommandHandler('agent', agent_command))
     application.add_handler(CommandHandler('pipeline', pipeline_command))
     application.add_handler(CommandHandler('img', img_command))
