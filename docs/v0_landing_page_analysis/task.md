@@ -12,3 +12,6 @@
 - [x] Optimize user flows and CTAs for Israeli market
 - [x] Define information hierarchy and "minimalist" flow
 - [x] Design high-impact, minimal CTAs
+- [x] Finalize design layout and information architecture
+- [x] Define user stories for the Israeli market
+- [x] Create a comprehensive Design Specification artifact
