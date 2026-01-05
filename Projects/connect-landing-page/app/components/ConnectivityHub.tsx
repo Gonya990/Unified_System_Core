@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap, BarChart3, Database, Sun, Moon, Languages } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -394,7 +395,13 @@ export default function ConnectivityHub() {
               transition={{ delay: i * 0.05 }}
             >
               <div className={`absolute inset-0 transition-colors z-10 ${mode === 'personal' ? 'bg-blue-500/20' : 'bg-purple-500/20'} group-hover:bg-transparent`} />
-              <img src={src} alt="Connect User" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <Image
+                src={src}
+                alt="Connect User"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                sizes="(max-width: 768px) 280px, 280px"
+              />
               <div className="absolute bottom-4 left-4 z-20 font-bold text-white text-sm drop-shadow-md">
                 {mode === 'personal' ? 'Connect.Global Traveler' : 'Connect.Global Enterprise'}
               </div>
@@ -408,7 +415,7 @@ export default function ConnectivityHub() {
                to { transform: translateX(-50%); }
             }
             .animate-scroll {
-               animation: scroll 120s linear infinite;
+               animation: scroll 180s linear infinite;
                width: max-content;
             }
             .animate-scroll:hover {

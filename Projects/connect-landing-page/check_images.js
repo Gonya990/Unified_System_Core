@@ -1,4 +1,6 @@
-export const TRAVEL_PHOTOS = [
+import https from 'https';
+
+const TRAVEL_PHOTOS = [
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&q=80&w=400&h=300",
@@ -7,11 +9,11 @@ export const TRAVEL_PHOTOS = [
     "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1499591934245-40b55745b905?auto=format&fit=crop&q=80&w=400&h=300",
-
+    "https://images.unsplash.com/photo-1532517891316-72a08e5c03bc?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1500835556837-99ac94a94552?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=400&h=300",
-
-
+    "https://images.unsplash.com/photo-1504964148243-d75dc99e63c7?auto=format&fit=crop&q=80&w=400&h=300",
+    "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&q=80&w=400&h=300",
@@ -22,8 +24,8 @@ export const TRAVEL_PHOTOS = [
     "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=400&h=300",
-
-
+    "https://images.unsplash.com/photo-1505884024623-2287f3b58474?auto=format&fit=crop&q=80&w=400&h=300",
+    "https://images.unsplash.com/photo-1481487484168-9b995ecc1660?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&q=80&w=400&h=300",
@@ -35,10 +37,10 @@ export const TRAVEL_PHOTOS = [
     "https://images.unsplash.com/photo-1476900543704-4312b78632f8?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1482398650355-d4c6462afa0e?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=400&h=300",
-
+    "https://images.unsplash.com/photo-1508672019048-805c276e7e5e?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1471623320832-752e8bbf8413?auto=format&fit=crop&q=80&w=400&h=300",
-
+    "https://images.unsplash.com/photo-1496950866446-325b84f64795?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=400&h=300",
@@ -49,7 +51,7 @@ export const TRAVEL_PHOTOS = [
     "https://images.unsplash.com/photo-1528642474493-1df6c9aea6b6?auto=format&fit=crop&q=80&w=400&h=300"
 ];
 
-export const OFFICE_PHOTOS = [
+const OFFICE_PHOTOS = [
     "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=400&h=300",
@@ -78,6 +80,37 @@ export const OFFICE_PHOTOS = [
     "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400&h=300",
-
+    "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=400&h=300",
     "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=400&h=300"
 ];
+
+const checkUrl = (url) => {
+    return new Promise((resolve) => {
+        const req = https.request(url, { method: 'HEAD' }, (res) => {
+            if (res.statusCode >= 200 && res.statusCode < 400) {
+                resolve({ url, valid: true });
+            } else {
+                resolve({ url, valid: false, status: res.statusCode });
+            }
+        });
+        req.on('error', () => resolve({ url, valid: false, error: true }));
+        req.end();
+    });
+};
+
+const checkAll = async () => {
+    console.log("Checking TRAVEL_PHOTOS...");
+    for (const url of TRAVEL_PHOTOS) {
+        const result = await checkUrl(url);
+        if (!result.valid) console.log(`INVALID: ${result.url}`);
+    }
+
+    console.log("\nChecking OFFICE_PHOTOS...");
+    for (const url of OFFICE_PHOTOS) {
+        const result = await checkUrl(url);
+        if (!result.valid) console.log(`INVALID: ${result.url}`);
+    }
+    console.log("Done.");
+};
+
+checkAll();
