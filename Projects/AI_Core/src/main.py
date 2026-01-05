@@ -69,6 +69,17 @@ gmail_client = GmailClient()
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
 
+# User aliases for messaging (name -> Telegram user ID)
+USER_ALIASES = {
+    "костя": 578363419,
+    "kostya": 578363419,
+    "kosta": 578363419,
+    "коста": 578363419,
+    "nibbler": 578363419,
+    "nibbler420": 578363419,
+    "toxicfi7h": 578363419,
+}
+
 # System prompt for AI responses
 SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), искусственный интеллект системы 'Unified System'.
 Сервер: pve-antigravity-1.
@@ -96,8 +107,14 @@ SYSTEM_PROMPT = f"""Ты - Гоня (Gonya), искусственный инте
 - [[HA:light_on:<name>]] - включить устройство (свет/розетку).
 - [[HA:light_off:<name>]] - выключить устройство.
 - [[RUN:SAY:<текст>]] - сказать через Яндекс.Алису.
+- [[RUN:MSG:<target>:<текст>]] - отправить сообщение пользователю в Telegram. Target = имя (костя, kostya) или user_id.
 - [[RUN:HA_STATUS]] - статус умного дома.
 - [[RUN:HA_SENSORS]] - датчики дома.
+
+### ИЗВЕСТНЫЕ ПОЛЬЗОВАТЕЛИ:
+- Костя (Nibbler420/@ToxicFi7h) — ID: 578363419
+
+**ВАЖНО**: Когда просят передать сообщение кому-то через бота — используй [[RUN:MSG:...]]! НЕ используй [[RUN:SAY:...]] для этого!
 
 Пример (Example):
 User: "Че там с сервером?"
@@ -1520,6 +1537,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     trigger_health = "[[RUN:HEALTH]]" in response
     trigger_ha_light_on = "[[HA:light_on:" in response
     trigger_ha_light_off = "[[HA:light_off:" in response
+    trigger_msg = "[[RUN:MSG:" in response
     
     # Clean response
     clean_response = response.replace("[[RUN:SCAN]]", "").replace("[[RUN:STATUS]]", "")
@@ -1597,6 +1615,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if match:
             ha_light_off_target = match.group(1)
             clean_response = clean_response.replace(f"[[HA:light_off:{ha_light_off_target}]]", "")
+    
+    # Extract MSG target and text if present
+    msg_target = None
+    msg_text = None
+    if trigger_msg:
+        import re
+        match = re.search(r'\[\[RUN:MSG:([^:]+):(.+?)\]\]', response)
+        if match:
+            msg_target = match.group(1).strip()
+            msg_text = match.group(2).strip()
+            clean_response = clean_response.replace(f"[[RUN:MSG:{match.group(1)}:{match.group(2)}]]", "")
     
     clean_response = clean_response.strip()
     
@@ -1740,6 +1769,39 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             f"😴 Сон: `{stats.get('sleep', 0):.1f} h`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
+    
+    # NEW: MSG trigger - send message to another user
+    if trigger_msg and msg_target and msg_text:
+        logger.info(f"Executing Tool: MSG to={msg_target}, text={msg_text}")
+        
+        # Resolve target to user ID
+        target_id = None
+        
+        # Check if target is a number (direct user ID)
+        if msg_target.isdigit():
+            target_id = int(msg_target)
+        else:
+            # Check aliases (case-insensitive)
+            target_id = USER_ALIASES.get(msg_target.lower())
+        
+        if target_id:
+            try:
+                sender_name = update.effective_user.first_name or "Кто-то"
+                formatted_msg = (
+                    f"📬 **Сообщение от {sender_name}:**\n\n"
+                    f"{msg_text}"
+                )
+                await context.bot.send_message(chat_id=target_id, text=formatted_msg, parse_mode="Markdown")
+                await update.message.reply_text(f"✅ Сообщение отправлено пользователю (ID: {target_id})!")
+                logger.info(f"Message sent successfully to {target_id}")
+            except Exception as e:
+                logger.error(f"Failed to send message to {target_id}: {e}")
+                await update.message.reply_text(f"❌ Не удалось отправить сообщение: {e}")
+        else:
+            await update.message.reply_text(
+                f"❌ Не знаю пользователя '{msg_target}'.\n\n"
+                f"Известные: {', '.join(USER_ALIASES.keys())}"
+            )
 
 
 async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
