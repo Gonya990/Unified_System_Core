@@ -1497,30 +1497,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
     
-    # Check for Tool Triggers
+    # Check for Tool Triggers - ONLY trigger SAY if AI explicitly used the tag
+    # NO auto-forcing! Alice speaks ONLY when AI decides to use [[RUN:SAY:...]]
     trigger_say = "[[RUN:SAY:" in response
-    
-    # Force trigger SAY if user asked explicitly but AI forgot the tag
-    if not trigger_say and any(word in message_text.lower() for word in ["скажи", "алиса", "алисе", "проговори"]):
-        # Preserve original case and text
-        speech_text = message_text
-        lower_text = message_text.lower()
-        
-        # Determine where the actual speech starts
-        for word in ["скажи через алису", "скажи алисе", "скажи"]:
-             if word in lower_text:
-                 # Find index of word and cut everything before it and the word itself
-                 idx = lower_text.find(word)
-                 speech_text = message_text[idx + len(word):].strip()
-                 # Remove leading colon or space
-                 if speech_text.startswith(":") or speech_text.startswith("-"):
-                     speech_text = speech_text[1:].strip()
-                 break
-        
-        if speech_text and len(speech_text) > 1:
-            logger.info(f"Forcing SAY trigger for verbatim text: {speech_text}")
-            trigger_say = True
-            response += f" [[RUN:SAY:{speech_text}]]"
 
     # Other triggers
     trigger_scan = "[[RUN:SCAN]]" in response
