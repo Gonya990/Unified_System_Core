@@ -36,6 +36,29 @@ const CURRENCIES = [
   { code: 'RUB', symbol: '₽', rate: 90 },
 ]
 
+const CODE_SNIPPETS = {
+  bash: `curl -X POST "https://api.connect.global/v1/plans/order" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d "country=IL&gb=10&duration=30"`,
+  node: `const axios = require('axios');
+
+await axios.post('https://api.connect.global/v1/plans/order', {
+  country: 'IL',
+  gb: 10,
+  duration: 30
+}, {
+  headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+});`,
+  python: `import requests
+
+resp = requests.post(
+    "https://api.connect.global/v1/plans/order",
+    json={"country": "IL", "gb": 10, "duration": 30},
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+print(resp.json())`
+};
+
 export default function ConnectivityHub() {
   const [mode, setMode] = useState<"personal" | "business">("personal")
   const [lang, setLang] = useState("ru")
@@ -62,6 +85,9 @@ export default function ConnectivityHub() {
   const [wizardData, setWizardData] = useState({ destination: "", duration: "", usage: "" })
   const [neverExpiring, setNeverExpiring] = useState(false)
   const [vpnEnabled, setVpnEnabled] = useState(false)
+  const [devTab, setDevTab] = useState<"bash" | "node" | "python">("bash")
+  const [devCopied, setDevCopied] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const t: Translation = translations[lang] || translations['en']
 
@@ -103,6 +129,14 @@ export default function ConnectivityHub() {
     const num = typeof val === 'string' ? parseFloat(val.replace('$', '')) : val
     if (isNaN(num)) return val
     return `${currency.symbol}${(num * currency.rate).toFixed(currency.code === 'RUB' ? 0 : 2)}`
+  }
+
+  const handleCopy = () => {
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(CODE_SNIPPETS[devTab])
+      setDevCopied(true)
+      setTimeout(() => setDevCopied(false), 2000)
+    }
   }
 
   const [platform, setPlatform] = useState({ os: "unknown", browser: "unknown" })
@@ -482,11 +516,20 @@ export default function ConnectivityHub() {
                     {t.hero.b2b_desc}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button size="lg" className="h-14 px-8 bg-purple-600 hover:bg-purple-500 rounded-full text-lg text-white">
+                    <Button
+                      size="lg"
+                      onClick={() => document.getElementById('developer-preview')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="h-14 px-8 bg-purple-600 hover:bg-purple-500 rounded-full text-lg text-white active:scale-95 transition-transform"
+                    >
                       {t.hero.b2b_btn_1}
                       <ArrowRight className="ms-2 w-5 h-5" />
                     </Button>
-                    <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => window.open('https://wa.me/message/CONNECT_GLOBAL', '_blank')}
+                      className={`h-14 px-8 rounded-full text-lg active:scale-95 transition-transform ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}
+                    >
                       {t.hero.b2b_btn_2}
                     </Button>
                   </div>
@@ -547,6 +590,7 @@ export default function ConnectivityHub() {
 
                   {/* API Developer Preview Section */}
                   <motion.div
+                    id="developer-preview"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     className="mt-12 text-start max-w-5xl mx-auto w-full"
@@ -557,22 +601,72 @@ export default function ConnectivityHub() {
                     </div>
                     <div className={`rounded-2xl border border-white/10 ${bgClass} overflow-hidden shadow-xl`}>
                       <div className="flex border-b border-white/5 bg-white/5 overflow-x-auto">
-                        <button className="px-6 py-3 text-xs font-bold border-r border-white/5 bg-white/5 whitespace-nowrap">{t.developer.bash_tab}</button>
-                        <button className="px-6 py-3 text-xs font-bold opacity-40 hover:opacity-100 transition-opacity whitespace-nowrap">Node.js</button>
-                        <button className="px-6 py-3 text-xs font-bold opacity-40 hover:opacity-100 transition-opacity whitespace-nowrap">Python</button>
+                        <button
+                          onClick={() => setDevTab("bash")}
+                          className={`px-6 py-4 text-xs font-bold border-r border-white/5 transition-colors whitespace-nowrap ${devTab === "bash" ? 'bg-white/5 text-purple-400' : 'opacity-40 hover:opacity-100'}`}
+                        >
+                          {t.developer.bash_tab}
+                        </button>
+                        <button
+                          onClick={() => setDevTab("node")}
+                          className={`px-6 py-4 text-xs font-bold border-r border-white/5 transition-colors whitespace-nowrap ${devTab === "node" ? 'bg-white/5 text-purple-400' : 'opacity-40 hover:opacity-100'}`}
+                        >
+                          {t.developer.js_tab}
+                        </button>
+                        <button
+                          onClick={() => setDevTab("python")}
+                          className={`px-6 py-4 text-xs font-bold border-r border-white/5 transition-colors whitespace-nowrap ${devTab === "python" ? 'bg-white/5 text-purple-400' : 'opacity-40 hover:opacity-100'}`}
+                        >
+                          Python
+                        </button>
                         <div className="flex-grow" />
-                        <button className="px-4 py-3 text-xs flex items-center gap-2 hover:bg-white/5 transition-colors group">
-                          <Copy className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
-                          <span className="opacity-40">{t.developer.copy}</span>
+                        <button
+                          onClick={handleCopy}
+                          className="px-4 py-3 text-xs flex items-center gap-2 hover:bg-white/5 transition-colors group relative"
+                        >
+                          <Copy className={`w-3 h-3 transition-colors ${devCopied ? 'text-green-500' : 'group-hover:text-purple-400'}`} />
+                          <span className={`${devCopied ? 'text-green-500' : 'opacity-40'}`}>
+                            {devCopied ? t.developer.copied : t.developer.copy}
+                          </span>
                         </button>
                       </div>
-                      <pre className="p-8 text-sm overflow-x-auto font-mono bg-zinc-950/50">
-                        <code>
-                          <span className="text-purple-400">curl</span> -X POST <span className="text-zinc-500">&quot;https://api.connect.global/v1/plans/order&quot;</span> \<br />
-                          &nbsp;&nbsp;-H <span className="text-zinc-500">&quot;Authorization: Bearer YOUR_API_KEY&quot;</span> \<br />
-                          &nbsp;&nbsp;-d <span className="text-zinc-500">&quot;country=IL&gb=10&duration=30&quot;</span>
-                        </code>
-                      </pre>
+                      <div className="relative group">
+                        <pre className="p-4 md:p-8 text-xs md:text-sm overflow-x-auto font-mono bg-zinc-950/50 custom-scrollbar min-h-[200px]">
+                          <code className="block leading-relaxed whitespace-pre md:whitespace-nowrap" dir="ltr">
+                            {devTab === "bash" && (
+                              <>
+                                <span className="text-purple-400">curl</span> -X POST <span className="text-green-400">&quot;https://api.connect.global/v1/plans/order&quot;</span> \<br />
+                                &nbsp;&nbsp;-H <span className="text-green-400">&quot;Authorization: Bearer YOUR_API_KEY&quot;</span> \<br />
+                                &nbsp;&nbsp;-d <span className="text-green-400">&quot;country=IL&gb=10&duration=30&quot;</span>
+                              </>
+                            )}
+                            {devTab === "node" && (
+                              <>
+                                <span className="text-purple-400">const</span> axios = <span className="text-purple-400">require</span>(<span className="text-green-400">&apos;axios&apos;</span>);<br /><br />
+                                <span className="text-purple-400">await</span> axios.post(<span className="text-green-400">&apos;https://api.connect.global/v1/plans/order&apos;</span>, &#123;<br />
+                                &nbsp;&nbsp;country: <span className="text-green-400">&apos;IL&apos;</span>,<br />
+                                &nbsp;&nbsp;gb: <span className="text-cyan-400">10</span>,<br />
+                                &nbsp;&nbsp;duration: <span className="text-cyan-400">30</span><br />
+                                &#125;, &#123;<br />
+                                &nbsp;&nbsp;headers: &#123; <span className="text-green-400">&apos;Authorization&apos;</span>: <span className="text-green-400">&apos;Bearer YOUR_API_KEY&apos;</span> &#125;<br />
+                                &#125;);
+                              </>
+                            )}
+                            {devTab === "python" && (
+                              <>
+                                <span className="text-purple-400">import</span> requests<br /><br />
+                                resp = requests.post(<br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-400">&quot;https://api.connect.global/v1/plans/order&quot;</span>,<br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;json=&#123;<span className="text-green-400">&quot;country&quot;</span>: <span className="text-green-400">&quot;IL&quot;</span>, <span className="text-green-400">&quot;gb&quot;</span>: <span className="text-cyan-400">10</span>, <span className="text-green-400">&quot;duration&quot;</span>: <span className="text-cyan-400">30</span>&#125;,<br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;headers=&#123;<span className="text-green-400">&quot;Authorization&quot;</span>: <span className="text-green-400">&quot;Bearer YOUR_API_KEY&quot;</span>&#125;<br />
+                                )<br />
+                                <span className="text-purple-400">print</span>(resp.json())
+                              </>
+                            )}
+                          </code>
+                        </pre>
+                        <div className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-widest opacity-20 pointer-events-none">{devTab}</div>
+                      </div>
                     </div>
                     <p className={`mt-4 text-xs font-medium uppercase tracking-widest ${mutedTextClass} opacity-50`}>{t.developer.subtitle}</p>
                   </motion.div>
@@ -688,14 +782,14 @@ export default function ConnectivityHub() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-12">
-              <Button size="lg" className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
+              <Button size="lg" onClick={() => alert('Connect iOS App: Coming Soon')} className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
                 <Download className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-[10px] uppercase font-bold opacity-50">Download on the</div>
                   <div className="text-sm font-bold">{t.hero.app_ios}</div>
                 </div>
               </Button>
-              <Button size="lg" className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
+              <Button size="lg" onClick={() => alert('Connect Android App: Coming Soon')} className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
                 <Smartphone className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-[10px] uppercase font-bold opacity-50">Get it on</div>
@@ -956,14 +1050,25 @@ export default function ConnectivityHub() {
                     <div className="space-y-4">
                       <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_1}</label>
                       <input
-                        placeholder="Search country..."
+                        placeholder={t.hero.search_placeholder}
+                        value={wizardData.destination}
                         className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 focus:border-blue-500/50 outline-none transition-colors"
                         onChange={(e) => setWizardData({ ...wizardData, destination: e.target.value })}
                       />
                       <div className="flex flex-wrap gap-2 pt-2">
-                        {['🇬🇧 UK', '🇺🇸 USA', '🇯🇵 Japan'].map(c => (
-                          <button key={c} onClick={() => setWizardStep(2)} className="px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs hover:border-blue-500/50 transition-colors">
-                            {c}
+                        {TOP_COUNTRIES.filter(c =>
+                          c.name.toLowerCase().includes(wizardData.destination.toLowerCase()) ||
+                          c.code.toLowerCase().includes(wizardData.destination.toLowerCase())
+                        ).slice(0, 5).map(c => (
+                          <button
+                            key={c.code}
+                            onClick={() => {
+                              setWizardData({ ...wizardData, destination: c.name });
+                              setWizardStep(2);
+                            }}
+                            className="px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs hover:border-blue-500/50 transition-colors active:scale-95"
+                          >
+                            {c.flag} {c.name}
                           </button>
                         ))}
                       </div>
@@ -974,8 +1079,11 @@ export default function ConnectivityHub() {
                     <div className="space-y-4">
                       <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_2}</label>
                       <div className="grid grid-cols-2 gap-4">
-                        {['1-7 days', '30 days', '90 days', '1 year'].map(d => (
-                          <button key={d} onClick={() => setWizardStep(3)} className="h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-center font-bold hover:border-blue-500/50 transition-colors">
+                        {t.wizard.durations.map((d, i) => (
+                          <button key={i} onClick={() => {
+                            setWizardData({ ...wizardData, duration: d });
+                            setWizardStep(3);
+                          }} className="h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-center font-bold hover:border-blue-500/50 transition-colors active:scale-95">
                             {d}
                           </button>
                         ))}
@@ -987,12 +1095,18 @@ export default function ConnectivityHub() {
                     <div className="space-y-4">
                       <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_3}</label>
                       <div className="space-y-3">
-                        {['Basic browsing', 'Work & Video Calls', 'Heavy Streaming (4K)'].map(u => (
-                          <button key={u} onClick={() => {
+                        {t.wizard.usage_types.map((u, i) => (
+                          <button key={i} onClick={() => {
                             setWizardOpen(false);
                             setWizardStep(1);
-                            handleSelectPlan({ name: 'Nomad Assistant', price: '$29', desc: 'Custom optimized for your trip', features: ['Optimized Coverage'] });
-                          }} className="w-full h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-start px-6 font-bold hover:border-blue-500/50 transition-colors">
+                            // Recommend Nomad plan as default Assistant plan
+                            handleSelectPlan({
+                              name: `${wizardData.destination} Nomad`,
+                              price: '$29',
+                              desc: t.wizard.result,
+                              features: [t.pricing.units.instant, t.pricing.units.full_speed]
+                            });
+                          }} className="w-full h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-start px-6 font-bold hover:border-blue-500/50 transition-colors active:scale-95">
                             {u}
                           </button>
                         ))}
@@ -1008,7 +1122,9 @@ export default function ConnectivityHub() {
                     ))}
                   </div>
                   {wizardStep > 1 && (
-                    <button onClick={() => setWizardStep(wizardStep - 1)} className="text-xs font-bold opacity-40 hover:opacity-100 uppercase tracking-widest">Back</button>
+                    <button onClick={() => setWizardStep(wizardStep - 1)} className="text-xs font-bold opacity-40 hover:opacity-100 uppercase tracking-widest transition-opacity flex items-center gap-1">
+                      &larr; {t.wizard.back}
+                    </button>
                   )}
                 </div>
               </div>
@@ -1208,18 +1324,43 @@ export default function ConnectivityHub() {
                     </div>
 
                     <div className="space-y-3">
-                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold transition-transform active:scale-95 flex items-center justify-center gap-2">
-                        {platform.os === "mac" || platform.os === "ios" ? (
-                          <><Download className="w-5 h-5" /> {t.checkout.apple_pay}</>
+                      <Button
+                        disabled={isProcessing}
+                        className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold transition-transform active:scale-95 flex items-center justify-center gap-2"
+                        onClick={() => {
+                          setIsProcessing(true);
+                          setTimeout(() => {
+                            setIsProcessing(false);
+                            setCheckoutStep("success");
+                          }, 1500);
+                        }}
+                      >
+                        {isProcessing ? (
+                          <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                         ) : (
-                          <><CreditCard className="w-5 h-5" /> Google Pay / Card</>
+                          platform.os === "mac" || platform.os === "ios" ? (
+                            <><Download className="w-5 h-5" /> {t.checkout.apple_pay}</>
+                          ) : (
+                            <><CreditCard className="w-5 h-5" /> Google Pay / Card</>
+                          )
                         )}
                       </Button>
                       <Button
-                        className="w-full h-14 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 font-bold"
-                        onClick={() => setCheckoutStep("success")}
+                        disabled={isProcessing}
+                        className="w-full h-14 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 font-bold relative overflow-hidden group"
+                        onClick={() => {
+                          setIsProcessing(true);
+                          setTimeout(() => {
+                            setIsProcessing(false);
+                            setCheckoutStep("success");
+                          }, 1500);
+                        }}
                       >
-                        {t.checkout.pay_now}
+                        {isProcessing ? (
+                          <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
+                        ) : (
+                          t.checkout.pay_now
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -1262,10 +1403,72 @@ export default function ConnectivityHub() {
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className={`fixed bottom-8 ${lang === 'he' ? 'left-8' : 'right-8'} z-[60] w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl text-white hover:bg-green-400 transition-colors`}
+        className={`fixed bottom-8 ${lang === 'he' ? 'left-8' : 'right-8'} z-[60] w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl text-white hover:bg-green-400 transition-colors cursor-pointer`}
       >
         <Phone className="w-6 h-6" />
       </motion.a>
+
+      {/* Footer Section */}
+      <footer className={`py-20 border-t border-white/5 ${bgClass} relative z-10`}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
+            <div className="col-span-2 lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white italic">C</div>
+                <span className="text-xl font-bold tracking-tighter text-white">CONNECT.GLOBAL</span>
+              </div>
+              <p className={`text-sm ${mutedTextClass} max-w-xs mb-8`}>
+                Next-generation eSIM infrastructure for global travelers and enterprises.
+                Reliable connectivity in 190+ countries.
+              </p>
+              <div className="flex gap-4">
+                {['Twitter', 'Instagram', 'LinkedIn'].map(s => (
+                  <button key={s} onClick={() => alert(`${s} page: Coming Soon`)} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors group">
+                    <Star className="w-4 h-4 opacity-50 group-hover:text-blue-500 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">{t.nav.coverage}</h4>
+              <ul className="space-y-4 text-sm opacity-50 font-medium">
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Europe</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Asia</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Middle East</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Americas</button></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Solutions</h4>
+              <ul className="space-y-4 text-sm opacity-50 font-medium">
+                <li><button onClick={() => setMode('personal')} className="hover:text-blue-500 transition-colors">For Personal</button></li>
+                <li><button onClick={() => setMode('business')} className="hover:text-purple-500 transition-colors">For Business</button></li>
+                <li><button onClick={() => document.getElementById('developer-preview')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-purple-500 transition-colors">API Docs</button></li>
+                <li><button onClick={() => window.open('https://wa.me/message/CONNECT_GLOBAL')} className="hover:text-green-500 transition-colors">Support</button></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Legal</h4>
+              <ul className="space-y-4 text-sm opacity-50 font-medium">
+                <li><button onClick={() => alert('Terms of Service: Coming Soon')} className="hover:text-blue-500 transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => alert('Privacy Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">Privacy Policy</button></li>
+                <li><button onClick={() => alert('Refund Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">Refund Policy</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold uppercase tracking-widest opacity-30">
+            <div className="text-white">{t.footer}</div>
+            <div className="flex gap-8 text-white">
+              <span>Status: All Operational</span>
+              <span>v1.2.0</span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
