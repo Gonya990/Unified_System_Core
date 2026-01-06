@@ -45,6 +45,7 @@ export interface Translation {
   wizard: {
     title: string; desc: string; btn: string; step_1: string; step_2: string;
     step_3: string; result: string;
+    durations: string[]; usage_types: string[]; back: string;
   };
   footer: string;
 }
@@ -235,7 +236,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -424,7 +437,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Куда вы летите?",
       "step_2": "Длительность поездки?",
       "step_3": "Как планируете использовать?",
-      "result": "Мы рекомендуем"
+      "result": "Мы рекомендуем",
+      "durations": [
+        "1-7 дней",
+        "30 дней",
+        "90 дней",
+        "1 год"
+      ],
+      "usage_types": [
+        "Карты и почта",
+        "Работа и звонки",
+        "Стриминг и видео"
+      ],
+      "back": "Назад"
     },
     "footer": "Connect.Global © 2026. Все системы работают штатно."
   },
@@ -613,7 +638,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "לאן אתם טסים?",
       "step_2": "משך השהות?",
       "step_3": "שימוש מתוכנן?",
-      "result": "מומלץ עבורך"
+      "result": "מומלץ עבורך",
+      "durations": [
+        "1-7 ימים",
+        "30 יום",
+        "90 יום",
+        "שנה 1"
+      ],
+      "usage_types": [
+        "גלישה ומפות",
+        "עבודה ושיחות",
+        "סטרימינג ווידאו"
+      ],
+      "back": "חזור"
     },
     "footer": "Connect.Global © 2026. כל המערכות פועלות כסדרן."
   },
@@ -802,7 +839,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -991,7 +1040,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1180,7 +1241,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1369,7 +1442,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1558,7 +1643,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1747,7 +1844,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1936,7 +2045,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2125,7 +2246,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2314,7 +2447,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2503,7 +2648,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2692,7 +2849,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2881,7 +3050,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3070,7 +3251,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3259,7 +3452,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3448,7 +3653,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3637,7 +3854,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3826,7 +4055,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4015,7 +4256,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4204,7 +4457,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4393,7 +4658,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4582,7 +4859,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4771,7 +5060,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4960,7 +5261,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5149,7 +5462,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5338,7 +5663,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5527,7 +5864,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5716,7 +6065,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5905,7 +6266,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6094,7 +6467,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6283,7 +6668,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6472,7 +6869,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6661,7 +7070,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6850,7 +7271,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7039,7 +7472,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7228,7 +7673,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7417,7 +7874,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7606,7 +8075,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7795,7 +8276,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7984,7 +8477,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8173,7 +8678,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8362,7 +8879,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8551,7 +9080,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8740,7 +9281,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8929,7 +9482,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9118,7 +9683,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9307,7 +9884,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9496,7 +10085,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9685,7 +10286,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9874,7 +10487,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10063,7 +10688,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10252,7 +10889,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10441,7 +11090,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10630,7 +11291,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10819,7 +11492,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11008,7 +11693,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11197,7 +11894,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11386,7 +12095,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11575,7 +12296,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11764,7 +12497,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11953,7 +12698,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12142,7 +12899,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12331,7 +13100,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12520,7 +13301,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12709,7 +13502,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12898,7 +13703,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13087,7 +13904,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13276,7 +14105,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13465,7 +14306,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13654,7 +14507,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13843,7 +14708,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14032,7 +14909,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14221,7 +15110,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14410,7 +15311,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14599,7 +15512,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14788,7 +15713,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14977,7 +15914,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15166,7 +16115,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15355,7 +16316,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15544,7 +16517,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15733,7 +16718,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15922,7 +16919,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16111,7 +17120,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16300,7 +17321,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16489,7 +17522,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16678,7 +17723,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16867,7 +17924,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17056,7 +18125,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17245,7 +18326,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17434,7 +18527,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17623,7 +18728,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17812,7 +18929,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18001,7 +19130,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18190,7 +19331,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18379,7 +19532,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18568,7 +19733,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18757,7 +19934,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18946,7 +20135,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19135,7 +20336,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19324,7 +20537,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19513,7 +20738,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19702,7 +20939,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19891,7 +21140,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20080,7 +21341,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20269,7 +21542,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20458,7 +21743,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20647,7 +21944,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20836,7 +22145,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21025,7 +22346,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21214,7 +22547,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21403,7 +22748,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21592,7 +22949,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21781,7 +23150,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21970,7 +23351,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22159,7 +23552,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22348,7 +23753,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22537,7 +23954,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22726,7 +24155,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22915,7 +24356,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23104,7 +24557,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23293,7 +24758,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23482,7 +24959,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23671,7 +25160,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23860,7 +25361,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24049,7 +25562,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24238,7 +25763,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24427,7 +25964,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24616,7 +26165,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24805,7 +26366,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24994,7 +26567,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -25183,7 +26768,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -25372,7 +26969,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -25561,7 +27170,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -25750,7 +27371,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -25939,7 +27572,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -26128,7 +27773,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -26317,7 +27974,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -26506,7 +28175,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -26695,7 +28376,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -26884,7 +28577,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -27073,7 +28778,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -27262,7 +28979,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -27451,7 +29180,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -27640,7 +29381,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -27829,7 +29582,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28018,7 +29783,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28207,7 +29984,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28396,7 +30185,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28585,7 +30386,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28774,7 +30587,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -28963,7 +30788,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -29152,7 +30989,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -29341,7 +31190,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -29530,7 +31391,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -29719,7 +31592,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -29908,7 +31793,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -30097,7 +31994,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -30286,7 +32195,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -30475,7 +32396,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -30664,7 +32597,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -30853,7 +32798,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31042,7 +32999,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31231,7 +33200,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31420,7 +33401,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31609,7 +33602,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31798,7 +33803,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -31987,7 +34004,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -32176,7 +34205,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -32365,7 +34406,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -32554,7 +34607,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -32743,7 +34808,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -32932,7 +35009,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -33121,7 +35210,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -33310,7 +35411,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -33499,7 +35612,19 @@ export const translations: Record<string, Translation> = {
       "step_1": "Where are you going?",
       "step_2": "Duration of stay?",
       "step_3": "Planned usage?",
-      "result": "Recommended for you"
+      "result": "Recommended for you",
+      "durations": [
+        "1-7 days",
+        "30 days",
+        "90 days",
+        "1 year"
+      ],
+      "usage_types": [
+        "Browsing & Maps",
+        "Work & Calls",
+        "Heavy Streaming"
+      ],
+      "back": "Back"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   }
