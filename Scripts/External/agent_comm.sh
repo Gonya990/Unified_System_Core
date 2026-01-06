@@ -2,7 +2,7 @@
 # agent_comm.sh
 # Local wrapper to interact with the Centralized Agent Mail Hub on igor-gaming-1
 
-HUB_URL="http://100.88.65.71:8765/mcp"
+HUB_URL="http://100.110.209.49:8765/mcp"
 AUTH_TOKEN="antigravity_secret"
 PROJECT_KEY="/main" # Logical project name (must be absolute path)
 AGENT_STATE_FILE="$HOME/.cache/agent_comm_state"
