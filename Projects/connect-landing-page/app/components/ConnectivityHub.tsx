@@ -33,6 +33,7 @@ export default function ConnectivityHub() {
   const [mode, setMode] = useState<"personal" | "business">("personal")
   const [lang, setLang] = useState("ru")
   const [langOpen, setLangOpen] = useState(false)
+  const [langMobileOpen, setLangMobileOpen] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isDetected, setIsDetected] = useState(false)
   const [dataVal, setDataVal] = useState(500)
@@ -131,9 +132,9 @@ export default function ConnectivityHub() {
                       {ALL_LANGUAGES.map((language) => (
                         <CommandItem
                           key={language.value}
-                          value={language.label}
-                          onSelect={() => {
-                            setLang(language.value)
+                          value={language.value}
+                          onSelect={(currentValue) => {
+                            setLang(currentValue)
                             setLangOpen(false)
                           }}
                         >
@@ -152,7 +153,7 @@ export default function ConnectivityHub() {
               </PopoverContent>
             </Popover>
 
-            <Popover open={langOpen} onOpenChange={setLangOpen}>
+            <Popover open={langMobileOpen} onOpenChange={setLangMobileOpen}>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className={`md:hidden ${navTextClass}`}>
                   <Languages className="w-5 h-5" />
@@ -166,10 +167,10 @@ export default function ConnectivityHub() {
                       {ALL_LANGUAGES.map((language) => (
                         <CommandItem
                           key={language.value}
-                          value={language.label}
-                          onSelect={() => {
-                            setLang(language.value)
-                            setLangOpen(false)
+                          value={language.value}
+                          onSelect={(currentValue) => {
+                            setLang(currentValue)
+                            setLangMobileOpen(false)
                           }}
                         >
                           {language.label}
