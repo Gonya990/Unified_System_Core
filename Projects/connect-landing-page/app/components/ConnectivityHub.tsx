@@ -78,7 +78,7 @@ export default function ConnectivityHub() {
                   className={`w-[140px] justify-between ${navTextClass} text-xs uppercase tracking-wider font-bold hidden md:flex`}
                 >
                   {lang === 'ru' ? 'Русский' : lang === 'en' ? 'English' : ALL_LANGUAGES.find(l => l.value === lang)?.label || lang}
-                  <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                  <ChevronsUpDown className="ms-2 h-3 w-3 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[200px] p-0 max-h-[400px]">
@@ -99,7 +99,7 @@ export default function ConnectivityHub() {
                           {language.label}
                           <Check
                             className={cn(
-                              "ml-auto h-4 w-4",
+                              "ms-auto h-4 w-4",
                               lang === language.value ? "opacity-100" : "opacity-0"
                             )}
                           />
@@ -209,7 +209,7 @@ export default function ConnectivityHub() {
                       onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                       {t.hero.b2c_btn_1}
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      <ArrowRight className="ms-2 w-5 h-5" />
                     </Button>
                     <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
                       {t.hero.b2c_btn_2}
@@ -275,7 +275,7 @@ export default function ConnectivityHub() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-6 mb-8 text-left">
+                      <div className="grid grid-cols-3 gap-6 mb-8 text-start">
                         <div>
                           <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.nodes}</p>
                           <p className="text-2xl font-bold">1,402</p>
@@ -316,7 +316,7 @@ export default function ConnectivityHub() {
                   </div>
 
                   {/* Startup Section Mini-Banner */}
-                  <div className={`mb-12 p-6 rounded-3xl border ${isDark ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'} flex flex-col md:flex-row items-center gap-6 text-left`}>
+                  <div className={`mb-12 p-6 rounded-3xl border ${isDark ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'} flex flex-col md:flex-row items-center gap-6 text-start`}>
                     <div className="flex-1">
                       <h4 className="font-bold text-lg mb-2">{t.startup_section.title}</h4>
                       <p className={`text-sm ${mutedTextClass}`}>{t.startup_section.desc}</p>
@@ -337,7 +337,7 @@ export default function ConnectivityHub() {
                       onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                       {t.hero.b2b_btn_1}
-                      <Database className="ml-2 w-5 h-5" />
+                      <Database className="ms-2 w-5 h-5" />
                     </Button>
                     <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
                       {t.hero.b2b_btn_2}
@@ -471,7 +471,7 @@ export default function ConnectivityHub() {
                   }}
                   className={`group relative p-8 rounded-3xl ${cardBgClass} hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2`}
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-0 rtl:left-0 ltr:right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
                     <plan.icon className="w-8 h-8 text-blue-500" />
                   </div>
                   <h3 className={`text-xl font-bold mb-2`}>{plan.name}</h3>
@@ -528,7 +528,7 @@ export default function ConnectivityHub() {
                   }}
                   className={`group relative p-8 rounded-3xl ${cardBgClass} hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-2`}
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-0 rtl:left-0 ltr:right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
                     <plan.icon className="w-8 h-8 text-purple-500" />
                   </div>
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
