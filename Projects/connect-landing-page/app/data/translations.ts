@@ -1,4 +1,34 @@
-export const translations: any = {
+
+export interface Translation {
+  nav: { coverage: string; pricing: string; tech: string; api: string };
+  hero: {
+    b2c_tag: string; b2c_title_1: string; b2c_title_2: string; b2c_desc: string;
+    b2c_btn_1: string; b2c_btn_2: string; b2b_tag: string; b2b_title_1: string;
+    b2b_title_2: string; b2b_desc: string; b2b_btn_1: string; b2b_btn_2: string;
+    loc_detecting: string; loc_found: string; support_whatsapp: string;
+  };
+  testimonials: {
+    title: string;
+    items: Array<{ name: string; role: string; text: string }>;
+  };
+  calculator: {
+    title: string; label: string; saving: string; per_year: string;
+  };
+  dashboard: {
+    title: string; nodes: string; traffic: string; latency: string; status: string;
+    israel_optimized: string;
+  };
+  startup_section: { title: string; desc: string; features: string[] };
+  stats: { countries: string; speed: string; privacy: string; uptime: string };
+  pricing: {
+    b2c_title: string; b2c_subtitle: string; b2b_title: string; b2b_subtitle: string;
+    plans: Record<string, { name: string; desc: string }>;
+    units: Record<string, string>;
+  };
+  footer: string;
+}
+
+export const translations: Record<string, Translation> = {
   "en": {
     "nav": {
       "coverage": "Coverage",
@@ -20,7 +50,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -114,7 +166,29 @@ export const translations: any = {
       "b2b_btn_1": "Начать Интеграцию",
       "b2b_btn_2": "Связаться с Sales",
       "loc_detecting": "Определяем вашу локацию...",
-      "loc_found": "Лучший план для России:"
+      "loc_found": "Лучший план для России:",
+      "support_whatsapp": "Поддержка в WhatsApp"
+    },
+    "testimonials": {
+      "title": "Нам доверяют лидеры",
+      "items": [
+        {
+          "name": "Ари Л.",
+          "role": "CTO @ Fintech Startup",
+          "text": "Интеграция через API прошла идеально. Управляем более чем 500 подключениями без сбоев."
+        },
+        {
+          "name": "Сара М.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Наконец-то eSIM провайдер, который понимает масштабы бизнеса. Лучшие цены на трафик в EU/US."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "Калькулятор выгоды B2B",
+      "label": "Месячный объем данных",
+      "saving": "Вы экономите до",
+      "per_year": "в год"
     },
     "dashboard": {
       "title": "Live Сетевая Активность",
@@ -208,7 +282,29 @@ export const translations: any = {
       "b2b_btn_1": "התחל אינטגרציה",
       "b2b_btn_2": "צור קשר עם המכירות",
       "loc_detecting": "מזהה את המיקום שלך...",
-      "loc_found": "התוכנית הטובה ביותר לישראל:"
+      "loc_found": "התוכנית הטובה ביותר לישראל:",
+      "support_whatsapp": "תמיכה ב-WhatsApp"
+    },
+    "testimonials": {
+      "title": "המובילים בוטחים בנו",
+      "items": [
+        {
+          "name": "ארי ל.",
+          "role": "CTO @ Fintech Startup",
+          "text": "האינטגרציה של ה-API הייתה חלקה. אנחנו מנהלים מעל 500 חיבורים עם אפס זמן השבתה."
+        },
+        {
+          "name": "שרה מ.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "סוף סוף ספק eSIM שמבין קנה מידה עסקי. המחירים הטובים ביותר לתעבורה ב-EU/US."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "מחשבון חיסכון B2B",
+      "label": "שימוש בנתונים חודשיים",
+      "saving": "אתה חוסך עד",
+      "per_year": "בשנה"
     },
     "dashboard": {
       "title": "פעילות רשת חיה",
@@ -302,7 +398,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -396,7 +514,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -490,7 +630,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -584,7 +746,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -678,7 +862,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -772,7 +978,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -866,7 +1094,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -960,7 +1210,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1054,7 +1326,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1148,7 +1442,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1242,7 +1558,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1336,7 +1674,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1430,7 +1790,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1524,7 +1906,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1618,7 +2022,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1712,7 +2138,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1806,7 +2254,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1900,7 +2370,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -1994,7 +2486,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2088,7 +2602,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2182,7 +2718,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2276,7 +2834,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2370,7 +2950,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2464,7 +3066,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2558,7 +3182,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2652,7 +3298,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2746,7 +3414,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2840,7 +3530,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -2934,7 +3646,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3028,7 +3762,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3122,7 +3878,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3216,7 +3994,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3310,7 +4110,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3404,7 +4226,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3498,7 +4342,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3592,7 +4458,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3686,7 +4574,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3780,7 +4690,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3874,7 +4806,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -3968,7 +4922,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4062,7 +5038,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4156,7 +5154,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4250,7 +5270,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4344,7 +5386,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4438,7 +5502,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4532,7 +5618,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4626,7 +5734,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4720,7 +5850,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4814,7 +5966,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -4908,7 +6082,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5002,7 +6198,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5096,7 +6314,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5190,7 +6430,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5284,7 +6546,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5378,7 +6662,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5472,7 +6778,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5566,7 +6894,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5660,7 +7010,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5754,7 +7126,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5848,7 +7242,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -5942,7 +7358,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6036,7 +7474,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6130,7 +7590,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6224,7 +7706,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6318,7 +7822,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6412,7 +7938,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6506,7 +8054,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6600,7 +8170,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6694,7 +8286,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6788,7 +8402,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6882,7 +8518,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -6976,7 +8634,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7070,7 +8750,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7164,7 +8866,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7258,7 +8982,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7352,7 +9098,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7446,7 +9214,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7540,7 +9330,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7634,7 +9446,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7728,7 +9562,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7822,7 +9678,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -7916,7 +9794,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8010,7 +9910,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8104,7 +10026,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8198,7 +10142,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8292,7 +10258,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8386,7 +10374,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8480,7 +10490,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8574,7 +10606,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8668,7 +10722,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8762,7 +10838,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8856,7 +10954,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -8950,7 +11070,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9044,7 +11186,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9138,7 +11302,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9232,7 +11418,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9326,7 +11534,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9420,7 +11650,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9514,7 +11766,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9608,7 +11882,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9702,7 +11998,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9796,7 +12114,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9890,7 +12230,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -9984,7 +12346,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10078,7 +12462,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10172,7 +12578,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10266,7 +12694,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10360,7 +12810,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10454,7 +12926,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10548,7 +13042,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10642,7 +13158,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10736,7 +13274,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10830,7 +13390,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -10924,7 +13506,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11018,7 +13622,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11112,7 +13738,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11206,7 +13854,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11300,7 +13970,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11394,7 +14086,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11488,7 +14202,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11582,7 +14318,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11676,7 +14434,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11770,7 +14550,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11864,7 +14666,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -11958,7 +14782,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12052,7 +14898,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12146,7 +15014,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12240,7 +15130,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12334,7 +15246,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12428,7 +15362,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12522,7 +15478,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12616,7 +15594,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12710,7 +15710,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12804,7 +15826,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12898,7 +15942,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -12992,7 +16058,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13086,7 +16174,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13180,7 +16290,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13274,7 +16406,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13368,7 +16522,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13462,7 +16638,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13556,7 +16754,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13650,7 +16870,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13744,7 +16986,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13838,7 +17102,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -13932,7 +17218,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14026,7 +17334,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14120,7 +17450,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14214,7 +17566,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14308,7 +17682,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14402,7 +17798,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14496,7 +17914,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14590,7 +18030,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14684,7 +18146,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14778,7 +18262,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14872,7 +18378,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -14966,7 +18494,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15060,7 +18610,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15154,7 +18726,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15248,7 +18842,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15342,7 +18958,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15436,7 +19074,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15530,7 +19190,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15624,7 +19306,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15718,7 +19422,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15812,7 +19538,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -15906,7 +19654,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16000,7 +19770,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16094,7 +19886,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16188,7 +20002,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16282,7 +20118,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16376,7 +20234,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16470,7 +20350,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
@@ -16564,7 +20466,29 @@ export const translations: any = {
       "b2b_btn_1": "Start Integration",
       "b2b_btn_2": "Contact Sales",
       "loc_detecting": "Detecting your location...",
-      "loc_found": "Best plan for United Kingdom:"
+      "loc_found": "Best plan for United Kingdom:",
+      "support_whatsapp": "WhatsApp Support"
+    },
+    "testimonials": {
+      "title": "Trusted by the Best",
+      "items": [
+        {
+          "name": "Ari L.",
+          "role": "CTO @ Fintech Startup",
+          "text": "The API integration was seamless. We manage over 500 connections with zero downtime."
+        },
+        {
+          "name": "Sarah M.",
+          "role": "CEO @ E-commerce Agency",
+          "text": "Finally an eSIM provider that understands business scale. Best rates for EU/US traffic."
+        }
+      ]
+    },
+    "calculator": {
+      "title": "B2B ROI Calculator",
+      "label": "Monthly Data Usage",
+      "saving": "You save up to",
+      "per_year": "per year"
     },
     "dashboard": {
       "title": "Live Network Activity",
