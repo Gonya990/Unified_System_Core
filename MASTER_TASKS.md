@@ -6,7 +6,7 @@
 
 ## ✅ Сегодня выполнено / Completed Today
 
-- [x] Telegram Bot deployed on igor-gaming-1 (running 2h+)
+- [x] Telegram Bot deployed on unified-home-core-cloud (migrated from igor-gaming-1)
 - [x] Tailscale SSH configured on all 4 hosts
 - [x] sudo NOPASSWD configured on all hosts
 - [x] gonya user created on PVE with Administrator role
@@ -14,6 +14,8 @@
 - [x] lenovo-tb-j606f restored to online
 - [x] Unified_System synced to all hosts
 - [x] Bluetooth DBus fix for HA ✅ (verified on smart)
+- [x] Agent Coordination Hub migrated to unified-home-core-cloud
+- [x] PDF with Direct Contacts generated
 
 ---
 
@@ -124,7 +126,7 @@
 
 ```bash
 # Tailscale SSH:
-tailscale ssh gonya@igor-gaming-1
+tailscale ssh gonya@unified-home-core-cloud
 tailscale ssh gonya@unified-home-core-cloud
 tailscale ssh igor@smart
 tailscale ssh gonya@pve-antigravity-1
