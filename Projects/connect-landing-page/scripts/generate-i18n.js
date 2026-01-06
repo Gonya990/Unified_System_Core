@@ -104,7 +104,10 @@ const sourceTranslation = {
         mins: "Voice (Mins)",
         sms: "SMS Pack",
         confirm: "Proceed to Checkout",
-        total: "Monthly Total"
+        total: "Monthly Total",
+        usage_video: "video hours",
+        usage_music: "music hours",
+        usage_social: "social browsing"
     },
     checkout: {
         title: "Secure Checkout",
@@ -204,7 +207,10 @@ const overrides = {
             mins: "Звонки (Мин)",
             sms: "Пакет SMS",
             confirm: "Перейти к оплате",
-            total: "Итого в месяц"
+            total: "Итого в месяц",
+            usage_video: "часов видео",
+            usage_music: "часов музыки",
+            usage_social: "соцсети и мессенджеры"
         },
         checkout: {
             title: "Безопасная оплата",
@@ -301,7 +307,10 @@ const overrides = {
             mins: "שיחות (דקות)",
             sms: "חבילת SMS",
             confirm: "המשך לתשלום",
-            total: "סה\"כ לחודש"
+            total: "סה\"כ לחודש",
+            usage_video: "שעות וידאו",
+            usage_music: "שעות מוזיקה",
+            usage_social: "רשתות חברתיות"
         },
         checkout: {
             title: "תשלום מאובטח",
@@ -363,6 +372,7 @@ export interface Translation {
   };
   config: {
     title: string; gb: string; mins: string; sms: string; confirm: string; total: string;
+    usage_video: string; usage_music: string; usage_social: string;
   };
   checkout: {
     title: string; step_final: string; apple_pay: string; plan: string;
