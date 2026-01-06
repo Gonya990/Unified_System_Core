@@ -2,21 +2,32 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap, BarChart3, Database, Sun, Moon, Languages, Quote, Phone } from "lucide-react"
+import {
+  Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap,
+  BarChart3, Database, Sun, Moon, Languages, Quote, Phone,
+  CreditCard, CheckCircle, Download, User, Settings, Star,
+  Check, ChevronsUpDown
+} from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+
 import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
 import { TOP_COUNTRIES } from "@/app/data/countries"
 import { translations, type Translation } from "@/app/data/translations"
 
-
+interface Plan {
+  name: string;
+  price: string;
+  desc: string;
+  features: string[];
+}
 
 export default function ConnectivityHub() {
   const [mode, setMode] = useState<"personal" | "business">("personal")
@@ -28,12 +39,38 @@ export default function ConnectivityHub() {
   const [selectedCountry, setSelectedCountry] = useState("")
   const [countryOpen, setCountryOpen] = useState(false)
 
+  // Plan Config & Checkout
+  const [activePlan, setActivePlan] = useState<Plan | null>(null)
+  const [checkoutStep, setCheckoutStep] = useState<"config" | "payment" | "success" | null>(null)
+  const [customGB, setCustomGB] = useState(5)
+  const [customMins, setCustomMins] = useState(100)
+  const [hasSMS, setHasSMS] = useState(false)
+
+  const t: Translation = translations[lang] || translations['en']
+
+  // Handle plan selection and initial config
+  const handleSelectPlan = (plan: Plan) => {
+    setActivePlan(plan)
+    if (plan.name.includes("Light")) setCustomGB(3)
+    else if (plan.name.includes("Nomad")) setCustomGB(15)
+    else if (plan.name.includes("Ultra")) setCustomGB(50)
+    setCheckoutStep("config")
+  }
+
+  const calculateTotal = () => {
+    if (!activePlan) return 0
+    const base = parseFloat(activePlan.price.replace('$', ''))
+    // Logic for extra data: $2 per GB, $0.05 per Min, $5 for SMS
+    const baseGB = activePlan.name.includes("Light") ? 3 : activePlan.name.includes("Nomad") ? 15 : 50
+    const extraGB = Math.max(0, customGB - baseGB)
+    const extraMins = Math.max(0, customMins - 100)
+    return base + (extraGB * 2) + (extraMins * 0.05) + (hasSMS ? 5 : 0)
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => setIsDetected(true), 2500)
     return () => clearTimeout(timer)
   }, [])
-
-  const t: Translation = translations[lang] || translations['en'] // Fallback to EN if translation missing
 
   // Theme logic
   const isDark = theme === 'dark'
@@ -69,7 +106,7 @@ export default function ConnectivityHub() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <a href="#stats" className={`${navTextClass} transition-colors`}>{t.nav.coverage}</a>
             <a href="#pricing" className={`${navTextClass} transition-colors`}>{t.nav.pricing}</a>
-            <a href="#" className={`${navTextClass} transition-colors`}>{t.nav.tech}</a>
+            <a href="#app" className={`${navTextClass} transition-colors`}>{t.nav.tech}</a>
             <a href="#" className={`${navTextClass} transition-colors`}>{t.nav.api}</a>
           </div>
           <div className="flex items-center gap-4">
@@ -100,13 +137,13 @@ export default function ConnectivityHub() {
                             setLangOpen(false)
                           }}
                         >
-                          {language.label}
                           <Check
                             className={cn(
-                              "ms-auto h-4 w-4",
+                              "me-2 h-4 w-4",
                               lang === language.value ? "opacity-100" : "opacity-0"
                             )}
                           />
+                          {language.label}
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -115,16 +152,15 @@ export default function ConnectivityHub() {
               </PopoverContent>
             </Popover>
 
-            {/* Mobile Lang Simplified (Icon only) */}
-            <Popover>
+            <Popover open={langOpen} onOpenChange={setLangOpen}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className={`w-8 h-8 ${navTextClass} md:hidden`}>
-                  <Languages className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className={`md:hidden ${navTextClass}`}>
+                  <Languages className="w-5 h-5" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] p-0">
+              <PopoverContent className="w-[200px] p-0 max-h-[400px]">
                 <Command>
-                  <CommandInput placeholder="Search..." className="h-9" />
+                  <CommandInput placeholder="Search language..." className="h-9" />
                   <CommandList>
                     <CommandGroup className="max-h-[300px] overflow-y-auto">
                       {ALL_LANGUAGES.map((language) => (
@@ -133,6 +169,7 @@ export default function ConnectivityHub() {
                           value={language.label}
                           onSelect={() => {
                             setLang(language.value)
+                            setLangOpen(false)
                           }}
                         >
                           {language.label}
@@ -206,6 +243,7 @@ export default function ConnectivityHub() {
                   <p className={`text-xl ${mutedTextClass} mb-10 max-w-2xl mx-auto`}>
                     {t.hero.b2c_desc}
                   </p>
+
                   <div className="flex flex-col items-center gap-6">
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-2xl">
                       <Popover open={countryOpen} onOpenChange={setCountryOpen}>
@@ -321,90 +359,69 @@ export default function ConnectivityHub() {
                   <p className={`text-xl ${mutedTextClass} mb-10 max-w-2xl mx-auto`}>
                     {t.hero.b2b_desc}
                   </p>
-
-                  {/* B2B Dashboard Mockup */}
-                  <div className="mb-12 relative max-w-3xl mx-auto">
-                    <div className={`absolute -inset-4 rounded-[40px] blur-3xl opacity-20 bg-purple-600`} />
-                    <div className={`relative p-6 rounded-3xl border ${cardBgClass} backdrop-blur-xl overflow-hidden`}>
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          <span className="text-xs font-bold tracking-widest uppercase opacity-70">{t.dashboard.title}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="w-8 h-1 rounded-full bg-zinc-800" />
-                          <div className="w-8 h-1 rounded-full bg-purple-500" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-6 mb-8 text-start">
-                        <div>
-                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.nodes}</p>
-                          <p className="text-2xl font-bold">1,402</p>
-                        </div>
-                        <div>
-                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.traffic}</p>
-                          <p className="text-2xl font-bold text-purple-500">42.8 GB/s</p>
-                        </div>
-                        <div>
-                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.latency}</p>
-                          <p className="text-2xl font-bold">14ms</p>
-                        </div>
-                      </div>
-
-                      <div className="h-24 w-full flex items-end gap-1">
-                        {[40, 70, 45, 90, 65, 80, 50, 40, 95, 75, 60, 85, 45, 90, 70, 100].map((h, i) => (
-                          <motion.div
-                            key={i}
-                            className="flex-1 bg-gradient-to-t from-purple-500 to-pink-400 rounded-t-sm"
-                            initial={{ height: 0 }}
-                            animate={{ height: `${h}%` }}
-                            transition={{ delay: i * 0.05, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-                          />
-                        ))}
-                      </div>
-
-                      <div className={`mt-4 py-2 border-t ${isDark ? 'border-white/5' : 'border-zinc-200'} flex justify-between items-center`}>
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="w-3 h-3 text-green-500" />
-                          <span className="text-[10px] font-medium opacity-50">{t.dashboard.israel_optimized}</span>
-                        </div>
-                        <div className="flex gap-4">
-                          <span className="text-[10px] font-mono opacity-50">ILI-TEL-AVIV-1</span>
-                          <span className="text-[10px] font-mono opacity-50">US-EAST-1</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Startup Section Mini-Banner */}
-                  <div className={`mb-12 p-6 rounded-3xl border ${isDark ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'} flex flex-col md:flex-row items-center gap-6 text-start`}>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-lg mb-2">{t.startup_section.title}</h4>
-                      <p className={`text-sm ${mutedTextClass}`}>{t.startup_section.desc}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-3 justify-center md:justify-end">
-                      {t.startup_section.features.map((f: string, i: number) => (
-                        <span key={i} className={`text-[10px] font-bold px-3 py-1 rounded-full ${isDark ? 'bg-zinc-800 text-blue-400' : 'bg-white text-blue-600 border border-blue-100 shadow-sm'}`}>
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button
-                      size="lg"
-                      className="h-14 px-8 bg-purple-600 hover:bg-purple-500 rounded-full text-lg text-white"
-                      onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
+                    <Button size="lg" className="h-14 px-8 bg-purple-600 hover:bg-purple-500 rounded-full text-lg text-white">
                       {t.hero.b2b_btn_1}
-                      <Database className="ms-2 w-5 h-5" />
+                      <ArrowRight className="ms-2 w-5 h-5" />
                     </Button>
                     <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
                       {t.hero.b2b_btn_2}
                     </Button>
                   </div>
+
+                  {/* B2B Dashboard Mockup */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className={`mt-20 p-8 rounded-[32px] border ${cardBgClass} max-w-5xl mx-auto overflow-hidden relative group`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-12 relative z-10">
+                      <div className="text-start">
+                        <h3 className="text-2xl font-bold mb-2">{t.dashboard.title}</h3>
+                        <div className="flex items-center gap-2 text-green-500 text-sm font-medium">
+                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                          {t.dashboard.status}
+                        </div>
+                      </div>
+                      <div className={`flex items-center gap-4 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md`}>
+                        <ShieldCheck className="w-5 h-5 text-purple-400" />
+                        <span className="text-xs font-bold tracking-tight opacity-70 uppercase">{t.dashboard.israel_optimized}</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                      {[
+                        { label: t.dashboard.nodes, val: "1,284", icon: Globe, color: "text-blue-400" },
+                        { label: t.dashboard.traffic, val: "4.2 Tbps", icon: Zap, color: "text-purple-400" },
+                        { label: t.dashboard.latency, val: "12ms", icon: BarChart3, color: "text-pink-400" }
+                      ].map((stat, i) => (
+                        <div key={i} className={`p-6 rounded-2xl bg-white/5 border border-white/5 text-start hover:bg-white/10 transition-colors`}>
+                          <stat.icon className={`w-5 h-5 mb-4 ${stat.color}`} />
+                          <div className={`text-xs ${mutedTextClass} mb-1Uppercase font-bold tracking-wider`}>{stat.label}</div>
+                          <div className="text-2xl font-bold">{stat.val}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Simple Sparkline Chart Mockup */}
+                    <div className="mt-8 h-32 w-full relative group">
+                      <svg className="w-full h-full opacity-30 transition-opacity group-hover:opacity-50" viewBox="0 0 1000 100">
+                        <motion.path
+                          d="M0,50 Q100,20 200,80 T400,40 T600,60 T800,20 T1000,50"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          className="text-purple-500"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/0 via-transparent to-transparent" />
+                    </div>
+                  </motion.div>
                 </>
               )}
             </motion.div>
@@ -412,9 +429,9 @@ export default function ConnectivityHub() {
         </div>
       </main>
 
-      {/* Stats / Features Grid */}
-      <section id="stats" className={`border-y ${isDark ? 'border-white/5 bg-white/5' : 'border-zinc-200 bg-zinc-100'} backdrop-blur-sm`}>
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* Trust Section */}
+      <section id="stats" className="py-20 border-y border-white/5 bg-zinc-900/50">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="flex flex-col items-center text-center">
             <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
               <Globe className={`w-6 h-6 ${mutedTextClass}`} />
@@ -426,17 +443,14 @@ export default function ConnectivityHub() {
             <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
               <Zap className={`w-6 h-6 ${mutedTextClass}`} />
             </div>
-            <div className="text-3xl font-bold mb-1">5G / LTE</div>
-            <div className={`text-[10px] font-bold uppercase tracking-widest ${mutedTextClass} mb-1`}>Local Peering</div>
-            <div className={`text-xs ${mutedTextClass} flex gap-2 items-center opacity-70`}>
-              <span>Partner</span> • <span>Cellcom</span> • <span>Pelephone</span>
-            </div>
+            <div className="text-3xl font-bold mb-1">5G</div>
+            <div className={`text-sm ${mutedTextClass}`}>{t.stats.speed}</div>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
               <ShieldCheck className={`w-6 h-6 ${mutedTextClass}`} />
             </div>
-            <div className="text-3xl font-bold mb-1">No KYC</div>
+            <div className="text-3xl font-bold mb-1">AES-256</div>
             <div className={`text-sm ${mutedTextClass}`}>{t.stats.privacy}</div>
           </div>
           <div className="flex flex-col items-center text-center">
@@ -493,215 +507,430 @@ export default function ConnectivityHub() {
          `}</style>
       </div>
 
+      {/* App Showcase Section */}
+      <section id="app" className="py-24 max-w-7xl mx-auto px-6 overflow-hidden">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="relative"
+          >
+            <div className={`absolute -inset-20 bg-blue-500/10 blur-[120px] rounded-full -z-10 transition-opacity duration-1000 ${mode === 'personal' ? 'opacity-100' : 'opacity-0'}`} />
+            <div className={`absolute -inset-20 bg-purple-500/10 blur-[120px] rounded-full -z-10 transition-opacity duration-1000 ${mode === 'business' ? 'opacity-100' : 'opacity-0'}`} />
+
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+              {t.hero.app_title}
+            </h2>
+            <p className={`text-xl ${mutedTextClass} mb-10 leading-relaxed`}>
+              {t.hero.app_desc}
+            </p>
+
+            <div className="flex flex-wrap gap-4 mb-12">
+              <Button size="lg" className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
+                <Download className="w-6 h-6" />
+                <div className="text-left">
+                  <div className="text-[10px] uppercase font-bold opacity-50">Download on the</div>
+                  <div className="text-sm font-bold">{t.hero.app_ios}</div>
+                </div>
+              </Button>
+              <Button size="lg" className="h-14 px-8 bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-2xl text-white gap-3 transition-transform active:scale-95">
+                <Smartphone className="w-6 h-6" />
+                <div className="text-left">
+                  <div className="text-[10px] uppercase font-bold opacity-50">Get it on</div>
+                  <div className="text-sm font-bold">{t.hero.app_android}</div>
+                </div>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              {[
+                { icon: Zap, title: "Instant Activation", desc: "No physical SIM needed" },
+                { icon: ShieldCheck, title: "Secure Payments", desc: "Apple Pay & Crypto" },
+                { icon: Database, title: "Data Tracking", desc: "Widget for iOS/Android" },
+                { icon: Smartphone, title: "Multi-device", desc: "Up to 5 eSIMs active" }
+              ].map((feature, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className={`p-2 rounded-xl border ${cardBgClass} shrink-0`}>
+                    <feature.icon className={`w-5 h-5 ${mode === 'personal' ? 'text-blue-500' : 'text-purple-500'}`} />
+                  </div>
+                  <div>
+                    <div className="font-bold text-sm mb-1">{feature.title}</div>
+                    <div className="text-xs opacity-50">{feature.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 50, rotateY: -20 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+            className="relative flex justify-center perspective-[1000px]"
+          >
+            <div className="relative w-full max-w-[400px]">
+              <Image
+                src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&q=80&w=800&h=1200"
+                alt="App Interface"
+                width={400}
+                height={800}
+                className="rounded-[3rem] border-8 border-zinc-900 shadow-2xl relative z-10"
+              />
+              <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/20 blur-3xl -z-10" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Pricing / Packages */}
       <section id="pricing" className="py-24 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">
             {mode === 'personal' ? t.pricing.b2c_title : t.pricing.b2b_title}
           </h2>
-          <p className={`${mutedTextClass} max-w-2xl mx-auto`}>
+          <p className={`text-lg ${mutedTextClass} max-w-2xl mx-auto`}>
             {mode === 'personal' ? t.pricing.b2c_subtitle : t.pricing.b2b_subtitle}
           </p>
         </div>
 
-        <motion.div
-          className="grid md:grid-cols-3 gap-6"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: { staggerChildren: 0.2 }
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {(mode === 'personal'
+            ? [
+              { id: 'light', price: '$9', features: [t.pricing.units.instant, t.pricing.units.hidden_fees], color: 'blue' },
+              { id: 'nomad', price: '$29', features: [t.pricing.units.instant, t.pricing.units.hotspot, 'Full Speed'], highlight: true, color: 'blue' },
+              { id: 'ultra', price: '$59', features: [t.pricing.units.instant, t.pricing.units.hotspot, 'Priority Support', 'Unlimited Term'], color: 'blue' }
+            ]
+            : [
+              { id: 'startup', price: '$199', features: [t.pricing.units.api_access, '1 TB Shared Pool', t.pricing.units.pool_ip], color: 'purple' },
+              { id: 'agency', price: '$899', features: [t.pricing.units.api_access, '5 TB Shared Pool', 'White Label Dashboard'], highlight: true, color: 'purple' },
+              { id: 'platform', price: 'Custom', features: [t.pricing.units.api_access, 'Unlimited Pool', 'Custom Infrastructure'], color: 'purple' }
+            ]
+          ).map((p) => {
+            const plan: Plan = {
+              name: t.pricing.plans[p.id].name,
+              price: p.price,
+              desc: t.pricing.plans[p.id].desc,
+              features: p.features
             }
-          }}
-        >
-          {mode === 'personal' ? (
-            // B2C CARDS
-            <>
-              {[
-                { name: t.pricing.plans.light.name, price: 9, gb: 3, days: 7, icon: Smartphone, desc: t.pricing.plans.light.desc },
-                { name: t.pricing.plans.nomad.name, price: 34, gb: 20, days: 30, icon: Globe, desc: t.pricing.plans.nomad.desc },
-                { name: t.pricing.plans.ultra.name, price: 69, gb: 50, days: 30, icon: Zap, desc: t.pricing.plans.ultra.desc }
-              ].map((plan, i) => (
-                <motion.div
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 30 },
-                    visible: { opacity: 1, y: 0 }
-                  }}
-                  className={`group relative p-8 rounded-3xl ${cardBgClass} hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2`}
-                >
-                  <div className="absolute top-0 rtl:left-0 ltr:right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <plan.icon className="w-8 h-8 text-blue-500" />
+            return (
+              <motion.div
+                key={p.id}
+                whileHover={{ y: -8 }}
+                className={`p-8 rounded-[32px] border ${p.highlight ? (p.color === 'blue' ? 'border-blue-500/50 bg-blue-500/5 ring-1 ring-blue-500/20' : 'border-purple-500/50 bg-purple-500/5 ring-1 ring-purple-500/20') : cardBgClass} relative overflow-hidden flex flex-col`}
+              >
+                {p.highlight && (
+                  <div className={`absolute top-0 right-0 px-4 py-1 rounded-bl-2xl text-[10px] font-black uppercase tracking-widest ${p.color === 'blue' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white'}`}>
+                    Most Popular
                   </div>
-                  <h3 className={`text-xl font-bold mb-2`}>{plan.name}</h3>
-                  <p className={`text-xs ${mutedTextClass} mb-6 h-8`}>{plan.desc}</p>
-
-                  <div className="flex items-baseline gap-1 mb-6">
-                    <span className={`text-5xl font-bold`}>${plan.price}</span>
-                    <span className={`text-sm ${mutedTextClass}`}>/ {plan.days} {t.pricing.units.days}</span>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-8">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-bold text-blue-500">{plan.gb} GB</span>
-                      <span className="text-xs text-blue-400/70">Global Coverage</span>
-                    </div>
-                    <div className={`w-full ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'} rounded-full h-1.5`}>
-                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${(plan.gb / 50) * 100}%` }}></div>
-                    </div>
-                  </div>
-
-                  <ul className={`space-y-3 mb-8 text-sm ${mutedTextClass}`}>
-                    <li className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>{t.pricing.units.instant}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <ArrowRight className="w-4 h-4" />
-                      <span>{t.pricing.units.hidden_fees}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Wifi className="w-4 h-4" />
-                      <span>{t.pricing.units.hotspot}</span>
-                    </li>
-                  </ul>
-                  <Button className={`w-full h-12 font-bold transition-all ${isDark ? 'bg-white text-black hover:bg-blue-500 hover:text-white' : 'bg-black text-white hover:bg-blue-600'}`}>
-                    {t.pricing.units.select} {plan.name}
-                  </Button>
-                </motion.div>
-              ))}
-            </>
-          ) : (
-            // B2B CARDS
-            <>
-              {[
-                { name: t.pricing.plans.startup.name, price: 299, tb: 0.5, icon: Building2, desc: t.pricing.plans.startup.desc },
-                { name: t.pricing.plans.agency.name, price: 999, tb: 2, icon: BarChart3, desc: t.pricing.plans.agency.desc },
-                { name: t.pricing.plans.platform.name, price: 2499, tb: 10, icon: Database, desc: t.pricing.plans.platform.desc }
-              ].map((plan, i) => (
-                <motion.div
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 30 },
-                    visible: { opacity: 1, y: 0 }
-                  }}
-                  className={`group relative p-8 rounded-3xl ${cardBgClass} hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-2`}
-                >
-                  <div className="absolute top-0 rtl:left-0 ltr:right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <plan.icon className="w-8 h-8 text-purple-500" />
-                  </div>
+                )}
+                <div className="mb-6">
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                  <p className={`text-xs ${mutedTextClass} mb-6 h-8`}>{plan.desc}</p>
-
-                  <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-5xl font-bold">${plan.price}</span>
-                    <span className={`text-sm ${mutedTextClass}`}>/ {t.pricing.units.month}</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black">{plan.price}</span>
+                    <span className={`text-sm ${mutedTextClass}`}>/{mode === 'personal' ? t.pricing.units.pack : t.pricing.units.month}</span>
                   </div>
-
-                  <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 mb-8">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-bold text-purple-500">{plan.tb} {t.pricing.units.pool_label}</span>
-                      <span className="text-xs text-purple-400/70">~${(plan.price / (plan.tb * 1000)).toFixed(2)} / GB</span>
+                </div>
+                <p className={`text-sm ${mutedTextClass} mb-8 flex-grow`}>
+                  {plan.desc}
+                </p>
+                <div className="space-y-4 mb-8">
+                  {plan.features.map((f, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm">
+                      <div className={`w-5 h-5 rounded-full ${p.color === 'blue' ? 'bg-blue-500/10' : 'bg-purple-500/10'} flex items-center justify-center`}>
+                        <CheckCircle className={`w-3 h-3 ${p.color === 'blue' ? 'text-blue-500' : 'text-purple-500'}`} />
+                      </div>
+                      <span className="opacity-70">{f}</span>
                     </div>
-                    <div className={`w-full ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'} rounded-full h-1.5`}>
-                      <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: `${(plan.price / 2500) * 100}%` }}></div>
-                    </div>
-                  </div>
+                  ))}
+                </div>
+                <Button
+                  onClick={() => handleSelectPlan(plan)}
+                  className={`w-full h-12 rounded-2xl font-bold transition-all shadow-lg ${isDark ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}
+                >
+                  {t.pricing.units.select}
+                </Button>
+              </motion.div>
+            )
+          })}
+        </div>
 
-                  <ul className={`space-y-3 mb-8 text-sm ${mutedTextClass}`}>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      {plan.tb < 1 ? plan.tb * 1000 : plan.tb} {plan.tb < 1 ? 'GB' : 'TB'} {t.pricing.units.traffic}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      {t.pricing.units.api_access}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      {t.pricing.units.pool_ip}
-                    </li>
-                  </ul>
-                  <Button className={`w-full h-12 font-bold transition-all ${isDark ? 'bg-zinc-800 hover:bg-purple-600 text-white border border-white/5' : 'bg-zinc-900 hover:bg-purple-600 text-white'}`}>
-                    {t.pricing.units.start}
-                  </Button>
-                </motion.div>
-              ))}
-            </>
-          )}
-        </motion.div>
-
-        {/* B2B ROI Calculator Section */}
+        {/* B2B ROI Calculator inside Pricing */}
         {mode === 'business' && (
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            className="max-w-4xl mx-auto px-6 py-20"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className={`mt-16 p-10 rounded-[40px] border ${cardBgClass} bg-gradient-to-br from-purple-500/5 to-transparent text-center`}
           >
-            <div className={`p-10 rounded-[40px] border ${cardBgClass} backdrop-blur-3xl text-center relative overflow-hidden`}>
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-purple-500/10 blur-[100px]" />
-              <h2 className="text-3xl font-bold mb-10">{t.calculator.title}</h2>
-
-              <div className="mb-12 max-w-xl mx-auto">
-                <div className="flex justify-between mb-4 text-sm font-bold uppercase tracking-widest opacity-70">
-                  <span>{t.calculator.label}</span>
-                  <span className="text-purple-500">{dataVal} GB</span>
+            <div className="max-w-xl mx-auto">
+              <h3 className="text-2xl font-bold mb-6">{t.calculator.title}</h3>
+              <div className="space-y-8">
+                <div>
+                  <div className="flex justify-between mb-4 text-sm font-bold opacity-70">
+                    <span>{t.calculator.label}</span>
+                    <span className="text-purple-500">{dataVal} TB</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="1000"
+                    value={dataVal}
+                    onChange={(e) => setDataVal(parseInt(e.target.value))}
+                    className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  />
                 </div>
-                <input
-                  type="range"
-                  min="100"
-                  max="10000"
-                  step="100"
-                  value={dataVal}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    setDataVal(val);
-                  }}
-                  className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                />
-              </div>
-
-              <div className="inline-block p-8 rounded-3xl bg-purple-500/5 border border-purple-500/20">
-                <p className={`text-sm ${mutedTextClass} mb-2`}>{t.calculator.saving}</p>
-                <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
-                  ${(dataVal * 2.5).toLocaleString()}
-                </p>
-                <p className="text-sm font-bold mt-2 opacity-70 uppercase tracking-widest">{t.calculator.per_year}</p>
+                <div className="p-6 rounded-3xl bg-white/5 border border-white/5">
+                  <div className={`text-sm ${mutedTextClass} mb-2`}>{t.calculator.saving}</div>
+                  <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
+                    ${(dataVal * 450).toLocaleString()}
+                  </div>
+                  <div className={`text-xs ${mutedTextClass} mt-1 uppercase tracking-widest font-bold`}>{t.calculator.per_year}</div>
+                </div>
+                <Button className="w-full h-14 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-lg">
+                  {t.pricing.units.start}
+                </Button>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Testimonials Section */}
-        <section className="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
-          <h2 className="text-3xl font-bold text-center mb-16">{t.testimonials.title}</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {t.testimonials.items.map((item, i: number) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className={`p-8 rounded-3xl border ${cardBgClass} relative`}
-              >
-                <Quote className="absolute top-6 rtl:left-6 ltr:right-6 w-8 h-8 opacity-10" />
-                <p className="text-lg italic mb-6 leading-relaxed opacity-90">&ldquo;{item.text}&rdquo;</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center font-bold text-white shadow-lg">
-                    {item.name[0]}
-                  </div>
-                  <div>
-                    <p className="font-bold">{item.name}</p>
-                    <p className={`text-xs ${mutedTextClass}`}>{item.role}</p>
-                  </div>
+        {/* Global Startup / Innovation Section */}
+        <section className="mt-32">
+          <div className={`p-12 rounded-[48px] border ${cardBgClass} text-start relative overflow-hidden group`}>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-1000" />
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-3xl font-bold mb-4">{t.startup_section.title}</h3>
+                <p className={`text-lg ${mutedTextClass} mb-8`}>
+                  {t.startup_section.desc}
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  {t.startup_section.features.map((f, i) => (
+                    <div key={i} className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-bold uppercase tracking-wider">
+                      {f}
+                    </div>
+                  ))}
                 </div>
-              </motion.div>
-            ))}
+              </div>
+              <div className="flex justify-center md:justify-end gap-4">
+                <div className="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
+                  <User className="w-8 h-8 opacity-20" />
+                </div>
+                <div className="w-24 h-24 mt-8 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
+                  <Settings className="w-8 h-8 opacity-20" />
+                </div>
+                <div className="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
+                  <ShieldCheck className="w-8 h-8 opacity-20" />
+                </div>
+              </div>
+            </div>
           </div>
         </section>
-      </section >
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <h2 className="text-3xl font-bold text-center mb-16">{t.testimonials.title}</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          {t.testimonials.items.map((item: { name: string; role: string; text: string }, i: number) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={`p-8 rounded-[32px] border ${cardBgClass} relative group`}
+            >
+              <Quote className="absolute top-8 right-8 w-12 h-12 text-blue-500/10 group-hover:text-blue-500/20 transition-colors" />
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500" />
+                <div>
+                  <div className="font-bold">{item.name}</div>
+                  <div className={`text-xs ${mutedTextClass}`}>{item.role}</div>
+                </div>
+              </div>
+              <p className="italic text-lg opacity-80 leading-relaxed">
+                &ldquo;{item.text}&rdquo;
+              </p>
+              <div className="mt-6 flex gap-1">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />)}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <footer className="py-12 border-t border-white/5 text-center">
+        <p className={`text-xs ${navTextClass}`}>
+          {t.footer}
+        </p>
+      </footer>
+
+      {/* Plan Configuration Overlay */}
+      <AnimatePresence>
+        {checkoutStep && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className={`w-full max-w-lg rounded-[40px] border border-white/10 ${bgClass} shadow-2xl overflow-hidden relative`}
+            >
+              <button
+                onClick={() => setCheckoutStep(null)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/5 flex items-center justify-center hover:bg-white/10 transition-colors z-10"
+              >
+                &times;
+              </button>
+
+              <div className="p-10">
+                {checkoutStep === "config" && (
+                  <div className="space-y-8">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                        <Settings className="w-6 h-6 text-blue-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold">{t.config.title}</h3>
+                        <p className="text-sm opacity-50">{activePlan?.name} Base</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between mb-4">
+                          <span className="font-bold flex items-center gap-2">
+                            <Database className="w-4 h-4 opacity-50" />
+                            {t.config.gb}
+                          </span>
+                          <span className="text-blue-500 font-black">{customGB} GB</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="100"
+                          value={customGB}
+                          onChange={(e) => setCustomGB(parseInt(e.target.value))}
+                          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between mb-4">
+                          <span className="font-bold flex items-center gap-2">
+                            <Phone className="w-4 h-4 opacity-50" />
+                            {t.config.mins}
+                          </span>
+                          <span className="text-blue-500 font-black">{customMins}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1000"
+                          step="50"
+                          value={customMins}
+                          onChange={(e) => setCustomMins(parseInt(e.target.value))}
+                          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <div className="flex items-center gap-3">
+                          <Zap className="w-4 h-4 text-yellow-500" />
+                          <span className="text-sm font-bold">{t.config.sms}</span>
+                        </div>
+                        <Switch checked={hasSMS} onCheckedChange={setHasSMS} />
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-white/5">
+                      <div className="flex justify-between items-center mb-6">
+                        <span className="text-xl font-bold">{t.config.total}</span>
+                        <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                          ${calculateTotal().toFixed(2)}
+                        </span>
+                      </div>
+                      <Button
+                        size="lg"
+                        className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg shadow-[0_10px_30px_rgba(37,99,235,0.3)]"
+                        onClick={() => setCheckoutStep("payment")}
+                      >
+                        {t.config.confirm}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {checkoutStep === "payment" && (
+                  <div className="space-y-8">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center">
+                        <CreditCard className="w-6 h-6 text-purple-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold">{t.checkout.title}</h3>
+                        <p className="text-sm opacity-50">Final Step</p>
+                      </div>
+                    </div>
+
+                    <div className="p-6 rounded-3xl bg-zinc-900 border border-white/5 space-y-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="opacity-50">Plan</span>
+                        <span>{activePlan?.name}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="opacity-50">Configuration</span>
+                        <span>{customGB}GB / {customMins}MIN</span>
+                      </div>
+                      <div className="h-px bg-white/5" />
+                      <div className="flex justify-between font-black text-lg">
+                        <span>Total Due</span>
+                        <span>${calculateTotal().toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold">
+                        Apple Pay
+                      </Button>
+                      <Button
+                        className="w-full h-14 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 font-bold"
+                        onClick={() => setCheckoutStep("success")}
+                      >
+                        {t.checkout.pay_now}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {checkoutStep === "success" && (
+                  <div className="text-center py-10 space-y-6">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto"
+                    >
+                      <CheckCircle className="w-10 h-10 text-green-500" />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-3xl font-bold mb-2">{t.checkout.success}</h3>
+                      <p className={`text-sm ${mutedTextClass}`}>{t.checkout.success_desc}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="h-12 px-8 rounded-full"
+                      onClick={() => setCheckoutStep(null)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Support Button */}
       <motion.a
@@ -711,18 +940,11 @@ export default function ConnectivityHub() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.1 }}
-        className="fixed bottom-8 rtl:left-8 ltr:right-8 z-[100] w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-2xl overflow-hidden group"
+        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-8 right-8 z-[60] w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl text-white hover:bg-green-400 transition-colors"
       >
-        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-        <Phone className="w-8 h-8 text-white relative z-10" />
-        <span className="absolute rtl:right-20 ltr:left-[-180px] bg-black text-white px-4 py-2 rounded-xl text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
-          {t.hero.support_whatsapp}
-        </span>
+        <Phone className="w-6 h-6" />
       </motion.a>
-
-      <footer className={`py-8 text-center text-sm ${mutedTextClass}`}>
-        {t.footer}
-      </footer>
-    </div >
+    </div>
   )
 }
