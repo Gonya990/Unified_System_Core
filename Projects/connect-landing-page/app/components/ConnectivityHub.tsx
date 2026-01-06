@@ -873,7 +873,7 @@ export default function ConnectivityHub() {
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className={`w-full max-w-md rounded-[40px] border border-white/10 ${bgClass} shadow-2xl overflow-hidden relative`}
+              className={`w-full max-w-[380px] max-h-[90vh] rounded-[40px] border border-white/10 ${bgClass} shadow-2xl overflow-hidden relative flex flex-col`}
             >
               <button
                 onClick={() => setCheckoutStep(null)}
@@ -882,7 +882,7 @@ export default function ConnectivityHub() {
                 &times;
               </button>
 
-              <div className="p-10">
+              <div className="p-8 overflow-y-auto custom-scrollbar">
                 {checkoutStep === "config" && (
                   <div className="space-y-8">
                     <div className="text-center">
