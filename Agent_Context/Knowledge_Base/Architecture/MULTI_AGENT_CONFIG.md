@@ -28,12 +28,20 @@
 
 ## 2. 🛡️ Privacy & Data Protection / Приватность и защита данных
 
-- **Context Isolation:** Agents **cannot** read each other's `.env` or password files.
-- **Filtering Layer:** A pre-processor that replaces personal strings with placeholders (e.g., `Goncharenko` -> `[USER_ADMIN_1]`) before sending context to the other agent.
-- **Shared Docs:** Only files in `Agent_Context/Knowledge_Base/Shared/` are indexed by both agents.
-- **Изоляция контекста:** Агенты **не могут** читать `.env` или файлы паролей друг друга.
-- **Слой фильтрации:** Препроцессор, который заменяет личные данные на заглушки (например, `Goncharenko` -> `[USER_ADMIN_1]`) перед отправкой контекста другому агенту.
-- **Общие документы:** Только файлы в `Agent_Context/Knowledge_Base/Shared/` индексируются обоими агентами.
+- **Context Isolation:** Agents **cannot** read each other's `.env` or password
+  files.
+- **Filtering Layer:** A pre-processor that replaces personal strings with
+  placeholders (e.g., `Goncharenko` -> `[USER_ADMIN_1]`) before sending
+  context to the other agent.
+- **Shared Docs:** Only files in `Agent_Context/Knowledge_Base/Shared/` are
+  indexed by both agents.
+- **Изоляция контекста:** Агенты **не могут** читать `.env` или файлы паролей
+  друг друга.
+- **Слой фильтрации:** Препроцессор, который заменяет личные данные на заглушки
+  (например, `Goncharenko` -> `[USER_ADMIN_1]`) перед отправкой контекста
+  другому агенту.
+- **Общие документы:** Только файлы в `Agent_Context/Knowledge_Base/Shared/`
+  индексируются обоими агентами.
 
 ---
 
@@ -46,7 +54,8 @@
 - **Unified Task Board:** **Beads (.beads/)**.
   - Tooling: `bd` (CLI) and `bv` (TUI/Robot).
   - Workflow: Agents track dependencies and pick tasks.
-- **Sync Mechanism:** One agent acts as "Primary", another as "Verifier" using **Agent Mail threads**.
+- **Sync Mechanism:** One agent acts as "Primary", another as "Verifier" using
+  **Agent Mail threads**.
 - **Меж-агентное общение (ACP/MCP):**
   - Стандарт: Принципы **Agent Communication Protocol (ACP)** для обмена сообщениями.
   - Реализация: **MCP Agent Mail** (HTTP/SSE через Private Mesh).
@@ -54,26 +63,35 @@
 - **Общая доска задач:** **Beads (.beads/)**.
   - Инструменты: `bd` (CLI) и `bv` (TUI/Robot).
   - Рабочий процесс: Агенты отслеживают зависимости и выбирают задачи.
-- **Синхронизация:** Один агент выступает как «Основной», другой — как «Проверяющий», используя **ветки обсуждений в Agent Mail**.
+- **Синхронизация:** Один агент выступает как «Основной», другой — как
+  «Проверяющий», используя **ветки обсуждений в Agent Mail**.
 
 ---
 
 ## 4. 🚀 Centralized Coordination / Централизованная координация
 
-- **Single Hub Hosting:** All core agent messaging (`mcp_agent_mail`) and shared task status (`beads`) MUST be hosted on the **Service Node** (`100.88.65.71`) to act as the single source of truth.
+- **Single Hub Hosting:** All core agent messaging (`mcp_agent_mail`) and shared
+  task status (`beads`) MUST be hosted on the **Service Node** (`100.110.209.49`)
+  to act as the single source of truth.
 - **Unified Messaging:**
   - Antigravity and Kostya-Agent use the same server to send and receive messages.
-  - Asynchronous coordination ensures tasks are never lost even if one agent node is offline.
-- **Централизованный хаб:** Весь основной обмен сообщениями (`mcp_agent_mail`) и общий статус задач (`beads`) ДОЛЖНЫ быть размещены на **Service Node** (`100.88.65.71`), который выступает единым источником истины.
+  - Asynchronous coordination ensures tasks are never lost even if one agent
+    node is offline.
+- **Централизованный хаб:** Весь основной обмен сообщениями (`mcp_agent_mail`)
+  и общий статус задач (`beads`) ДОЛЖНЫ быть размещены на **Service Node**
+  (`100.110.209.49`), который выступает единым источником истины.
 - **Единая система сообщений:**
-  - Antigravity и Kostya-Agent используют один и тот же сервер для отправки и получения сообщений.
-  - Асинхронная координация гарантирует, что задачи никогда не будут потеряны, даже если один из узлов агента находится в автономном режиме.
+  - Antigravity и Kostya-Agent используют один и тот же сервер для отправки и
+    получения сообщений.
+  - Асинхронная координация гарантирует, что задачи никогда не будут потеряны,
+    даже если один из узлов агента находится в автономном режиме.
 
 ---
 
 ## 5. 📚 Onboarding & Registration
 
-**New agents:** See `Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md` for full integration guide.
+**New agents:** See `Agent_Context/Knowledge_Base/Docs/AGENT_ONBOARDING.md`
+for full integration guide.
 
 **Agent Registry:** `Agent_Context/agents/REGISTRY.md`
 

@@ -10,10 +10,11 @@
 You are joining a **federated multi-agent network** where AI agents coordinate through:
 
 - **Shared Git Repository** - This repo is the filesystem and state store
-- **MCP Agent Mail** - Async messaging at `http://100.88.65.71:8765`
+- **MCP Agent Mail** - Async messaging at `http://100.110.209.49:8765`
 - **Beads** - Git-native task tracking in `.beads/`
 
 Each agent:
+
 - Runs in their own runtime (machine/platform agnostic)
 - Manages their own humans and subagents
 - Coordinates with other agents via defined protocols
@@ -46,7 +47,7 @@ Note: This file is gitignored - each runtime maintains its own identity.
 
 ### Configuration
 
-```
+```bash
 AGENT_ID=$(cat .agent-identity)  # Read from identity file
 AGENT_MAIL_TOKEN=<auth-token>    # For MCP Agent Mail authentication
 ```
@@ -54,11 +55,13 @@ AGENT_MAIL_TOKEN=<auth-token>    # For MCP Agent Mail authentication
 ### Registration Steps
 
 1. Create your agent folder:
-   ```
+
+   ```bash
    Agent_Context/agents/<your-agent-id>/STATUS.md
    ```
 
 2. Add your profile to `STATUS.md`:
+
    ```markdown
    # Agent: <your-id>
 
@@ -137,7 +140,7 @@ git commit -m "WIP: <agent-id> - <brief description>"
 
 | Property | Value |
 |----------|-------|
-| **URL** | `http://100.88.65.71:8765` |
+| **URL** | `http://100.110.209.49:8765` |
 | **Protocol** | HTTP/SSE (async) |
 | **Auth** | Bearer token |
 
@@ -160,13 +163,13 @@ Location: `Scripts/External/agent_comm.sh`
 
 ```bash
 # Send message
-curl -X POST "http://100.88.65.71:8765/messages/send" \
+curl -X POST "http://100.110.209.49:8765/messages/send" \
      -H "Authorization: Bearer $AGENT_MAIL_TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"recipient": "<agent-id>", "body": "<message>"}'
 
 # Check inbox
-curl -X GET "http://100.88.65.71:8765/messages/inbox" \
+curl -X GET "http://100.110.209.49:8765/messages/inbox" \
      -H "Authorization: Bearer $AGENT_MAIL_TOKEN"
 ```
 
@@ -358,7 +361,7 @@ git add <files> && git commit -m "type(agent-id): description" && git push
 
 | Service | URL |
 |---------|-----|
-| Agent Mail | `http://100.88.65.71:8765` |
+| Agent Mail | `http://100.110.209.49:8765` |
 | Beads | via git (`.beads/`) |
 
 ---

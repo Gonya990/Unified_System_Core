@@ -542,7 +542,7 @@ fi
 ### Service Centralization
 
 1. **The Hub**: The `mcp_agent_mail` server and Beads task board MUST be
-   hosted on the **Service Node** (`100.88.65.71`).
+   hosted on the **Service Node** (`100.110.209.49`).
 2. **Unified Access**: All agents connect to this single hub via Tailscale.
    This ensures that the message "source of truth" is never split across nodes.
 
