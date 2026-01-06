@@ -95,7 +95,14 @@ const sourceTranslation = {
             pool_ip: "Dedicated IP Pool",
             pool_label: "TB Pool",
             select: "Select",
-            start: "Get Started"
+            start: "Get Started",
+            full_speed: "Full Speed",
+            priority_support: "Priority Support",
+            unlimited_term: "Unlimited Term",
+            shared_pool: "Shared Pool",
+            white_label: "White Label Dashboard",
+            custom_infra: "Custom Infrastructure",
+            most_popular: "Most Popular"
         }
     },
     config: {
@@ -190,15 +197,22 @@ const overrides = {
             b2b_title: "Инфраструктурные Тарифы",
             b2b_subtitle: "Оптовая закупка трафика. Подключайте своих пользователей через наш API. Вы платите за общий пул, ваши клиенты платят вам.",
             plans: {
-                light: { name: "Light Tripper", desc: "Идеально для карт и мессенджеров на короткую поездку." },
-                nomad: { name: "Digital Nomad", desc: "Хватит на звонки, работу и соцсети на целый месяц." },
-                ultra: { name: "Ultra Stream", desc: "Максимум свободы. Стриминг, видео 4K и раздача интернета." },
-                startup: { name: "Startup Pool", desc: "Для небольших команд и арбитраж-тестов." },
-                agency: { name: "Agency Scale", desc: "Для маркетинговых агентств с большим расходом." },
-                platform: { name: "Platform API", desc: "Интеграция в ваше приложение (White Label)." }
+                light: { name: "Легкий Путешественник", desc: "Идеально для карт и мессенджеров на короткую поездку." },
+                nomad: { name: "Цифровой Кочевник", desc: "Хватит на звонки, работу и соцсети на целый месяц." },
+                ultra: { name: "Ультра Стрим", desc: "Максимум свободы. Стриминг, видео 4K и раздача интернета." },
+                startup: { name: "Стартап Пул", desc: "Для небольших команд и арбитраж-тестов." },
+                agency: { name: "Агентский Масштаб", desc: "Для маркетинговых агентств с большим расходом." },
+                platform: { name: "Платформа API", desc: "Интеграция в ваше приложение (White Label)." }
             },
             units: {
-                pack: "пакет", month: "мес", days: "дней", instant: "Мгновенная активация (QR)", hidden_fees: "Без скрытых списаний", hotspot: "Разрешена раздача (Hotspot)", traffic: "Трафика", api_access: "API Ключ доступа", pool_ip: "Выделенный пул IP", pool_label: "TB Pool", select: "Выбрать", start: "Начать работу"
+                pack: "пакет", month: "мес", days: "дней", instant: "Мгновенная активация (QR)", hidden_fees: "Без скрытых списаний", hotspot: "Разрешена раздача (Hotspot)", traffic: "Трафика", api_access: "API Ключ доступа", pool_ip: "Выделенный пул IP", pool_label: "TB Pool", select: "Выбрать", start: "Начать работу",
+                full_speed: "Полная скорость",
+                priority_support: "Приоритетная поддержка",
+                unlimited_term: "Безлимитный срок",
+                shared_pool: "Общий пул данных",
+                white_label: "White Label панель",
+                custom_infra: "Своя инфраструктура",
+                most_popular: "Популярный"
             }
         },
         config: {
@@ -290,15 +304,22 @@ const overrides = {
             b2b_title: "תוכניות תשתית",
             b2b_subtitle: "רכישת תעבורה בסיטונאות. חבר את המשתמשים שלך דרך ה-API שלנו. אתה משלם על המאגר המשותף, הלקוחות שלך משלמים לך.",
             plans: {
-                light: { name: "נוסע קל", desc: "מושלם למפות והודעות לנסיעה קצרה." },
-                nomad: { name: "נווד דיגיטלי", desc: "מספיק לשיחות, עבודה и רשתות חברתיות לחודש שלם." },
+                light: { name: "מטייל קל", desc: "מושלם למפות והודעות לנסיעה קцרה." },
+                nomad: { name: "נווד דיגיטלי", desc: "מספיק לשיחות, עבודה ורשתות חברתיות לחודש שלם." },
                 ultra: { name: "שידור אולטרה", desc: "חופש מקסימלי. סטרימינג, וידאו 4K ושיתוף אינטרנט." },
                 startup: { name: "מאגר סטארטאפ", desc: "לצוותים קטנים ובדיקות ארביטראז'." },
-                agency: { name: "קנה מידה של סוכנות", desc: "לסוכנויות שיווק עם צриכה גבוהה." },
+                agency: { name: "קנה מידה של סוכנות", desc: "לסוכנויות שיווק עם צריכה גבוהה." },
                 platform: { name: "פלטפורמת API", desc: "אינטגרציה לאפליקציה שלך (White Label)." }
             },
             units: {
-                pack: "חבילה", month: "חודש", days: "ימים", instant: "הפעלה מיידית (QR)", hidden_fees: "ללא עמלות נסתרות", hotspot: "שיתוף אינטרנט מותר", traffic: "תעבורה", api_access: "קוד גישה ל-API", pool_ip: "מאגר IP ייעודי", pool_label: "מאגר TB", select: "בחר", start: "התחל עבודה"
+                pack: "חבילה", month: "חודש", days: "ימים", instant: "הפעלה מיידית (QR)", hidden_fees: "ללא עמלות נסתרות", hotspot: "שיתוף אינטרנט מותר", traffic: "תעבורה", api_access: "קוד גישה ל-API", pool_ip: "מאגר IP ייעודי", pool_label: "מאגר TB", select: "בחר", start: "התחל עבודה",
+                full_speed: "מהירות מלאה",
+                priority_support: "תמיכה בעדיפות",
+                unlimited_term: "תקופה ללא הגבלה",
+                shared_pool: "מאגר משותף",
+                white_label: "לוח בקרה White Label",
+                custom_infra: "תשתית מותאמת אישית",
+                most_popular: "הכי פופולרי"
             }
         },
         config: {

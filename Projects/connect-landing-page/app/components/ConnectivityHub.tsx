@@ -694,13 +694,13 @@ export default function ConnectivityHub() {
           {(mode === 'personal'
             ? [
               { id: 'light', price: '$9', features: [t.pricing.units.instant, t.pricing.units.hidden_fees], color: 'blue' },
-              { id: 'nomad', price: '$29', features: [t.pricing.units.instant, t.pricing.units.hotspot, 'Full Speed'], highlight: true, color: 'blue' },
-              { id: 'ultra', price: '$59', features: [t.pricing.units.instant, t.pricing.units.hotspot, 'Priority Support', 'Unlimited Term'], color: 'blue' }
+              { id: 'nomad', price: '$29', features: [t.pricing.units.instant, t.pricing.units.hotspot, t.pricing.units.full_speed], highlight: true, color: 'blue' },
+              { id: 'ultra', price: '$59', features: [t.pricing.units.instant, t.pricing.units.hotspot, t.pricing.units.priority_support, t.pricing.units.unlimited_term], color: 'blue' }
             ]
             : [
-              { id: 'startup', price: '$199', features: [t.pricing.units.api_access, '1 TB Shared Pool', t.pricing.units.pool_ip], color: 'purple' },
-              { id: 'agency', price: '$899', features: [t.pricing.units.api_access, '5 TB Shared Pool', 'White Label Dashboard'], highlight: true, color: 'purple' },
-              { id: 'platform', price: 'Custom', features: [t.pricing.units.api_access, 'Unlimited Pool', 'Custom Infrastructure'], color: 'purple' }
+              { id: 'startup', price: '$199', features: [t.pricing.units.api_access, '1 ' + t.pricing.units.pool_label, t.pricing.units.pool_ip], color: 'purple' },
+              { id: 'agency', price: '$899', features: [t.pricing.units.api_access, '5 ' + t.pricing.units.pool_label, t.pricing.units.white_label], highlight: true, color: 'purple' },
+              { id: 'platform', price: 'Custom', features: [t.pricing.units.api_access, t.pricing.units.shared_pool, t.pricing.units.custom_infra], color: 'purple' }
             ]
           ).map((p) => {
             const plan: Plan = {
@@ -717,7 +717,7 @@ export default function ConnectivityHub() {
               >
                 {p.highlight && (
                   <div className={`absolute top-0 right-0 px-4 py-1 rounded-bl-2xl text-[10px] font-black uppercase tracking-widest ${p.color === 'blue' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white'}`}>
-                    Most Popular
+                    {t.pricing.units.most_popular}
                   </div>
                 )}
                 <div className="mb-6">
