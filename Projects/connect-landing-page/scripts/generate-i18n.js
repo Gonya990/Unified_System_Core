@@ -26,7 +26,11 @@ const sourceTranslation = {
         loc_found: "Best plan for United Kingdom:",
         support_whatsapp: "WhatsApp Support",
         search_placeholder: "Where are you going?",
-        popular_dest: "Popular Destinations"
+        popular_dest: "Popular Destinations",
+        app_title: "The Connect.Global App",
+        app_desc: "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
+        app_ios: "App Store",
+        app_android: "Google Play"
     },
     testimonials: {
         title: "Trusted by the Best",
@@ -88,6 +92,20 @@ const sourceTranslation = {
             start: "Get Started"
         }
     },
+    config: {
+        title: "Configure Your Plan",
+        gb: "Data (GB)",
+        mins: "Voice (Mins)",
+        sms: "SMS Pack",
+        confirm: "Proceed to Checkout",
+        total: "Monthly Total"
+    },
+    checkout: {
+        title: "Secure Checkout",
+        pay_now: "Pay Now",
+        success: "Activation Successful!",
+        success_desc: "Your eSIM is ready. Check your email for the QR code."
+    },
     footer: "Connect.Global © 2026. All Systems Operational."
 };
 
@@ -112,7 +130,11 @@ const overrides = {
             loc_found: "Лучший план для России:",
             support_whatsapp: "Поддержка в WhatsApp",
             search_placeholder: "Куда вы летите?",
-            popular_dest: "Популярные направления"
+            popular_dest: "Популярные направления",
+            app_title: "Приложение Connect.Global",
+            app_desc: "Управляйте своими eSIM, отслеживайте расход трафика в реальном времени и пополняйте баланс из любой точки мира.",
+            app_ios: "App Store",
+            app_android: "Google Play"
         },
         testimonials: {
             title: "Нам доверяют лидеры",
@@ -158,12 +180,26 @@ const overrides = {
                 pack: "пакет", month: "мес", days: "дней", instant: "Мгновенная активация (QR)", hidden_fees: "Без скрытых списаний", hotspot: "Разрешена раздача (Hotspot)", traffic: "Трафика", api_access: "API Ключ доступа", pool_ip: "Выделенный пул IP", pool_label: "TB Pool", select: "Выбрать", start: "Начать работу"
             }
         },
+        config: {
+            title: "Настройка тарифа",
+            gb: "Данные (ГБ)",
+            mins: "Звонки (Мин)",
+            sms: "Пакет SMS",
+            confirm: "Перейти к оплате",
+            total: "Итого в месяц"
+        },
+        checkout: {
+            title: "Безопасная оплата",
+            pay_now: "Оплатить сейчас",
+            success: "Активация успешна!",
+            success_desc: "Ваша eSIM готова. Проверьте почту для получения QR-кода."
+        },
         footer: "Connect.Global © 2026. Все системы работают штатно."
     },
     he: {
         nav: { coverage: "כיסוי", pricing: "מחירים", tech: "טכנולוגיה", api: "API" },
         hero: {
-            b2c_tag: "נדידה גлובלית בוטלה",
+            b2c_tag: "נדידה גלובלית בוטלה",
             b2c_title_1: "העולם שלך.",
             b2c_title_2: "פשוט להתחבר.",
             b2c_desc: "גישה מיידית לאינטרנט eSIM ב-190+ מדינות. חבילות גלישה בתשלום מראש ללא עמלות נסתרות.",
@@ -172,14 +208,18 @@ const overrides = {
             b2b_tag: "תשתית תעבורה ברמת Enterprise",
             b2b_title_1: "סביבת",
             b2b_title_2: "קישוריות ניתנת להרחבה.",
-            b2b_desc: "תעבורה פרימיום לעסקים. אינטגרציה של API, ערוצים ייעודיים, חבילות נתונים בסיטונאות וניהול אלפי חיבורים.",
+            b2b_desc: "תעבורה פриמיום לעסקים. אינטגרציה של API, ערוצים ייעודיים, חבילות נתונים בסיטונאות וניהול אלפי חיבורים.",
             b2b_btn_1: "התחל אינטגרציה",
             b2b_btn_2: "צור קשר עם המכירות",
             loc_detecting: "מזהה את המיקום שלך...",
             loc_found: "התוכנית הטובה ביותר לישראל:",
             support_whatsapp: "תמיכה ב-WhatsApp",
             search_placeholder: "לאן אתם טסים?",
-            popular_dest: "יעדים פופולריים"
+            popular_dest: "יעדים פופולריים",
+            app_title: "אפליקציית Connect.Global",
+            app_desc: "נהל את ה-eSIM שלך, עקוב אחר שימוש בנתונים בזמן אמת והטען מכל מקום בעולם.",
+            app_ios: "App Store",
+            app_android: "Google Play"
         },
         testimonials: {
             title: "המובילים בוטחים בנו",
@@ -204,7 +244,7 @@ const overrides = {
         },
         startup_section: {
             title: "נבנה עבור היי-טק וסטארטאפים",
-            desc: "תשתית מהימנה על ידי צוותים בתל אביב. הרחבה מיידית עבור סקריפינג, אוטומציה שיווקית ועבודה מרחוק.",
+            desc: "תשתית מהימנה על ידי צוותים בתל אביב. הרחבה מיידית עבור סקриפינג, אוטומציה שיווקית ועבודה מרחוק.",
             features: ["5G זמן תגובה נמוך", "גישת API ללא הגבלה", "חיוב ארגוני"]
         },
         stats: { countries: "מדינות בכיסוי", speed: "מהירות מקסימלית", privacy: "פרטיות מלאה", uptime: "התחייבות לזמינות" },
@@ -218,12 +258,26 @@ const overrides = {
                 nomad: { name: "נווד דיגיטלי", desc: "מספיק לשיחות, עבודה и רשתות חברתיות לחודש שלם." },
                 ultra: { name: "שידור אולטרה", desc: "חופש מקסימלי. סטרימינג, וידאו 4K ושיתוף אינטרנט." },
                 startup: { name: "מאגר סטארטאפ", desc: "לצוותים קטנים ובדיקות ארביטראז'." },
-                agency: { name: "קנה מידה של סוכנות", desc: "לסוכנויות שיווק עם צריכה גבוהה." },
+                agency: { name: "קנה מידה של סוכנות", desc: "לסוכנויות שיווק עם צриכה גבוהה." },
                 platform: { name: "פלטפורמת API", desc: "אינטגרציה לאפליקציה שלך (White Label)." }
             },
             units: {
                 pack: "חבילה", month: "חודש", days: "ימים", instant: "הפעלה מיידית (QR)", hidden_fees: "ללא עמלות נסתרות", hotspot: "שיתוף אינטרנט מותר", traffic: "תעבורה", api_access: "קוד גישה ל-API", pool_ip: "מאגר IP ייעודי", pool_label: "מאגר TB", select: "בחר", start: "התחל עבודה"
             }
+        },
+        config: {
+            title: "הגדרת החבילה",
+            gb: "נתונים (GB)",
+            mins: "שיחות (דקות)",
+            sms: "חבילת SMS",
+            confirm: "המשך לתשלום",
+            total: "סה\"כ לחודש"
+        },
+        checkout: {
+            title: "תשלום מאובטח",
+            pay_now: "שלם עכשיו",
+            success: "ההפעלה הצליחה!",
+            success_desc: "ה-eSIM שלך מוכן. בדוק את האימייל שלך עבור קוד ה-QR."
         },
         footer: "Connect.Global © 2026. כל המערכות פועלות כסדרן."
     }
@@ -250,6 +304,7 @@ export interface Translation {
     b2b_title_2: string; b2b_desc: string; b2b_btn_1: string; b2b_btn_2: string;
     loc_detecting: string; loc_found: string; support_whatsapp: string;
     search_placeholder: string; popular_dest: string;
+    app_title: string; app_desc: string; app_ios: string; app_android: string;
   };
   testimonials: {
     title: string;
@@ -268,6 +323,12 @@ export interface Translation {
     b2c_title: string; b2c_subtitle: string; b2b_title: string; b2b_subtitle: string;
     plans: Record<string, { name: string; desc: string }>;
     units: Record<string, string>;
+  };
+  config: {
+    title: string; gb: string; mins: string; sms: string; confirm: string; total: string;
+  };
+  checkout: {
+    title: string; pay_now: string; success: string; success_desc: string;
   };
   footer: string;
 }
