@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { AnimatedClouds } from "./animated-clouds"
 
 interface SkyBackgroundProps {
@@ -10,11 +9,36 @@ interface SkyBackgroundProps {
   className?: string
 }
 
+interface Star {
+  width: string
+  height: string
+  top: string
+  left: string
+  opacity: number
+  delay: string
+  duration: string
+}
+
 export function SkyBackground({ variant, children, className = "" }: SkyBackgroundProps) {
   const [mounted, setMounted] = useState(false)
+  const [stars, setStars] = useState<Star[]>([])
+  const [lightningDelay, setLightningDelay] = useState("0s")
 
   useEffect(() => {
     setMounted(true)
+
+    // Generate star properties after mount to maintain purity during render
+    const generatedStars = Array.from({ length: 80 }).map(() => ({
+      width: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
+      height: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
+      top: (Math.random() * 100).toFixed(2) + "%",
+      left: (Math.random() * 100).toFixed(2) + "%",
+      opacity: Number((Math.random() * 0.8 + 0.2).toFixed(2)),
+      delay: (Math.random() * 4).toFixed(2) + "s",
+      duration: (2 + Math.random() * 3).toFixed(2) + "s",
+    }))
+    setStars(generatedStars)
+    setLightningDelay((Math.random() * 6).toFixed(2) + "s")
   }, [])
 
   const gradients = {
@@ -31,18 +55,18 @@ export function SkyBackground({ variant, children, className = "" }: SkyBackgrou
       {/* Stars for night */}
       {variant === "night" && mounted && (
         <div className="absolute inset-0">
-          {Array.from({ length: 80 }).map((_, i) => (
+          {stars.map((star, i) => (
             <div
               key={i}
               className="absolute rounded-full bg-white animate-pulse"
               style={{
-                width: Math.random() * 2.5 + 0.5 + "px",
-                height: Math.random() * 2.5 + 0.5 + "px",
-                top: Math.random() * 100 + "%",
-                left: Math.random() * 100 + "%",
-                opacity: Math.random() * 0.8 + 0.2,
-                animationDelay: Math.random() * 4 + "s",
-                animationDuration: 2 + Math.random() * 3 + "s",
+                width: star.width,
+                height: star.height,
+                top: star.top,
+                left: star.left,
+                opacity: star.opacity,
+                animationDelay: star.delay,
+                animationDuration: star.duration,
               }}
             />
           ))}
@@ -63,7 +87,7 @@ export function SkyBackground({ variant, children, className = "" }: SkyBackgrou
           className="absolute inset-0 bg-white/30 pointer-events-none"
           style={{
             animation: "lightning 10s infinite",
-            animationDelay: Math.random() * 6 + "s",
+            animationDelay: lightningDelay,
           }}
         />
       )}
