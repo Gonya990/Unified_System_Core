@@ -29,6 +29,13 @@ interface Plan {
   features: string[];
 }
 
+const CURRENCIES = [
+  { code: 'USD', symbol: '$', rate: 1 },
+  { code: 'EUR', symbol: '€', rate: 0.92 },
+  { code: 'ILS', symbol: '₪', rate: 3.7 },
+  { code: 'RUB', symbol: '₽', rate: 90 },
+]
+
 export default function ConnectivityHub() {
   const [mode, setMode] = useState<"personal" | "business">("personal")
   const [lang, setLang] = useState("ru")
@@ -46,6 +53,8 @@ export default function ConnectivityHub() {
   const [customGB, setCustomGB] = useState(5)
   const [customMins, setCustomMins] = useState(100)
   const [hasSMS, setHasSMS] = useState(false)
+  const [currency, setCurrency] = useState(CURRENCIES[0])
+  const [currencyOpen, setCurrencyOpen] = useState(false)
 
   const t: Translation = translations[lang] || translations['en']
 
@@ -79,7 +88,14 @@ export default function ConnectivityHub() {
     const baseGB = activePlan.name.includes("Light") ? 3 : activePlan.name.includes("Nomad") ? 15 : 50
     const extraGB = Math.max(0, customGB - baseGB)
     const extraMins = Math.max(0, customMins - 100)
-    return base + (extraGB * 2) + (extraMins * 0.05) + (hasSMS ? 5 : 0)
+    const totalUSD = base + (extraGB * 2) + (extraMins * 0.05) + (hasSMS ? 5 : 0)
+    return totalUSD * currency.rate
+  }
+
+  const formatPrice = (val: number | string) => {
+    const num = typeof val === 'string' ? parseFloat(val.replace('$', '')) : val
+    if (isNaN(num)) return val
+    return `${currency.symbol}${(num * currency.rate).toFixed(currency.code === 'RUB' ? 0 : 2)}`
   }
 
   useEffect(() => {
@@ -121,7 +137,12 @@ export default function ConnectivityHub() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <a href="#stats" className={`${navTextClass} transition-colors`}>{t.nav.coverage}</a>
             <a href="#pricing" className={`${navTextClass} transition-colors`}>{t.nav.pricing}</a>
-            <a href="#app" className={`${navTextClass} transition-colors`}>{t.nav.tech}</a>
+            <button
+              onClick={() => document.getElementById('app-showcase')?.scrollIntoView({ behavior: 'smooth' })}
+              className={`${navTextClass} transition-colors cursor-pointer`}
+            >
+              {t.nav.tech}
+            </button>
             <a href="#" className={`${navTextClass} transition-colors`}>{t.nav.api}</a>
           </div>
           <div className="flex items-center gap-4">
@@ -193,6 +214,34 @@ export default function ConnectivityHub() {
                     </CommandGroup>
                   </CommandList>
                 </Command>
+              </PopoverContent>
+            </Popover>
+
+            <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className={`h-8 gap-1 ${navTextClass} font-bold`}>
+                  {currency.symbol} {currency.code}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[120px] p-0 overflow-hidden" align="end">
+                <div className={cn("grid", isDark ? "bg-zinc-900" : "bg-white")}>
+                  {CURRENCIES.map((cur) => (
+                    <button
+                      key={cur.code}
+                      onClick={() => {
+                        setCurrency(cur)
+                        setCurrencyOpen(false)
+                      }}
+                      className={cn(
+                        "flex items-center justify-between px-3 py-2 text-xs font-bold hover:bg-blue-500/10 transition-colors",
+                        currency.code === cur.code ? "text-blue-500 bg-blue-500/5" : mutedTextClass
+                      )}
+                    >
+                      <span>{cur.code}</span>
+                      <span className="opacity-50">{cur.symbol}</span>
+                    </button>
+                  ))}
+                </div>
               </PopoverContent>
             </Popover>
 
@@ -304,7 +353,12 @@ export default function ConnectivityHub() {
                         </PopoverContent>
                       </Popover>
 
-                      <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg w-full sm:w-auto ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={() => document.getElementById('app-showcase')?.scrollIntoView({ behavior: 'smooth' })}
+                        className={`h-14 px-8 rounded-full text-lg w-full sm:w-auto ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}
+                      >
                         {t.hero.b2c_btn_2}
                       </Button>
                     </div>
@@ -352,7 +406,7 @@ export default function ConnectivityHub() {
                             animate={{ opacity: 1, x: 0 }}
                             className="font-bold text-sm bg-blue-500 px-2 py-0.5 rounded text-white"
                           >
-                            15GB / $29
+                            15GB / {formatPrice(29)}
                           </motion.span>
                         )}
                       </div>
@@ -523,7 +577,7 @@ export default function ConnectivityHub() {
       </div>
 
       {/* App Showcase Section */}
-      <section id="app" className="py-24 max-w-7xl mx-auto px-6 overflow-hidden">
+      <section id="app-showcase" className="py-24 max-w-7xl mx-auto px-6 overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -635,7 +689,7 @@ export default function ConnectivityHub() {
                 <div className="mb-6">
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black">{plan.price}</span>
+                    <span className="text-4xl font-black">{formatPrice(plan.price)}</span>
                     <span className={`text-sm ${mutedTextClass}`}>/{mode === 'personal' ? t.pricing.units.pack : t.pricing.units.month}</span>
                   </div>
                 </div>
@@ -690,7 +744,7 @@ export default function ConnectivityHub() {
                 <div className="p-6 rounded-3xl bg-white/5 border border-white/5">
                   <div className={`text-sm ${mutedTextClass} mb-2`}>{t.calculator.saving}</div>
                   <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
-                    ${(dataVal * 450).toLocaleString()}
+                    {currency.symbol}{(dataVal * 450 * currency.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
                   <div className={`text-xs ${mutedTextClass} mt-1 uppercase tracking-widest font-bold`}>{t.calculator.per_year}</div>
                 </div>
@@ -785,7 +839,7 @@ export default function ConnectivityHub() {
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className={`w-full max-w-lg rounded-[40px] border border-white/10 ${bgClass} shadow-2xl overflow-hidden relative`}
+              className={`w-full max-w-md rounded-[40px] border border-white/10 ${bgClass} shadow-2xl overflow-hidden relative`}
             >
               <button
                 onClick={() => setCheckoutStep(null)}
@@ -878,7 +932,7 @@ export default function ConnectivityHub() {
                         <span className="text-xl opacity-50 font-bold">{t.config.total}</span>
                         <div className="text-right">
                           <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-                            ${calculateTotal().toFixed(2)}
+                            {formatPrice(calculateTotal())}
                           </div>
                         </div>
                       </div>
@@ -918,7 +972,7 @@ export default function ConnectivityHub() {
                       <div className="flex justify-between font-black text-xl">
                         <span>{t.checkout.total_due}</span>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-                          ${calculateTotal().toFixed(2)}
+                          {formatPrice(calculateTotal())}
                         </span>
                       </div>
                     </div>
