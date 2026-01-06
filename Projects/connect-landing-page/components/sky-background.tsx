@@ -25,21 +25,26 @@ export function SkyBackground({ variant, children, className = "" }: SkyBackgrou
   const [lightningDelay, setLightningDelay] = useState("0s")
 
   useEffect(() => {
-    setMounted(true)
+    // Wrap in setTimeout to avoid "setState synchronously within an effect" warning
+    const timer = setTimeout(() => {
+      setMounted(true)
 
-    // Generate star properties after mount to maintain purity during render
-    const generatedStars = Array.from({ length: 80 }).map(() => ({
-      width: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
-      height: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
-      top: (Math.random() * 100).toFixed(2) + "%",
-      left: (Math.random() * 100).toFixed(2) + "%",
-      opacity: Number((Math.random() * 0.8 + 0.2).toFixed(2)),
-      delay: (Math.random() * 4).toFixed(2) + "s",
-      duration: (2 + Math.random() * 3).toFixed(2) + "s",
-    }))
-    setStars(generatedStars)
-    setLightningDelay((Math.random() * 6).toFixed(2) + "s")
+      // Generate star properties after mount to maintain purity during render
+      const generatedStars = Array.from({ length: 80 }).map(() => ({
+        width: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
+        height: (Math.random() * 2.5 + 0.5).toFixed(2) + "px",
+        top: (Math.random() * 100).toFixed(2) + "%",
+        left: (Math.random() * 100).toFixed(2) + "%",
+        opacity: Number((Math.random() * 0.8 + 0.2).toFixed(2)),
+        delay: (Math.random() * 4).toFixed(2) + "s",
+        duration: (2 + Math.random() * 3).toFixed(2) + "s",
+      }))
+      setStars(generatedStars)
+      setLightningDelay((Math.random() * 6).toFixed(2) + "s")
+    }, 0)
+    return () => clearTimeout(timer)
   }, [])
+
 
   const gradients = {
     day: "from-[#87CEEB] via-[#ADD8E6] to-[#B0E0E6]", // Light sky blue palette
