@@ -525,36 +525,44 @@ export default function ConnectivityHub() {
       </main>
 
       {/* Trust Section */}
-      <section id="stats" className="py-20 border-y border-white/5 bg-zinc-900/50">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12">
-          <div className="flex flex-col items-center text-center">
-            <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
-              <Globe className={`w-6 h-6 ${mutedTextClass}`} />
+      <section id="stats" className="py-24 border-y border-white/5 bg-transparent relative overflow-hidden backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+          {[
+            { tag: "190+", label: t.stats.countries, icon: Globe, img: TRAVEL_PHOTOS[0] },
+            { tag: "5G", label: t.stats.speed, icon: Zap, img: TRAVEL_PHOTOS[1] },
+            { tag: "AES-256", label: t.stats.privacy, icon: ShieldCheck, img: OFFICE_PHOTOS[0] },
+            { tag: "99.9%", label: t.stats.uptime, icon: BarChart3, img: OFFICE_PHOTOS[1] }
+          ].map((stat, i) => (
+            <div key={i} className="group relative flex flex-col items-center text-center p-8 rounded-[32px] overflow-hidden transition-all hover:scale-105 active:scale-95">
+              {/* Background Photo (Semi-transparent with floating animation) */}
+              <motion.div
+                className="absolute inset-0 z-0 opacity-[0.05] grayscale group-hover:opacity-20 group-hover:grayscale-0 transition-all duration-700"
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 1, 0]
+                }}
+                transition={{
+                  duration: 10 + i * 2,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              >
+                <Image
+                  src={stat.img}
+                  alt="stat bg"
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 dark:to-white/5 z-0" />
+
+              <div className={`relative z-10 mb-6 p-4 rounded-3xl border transition-colors ${isDark ? 'bg-zinc-900/50 border-white/10 group-hover:border-blue-500/50' : 'bg-white/50 border-stone-200 group-hover:border-blue-500/50 shadow-sm'}`}>
+                <stat.icon className={`w-8 h-8 transition-colors ${isDark ? 'text-zinc-400 group-hover:text-blue-400' : 'text-stone-500 group-hover:text-blue-500'}`} />
+              </div>
+              <div className="relative z-10 text-4xl font-black mb-2 tracking-tighter">{stat.tag}</div>
+              <div className={`relative z-10 text-xs uppercase font-black tracking-widest ${mutedTextClass}`}>{stat.label}</div>
             </div>
-            <div className="text-3xl font-bold mb-1">190+</div>
-            <div className={`text-sm ${mutedTextClass}`}>{t.stats.countries}</div>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
-              <Zap className={`w-6 h-6 ${mutedTextClass}`} />
-            </div>
-            <div className="text-3xl font-bold mb-1">5G</div>
-            <div className={`text-sm ${mutedTextClass}`}>{t.stats.speed}</div>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
-              <ShieldCheck className={`w-6 h-6 ${mutedTextClass}`} />
-            </div>
-            <div className="text-3xl font-bold mb-1">AES-256</div>
-            <div className={`text-sm ${mutedTextClass}`}>{t.stats.privacy}</div>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
-              <BarChart3 className={`w-6 h-6 ${mutedTextClass}`} />
-            </div>
-            <div className="text-3xl font-bold mb-1">99.9%</div>
-            <div className={`text-sm ${mutedTextClass}`}>{t.stats.uptime}</div>
-          </div>
+          ))}
         </div>
       </section>
 
