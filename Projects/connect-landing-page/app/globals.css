@@ -191,11 +191,11 @@ input[type="range"]::-moz-range-track {
 
 /* Thumb (Runner) */
 input[type="range"]::-webkit-slider-thumb {
-  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 -mt-3 transition-transform active:scale-90 relative z-10;
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)] border-4 border-blue-500 -mt-3 transition-transform active:scale-90 relative z-10;
 }
 
 input[type="range"]::-moz-range-thumb {
-  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 transition-transform active:scale-90 border-none relative z-10;
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)] border-4 border-blue-500 transition-transform active:scale-90 border-none relative z-10;
 }
 
 /* Filling the track before the thumb */
