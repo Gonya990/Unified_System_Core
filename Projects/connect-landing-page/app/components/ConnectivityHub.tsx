@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import Image from "next/image"
+
 import {
   Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap,
   BarChart3, Database, Sun, Moon, Languages, Quote, Phone,
@@ -59,7 +61,11 @@ resp = requests.post(
 print(resp.json())`
 };
 
-export default function ConnectivityHub() {
+interface ConnectivityHubProps {
+  initialCountry?: string
+}
+
+export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps = {}) {
   const [mode, setMode] = useState<"personal" | "business">("personal")
   const [lang, setLang] = useState("ru")
   const [langOpen, setLangOpen] = useState(false)
@@ -67,7 +73,7 @@ export default function ConnectivityHub() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isDetected, setIsDetected] = useState(false)
   const [dataVal, setDataVal] = useState(500)
-  const [selectedCountry, setSelectedCountry] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry || "")
   const [countryOpen, setCountryOpen] = useState(false)
 
   // Plan Config & Checkout
@@ -82,7 +88,11 @@ export default function ConnectivityHub() {
   // Travel Wizard & Advanced Options
   const [wizardOpen, setWizardOpen] = useState(false)
   const [wizardStep, setWizardStep] = useState(1)
-  const [wizardData, setWizardData] = useState({ destination: "", duration: "", usage: "" })
+  const [wizardData, setWizardData] = useState({
+    destination: initialCountry || "",
+    duration: "",
+    usage: ""
+  })
   const [neverExpiring, setNeverExpiring] = useState(false)
   const [vpnEnabled, setVpnEnabled] = useState(false)
   const [devTab, setDevTab] = useState<"bash" | "node" | "python">("bash")
@@ -436,19 +446,18 @@ export default function ConnectivityHub() {
                         {t.hero.popular_dest}
                       </span>
                       {TOP_COUNTRIES.slice(0, 10).map((c) => (
-                        <button
+                        <Link
                           key={c.code}
-                          onClick={() => {
-                            setSelectedCountry(`${c.flag} ${c.name}`);
-                            document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                          }}
+                          href={`/countries/${c.slug}`}
                           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all hover:scale-105 active:scale-95 ${isDark ? 'bg-zinc-900 border-white/5 hover:border-blue-500/50 hover:bg-blue-500/10' : 'bg-white border-zinc-200 hover:border-blue-500/50 hover:bg-blue-50/50'}`}
                         >
+
                           <span>{c.flag}</span>
                           <span>{c.name}</span>
-                        </button>
+                        </Link>
                       ))}
                     </div>
+
 
                     <div className="mt-4 flex flex-col items-center">
                       <div className={`flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-1000 ${isDetected ? (isDark ? 'bg-green-500/10 border-green-500/30' : 'bg-green-50 border-green-200') : (isDark ? 'bg-zinc-800 border-white/5' : 'bg-zinc-100 border-zinc-200')}`}>
