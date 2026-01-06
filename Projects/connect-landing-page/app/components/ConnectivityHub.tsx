@@ -89,10 +89,10 @@ export default function ConnectivityHub() {
 
   // Theme logic
   const isDark = theme === 'dark'
-  const bgClass = isDark ? "bg-[#0a0c10]" : "bg-[#fcfaf2]" // Soft Midnight Black vs Warm Beige
+  const bgClass = isDark ? "bg-[#111418]" : "bg-[#f5f2e8]" // Deep Charcoal vs Warm Sand Beige
   const textClass = isDark ? "text-zinc-100" : "text-stone-900"
-  const navBgClass = isDark ? "bg-[#0a0c10]/80 border-white/5" : "bg-[#fcfaf2]/80 border-stone-200"
-  const cardBgClass = isDark ? "bg-zinc-900/40 border-white/5" : "bg-white/90 border-stone-100 shadow-sm"
+  const navBgClass = isDark ? "bg-[#111418]/80 border-white/5" : "bg-[#f5f2e8]/80 border-stone-200"
+  const cardBgClass = isDark ? "bg-[#1a1f26] border-white/5 shadow-2xl" : "bg-white/70 border-stone-100 shadow-md"
   const mutedTextClass = isDark ? "text-zinc-400" : "text-stone-500"
   const navTextClass = isDark ? "text-zinc-400 hover:text-zinc-100" : "text-stone-600 hover:text-stone-900"
   const isRTL = lang === 'he' || lang === 'ar' || lang === 'fa'
@@ -100,7 +100,7 @@ export default function ConnectivityHub() {
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className={`min-h-screen ${bgClass} ${textClass} selection:bg-blue-500/30 font-sans transition-colors duration-500`}
+      className={`min-h-screen ${bgClass} ${textClass} ${isDark ? 'dark' : ''} selection:bg-blue-500/30 font-sans transition-colors duration-500`}
     >
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-xl transition-colors duration-500 ${navBgClass}`}>
