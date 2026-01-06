@@ -13,7 +13,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
-import { translations } from "@/app/data/translations"
+import { translations, type Translation } from "@/app/data/translations"
 
 
 
@@ -23,13 +23,14 @@ export default function ConnectivityHub() {
   const [langOpen, setLangOpen] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isDetected, setIsDetected] = useState(false)
+  const [dataVal, setDataVal] = useState(500)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsDetected(true), 2500)
     return () => clearTimeout(timer)
   }, [])
 
-  const t = translations[lang as keyof typeof translations] || translations['en'] // Fallback to EN if translation missing
+  const t: Translation = translations[lang] || translations['en'] // Fallback to EN if translation missing
 
   // Theme logic
   const isDark = theme === 'dark'
@@ -586,19 +587,17 @@ export default function ConnectivityHub() {
               <div className="mb-12 max-w-xl mx-auto">
                 <div className="flex justify-between mb-4 text-sm font-bold uppercase tracking-widest opacity-70">
                   <span>{t.calculator.label}</span>
-                  <span className="text-purple-500">{(window as any).dataVal || 500} GB</span>
+                  <span className="text-purple-500">{dataVal} GB</span>
                 </div>
                 <input
                   type="range"
                   min="100"
                   max="10000"
                   step="100"
-                  defaultValue="500"
+                  value={dataVal}
                   onChange={(e) => {
                     const val = parseInt(e.target.value);
-                    const savingElem = document.getElementById('saving-val');
-                    if (savingElem) savingElem.innerText = `$${(val * 2.5).toLocaleString()}`;
-                    (window as any).dataVal = val;
+                    setDataVal(val);
                   }}
                   className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
                 />
@@ -606,8 +605,8 @@ export default function ConnectivityHub() {
 
               <div className="inline-block p-8 rounded-3xl bg-purple-500/5 border border-purple-500/20">
                 <p className={`text-sm ${mutedTextClass} mb-2`}>{t.calculator.saving}</p>
-                <p id="saving-val" className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
-                  $1,250
+                <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
+                  ${(dataVal * 2.5).toLocaleString()}
                 </p>
                 <p className="text-sm font-bold mt-2 opacity-70 uppercase tracking-widest">{t.calculator.per_year}</p>
               </div>
@@ -619,7 +618,7 @@ export default function ConnectivityHub() {
         <section className="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
           <h2 className="text-3xl font-bold text-center mb-16">{t.testimonials.title}</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            {t.testimonials.items.map((item: any, i: number) => (
+            {t.testimonials.items.map((item, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}

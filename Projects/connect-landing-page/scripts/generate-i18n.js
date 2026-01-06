@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
 
@@ -158,7 +159,7 @@ const overrides = {
     he: {
         nav: { coverage: "כיסוי", pricing: "מחירים", tech: "טכנולוגיה", api: "API" },
         hero: {
-            b2c_tag: "נדידה גלובלית בוטלה",
+            b2c_tag: "נדידה גлובלית בוטלה",
             b2c_title_1: "העולם שלך.",
             b2c_title_2: "פשוט להתחבר.",
             b2c_desc: "גישה מיידית לאינטרנט eSIM ב-190+ מדינות. חבילות גלישה בתשלום מראש ללא עמלות נסתרות.",
@@ -208,7 +209,7 @@ const overrides = {
             b2b_subtitle: "רכישת תעבורה בסיטונאות. חבר את המשתמשים שלך דרך ה-API שלנו. אתה משלם על המאגר המשותף, הלקוחות שלך משלמים לך.",
             plans: {
                 light: { name: "נוסע קל", desc: "מושלם למפות והודעות לנסיעה קצרה." },
-                nomad: { name: "נווד דיגיטלי", desc: "מספיק לשיחות, עבודה ורשתות חברתיות לחודש שלם." },
+                nomad: { name: "נווד דיגיטלי", desc: "מספיק לשיחות, עבודה и רשתות חברתיות לחודש שלם." },
                 ultra: { name: "שידור אולטרה", desc: "חופש מקסימלי. סטרימינג, וידאו 4K ושיתוף אינטרנט." },
                 startup: { name: "מאגר סטארטאפ", desc: "לצוותים קטנים ובדיקות ארביטראז'." },
                 agency: { name: "קנה מידה של סוכנות", desc: "לסוכנויות שיווק עם צריכה גבוהה." },
@@ -265,7 +266,7 @@ export interface Translation {
 }
 `;
 
-const content = `${typeDef}\nexport const translations: Record<string, Translation> = ${JSON.stringify(finalTranslations, null, 2)};`;
+const content = typeDef + '\nexport const translations: Record<string, Translation> = ' + JSON.stringify(finalTranslations, null, 2) + ';';
 
 fs.writeFileSync(path.join(__dirname, '../app/data/translations.ts'), content);
-console.log(`Successfully generated translations.ts with ${ALL_LANGUAGES.length} languages!`);
+console.log('Successfully generated translations.ts with ' + ALL_LANGUAGES.length + ' languages!');

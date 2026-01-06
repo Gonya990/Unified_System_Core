@@ -269,7 +269,7 @@ export const translations: Record<string, Translation> = {
       "api": "API"
     },
     "hero": {
-      "b2c_tag": "נדידה גלובלית בוטלה",
+      "b2c_tag": "נדידה גлובלית בוטלה",
       "b2c_title_1": "העולם שלך.",
       "b2c_title_2": "פשוט להתחבר.",
       "b2c_desc": "גישה מיידית לאינטרנט eSIM ב-190+ מדינות. חבילות גלישה בתשלום מראש ללא עמלות נסתרות.",
@@ -341,7 +341,7 @@ export const translations: Record<string, Translation> = {
         },
         "nomad": {
           "name": "נווד דיגיטלי",
-          "desc": "מספיק לשיחות, עבודה ורשתות חברתיות לחודש שלם."
+          "desc": "מספיק לשיחות, עבודה и רשתות חברתיות לחודש שלם."
         },
         "ultra": {
           "name": "שידור אולטרה",
