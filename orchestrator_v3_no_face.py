@@ -11,11 +11,18 @@ import os
 from pathlib import Path
 from typing import List, Dict
 import json
+from dotenv import load_dotenv
 
-# Import internal tools
+# Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
+# Load API keys from potential locations
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "LLM_Council" / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
+
+# Import internal tools
 try:
     from pexels_broll import semantic_search_broll
     from video_assembler import create_video_with_broll, get_video_duration
@@ -30,19 +37,54 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 INPUT_DIR.mkdir(exist_ok=True)
 BROLL_DIR.mkdir(exist_ok=True)
 
-# Voice options (Edge-TTS)
+# Voice options (OpenAI TTS preferred, Edge-TTS fallback)
 VOICES = {
-    "en": "en-US-ChristopherNeural",  # English male
-    "en_female": "en-US-JennyNeural",  # English female  
-    "ru": "ru-RU-DmitryNeural",         # Russian male
-    "ru_female": "ru-RU-SvetlanaNeural" # Russian female
+    "en": "onyx",        # OpenAI Male (Premium)
+    "en_female": "nova",   # OpenAI Female (Premium)
+    "ru": "onyx",        # OpenAI Male (Premium)
+    "ru_female": "nova",   # OpenAI Female (Premium)
+    "fallback_ru": "ru-RU-DmitryNeural",
+    "fallback_en": "en-US-EmmaNeural" # Newer, more natural than Christopher
 }
 
-def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
-    """Generate audio using Edge-TTS"""
-    print(f"🎤 Generating Audio ({lang})...")
+def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
+    """Generate audio using OpenAI TTS"""
+    print(f"🎙 Generating Premium OpenAI Audio (voice={voice})...")
     
-    voice = VOICES.get(lang, VOICES["en"])
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return False
+        
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        
+        # Prepare text - OpenAI handles punctuation well
+        response = client.audio.speech.create(
+            model="tts-1-hd",
+            voice=voice,
+            input=text
+        )
+        
+        mp3_path = output_path.with_suffix(".mp3")
+        response.stream_to_file(str(mp3_path))
+        
+        # Convert to WAV
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(mp3_path),
+            "-ar", "16000", "-ac", "1", str(output_path)
+        ], check=True, capture_output=True)
+        
+        print(f"✅ Premium Audio: {output_path}")
+        return True
+    except Exception as e:
+        print(f"❌ OpenAI TTS failed: {e}")
+        return False
+
+def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
+    """Generate audio using Edge-TTS with rate control for better naturalness"""
+    print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice}, rate=-10%)...")
+    
     mp3_path = output_path.with_suffix(".mp3")
     
     # Try multiple ways to find edge-tts
@@ -51,7 +93,14 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     if venv_bin.exists():
         edge_tts_cmd = str(venv_bin)
         
-    cmd = [edge_tts_cmd, "--text", text, "--write-media", str(mp3_path), "--voice", voice]
+    # Using --rate to slow down speech for more natural delivery
+    cmd = [
+        edge_tts_cmd, 
+        "--text", text, 
+        "--write-media", str(mp3_path), 
+        "--voice", voice,
+        "--rate", "-10%"
+    ]
     
     try:
         subprocess.run(cmd, check=True, cwd=str(ROOT_DIR))
@@ -60,11 +109,23 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
             "ffmpeg", "-y", "-i", str(mp3_path),
             "-ar", "16000", "-ac", "1", str(output_path)
         ], check=True, capture_output=True)
-        print(f"✅ Audio: {output_path}")
+        print(f"✅ Enhanced Fallback Audio: {output_path}")
         return True
     except Exception as e:
-        print(f"❌ Audio failed: {e}")
+        print(f"❌ Edge-TTS failed: {e}")
         return False
+
+def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
+    """Main audio generation with premium support and fallback"""
+    voice = VOICES.get(lang, VOICES["en"])
+    
+    # 1. Try OpenAI (Premium)
+    if generate_audio_openai(text, output_path, voice):
+        return True
+        
+    # 2. Fallback to Edge-TTS
+    fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-ChristopherNeural")
+    return generate_audio_edge(text, output_path, fallback_voice)
 
 def add_subtitles(video_path: Path, output_path: Path, lang: str = "en") -> bool:
     """Add dynamic subtitles using PyCaps"""
@@ -251,23 +312,23 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     return final_video
 
 if __name__ == "__main__":
-    # Council-Generated 15-Scene Script
+    # Council-Generated 15-Scene Script (Refined for Natural TTS)
     script_ru = (
-        "Добро пожаловать в 2026 год — мир, где искусственный интеллект стал неотъемлемой частью нашей реальности, изменяя экономику и общество. "
-        "С добавлением 15 триллионов долларов в мировую экономику, ИИ стал движущей силой прогресса и инноваций. "
-        "90 процентов контента, который мы поглощаем, теперь создан ИИ — от новостей до фильмов и музыки. "
-        "Задачи, которые раньше требовали десятилетий, теперь решаются за недели, открывая новые горизонты для человечества. "
-        "Мы наблюдаем эволюцию разума — симбиоз человеческого и искусственного интеллекта. "
-        "Код становится новой материей, формируя основу для наших будущих творений. "
-        "Автоматизация труда освобождает человека для творчества и самовыражения. "
-        "ИИ вдохновляет новые формы искусства, расширяя границы нашей фантазии. "
-        "Образование трансформируется, становясь более персонализированным и доступным для всех. "
-        "ИИ революционизирует здравоохранение, предоставляя каждому доступ к высококачественному уходу. "
-        "С умными городами и устойчивыми технологиями, ИИ помогает сохранять нашу планету. "
-        "С развитием ИИ приходят вопросы безопасности и этики, требующие нашего внимания. "
-        "Мы учимся взаимодействовать с новым разумом, развивая взаимопонимание и сотрудничество. "
-        "ИИ создает глобальную сеть, объединяющую человечество и ускоряющую наше развитие. "
-        "2026 год — это начало новой эры, где разум и технология объединяются для создания нового мира."
+        "Добро пожаловать в две тысячи двадцать шестой год... мир, где искусственный интеллект стал частью нашей реальности... навсегда изменив экономику и общество. "
+        "Пятнадцать триллионов долларов. Именно столько ИИ привнес в мировую экономику... став главным двигателем прогресса. "
+        "Девяносто процентов контента, который мы видим каждый день... теперь создается алгоритмами. От новостей... до кино и музыки. "
+        "Задачи, которые раньше требовали десятилетий... сегодня решаются за считанные недели. Это открывает перед человечеством новые... невероятные горизонты. "
+        "Мы наблюдаем настоящую эволюцию разума... уникальный симбиоз человеческого опыта и цифрового интеллекта. "
+        "Код становится новой материей... фундаментом, на котором строятся наши будущие творения. "
+        "Автоматизация труда. Она не заменяет нас... она освобождает человека для истинного творчества и самовыражения. "
+        "Искусственный интеллект вдохновляет на новые формы искусства... расширяя границы нашей фантазии до бесконечности. "
+        "Образование трансформируется прямо сейчас... оно становится персональным... доступным каждому, в любой точке планеты. "
+        "В медицине происходит революция. ИИ обеспечивает каждому из нас доступ к диагностике... и лечению высочайшего уровня. "
+        "Умные города и экологичные технологии. С помощью ИИ... мы находим способы сохранить наш общий дом... нашу планету. "
+        "Но с великой силой приходят и вопросы... вопросы безопасности... и этики. Они требуют нашего глубокого внимания. "
+        "Мы учимся взаимодействовать с новым типом разума... выстраивая мосты взаимопонимания... и сотрудничества. "
+        "Глобальная сеть интеллектуальных систем объединяет мир... и ускоряет наше общее развитие... с каждым днем. "
+        "Две тысячи двадцать шестой год. Это лишь начало новой эры... где разум и технологии создают совершенно новый мир... мир будущего."
     )
     
     # Mapping scenes to images (using the ones generated across steps)
@@ -305,23 +366,23 @@ if __name__ == "__main__":
     if len(selected_images) >= 15:
         run_no_face_pipeline(script_ru, lang="ru", output_name="ai_council_ru", image_paths=selected_images)
         
-        # English translation
+        # English translation (Refined for Natural TTS)
         script_en = (
-            "Welcome to 2026 — a world where artificial intelligence has become an integral part of our reality, reshaping economy and society. "
-            "With an addition of 15 trillion dollars to the global economy, AI has become a driving force of progress and innovation. "
-            "90 percent of the content we consume is now created by AI — from news to movies and music. "
-            "Tasks that previously required decades are now solved in weeks, opening new horizons for humanity. "
-            "We are witnessing the evolution of mind — a symbiosis of human and artificial intelligence. "
-            "Code is becoming a new matter, forming the foundation of our future creations. "
-            "Automation of labor frees humans for creativity and self-expression. "
-            "AI inspires new forms of art, expanding the boundaries of our imagination. "
-            "Education is transforming, becoming more personalized and accessible to all. "
-            "AI is revolutionizing healthcare, providing everyone with access to high-quality care. "
-            "With smart cities and sustainable technologies, AI helps preserve our planet. "
-            "With the growth of AI come questions of safety and ethics, demanding our attention. "
-            "We are learning to interact with a new mind, developing mutual understanding and cooperation. "
-            "AI creates a global network, uniting humanity and accelerating our progress. "
-            "2026 marks the beginning of a new era, where mind and technology unite to create a new world."
+            "Welcome to the year twenty twenty-six... a world where artificial intelligence has become an inseparable part of our reality... forever changing our economy and our society. "
+            "Fifteen trillion dollars. That is how much AI has contributed to the global wealth... becoming the ultimate engine of progress. "
+            "Ninety percent of the content we consume every single day... is now generated by algorithms. From breaking news... to cinema and music. "
+            "Tasks that used to take decades of research... are now solved in just a few weeks. This opens up new... incredible horizons for all of humanity. "
+            "We are witnessing a true evolution of the mind... a unique symbiosis between human experience and digital intelligence. "
+            "Code is becoming the new matter... the very foundation upon which our future creations are built. "
+            "The automation of labor. It is not here to replace us... it is here to free us for true creativity and self-expression. "
+            "Artificial intelligence inspires new forms of art... pushing the boundaries of our imagination to infinity. "
+            "Education is transforming right before our eyes. It is becoming personal... accessible to everyone, anywhere on the planet. "
+            "A revolution is happening in healthcare. AI provides each of us with diagnostics... and medical care of the highest standard. "
+            "Smart cities and sustainable technologies. With the help of AI... we are finding ways to preserve our common home... our planet. "
+            "But with great power come deep questions... questions of safety... and ethics. They demand our absolute attention. "
+            "We are learning to interact with a new kind of consciousness... building bridges of understanding... and cooperation. "
+            "A global network of intelligent systems is uniting the world... accelerating our collective progress... every single day. "
+            "Twenty twenty-six. This is just the beginning of a new era... where mind and technology unite to create a completely new world... the world of tomorrow."
         )
         run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", image_paths=selected_images)
     else:
