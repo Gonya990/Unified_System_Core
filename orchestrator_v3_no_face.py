@@ -215,57 +215,88 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
     
     print(f"✅ Video assembled: {output_path}")
 
-def assemble_slideshow_video(audio_path: Path, images: List[Path], output_path: Path):
+def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path):
     """
-    Create a professional slideshow with Ken Burns (zoom) effect
+    Create a professional hybrid video with images, B-roll, and smooth transitions.
+    scenes: list of {'image': Path, 'keyword': str}
     """
-    print(f"🖼 Assembling professional slideshow from {len(images)} images...")
+    print(f"🎬 Assembling ENHANCED hybrid video sequence...")
     
     audio_duration = float(subprocess.run([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
         "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
     ], capture_output=True, text=True).stdout.strip())
     
-    if not images:
-        print("❌ No images provided")
-        return False
-        
-    img_duration = audio_duration / len(images)
-    
-    # We will use a complex filter to generate zoom effects for each image and then concat them
-    # This is more robust than simple concat for "movement"
+    num_scenes = len(scenes)
+    seg_duration = audio_duration / num_scenes
     
     segments = []
-    for i, img in enumerate(images):
-        seg_path = OUTPUT_DIR / f"seg_zoom_{i}.mp4"
-        # Ken Burns effect: zoom in slowly
-        # scale=8000:-1: zooming works better on higher res
-        # zoompan: zoom=zoom+0.001 (slow zoom)
-        cmd = [
-            "ffmpeg", "-y", "-loop", "1", "-i", str(img),
-            "-t", str(img_duration),
-            "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-                   "zoompan=z='zoom+0.0005':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125:s=1080x1920",
-            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
-            str(seg_path)
-        ]
-        subprocess.run(cmd, check=True, capture_output=True)
-        segments.append(seg_path)
+    
+    # We will try to fetch 1 B-roll clip for each scene to mix with the image
+    for i, scene in enumerate(scenes):
+        img_path = scene['image']
+        keyword = scene['keyword']
         
-    # Concat segments
-    concat_file = OUTPUT_DIR / "seg_concat.txt"
+        # Determine motion (alternate zoom in/out)
+        zoom_expr = "zoom+0.0006" if i % 2 == 0 else "zoom-0.0006"
+        start_zoom = "1" if i % 2 == 0 else "1.1"
+        
+        # Segment 1: The AI Image (half the scene duration)
+        seg_path_img = OUTPUT_DIR / f"hybrid_seg_{i}_img.mp4"
+        cmd_img = [
+            "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
+            "-t", str(seg_duration / 2),
+            "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+                   f"zoompan=z='{zoom_expr}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,"
+                   f"unsharp=5:5:1.0:5:5:0.0", # Sharpen for premium look
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
+            str(seg_path_img)
+        ]
+        subprocess.run(cmd_img, check=True, capture_output=True)
+        segments.append(seg_path_img)
+        
+        # Segment 2: B-Roll (the other half)
+        seg_path_broll = OUTPUT_DIR / f"hybrid_seg_{i}_broll.mp4"
+        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=1)
+        
+        if broll_clips:
+            clip = broll_clips[0]
+            subprocess.run([
+                "ffmpeg", "-y", "-i", str(clip),
+                "-t", str(seg_duration / 2),
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+                       "hue=s=1.2", # Vivid color boost
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30",
+                str(seg_path_broll)
+            ], check=True, capture_output=True)
+            segments.append(seg_path_broll)
+        else:
+            # Fallback to another image zoom if no B-roll found
+            seg_path_fallback = OUTPUT_DIR / f"hybrid_seg_{i}_fallback.mp4"
+            subprocess.run([
+                "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
+                "-t", str(seg_duration / 2),
+                "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+                       f"zoompan=z='zoom+0.0003':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30",
+                "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
+                str(seg_path_fallback)
+            ], check=True, capture_output=True)
+            segments.append(seg_path_fallback)
+
+    # Concat all segments with simple concat protocol first (faster)
+    concat_file = OUTPUT_DIR / "hybrid_concat.txt"
     with open(concat_file, "w") as f:
         for seg in segments:
             f.write(f"file '{seg.name}'\n")
             
-    video_no_audio = OUTPUT_DIR / "temp_motion_video.mp4"
+    video_no_audio = OUTPUT_DIR / "temp_hybrid_video.mp4"
     subprocess.run([
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_file),
         "-c", "copy", str(video_no_audio)
     ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
     
-    # Final merge
+    # Final merge with audio
     subprocess.run([
         "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
         "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
@@ -278,22 +309,23 @@ def assemble_slideshow_video(audio_path: Path, images: List[Path], output_path: 
     concat_file.unlink()
     return True
 
-def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", image_paths: List[Path] = None):
+def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: List[Dict] = None):
     """Run pipeline without face usage"""
-    print(f"\n🚀 Starting NO-FACE Pipeline (lang={lang})")
+    print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang})")
     
     # 1. Audio
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
     if not generate_audio(text, audio_path, lang):
         return None
         
-    # 2. Visuals (B-Roll or Slideshow)
+    # 2. Visuals
+    final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
     raw_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
     
-    if image_paths:
-        assemble_slideshow_video(audio_path, image_paths, raw_video)
+    if scenes:
+        assemble_hybrid_video(audio_path, scenes, raw_video)
     else:
-        # Fallback to B-Roll
+        # Fallback to simple B-Roll logic if no scenes provided
         clips = semantic_search_broll(text, BROLL_DIR, num_clips=5)
         if clips:
             assemble_broll_only_video(audio_path, clips, raw_video)
@@ -302,7 +334,6 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
             return None
     
     # 3. Subtitles
-    final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
     if not add_subtitles(raw_video, final_video, lang):
         print("⚠️ Subtitles failed, using raw video.")
         if final_video.exists(): final_video.unlink()
@@ -334,37 +365,39 @@ if __name__ == "__main__":
     # Mapping scenes to images (using the ones generated across steps)
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
-    # Selecting the best 15 images in order for the 15 segments
-    image_names = [
-        "ai_scene_1_network",   # 1. Intro
-        "ai_scene_2_economy",   # 2. Economy
-        "ai_scene_3_content_gen", # 3. Content
-        "ai_future_bg_3",       # 4. Tasks (Lab)
-        "ai_future_bg_4",       # 5. Evolution (Brain)
-        "ai_scene_6_code_matter", # 6. Code
-        "ai_future_bg_1",       # 7. Labor
-        "ai_scene_8_art_exhibit", # 8. Art
-        "ai_scene_9_edu_tutor",  # 9. Education
-        "ai_fact_3_medical",    # 10. Healthcare
-        "ai_scene_11_green_city", # 11. Planet
-        "ai_scene_12_ethics_safety", # 12. Ethics
-        "ai_fact_1_robot",      # 13. Collaboration
-        "ai_scene_14_global_net_earth", # 14. Global
-        "ai_scene_15_sunrise_digital"   # 15. Conclusion
+    # Selecting the best 15 images and defining keywords for B-roll
+    scene_data = [
+        {"image": "ai_scene_1_network", "keyword": "neural network digital"},
+        {"image": "ai_scene_2_economy", "keyword": "world economy growth"},
+        {"image": "ai_scene_3_content_gen", "keyword": "digital content creation"},
+        {"image": "ai_future_bg_3", "keyword": "science laboratory future"},
+        {"image": "ai_future_bg_4", "keyword": "human brain digital"},
+        {"image": "ai_scene_6_code_matter", "keyword": "coding developer matrix"},
+        {"image": "ai_future_bg_1", "keyword": "robot automation factory"},
+        {"image": "ai_scene_8_art_exhibit", "keyword": "modern art digital gallery"},
+        {"image": "ai_scene_9_edu_tutor", "keyword": "education future technology"},
+        {"image": "ai_fact_3_medical", "keyword": "medical technology robot"},
+        {"image": "ai_scene_11_green_city", "keyword": "smart city green energy"},
+        {"image": "ai_scene_12_ethics_safety", "keyword": "cyber security ethics"},
+        {"image": "ai_fact_1_robot", "keyword": "human robot handshake"},
+        {"image": "ai_scene_14_global_net_earth", "keyword": "global network earth space"},
+        {"image": "ai_scene_15_sunrise_digital", "keyword": "sunrise future city horizon"}
     ]
     
-    selected_images = []
-    for name in image_names:
-        matches = list(gen_dir.glob(f"{name}_*.png"))
+    selected_scenes = []
+    for scene in scene_data:
+        matches = list(gen_dir.glob(f"{scene['image']}_*.png"))
         if matches:
-            # Get the latest one if multiple
-            selected_images.append(sorted(matches)[-1])
+            selected_scenes.append({
+                "image": sorted(matches)[-1],
+                "keyword": scene['keyword']
+            })
         else:
-            print(f"⚠️ Image {name} not found in {gen_dir}")
+            print(f"⚠️ Image {scene['image']} not found in {gen_dir}")
 
     # Run RU pipeline
-    if len(selected_images) >= 15:
-        run_no_face_pipeline(script_ru, lang="ru", output_name="ai_council_ru", image_paths=selected_images)
+    if len(selected_scenes) >= 15:
+        run_no_face_pipeline(script_ru, lang="ru", output_name="ai_council_ru", scenes=selected_scenes)
         
         # English translation (Refined for Natural TTS)
         script_en = (
@@ -384,6 +417,6 @@ if __name__ == "__main__":
             "A global network of intelligent systems is uniting the world... accelerating our collective progress... every single day. "
             "Twenty twenty-six. This is just the beginning of a new era... where mind and technology unite to create a completely new world... the world of tomorrow."
         )
-        run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", image_paths=selected_images)
+        run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", scenes=selected_scenes)
     else:
         print(f"❌ Not enough images found ({len(selected_images)}/15). Check generation.")
