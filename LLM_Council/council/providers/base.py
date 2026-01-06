@@ -158,5 +158,9 @@ class _TimeMeasure:
         self.start = time.perf_counter()
         return self
     
+    @property
+    def elapsed_ms(self) -> float:
+        return (time.perf_counter() - self.start) * 1000
+    
     def __exit__(self, *args):
-        self.elapsed_ms = (time.perf_counter() - self.start) * 1000
+        pass

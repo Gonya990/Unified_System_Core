@@ -92,7 +92,7 @@ class LLMCouncil:
         from dotenv import load_dotenv
         import os
         
-        load_dotenv(env_path)
+        load_dotenv(env_path, override=True)
         
         providers = []
         

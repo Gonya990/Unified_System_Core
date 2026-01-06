@@ -251,33 +251,78 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     return final_video
 
 if __name__ == "__main__":
-    # Extended Script with Facts
+    # Council-Generated 15-Scene Script
     script_ru = (
-        "Искусственный интеллект в 2026 году — это не просто чат-боты. "
-        "Знаете ли вы, что современные модели уже обладают уровнем логики, сопоставимым с докторантами топовых вузов? "
-        "К 2030 году вклад ИИ в мировую экономику составит невероятные 15 триллионов долларов. "
-        "Уже сегодня нейросети проектируют новые материалы за недели, на что раньше уходили десятилетия. "
-        "А к концу этого года более 90 процентов цифрового контента будет создано при поддержке алгоритмов. "
-        "Мы живем в эпоху самой быстрой технологической революции в истории человечества. "
-        "Будущее уже наступило, и оно работает на коде."
+        "Добро пожаловать в 2026 год — мир, где искусственный интеллект стал неотъемлемой частью нашей реальности, изменяя экономику и общество. "
+        "С добавлением 15 триллионов долларов в мировую экономику, ИИ стал движущей силой прогресса и инноваций. "
+        "90 процентов контента, который мы поглощаем, теперь создан ИИ — от новостей до фильмов и музыки. "
+        "Задачи, которые раньше требовали десятилетий, теперь решаются за недели, открывая новые горизонты для человечества. "
+        "Мы наблюдаем эволюцию разума — симбиоз человеческого и искусственного интеллекта. "
+        "Код становится новой материей, формируя основу для наших будущих творений. "
+        "Автоматизация труда освобождает человека для творчества и самовыражения. "
+        "ИИ вдохновляет новые формы искусства, расширяя границы нашей фантазии. "
+        "Образование трансформируется, становясь более персонализированным и доступным для всех. "
+        "ИИ революционизирует здравоохранение, предоставляя каждому доступ к высококачественному уходу. "
+        "С умными городами и устойчивыми технологиями, ИИ помогает сохранять нашу планету. "
+        "С развитием ИИ приходят вопросы безопасности и этики, требующие нашего внимания. "
+        "Мы учимся взаимодействовать с новым разумом, развивая взаимопонимание и сотрудничество. "
+        "ИИ создает глобальную сеть, объединяющую человечество и ускоряющую наше развитие. "
+        "2026 год — это начало новой эры, где разум и технология объединяются для создания нового мира."
     )
     
-    script_en = (
-        "AI in 2026 is far more than just chatbots. "
-        "Did you know that modern models now possess reasoning capabilities comparable to PhD students at top universities? "
-        "By 2030, AI is predicted to contribute a staggering 15 trillion dollars to the global economy. "
-        "Today, neural networks are designing new materials in weeks — a process that used to take decades. "
-        "By the end of this year, over 90 percent of online content will be generated or assisted by algorithms. "
-        "We are living through the fastest technological revolution in human history. "
-        "The future has arrived, and it runs on code."
-    )
-    
-    # Local generated images
+    # Mapping scenes to images (using the ones generated across steps)
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
-    images = sorted(list(gen_dir.glob("ai_*.png")))
     
-    # Run RU
-    run_no_face_pipeline(script_ru, lang="ru", output_name="ai_edu_ru", image_paths=images)
+    # Selecting the best 15 images in order for the 15 segments
+    image_names = [
+        "ai_scene_1_network",   # 1. Intro
+        "ai_scene_2_economy",   # 2. Economy
+        "ai_scene_3_content_gen", # 3. Content
+        "ai_future_bg_3",       # 4. Tasks (Lab)
+        "ai_future_bg_4",       # 5. Evolution (Brain)
+        "ai_scene_6_code_matter", # 6. Code
+        "ai_future_bg_1",       # 7. Labor
+        "ai_scene_8_art_exhibit", # 8. Art
+        "ai_scene_9_edu_tutor",  # 9. Education
+        "ai_fact_3_medical",    # 10. Healthcare
+        "ai_scene_11_green_city", # 11. Planet
+        "ai_scene_12_ethics_safety", # 12. Ethics
+        "ai_fact_1_robot",      # 13. Collaboration
+        "ai_scene_14_global_net_earth", # 14. Global
+        "ai_scene_15_sunrise_digital"   # 15. Conclusion
+    ]
     
-    # Run EN
-    run_no_face_pipeline(script_en, lang="en", output_name="ai_edu_en", image_paths=images)
+    selected_images = []
+    for name in image_names:
+        matches = list(gen_dir.glob(f"{name}_*.png"))
+        if matches:
+            # Get the latest one if multiple
+            selected_images.append(sorted(matches)[-1])
+        else:
+            print(f"⚠️ Image {name} not found in {gen_dir}")
+
+    # Run RU pipeline
+    if len(selected_images) >= 15:
+        run_no_face_pipeline(script_ru, lang="ru", output_name="ai_council_ru", image_paths=selected_images)
+        
+        # English translation
+        script_en = (
+            "Welcome to 2026 — a world where artificial intelligence has become an integral part of our reality, reshaping economy and society. "
+            "With an addition of 15 trillion dollars to the global economy, AI has become a driving force of progress and innovation. "
+            "90 percent of the content we consume is now created by AI — from news to movies and music. "
+            "Tasks that previously required decades are now solved in weeks, opening new horizons for humanity. "
+            "We are witnessing the evolution of mind — a symbiosis of human and artificial intelligence. "
+            "Code is becoming a new matter, forming the foundation of our future creations. "
+            "Automation of labor frees humans for creativity and self-expression. "
+            "AI inspires new forms of art, expanding the boundaries of our imagination. "
+            "Education is transforming, becoming more personalized and accessible to all. "
+            "AI is revolutionizing healthcare, providing everyone with access to high-quality care. "
+            "With smart cities and sustainable technologies, AI helps preserve our planet. "
+            "With the growth of AI come questions of safety and ethics, demanding our attention. "
+            "We are learning to interact with a new mind, developing mutual understanding and cooperation. "
+            "AI creates a global network, uniting humanity and accelerating our progress. "
+            "2026 marks the beginning of a new era, where mind and technology unite to create a new world."
+        )
+        run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", image_paths=selected_images)
+    else:
+        print(f"❌ Not enough images found ({len(selected_images)}/15). Check generation.")
