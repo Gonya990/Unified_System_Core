@@ -13,6 +13,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
+import { TOP_COUNTRIES } from "@/app/data/countries"
 import { translations, type Translation } from "@/app/data/translations"
 
 
@@ -24,6 +25,8 @@ export default function ConnectivityHub() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isDetected, setIsDetected] = useState(false)
   const [dataVal, setDataVal] = useState(500)
+  const [selectedCountry, setSelectedCountry] = useState("")
+  const [countryOpen, setCountryOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsDetected(true), 2500)
@@ -203,19 +206,77 @@ export default function ConnectivityHub() {
                   <p className={`text-xl ${mutedTextClass} mb-10 max-w-2xl mx-auto`}>
                     {t.hero.b2c_desc}
                   </p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button
-                      size="lg"
-                      className="h-14 px-8 bg-blue-600 hover:bg-blue-500 rounded-full text-lg text-white"
-                      onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                      {t.hero.b2c_btn_1}
-                      <ArrowRight className="ms-2 w-5 h-5" />
-                    </Button>
-                    <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
-                      {t.hero.b2c_btn_2}
-                    </Button>
-                    <div className="mt-8 flex flex-col items-center">
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-2xl">
+                      <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            size="lg"
+                            className="h-14 px-8 bg-blue-600 hover:bg-blue-500 rounded-full text-lg text-white w-full sm:w-[320px] justify-between group overflow-hidden relative"
+                          >
+                            <span className="flex items-center gap-2">
+                              <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                              {selectedCountry || t.hero.b2c_btn_1}
+                            </span>
+                            <ArrowRight className="ms-2 w-5 h-5 opacity-50 group-hover:translate-x-1 transition-transform" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className={`w-[320px] p-0 ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200'}`} align="center">
+                          <Command className={isDark ? 'bg-zinc-900' : 'bg-white'}>
+                            <CommandInput placeholder={t.hero.search_placeholder} className="h-12" />
+                            <CommandList className="max-h-[300px]">
+                              <CommandEmpty>No country found.</CommandEmpty>
+                              <CommandGroup>
+                                {TOP_COUNTRIES.map((c) => (
+                                  <CommandItem
+                                    key={c.code}
+                                    value={c.name}
+                                    onSelect={() => {
+                                      setSelectedCountry(`${c.flag} ${c.name}`);
+                                      setCountryOpen(false);
+                                      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    className="flex items-center gap-3 py-3 cursor-pointer"
+                                  >
+                                    <span className="text-xl">{c.flag}</span>
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{c.name}</span>
+                                      <span className="text-xs opacity-50">{c.region}</span>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+
+                      <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg w-full sm:w-auto ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
+                        {t.hero.b2c_btn_2}
+                      </Button>
+                    </div>
+
+                    {/* Popular Destinations Chips */}
+                    <div className="flex flex-wrap justify-center gap-2 max-w-3xl">
+                      <span className={`text-xs font-bold uppercase tracking-widest ${mutedTextClass} w-full mb-2`}>
+                        {t.hero.popular_dest}
+                      </span>
+                      {TOP_COUNTRIES.slice(0, 10).map((c) => (
+                        <button
+                          key={c.code}
+                          onClick={() => {
+                            setSelectedCountry(`${c.flag} ${c.name}`);
+                            document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all hover:scale-105 active:scale-95 ${isDark ? 'bg-zinc-900 border-white/5 hover:border-blue-500/50 hover:bg-blue-500/10' : 'bg-white border-zinc-200 hover:border-blue-500/50 hover:bg-blue-50/50'}`}
+                        >
+                          <span>{c.flag}</span>
+                          <span>{c.name}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex flex-col items-center">
                       <div className={`flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-1000 ${isDetected ? (isDark ? 'bg-green-500/10 border-green-500/30' : 'bg-green-50 border-green-200') : (isDark ? 'bg-zinc-800 border-white/5' : 'bg-zinc-100 border-zinc-200')}`}>
                         {!isDetected ? (
                           <motion.div
@@ -388,8 +449,8 @@ export default function ConnectivityHub() {
         </div>
       </section>
 
-      {/* Marquee Section */}
-      <div className="py-12 overflow-hidden bg-zinc-900 border-y border-white/5">
+      {/* Marquee Section - Forced LTR to maintain animation direction */}
+      <div className="py-12 overflow-hidden bg-zinc-900 border-y border-white/5" dir="ltr">
         <div className="flex gap-8 items-center animate-scroll whitespace-nowrap min-w-full" style={{
           maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)'
         }}>
@@ -644,7 +705,7 @@ export default function ConnectivityHub() {
 
       {/* Floating Support Button */}
       <motion.a
-        href="https://wa.me/972500000000"
+        href="https://wa.me/message/CONNECT_GLOBAL" // Updated placeholder
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0 }}
