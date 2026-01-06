@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap, BarChart3, Database, Sun, Moon, Languages } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -34,7 +34,16 @@ const translations = {
       b2b_title_2: "Среда Связи.",
       b2b_desc: "Премиум трафик для бизнеса. API интеграция, выделенные каналы, оптовые пакеты данных и управление тысячами подключений.",
       b2b_btn_1: "Начать Интеграцию",
-      b2b_btn_2: "Связаться с Sales"
+      b2b_btn_2: "Связаться с Sales",
+      loc_detecting: "Определяем вашу локацию...",
+      loc_found: "Лучший план для России:"
+    },
+    dashboard: {
+      title: "Live Сетевая Активность",
+      nodes: "Активные узлы",
+      traffic: "Текущий трафик",
+      latency: "Задержка",
+      status: "Статус системы: Штатно"
     },
     stats: {
       countries: "Стран покрытия",
@@ -91,7 +100,16 @@ const translations = {
       b2b_title_2: "Connectivity Env.",
       b2b_desc: "Premium traffic for business. API integration, dedicated channels, wholesale data packages, and management of thousands of connections.",
       b2b_btn_1: "Start Integration",
-      b2b_btn_2: "Contact Sales"
+      b2b_btn_2: "Contact Sales",
+      loc_detecting: "Detecting your location...",
+      loc_found: "Best plan for United Kingdom:"
+    },
+    dashboard: {
+      title: "Live Network Activity",
+      nodes: "Active Nodes",
+      traffic: "Current Traffic",
+      latency: "Latency",
+      status: "System Status: Operational"
     },
     stats: {
       countries: "Countries Covered",
@@ -136,6 +154,12 @@ export default function ConnectivityHub() {
   const [lang, setLang] = useState("ru")
   const [langOpen, setLangOpen] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
+  const [isDetected, setIsDetected] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsDetected(true), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const t = translations[lang as keyof typeof translations] || translations['en'] // Fallback to EN if translation missing
 
@@ -154,8 +178,17 @@ export default function ConnectivityHub() {
       <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-xl transition-colors duration-500 ${navBgClass}`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-500" />
-            <span className="font-bold text-xl tracking-tight">Connect<span className="text-blue-500">.Global</span></span>
+            <Globe className={`w-5 h-5 transition-colors duration-500 ${mode === 'personal' ? 'text-blue-500' : 'text-purple-500'}`} />
+            <span className="font-bold text-xl tracking-tight relative">
+              Connect
+              <span className={`transition-colors duration-500 ${mode === 'personal' ? 'text-blue-500' : 'text-purple-500'}`}>.Global</span>
+              {mode === 'business' && (
+                <motion.div
+                  layoutId="glow"
+                  className="absolute -inset-1 bg-purple-500/20 blur-sm rounded-lg -z-10"
+                />
+              )}
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <a href="#stats" className={`${navTextClass} transition-colors`}>{t.nav.coverage}</a>
@@ -309,6 +342,34 @@ export default function ConnectivityHub() {
                     <Button size="lg" variant="outline" className={`h-14 px-8 rounded-full text-lg ${isDark ? 'border-white/10 hover:bg-white/5 text-white' : 'border-zinc-200 hover:bg-zinc-100 text-black'}`}>
                       {t.hero.b2c_btn_2}
                     </Button>
+                    <div className="mt-8 flex flex-col items-center">
+                      <div className={`flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-1000 ${isDetected ? (isDark ? 'bg-green-500/10 border-green-500/30' : 'bg-green-50 border-green-200') : (isDark ? 'bg-zinc-800 border-white/5' : 'bg-zinc-100 border-zinc-200')}`}>
+                        {!isDetected ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                          >
+                            <Globe className={`w-4 h-4 ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`} />
+                          </motion.div>
+                        ) : (
+                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                            <div className="w-4 h-4 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                          </motion.div>
+                        )}
+                        <span className={`text-sm font-medium ${isDetected ? (isDark ? 'text-green-400' : 'text-green-600') : mutedTextClass}`}>
+                          {isDetected ? `${t.hero.loc_found}` : t.hero.loc_detecting}
+                        </span>
+                        {isDetected && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="font-bold text-sm bg-blue-500 px-2 py-0.5 rounded text-white"
+                          >
+                            15GB / $29
+                          </motion.span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -326,6 +387,59 @@ export default function ConnectivityHub() {
                   <p className={`text-xl ${mutedTextClass} mb-10 max-w-2xl mx-auto`}>
                     {t.hero.b2b_desc}
                   </p>
+
+                  {/* B2B Dashboard Mockup */}
+                  <div className="mb-12 relative max-w-3xl mx-auto">
+                    <div className={`absolute -inset-4 rounded-[40px] blur-3xl opacity-20 bg-purple-600`} />
+                    <div className={`relative p-6 rounded-3xl border ${cardBgClass} backdrop-blur-xl overflow-hidden`}>
+                      <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                          <span className="text-xs font-bold tracking-widest uppercase opacity-70">{t.dashboard.title}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="w-8 h-1 rounded-full bg-zinc-800" />
+                          <div className="w-8 h-1 rounded-full bg-purple-500" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-6 mb-8 text-left">
+                        <div>
+                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.nodes}</p>
+                          <p className="text-2xl font-bold">1,402</p>
+                        </div>
+                        <div>
+                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.traffic}</p>
+                          <p className="text-2xl font-bold text-purple-500">42.8 GB/s</p>
+                        </div>
+                        <div>
+                          <p className={`text-[10px] font-bold uppercase tracking-wider ${mutedTextClass} mb-1`}>{t.dashboard.latency}</p>
+                          <p className="text-2xl font-bold">14ms</p>
+                        </div>
+                      </div>
+
+                      <div className="h-24 w-full flex items-end gap-1">
+                        {[40, 70, 45, 90, 65, 80, 50, 40, 95, 75, 60, 85, 45, 90, 70, 100].map((h, i) => (
+                          <motion.div
+                            key={i}
+                            className="flex-1 bg-gradient-to-t from-purple-500 to-pink-400 rounded-t-sm"
+                            initial={{ height: 0 }}
+                            animate={{ height: `${h}%` }}
+                            transition={{ delay: i * 0.05, duration: 1, repeat: Infinity, repeatType: "reverse" }}
+                          />
+                        ))}
+                      </div>
+
+                      <div className={`mt-4 py-2 border-t ${isDark ? 'border-white/5' : 'border-zinc-200'} flex justify-between items-center`}>
+                        <span className="text-[10px] font-medium opacity-50">{t.dashboard.status}</span>
+                        <div className="flex gap-4">
+                          <span className="text-[10px] font-mono opacity-50">US-EAST-1</span>
+                          <span className="text-[10px] font-mono opacity-50">EU-CENTRAL-1</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Button
                       size="lg"
@@ -415,7 +529,7 @@ export default function ConnectivityHub() {
                to { transform: translateX(-50%); }
             }
             .animate-scroll {
-               animation: scroll 180s linear infinite;
+               animation: scroll 240s linear infinite;
                width: max-content;
             }
             .animate-scroll:hover {
