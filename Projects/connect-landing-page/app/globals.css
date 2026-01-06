@@ -39,6 +39,12 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Fluid Typography Tokens */
+  --font-size-base: clamp(0.9rem, 0.4vw + 0.8rem, 1.1rem);
+  --font-size-h1: clamp(2.5rem, 5vw + 1rem, 5rem);
+  --font-size-h2: clamp(2rem, 3vw + 1rem, 3.5rem);
+  --font-size-h3: clamp(1.5rem, 2vw + 1rem, 2.5rem);
 }
 
 .dark {
@@ -125,10 +131,30 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    font-size: var(--font-size-base);
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01", "kern";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+  }
+
+  h1 {
+    font-size: var(--font-size-h1);
+    line-height: 1;
+    font-weight: 800;
+  }
+
+  h2 {
+    font-size: var(--font-size-h2);
+    line-height: 1.1;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: var(--font-size-h3);
+    line-height: 1.2;
+    font-weight: 600;
   }
 }
 
@@ -191,11 +217,11 @@ input[type="range"]::-moz-range-track {
 
 /* Thumb (Runner) */
 input[type="range"]::-webkit-slider-thumb {
-  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)] border-4 border-blue-500 -mt-3 transition-transform active:scale-90 relative z-10;
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 -mt-3 transition-transform active:scale-90 relative z-10;
 }
 
 input[type="range"]::-moz-range-thumb {
-  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)] border-4 border-blue-500 transition-transform active:scale-90 border-none relative z-10;
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 transition-transform active:scale-90 border-none relative z-10;
 }
 
 /* Filling the track before the thumb */
