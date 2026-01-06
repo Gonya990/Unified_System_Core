@@ -52,9 +52,23 @@ export default function ConnectivityHub() {
   // Handle plan selection and initial config
   const handleSelectPlan = (plan: Plan) => {
     setActivePlan(plan)
-    if (plan.name.includes("Light")) setCustomGB(3)
-    else if (plan.name.includes("Nomad")) setCustomGB(15)
-    else if (plan.name.includes("Ultra")) setCustomGB(50)
+    if (plan.name.includes("Light")) {
+      setCustomGB(3)
+      setCustomMins(100)
+      setHasSMS(false)
+    } else if (plan.name.includes("Nomad")) {
+      setCustomGB(15)
+      setCustomMins(300)
+      setHasSMS(false)
+    } else if (plan.name.includes("Ultra")) {
+      setCustomGB(50)
+      setCustomMins(1000)
+      setHasSMS(true)
+    } else {
+      setCustomGB(5)
+      setCustomMins(150)
+      setHasSMS(false)
+    }
     setCheckoutStep("config")
   }
 
@@ -783,24 +797,23 @@ export default function ConnectivityHub() {
               <div className="p-10">
                 {checkoutStep === "config" && (
                   <div className="space-y-8">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                        <Settings className="w-6 h-6 text-blue-500" />
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-3xl bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
+                        <Settings className="w-8 h-8 text-blue-500" />
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-bold">{t.config.title}</h3>
-                        <p className="text-sm opacity-50">{activePlan?.name} Base</p>
-                      </div>
+                      <h3 className="text-3xl font-black mb-1">{t.config.title}</h3>
+                      <p className={`text-sm ${mutedTextClass}`}>{activePlan?.name} Base</p>
                     </div>
 
-                    <div className="space-y-6">
-                      <div>
-                        <div className="flex justify-between mb-4">
-                          <span className="font-bold flex items-center gap-2">
-                            <Database className="w-4 h-4 opacity-50" />
-                            {t.config.gb}
-                          </span>
-                          <span className="text-blue-500 font-black">{customGB} GB</span>
+                    <div className="space-y-10">
+                      {/* Data Slider */}
+                      <div className="space-y-6">
+                        <div className="flex justify-between items-end">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs font-black uppercase tracking-widest opacity-40">{t.config.gb}</span>
+                            <span className="text-4xl font-black">{customGB}</span>
+                          </div>
+                          <span className="text-blue-500 font-bold text-sm">GB</span>
                         </div>
                         <input
                           type="range"
@@ -808,48 +821,70 @@ export default function ConnectivityHub() {
                           max="100"
                           value={customGB}
                           onChange={(e) => setCustomGB(parseInt(e.target.value))}
-                          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                          className="w-full h-3 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
                         />
+
+                        {/* Usage Visualization */}
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
+                            <div className="text-xl font-black mb-0.5">~{Math.floor(customGB * 1.5)}</div>
+                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_video}</div>
+                          </div>
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
+                            <div className="text-xl font-black mb-0.5">~{customGB * 12}</div>
+                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_music}</div>
+                          </div>
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
+                            <div className="text-xl font-black mb-0.5">~{customGB * 15}</div>
+                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_social}</div>
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <div className="flex justify-between mb-4">
-                          <span className="font-bold flex items-center gap-2">
-                            <Phone className="w-4 h-4 opacity-50" />
-                            {t.config.mins}
-                          </span>
-                          <span className="text-blue-500 font-black">{customMins}</span>
+                      {/* Mins Slider */}
+                      <div className="space-y-6">
+                        <div className="flex justify-between items-end">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs font-black uppercase tracking-widest opacity-40">{t.config.mins}</span>
+                            <span className="text-4xl font-black">{customMins}</span>
+                          </div>
+                          <span className="text-blue-500 font-bold text-sm">MIN</span>
                         </div>
                         <input
                           type="range"
                           min="0"
-                          max="1000"
+                          max="2000"
                           step="50"
                           value={customMins}
                           onChange={(e) => setCustomMins(parseInt(e.target.value))}
-                          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                          className="w-full h-3 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
                         />
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm font-bold">{t.config.sms}</span>
+                      {/* SMS Toggle */}
+                      <div className="flex items-center justify-between p-6 rounded-[32px] bg-white/5 border border-white/5 group hover:bg-white/10 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                            <Zap className="w-5 h-5 text-yellow-500" />
+                          </div>
+                          <span className="font-bold">{t.config.sms}</span>
                         </div>
                         <Switch checked={hasSMS} onCheckedChange={setHasSMS} />
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-white/5">
-                      <div className="flex justify-between items-center mb-6">
-                        <span className="text-xl font-bold">{t.config.total}</span>
-                        <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-                          ${calculateTotal().toFixed(2)}
-                        </span>
+                    <div className="pt-8 border-t border-white/5">
+                      <div className="flex justify-between items-center mb-8">
+                        <span className="text-xl opacity-50 font-bold">{t.config.total}</span>
+                        <div className="text-right">
+                          <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                            ${calculateTotal().toFixed(2)}
+                          </div>
+                        </div>
                       </div>
                       <Button
                         size="lg"
-                        className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg shadow-[0_10px_30px_rgba(37,99,235,0.3)]"
+                        className="w-full h-16 rounded-[24px] bg-blue-600 hover:bg-blue-500 text-white font-black text-xl shadow-[0_20px_50px_rgba(37,99,235,0.4)] transition-transform active:scale-95"
                         onClick={() => setCheckoutStep("payment")}
                       >
                         {t.config.confirm}
