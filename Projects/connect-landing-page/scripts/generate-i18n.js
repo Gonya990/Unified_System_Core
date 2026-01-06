@@ -114,7 +114,9 @@ const sourceTranslation = {
         total: "Monthly Total",
         usage_video: "video hours",
         usage_music: "music hours",
-        usage_social: "social browsing"
+        usage_social: "social browsing",
+        vpn: "Secure Tunnel (VPN)",
+        never_expire: "Never Expire"
     },
     checkout: {
         title: "Secure Checkout",
@@ -127,6 +129,23 @@ const sourceTranslation = {
         success: "Activation Successful!",
         success_desc: "Your eSIM is ready. Check your email for the QR code.",
         close: "Close"
+    },
+    developer: {
+        title: "Developer Preview",
+        subtitle: "Integrate eSIM in minutes",
+        bash_tab: "Bash/Curl",
+        js_tab: "Javascript",
+        copy: "Copy Code",
+        copied: "Copied!"
+    },
+    wizard: {
+        title: "Travel Assistant",
+        desc: "Help me choose the best plan for my trip",
+        btn: "Start Wizard",
+        step_1: "Where are you going?",
+        step_2: "Duration of stay?",
+        step_3: "Planned usage?",
+        result: "Recommended for you"
     },
     footer: "Connect.Global © 2026. All Systems Operational."
 };
@@ -224,7 +243,9 @@ const overrides = {
             total: "Итого в месяц",
             usage_video: "часов видео",
             usage_music: "часов музыки",
-            usage_social: "соцсети и мессенджеры"
+            usage_social: "соцсети и мессенджеры",
+            vpn: "Защищенный туннель (VPN)",
+            never_expire: "Без срока действия"
         },
         checkout: {
             title: "Безопасная оплата",
@@ -237,6 +258,23 @@ const overrides = {
             success: "Активация успешна!",
             success_desc: "Ваша eSIM готова. Проверьте почту для получения QR-кода.",
             close: "Закрыть"
+        },
+        developer: {
+            title: "Для разработчиков",
+            subtitle: "Интеграция eSIM за считанные минуты",
+            bash_tab: "Bash/Curl",
+            js_tab: "Javascript",
+            copy: "Копировать",
+            copied: "Скопировано!"
+        },
+        wizard: {
+            title: "Помощник в поездке",
+            desc: "Помогите выбрать лучший план для моей поездки",
+            btn: "Начать подбор",
+            step_1: "Куда вы летите?",
+            step_2: "Длительность поездки?",
+            step_3: "Как планируете использовать?",
+            result: "Мы рекомендуем"
         },
         footer: "Connect.Global © 2026. Все системы работают штатно."
     },
@@ -331,7 +369,9 @@ const overrides = {
             total: "סה\"כ לחודש",
             usage_video: "שעות וידאו",
             usage_music: "שעות מוזיקה",
-            usage_social: "רשתות חברתיות"
+            usage_social: "רשתות חברתיות",
+            vpn: "מנהרה מאובטחת (VPN)",
+            never_expire: "לעולם לא פג תוקף"
         },
         checkout: {
             title: "תשלום מאובטח",
@@ -344,6 +384,23 @@ const overrides = {
             success: "ההפעלה הצליחה!",
             success_desc: "ה-eSIM שלך מוכן. בדוק את האימייל שלך עבור קוד ה-QR.",
             close: "סגור"
+        },
+        developer: {
+            title: "תצוגה למפתחים",
+            subtitle: "שלב eSIM תוך דקות",
+            bash_tab: "Bash/Curl",
+            js_tab: "Javascript",
+            copy: "העתק קוד",
+            copied: "הועתק!"
+        },
+        wizard: {
+            title: "עוזר נסיעות",
+            desc: "עזור לי לבחור את התוכנית הטובה ביותר לנסיעה שלי",
+            btn: "התחל עוזר",
+            step_1: "לאן אתם טסים?",
+            step_2: "משך השהות?",
+            step_3: "שימוש מתוכנן?",
+            result: "מומלץ עבורך"
         },
         footer: "Connect.Global © 2026. כל המערכות פועלות כסדרן."
     }
@@ -394,11 +451,20 @@ export interface Translation {
   config: {
     title: string; gb: string; mins: string; sms: string; confirm: string; total: string;
     usage_video: string; usage_music: string; usage_social: string;
+    vpn: string; never_expire: string;
   };
   checkout: {
     title: string; step_final: string; apple_pay: string; plan: string;
     config: string; total_due: string; pay_now: string; success: string;
     success_desc: string; close: string;
+  };
+  developer: {
+    title: string; subtitle: string; bash_tab: string; js_tab: string;
+    copy: string; copied: string;
+  };
+  wizard: {
+    title: string; desc: string; btn: string; step_1: string; step_2: string;
+    step_3: string; result: string;
   };
   footer: string;
 }

@@ -6,7 +6,7 @@ import {
   Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap,
   BarChart3, Database, Sun, Moon, Languages, Quote, Phone,
   CreditCard, CheckCircle, Download, User, Settings, Star,
-  Check, ChevronsUpDown
+  Check, ChevronsUpDown, Code, Copy
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -56,6 +56,13 @@ export default function ConnectivityHub() {
   const [currency, setCurrency] = useState(CURRENCIES[0])
   const [currencyOpen, setCurrencyOpen] = useState(false)
 
+  // Travel Wizard & Advanced Options
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [wizardStep, setWizardStep] = useState(1)
+  const [wizardData, setWizardData] = useState({ destination: "", duration: "", usage: "" })
+  const [neverExpiring, setNeverExpiring] = useState(false)
+  const [vpnEnabled, setVpnEnabled] = useState(false)
+
   const t: Translation = translations[lang] || translations['en']
 
   // Handle plan selection and initial config
@@ -88,7 +95,7 @@ export default function ConnectivityHub() {
     const baseGB = activePlan.name.includes("Light") ? 3 : activePlan.name.includes("Nomad") ? 15 : 50
     const extraGB = Math.max(0, customGB - baseGB)
     const extraMins = Math.max(0, customMins - 100)
-    const totalUSD = base + (extraGB * 2) + (extraMins * 0.05) + (hasSMS ? 5 : 0)
+    const totalUSD = base + (extraGB * 2) + (extraMins * 0.05) + (hasSMS ? 5 : 0) + (neverExpiring ? 5 : 0) + (vpnEnabled ? 3 : 0)
     return totalUSD * currency.rate
   }
 
@@ -437,6 +444,26 @@ export default function ConnectivityHub() {
                         )}
                       </div>
                     </div>
+
+                    {/* Travel Wizard CTA */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      onClick={() => setWizardOpen(true)}
+                      className={`mt-12 p-1 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 border border-white/10 inline-flex items-center gap-4 pr-6 pl-2 backdrop-blur-sm group cursor-pointer hover:border-blue-500/50 transition-colors shadow-2xl overflow-hidden relative`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10 animate-pulse" />
+                      <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center relative z-10 group-hover:rotate-12 transition-transform shadow-lg">
+                        <Star className="w-5 h-5 text-white fill-white" />
+                      </div>
+                      <div className="relative z-10 text-start">
+                        <div className="text-xs font-black uppercase tracking-tighter opacity-50">{t.wizard.title}</div>
+                        <div className="text-sm font-bold flex items-center gap-1 text-start">
+                          {t.wizard.desc}
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 </>
               ) : (
@@ -516,6 +543,38 @@ export default function ConnectivityHub() {
                       </svg>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/0 via-transparent to-transparent" />
                     </div>
+                  </motion.div>
+
+                  {/* API Developer Preview Section */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    className="mt-12 text-start max-w-5xl mx-auto w-full"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <Code className="w-6 h-6 text-purple-500" />
+                      <h3 className="text-xl font-bold">{t.developer.title}</h3>
+                    </div>
+                    <div className={`rounded-2xl border border-white/10 ${bgClass} overflow-hidden shadow-xl`}>
+                      <div className="flex border-b border-white/5 bg-white/5 overflow-x-auto">
+                        <button className="px-6 py-3 text-xs font-bold border-r border-white/5 bg-white/5 whitespace-nowrap">{t.developer.bash_tab}</button>
+                        <button className="px-6 py-3 text-xs font-bold opacity-40 hover:opacity-100 transition-opacity whitespace-nowrap">Node.js</button>
+                        <button className="px-6 py-3 text-xs font-bold opacity-40 hover:opacity-100 transition-opacity whitespace-nowrap">Python</button>
+                        <div className="flex-grow" />
+                        <button className="px-4 py-3 text-xs flex items-center gap-2 hover:bg-white/5 transition-colors group">
+                          <Copy className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
+                          <span className="opacity-40">{t.developer.copy}</span>
+                        </button>
+                      </div>
+                      <pre className="p-8 text-sm overflow-x-auto font-mono bg-zinc-950/50">
+                        <code>
+                          <span className="text-purple-400">curl</span> -X POST <span className="text-zinc-500">&quot;https://api.connect.global/v1/plans/order&quot;</span> \<br />
+                          &nbsp;&nbsp;-H <span className="text-zinc-500">&quot;Authorization: Bearer YOUR_API_KEY&quot;</span> \<br />
+                          &nbsp;&nbsp;-d <span className="text-zinc-500">&quot;country=IL&gb=10&duration=30&quot;</span>
+                        </code>
+                      </pre>
+                    </div>
+                    <p className={`mt-4 text-xs font-medium uppercase tracking-widest ${mutedTextClass} opacity-50`}>{t.developer.subtitle}</p>
                   </motion.div>
                 </>
               )}
@@ -861,6 +920,103 @@ export default function ConnectivityHub() {
         </p>
       </footer>
 
+      {/* Travel Wizard Modal */}
+      <AnimatePresence>
+        {wizardOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-xl p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              className={`w-full max-w-md rounded-[40px] border border-white/10 ${bgClass} shadow-2xl p-10 relative overflow-hidden`}
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl -z-10" />
+              <button
+                onClick={() => setWizardOpen(false)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/5 flex items-center justify-center hover:bg-white/10 transition-colors z-10"
+              >
+                &times;
+              </button>
+
+              <div className="space-y-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-blue-600/20 flex items-center justify-center mx-auto mb-4">
+                    <Star className="w-8 h-8 text-blue-500" />
+                  </div>
+                  <h3 className="text-2xl font-black">{t.wizard.title}</h3>
+                  <p className={`text-sm ${mutedTextClass}`}>{t.wizard.desc}</p>
+                </div>
+
+                <div className="space-y-6">
+                  {wizardStep === 1 && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_1}</label>
+                      <input
+                        placeholder="Search country..."
+                        className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 focus:border-blue-500/50 outline-none transition-colors"
+                        onChange={(e) => setWizardData({ ...wizardData, destination: e.target.value })}
+                      />
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {['🇬🇧 UK', '🇺🇸 USA', '🇯🇵 Japan'].map(c => (
+                          <button key={c} onClick={() => setWizardStep(2)} className="px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs hover:border-blue-500/50 transition-colors">
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {wizardStep === 2 && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_2}</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {['1-7 days', '30 days', '90 days', '1 year'].map(d => (
+                          <button key={d} onClick={() => setWizardStep(3)} className="h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-center font-bold hover:border-blue-500/50 transition-colors">
+                            {d}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {wizardStep === 3 && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-black uppercase tracking-widest opacity-40">{t.wizard.step_3}</label>
+                      <div className="space-y-3">
+                        {['Basic browsing', 'Work & Video Calls', 'Heavy Streaming (4K)'].map(u => (
+                          <button key={u} onClick={() => {
+                            setWizardOpen(false);
+                            setWizardStep(1);
+                            handleSelectPlan({ name: 'Nomad Assistant', price: '$29', desc: 'Custom optimized for your trip', features: ['Optimized Coverage'] });
+                          }} className="w-full h-14 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-start px-6 font-bold hover:border-blue-500/50 transition-colors">
+                            {u}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center pt-8">
+                  <div className="flex gap-2">
+                    {[1, 2, 3].map(s => (
+                      <div key={s} className={`w-2 h-2 rounded-full transition-all ${wizardStep === s ? 'w-6 bg-blue-500' : 'bg-white/10'}`} />
+                    ))}
+                  </div>
+                  {wizardStep > 1 && (
+                    <button onClick={() => setWizardStep(wizardStep - 1)} className="text-xs font-bold opacity-40 hover:opacity-100 uppercase tracking-widest">Back</button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Plan Configuration Overlay */}
       <AnimatePresence>
         {checkoutStep && (
@@ -970,6 +1126,34 @@ export default function ConnectivityHub() {
                           <span className="font-bold">{t.config.sms}</span>
                         </div>
                         <Switch checked={hasSMS} onCheckedChange={setHasSMS} />
+                      </div>
+
+                      {/* Advanced Toggles */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-6 rounded-[32px] bg-white/5 border border-white/5 group hover:bg-white/10 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                              <ShieldCheck className="w-5 h-5 text-blue-500" />
+                            </div>
+                            <div>
+                              <div className="font-bold">Secure Tunnel (VPN)</div>
+                              <div className="text-[10px] opacity-40 font-bold uppercase tracking-widest">+ $3 / pack</div>
+                            </div>
+                          </div>
+                          <Switch checked={vpnEnabled} onCheckedChange={setVpnEnabled} />
+                        </div>
+                        <div className="flex items-center justify-between p-6 rounded-[32px] bg-white/5 border border-white/5 group hover:bg-white/10 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                              <Wifi className="w-5 h-5 text-purple-500" />
+                            </div>
+                            <div>
+                              <div className="font-bold">Never Expire</div>
+                              <div className="text-[10px] opacity-40 font-bold uppercase tracking-widest">+ $5 / pack</div>
+                            </div>
+                          </div>
+                          <Switch checked={neverExpiring} onCheckedChange={setNeverExpiring} />
+                        </div>
                       </div>
                     </div>
 
