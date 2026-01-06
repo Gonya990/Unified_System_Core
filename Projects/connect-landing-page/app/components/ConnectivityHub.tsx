@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap, BarChart3, Database, Sun, Moon, Languages } from "lucide-react"
+import { Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap, BarChart3, Database, Sun, Moon, Languages, Quote, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { motion, AnimatePresence } from "framer-motion"
@@ -552,7 +552,6 @@ export default function ConnectivityHub() {
                   <ul className={`space-y-3 mb-8 text-sm ${mutedTextClass}`}>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      {/* B2B traffic calc */}
                       {plan.tb < 1 ? plan.tb * 1000 : plan.tb} {plan.tb < 1 ? 'GB' : 'TB'} {t.pricing.units.traffic}
                     </li>
                     <li className="flex items-center gap-2">
@@ -572,7 +571,94 @@ export default function ConnectivityHub() {
             </>
           )}
         </motion.div>
+
+        {/* B2B ROI Calculator Section */}
+        {mode === 'business' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            className="max-w-4xl mx-auto px-6 py-20"
+          >
+            <div className={`p-10 rounded-[40px] border ${cardBgClass} backdrop-blur-3xl text-center relative overflow-hidden`}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-purple-500/10 blur-[100px]" />
+              <h2 className="text-3xl font-bold mb-10">{t.calculator.title}</h2>
+
+              <div className="mb-12 max-w-xl mx-auto">
+                <div className="flex justify-between mb-4 text-sm font-bold uppercase tracking-widest opacity-70">
+                  <span>{t.calculator.label}</span>
+                  <span className="text-purple-500">{(window as any).dataVal || 500} GB</span>
+                </div>
+                <input
+                  type="range"
+                  min="100"
+                  max="10000"
+                  step="100"
+                  defaultValue="500"
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    const savingElem = document.getElementById('saving-val');
+                    if (savingElem) savingElem.innerText = `$${(val * 2.5).toLocaleString()}`;
+                    (window as any).dataVal = val;
+                  }}
+                  className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+              </div>
+
+              <div className="inline-block p-8 rounded-3xl bg-purple-500/5 border border-purple-500/20">
+                <p className={`text-sm ${mutedTextClass} mb-2`}>{t.calculator.saving}</p>
+                <p id="saving-val" className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
+                  $1,250
+                </p>
+                <p className="text-sm font-bold mt-2 opacity-70 uppercase tracking-widest">{t.calculator.per_year}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Testimonials Section */}
+        <section className="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
+          <h2 className="text-3xl font-bold text-center mb-16">{t.testimonials.title}</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {t.testimonials.items.map((item: any, i: number) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                className={`p-8 rounded-3xl border ${cardBgClass} relative`}
+              >
+                <Quote className="absolute top-6 rtl:left-6 ltr:right-6 w-8 h-8 opacity-10" />
+                <p className="text-lg italic mb-6 leading-relaxed opacity-90">&ldquo;{item.text}&rdquo;</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center font-bold text-white shadow-lg">
+                    {item.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-bold">{item.name}</p>
+                    <p className={`text-xs ${mutedTextClass}`}>{item.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
       </section >
+
+      {/* Floating Support Button */}
+      <motion.a
+        href="https://wa.me/972500000000"
+        target="_blank"
+        rel="noopener noreferrer"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        className="fixed bottom-8 rtl:left-8 ltr:right-8 z-[100] w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-2xl overflow-hidden group"
+      >
+        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+        <Phone className="w-8 h-8 text-white relative z-10" />
+        <span className="absolute rtl:right-20 ltr:left-[-180px] bg-black text-white px-4 py-2 rounded-xl text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+          {t.hero.support_whatsapp}
+        </span>
+      </motion.a>
 
       <footer className={`py-8 text-center text-sm ${mutedTextClass}`}>
         {t.footer}
