@@ -156,9 +156,9 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
 
 def assemble_slideshow_video(audio_path: Path, images: List[Path], output_path: Path):
     """
-    Create a slideshow video from images, matched to audio length with cross-fades
+    Create a professional slideshow with Ken Burns (zoom) effect
     """
-    print(f"🖼 Assembling slideshow from {len(images)} images...")
+    print(f"🖼 Assembling professional slideshow from {len(images)} images...")
     
     audio_duration = float(subprocess.run([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -166,51 +166,53 @@ def assemble_slideshow_video(audio_path: Path, images: List[Path], output_path: 
     ], capture_output=True, text=True).stdout.strip())
     
     if not images:
-        print("❌ No images provided for slideshow")
+        print("❌ No images provided")
         return False
         
     img_duration = audio_duration / len(images)
-    fade_duration = 0.5
     
-    # Construct complex filter for cross-fades
-    filter_complex = ""
-    inputs = ""
+    # We will use a complex filter to generate zoom effects for each image and then concat them
+    # This is more robust than simple concat for "movement"
+    
+    segments = []
     for i, img in enumerate(images):
-        inputs += f"-loop 1 -t {img_duration + fade_duration} -i {img} "
-        # Scale and crop to vertical 1080x1920
-        filter_complex += f"[{i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1"
-        if i > 0:
-            # Add fade from previous
-            prev_idx = i - 1
-            start_fade = i * img_duration - fade_duration
-            filter_complex += f",fade=t=in:st=0:d={fade_duration}[v{i}];"
-            if i == 1:
-                filter_complex = f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1[v0];" + filter_complex
-            # This is complex to do correctly in a loop for many images.
-            # Simpler version: just concat them
-    
-    # Fallback to simple concat for simplicity in script
-    concat_file = OUTPUT_DIR / "img_concat.txt"
-    with open(concat_file, "w") as f:
-        for img in images:
-            f.write(f"file '{img}'\nduration {img_duration}\n")
-        f.write(f"file '{images[-1]}'\n") # Last image needs to be repeated or it stops
+        seg_path = OUTPUT_DIR / f"seg_zoom_{i}.mp4"
+        # Ken Burns effect: zoom in slowly
+        # scale=8000:-1: zooming works better on higher res
+        # zoompan: zoom=zoom+0.001 (slow zoom)
+        cmd = [
+            "ffmpeg", "-y", "-loop", "1", "-i", str(img),
+            "-t", str(img_duration),
+            "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+                   "zoompan=z='zoom+0.0005':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125:s=1080x1920",
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
+            str(seg_path)
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
+        segments.append(seg_path)
         
-    video_no_audio = OUTPUT_DIR / "temp_slideshow.mp4"
+    # Concat segments
+    concat_file = OUTPUT_DIR / "seg_concat.txt"
+    with open(concat_file, "w") as f:
+        for seg in segments:
+            f.write(f"file '{seg.name}'\n")
+            
+    video_no_audio = OUTPUT_DIR / "temp_motion_video.mp4"
     subprocess.run([
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_file),
-        "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
-        str(video_no_audio)
+        "-c", "copy", str(video_no_audio)
     ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
     
-    # Merge with audio
+    # Final merge
     subprocess.run([
         "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
         "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
         "-shortest", str(output_path)
     ], check=True, capture_output=True)
     
+    # Cleanup
+    for seg in segments: seg.unlink()
     video_no_audio.unlink()
     concat_file.unlink()
     return True
@@ -227,41 +229,55 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     # 2. Visuals (B-Roll or Slideshow)
     raw_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
     
-    clips = []
-    if not image_paths:
-        try:
-            clips = semantic_search_broll(text, BROLL_DIR, num_clips=5)
-        except:
-            print("⚠️ B-Roll search failed.")
-            
-    if clips:
-        assemble_broll_only_video(audio_path, clips, raw_video)
-    elif image_paths:
+    if image_paths:
         assemble_slideshow_video(audio_path, image_paths, raw_video)
     else:
-        print("❌ No visual assets found.")
-        return None
+        # Fallback to B-Roll
+        clips = semantic_search_broll(text, BROLL_DIR, num_clips=5)
+        if clips:
+            assemble_broll_only_video(audio_path, clips, raw_video)
+        else:
+            print("❌ No visual assets found.")
+            return None
     
     # 3. Subtitles
     final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
-    # Fallback if pycaps is missing
     if not add_subtitles(raw_video, final_video, lang):
         print("⚠️ Subtitles failed, using raw video.")
+        if final_video.exists(): final_video.unlink()
         raw_video.rename(final_video)
         
     print(f"\n✨ DONE: {final_video}")
     return final_video
 
 if __name__ == "__main__":
-    test_text_ru = "Искусственный интеллект меняет мир прямо сейчас. Пока ты смотришь это видео, тысячи нейросетей обучаются решать твои задачи."
-    test_text_en = "Artificial intelligence is changing the world right now. While you watch this video, thousands of neural networks are learning to solve your problems."
+    # Extended Script with Facts
+    script_ru = (
+        "Искусственный интеллект в 2026 году — это не просто чат-боты. "
+        "Знаете ли вы, что современные модели уже обладают уровнем логики, сопоставимым с докторантами топовых вузов? "
+        "К 2030 году вклад ИИ в мировую экономику составит невероятные 15 триллионов долларов. "
+        "Уже сегодня нейросети проектируют новые материалы за недели, на что раньше уходили десятилетия. "
+        "А к концу этого года более 90 процентов цифрового контента будет создано при поддержке алгоритмов. "
+        "Мы живем в эпоху самой быстрой технологической революции в истории человечества. "
+        "Будущее уже наступило, и оно работает на коде."
+    )
+    
+    script_en = (
+        "AI in 2026 is far more than just chatbots. "
+        "Did you know that modern models now possess reasoning capabilities comparable to PhD students at top universities? "
+        "By 2030, AI is predicted to contribute a staggering 15 trillion dollars to the global economy. "
+        "Today, neural networks are designing new materials in weeks — a process that used to take decades. "
+        "By the end of this year, over 90 percent of online content will be generated or assisted by algorithms. "
+        "We are living through the fastest technological revolution in human history. "
+        "The future has arrived, and it runs on code."
+    )
     
     # Local generated images
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
-    images = list(gen_dir.glob("ai_future_bg_*.png"))
+    images = sorted(list(gen_dir.glob("ai_*.png")))
     
     # Run RU
-    run_no_face_pipeline(test_text_ru, lang="ru", output_name="ai_future_ru", image_paths=images)
+    run_no_face_pipeline(script_ru, lang="ru", output_name="ai_edu_ru", image_paths=images)
     
     # Run EN
-    run_no_face_pipeline(test_text_en, lang="en", output_name="ai_future_en", image_paths=images)
+    run_no_face_pipeline(script_en, lang="en", output_name="ai_edu_en", image_paths=images)
