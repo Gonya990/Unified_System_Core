@@ -50,4 +50,8 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
-
+# Local Venv and Assets
+venv_content/
+outputs/
+inputs/
+broll/
