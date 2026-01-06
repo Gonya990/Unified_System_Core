@@ -1,4 +1,5 @@
-const fs = require('fs');
+import fs from 'fs';
+
 
 const ALL_LANGUAGES = [
     { value: "en", label: "English" },
