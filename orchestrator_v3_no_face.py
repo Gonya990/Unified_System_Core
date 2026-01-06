@@ -39,12 +39,12 @@ BROLL_DIR.mkdir(exist_ok=True)
 
 # Voice options (OpenAI TTS preferred, Edge-TTS fallback)
 VOICES = {
-    "en": "onyx",        # OpenAI Male (Premium)
-    "en_female": "nova",   # OpenAI Female (Premium)
-    "ru": "onyx",        # OpenAI Male (Premium)
-    "ru_female": "nova",   # OpenAI Female (Premium)
+    "en": "alloy",       # More neutral/pro
+    "en_female": "shimmer",
+    "ru": "alloy",       # Clear, professional male
+    "ru_female": "shimmer",
     "fallback_ru": "ru-RU-DmitryNeural",
-    "fallback_en": "en-US-EmmaNeural" # Newer, more natural than Christopher
+    "fallback_en": "en-US-EmmaNeural"
 }
 
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
@@ -180,7 +180,7 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
             "ffmpeg", "-y", "-i", str(clip),
             "-t", str(target_duration),
             "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920", # Vertical format
-            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-pix_fmt", "yuv4202p",
             str(trimmed_path)
         ], check=True, capture_output=True)
         
@@ -217,10 +217,10 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
 
 def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path):
     """
-    Create a professional hybrid video with images, B-roll, and smooth transitions.
-    scenes: list of {'image': Path, 'keyword': str}
+    Create a HIGH-ENERGY hybrid video. 
+    Prioritizes B-Roll (80%) and uses AI Images as stylized flashes (20%).
     """
-    print(f"🎬 Assembling ENHANCED hybrid video sequence...")
+    print(f"🔥 Assembling DYNAMIC high-energy video sequence...")
     
     audio_duration = float(subprocess.run([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -232,67 +232,71 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     
     segments = []
     
-    # We will try to fetch 1 B-roll clip for each scene to mix with the image
     for i, scene in enumerate(scenes):
         img_path = scene['image']
         keyword = scene['keyword']
         
-        # Determine motion (alternate zoom in/out)
-        zoom_expr = "zoom+0.0006" if i % 2 == 0 else "zoom-0.0006"
-        start_zoom = "1" if i % 2 == 0 else "1.1"
+        # 1. B-Roll Segment (Hero - 80% of time)
+        broll_duration = seg_duration * 0.8
+        img_duration = seg_duration * 0.2
         
-        # Segment 1: The AI Image (half the scene duration)
-        seg_path_img = OUTPUT_DIR / f"hybrid_seg_{i}_img.mp4"
+        # Fast cutting: We try to get 2 clips per keyword to keep it moving
+        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=2)
+        
+        if broll_clips:
+            # First clip
+            clip_path = broll_clips[0]
+            seg_path_b1 = OUTPUT_DIR / f"dyn_seg_{i}_b1.mp4"
+            subprocess.run([
+                "ffmpeg", "-y", "-i", str(clip_path),
+                "-t", str(broll_duration / 2),
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:brightness=0.02:saturation=1.3",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_path_b1)
+            ], check=True, capture_output=True)
+            segments.append(seg_path_b1)
+            
+            # Second clip (if exists) or stylized image flash
+            if len(broll_clips) > 1:
+                clip_path_2 = broll_clips[1]
+                seg_path_b2 = OUTPUT_DIR / f"dyn_seg_{i}_b2.mp4"
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", str(clip_path_2),
+                    "-t", str(broll_duration / 2),
+                    "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:saturation=1.2",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_path_b2)
+                ], check=True, capture_output=True)
+                segments.append(seg_path_b2)
+            else:
+                img_duration += broll_duration / 2
+        else:
+            img_duration = seg_duration
+
+        # 2. AI Image Segment (Visionary Flash with aggressive pan)
+        seg_path_img = OUTPUT_DIR / f"dyn_seg_{i}_img.mp4"
+        # Dynamic pan direction
+        x_expr = "iw/2-(iw/zoom/2)"
+        y_expr = f"ih/2-(ih/zoom/2)+({'100' if i%2==0 else '-100'}*t/d)"
+        
         cmd_img = [
             "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
-            "-t", str(seg_duration / 2),
-            "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-                   f"zoompan=z='{zoom_expr}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,"
-                   f"unsharp=5:5:1.0:5:5:0.0", # Sharpen for premium look
+            "-t", str(img_duration),
+            "-vf", f"scale=2000:-1,zoompan=z='1.1':x='{x_expr}':y='{y_expr}':d=1:s=1080x1920:fps=30,"
+                   f"vignette=angle=0.3,unsharp=5:5:1.0:5:5:0.0",
             "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
             str(seg_path_img)
         ]
         subprocess.run(cmd_img, check=True, capture_output=True)
         segments.append(seg_path_img)
-        
-        # Segment 2: B-Roll (the other half)
-        seg_path_broll = OUTPUT_DIR / f"hybrid_seg_{i}_broll.mp4"
-        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=1)
-        
-        if broll_clips:
-            clip = broll_clips[0]
-            subprocess.run([
-                "ffmpeg", "-y", "-i", str(clip),
-                "-t", str(seg_duration / 2),
-                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-                       "hue=s=1.2", # Vivid color boost
-                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30",
-                str(seg_path_broll)
-            ], check=True, capture_output=True)
-            segments.append(seg_path_broll)
-        else:
-            # Fallback to another image zoom if no B-roll found
-            seg_path_fallback = OUTPUT_DIR / f"hybrid_seg_{i}_fallback.mp4"
-            subprocess.run([
-                "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
-                "-t", str(seg_duration / 2),
-                "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-                       f"zoompan=z='zoom+0.0003':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30",
-                "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
-                str(seg_path_fallback)
-            ], check=True, capture_output=True)
-            segments.append(seg_path_fallback)
 
-    # Concat all segments with simple concat protocol first (faster)
-    concat_file = OUTPUT_DIR / "hybrid_concat.txt"
+    # Concat
+    concat_file = OUTPUT_DIR / "dyn_concat.txt"
     with open(concat_file, "w") as f:
         for seg in segments:
             f.write(f"file '{seg.name}'\n")
             
-    video_no_audio = OUTPUT_DIR / "temp_hybrid_video.mp4"
+    video_no_audio = OUTPUT_DIR / "temp_dynamic_video.mp4"
     subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", str(concat_file),
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
         "-c", "copy", str(video_no_audio)
     ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
     
