@@ -5,7 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.96 0.01 70); /* Warm Beige approx */
+  --background: oklch(0.96 0.01 70);
+  /* Warm Beige approx */
   --foreground: oklch(0.2 0.01 20);
   --card: oklch(0.98 0 0);
   --card-foreground: oklch(0.2 0.01 20);
@@ -41,7 +42,8 @@
 }
 
 .dark {
-  --background: oklch(0.18 0.01 240); /* Soft Dark approx */
+  --background: oklch(0.18 0.01 240);
+  /* Soft Dark approx */
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.22 0.01 240);
   --card-foreground: oklch(0.985 0 0);
@@ -120,7 +122,66 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+}
+
+/* Custom Scrollbar for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.4 0.01 240 / 0.2) transparent;
+}
+
+.dark * {
+  scrollbar-color: oklch(0.8 0.01 240 / 0.1) transparent;
+}
+
+/* Custom Scrollbar for Windows/Linux/Chrome */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.4 0.01 240 / 0.2);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.4 0.01 240 / 0.4);
+  background-clip: content-box;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.8 0.01 240 / 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.8 0.01 240 / 0.2);
+}
+
+/* Platform Fixes */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type="range"] {
+  accent-color: var(--primary);
+}
+
+/* Focus Ring for accessibility across all Input types */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }

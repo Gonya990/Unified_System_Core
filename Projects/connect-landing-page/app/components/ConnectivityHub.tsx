@@ -98,8 +98,28 @@ export default function ConnectivityHub() {
     return `${currency.symbol}${(num * currency.rate).toFixed(currency.code === 'RUB' ? 0 : 2)}`
   }
 
+  const [platform, setPlatform] = useState({ os: "unknown", browser: "unknown" })
+
   useEffect(() => {
     const timer = setTimeout(() => setIsDetected(true), 2500)
+
+    // Platform detection (Client-only)
+    const ua = window.navigator.userAgent.toLowerCase()
+    const detectedOS = ua.includes("win") ? "windows" :
+      ua.includes("mac") ? "mac" :
+        ua.includes("linux") ? "linux" :
+          ua.includes("android") ? "android" :
+            (ua.includes("iphone") || ua.includes("ipad")) ? "ios" : "unknown"
+
+    const detectedBrowser = (ua.includes("chrome") && !ua.includes("edg") && !ua.includes("opr")) ? "chrome" :
+      (ua.includes("safari") && !ua.includes("chrome")) ? "safari" :
+        ua.includes("edg") ? "edge" :
+          ua.includes("firefox") ? "firefox" :
+            (ua.includes("opr") || ua.includes("opera")) ? "opera" : "unknown"
+
+    Promise.resolve().then(() => {
+      setPlatform({ os: detectedOS, browser: detectedBrowser })
+    })
     return () => clearTimeout(timer)
   }, [])
 
@@ -116,7 +136,7 @@ export default function ConnectivityHub() {
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className={`min-h-screen ${bgClass} ${textClass} ${isDark ? 'dark' : ''} selection:bg-blue-500/30 font-sans transition-colors duration-500`}
+      className={`min-h-screen ${bgClass} ${textClass} ${isDark ? 'dark' : ''} selection:bg-blue-500/30 font-sans transition-all duration-500 antialiased`}
     >
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-xl transition-colors duration-500 ${navBgClass}`}>
@@ -294,9 +314,15 @@ export default function ConnectivityHub() {
             >
               {mode === "personal" ? (
                 <>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs mb-8">
-                    <Wifi className="w-3 h-3" />
-                    <span>{t.hero.b2c_tag}</span>
+                  <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs">
+                      <Wifi className="w-3 h-3" />
+                      <span>{t.hero.b2c_tag}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-500/10 border border-zinc-500/20 text-zinc-500 text-[10px] uppercase font-bold tracking-widest">
+                      <Settings className="w-2.5 h-2.5" />
+                      <span>{platform.os !== "unknown" ? `${platform.os} × ${platform.browser}` : "Cross-Platform"} optimized</span>
+                    </div>
                   </div>
                   <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">
                     {t.hero.b2c_title_1} <br />
@@ -656,7 +682,7 @@ export default function ConnectivityHub() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {(mode === 'personal'
             ? [
               { id: 'light', price: '$9', features: [t.pricing.units.instant, t.pricing.units.hidden_fees], color: 'blue' },
@@ -978,8 +1004,12 @@ export default function ConnectivityHub() {
                     </div>
 
                     <div className="space-y-3">
-                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold transition-transform active:scale-95">
-                        {t.checkout.apple_pay}
+                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold transition-transform active:scale-95 flex items-center justify-center gap-2">
+                        {platform.os === "mac" || platform.os === "ios" ? (
+                          <><Download className="w-5 h-5" /> {t.checkout.apple_pay}</>
+                        ) : (
+                          <><CreditCard className="w-5 h-5" /> Google Pay / Card</>
+                        )}
                       </Button>
                       <Button
                         className="w-full h-14 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 font-bold"
