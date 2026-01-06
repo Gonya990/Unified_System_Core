@@ -177,7 +177,33 @@
 }
 
 input[type="range"] {
-  accent-color: var(--primary);
+  @apply appearance-none bg-transparent cursor-pointer overflow-hidden;
+}
+
+/* Track */
+input[type="range"]::-webkit-slider-runnable-track {
+  @apply h-4 rounded-full bg-zinc-800/50 border border-white/5;
+}
+
+input[type="range"]::-moz-range-track {
+  @apply h-4 rounded-full bg-zinc-800/50 border border-white/5;
+}
+
+/* Thumb (Runner) */
+input[type="range"]::-webkit-slider-thumb {
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 -mt-3 transition-transform active:scale-90 relative z-10;
+}
+
+input[type="range"]::-moz-range-thumb {
+  @apply appearance-none h-10 w-10 rounded-2xl bg-white shadow-[0_0_20px_rgba(255, 255, 255, 0.3)] border-4 border-blue-500 transition-transform active:scale-90 border-none relative z-10;
+}
+
+/* Filling the track before the thumb */
+/* Note: Standard CSS doesn't support filling the track before the thumb easily in Webkit without hacks or JS, 
+   but for the most tactile feel, the large thumb is the priority. */
+
+.dark input[type="range"]::-webkit-slider-runnable-track {
+  @apply bg-white/10;
 }
 
 /* Focus Ring for accessibility across all Input types */

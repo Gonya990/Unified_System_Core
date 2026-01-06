@@ -909,22 +909,34 @@ export default function ConnectivityHub() {
                           max="100"
                           value={customGB}
                           onChange={(e) => setCustomGB(parseInt(e.target.value))}
-                          className="w-full h-3 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
+                          className="w-full relative z-10"
                         />
 
-                        {/* Usage Visualization */}
+                        {/* Usage Visualization with Logos */}
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
-                            <div className="text-xl font-black mb-0.5">~{Math.floor(customGB * 1.5)}</div>
-                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_video}</div>
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 flex flex-col items-center gap-2 group hover:bg-white/10 transition-colors">
+                            <div className="flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                              <div className="w-5 h-5 bg-red-600 rounded-sm flex items-center justify-center text-[7px] font-black text-white">Y</div>
+                              <div className="w-5 h-5 bg-black rounded-sm flex items-center justify-center text-[7px] font-black text-red-600 border border-red-600/20">N</div>
+                            </div>
+                            <div className="text-xl font-black">~{Math.floor(customGB * 1.5)}h</div>
+                            <div className="text-[8px] uppercase font-bold opacity-30 leading-tight text-center">{t.config.usage_video}</div>
                           </div>
-                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
-                            <div className="text-xl font-black mb-0.5">~{customGB * 12}</div>
-                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_music}</div>
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 flex flex-col items-center gap-2 group hover:bg-white/10 transition-colors">
+                            <div className="flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                              <div className="w-5 h-5 bg-[#1DB954] rounded-full flex items-center justify-center text-[7px] font-black text-black">S</div>
+                              <div className="w-5 h-5 bg-[#FC3C44] rounded-full flex items-center justify-center text-[7px] font-black text-white">A</div>
+                            </div>
+                            <div className="text-xl font-black">~{customGB * 12}h</div>
+                            <div className="text-[8px] uppercase font-bold opacity-30 leading-tight text-center">{t.config.usage_music}</div>
                           </div>
-                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 text-center">
-                            <div className="text-xl font-black mb-0.5">~{customGB * 15}</div>
-                            <div className="text-[9px] uppercase font-bold opacity-40 leading-tight">{t.config.usage_social}</div>
+                          <div className="p-4 rounded-3xl bg-white/5 border border-white/5 flex flex-col items-center gap-2 group hover:bg-white/10 transition-colors">
+                            <div className="flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                              <div className="w-5 h-5 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] rounded-md flex items-center justify-center text-[7px] font-black text-white">I</div>
+                              <div className="w-5 h-5 bg-black rounded-md flex items-center justify-center text-[7px] font-black text-[#00f2ea]">T</div>
+                            </div>
+                            <div className="text-xl font-black">~{customGB * 15}h</div>
+                            <div className="text-[8px] uppercase font-bold opacity-30 leading-tight text-center">{t.config.usage_social}</div>
                           </div>
                         </div>
                       </div>
@@ -945,7 +957,7 @@ export default function ConnectivityHub() {
                           step="50"
                           value={customMins}
                           onChange={(e) => setCustomMins(parseInt(e.target.value))}
-                          className="w-full h-3 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
+                          className="w-full relative z-10"
                         />
                       </div>
 
