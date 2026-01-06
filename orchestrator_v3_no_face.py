@@ -37,19 +37,21 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 INPUT_DIR.mkdir(exist_ok=True)
 BROLL_DIR.mkdir(exist_ok=True)
 
+import random
+
 # Voice options (OpenAI TTS preferred, Edge-TTS fallback)
 VOICES = {
-    "en": "alloy",       # More neutral/pro
+    "en": "onyx",        # Deep, authoritative
     "en_female": "shimmer",
-    "ru": "alloy",       # Clear, professional male
+    "ru": "onyx",        # Deep, professional
     "ru_female": "shimmer",
     "fallback_ru": "ru-RU-DmitryNeural",
     "fallback_en": "en-US-EmmaNeural"
 }
 
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
-    """Generate audio using OpenAI TTS"""
-    print(f"🎙 Generating Premium OpenAI Audio (voice={voice})...")
+    """Generate audio using OpenAI TTS with Studio Post-Processing"""
+    print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
     
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -59,7 +61,6 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
         
-        # Prepare text - OpenAI handles punctuation well
         response = client.audio.speech.create(
             model="tts-1-hd",
             voice=voice,
@@ -69,13 +70,18 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         mp3_path = output_path.with_suffix(".mp3")
         response.stream_to_file(str(mp3_path))
         
-        # Convert to WAV
+        # STUDIO POST-PROCESSING:
+        # 1. bass boost (4dB at 100Hz)
+        # 2. treble boost (3dB at 8kHz)
+        # 3. loudnorm (EBU R128 normalization)
+        # 4. compressor for that "radio" punch
         subprocess.run([
             "ffmpeg", "-y", "-i", str(mp3_path),
-            "-ar", "16000", "-ac", "1", str(output_path)
+            "-af", "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
+            "-ar", "44100", "-ac", "2", "-b:a", "192k", str(output_path)
         ], check=True, capture_output=True)
         
-        print(f"✅ Premium Audio: {output_path}")
+        print(f"✅ Studio Audio Mastered: {output_path}")
         return True
     except Exception as e:
         print(f"❌ OpenAI TTS failed: {e}")
@@ -115,6 +121,28 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
         print(f"❌ Edge-TTS failed: {e}")
         return False
 
+def transcribe_audio_whisper(audio_path: Path) -> List[Dict]:
+    """Get word-level timestamps using OpenAI Whisper API"""
+    print("🧠 Transcribing audio for word-level subtitles...")
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key: return []
+    
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        
+        with open(audio_path, "rb") as f:
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=f,
+                response_format="verbose_json",
+                timestamp_granularities=["word"]
+            )
+        return transcript.words if hasattr(transcript, 'words') else []
+    except Exception as e:
+        print(f"❌ Transcription failed: {e}")
+        return []
+
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     """Main audio generation with premium support and fallback"""
     voice = VOICES.get(lang, VOICES["en"])
@@ -127,25 +155,53 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-ChristopherNeural")
     return generate_audio_edge(text, output_path, fallback_voice)
 
-def add_subtitles(video_path: Path, output_path: Path, lang: str = "en") -> bool:
-    """Add dynamic subtitles using PyCaps"""
-    print(f"📝 Adding subtitles...")
+def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool:
+    """Add dynamic word-by-word subtitles using custom FFmpeg filter"""
+    print(f"📝 Adding dynamic subtitles (Hormozi-style)...")
     
-    cmd = [
-        "pycaps",
-        str(video_path),
-        "-o", str(output_path),
-        "--style", "hormozi",
-        "--font-size", "70",
-        "--stroke-width", "4"
-    ]
+    # 1. Extract audio and transcribe
+    temp_audio = OUTPUT_DIR / "temp_sub_audio.wav"
+    subprocess.run(["ffmpeg", "-y", "-i", str(video_path), "-vn", "-ac", "1", str(temp_audio)], check=True, capture_output=True)
+    
+    words = transcribe_audio_whisper(temp_audio)
+    if not words:
+        print("⚠️ No words found for subtitles.")
+        return False
+        
+    # 2. Build massive drawtext filter
+    # Style: Big, yellow/white, bold, centered
+    filters = []
+    font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf" # Typical Mac bold font
+    if not Path(font_path).exists(): font_path = "Arial"
+
+    for i, w in enumerate(words):
+        start = w['start']
+        end = w['end']
+        text = w['word'].upper()
+        # Clean text for ffmpeg
+        text = text.replace("'", "").replace(":", "").replace("\"", "")
+        
+        # Current word in Yellow, others invisible or faint? 
+        # For simplicity: only show the current word big in the middle
+        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=yellow:fontsize=90:"
+             f"x=(w-text_w)/2:y=(h-text_h)/2+200:borderw=4:bordercolor=black:"
+             f"enable='between(t,{start},{end})'")
+        filters.append(f)
+        
+    filter_str = ",".join(filters)
     
     try:
-        subprocess.run(cmd, check=True, cwd=str(ROOT_DIR))
-        print(f"✅ Subtitles: {output_path}")
+        # Apply filters in batches if too long, but here we try all at once
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(video_path),
+            "-vf", filter_str,
+            "-c:a", "copy", str(output_path)
+        ], check=True, capture_output=True)
+        print(f"✅ Subtitles burned: {output_path}")
+        temp_audio.unlink()
         return True
     except Exception as e:
-        print(f"❌ Subtitles failed: {e}")
+        print(f"❌ Subtitle burning failed: {e}")
         return False
 
 def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: Path):
@@ -180,7 +236,7 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
             "ffmpeg", "-y", "-i", str(clip),
             "-t", str(target_duration),
             "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920", # Vertical format
-            "-c:v", "libx264", "-pix_fmt", "yuv4202p",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p",
             str(trimmed_path)
         ], check=True, capture_output=True)
         
@@ -217,10 +273,10 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
 
 def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path):
     """
-    Create a HIGH-ENERGY hybrid video. 
-    Prioritizes B-Roll (80%) and uses AI Images as stylized flashes (20%).
+    Create a CINEMATIC high-energy video. 
+    Uses audio post-processing, background ambience, and aggressive editing.
     """
-    print(f"🔥 Assembling DYNAMIC high-energy video sequence...")
+    print(f"🎬 Producing CINEMATIC MASTERPIECE...")
     
     audio_duration = float(subprocess.run([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -236,80 +292,94 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         img_path = scene['image']
         keyword = scene['keyword']
         
-        # 1. B-Roll Segment (Hero - 80% of time)
-        broll_duration = seg_duration * 0.8
-        img_duration = seg_duration * 0.2
+        # Timing: 75% B-Roll, 25% Image Flash
+        broll_dur = seg_duration * 0.75
+        img_dur = seg_duration * 0.25
         
-        # Fast cutting: We try to get 2 clips per keyword to keep it moving
-        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=2)
+        # Get multiple clips for energy
+        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=3)
         
+        # 1. B-Roll Sequence (2-3 clips per scene for fast rhythm)
         if broll_clips:
-            # First clip
-            clip_path = broll_clips[0]
-            seg_path_b1 = OUTPUT_DIR / f"dyn_seg_{i}_b1.mp4"
-            subprocess.run([
-                "ffmpeg", "-y", "-i", str(clip_path),
-                "-t", str(broll_duration / 2),
-                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:brightness=0.02:saturation=1.3",
-                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_path_b1)
-            ], check=True, capture_output=True)
-            segments.append(seg_path_b1)
-            
-            # Second clip (if exists) or stylized image flash
-            if len(broll_clips) > 1:
-                clip_path_2 = broll_clips[1]
-                seg_path_b2 = OUTPUT_DIR / f"dyn_seg_{i}_b2.mp4"
+            per_clip = broll_dur / len(broll_clips)
+            for j, clip in enumerate(broll_clips):
+                seg_p = OUTPUT_DIR / f"cin_seg_{i}_b{j}.mp4"
+                # Color grading + subtle camera shake (via crop/pan)
                 subprocess.run([
-                    "ffmpeg", "-y", "-i", str(clip_path_2),
-                    "-t", str(broll_duration / 2),
-                    "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:saturation=1.2",
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_path_b2)
+                    "ffmpeg", "-y", "-i", str(clip),
+                    "-t", str(per_clip),
+                    "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.4:brightness=0.03,curves=strong_contrast,vignette=angle=0.4",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_p)
                 ], check=True, capture_output=True)
-                segments.append(seg_path_b2)
-            else:
-                img_duration += broll_duration / 2
+                segments.append(seg_p)
         else:
-            img_duration = seg_duration
+            img_dur += broll_dur
 
-        # 2. AI Image Segment (Visionary Flash with aggressive pan)
-        seg_path_img = OUTPUT_DIR / f"dyn_seg_{i}_img.mp4"
-        # Dynamic pan direction
-        x_expr = "iw/2-(iw/zoom/2)"
-        y_expr = f"ih/2-(ih/zoom/2)+({'100' if i%2==0 else '-100'}*t/d)"
-        
-        cmd_img = [
-            "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
-            "-t", str(img_duration),
-            "-vf", f"scale=2000:-1,zoompan=z='1.1':x='{x_expr}':y='{y_expr}':d=1:s=1080x1920:fps=30,"
-                   f"vignette=angle=0.3,unsharp=5:5:1.0:5:5:0.0",
-            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
-            str(seg_path_img)
+        # 2. Visionary AI Image Flash (Aggressive motion)
+        seg_p_img = OUTPUT_DIR / f"cin_seg_{i}_img.mp4"
+        # Randomize movement: Zoom in, Pan up, or Pan down
+        motions = [
+            "zoom+0.001", 
+            "zoom-0.0005:y='ih/2-(ih/zoom/2)+100*t/d'", 
+            "zoom+0.0008:x='iw/2-(iw/zoom/2)+100*t/d'"
         ]
-        subprocess.run(cmd_img, check=True, capture_output=True)
-        segments.append(seg_path_img)
+        import random
+        motion = random.choice(motions).split(":")
+        z_expr = motion[0]
+        extra = f":{motion[1]}" if len(motion) > 1 else ":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+        
+        subprocess.run([
+            "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
+            "-t", str(img_dur),
+            "-vf", f"scale=2000:-1,zoompan=z='{z_expr}'{extra}:d=1:s=1080x1920:fps=30,"
+                   "fade=in:0:5:color=white,vignette=angle=0.5,curves=vintage",
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
+            str(seg_p_img)
+        ], check=True, capture_output=True)
+        segments.append(seg_p_img)
 
-    # Concat
-    concat_file = OUTPUT_DIR / "dyn_concat.txt"
+    # Concat visuals
+    concat_file = OUTPUT_DIR / "cin_concat.txt"
     with open(concat_file, "w") as f:
-        for seg in segments:
-            f.write(f"file '{seg.name}'\n")
+        for seg in segments: f.write(f"file '{seg.name}'\n")
             
-    video_no_audio = OUTPUT_DIR / "temp_dynamic_video.mp4"
+    raw_visuals = OUTPUT_DIR / "temp_cin_visuals.mp4"
     subprocess.run([
         "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
-        "-c", "copy", str(video_no_audio)
+        "-c", "copy", str(raw_visuals)
     ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
     
-    # Final merge with audio
+    # 3. PRO AUDIO ENGINE: Compression + Reverb + Tech Ambience
+    # We generate brown noise as a "tech floor" and sidechain/mix it
+    print("🔊 Mixing professional audio suite...")
+    final_audio = OUTPUT_DIR / "final_cin_audio.wav"
+    
+    # Filter complex for audio:
+    # [0:a] is voice. Apply compressor (acompressor), then reverb (aecho), then mix with generated brown noise (anoisesrc)
+    audio_filter = (
+        "[0:a]acompressor=threshold=-15dB:ratio=4:attack=5:release=50[voice];"
+        "[voice]aecho=0.8:0.88:40:0.3[voice_verb];"
+        "anoisesrc=d=" + str(audio_duration) + ":c=brown:amp=0.01[bg];"
+        "[voice_verb][bg]amix=inputs=2:duration=first:weights=1 0.3[out]"
+    )
+    
     subprocess.run([
-        "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
-        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
-        "-shortest", str(output_path)
+        "ffmpeg", "-y", "-i", str(audio_path),
+        "-filter_complex", audio_filter,
+        "-map", "[out]", str(final_audio)
+    ], check=True, capture_output=True)
+
+    # 4. Final Final Merge
+    subprocess.run([
+        "ffmpeg", "-y", "-i", str(raw_visuals), "-i", str(final_audio),
+        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", "-shortest",
+        str(output_path)
     ], check=True, capture_output=True)
     
     # Cleanup
     for seg in segments: seg.unlink()
-    video_no_audio.unlink()
+    raw_visuals.unlink()
+    final_audio.unlink()
     concat_file.unlink()
     return True
 
@@ -369,23 +439,23 @@ if __name__ == "__main__":
     # Mapping scenes to images (using the ones generated across steps)
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
-    # Selecting the best 15 images and defining keywords for B-roll
+    # Selecting the best 15 images and defining keywords for B-roll (Motion-Oriented)
     scene_data = [
-        {"image": "ai_scene_1_network", "keyword": "neural network digital"},
-        {"image": "ai_scene_2_economy", "keyword": "world economy growth"},
-        {"image": "ai_scene_3_content_gen", "keyword": "digital content creation"},
-        {"image": "ai_future_bg_3", "keyword": "science laboratory future"},
-        {"image": "ai_future_bg_4", "keyword": "human brain digital"},
-        {"image": "ai_scene_6_code_matter", "keyword": "coding developer matrix"},
-        {"image": "ai_future_bg_1", "keyword": "robot automation factory"},
-        {"image": "ai_scene_8_art_exhibit", "keyword": "modern art digital gallery"},
-        {"image": "ai_scene_9_edu_tutor", "keyword": "education future technology"},
-        {"image": "ai_fact_3_medical", "keyword": "medical technology robot"},
-        {"image": "ai_scene_11_green_city", "keyword": "smart city green energy"},
-        {"image": "ai_scene_12_ethics_safety", "keyword": "cyber security ethics"},
-        {"image": "ai_fact_1_robot", "keyword": "human robot handshake"},
-        {"image": "ai_scene_14_global_net_earth", "keyword": "global network earth space"},
-        {"image": "ai_scene_15_sunrise_digital", "keyword": "sunrise future city horizon"}
+        {"image": "ai_scene_1_network", "keyword": "digital neural network flying through 4k cinematic"},
+        {"image": "ai_scene_2_economy", "keyword": "stock market chart motion blur global finance"},
+        {"image": "ai_scene_3_content_gen", "keyword": "digital content holographic neon city glitch"},
+        {"image": "ai_future_bg_3", "keyword": "robot arm working in hi-tech laboratory timelapse"},
+        {"image": "ai_future_bg_4", "keyword": "human brain synapses firing close up cinematic"},
+        {"image": "ai_scene_6_code_matter", "keyword": "matrix code rain falling digital background"},
+        {"image": "ai_future_bg_1", "keyword": "automated factory robots moving fast cinematic"},
+        {"image": "ai_scene_8_art_exhibit", "keyword": "abstract colorful light show motion background"},
+        {"image": "ai_scene_9_edu_tutor", "keyword": "hologram technology student classroom future"},
+        {"image": "ai_fact_3_medical", "keyword": "medical scan 3d rendering clinic future"},
+        {"image": "ai_scene_11_green_city", "keyword": "smart city aerial view timelapse green tech"},
+        {"image": "ai_scene_12_ethics_safety", "keyword": "cyber security digital lock background motion"},
+        {"image": "ai_fact_1_robot", "keyword": "cyborg human handshake futuristic interaction"},
+        {"image": "ai_scene_14_global_net_earth", "keyword": "earth from space rotating global connection city lights"},
+        {"image": "ai_scene_15_sunrise_digital", "keyword": "futuristic city sunrise horizon cinematic aerial"}
     ]
     
     selected_scenes = []
