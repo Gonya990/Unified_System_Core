@@ -400,7 +400,7 @@ export default function ConnectivityHub() {
                       ].map((stat, i) => (
                         <div key={i} className={`p-6 rounded-2xl bg-white/5 border border-white/5 text-start hover:bg-white/10 transition-colors`}>
                           <stat.icon className={`w-5 h-5 mb-4 ${stat.color}`} />
-                          <div className={`text-xs ${mutedTextClass} mb-1Uppercase font-bold tracking-wider`}>{stat.label}</div>
+                          <div className={`text-[10px] ${mutedTextClass} mb-1 uppercase font-black tracking-widest`}>{stat.label}</div>
                           <div className="text-2xl font-bold">{stat.val}</div>
                         </div>
                       ))}
@@ -544,19 +544,14 @@ export default function ConnectivityHub() {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              {[
-                { icon: Zap, title: "Instant Activation", desc: "No physical SIM needed" },
-                { icon: ShieldCheck, title: "Secure Payments", desc: "Apple Pay & Crypto" },
-                { icon: Database, title: "Data Tracking", desc: "Widget for iOS/Android" },
-                { icon: Smartphone, title: "Multi-device", desc: "Up to 5 eSIMs active" }
-              ].map((feature, i) => (
-                <div key={i} className="flex gap-4">
+              {[Zap, ShieldCheck, Database, Smartphone].map((Icon, i) => (
+                <div key={i} className="flex gap-4 items-start">
                   <div className={`p-2 rounded-xl border ${cardBgClass} shrink-0`}>
-                    <feature.icon className={`w-5 h-5 ${mode === 'personal' ? 'text-blue-500' : 'text-purple-500'}`} />
+                    <Icon className={`w-5 h-5 ${mode === 'personal' ? 'text-blue-500' : 'text-purple-500'}`} />
                   </div>
-                  <div>
-                    <div className="font-bold text-sm mb-1">{feature.title}</div>
-                    <div className="text-xs opacity-50">{feature.desc}</div>
+                  <div className="text-start">
+                    <div className="font-bold text-sm mb-1 leading-tight">{t.hero.app_features[i]?.title}</div>
+                    <div className="text-xs opacity-50 leading-tight">{t.hero.app_features[i]?.desc}</div>
                   </div>
                 </div>
               ))}
@@ -871,29 +866,31 @@ export default function ConnectivityHub() {
                       </div>
                       <div>
                         <h3 className="text-2xl font-bold">{t.checkout.title}</h3>
-                        <p className="text-sm opacity-50">Final Step</p>
+                        <p className="text-sm opacity-50 uppercase tracking-widest font-bold">{t.checkout.step_final}</p>
                       </div>
                     </div>
 
-                    <div className="p-6 rounded-3xl bg-zinc-900 border border-white/5 space-y-4">
+                    <div className="p-6 rounded-3xl bg-zinc-900 border border-white/5 space-y-4 text-white">
                       <div className="flex justify-between text-sm">
-                        <span className="opacity-50">Plan</span>
-                        <span>{activePlan?.name}</span>
+                        <span className="opacity-50">{t.checkout.plan}</span>
+                        <span className="font-bold">{activePlan?.name}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="opacity-50">Configuration</span>
-                        <span>{customGB}GB / {customMins}MIN</span>
+                        <span className="opacity-50">{t.checkout.config}</span>
+                        <span className="font-bold">{customGB}GB / {customMins}MIN</span>
                       </div>
                       <div className="h-px bg-white/5" />
-                      <div className="flex justify-between font-black text-lg">
-                        <span>Total Due</span>
-                        <span>${calculateTotal().toFixed(2)}</span>
+                      <div className="flex justify-between font-black text-xl">
+                        <span>{t.checkout.total_due}</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                          ${calculateTotal().toFixed(2)}
+                        </span>
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold">
-                        Apple Pay
+                      <Button className="w-full h-14 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold transition-transform active:scale-95">
+                        {t.checkout.apple_pay}
                       </Button>
                       <Button
                         className="w-full h-14 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 font-bold"
@@ -920,10 +917,10 @@ export default function ConnectivityHub() {
                     </div>
                     <Button
                       variant="outline"
-                      className="h-12 px-8 rounded-full"
+                      className={`h-12 px-8 rounded-full ${isDark ? 'border-white/10 text-white' : 'border-zinc-200 text-black'}`}
                       onClick={() => setCheckoutStep(null)}
                     >
-                      Close
+                      {t.checkout.close}
                     </Button>
                   </div>
                 )}
@@ -942,7 +939,7 @@ export default function ConnectivityHub() {
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-8 right-8 z-[60] w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl text-white hover:bg-green-400 transition-colors"
+        className={`fixed bottom-8 ${lang === 'he' ? 'left-8' : 'right-8'} z-[60] w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl text-white hover:bg-green-400 transition-colors`}
       >
         <Phone className="w-6 h-6" />
       </motion.a>

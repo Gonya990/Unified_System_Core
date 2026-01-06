@@ -8,6 +8,7 @@ export interface Translation {
     loc_detecting: string; loc_found: string; support_whatsapp: string;
     search_placeholder: string; popular_dest: string;
     app_title: string; app_desc: string; app_ios: string; app_android: string;
+    app_features: Array<{ title: string; desc: string }>;
   };
   testimonials: {
     title: string;
@@ -31,7 +32,9 @@ export interface Translation {
     title: string; gb: string; mins: string; sms: string; confirm: string; total: string;
   };
   checkout: {
-    title: string; pay_now: string; success: string; success_desc: string;
+    title: string; step_final: string; apple_pay: string; plan: string;
+    config: string; total_due: string; pay_now: string; success: string;
+    success_desc: string; close: string;
   };
   footer: string;
 }
@@ -65,7 +68,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -167,9 +188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -201,7 +228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "Приложение Connect.Global",
       "app_desc": "Управляйте своими eSIM, отслеживайте расход трафика в реальном времени и пополняйте баланс из любой точки мира.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Мгновенная активация",
+          "desc": "Физическая SIM не нужна"
+        },
+        {
+          "title": "Безопасные платежи",
+          "desc": "Apple Pay и Крипта"
+        },
+        {
+          "title": "Отслеживание данных",
+          "desc": "Виджет для iOS/Android"
+        },
+        {
+          "title": "Мульти-девайс",
+          "desc": "До 5 активных eSIM"
+        }
+      ]
     },
     "testimonials": {
       "title": "Нам доверяют лидеры",
@@ -303,9 +348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Безопасная оплата",
+      "step_final": "Финальный шаг",
+      "apple_pay": "Apple Pay",
+      "plan": "Тариф",
+      "config": "Конфигурация",
+      "total_due": "Итого к оплате",
       "pay_now": "Оплатить сейчас",
       "success": "Активация успешна!",
-      "success_desc": "Ваша eSIM готова. Проверьте почту для получения QR-кода."
+      "success_desc": "Ваша eSIM готова. Проверьте почту для получения QR-кода.",
+      "close": "Закрыть"
     },
     "footer": "Connect.Global © 2026. Все системы работают штатно."
   },
@@ -337,7 +388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "אפליקציית Connect.Global",
       "app_desc": "נהל את ה-eSIM שלך, עקוב אחר שימוש בנתונים בזמן אמת והטען מכל מקום בעולם.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "הפעלה מיידית",
+          "desc": "לא נדרש SIM פיזי"
+        },
+        {
+          "title": "תשלומים מאובטחים",
+          "desc": "Apple Pay וקריפטו"
+        },
+        {
+          "title": "מעקב נתונים",
+          "desc": "ווידג'ט ל-iOS/Android"
+        },
+        {
+          "title": "ריבוי מכשירים",
+          "desc": "עד 5 eSIM פעילים"
+        }
+      ]
     },
     "testimonials": {
       "title": "המובילים בוטחים בנו",
@@ -439,9 +508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "תשלום מאובטח",
+      "step_final": "שלב אחרון",
+      "apple_pay": "Apple Pay",
+      "plan": "חבילה",
+      "config": "הגדרה",
+      "total_due": "סה\"כ לתשלום",
       "pay_now": "שלם עכשיו",
       "success": "ההפעלה הצליחה!",
-      "success_desc": "ה-eSIM שלך מוכן. בדוק את האימייל שלך עבור קוד ה-QR."
+      "success_desc": "ה-eSIM שלך מוכן. בדוק את האימייל שלך עבור קוד ה-QR.",
+      "close": "סגור"
     },
     "footer": "Connect.Global © 2026. כל המערכות פועלות כסדרן."
   },
@@ -473,7 +548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -575,9 +668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -609,7 +708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -711,9 +828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -745,7 +868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -847,9 +988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -881,7 +1028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -983,9 +1148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1017,7 +1188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1119,9 +1308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1153,7 +1348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1255,9 +1468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1289,7 +1508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1391,9 +1628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1425,7 +1668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1527,9 +1788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1561,7 +1828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1663,9 +1948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1697,7 +1988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1799,9 +2108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1833,7 +2148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -1935,9 +2268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -1969,7 +2308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2071,9 +2428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2105,7 +2468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2207,9 +2588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2241,7 +2628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2343,9 +2748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2377,7 +2788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2479,9 +2908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2513,7 +2948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2615,9 +3068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2649,7 +3108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2751,9 +3228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2785,7 +3268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -2887,9 +3388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -2921,7 +3428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3023,9 +3548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3057,7 +3588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3159,9 +3708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3193,7 +3748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3295,9 +3868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3329,7 +3908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3431,9 +4028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3465,7 +4068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3567,9 +4188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3601,7 +4228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3703,9 +4348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3737,7 +4388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3839,9 +4508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -3873,7 +4548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -3975,9 +4668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4009,7 +4708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4111,9 +4828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4145,7 +4868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4247,9 +4988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4281,7 +5028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4383,9 +5148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4417,7 +5188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4519,9 +5308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4553,7 +5348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4655,9 +5468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4689,7 +5508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4791,9 +5628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4825,7 +5668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -4927,9 +5788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -4961,7 +5828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5063,9 +5948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5097,7 +5988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5199,9 +6108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5233,7 +6148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5335,9 +6268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5369,7 +6308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5471,9 +6428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5505,7 +6468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5607,9 +6588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5641,7 +6628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5743,9 +6748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5777,7 +6788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -5879,9 +6908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -5913,7 +6948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6015,9 +7068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6049,7 +7108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6151,9 +7228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6185,7 +7268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6287,9 +7388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6321,7 +7428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6423,9 +7548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6457,7 +7588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6559,9 +7708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6593,7 +7748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6695,9 +7868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6729,7 +7908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6831,9 +8028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -6865,7 +8068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -6967,9 +8188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7001,7 +8228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7103,9 +8348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7137,7 +8388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7239,9 +8508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7273,7 +8548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7375,9 +8668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7409,7 +8708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7511,9 +8828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7545,7 +8868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7647,9 +8988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7681,7 +9028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7783,9 +9148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7817,7 +9188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -7919,9 +9308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -7953,7 +9348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8055,9 +9468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8089,7 +9508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8191,9 +9628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8225,7 +9668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8327,9 +9788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8361,7 +9828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8463,9 +9948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8497,7 +9988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8599,9 +10108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8633,7 +10148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8735,9 +10268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8769,7 +10308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -8871,9 +10428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -8905,7 +10468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9007,9 +10588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9041,7 +10628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9143,9 +10748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9177,7 +10788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9279,9 +10908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9313,7 +10948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9415,9 +11068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9449,7 +11108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9551,9 +11228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9585,7 +11268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9687,9 +11388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9721,7 +11428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9823,9 +11548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9857,7 +11588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -9959,9 +11708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -9993,7 +11748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10095,9 +11868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10129,7 +11908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10231,9 +12028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10265,7 +12068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10367,9 +12188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10401,7 +12228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10503,9 +12348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10537,7 +12388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10639,9 +12508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10673,7 +12548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10775,9 +12668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10809,7 +12708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -10911,9 +12828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -10945,7 +12868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11047,9 +12988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11081,7 +13028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11183,9 +13148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11217,7 +13188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11319,9 +13308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11353,7 +13348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11455,9 +13468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11489,7 +13508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11591,9 +13628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11625,7 +13668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11727,9 +13788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11761,7 +13828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11863,9 +13948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -11897,7 +13988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -11999,9 +14108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12033,7 +14148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12135,9 +14268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12169,7 +14308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12271,9 +14428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12305,7 +14468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12407,9 +14588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12441,7 +14628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12543,9 +14748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12577,7 +14788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12679,9 +14908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12713,7 +14948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12815,9 +15068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12849,7 +15108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -12951,9 +15228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -12985,7 +15268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13087,9 +15388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13121,7 +15428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13223,9 +15548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13257,7 +15588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13359,9 +15708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13393,7 +15748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13495,9 +15868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13529,7 +15908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13631,9 +16028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13665,7 +16068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13767,9 +16188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13801,7 +16228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -13903,9 +16348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -13937,7 +16388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14039,9 +16508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14073,7 +16548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14175,9 +16668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14209,7 +16708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14311,9 +16828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14345,7 +16868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14447,9 +16988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14481,7 +17028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14583,9 +17148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14617,7 +17188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14719,9 +17308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14753,7 +17348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14855,9 +17468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -14889,7 +17508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -14991,9 +17628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15025,7 +17668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15127,9 +17788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15161,7 +17828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15263,9 +17948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15297,7 +17988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15399,9 +18108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15433,7 +18148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15535,9 +18268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15569,7 +18308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15671,9 +18428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15705,7 +18468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15807,9 +18588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15841,7 +18628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -15943,9 +18748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -15977,7 +18788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16079,9 +18908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16113,7 +18948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16215,9 +19068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16249,7 +19108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16351,9 +19228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16385,7 +19268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16487,9 +19388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16521,7 +19428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16623,9 +19548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16657,7 +19588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16759,9 +19708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16793,7 +19748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -16895,9 +19868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -16929,7 +19908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17031,9 +20028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17065,7 +20068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17167,9 +20188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17201,7 +20228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17303,9 +20348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17337,7 +20388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17439,9 +20508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17473,7 +20548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17575,9 +20668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17609,7 +20708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17711,9 +20828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17745,7 +20868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17847,9 +20988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -17881,7 +21028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -17983,9 +21148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18017,7 +21188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18119,9 +21308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18153,7 +21348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18255,9 +21468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18289,7 +21508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18391,9 +21628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18425,7 +21668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18527,9 +21788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18561,7 +21828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18663,9 +21948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18697,7 +21988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18799,9 +22108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18833,7 +22148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -18935,9 +22268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -18969,7 +22308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19071,9 +22428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19105,7 +22468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19207,9 +22588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19241,7 +22628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19343,9 +22748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19377,7 +22788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19479,9 +22908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19513,7 +22948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19615,9 +23068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19649,7 +23108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19751,9 +23228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19785,7 +23268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -19887,9 +23388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -19921,7 +23428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20023,9 +23548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20057,7 +23588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20159,9 +23708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20193,7 +23748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20295,9 +23868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20329,7 +23908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20431,9 +24028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20465,7 +24068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20567,9 +24188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20601,7 +24228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20703,9 +24348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20737,7 +24388,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20839,9 +24508,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -20873,7 +24548,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -20975,9 +24668,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21009,7 +24708,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21111,9 +24828,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21145,7 +24868,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21247,9 +24988,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21281,7 +25028,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21383,9 +25148,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21417,7 +25188,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21519,9 +25308,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21553,7 +25348,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21655,9 +25468,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21689,7 +25508,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21791,9 +25628,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21825,7 +25668,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -21927,9 +25788,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -21961,7 +25828,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22063,9 +25948,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22097,7 +25988,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22199,9 +26108,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22233,7 +26148,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22335,9 +26268,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22369,7 +26308,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22471,9 +26428,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22505,7 +26468,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22607,9 +26588,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22641,7 +26628,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22743,9 +26748,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22777,7 +26788,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -22879,9 +26908,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -22913,7 +26948,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23015,9 +27068,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23049,7 +27108,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23151,9 +27228,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23185,7 +27268,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23287,9 +27388,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23321,7 +27428,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23423,9 +27548,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23457,7 +27588,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23559,9 +27708,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23593,7 +27748,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23695,9 +27868,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23729,7 +27908,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23831,9 +28028,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -23865,7 +28068,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -23967,9 +28188,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   },
@@ -24001,7 +28228,25 @@ export const translations: Record<string, Translation> = {
       "app_title": "The Connect.Global App",
       "app_desc": "Manage your eSIMs, track data usage in real-time, and top up instantly from anywhere in the world.",
       "app_ios": "App Store",
-      "app_android": "Google Play"
+      "app_android": "Google Play",
+      "app_features": [
+        {
+          "title": "Instant Activation",
+          "desc": "No physical SIM needed"
+        },
+        {
+          "title": "Secure Payments",
+          "desc": "Apple Pay & Crypto"
+        },
+        {
+          "title": "Data Tracking",
+          "desc": "Widget for iOS/Android"
+        },
+        {
+          "title": "Multi-device",
+          "desc": "Up to 5 eSIMs active"
+        }
+      ]
     },
     "testimonials": {
       "title": "Trusted by the Best",
@@ -24103,9 +28348,15 @@ export const translations: Record<string, Translation> = {
     },
     "checkout": {
       "title": "Secure Checkout",
+      "step_final": "Final Step",
+      "apple_pay": "Apple Pay",
+      "plan": "Plan",
+      "config": "Configuration",
+      "total_due": "Total Due",
       "pay_now": "Pay Now",
       "success": "Activation Successful!",
-      "success_desc": "Your eSIM is ready. Check your email for the QR code."
+      "success_desc": "Your eSIM is ready. Check your email for the QR code.",
+      "close": "Close"
     },
     "footer": "Connect.Global © 2026. All Systems Operational."
   }
