@@ -24,7 +24,9 @@ const sourceTranslation = {
         b2b_btn_2: "Contact Sales",
         loc_detecting: "Detecting your location...",
         loc_found: "Best plan for United Kingdom:",
-        support_whatsapp: "WhatsApp Support"
+        support_whatsapp: "WhatsApp Support",
+        search_placeholder: "Where are you going?",
+        popular_dest: "Popular Destinations"
     },
     testimonials: {
         title: "Trusted by the Best",
@@ -108,7 +110,9 @@ const overrides = {
             b2b_btn_2: "Связаться с Sales",
             loc_detecting: "Определяем вашу локацию...",
             loc_found: "Лучший план для России:",
-            support_whatsapp: "Поддержка в WhatsApp"
+            support_whatsapp: "Поддержка в WhatsApp",
+            search_placeholder: "Куда вы летите?",
+            popular_dest: "Популярные направления"
         },
         testimonials: {
             title: "Нам доверяют лидеры",
@@ -173,7 +177,9 @@ const overrides = {
             b2b_btn_2: "צור קשר עם המכירות",
             loc_detecting: "מזהה את המיקום שלך...",
             loc_found: "התוכנית הטובה ביותר לישראל:",
-            support_whatsapp: "תמיכה ב-WhatsApp"
+            support_whatsapp: "תמיכה ב-WhatsApp",
+            search_placeholder: "לאן אתם טסים?",
+            popular_dest: "יעדים פופולריים"
         },
         testimonials: {
             title: "המובילים בוטחים בנו",
@@ -243,6 +249,7 @@ export interface Translation {
     b2c_btn_1: string; b2c_btn_2: string; b2b_tag: string; b2b_title_1: string;
     b2b_title_2: string; b2b_desc: string; b2b_btn_1: string; b2b_btn_2: string;
     loc_detecting: string; loc_found: string; support_whatsapp: string;
+    search_placeholder: string; popular_dest: string;
   };
   testimonials: {
     title: string;
