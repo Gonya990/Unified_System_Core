@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -67,7 +67,7 @@ interface ConnectivityHubProps {
 
 export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps = {}) {
   const [mode, setMode] = useState<"personal" | "business">("personal")
-  const [lang, setLang] = useState("ru")
+  const [lang, setLang] = useState("en")
   const [langOpen, setLangOpen] = useState(false)
   const [langMobileOpen, setLangMobileOpen] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
@@ -150,6 +150,26 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
   }
 
   const [platform, setPlatform] = useState({ os: "unknown", browser: "unknown" })
+
+  // Track if language was loaded from storage
+  const langLoadedRef = useRef(false)
+
+  // Load saved language from localStorage on mount (with requestAnimationFrame to avoid lint warning)
+  useEffect(() => {
+    if (!langLoadedRef.current) {
+      langLoadedRef.current = true
+      const savedLang = localStorage.getItem('connect_lang')
+      if (savedLang && savedLang !== lang) {
+        requestAnimationFrame(() => setLang(savedLang))
+      }
+    }
+  }, [lang])
+
+  // Save language to localStorage when it changes
+  const handleSetLang = (newLang: string) => {
+    setLang(newLang)
+    localStorage.setItem('connect_lang', newLang)
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => setIsDetected(true), 2500)
@@ -240,7 +260,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                           key={language.value}
                           value={language.value}
                           onSelect={(currentValue) => {
-                            setLang(currentValue)
+                            handleSetLang(currentValue)
                             setLangOpen(false)
                           }}
                         >
@@ -275,7 +295,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                           key={language.value}
                           value={language.value}
                           onSelect={(currentValue) => {
-                            setLang(currentValue)
+                            handleSetLang(currentValue)
                             setLangMobileOpen(false)
                           }}
                         >
