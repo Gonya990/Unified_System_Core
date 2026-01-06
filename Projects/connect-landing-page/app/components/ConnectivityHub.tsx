@@ -13,141 +13,9 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
+import { translations } from "@/app/data/translations"
 
-const translations = {
-  ru: {
-    nav: {
-      coverage: "Покрытие",
-      pricing: "Цены",
-      tech: "Технология",
-      api: "API"
-    },
-    hero: {
-      b2c_tag: "Глобальный роуминг отменен",
-      b2c_title_1: "Мир Твой.",
-      b2c_title_2: "Просто подключись.",
-      b2c_desc: "Мгновенный доступ к eSIM интернету в 190+ странах. Предоплаченные пакеты трафика без скрытых комиссий.",
-      b2c_btn_1: "Найти страну",
-      b2c_btn_2: "Скачать Приложение",
-      b2b_tag: "Инфраструктура Трафика Класса Enterprise",
-      b2b_title_1: "Масштабируемая",
-      b2b_title_2: "Среда Связи.",
-      b2b_desc: "Премиум трафик для бизнеса. API интеграция, выделенные каналы, оптовые пакеты данных и управление тысячами подключений.",
-      b2b_btn_1: "Начать Интеграцию",
-      b2b_btn_2: "Связаться с Sales",
-      loc_detecting: "Определяем вашу локацию...",
-      loc_found: "Лучший план для России:"
-    },
-    dashboard: {
-      title: "Live Сетевая Активность",
-      nodes: "Активные узлы",
-      traffic: "Текущий трафик",
-      latency: "Задержка",
-      status: "Статус системы: Штатно"
-    },
-    stats: {
-      countries: "Стран покрытия",
-      speed: "Максимальная скорость",
-      privacy: "Полная приватность",
-      uptime: "Uptime гарантия"
-    },
-    pricing: {
-      b2c_title: "Пакеты для Путешествий",
-      b2c_subtitle: "Честные гигабайты на максимальной скорости. Неиспользованный трафик сгорает в конце срока, обеспечивая нам возможность держать лучшие цены.",
-      b2b_title: "Инфраструктурные Тарифы",
-      b2b_subtitle: "Оптовая закупка трафика. Подключайте своих пользователей через наш API. Вы платите за общий пул, ваши клиенты платят вам.",
-      plans: {
-        light: { name: "Light Tripper", desc: "Идеально для карт и мессенджеров на короткую поездку." },
-        nomad: { name: "Digital Nomad", desc: "Хватит на звонки, работу и соцсети на целый месяц." },
-        ultra: { name: "Ultra Stream", desc: "Максимум свободы. Стриминг, видео 4K и раздача интернета." },
-        startup: { name: "Startup Pool", desc: "Для небольших команд и арбитраж-тестов." },
-        agency: { name: "Agency Scale", desc: "Для маркетинговых агентств с большим расходом." },
-        platform: { name: "Platform API", desc: "Интеграция в ваше приложение (White Label)." }
-      },
-      units: {
-        pack: "пакет",
-        month: "мес",
-        days: "дней",
-        instant: "Мгновенная активация (QR)",
-        hidden_fees: "Без скрытых списаний",
-        hotspot: "Разрешена раздача (Hotspot)",
-        traffic: "Трафика",
-        api_access: "API Ключ доступа",
-        pool_ip: "Выделенный пул IP",
-        pool_label: "TB Pool",
-        select: "Выбрать",
-        start: "Начать работу"
-      }
-    },
-    footer: "Connect.Global © 2026. Все системы работают штатно."
-  },
-  en: {
-    nav: {
-      coverage: "Coverage",
-      pricing: "Pricing",
-      tech: "Technology",
-      api: "API"
-    },
-    hero: {
-      b2c_tag: "Global roaming is cancelled",
-      b2c_title_1: "The World is Yours.",
-      b2c_title_2: "Just Connect.",
-      b2c_desc: "Instant access to eSIM internet in 190+ countries. Prepaid data packages with no hidden fees.",
-      b2c_btn_1: "Find Country",
-      b2c_btn_2: "Get the App",
-      b2b_tag: "Enterprise Class Traffic Infrastructure",
-      b2b_title_1: "Scalable",
-      b2b_title_2: "Connectivity Env.",
-      b2b_desc: "Premium traffic for business. API integration, dedicated channels, wholesale data packages, and management of thousands of connections.",
-      b2b_btn_1: "Start Integration",
-      b2b_btn_2: "Contact Sales",
-      loc_detecting: "Detecting your location...",
-      loc_found: "Best plan for United Kingdom:"
-    },
-    dashboard: {
-      title: "Live Network Activity",
-      nodes: "Active Nodes",
-      traffic: "Current Traffic",
-      latency: "Latency",
-      status: "System Status: Operational"
-    },
-    stats: {
-      countries: "Countries Covered",
-      speed: "Max Speed",
-      privacy: "Full Privacy",
-      uptime: "Uptime Guarantee"
-    },
-    pricing: {
-      b2c_title: "Travel Packages",
-      b2c_subtitle: "Honest gigabytes at max speed. Unused traffic expires at the end of the term, allowing us to keep the best prices.",
-      b2b_title: "Infrastructure Plans",
-      b2b_subtitle: "Wholesale traffic purchase. Connect your users via our API. You pay for the shared pool, your clients pay you.",
-      plans: {
-        light: { name: "Light Tripper", desc: "Perfect for maps and messengers for a short trip." },
-        nomad: { name: "Digital Nomad", desc: "Enough for calls, work, and social media for a whole month." },
-        ultra: { name: "Ultra Stream", desc: "Maximum freedom. Streaming, 4K video, and hotspot tethering." },
-        startup: { name: "Startup Pool", desc: "For small teams and arbitrage tests." },
-        agency: { name: "Agency Scale", desc: "For marketing agencies with high consumption." },
-        platform: { name: "Platform API", desc: "Integration into your app (White Label)." }
-      },
-      units: {
-        pack: "pack",
-        month: "mo",
-        days: "days",
-        instant: "Instant Activation (QR)",
-        hidden_fees: "No hidden fees",
-        hotspot: "Hotspot Allowed",
-        traffic: "Traffic",
-        api_access: "API Access Key",
-        pool_ip: "Dedicated IP Pool",
-        pool_label: "TB Pool",
-        select: "Select",
-        start: "Get Started"
-      }
-    },
-    footer: "Connect.Global © 2026. All Systems Operational."
-  }
-}
+
 
 export default function ConnectivityHub() {
   const [mode, setMode] = useState<"personal" | "business">("personal")
@@ -171,9 +39,13 @@ export default function ConnectivityHub() {
   const cardBgClass = isDark ? "bg-zinc-900/50 border-white/5" : "bg-white border-zinc-200 shadow-lg"
   const mutedTextClass = isDark ? "text-zinc-400" : "text-zinc-500"
   const navTextClass = isDark ? "text-zinc-400 hover:text-white" : "text-zinc-600 hover:text-zinc-900"
+  const isRTL = lang === 'he' || lang === 'ar' || lang === 'fa'
 
   return (
-    <div className={`min-h-screen ${bgClass} ${textClass} selection:bg-blue-500/30 font-sans transition-colors duration-500`}>
+    <div
+      dir={isRTL ? "rtl" : "ltr"}
+      className={`min-h-screen ${bgClass} ${textClass} selection:bg-blue-500/30 font-sans transition-colors duration-500`}
+    >
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-xl transition-colors duration-500 ${navBgClass}`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -431,12 +303,30 @@ export default function ConnectivityHub() {
                       </div>
 
                       <div className={`mt-4 py-2 border-t ${isDark ? 'border-white/5' : 'border-zinc-200'} flex justify-between items-center`}>
-                        <span className="text-[10px] font-medium opacity-50">{t.dashboard.status}</span>
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="w-3 h-3 text-green-500" />
+                          <span className="text-[10px] font-medium opacity-50">{t.dashboard.israel_optimized}</span>
+                        </div>
                         <div className="flex gap-4">
+                          <span className="text-[10px] font-mono opacity-50">ILI-TEL-AVIV-1</span>
                           <span className="text-[10px] font-mono opacity-50">US-EAST-1</span>
-                          <span className="text-[10px] font-mono opacity-50">EU-CENTRAL-1</span>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Startup Section Mini-Banner */}
+                  <div className={`mb-12 p-6 rounded-3xl border ${isDark ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'} flex flex-col md:flex-row items-center gap-6 text-left`}>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-lg mb-2">{t.startup_section.title}</h4>
+                      <p className={`text-sm ${mutedTextClass}`}>{t.startup_section.desc}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-end">
+                      {t.startup_section.features.map((f: string, i: number) => (
+                        <span key={i} className={`text-[10px] font-bold px-3 py-1 rounded-full ${isDark ? 'bg-zinc-800 text-blue-400' : 'bg-white text-blue-600 border border-blue-100 shadow-sm'}`}>
+                          {f}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
@@ -475,7 +365,10 @@ export default function ConnectivityHub() {
               <Zap className={`w-6 h-6 ${mutedTextClass}`} />
             </div>
             <div className="text-3xl font-bold mb-1">5G / LTE</div>
-            <div className={`text-sm ${mutedTextClass}`}>{t.stats.speed}</div>
+            <div className={`text-[10px] font-bold uppercase tracking-widest ${mutedTextClass} mb-1`}>Local Peering</div>
+            <div className={`text-xs ${mutedTextClass} flex gap-2 items-center opacity-70`}>
+              <span>Partner</span> • <span>Cellcom</span> • <span>Pelephone</span>
+            </div>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className={`mb-4 p-3 rounded-2xl border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
