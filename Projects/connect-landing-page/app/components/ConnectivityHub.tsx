@@ -194,6 +194,15 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
     return () => clearTimeout(timer)
   }, [])
 
+  // Sync theme with document element for Portals (Radix UI)
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [theme])
+
   // Theme logic
   const isDark = theme === 'dark'
   const bgClass = isDark ? "bg-[#111418]" : "bg-[#f5f2e8]" // Deep Charcoal vs Warm Sand Beige
@@ -348,13 +357,13 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
 
             <div className="w-px h-4 bg-zinc-700/50 mx-1"></div>
 
-            <span className={`text-xs font-bold tracking-wider ${mode === 'personal' ? 'text-blue-500' : 'text-zinc-400'}`}>B2C</span>
+            <span className={`text-xs font-bold tracking-wider ${mode === 'personal' ? 'text-blue-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2C</span>
             <Switch
               checked={mode === "business"}
               onCheckedChange={(c) => setMode(c ? "business" : "personal")}
               className="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-blue-600"
             />
-            <span className={`text-xs font-bold tracking-wider ${mode === 'business' ? 'text-purple-500' : 'text-zinc-400'}`}>B2B</span>
+            <span className={`text-xs font-bold tracking-wider ${mode === 'business' ? 'text-purple-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2B</span>
           </div>
         </div>
       </nav>
