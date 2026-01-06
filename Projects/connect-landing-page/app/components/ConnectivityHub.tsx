@@ -249,6 +249,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             <Popover open={langOpen} onOpenChange={setLangOpen}>
               <PopoverTrigger asChild>
                 <Button
+                  suppressHydrationWarning
                   variant="ghost"
                   role="combobox"
                   aria-expanded={langOpen}
@@ -260,6 +261,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
               </PopoverTrigger>
               <PopoverContent className="w-[200px] p-0 max-h-[400px]">
                 <Command>
+
                   <CommandInput placeholder="Search language..." className="h-9" />
                   <CommandList>
                     <CommandEmpty>No language found.</CommandEmpty>
@@ -290,10 +292,11 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
 
             <Popover open={langMobileOpen} onOpenChange={setLangMobileOpen}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className={`md:hidden ${navTextClass}`}>
+                <Button suppressHydrationWarning variant="ghost" size="icon" className={`md:hidden ${navTextClass}`}>
                   <Languages className="w-5 h-5" />
                 </Button>
               </PopoverTrigger>
+
               <PopoverContent className="w-[200px] p-0 max-h-[400px]">
                 <Command>
                   <CommandInput placeholder="Search language..." className="h-9" />
@@ -319,7 +322,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
 
             <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className={`h-8 gap-1 ${navTextClass} font-bold`}>
+                <Button suppressHydrationWarning variant="ghost" size="sm" className={`h-8 gap-1 ${navTextClass} font-bold`}>
                   {currency.symbol} {currency.code}
                 </Button>
               </PopoverTrigger>
@@ -419,9 +422,11 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                       <Popover open={countryOpen} onOpenChange={setCountryOpen}>
                         <PopoverTrigger asChild>
                           <Button
+                            suppressHydrationWarning
                             size="lg"
                             className="h-14 px-8 bg-blue-600 hover:bg-blue-500 rounded-full text-lg text-white w-full sm:w-[320px] justify-between group overflow-hidden relative"
                           >
+
                             <span className="flex items-center gap-2">
                               <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                               {selectedCountry || t.hero.b2c_btn_1}
