@@ -89,12 +89,12 @@ export default function ConnectivityHub() {
 
   // Theme logic
   const isDark = theme === 'dark'
-  const bgClass = isDark ? "bg-black" : "bg-zinc-50"
-  const textClass = isDark ? "text-white" : "text-zinc-900"
-  const navBgClass = isDark ? "bg-black/50 border-white/5" : "bg-white/70 border-zinc-200"
-  const cardBgClass = isDark ? "bg-zinc-900/50 border-white/5" : "bg-white border-zinc-200 shadow-lg"
-  const mutedTextClass = isDark ? "text-zinc-400" : "text-zinc-500"
-  const navTextClass = isDark ? "text-zinc-400 hover:text-white" : "text-zinc-600 hover:text-zinc-900"
+  const bgClass = isDark ? "bg-[#0a0c10]" : "bg-[#fcfaf2]" // Soft Midnight Black vs Warm Beige
+  const textClass = isDark ? "text-zinc-100" : "text-stone-900"
+  const navBgClass = isDark ? "bg-[#0a0c10]/80 border-white/5" : "bg-[#fcfaf2]/80 border-stone-200"
+  const cardBgClass = isDark ? "bg-zinc-900/40 border-white/5" : "bg-white/90 border-stone-100 shadow-sm"
+  const mutedTextClass = isDark ? "text-zinc-400" : "text-stone-500"
+  const navTextClass = isDark ? "text-zinc-400 hover:text-zinc-100" : "text-stone-600 hover:text-stone-900"
   const isRTL = lang === 'he' || lang === 'ar' || lang === 'fa'
 
   return (
