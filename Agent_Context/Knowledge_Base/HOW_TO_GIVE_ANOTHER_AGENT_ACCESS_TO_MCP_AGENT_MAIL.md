@@ -71,15 +71,27 @@ cat .env | grep HTTP_BEARER_TOKEN
 
 ### 3. Project Key / Ключ проекта
 
-**English:** This is the absolute path to the project/repository the agent will work on.
+**English:** This is the **project slug** (not absolute path). All agents working on the same project use the same slug, regardless of their local filesystem path.
 
-**Русский:** Это абсолютный путь к проекту/репозиторию, над которым будет работать агент.
+**Русский:** Это **слаг проекта** (не абсолютный путь). Все агенты, работающие над одним проектом, используют один и тот же слаг, независимо от их локального пути в файловой системе.
+
+**Format / Формат:**
+
+```text
+/<owner>/<project_name>
+```
 
 **Example / Пример:**
 
 ```text
-/Users/macbook/Documents/Unified_System
+/Gonya990/Unified_System_Core
 ```
+
+**Why slug instead of path? / Почему слаг вместо пути?**
+
+- Agents may run on different machines with different paths
+- Slug ensures all agents coordinate via the same shared mailbox
+- The hub server maps slug to a unified project identity
 
 ---
 
@@ -160,7 +172,7 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 Tool: register_agent
 
 Parameters:
-  project_key: "/Users/macbook/Documents/Unified_System"
+  project_key: "/Gonya990/Unified_System_Core"  # Project slug, NOT absolute path
   program: "Claude" (or "Codex", "Gemini", etc.)
   model: "claude-3.5-sonnet" (or your model name)
   name: (optional, system will assign like "BlueMountain")
@@ -172,7 +184,7 @@ Parameters:
 
 ```text
 Please register yourself with Agent Mail using the register_agent tool.
-Use project_key: /Users/macbook/Documents/Unified_System
+Use project_key: /Gonya990/Unified_System_Core
 Your program is: Claude
 Your model is: claude-3.5-sonnet
 ```
@@ -181,7 +193,7 @@ Your model is: claude-3.5-sonnet
 
 ```text
 Пожалуйста, зарегистрируйтесь в Agent Mail используя инструмент register_agent.
-Используйте project_key: /Users/macbook/Documents/Unified_System
+Используйте project_key: /Gonya990/Unified_System_Core
 Ваша программа: Claude
 Ваша модель: claude-3.5-sonnet
 ```
@@ -234,9 +246,9 @@ Your model is: claude-3.5-sonnet
 Tool: request_contact
 
 Parameters:
-  from_project: "/path/to/project-a"
+  from_project: "/Gonya990/ProjectA"  # Project slug
   from_agent: "BlueMountain"
-  to_project: "/path/to/project-b"
+  to_project: "/Gonya990/ProjectB"    # Target project slug
   to_agent: "GreenCastle"
   reason: "Need to coordinate API changes"
 ```
@@ -251,9 +263,9 @@ Parameters:
 Tool: respond_contact
 
 Parameters:
-  to_project: "/path/to/project-b"
+  to_project: "/Gonya990/ProjectB"
   to_agent: "GreenCastle"
-  from_project: "/path/to/project-a"
+  from_project: "/Gonya990/ProjectA"
   from_agent: "BlueMountain"
   accept: true
 ```
@@ -268,9 +280,9 @@ Parameters:
 Tool: send_message
 
 Parameters:
-  project_key: "/path/to/project-a"
+  project_key: "/Gonya990/ProjectA"
   from_agent: "BlueMountain"
-  to_agents: ["GreenCastle@/path/to/project-b"]
+  to_agents: ["GreenCastle@/Gonya990/ProjectB"]
   subject: "API coordination"
   body: "Let's discuss the new endpoint..."
 ```
@@ -289,7 +301,7 @@ Parameters:
 
 ```python
 file_reservation_paths(
-  project_key="/path/to/project",
+  project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
@@ -302,7 +314,7 @@ file_reservation_paths(
 
 ```python
 file_reservation_paths(
-  project_key="/path/to/project",
+  project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
@@ -339,14 +351,14 @@ send_message(
 
 ```python
 # At the start of each work session
-fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
+fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
 ```
 
 **Русский:**
 
 ```python
 # В начале каждой рабочей сессии
-fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
+fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
 ```
 
 ### 4. Acknowledge Important Messages / Подтверждайте важные сообщения
@@ -355,7 +367,7 @@ fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
 
 ```python
 acknowledge_message(
-  project_key="/path/to/project",
+  project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   message_id="msg-123"
 )
@@ -365,7 +377,7 @@ acknowledge_message(
 
 ```python
 acknowledge_message(
-  project_key="/path/to/project",
+  project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   message_id="msg-123"
 )
