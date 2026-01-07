@@ -10,13 +10,11 @@ from datetime import datetime
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
-from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
+from orchestrator_v3_no_face import run_no_face_pipeline, add_subtitles, OUTPUT_DIR
 from insta_uploader import upload_reel
-from pexels_broll import search_pexels_videos, download_video, get_best_video_file
 
 # Configuration
-REELS_AUTO_UPLOAD = False  # Set to True when Instagram credentials are ready
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
+REELS_AUTO_UPLOAD = True  # Set to False if you want to manual review first
 
 def get_weekly_trend():
     """
@@ -50,12 +48,11 @@ def get_weekly_trend():
 
 def generate_dynamic_script(trend):
     """
-    HIGH-QUALITY Impact Vision style script.
-    15 scenes with EPIC cinematic keywords.
+    Calls the LLM Council to generate a 15-scene script.
     """
     print(f"📝 Drafting Script for: {trend['topic']}")
     
-    # ORIGINAL Impact Vision Script - Premium Quality
+    # Generic high-impact script template that adapts to the topic
     script_ru = (
         f"Мы перешли черту. 2026 год стал моментом... когда {trend['topic']} перестал быть просто теорией... и стал реальностью. "
         f"Познакомьтесь с будущим. Это не просто технология... это глобальный сдвиг в самой сути нашего существования. "
@@ -74,7 +71,7 @@ def generate_dynamic_script(trend):
         "Это ваш новый мир. Мир, где каждый из нас — лидер армии технологий."
     )
     
-    # PREDEFINED 15 scenes with CINEMATIC keywords (ORIGINAL)
+    # Scene mapping with epic keywords
     scenes = [
         {"image": "ai_factory_s1_agent_working", "keyword": "cyborg digital office futuristic 4k"},
         {"image": "ai_factory_s2_interface", "keyword": "holographic dashboard futuristic computer cinematic"},
@@ -89,156 +86,71 @@ def generate_dynamic_script(trend):
         {"image": "ai_factory_s11_brain_firing", "keyword": "digital brain firing synapses close up cinematic"},
         {"image": "ai_factory_s12_hr_minimalist", "keyword": "clean futuristic hall minimalist architecture cinematic"},
         {"image": "ai_factory_s13_typing_code_matrix", "keyword": "hands typing glowing code matrix background cinematic"},
-        {"image": "ai_factory_s14_gears_digital_light", "keyword": "old gears turning into digital light cinematic"},
-        {"image": "ai_factory_s15_robot_army", "keyword": "massive army of robots silhouettes sunset cinematic"}
+        {"image": "ai_factory_s14_gears_digital_light_cinematic", "keyword": "old gears turning into digital light cinematic"},
+        {"image": "ai_factory_s15_robot_army_silhouette_sunset_cinematic", "keyword": "massive army of robots silhouettes sunset cinematic"}
     ]
     
     return script_ru, scenes
 
-def fetch_pexels_image(keyword, output_dir, scene_name):
-    """
-    Fetch image from Pexels Photos API (not videos).
-    """
-    import requests
-    
-    try:
-        url = "https://api.pexels.com/v1/search"
-        headers = {"Authorization": PEXELS_API_KEY}
-        params = {
-            "query": keyword,
-            "per_page": 1,
-            "orientation": "portrait"
-        }
-        
-        response = requests.get(url, headers=headers, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        if data.get("photos"):
-            photo = data["photos"][0]
-            img_url = photo["src"]["large2x"]  # High quality
-            
-            # Download
-            img_data = requests.get(img_url, timeout=15).content
-            
-            # Save
-            filename = f"{scene_name}.jpg"
-            filepath = output_dir / filename
-            
-            with open(filepath, "wb") as f:
-                f.write(img_data)
-                
-            print(f"      ✅ Pexels: {filename}")
-            return str(filepath)
-        else:
-            print(f"      ⚠️  No Pexels results for: {keyword}")
-            return None
-            
-    except Exception as e:
-        print(f"      ❌ Pexels failed: {e}")
-        return None
-
-def run_factory_production():
-    """ORIGINAL Factory Logic - Impact Vision Style"""
+def run_weekly_production():
+    """Main Factory Loop"""
     day_str = datetime.now().strftime('%Y-%m-%d')
     print(f"🏭 --- Factory Run: {day_str} ---")
-    print(f"📡 API Status: Pexels={PEXELS_API_KEY[:8]}...")
     
     # 1. Research
     trend = get_weekly_trend()
     
-    # 2. Scripting (ORIGINAL HIGH-QUALITY SCRIPT)
+    # 2. Scripting
     script_ru, scenes = generate_dynamic_script(trend)
     
-    # 3. Asset Resolution (ORIGINAL: check pre-generated, fallback to Pexels)
+    # 3. Production
     output_name = f"factory_daily_{day_str.replace('-', '')}"
     
-    # Try to find pre-generated assets first
-    assets_dirs = [
-        ROOT_DIR / "assets",
-        Path("/home/gonya/Unified_System/assets"),
-        Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
-    ]
+    # Path to where images are saved
+    gen_dir = ROOT_DIR / "assets"
+    if not gen_dir.exists(): # Fallback for MacBook local testing
+        gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
-    gen_dir = None
-    for d in assets_dirs:
-        if d.exists():
-            gen_dir = d
-            break
-    
-    if not gen_dir:
-        # Create assets dir on server
-        gen_dir = ROOT_DIR / "assets" / day_str
-        gen_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Resolve scenes
+    # Resolve image paths
     resolved_scenes = []
-    print(f"🎨 Resolving 15 scenes (assets or Pexels)...")
-    
-    for i, scene in enumerate(scenes):
-        # First: try to find pre-generated image
-        matches = list(gen_dir.glob(f"{scene['image']}_*.png")) + list(gen_dir.glob(f"{scene['image']}.jpg"))
-        
+    for scene in scenes:
+        matches = list(gen_dir.glob(f"{scene['image']}_*.png"))
         if matches:
-            print(f"   [{i+1}/15] ✅ Using cached: {scene['image']}")
             resolved_scenes.append({
                 "image": str(sorted(matches)[-1]),
                 "keyword": scene['keyword']
             })
         else:
-            # Fallback: fetch from Pexels
-            print(f"   [{i+1}/15] 🔍 Fetching from Pexels: {scene['keyword'][:40]}...")
-            img_path = fetch_pexels_image(scene['keyword'], gen_dir, scene['image'])
-            if img_path:
-                resolved_scenes.append({
-                    "image": img_path,
-                    "keyword": scene['keyword']
-                })
-            else:
-                print(f"      ⚠️  Skipping scene {i+1}")
+            print(f"⚠️ Image {scene['image']} not found. Skipping.")
 
-    if len(resolved_scenes) < 10:
-        print(f"❌ Critical failure: only {len(resolved_scenes)}/15 scenes. Minimum 10 required.")
+    if len(resolved_scenes) < 15:
+        print(f"❌ Not enough scenes resolved ({len(resolved_scenes)}/15). Check logs.")
         return
 
-    print(f"✅ Asset Resolution Complete: {len(resolved_scenes)}/15 scenes ready")
-    
-    # 4. Production Pipeline (ORIGINAL orchestrator_v3_no_face)
     print("🚀 Launching Production Pipeline...")
-    final_video_path = run_no_face_pipeline(script_ru, lang="ru", output_name=output_name, scenes=resolved_scenes)
+    run_no_face_pipeline(script_ru, lang="ru", output_name=output_name, scenes=resolved_scenes)
     
-    # 5. Final Verification and Upload
-    final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
-    impact_video = OUTPUT_DIR / f"{output_name}_impact.mp4"
-    
-    # Check both filenames (pipeline might produce either)
-    if final_video.exists():
-        actual_video = final_video
-    elif impact_video.exists():
-        actual_video = impact_video
-    elif (OUTPUT_DIR / f"{output_name}_raw.mp4").exists():
-        actual_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
-    else:
-        print(f"❌ Final video not found: {output_name}")
-        return
+    # 4. Final Verification and Upload
+    final_video = OUTPUT_DIR / f"{output_name}_impact.mp4"
+    if not final_video.exists():
+        # Fallback to check raw_final
+        raw_final = OUTPUT_DIR / f"{output_name}_final.mp4"
+        if raw_final.exists():
+            raw_final.rename(final_video)
 
-    print(f"✅ Factory Production Success: {actual_video}")
-    print(f"   Size: {actual_video.stat().st_size / 1024 / 1024:.1f} MB")
-    
-    if REELS_AUTO_UPLOAD:
-        print("📤 Initializing Auto-Upload to Instagram...")
-        caption = f"{trend['topic']}\\n\\n{trend['description']}\\n\\n#AI #Technology #2026 #Future #ImpactVision"
-        success = upload_reel(str(actual_video), caption)
-        if success:
-            print("🏆 Reel successfully published!")
-        else:
-            print("⚠️ Auto-upload failed. Manual check required.")
+    if final_video.exists():
+        print(f"✅ Factory Production Success: {final_video}")
+        
+        if REELS_AUTO_UPLOAD:
+            print("📤 Initializing Server-Side Upload...")
+            caption = f"{trend['topic']}\n\n{trend['description']}\n\n#AI #Technology #2026 #Future #ImpactVision"
+            success = upload_reel(str(final_video), caption)
+            if success:
+                print("🏆 Reel successfully published to Instagram!")
+            else:
+                print("⚠️ Auto-upload failed. Manual check required.")
     else:
-        print("📤 Auto-upload DISABLED. Video ready for manual upload.")
+        print(f"❌ Final video not found/generated: {output_name}")
 
 if __name__ == "__main__":
-    # Ensure we're using correct API KEY from environment
-    from dotenv import load_dotenv
-    load_dotenv(ROOT_DIR / ".env")
-    
-    run_factory_production()
+    run_weekly_production()
