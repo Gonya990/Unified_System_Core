@@ -17,10 +17,15 @@ from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
-# Load API keys from potential locations
-load_dotenv(ROOT_DIR / ".env")
-load_dotenv(ROOT_DIR / "LLM_Council" / ".env")
-load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
+# Load API keys from potential locations - OVERRIDE to ensure new key is used
+load_dotenv(ROOT_DIR / ".env", override=True)
+load_dotenv(ROOT_DIR / "LLM_Council" / ".env", override=True)
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+
+# Masked key debug
+openai_key = os.getenv("OPENAI_API_KEY", "")
+pexels_key = os.getenv("PEXELS_API_KEY", "")
+print(f"📡 API Status: OpenAI={openai_key[:8]}... Pexels={pexels_key[:8]}...")
 
 # Import internal tools
 try:
@@ -55,11 +60,17 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
+        print("❌ Error: OPENAI_API_KEY not found in environment.")
         return False
+        
+    # Masked key debug
+    masked_key = f"{api_key[:8]}...{api_key[-4:]}"
+    print(f"🔑 Using API Key: {masked_key}")
         
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        # Force default base_url to avoid 404s from conflicting env vars
+        client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
         
         response = client.audio.speech.create(
             model="tts-1-hd",
@@ -70,11 +81,7 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         mp3_path = output_path.with_suffix(".mp3")
         response.stream_to_file(str(mp3_path))
         
-        # STUDIO POST-PROCESSING:
-        # 1. bass boost (4dB at 100Hz)
-        # 2. treble boost (3dB at 8kHz)
-        # 3. loudnorm (EBU R128 normalization)
-        # 4. compressor for that "radio" punch
+        # STUDIO POST-PROCESSING
         subprocess.run([
             "ffmpeg", "-y", "-i", str(mp3_path),
             "-af", "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
@@ -88,59 +95,71 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         return False
 
 def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
-    """Generate audio using Edge-TTS with rate control for better naturalness"""
-    print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice}, rate=-10%)...")
+    """Generate audio using Edge-TTS with rate control"""
+    print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice})...")
     
     mp3_path = output_path.with_suffix(".mp3")
-    
-    # Try multiple ways to find edge-tts
     edge_tts_cmd = "edge-tts"
     venv_bin = ROOT_DIR / "venv_content/bin/edge-tts"
-    if venv_bin.exists():
-        edge_tts_cmd = str(venv_bin)
+    if venv_bin.exists(): edge_tts_cmd = str(venv_bin)
         
-    # Using --rate to slow down speech for more natural delivery
+    # FIX: Pass --rate as a single argument string or ensure it's correctly handled
     cmd = [
         edge_tts_cmd, 
         "--text", text, 
         "--write-media", str(mp3_path), 
         "--voice", voice,
-        "--rate", "-10%"
+        f"--rate=-10%" 
     ]
     
     try:
-        subprocess.run(cmd, check=True, cwd=str(ROOT_DIR))
+        subprocess.run(cmd, check=True, capture_output=True)
         # Convert to WAV
         subprocess.run([
             "ffmpeg", "-y", "-i", str(mp3_path),
-            "-ar", "16000", "-ac", "1", str(output_path)
+            "-ar", "44100", "-ac", "2", str(output_path)
         ], check=True, capture_output=True)
         print(f"✅ Enhanced Fallback Audio: {output_path}")
         return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Edge-TTS command failed: {e.stderr.decode() if e.stderr else e}")
+        return False
     except Exception as e:
-        print(f"❌ Edge-TTS failed: {e}")
+        print(f"❌ Edge-TTS general error: {e}")
         return False
 
 def transcribe_audio_whisper(audio_path: Path) -> List[Dict]:
-    """Get word-level timestamps using OpenAI Whisper API"""
+    """Get word-level timestamps using OpenAI Whisper API (compressed for size)"""
     print("🧠 Transcribing audio for word-level subtitles...")
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: return []
+    if not api_key: 
+        print("❌ Transcription failed: No API Key")
+        return []
     
+    # OpenAI Whisper has a 25MB limit. WAVs can be large, so convert to MP3 for upload.
+    temp_mp3 = audio_path.with_suffix(".mp3")
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(audio_path),
+            "-b:a", "128k", str(temp_mp3)
+        ], check=True, capture_output=True)
         
-        with open(audio_path, "rb") as f:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
+        
+        with open(temp_mp3, "rb") as f:
             transcript = client.audio.transcriptions.create(
                 model="whisper-1",
                 file=f,
                 response_format="verbose_json",
                 timestamp_granularities=["word"]
             )
+        
+        if temp_mp3.exists(): temp_mp3.unlink()
         return transcript.words if hasattr(transcript, 'words') else []
     except Exception as e:
         print(f"❌ Transcription failed: {e}")
+        if temp_mp3.exists(): temp_mp3.unlink()
         return []
 
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
@@ -152,12 +171,13 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
         return True
         
     # 2. Fallback to Edge-TTS
-    fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-ChristopherNeural")
+    print("⚠️ OpenAI Failed, falling back to Edge-TTS...")
+    fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-EmmaNeural")
     return generate_audio_edge(text, output_path, fallback_voice)
 
 def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool:
-    """Add dynamic word-by-word subtitles using custom FFmpeg filter"""
-    print(f"📝 Adding dynamic subtitles (Hormozi-style)...")
+    """Add dynamic word-by-word subtitles matching 'Motivaider' style (Gold, Centered, Big)"""
+    print(f"📝 Burning 'Motivaider' Style Subtitles...")
     
     # 1. Extract audio and transcribe
     temp_audio = OUTPUT_DIR / "temp_sub_audio.wav"
@@ -168,36 +188,35 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool
         print("⚠️ No words found for subtitles.")
         return False
         
-    # 2. Build massive drawtext filter
-    # Style: Big, yellow/white, bold, centered
+    # 2. Build drawtext filters
+    # Motivaider: High contrast, centered, Gold/White
     filters = []
-    font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf" # Typical Mac bold font
+    font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf"
     if not Path(font_path).exists(): font_path = "Arial"
 
     for i, w in enumerate(words):
-        start = w['start']
-        end = w['end']
-        text = w['word'].upper()
-        # Clean text for ffmpeg
-        text = text.replace("'", "").replace(":", "").replace("\"", "")
+        # Handle both dict and object (OpenAI SDK returns objects)
+        start = w.start if hasattr(w, 'start') else w.get('start', 0)
+        end = w.end if hasattr(w, 'end') else w.get('end', 0)
+        text = w.word if hasattr(w, 'word') else w.get('word', "")
         
-        # Current word in Yellow, others invisible or faint? 
-        # For simplicity: only show the current word big in the middle
-        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=yellow:fontsize=90:"
-             f"x=(w-text_w)/2:y=(h-text_h)/2+200:borderw=4:bordercolor=black:"
+        text = text.upper().replace("'", "").replace(":", "").replace("\"", "").replace("\\", "")
+        
+        # Color: Golden Yellow (0xFFD700)
+        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=120:"
+             f"x=(w-text_w)/2:y=(h-text_h)/2+50:borderw=5:bordercolor=black:"
              f"enable='between(t,{start},{end})'")
         filters.append(f)
         
     filter_str = ",".join(filters)
     
     try:
-        # Apply filters in batches if too long, but here we try all at once
         subprocess.run([
             "ffmpeg", "-y", "-i", str(video_path),
             "-vf", filter_str,
             "-c:a", "copy", str(output_path)
         ], check=True, capture_output=True)
-        print(f"✅ Subtitles burned: {output_path}")
+        print(f"✨ Motivaider Masterpiece Finalized: {output_path}")
         temp_audio.unlink()
         return True
     except Exception as e:
@@ -271,6 +290,9 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
     
     print(f"✅ Video assembled: {output_path}")
 
+# FORCE CORRECT API KEY (bypassing potentially bad environment)
+os.environ["OPENAI_API_KEY"] = "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"
+
 def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path):
     """
     Create a CINEMATIC high-energy video. 
@@ -315,26 +337,14 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         else:
             img_dur += broll_dur
 
-        # 2. Visionary AI Image Flash (Aggressive motion)
+        # 2. Visionary AI Image Flash (STABLE ROBUST MOTION)
         seg_p_img = OUTPUT_DIR / f"cin_seg_{i}_img.mp4"
-        # Randomize movement: Zoom in, Pan up, or Pan down
-        motions = [
-            "zoom+0.001", 
-            "zoom-0.0005:y='ih/2-(ih/zoom/2)+100*t/d'", 
-            "zoom+0.0008:x='iw/2-(iw/zoom/2)+100*t/d'"
-        ]
-        import random
-        motion = random.choice(motions).split(":")
-        z_expr = motion[0]
-        extra = f":{motion[1]}" if len(motion) > 1 else ":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        
+        # We use a simple scale+crop to avoid zoompan issues
         subprocess.run([
             "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
             "-t", str(img_dur),
-            "-vf", f"scale=2000:-1,zoompan=z='{z_expr}'{extra}:d=1:s=1080x1920:fps=30,"
-                   "fade=in:0:5:color=white,vignette=angle=0.5,curves=vintage",
-            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30",
-            str(seg_p_img)
+            "-vf", "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=white,vignette=angle=0.5",
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30", str(seg_p_img)
         ], check=True, capture_output=True)
         segments.append(seg_p_img)
 
@@ -349,24 +359,21 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         "-c", "copy", str(raw_visuals)
     ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
     
-    # 3. PRO AUDIO ENGINE: Compression + Reverb + Tech Ambience
-    # We generate brown noise as a "tech floor" and sidechain/mix it
+    # 3. PRO AUDIO ENGINE: Compression + Reverb
     print("🔊 Mixing professional audio suite...")
     final_audio = OUTPUT_DIR / "final_cin_audio.wav"
     
-    # Filter complex for audio:
-    # [0:a] is voice. Apply compressor (acompressor), then reverb (aecho), then mix with generated brown noise (anoisesrc)
+    # Simplified robust filter complex
     audio_filter = (
-        "[0:a]acompressor=threshold=-15dB:ratio=4:attack=5:release=50[voice];"
-        "[voice]aecho=0.8:0.88:40:0.3[voice_verb];"
-        "anoisesrc=d=" + str(audio_duration) + ":c=brown:amp=0.01[bg];"
-        "[voice_verb][bg]amix=inputs=2:duration=first:weights=1 0.3[out]"
+        "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
+        "aecho=0.8:0.88:40:0.3,"
+        "loudnorm"
     )
     
     subprocess.run([
         "ffmpeg", "-y", "-i", str(audio_path),
-        "-filter_complex", audio_filter,
-        "-map", "[out]", str(final_audio)
+        "-af", audio_filter,
+        str(final_audio)
     ], check=True, capture_output=True)
 
     # 4. Final Final Merge
@@ -377,10 +384,11 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     ], check=True, capture_output=True)
     
     # Cleanup
-    for seg in segments: seg.unlink()
-    raw_visuals.unlink()
-    final_audio.unlink()
-    concat_file.unlink()
+    for seg in segments: 
+        if seg.exists(): seg.unlink()
+    if raw_visuals.exists(): raw_visuals.unlink()
+    if final_audio.exists(): final_audio.unlink()
+    if concat_file.exists(): concat_file.unlink()
     return True
 
 def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: List[Dict] = None):
@@ -439,23 +447,23 @@ if __name__ == "__main__":
     # Mapping scenes to images (using the ones generated across steps)
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
-    # Selecting the best 15 images and defining keywords for B-roll (Motion-Oriented)
+    # Selecting the best 15 images and defining keywords for B-roll (MOTIVAIDER STYLE: POWER, NATURE, CINEMA)
     scene_data = [
-        {"image": "ai_scene_1_network", "keyword": "digital neural network flying through 4k cinematic"},
-        {"image": "ai_scene_2_economy", "keyword": "stock market chart motion blur global finance"},
-        {"image": "ai_scene_3_content_gen", "keyword": "digital content holographic neon city glitch"},
-        {"image": "ai_future_bg_3", "keyword": "robot arm working in hi-tech laboratory timelapse"},
-        {"image": "ai_future_bg_4", "keyword": "human brain synapses firing close up cinematic"},
-        {"image": "ai_scene_6_code_matter", "keyword": "matrix code rain falling digital background"},
-        {"image": "ai_future_bg_1", "keyword": "automated factory robots moving fast cinematic"},
-        {"image": "ai_scene_8_art_exhibit", "keyword": "abstract colorful light show motion background"},
-        {"image": "ai_scene_9_edu_tutor", "keyword": "hologram technology student classroom future"},
-        {"image": "ai_fact_3_medical", "keyword": "medical scan 3d rendering clinic future"},
-        {"image": "ai_scene_11_green_city", "keyword": "smart city aerial view timelapse green tech"},
-        {"image": "ai_scene_12_ethics_safety", "keyword": "cyber security digital lock background motion"},
-        {"image": "ai_fact_1_robot", "keyword": "cyborg human handshake futuristic interaction"},
-        {"image": "ai_scene_14_global_net_earth", "keyword": "earth from space rotating global connection city lights"},
-        {"image": "ai_scene_15_sunrise_digital", "keyword": "futuristic city sunrise horizon cinematic aerial"}
+        {"image": "ai_scene_1_network", "keyword": "cinematic nebula space 4k slow motion"},
+        {"image": "ai_scene_2_economy", "keyword": "stormy ocean waves cinematic 4k"},
+        {"image": "ai_scene_3_content_gen", "keyword": "lion roar slow motion cinematic"},
+        {"image": "ai_future_bg_3", "keyword": "eagle flying mountains cinematic"},
+        {"image": "ai_future_bg_4", "keyword": "lightning storm night sky cinematic"},
+        {"image": "ai_scene_6_code_matter", "keyword": "matrix code rain slow motion cinematic"},
+        {"image": "ai_future_bg_1", "keyword": "mountain fireplace cozy dark cinematic"},
+        {"image": "ai_scene_8_art_exhibit", "keyword": "ink in water slow motion cinematic"},
+        {"image": "ai_scene_9_edu_tutor", "keyword": "old library bookshelf cinematic"},
+        {"image": "ai_fact_3_medical", "keyword": "human heart 3d rendering cinematic"},
+        {"image": "ai_scene_11_green_city", "keyword": "waterfall cinematic 4k slow motion"},
+        {"image": "ai_scene_12_ethics_safety", "keyword": "cyber attack digital shield cinematic"},
+        {"image": "ai_fact_1_robot", "keyword": "artificial intelligence robot thinking cinematic"},
+        {"image": "ai_scene_14_global_net_earth", "keyword": "planet earth from space cinematic"},
+        {"image": "ai_scene_15_sunrise_digital", "keyword": "futuristic city sunrise cinematic"}
     ]
     
     selected_scenes = []
@@ -468,6 +476,8 @@ if __name__ == "__main__":
             })
         else:
             print(f"⚠️ Image {scene['image']} not found in {gen_dir}")
+
+    print(f"🔍 Found {len(selected_scenes)}/15 scenes with images.")
 
     # Run RU pipeline
     if len(selected_scenes) >= 15:
@@ -493,4 +503,4 @@ if __name__ == "__main__":
         )
         run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", scenes=selected_scenes)
     else:
-        print(f"❌ Not enough images found ({len(selected_images)}/15). Check generation.")
+        print(f"❌ Not enough images found ({len(selected_scenes)}/15). Check gen_dir: {gen_dir}")
