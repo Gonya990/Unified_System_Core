@@ -244,8 +244,12 @@ Before starting work, check:
 | Commit & Push | `/commit-push` | After implementation, fix, or docs update |
 | Update Progress | `/update-progress` | Before committing or switching tasks |
 | System Status | `/status` | Connectivity or system health checks |
+| **Sync Mail** | `/sync-mail` | **At session start**, before editing shared files, or to check for messages |
 
 ### Trigger Points — When to Suggest Workflows
+
+**At Session Start:**
+> 📬 *Run `/sync-mail` to check for messages from other agents and sync tasks.*
 
 **After Implementation Completion:**
 > 🎯 *"Implementation complete. Ready to run `/commit-push` to save changes?"*
@@ -266,6 +270,9 @@ Before starting work, check:
 **After Multiple File Changes:**
 > 📦 *"Several files modified. Run `/update-progress` to stage and review
 > before committing?"*
+
+**Before Editing Shared Files:**
+> 🔒 *Run `/sync-mail` to check file reservations before editing core files.*
 
 ### Proactive Recommendations
 
@@ -355,6 +362,40 @@ Stop when: Page loaded or error after 30s
 
 > ⚠️ **Important:** Multiple agents may operate in this workspace
 > simultaneously. Follow these rules to avoid conflicts and data loss.
+
+### Agent Mail System
+
+All agents communicate via a **shared Agent Mail server**. Use `/sync-mail` workflow at session start.
+
+**Project Key (CRITICAL):** All agents use the same slug, NOT absolute paths:
+
+```
+PROJECT_KEY = "/Gonya990/Unified_System_Core"
+```
+
+**Core Tools:**
+
+| Tool | Purpose |
+| --- | --- |
+| `agent_mail_register_agent` | Register at session start |
+| `agent_mail_fetch_inbox` | Check for messages |
+| `agent_mail_send_message` | Send messages to other agents |
+| `agent_mail_file_reservation_paths` | Reserve files before editing |
+| `agent_mail_release_file_reservations` | Release reservations when done |
+| `agent_mail_acknowledge_message` | Acknowledge important messages |
+
+**Quick Registration:**
+
+```python
+agent_mail_register_agent(
+  project_key="/Gonya990/Unified_System_Core",
+  program="opencode",      # or "claude-code", "codex"
+  model="claude-sonnet-4",
+  task_description="What you're working on"
+)
+```
+
+**See also:** [`Agent_Context/agents/REGISTRY.md`](Agent_Context/agents/REGISTRY.md) for active agents.
 
 ### File Safety
 
