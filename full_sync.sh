@@ -86,7 +86,7 @@ def broadcast(msg):
             'arguments': {
                 'project_key': PROJECT_KEY,
                 'sender_name': 'Antigravity',
-                'to': ['FuchsiaCat', '@all'],
+                'to': ['FuchsiaCat', 'PinkLake'],
                 'subject': 'SYSTEM SYNC & LIFT COMPLETE',
                 'body_md': msg
             }
