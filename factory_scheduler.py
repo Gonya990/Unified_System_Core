@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 from datetime import datetime
+import os
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
@@ -13,7 +14,8 @@ from insta_uploader import upload_reel
 from daily_researcher import run_daily_research, generate_vision_assets
 
 # Configuration
-REELS_AUTO_UPLOAD = True 
+REELS_AUTO_UPLOAD = True
+HEBREW_WEEKLY = True  # Enable weekly Hebrew special 
 
 def run_factory_production():
     """
@@ -87,5 +89,101 @@ def run_factory_production():
     else:
         print("❌ Video generation failed.")
 
+def translate_to_hebrew(russian_text: str) -> str:
+    """
+    Translate Russian script to Hebrew using OpenAI
+    """
+    try:
+        from openai import OpenAI
+        client = OpenAI()
+        
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a professional translator. Translate the following Russian text to Hebrew. Maintain the style, energy, and impact. Return ONLY the Hebrew translation, no explanations."},
+                {"role": "user", "content": russian_text}
+            ]
+        )
+        
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"❌ Translation failed: {e}")
+        return "העתיד כאן. הטכנולוגיה משנה הכל. אנחנו בונים את המחר."
+
+def run_factory_production_hebrew():
+    """
+    Weekly Hebrew Special Production
+    Same research as daily, but with Hebrew translation and special branding
+    """
+    day_str = datetime.now().strftime('%Y-%m-%d')
+    print(f"🇮🇱 --- Hebrew Weekly Special: {day_str} ---")
+    
+    # 1. Research & Scripting (same as daily)
+    print("🧠 Starting Research Phase...")
+    content_data = run_daily_research()
+    
+    if not content_data:
+        print("❌ Research failed. Aborting production.")
+        return
+
+    print(f"✅ Topic Selected: {content_data['selected_topic']}")
+    
+    # 2. Translate to Hebrew
+    print("🌐 Translating to Hebrew...")
+    script_he = translate_to_hebrew(content_data['script_ru'])
+    print(f"✅ Hebrew Translation Ready ({len(script_he)} chars)")
+    
+    # 3. Asset Generation (same visuals)
+    print("🎨 Starting Asset Generation Phase...")
+    assets_dir = ROOT_DIR / "assets" / f"{day_str}_hebrew"
+    
+    scenes_with_assets = generate_vision_assets(content_data['scenes'], assets_dir)
+    
+    final_scenes = []
+    for scene in scenes_with_assets:
+        if scene.get("resolved_path"):
+            final_scenes.append({
+                "image": scene["resolved_path"],
+                "keyword": scene["keyword"]
+            })
+            
+    if len(final_scenes) < 5:
+        print(f"❌ Critical Asset Failure. Only {len(final_scenes)} assets generated. Aborting.")
+        return
+
+    # 4. Production Pipeline (HEBREW)
+    output_name = f"factory_hebrew_{day_str.replace('-', '')}"
+    print(f"🎬 Starting Hebrew Production: {output_name}")
+    
+    final_video_path = run_no_face_pipeline(
+        text=script_he, 
+        lang="he",  # Hebrew!
+        output_name=output_name, 
+        scenes=final_scenes
+    )
+    
+    # 5. Verification & Upload
+    if final_video_path and final_video_path.exists():
+        print(f"✅ HEBREW VIDEO READY: {final_video_path}")
+        
+        if REELS_AUTO_UPLOAD:
+            print("📤 Initializing Hebrew Upload...")
+            caption = (
+                f"🇮🇱 {content_data['selected_topic']}\n\n"
+                f"{content_data.get('description', '')}\n\n"
+                "#AI #עתיד #טכנולוגיה #חדשנות #2026"
+            )
+            success = upload_reel(str(final_video_path), caption)
+            if success:
+                print("🏆 Hebrew Reel published successfully!")
+            else:
+                print("⚠️ Upload failed. Check logs.")
+    else:
+        print("❌ Hebrew video generation failed.")
+
 if __name__ == "__main__":
-    run_factory_production()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--hebrew":
+        run_factory_production_hebrew()
+    else:
+        run_factory_production()
