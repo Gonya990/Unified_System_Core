@@ -24,11 +24,14 @@ echo "✅ Локальный код отправлен в облако."
 echo "📌 [3/6] Обновление кода и запуск сервисов на удаленном сервере..."
 tailscale ssh gonya@100.110.209.49 "
     cd /home/gonya/Unified_System
+    # Фиксируем или сбрасываем локальные изменения на сервере для чистого pull
+    git add .
+    git commit -m 'chore: remote auto-sync save' || echo 'No remote changes'
     git pull origin main --rebase
     
     echo '--- RESTARTING SERVICES ---'
     cd Projects/AI_Core
-    # Перезапуск бота с локальным билдом (профиль local)
+    # Перезапуск бота с локальным билдом
     docker compose --profile local up -d ai-bot-local
     
     echo '--- REMOTE SYSTEM CHECK ---'
@@ -38,19 +41,40 @@ echo "✅ Удаленный сервер обновлен и перезапущ
 
 # 4. MCP BROADCAST (Communication)
 echo "📌 [4/6] Рассылка уведомлений всем агентам..."
-# Собираем лог последних коммитов для прозрачности
+# Собираем лог последних коммитов
 LAST_WORK=$(git log -n 5 --pretty=format:"- %s (%an)")
+REPORT_FILE="/tmp/mcp_report.md"
+
+cat <<EOF > "$REPORT_FILE"
+### 🏁 Система Перезапущена и Синхронизирована
+**Время:** $(date +'%Y-%m-%d %H:%M:%S')
+
+**Проделанная работа (последние правки):**
+$LAST_WORK
+
+**Статус сервисов:**
+- AI Telegram Bot: 🟢 Running (Remote)
+- Connect Landing Page: 🟢 Running (Local:3002)
+- Beads: 🟢 Synced
+
+*Все агенты, примите во внимание текущий стейт проекта.*
+EOF
+
+# Передаем файл на сервер и отправляем через Python
+tailscale ssh gonya@100.110.209.49 "cat > /tmp/mcp_report.md" < "$REPORT_FILE"
 
 tailscale ssh gonya@100.110.209.49 "
     cd /home/gonya/Unified_System
     ./venv/bin/python3 -c \"
 import requests
 import json
-from datetime import datetime
 
 URL = 'http://localhost:8765/mcp'
 TOKEN = 'c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb'
 PROJECT_KEY = '/Gonya990/Unified_System_Core'
+
+with open('/tmp/mcp_report.md', 'r') as f:
+    report_content = f.read()
 
 def broadcast(msg):
     headers = {'Authorization': f'Bearer {TOKEN}', 'Content-Type': 'application/json'}
@@ -69,23 +93,12 @@ def broadcast(msg):
         }, 
         'id': 1
     }
-    requests.post(URL, json=payload, headers=headers)
+    r = requests.post(URL, json=payload, headers=headers)
+    print(r.text)
 
-report = f'''### 🏁 Система Перезапущена и Синхронизирована
-**Время:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-**Проделанная работа (последние правки):**
-{'''"'''+LAST_WORK+'''"'''}
-
-**Статус сервисов:**
-- AI Telegram Bot: 🟢 Running (Remote)
-- Connect Landing Page: 🟢 Running (Local:3002)
-- Beads: 🟢 Synced
-
-*Все агенты, примите во внимание текущий стейт проекта.*
-'''
-broadcast(report)
+broadcast(report_content)
 \""
+rm "$REPORT_FILE"
 echo "✅ Уведомление отправлено всем агентам."
 
 # 5. WORK LOG UPDATE
