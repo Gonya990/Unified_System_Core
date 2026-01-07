@@ -11,6 +11,15 @@ sys.path.append(str(ROOT_DIR))
 from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
 from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew
 from insta_uploader import upload_reel
+import subprocess
+
+def agent_sync(msg):
+    """Синхронизация с агентом Кости (FuchsiaCat) через MCP"""
+    try:
+        subprocess.run(["python3", "sync_agent.py", msg], capture_output=True, text=True)
+        print(f"🔄 Agent Sync: {msg[:50]}...")
+    except Exception as e:
+        print(f"⚠️ Sync Error: {e}")
 
 # Configuration
 REELS_AUTO_UPLOAD = False
@@ -56,14 +65,18 @@ def run_factory_production(is_weekly=False):
 
     print(f"🏭 RUN: {day_str} {'(HEBREW)' if is_weekly_hebrew else ''}")
     
-    # 1. RESEARCH
+    # PHASE 1: DAILY RESEARCH
+    agent_sync(f"Начинаю фазу исследования для {'еженедельного иврита' if is_weekly_hebrew else 'ежедневного ролика'}")
     try:
         content_data = run_daily_research()
         if not content_data:
+            agent_sync("Исследование не дало результатов, использую Fallback")
             content_data = get_static_fallback()
     except Exception as e:
-        print(f"❌ Research Panic: {e}")
+        agent_sync(f"Ошибка исследования: {e}")
         content_data = get_static_fallback()
+
+    agent_sync(f"Тема выбрана: {content_data.get('selected_topic')}")
 
     # 2. SELECTION
     if is_weekly_hebrew:
@@ -77,6 +90,7 @@ def run_factory_production(is_weekly=False):
         prefix = "factory_daily"
 
     # 3. ASSETS
+    agent_sync(f"Генерирую визуалы для {len(content_data.get('scenes', []))} сцен")
     assets_dir = ROOT_DIR / "assets" / day_str
     assets_dir.mkdir(parents=True, exist_ok=True)
     
@@ -85,6 +99,8 @@ def run_factory_production(is_weekly=False):
     for a in assets:
         if a.get('resolved_path'):
             final_scenes.append({"image": a['resolved_path'], "keyword": a['keyword']})
+            
+    agent_sync(f"Ассеты готовы: {len(final_scenes)} сцен успешно скачано")
             
     if not final_scenes:
         print("❌ No assets. Aborting.")
