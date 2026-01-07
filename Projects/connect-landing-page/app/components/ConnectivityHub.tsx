@@ -947,6 +947,17 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
           })}
         </div>
 
+        {/* Pricing Footnotes */}
+        {t.pricing.footnotes && (
+          <div className="mt-12 max-w-3xl mx-auto space-y-2">
+            {t.pricing.footnotes.map((note, i) => (
+              <p key={i} className={`text-[10px] ${mutedTextClass} opacity-50 uppercase tracking-widest leading-relaxed`}>
+                {note}
+              </p>
+            ))}
+          </div>
+        )}
+
         {/* B2B ROI Calculator inside Pricing */}
         {mode === 'business' && (
           <motion.div
@@ -1439,7 +1450,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
 
       {/* Floating Support Button */}
       <motion.a
-        href="https://wa.me/message/CONNECT_GLOBAL" // Updated placeholder
+        href={t.contact?.whatsapp || "https://wa.me/972528416550"}
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0 }}
@@ -1484,21 +1495,21 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             </div>
 
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Solutions</h4>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Contact</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
-                <li><button onClick={() => setMode('personal')} className="hover:text-blue-500 transition-colors">For Personal</button></li>
-                <li><button onClick={() => setMode('business')} className="hover:text-purple-500 transition-colors">For Business</button></li>
-                <li><button onClick={() => document.getElementById('developer-preview')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-purple-500 transition-colors">API Docs</button></li>
-                <li><button onClick={() => window.open('https://wa.me/message/CONNECT_GLOBAL')} className="hover:text-green-500 transition-colors">Support</button></li>
+                <li><a href={`mailto:${t.contact?.email}`} className="hover:text-blue-500 transition-colors">{t.contact?.email || 'Email Support'}</a></li>
+                <li><a href={`tel:${t.contact?.phone}`} className="hover:text-blue-500 transition-colors">{t.contact?.phone || 'Call Us'}</a></li>
+                <li><a href={t.contact?.whatsapp} target="_blank" rel="noreferrer" className="hover:text-green-500 transition-colors">WhatsApp</a></li>
+                <li className="text-xs uppercase opacity-60">{t.contact?.address}</li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Legal</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
-                <li><button onClick={() => alert('Terms of Service: Coming Soon')} className="hover:text-blue-500 transition-colors">Terms of Service</button></li>
-                <li><button onClick={() => alert('Privacy Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">Privacy Policy</button></li>
-                <li><button onClick={() => alert('Refund Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">Refund Policy</button></li>
+                <li><button onClick={() => alert('Terms of Service: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.terms || 'Terms'}</button></li>
+                <li><button onClick={() => alert('Privacy Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.privacy || 'Privacy'}</button></li>
+                <li><button onClick={() => alert('Refund Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.refund || 'Refunds'}</button></li>
               </ul>
             </div>
           </div>
@@ -1506,7 +1517,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold uppercase tracking-widest opacity-30">
             <div className="text-white">{t.footer}</div>
             <div className="flex gap-8 text-white">
-              <span>Status: All Operational</span>
+              <span>Status: {t.legal?.status || 'Operational'}</span>
               <span>v1.2.0</span>
             </div>
           </div>

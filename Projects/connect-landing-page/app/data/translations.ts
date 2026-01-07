@@ -27,6 +27,7 @@ export interface Translation {
     b2c_title: string; b2c_subtitle: string; b2b_title: string; b2b_subtitle: string;
     plans: Record<string, { name: string; desc: string }>;
     units: Record<string, string>;
+    footnotes?: string[];
   };
   config: {
     title: string; gb: string; mins: string; sms: string; confirm: string; total: string;
@@ -48,10 +49,22 @@ export interface Translation {
     durations: string[]; usage_types: string[]; back: string;
   };
   footer: string;
+  contact?: {
+    email: string;
+    phone: string;
+    whatsapp: string;
+    address: string;
+  };
+  legal?: {
+    terms: string;
+    privacy: string;
+    refund: string;
+    status: string;
+  };
 }
 
 export const translations: Record<string, Translation> = {
-  "en": {
+  "en": { // Main English
     "nav": {
       "coverage": "Coverage",
       "pricing": "Pricing",
@@ -194,7 +207,12 @@ export const translations: Record<string, Translation> = {
         "white_label": "White Label Dashboard",
         "custom_infra": "Custom Infrastructure",
         "most_popular": "Most Popular"
-      }
+      },
+      "footnotes": [
+        "* 5G availability depends on local carrier coverage and device capabilities.",
+        "* Data plans are prepaid and do not auto-renew unless specified.",
+        "* Prices are exclusive of local VAT where applicable."
+      ]
     },
     "config": {
       "title": "Configure Your Plan",
@@ -250,7 +268,19 @@ export const translations: Record<string, Translation> = {
       ],
       "back": "Back"
     },
-    "footer": "Connect.Global © 2026. All Systems Operational."
+    "footer": "Connect.Global © 2026. Next-generation eSIM infrastructure.",
+    "contact": {
+      "email": "gonya90.gg@gmail.com",
+      "phone": "+972 52-841-6550",
+      "whatsapp": "https://wa.me/972528416550",
+      "address": "Haifa, Israel"
+    },
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "refund": "Refund Policy",
+      "status": "All Systems Operational"
+    }
   },
   "ru": {
     "nav": {
@@ -394,8 +424,13 @@ export const translations: Record<string, Translation> = {
         "shared_pool": "Общий пул данных",
         "white_label": "White Label панель",
         "custom_infra": "Своя инфраструктура",
-        "most_popular": "Популярный"
-      }
+        "most_popular": "Самый популярный"
+      },
+      "footnotes": [
+        "* Доступность 5G зависит от покрытия местного оператора и возможностей устройства.",
+        "* Пакеты данных предоплачены и не продлеваются автоматически.",
+        "* Цены указаны без учета НДС, если применимо."
+      ]
     },
     "config": {
       "title": "Настройка тарифа",
@@ -451,7 +486,19 @@ export const translations: Record<string, Translation> = {
       ],
       "back": "Назад"
     },
-    "footer": "Connect.Global © 2026. Все системы работают штатно."
+    "footer": "Connect.Global © 2026. Инфраструктура eSIM нового поколения.",
+    "contact": {
+      "email": "gonya90.gg@gmail.com",
+      "phone": "+972 52-841-6550",
+      "whatsapp": "https://wa.me/972528416550",
+      "address": "Хайфа, Израиль"
+    },
+    "legal": {
+      "terms": "Условия использования",
+      "privacy": "Политика конфиденциальности",
+      "refund": "Политика возврата",
+      "status": "Все системы работают штатно"
+    }
   },
   "he": {
     "nav": {
@@ -596,7 +643,12 @@ export const translations: Record<string, Translation> = {
         "white_label": "לוח בקרה White Label",
         "custom_infra": "תשתית מותאמת אישית",
         "most_popular": "הכי פופולרי"
-      }
+      },
+      "footnotes": [
+        "* זמינות 5G תלויה בכיסוי המפעיל המקומי וביכולות המכשיר.",
+        "* חבילות הגלישה הן בתשלום מראש ואינן מתחדשות אוטומטית.",
+        "* המחירים אינם כוללים מע\"מ במידת הצורך."
+      ]
     },
     "config": {
       "title": "הגדרת החבילה",
@@ -652,7 +704,19 @@ export const translations: Record<string, Translation> = {
       ],
       "back": "חזור"
     },
-    "footer": "Connect.Global © 2026. כל המערכות פועלות כסדרן."
+    "footer": "Connect.Global © 2026. תשתית eSIM מהדור הבא.",
+    "contact": {
+      "email": "gonya90.gg@gmail.com",
+      "phone": "052-841-6550",
+      "whatsapp": "https://wa.me/972528416550",
+      "address": "חיפה, ישראל"
+    },
+    "legal": {
+      "terms": "תנאי שימוש",
+      "privacy": "מדיניות פרטיות",
+      "refund": "מדיניות החזרים",
+      "status": "כל המערכות פועלות כסדרן"
+    }
   },
   "es": {
     "nav": {
