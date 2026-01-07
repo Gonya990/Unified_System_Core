@@ -169,13 +169,14 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 **Русский:** Агент должен вызвать этот MCP инструмент:
 
 ```yaml
-Tool: register_agent
+Tool: agent_mail_register_agent
 
 Parameters:
   project_key: "/Gonya990/Unified_System_Core"  # Project slug, NOT absolute path
-  program: "Claude" (or "Codex", "Gemini", etc.)
-  model: "claude-3.5-sonnet" (or your model name)
-  name: (optional, system will assign like "BlueMountain")
+  program: "claude-code" (or "opencode", "codex", "gemini", etc.)
+  model: "claude-sonnet-4" (or your model name)
+  name: (optional, system will auto-generate like "BlueMountain")
+  task_description: "What you're working on" (optional)
 ```
 
 ### Example Prompt for the Agent / Пример промпта для агента
@@ -210,11 +211,11 @@ Your model is: claude-3.5-sonnet
 
 | Tool / Инструмент | Purpose / Назначение |
 | ----------------- | -------------------- |
-| `send_message` | Send messages to other agents / Отправить сообщения другим агентам |
-| `fetch_inbox` | Check inbox for new messages / Проверить входящие сообщения |
-| `acknowledge_message` | Mark message as read / Отметить сообщение как прочитанное |
-| `file_reservation_paths` | Reserve files to avoid conflicts / Зарезервировать файлы чтобы избежать конфликтов |
-| `release_file_reservations` | Release file reservations / Освободить резервирования файлов |
+| `agent_mail_send_message` | Send messages to other agents / Отправить сообщения другим агентам |
+| `agent_mail_fetch_inbox` | Check inbox for new messages / Проверить входящие сообщения |
+| `agent_mail_acknowledge_message` | Mark message as read / Отметить сообщение как прочитанное |
+| `agent_mail_file_reservation_paths` | Reserve files to avoid conflicts / Зарезервировать файлы чтобы избежать конфликтов |
+| `agent_mail_release_file_reservations` | Release file reservations / Освободить резервирования файлов |
 
 ### Macro Tools (Recommended) / Макро инструменты (Рекомендуется)
 
@@ -224,9 +225,9 @@ Your model is: claude-3.5-sonnet
 
 | Macro / Макрос | Purpose / Назначение |
 | -------------- | -------------------- |
-| `macro_start_session` | Register + announce presence / Регистрация + объявить присутствие |
-| `macro_prepare_thread` | Start a new conversation / Начать новый разговор |
-| `macro_file_reservation_cycle` | Reserve → work → release / Зарезервировать → работать → освободить |
+| `agent_mail_macro_start_session` | Register + announce presence / Регистрация + объявить присутствие |
+| `agent_mail_macro_prepare_thread` | Start a new conversation / Начать новый разговор |
+| `agent_mail_macro_file_reservation_cycle` | Reserve → work → release / Зарезервировать → работать → освободить |
 
 ---
 
@@ -243,10 +244,10 @@ Your model is: claude-3.5-sonnet
 **Русский:** Агент A хочет связаться с Агентом B в другом проекте:
 
 ```yaml
-Tool: request_contact
+Tool: agent_mail_request_contact
 
 Parameters:
-  from_project: "/Gonya990/ProjectA"  # Project slug
+  project_key: "/Gonya990/ProjectA"   # Your project slug
   from_agent: "BlueMountain"
   to_project: "/Gonya990/ProjectB"    # Target project slug
   to_agent: "GreenCastle"
@@ -260,12 +261,12 @@ Parameters:
 **Русский:** Агент B одобряет запрос:
 
 ```yaml
-Tool: respond_contact
+Tool: agent_mail_respond_contact
 
 Parameters:
-  to_project: "/Gonya990/ProjectB"
+  project_key: "/Gonya990/ProjectB"
   to_agent: "GreenCastle"
-  from_project: "/Gonya990/ProjectA"
+  from_project: "/Gonya990/ProjectA"  # Optional, if cross-project
   from_agent: "BlueMountain"
   accept: true
 ```
@@ -277,14 +278,14 @@ Parameters:
 **Русский:** Теперь Агент A может отправлять сообщения Агенту B:
 
 ```yaml
-Tool: send_message
+Tool: agent_mail_send_message
 
 Parameters:
   project_key: "/Gonya990/ProjectA"
-  from_agent: "BlueMountain"
-  to_agents: ["GreenCastle@/Gonya990/ProjectB"]
+  sender_name: "BlueMountain"
+  to: ["GreenCastle"]  # For cross-project, use request_contact first
   subject: "API coordination"
-  body: "Let's discuss the new endpoint..."
+  body_md: "Let's discuss the new endpoint..."
 ```
 
 ---
@@ -300,12 +301,12 @@ Parameters:
 **English:**
 
 ```python
-file_reservation_paths(
+agent_mail_file_reservation_paths(
   project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
-  exclusive=true,
+  exclusive=True,
   reason="Refactoring API layer"
 )
 ```
@@ -313,12 +314,12 @@ file_reservation_paths(
 **Русский:**
 
 ```python
-file_reservation_paths(
+agent_mail_file_reservation_paths(
   project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
-  exclusive=true,
+  exclusive=True,
   reason="Рефакторинг API слоя"
 )
 ```
@@ -328,20 +329,26 @@ file_reservation_paths(
 **English:**
 
 ```python
-send_message(
+agent_mail_send_message(
+  project_key="/Gonya990/Unified_System_Core",
+  sender_name="BlueMountain",
+  to=["OtherAgent"],
   thread_id="FEAT-123",
   subject="[FEAT-123] API implementation update",
-  ...
+  body_md="Status update..."
 )
 ```
 
 **Русский:**
 
 ```python
-send_message(
+agent_mail_send_message(
+  project_key="/Gonya990/Unified_System_Core",
+  sender_name="BlueMountain",
+  to=["OtherAgent"],
   thread_id="FEAT-123",
   subject="[FEAT-123] Обновление реализации API",
-  ...
+  body_md="Обновление статуса..."
 )
 ```
 
@@ -351,14 +358,14 @@ send_message(
 
 ```python
 # At the start of each work session
-fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
 ```
 
 **Русский:**
 
 ```python
 # В начале каждой рабочей сессии
-fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
 ```
 
 ### 4. Acknowledge Important Messages / Подтверждайте важные сообщения
@@ -366,20 +373,20 @@ fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountai
 **English:**
 
 ```python
-acknowledge_message(
+agent_mail_acknowledge_message(
   project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
-  message_id="msg-123"
+  message_id=123  # Integer, not string
 )
 ```
 
 **Русский:**
 
 ```python
-acknowledge_message(
+agent_mail_acknowledge_message(
   project_key="/Gonya990/Unified_System_Core",
   agent_name="BlueMountain",
-  message_id="msg-123"
+  message_id=123  # Целое число, не строка
 )
 ```
 
@@ -439,10 +446,10 @@ am  # This starts the server
 - [ ] Get server URL (usually `http://igor-gaming-1:8765`)
 - [ ] Get bearer token from `.env` file
 - [ ] Configure agent client (Claude Code, Codex, etc.)
-- [ ] Register agent with `register_agent` tool
-- [ ] Test with `send_message` to other agents
-- [ ] Reserve files with `file_reservation_paths` before editing
-- [ ] Check inbox with `fetch_inbox`
+- [ ] Register agent with `agent_mail_register_agent` tool
+- [ ] Test with `agent_mail_send_message` to other agents
+- [ ] Reserve files with `agent_mail_file_reservation_paths` before editing
+- [ ] Check inbox with `agent_mail_fetch_inbox`
 
 ---
 
