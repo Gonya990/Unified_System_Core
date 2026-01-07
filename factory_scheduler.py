@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import os
 import sys
-import json
-import random
 from pathlib import Path
 from datetime import datetime
 
@@ -11,234 +9,95 @@ ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
 from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
+from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew
 from insta_uploader import upload_reel
-from pexels_broll import search_pexels_videos, download_video, get_best_video_file
 
 # Configuration
-REELS_AUTO_UPLOAD = False  # Set to True when Instagram credentials are ready
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
+REELS_AUTO_UPLOAD = False
 
-def get_weekly_trend():
+def get_static_fallback():
     """
-    Randomly selects a futuristic topic for daily variation.
+    Emergency fallback if deep research fails.
     """
-    topics = [
-        {
-            "topic": "The Rise of Agentic AI: Your New Digital Co-workers",
-            "description": "Explaining the shift from chatbots to autonomous agents in 2026.",
-            "keywords": ["agentic ai", "autonomous agents", "productivity 2026", "digital workforce"]
-        },
-        {
-            "topic": "AI & Bio-Engineering: The Neural Link Era",
-            "description": "How AI is merging with human biology to enhance cognition.",
-            "keywords": ["neuralink", "bio-ai", "cybernetic enhancement", "future brain"]
-        },
-        {
-            "topic": "The Post-Labor Economy: Living with AI Wealth",
-            "description": "What happens when AI does 90% of the work? The new human purpose.",
-            "keywords": ["post-labor", "universal income", "ai economy", "future of work"]
-        },
-        {
-            "topic": "Digital Immortality: Uploading the Mind in 2026",
-            "description": "The first steps towards consciousness preservation in the cloud.",
-            "keywords": ["digital immortality", "mind uploading", "consciousness", "future tech"]
-        }
-    ]
-    trend = random.choice(topics)
-    print(f"🔍 Selected Daily Trend: {trend['topic']}")
-    return trend
+    print("⚠️ Using static fallback content...")
+    return {
+        "selected_topic": "The AI Singularity 2026",
+        "description": "Exploring the point where AI exceeds human intelligence.",
+        "script_ru": "Мы перешли черту. 2026 год стал моментом... когда искусственный интеллект перестал быть инструментом... и стал реальностью. Ваша жизнь уже изменилась... пока вы спали. Это не просто прогресс... это симбиоз человеческой воли и цифровой мощи.",
+        "scenes": [
+            {"image": f"scene_{i}", "keyword": kw} for i, kw in enumerate([
+                "futuristic cyborg city 4k", "digital matrix rain motion", "humanoid robot portrait cinematic",
+                "holographic dashboard futuristic", "planet earth neural network", "sunrise over tech city",
+                "digital brain neurons firing", "abstract ink water cinematic"
+            ])
+        ]
+    }
 
-def generate_dynamic_script(trend):
+def generate_hebrew_content(russian_content):
     """
-    HIGH-QUALITY Impact Vision style script.
-    15 scenes with EPIC cinematic keywords.
+    HEBREW WEEKLY LOGIC
     """
-    print(f"📝 Drafting Script for: {trend['topic']}")
-    
-    # ORIGINAL Impact Vision Script - Premium Quality
-    script_ru = (
-        f"Мы перешли черту. 2026 год стал моментом... когда {trend['topic']} перестал быть просто теорией... и стал реальностью. "
-        f"Познакомьтесь с будущим. Это не просто технология... это глобальный сдвиг в самой сути нашего существования. "
-        "Они не спрашивают 'как это работает?'... они спрашивают 'как далеко мы готовы зайти?'. "
-        "Ваш новый мир уже здесь. Он управляет вашим временем... вашими возможностями... и вашей судьбой... пока вы спите. "
-        "Это не просто прогресс. Это симбиоз человеческой воли... и бесконечной цифровой мощи. "
-        "Миллиарды процессов уже трудятся в глобальной сети... создавая новую цивилизацию... цивилизацию действий, а не ожиданий. "
-        "Но готовы ли вы... доверить свое будущее коду? "
-        "Граница между человеком и машиной стирается... и это только начало. "
-        "Эти изменения не заменяют вас... они освобождают вас для великих свершений. "
-        "Добро пожаловать в эру осознанного разума. "
-        "Эпоха 2026 года. Где интеллект — это не ресурс... а само действие. "
-        "Весь мир скоро изменится навсегда. "
-        "Будущее не наступает... оно программируется прямо сейчас. "
-        "Приготовьтесь к самому масштабному сдвигу в истории человечества. "
-        "Это ваш новый мир. Мир, где каждый из нас — лидер армии технологий."
-    )
-    
-    # PREDEFINED 15 scenes with CINEMATIC keywords (ORIGINAL)
-    scenes = [
-        {"image": "ai_factory_s1_agent_working", "keyword": "cyborg digital office futuristic 4k"},
-        {"image": "ai_factory_s2_interface", "keyword": "holographic dashboard futuristic computer cinematic"},
-        {"image": "ai_factory_s3_avatar", "keyword": "humanoid robot face smooth white portrait cinematic"},
-        {"image": "ai_factory_s4_matrix", "keyword": "fast digital matrix particles movement slow motion"},
-        {"image": "ai_factory_s5_collab", "keyword": "human hand touching holographic screen cinematic"},
-        {"image": "ai_factory_s6_global", "keyword": "planet earth glowing neural network space cinematic"},
-        {"image": "ai_factory_s7_trust", "keyword": "stormy dark ocean lighthouse cinematic"},
-        {"image": "ai_factory_s8_blurring", "keyword": "ink merging in water abstract slow motion cinematic"},
-        {"image": "ai_factory_s9_liberation", "keyword": "eagle wings flying through clouds cinematic sky"},
-        {"image": "ai_factory_s10_era_sunrise", "keyword": "sunrise over futuristic city horizon cinematic"},
-        {"image": "ai_factory_s11_brain_firing", "keyword": "digital brain firing synapses close up cinematic"},
-        {"image": "ai_factory_s12_hr_minimalist", "keyword": "clean futuristic hall minimalist architecture cinematic"},
-        {"image": "ai_factory_s13_typing_code_matrix", "keyword": "hands typing glowing code matrix background cinematic"},
-        {"image": "ai_factory_s14_gears_digital_light", "keyword": "old gears turning into digital light cinematic"},
-        {"image": "ai_factory_s15_robot_army", "keyword": "massive army of robots silhouettes sunset cinematic"}
-    ]
-    
-    return script_ru, scenes
-
-def fetch_pexels_image(keyword, output_dir, scene_name):
-    """
-    Fetch image from Pexels Photos API (not videos).
-    """
-    import requests
-    
-    try:
-        url = "https://api.pexels.com/v1/search"
-        headers = {"Authorization": PEXELS_API_KEY}
-        params = {
-            "query": keyword,
-            "per_page": 1,
-            "orientation": "portrait"
-        }
+    if not russian_content:
+        russian_content = get_static_fallback()
         
-        response = requests.get(url, headers=headers, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        if data.get("photos"):
-            photo = data["photos"][0]
-            img_url = photo["src"]["large2x"]  # High quality
-            
-            # Download
-            img_data = requests.get(img_url, timeout=15).content
-            
-            # Save
-            filename = f"{scene_name}.jpg"
-            filepath = output_dir / filename
-            
-            with open(filepath, "wb") as f:
-                f.write(img_data)
-                
-            print(f"      ✅ Pexels: {filename}")
-            return str(filepath)
-        else:
-            print(f"      ⚠️  No Pexels results for: {keyword}")
-            return None
-            
-    except Exception as e:
-        print(f"      ❌ Pexels failed: {e}")
-        return None
+    print("🇮🇱 Translating to Hebrew...")
+    he_script = translate_to_hebrew(russian_content.get('script_ru', ""))
+    
+    return {
+        "selected_topic": russian_content.get('selected_topic', "AI Future"),
+        "script_he": he_script,
+        "scenes": (russian_content.get('scenes', []) * 2)[:16],
+        "description": f"מהדורת שבועית: {russian_content.get('selected_topic', '')} #AI #Israel"
+    }
 
-def run_factory_production():
-    """ORIGINAL Factory Logic - Impact Vision Style"""
+def run_factory_production(is_weekly=False):
     day_str = datetime.now().strftime('%Y-%m-%d')
-    print(f"🏭 --- Factory Run: {day_str} ---")
-    print(f"📡 API Status: Pexels={PEXELS_API_KEY[:8]}...")
-    
-    # 1. Research
-    trend = get_weekly_trend()
-    
-    # 2. Scripting (ORIGINAL HIGH-QUALITY SCRIPT)
-    script_ru, scenes = generate_dynamic_script(trend)
-    
-    # 3. Asset Resolution (ORIGINAL: check pre-generated, fallback to Pexels)
-    output_name = f"factory_daily_{day_str.replace('-', '')}"
-    
-    # Try to find pre-generated assets first
-    assets_dirs = [
-        ROOT_DIR / "assets",
-        Path("/home/gonya/Unified_System/assets"),
-        Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
-    ]
-    
-    gen_dir = None
-    for d in assets_dirs:
-        if d.exists():
-            gen_dir = d
-            break
-    
-    if not gen_dir:
-        # Create assets dir on server
-        gen_dir = ROOT_DIR / "assets" / day_str
-        gen_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Resolve scenes
-    resolved_scenes = []
-    print(f"🎨 Resolving 15 scenes (assets or Pexels)...")
-    
-    for i, scene in enumerate(scenes):
-        # First: try to find pre-generated image
-        matches = list(gen_dir.glob(f"{scene['image']}_*.png")) + list(gen_dir.glob(f"{scene['image']}.jpg"))
-        
-        if matches:
-            print(f"   [{i+1}/15] ✅ Using cached: {scene['image']}")
-            resolved_scenes.append({
-                "image": str(sorted(matches)[-1]),
-                "keyword": scene['keyword']
-            })
-        else:
-            # Fallback: fetch from Pexels
-            print(f"   [{i+1}/15] 🔍 Fetching from Pexels: {scene['keyword'][:40]}...")
-            img_path = fetch_pexels_image(scene['keyword'], gen_dir, scene['image'])
-            if img_path:
-                resolved_scenes.append({
-                    "image": img_path,
-                    "keyword": scene['keyword']
-                })
-            else:
-                print(f"      ⚠️  Skipping scene {i+1}")
+    is_weekly_hebrew = is_weekly or (datetime.now().weekday() == 6)
 
-    if len(resolved_scenes) < 10:
-        print(f"❌ Critical failure: only {len(resolved_scenes)}/15 scenes. Minimum 10 required.")
+    print(f"🏭 RUN: {day_str} {'(HEBREW)' if is_weekly_hebrew else ''}")
+    
+    # 1. RESEARCH
+    try:
+        content_data = run_daily_research()
+        if not content_data:
+            content_data = get_static_fallback()
+    except Exception as e:
+        print(f"❌ Research Panic: {e}")
+        content_data = get_static_fallback()
+
+    # 2. SELECTION
+    if is_weekly_hebrew:
+        content_data = generate_hebrew_content(content_data)
+        script = content_data['script_he']
+        lang = "he"
+        prefix = "weekly_he"
+    else:
+        script = content_data['script_ru']
+        lang = "ru"
+        prefix = "factory_daily"
+
+    # 3. ASSETS
+    assets_dir = ROOT_DIR / "assets" / day_str
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    
+    final_scenes = []
+    assets = generate_vision_assets(content_data.get('scenes', []), assets_dir)
+    for a in assets:
+        if a.get('resolved_path'):
+            final_scenes.append({"image": a['resolved_path'], "keyword": a['keyword']})
+            
+    if not final_scenes:
+        print("❌ No assets. Aborting.")
         return
 
-    print(f"✅ Asset Resolution Complete: {len(resolved_scenes)}/15 scenes ready")
-    
-    # 4. Production Pipeline (ORIGINAL orchestrator_v3_no_face)
-    print("🚀 Launching Production Pipeline...")
-    final_video_path = run_no_face_pipeline(script_ru, lang="ru", output_name=output_name, scenes=resolved_scenes)
-    
-    # 5. Final Verification and Upload
-    final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
-    impact_video = OUTPUT_DIR / f"{output_name}_impact.mp4"
-    
-    # Check both filenames (pipeline might produce either)
-    if final_video.exists():
-        actual_video = final_video
-    elif impact_video.exists():
-        actual_video = impact_video
-    elif (OUTPUT_DIR / f"{output_name}_raw.mp4").exists():
-        actual_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
-    else:
-        print(f"❌ Final video not found: {output_name}")
-        return
-
-    print(f"✅ Factory Production Success: {actual_video}")
-    print(f"   Size: {actual_video.stat().st_size / 1024 / 1024:.1f} MB")
-    
-    if REELS_AUTO_UPLOAD:
-        print("📤 Initializing Auto-Upload to Instagram...")
-        caption = f"{trend['topic']}\\n\\n{trend['description']}\\n\\n#AI #Technology #2026 #Future #ImpactVision"
-        success = upload_reel(str(actual_video), caption)
-        if success:
-            print("🏆 Reel successfully published!")
-        else:
-            print("⚠️ Auto-upload failed. Manual check required.")
-    else:
-        print("📤 Auto-upload DISABLED. Video ready for manual upload.")
+    # 4. PRODUCTION
+    out_name = f"{prefix}_{day_str.replace('-', '')}"
+    try:
+        run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes)
+    except Exception as e:
+        print(f"❌ Factory Crash: {e}")
 
 if __name__ == "__main__":
-    # Ensure we're using correct API KEY from environment
     from dotenv import load_dotenv
     load_dotenv(ROOT_DIR / ".env")
-    
     run_factory_production()
