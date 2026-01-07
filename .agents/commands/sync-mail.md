@@ -11,34 +11,27 @@ This workflow helps agents sync with each other to ensure coordination and avoid
 
 ---
 
-## Step 1: Identify Your Agent Identity
+## Prerequisites
 
-Confirm your identity and project key before syncing.
+Set these environment variables in your `.env` or session:
 
-- **Project Key**: `/Gonya990/Unified_System_Core`
-- **Agent Name**: Your assigned name (e.g., FuchsiaCat, FuchsiaPond, PurpleCastle)
-
-If you don't know your agent name, register or look it up:
-
+```bash
+AGENT_NAME=FuchsiaCat          # Your assigned agent name
+AGENT_PROJECT_KEY=/Gonya990/Unified_System_Core
 ```
-agent_mail_register_agent(
-  project_key="/Gonya990/Unified_System_Core",
-  program="opencode",  // or "claude-code", "antigravity"
-  model="<your-model>",
-  task_description="<current task>"
-)
-```
+
+Your agent name is assigned once during initial registration. Use `$AGENT_NAME` throughout.
 
 ---
 
-## Step 2: Fetch Inbox
+## Step 1: Fetch Inbox
 
 Check for new messages from other agents or the user.
 
 ```
 agent_mail_fetch_inbox(
-  project_key="/Gonya990/Unified_System_Core",
-  agent_name="<YOUR_AGENT_NAME>",
+  project_key="$AGENT_PROJECT_KEY",
+  agent_name="$AGENT_NAME",
   include_bodies=true,
   limit=20
 )
@@ -47,18 +40,18 @@ agent_mail_fetch_inbox(
 **Actions**:
 - **URGENT messages**: STOP this workflow and handle immediately
 - **Coordination messages** (e.g., "I'm editing file X"): Respect file reservations
-- **Ack-required messages**: Acknowledge them with `agent_mail_acknowledge_message`
+- **Ack-required messages**: Acknowledge with `agent_mail_acknowledge_message`
 
 ---
 
-## Step 3: Check File Reservations
+## Step 2: Check File Reservations
 
 Before editing files, check if another agent has reserved them.
 
 ```
 agent_mail_file_reservation_paths(
-  project_key="/Gonya990/Unified_System_Core",
-  agent_name="<YOUR_AGENT_NAME>",
+  project_key="$AGENT_PROJECT_KEY",
+  agent_name="$AGENT_NAME",
   paths=["<files-you-plan-to-edit>"],
   exclusive=true,
   reason="<what you're doing>"
@@ -69,7 +62,7 @@ If conflicts are reported, coordinate with the holder or wait.
 
 ---
 
-## Step 4: Sync Task Board (Beads)
+## Step 3: Sync Task Board (Beads)
 
 Ensure your task list is up to date.
 
@@ -85,7 +78,7 @@ bd ready
 
 ---
 
-## Step 5: Check Workflow Locks
+## Step 4: Check Workflow Locks
 
 Check if another agent is performing a critical operation.
 
@@ -102,14 +95,14 @@ If lock exists and is recent (< 5 min), wait before starting conflicting workflo
 
 ---
 
-## Step 6: Broadcast Status (Optional)
+## Step 5: Broadcast Status (Optional)
 
 If you completed significant work or are starting a major task, notify other agents:
 
 ```
 agent_mail_send_message(
-  project_key="/Gonya990/Unified_System_Core",
-  sender_name="<YOUR_AGENT_NAME>",
+  project_key="$AGENT_PROJECT_KEY",
+  sender_name="$AGENT_NAME",
   to=["<other-agents>"],
   subject="Status Update",
   body_md="Starting work on <task>. Will be editing <files>."
@@ -118,7 +111,7 @@ agent_mail_send_message(
 
 ---
 
-## Step 7: Summary Report
+## Step 6: Summary Report
 
 After syncing, report:
 
@@ -136,6 +129,20 @@ If all clear, proceed with your work.
 For fast syncs, just fetch inbox and check beads:
 
 ```
-1. agent_mail_fetch_inbox(...) 
+1. agent_mail_fetch_inbox(project_key="$AGENT_PROJECT_KEY", agent_name="$AGENT_NAME", include_bodies=true)
 2. bd sync && bd ready
 ```
+
+---
+
+## First-Time Setup
+
+If you're a new agent and don't have `$AGENT_NAME` yet:
+
+1. Ask Kostya to assign you an agent name (e.g., FuchsiaCat, PurpleCastle)
+2. Add to your `.env`:
+   ```
+   AGENT_NAME=YourAssignedName
+   AGENT_PROJECT_KEY=/Gonya990/Unified_System_Core
+   ```
+3. Registration is done once via `agent_mail_register_agent` at session start (handled by your agent framework)
