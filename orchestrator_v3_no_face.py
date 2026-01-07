@@ -34,13 +34,13 @@ try:
 except ImportError:
     print("⚠️ Internal tools not found. Script might fail.")
 
-OUTPUT_DIR = ROOT_DIR / "outputs"
-INPUT_DIR = ROOT_DIR / "inputs"
-BROLL_DIR = ROOT_DIR / "broll"
+OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR_OVERRIDE", str(ROOT_DIR / "outputs")))
+INPUT_DIR = Path(os.getenv("INPUT_DIR_OVERRIDE", str(ROOT_DIR / "inputs")))
+BROLL_DIR = Path(os.getenv("BROLL_DIR_OVERRIDE", str(ROOT_DIR / "broll")))
 
-OUTPUT_DIR.mkdir(exist_ok=True)
-INPUT_DIR.mkdir(exist_ok=True)
-BROLL_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+INPUT_DIR.mkdir(exist_ok=True, parents=True)
+BROLL_DIR.mkdir(exist_ok=True, parents=True)
 
 import random
 
@@ -176,8 +176,8 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     return generate_audio_edge(text, output_path, fallback_voice)
 
 def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool:
-    """Add dynamic word-by-word subtitles matching 'Motivaider' style (Gold, Centered, Big)"""
-    print(f"📝 Burning 'Motivaider' Style Subtitles...")
+    """Add dynamic word-by-word subtitles matching 'Impact Vision' style (Gold, Centered, Big)"""
+    print(f"📝 Burning 'Impact Vision' Style Subtitles...")
     
     # 1. Extract audio and transcribe
     temp_audio = OUTPUT_DIR / "temp_sub_audio.wav"
@@ -216,7 +216,7 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool
             "-vf", filter_str,
             "-c:a", "copy", str(output_path)
         ], check=True, capture_output=True)
-        print(f"✨ Motivaider Masterpiece Finalized: {output_path}")
+        print(f"✨ Impact Vision Masterpiece Finalized: {output_path}")
         temp_audio.unlink()
         return True
     except Exception as e:
@@ -447,7 +447,7 @@ if __name__ == "__main__":
     # Mapping scenes to images (using the ones generated across steps)
     gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
-    # Selecting the best 15 images and defining keywords for B-roll (MOTIVAIDER STYLE: POWER, NATURE, CINEMA)
+    # Selecting the best 15 images and defining keywords for B-roll (POWER, NATURE, CINEMA)
     scene_data = [
         {"image": "ai_scene_1_network", "keyword": "cinematic nebula space 4k slow motion"},
         {"image": "ai_scene_2_economy", "keyword": "stormy ocean waves cinematic 4k"},

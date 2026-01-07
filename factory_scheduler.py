@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+import random
 from pathlib import Path
 from datetime import datetime
 
@@ -9,49 +10,68 @@ from datetime import datetime
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
-from orchestrator_v3_no_face import run_no_face_pipeline, add_subtitles
+from orchestrator_v3_no_face import run_no_face_pipeline, add_subtitles, OUTPUT_DIR
+from insta_uploader import upload_reel
+
+# Configuration
+REELS_AUTO_UPLOAD = True  # Set to False if you want to manual review first
 
 def get_weekly_trend():
     """
-    Simulates or performs web search for trending tech topics.
-    For this 'Завод' run, we focus on 'Agentic AI / Digital Co-workers'.
+    Randomly selects a futuristic topic for daily variation.
     """
-    print("🔍 Researching Weekly Trends...")
-    # In a fully automated version, this would call search_web via an API or use a pre-scanned report.
-    trend = {
-        "topic": "The Rise of Agentic AI: Your New Digital Co-workers",
-        "description": "Explaining the shift from chatbots to autonomous agents that perform multi-step tasks in 2026.",
-        "keywords": ["agentic ai", "autonomous agents", "productivity 2026", "digital workforce"]
-    }
+    topics = [
+        {
+            "topic": "The Rise of Agentic AI: Your New Digital Co-workers",
+            "description": "Explaining the shift from chatbots to autonomous agents in 2026.",
+            "keywords": ["agentic ai", "autonomous agents", "productivity 2026", "digital workforce"]
+        },
+        {
+            "topic": "AI & Bio-Engineering: The Neural Link Era",
+            "description": "How AI is merging with human biology to enhance cognition.",
+            "keywords": ["neuralink", "bio-ai", "cybernetic enhancement", "future brain"]
+        },
+        {
+            "topic": "The Post-Labor Economy: Living with AI Wealth",
+            "description": "What happens when AI does 90% of the work? The new human purpose.",
+            "keywords": ["post-labor", "universal income", "ai economy", "future of work"]
+        },
+        {
+            "topic": "Digital Immortality: Uploading the Mind in 2026",
+            "description": "The first steps towards consciousness preservation in the cloud.",
+            "keywords": ["digital immortality", "mind uploading", "consciousness", "future tech"]
+        }
+    ]
+    trend = random.choice(topics)
+    print(f"🔍 Selected Daily Trend: {trend['topic']}")
     return trend
 
 def generate_dynamic_script(trend):
     """
     Calls the LLM Council to generate a 15-scene script.
-    For now, we provide a high-quality template specifically for the trend.
     """
     print(f"📝 Drafting Script for: {trend['topic']}")
     
-    # This script is designed for the 'Motivaider' aesthetic: Strong, punchy, futuristic.
+    # Generic high-impact script template that adapts to the topic
     script_ru = (
-        "Мы перешли черту. 2026 год стал моментом... когда искусственный интеллект перестал быть просто инструментом... и стал сотрудником. "
-        "Познакомьтесь с Агентным ИИ. Это не просто чат-бот... это цифровая личность, способная действовать автономно. "
-        "Они не спрашивают 'что написать?'... они спрашивают 'какую проблему решить?'. "
-        "Ваш новый цифровой коллега уже здесь. Он управляет вашим календарем... вашими проектами... и вашей стратегией... пока вы спите. "
-        "Это не просто автоматизация. Это симбиоз человеческой воли... и бесконечной вычислительной мощности. "
-        "Миллиарды таких агентов уже трудятся в глобальной сети... создавая новую экономику... экономику действий, а не слов. "
-        "Но готовы ли вы... доверить решение машине? "
-        "Граница между человеком и кодом стирается... и это только начало. "
-        "Агентный ИИ не заменяет вас... он освобождает вас для великих дел. "
-        "Добро пожаловать в эру автономного разума. "
-        "Эпоха 2026 года. Где интеллект — это не ресурс... а действие. "
-        "Ваш отдел кадров скоро изменится навсегда. "
+        f"Мы перешли черту. 2026 год стал моментом... когда {trend['topic']} перестал быть просто теорией... и стал реальностью. "
+        f"Познакомьтесь с будущим. Это не просто технология... это глобальный сдвиг в самой сути нашего существования. "
+        "Они не спрашивают 'как это работает?'... они спрашивают 'как далеко мы готовы зайти?'. "
+        "Ваш новый мир уже здесь. Он управляет вашим временем... вашими возможностями... и вашей судьбой... пока вы спите. "
+        "Это не просто прогресс. Это симбиоз человеческой воли... и бесконечной цифровой мощи. "
+        "Миллиарды процессов уже трудятся в глобальной сети... создавая новую цивилизацию... цивилизацию действий, а не ожиданий. "
+        "Но готовы ли вы... доверить свое будущее коду? "
+        "Граница между человеком и машиной стирается... и это только начало. "
+        "Эти изменения не заменяют вас... они освобождают вас для великих свершений. "
+        "Добро пожаловать в эру осознанного разума. "
+        "Эпоха 2026 года. Где интеллект — это не ресурс... а само действие. "
+        "Весь мир скоро изменится навсегда. "
         "Будущее не наступает... оно программируется прямо сейчас. "
-        "Приготовьтесь к самому масштабному сдвигу в истории труда. "
-        "Это ваш новый мир. Мир, где каждый из нас — лидер армии цифровых агентов."
+        "Приготовьтесь к самому масштабному сдвигу в истории человечества. "
+        "Это ваш новый мир. Мир, где каждый из нас — лидер армии технологий."
     )
     
-    # Scene mapping with epic keywords and PRE-GENERATED assets
+    # Scene mapping with epic keywords
     scenes = [
         {"image": "ai_factory_s1_agent_working", "keyword": "cyborg digital office futuristic 4k"},
         {"image": "ai_factory_s2_interface", "keyword": "holographic dashboard futuristic computer cinematic"},
@@ -74,7 +94,8 @@ def generate_dynamic_script(trend):
 
 def run_weekly_production():
     """Main Factory Loop"""
-    print(f"🏭 --- Factory Run: {datetime.now().strftime('%Y-%m-%d')} ---")
+    day_str = datetime.now().strftime('%Y-%m-%d')
+    print(f"🏭 --- Factory Run: {day_str} ---")
     
     # 1. Research
     trend = get_weekly_trend()
@@ -82,14 +103,13 @@ def run_weekly_production():
     # 2. Scripting
     script_ru, scenes = generate_dynamic_script(trend)
     
-    # 3. Production (RU only for the 'Factory' demo, EN can be added)
-    output_name = f"factory_weekly_{datetime.now().strftime('%Y%V')}"
-    
-    # We need to ensure images exist for the keywords or use Pexels effectively
-    # For the factory, we rely on Pexels B-roll and AI images we've already generated or mock if missing
+    # 3. Production
+    output_name = f"factory_daily_{day_str.replace('-', '')}"
     
     # Path to where images are saved
-    gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
+    gen_dir = ROOT_DIR / "assets"
+    if not gen_dir.exists(): # Fallback for MacBook local testing
+        gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
     
     # Resolve image paths
     resolved_scenes = []
@@ -97,7 +117,7 @@ def run_weekly_production():
         matches = list(gen_dir.glob(f"{scene['image']}_*.png"))
         if matches:
             resolved_scenes.append({
-                "image": sorted(matches)[-1],
+                "image": str(sorted(matches)[-1]),
                 "keyword": scene['keyword']
             })
         else:
@@ -110,10 +130,27 @@ def run_weekly_production():
     print("🚀 Launching Production Pipeline...")
     run_no_face_pipeline(script_ru, lang="ru", output_name=output_name, scenes=resolved_scenes)
     
-    # 4. Final Pass: Subtitles (Motivaider Style)
-    final_video = ROOT_DIR / "outputs" / f"{output_name}_final.mp4"
-    if (ROOT_DIR / "outputs" / f"{output_name}_raw.mp4").exists(): # Pipeline produces _final after subtitles
-        print(f"✅ Factory Success: {final_video}")
+    # 4. Final Verification and Upload
+    final_video = OUTPUT_DIR / f"{output_name}_impact.mp4"
+    if not final_video.exists():
+        # Fallback to check raw_final
+        raw_final = OUTPUT_DIR / f"{output_name}_final.mp4"
+        if raw_final.exists():
+            raw_final.rename(final_video)
+
+    if final_video.exists():
+        print(f"✅ Factory Production Success: {final_video}")
+        
+        if REELS_AUTO_UPLOAD:
+            print("📤 Initializing Server-Side Upload...")
+            caption = f"{trend['topic']}\n\n{trend['description']}\n\n#AI #Technology #2026 #Future #ImpactVision"
+            success = upload_reel(str(final_video), caption)
+            if success:
+                print("🏆 Reel successfully published to Instagram!")
+            else:
+                print("⚠️ Auto-upload failed. Manual check required.")
+    else:
+        print(f"❌ Final video not found/generated: {output_name}")
 
 if __name__ == "__main__":
     run_weekly_production()
