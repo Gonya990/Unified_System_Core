@@ -50,8 +50,11 @@ VOICES = {
     "en_female": "shimmer",
     "ru": "onyx",        # Deep, professional
     "ru_female": "shimmer",
+    "he": "onyx",        # Using Onyx for Hebrew (Multilingual v2 supports it)
+    "he_female": "shimmer",
     "fallback_ru": "ru-RU-DmitryNeural",
-    "fallback_en": "en-US-EmmaNeural"
+    "fallback_en": "en-US-EmmaNeural",
+    "fallback_he": "he-IL-AvriNeural" # Edge-TTS Hebrew
 }
 
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
