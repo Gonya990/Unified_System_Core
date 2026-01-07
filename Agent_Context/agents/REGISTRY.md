@@ -51,12 +51,22 @@ All agents communicate via:
 - **Git repo:** This repository (shared filesystem)
 - **Task board:** `.beads/` (Beads issue tracker)
 
+### Project Key (IMPORTANT)
+
+All agents use the **same project slug** (not absolute paths):
+
+```
+PROJECT_KEY = "/Gonya990/Unified_System_Core"
+```
+
+This allows agents on different machines to coordinate via the shared hub server.
+
 ### Registering with Agent-Mail
 
 ```bash
 # At session start, register yourself:
 agent_mail_register_agent(
-  project_key="/home/kosta/Documents/Unified_System_Core",
+  project_key="/Gonya990/Unified_System_Core",
   program="opencode",  # or "claude-code", "codex", etc.
   model="claude-sonnet-4",
   name="YourAgentName",  # Adjective+Noun format (e.g., BlueLake)
@@ -70,11 +80,11 @@ agent_mail_register_agent(
 
 ```bash
 # Check who's available
-agent_mail_whois(project_key="...", agent_name="PinkLake")
+agent_mail_whois(project_key="/Gonya990/Unified_System_Core", agent_name="PinkLake")
 
 # Send a message
 agent_mail_send_message(
-  project_key="...",
+  project_key="/Gonya990/Unified_System_Core",
   sender_name="YourName",
   to=["PinkLake"],
   subject="Coordination request",
