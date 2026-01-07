@@ -11,16 +11,15 @@ from pathlib import Path
 from typing import List, Optional
 
 # Pexels API
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
-
 def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
     """Search Pexels for videos matching query"""
-    if not PEXELS_API_KEY:
+    api_key = os.getenv("PEXELS_API_KEY", "")
+    if not api_key:
         print("⚠️ PEXELS_API_KEY not set. Using mock data.")
         return []
     
     url = "https://api.pexels.com/videos/search"
-    headers = {"Authorization": PEXELS_API_KEY}
+    headers = {"Authorization": api_key}
     params = {"query": query, "per_page": per_page, "orientation": "portrait"}
     
     try:
@@ -33,7 +32,10 @@ def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
         return []
 
 def download_video(url: str, output_path: Path) -> bool:
-    """Download video from URL"""
+    """Download video from URL (skip if exists)"""
+    if output_path.exists() and output_path.stat().st_size > 0:
+        print(f"⏭ Skip download (exists): {output_path}")
+        return True
     try:
         response = requests.get(url, stream=True)
         response.raise_for_status()
@@ -52,7 +54,8 @@ def get_best_video_file(video: dict, quality: str = "hd") -> Optional[str]:
     
     # Sort by quality preference
     for f in files:
-        if quality in f.get("quality", "").lower():
+        f_quality = f.get("quality") or ""
+        if quality in str(f_quality).lower():
             return f.get("link")
     
     # Fallback to first file
