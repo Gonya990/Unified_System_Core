@@ -26,11 +26,14 @@ tailscale ssh gonya@100.110.209.49 "
 # 3. AGENT SYNC (Talk to Kostya)
 echo "📌 [3/4] Доклад агенту FuchsiaCat через MCP..."
 STATE_REPORT=$(cat .system_state.tmp)
-python3 sync_agent.py "ПОЛНАЯ СИНХРОНИЗАЦИЯ ВЫПОЛНЕНА. 
+
+# Пушим через сервер, так как там живет MCP Agent
+tailscale ssh gonya@100.110.209.49 "cd /home/gonya/Unified_System && ./venv/bin/python3 sync_agent.py \"ПОЛНАЯ СИНХРОНИЗАЦИЯ ВЫПОЛНЕНА. 
 Текущее состояние системы:
 $STATE_REPORT
 
-Все системы в норме. Работаем дальше в унисон! 🤝"
+Все системы в норме. Настройки на данную секунду синхронизированы! 🤝\""
+
 rm .system_state.tmp
 echo "✅ Агент FuchsiaCat оповещен."
 
