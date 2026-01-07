@@ -118,56 +118,65 @@ def generate_daily_script(news_items):
 
 def generate_vision_assets(scenes, output_dir: Path):
     """
-    Generates images for each scene using DALL-E 3.
+    Generates images for each scene using Pexels (fallback from DALL-E).
     """
-    client = OpenAI()
+    import requests
+    
+    PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    print(f"🎨 Generating {len(scenes)} visual assets via DALL-E 3...")
-    
-    generated_files = []
+    print(f"🎨 Generating {len(scenes)} visual assets via Pexels...")
     
     for i, scene in enumerate(scenes):
-        prompt = f"Cinematic, photorealistic, 4k, futuristic style: {scene['keyword']}. Aspect ratio 9:16 vertical."
+        keyword = scene['keyword']
         safe_name = scene['image']
         
-        # Check if already exists (skip to save money/time if re-running)
-        existing = list(output_dir.glob(f"{safe_name}_*.png"))
+        # Check if already exists
+        existing = list(output_dir.glob(f"{safe_name}_*.jpg"))
         if existing:
             print(f"   ⏭️  Skipping {safe_name}, already exists.")
             scene["resolved_path"] = str(existing[0])
             continue
             
-        print(f"   🖌️  Generating {i+1}/{len(scenes)}: {safe_name}...")
+        print(f"   🖼️  Searching {i+1}/{len(scenes)}: {keyword[:30]}...")
         
         try:
-            response = client.images.generate(
-                model="dall-e-3",
-                prompt=prompt,
-                size="1024x1792",
-                quality="standard",
-                n=1,
-            )
+            # Search Pexels
+            url = "https://api.pexels.com/v1/search"
+            headers = {"Authorization": PEXELS_API_KEY}
+            params = {
+                "query": keyword,
+                "per_page": 1,
+                "orientation": "portrait"
+            }
             
-            image_url = response.data[0].url
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
             
-            # Download
-            import requests
-            img_data = requests.get(image_url).content
-            
-            # Save
-            timestamp = datetime.now().strftime("%H%M%S")
-            filename = f"{safe_name}_{timestamp}.png"
-            filepath = output_dir / filename
-            
-            with open(filepath, "wb") as f:
-                f.write(img_data)
+            if data.get("photos"):
+                photo = data["photos"][0]
+                img_url = photo["src"]["large2x"]  # High quality
                 
-            print(f"      ✅ Saved: {filename}")
-            scene["resolved_path"] = str(filepath)
+                # Download
+                img_data = requests.get(img_url, timeout=15).content
+                
+                # Save
+                timestamp = datetime.now().strftime("%H%M%S")
+                filename = f"{safe_name}_{timestamp}.jpg"
+                filepath = output_dir / filename
+                
+                with open(filepath, "wb") as f:
+                    f.write(img_data)
+                    
+                print(f"      ✅ Saved: {filename}")
+                scene["resolved_path"] = str(filepath)
+            else:
+                print(f"      ⚠️  No results for {keyword}")
+                scene["resolved_path"] = None
             
         except Exception as e:
-            print(f"      ❌ Generation failed for {safe_name}: {e}")
+            print(f"      ❌ Download failed for {safe_name}: {e}")
             scene["resolved_path"] = None
 
     return scenes
