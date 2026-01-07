@@ -397,13 +397,18 @@ agent_mail_register_agent(
 
 **See also:** [`Agent_Context/agents/REGISTRY.md`](Agent_Context/agents/REGISTRY.md) for active agents.
 
-### File Safety
+### Transparency & Synchronization Rules
 
-**Before editing a file:**
+To ensure all agents and humans are aware of the current state of the system, follow these MANDATORY rules:
 
-1. Check if file was recently modified: `git diff <file>` or `ls -la <file>`
-2. If another agent is working on the same file, coordinate or wait
-3. Never overwrite entire files — use targeted edits (`replace_file_content`)
+1. **Work Session Log**: Every significant change or session must be logged in `Agent_Context/WORK_SESSION_LOG.md`.
+2. **Full System Lift**: Use `./full_sync.sh` (or the equivalent slash command) at the end of every major task. This script pulls code to all nodes, restarts necessary services, and broadcasts a status update to the entire agent network.
+3. **Broadcast Every Sync**: When running a synchronization, always use the `agent_mail_send_message` tool to notify `@all` about the changes. This is handled automatically by the updated `full_sync.sh`.
+4. **No Hidden State**: Avoid keeping modified files uncommitted or services in a custom state that isn't reflected in the repository configuration.
+
+5. Check if file was recently modified: `git diff <file>` or `ls -la <file>`
+6. If another agent is working on the same file, coordinate or wait
+7. Never overwrite entire files — use targeted edits (`replace_file_content`)
 
 **Avoid overwriting other agents' work:**
 
