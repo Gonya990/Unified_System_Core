@@ -93,6 +93,22 @@ def broadcast(msg):
         }, 
         'id': 1
     }
+    r_reg = requests.post(URL, json={
+        'jsonrpc': '2.0', 
+        'method': 'tools/call', 
+        'params': {
+            'name': 'register_agent',
+            'arguments': {
+                'project_key': PROJECT_KEY,
+                'name': 'Antigravity',
+                'program': 'opencode',
+                'model': 'claude-sonnet-4',
+                'task_description': 'System synchronization and maintenance'
+            }
+        }, 
+        'id': 0
+    }, headers=headers)
+
     r = requests.post(URL, json=payload, headers=headers)
     print(r.text)
 
