@@ -109,7 +109,7 @@ def broadcast(msg):
         }, 
         'id': 0
     }, headers=headers)
-    print(f"Registration: {r_reg.text}")
+    print(f'Registration: {r_reg.text}')
 
     import time
     time.sleep(1) # Wait for registration to propagate
@@ -118,7 +118,7 @@ def broadcast(msg):
     payload['params']['arguments']['sender_name'] = 'Antigravity'
     
     r = requests.post(URL, json=payload, headers=headers)
-    print(f"Broadcast: {r.text}")
+    print(f'Broadcast: {r.text}')
 
 broadcast(report_content)
 \""
