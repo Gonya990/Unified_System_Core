@@ -58,6 +58,11 @@ class InferenceClient:
             return "ollama"
         return prov
     
+    @provider.setter
+    def provider(self, value: str):
+        """Set inference provider."""
+        self.config.set("INFERENCE_PROVIDER", value.lower())
+    
     @property
     def base_url(self) -> str:
         """Get base URL based on provider."""
@@ -96,6 +101,11 @@ class InferenceClient:
             return self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
         else:  # ollama
             return self.config.get("OLLAMA_MODEL", self.config.get("MODEL_NAME", "llama3.2"))
+            
+    @model.setter
+    def model(self, value: str):
+        """Set inference model."""
+        self.config.set("MODEL_NAME", value)
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session. Recreates if API key changed."""

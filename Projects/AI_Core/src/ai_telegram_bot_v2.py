@@ -127,7 +127,7 @@ else:
     db = UserContextDB()
     logger.info("Using SQLite database (local mode)")
 
-auth_manager = GoogleAuthManager(client_secrets_file="client_secret.json")
+auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
 agent_orchestrator = AgentOrchestrator(inference)
@@ -139,21 +139,20 @@ if _DIGEST_AVAILABLE and usage_tracker and task_manager:
 else:
     digest_service = None
 
-# Admin ID
+# Admin access configuration
 allowed_users_str = config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
 logger.info(f"Raw ALLOWED_USERS from config: '{allowed_users_str}'")
 try:
-    # Explicitly include known admins to prevent lockout
-    allowed_ids = [708531393, 5569219290, 578363419]
+    # Hardcoded admins + env var users
+    DEFAULT_ADMINS = [708531393, 5569219290, 578363419]
     parsed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-    # Merge and deduplicate
-    allowed_ids = list(set(allowed_ids + parsed_ids))
-    logger.info(f"Final Allowed IDs: {allowed_ids}")
+    ALLOWED_IDS = list(set(DEFAULT_ADMINS + parsed_ids))
+    logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
 except Exception as e:
     logger.error(f"Failed to parse ALLOWED_USERS: {e}")
-    allowed_ids = [708531393, 5569219290, 578363419] # Hard fallback
+    ALLOWED_IDS = [708531393, 5569219290, 578363419]
 
-ADMIN_ID = 708531393 # Hardcoded main admin
+ADMIN_ID = 708531393 # Primary admin for notifications
 
 # keyboards
 def get_main_menu(user_id: int):
@@ -161,9 +160,7 @@ def get_main_menu(user_id: int):
         ["📅 Обзор дня", "➕ Новая задача"],
         ["🧠 Память/Контекст", "⚙️ Настройки", "❓ Помощь"]
     ]
-    allowed_users_str = config.get("ALLOWED_USERS", "")
-    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-    if user_id in allowed_ids:
+    if user_id in ALLOWED_IDS:
         keyboard.append(["🛠 Админ-панель"])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -225,17 +222,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 2. Check Auth/Approval
     if not db.is_approved(user.id):
-        # Auto-approve if in ALLOWED_USERS
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        logger.info(f"[CMD] ALLOWED_USERS config: '{allowed_users_str}'")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        logger.info(f"[CMD] Parsed allowed IDs: {allowed_ids}, checking user {user.id}")
+        # Auto-approve if in ALLOWED_IDS
+        logger.info(f"[CMD] Checking if user {user.id} is in global ALLOWED_IDS: {ALLOWED_IDS}")
 
-        if user.id in allowed_ids:
+        if user.id in ALLOWED_IDS:
             db.approve_user(user.id, True)
             logger.info(f"[CMD] Auto-approved user {user.id}")
         else:
-            logger.warning(f"[CMD] User {user.id} not in ALLOWED_USERS, denying access")
+            logger.warning(f"[CMD] User {user.id} not in ALLOWED_IDS, denying access")
             await update.message.reply_text(
                 f"⛔️ **Доступ ограничен**\n\n"
                 f"Ваш ID: `{user.id}`\n"
@@ -464,9 +458,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Admin Handlers
     elif data == "admin_services":
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
 
         # Service status check
         import psutil
@@ -494,9 +486,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"🛠 **Service Status:**\n\n```\n{status}\n```", parse_mode='Markdown', reply_markup=get_admin_menu())
 
     elif data == "admin_keys":
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
         
         status = config.get_status()
         resp = (
@@ -510,9 +500,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(resp, parse_mode='Markdown', reply_markup=get_admin_menu())
 
     elif data == "admin_users":
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
         users = db.get_inactive_users(hours=0) # Get all users
         resp = "👥 **User Management:**\n\n"
         for u in users:
@@ -522,9 +510,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "admin_pending":
         # Show pending approval requests with inline buttons
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
 
         users = db.get_inactive_users(hours=0)  # Get all users
         pending_users = [u for u in users if not u['is_approved']]
@@ -551,9 +537,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("approve_user:"):
         # Approve user via inline button
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
 
         target_id = int(data.split(":")[1])
         db.approve_user(target_id, True)
@@ -577,9 +561,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("deny_user:"):
         # Deny user access
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
 
         target_id = int(data.split(":")[1])
         logger.info(f"[ADMIN] User {user_id} denied user {target_id}")
@@ -600,10 +582,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif data == "show_admin":
-        # Return to admin menu
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id not in allowed_ids: return
+        if user_id not in ALLOWED_IDS: return
         await query.edit_message_text("🛠 **Центр управления админа**", parse_mode="Markdown", reply_markup=get_admin_menu())
 
     # Model selection callback
@@ -673,10 +652,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"[MESSAGE] Received from {user_id} (@{username}): {user_text}")
 
     if not db.is_approved(user_id):
-        # Auto-approve if matches hardcoded allowed list
-        if user_id in allowed_ids:
+        # Auto-approve if matches global allowed list
+        if user_id in ALLOWED_IDS:
             db.approve_user(user_id, True)
-            logger.info(f"[MESSAGE] Auto-approved user {user_id} because they are in allowed_ids")
+            logger.info(f"[MESSAGE] Auto-approved user {user_id} via global ALLOWED_IDS")
         else:
             logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
             return
@@ -731,9 +710,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_memory_context(update, context)
         return
     elif user_text == "🛠 Админ-панель":
-        allowed_users_str = config.get("ALLOWED_USERS", "")
-        allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-        if user_id in allowed_ids:
+        if user_id in ALLOWED_IDS:
             await update.message.reply_text("🛠 **Центр управления админа**", reply_markup=get_admin_menu())
         else:
             await update.message.reply_text("⛔️ Доступ запрещен.")
@@ -1161,9 +1138,7 @@ async def newtask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    allowed_users_str = config.get("ALLOWED_USERS", "")
-    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-    if user_id not in allowed_ids: return
+    if user_id not in ALLOWED_IDS: return
 
     if not context.args or len(context.args) < 2:
         await update.message.reply_text("Usage: `/set_key NAME VALUE`", parse_mode='Markdown')
@@ -1183,9 +1158,7 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    allowed_users_str = config.get("ALLOWED_USERS", "")
-    allowed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-    if user_id not in allowed_ids: return
+    if user_id not in ALLOWED_IDS: return
 
     if not context.args:
         await update.message.reply_text("Usage: `/approve USER_ID`")
