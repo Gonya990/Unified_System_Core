@@ -140,7 +140,20 @@ else:
     digest_service = None
 
 # Admin ID
-ADMIN_ID = int(config.get("ALLOWED_USERS", "708531393").split(",")[0])
+allowed_users_str = config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
+logger.info(f"Raw ALLOWED_USERS from config: '{allowed_users_str}'")
+try:
+    # Explicitly include known admins to prevent lockout
+    allowed_ids = [708531393, 5569219290, 578363419]
+    parsed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
+    # Merge and deduplicate
+    allowed_ids = list(set(allowed_ids + parsed_ids))
+    logger.info(f"Final Allowed IDs: {allowed_ids}")
+except Exception as e:
+    logger.error(f"Failed to parse ALLOWED_USERS: {e}")
+    allowed_ids = [708531393, 5569219290, 578363419] # Hard fallback
+
+ADMIN_ID = 708531393 # Hardcoded main admin
 
 # keyboards
 def get_main_menu(user_id: int):
@@ -660,8 +673,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"[MESSAGE] Received from {user_id} (@{username}): {user_text}")
 
     if not db.is_approved(user_id):
-        logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
-        return
+        # Auto-approve if matches hardcoded allowed list
+        if user_id in allowed_ids:
+            db.approve_user(user_id, True)
+            logger.info(f"[MESSAGE] Auto-approved user {user_id} because they are in allowed_ids")
+        else:
+            logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
+            return
 
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
