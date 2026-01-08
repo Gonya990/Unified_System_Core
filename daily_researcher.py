@@ -41,7 +41,14 @@ def get_latest_tech_news():
         "spacex mars colonization progress",
         "metaverse web3 evolution",
         "biotechnology longevity research",
-        "autonomous vehicles level 5"
+        "autonomous vehicles level 5",
+        "renewable energy revolution 2026",
+        "robotics in healthcare surgery",
+        "ai in cybersecurity threat hunting",
+        "blockchain beyond crypto 2026",
+        "nanotechnology in medicine",
+        "6G network release and edge computing",
+        "smart cities and digital twins"
     ]
     query = random.choice(topics)
     print(f"📡 Researching topic: {query}")
@@ -147,6 +154,20 @@ def translate_to_hebrew(text):
     except Exception as e:
         print(f"❌ Hebrew translation failed: {e}")
         return "העתיד כבר כאן. בינה מלאכותית משנה את העולם."
+def translate_to_english(text):
+    """
+    High-quality translation to English for the Weekly Special.
+    """
+    try:
+        response = get_client().chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "system", "content": "Translate the following futuristic script to ENGLISH. Maintain the 'Impact Vision' energy. Return ONLY text."},
+                      {"role": "user", "content": text}]
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"❌ English translation failed: {e}")
+        return "The future is here. AI is transforming the world."
 
 def generate_vision_assets(scenes, output_dir: Path):
     """

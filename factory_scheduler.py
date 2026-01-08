@@ -2,6 +2,8 @@
 import os
 import sys
 import random
+import json
+import argparse
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -14,9 +16,13 @@ sys.path.append(str(ROOT_DIR))
 load_dotenv(ROOT_DIR / ".env")
 
 from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
-from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew
+from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew, translate_to_english
 from insta_uploader import upload_reel
 import subprocess
+
+# Configuration
+REELS_AUTO_UPLOAD = True
+POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
 def agent_sync(msg):
     """Синхронизация с агентом Кости (FuchsiaCat) через MCP"""
@@ -26,8 +32,35 @@ def agent_sync(msg):
     except Exception as e:
         print(f"⚠️ Sync Error: {e}")
 
-# Configuration
-REELS_AUTO_UPLOAD = True
+def load_history():
+    if POSTED_HISTORY_FILE.exists():
+        try:
+            with open(POSTED_HISTORY_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_history(history):
+    with open(POSTED_HISTORY_FILE, "w") as f:
+        json.dump(history, f, indent=4)
+
+def is_already_posted(topic):
+    history = load_history()
+    # Check if topic was posted in the last 30 entries to avoid near-duplicates
+    posted_topics = [item.get("topic") for item in history[-30:]]
+    return topic in posted_topics
+
+def mark_as_posted(topic, prefix, lang):
+    history = load_history()
+    history.append({
+        "topic": topic,
+        "prefix": prefix,
+        "lang": lang,
+        "timestamp": datetime.now().isoformat()
+    })
+    # Keep history manageable
+    save_history(history[-200:])
 
 def get_static_fallback():
     """
@@ -40,9 +73,15 @@ def get_static_fallback():
         ("Quantum Supremacy", "The race for the first practical quantum computer."),
         ("Space Exploration 2026", "Mars colonization and the moon gateway mission."),
         ("Neural interface evolution", "Connecting human brains directly to the cloud."),
-        ("Sustainable Fusion Energy", "Clean, infinite power is finally within reach.")
+        ("Sustainable Fusion Energy", "Clean, infinite power is finally within reach."),
+        ("Robotics in Everyday Life", "How machines are helping us in our homes."),
+        ("The Future of Medicine", "AI-driven diagnostics and personalized treatments.")
     ]
-    topic, desc = random.choice(topics)
+    # Filter out already posted topics if possible
+    available_topics = [t for t in topics if not is_already_posted(t[0])]
+    if not available_topics: available_topics = topics
+    
+    topic, desc = random.choice(available_topics)
     
     print(f"⚠️ Using static fallback content: {topic}")
     return {
@@ -59,15 +98,10 @@ def get_static_fallback():
     }
 
 def generate_hebrew_content(russian_content):
-    """
-    HEBREW WEEKLY LOGIC
-    """
     if not russian_content:
         russian_content = get_static_fallback()
-        
     print("🇮🇱 Translating to Hebrew...")
     he_script = translate_to_hebrew(russian_content.get('script_ru', ""))
-    
     return {
         "selected_topic": russian_content.get('selected_topic', "AI Future"),
         "script_he": he_script,
@@ -75,19 +109,48 @@ def generate_hebrew_content(russian_content):
         "description": f"מהדורת שבועית: {russian_content.get('selected_topic', '')} #AI #Israel"
     }
 
-def run_factory_production(is_weekly=False):
-    day_str = datetime.now().strftime('%Y-%m-%d')
-    is_weekly_hebrew = is_weekly or (datetime.now().weekday() == 6)
+def generate_english_content(russian_content):
+    if not russian_content:
+        russian_content = get_static_fallback()
+    print("🇬🇧 Translating to English...")
+    en_script = translate_to_english(russian_content.get('script_ru', ""))
+    return {
+        "selected_topic": russian_content.get('selected_topic', "AI Future"),
+        "script_en": en_script,
+        "scenes": (russian_content.get('scenes', []) * 2)[:16],
+        "description": f"Weekly Edition: {russian_content.get('selected_topic', '')} #AI #Future #Tech"
+    }
 
-    print(f"🏭 RUN: {day_str} {'(HEBREW)' if is_weekly_hebrew else ''}")
+def run_factory_production(mode="daily"):
+    day_str = datetime.now().strftime('%Y-%m-%d')
+    
+    # Auto-detect mode based on day if not specified
+    if mode == "auto":
+        weekday = datetime.now().weekday()
+        if weekday == 6: # Sunday
+            mode = "hebrew"
+        elif weekday == 2: # Wednesday
+            mode = "english"
+        else:
+            mode = "daily"
+
+    print(f"🏭 RUN: {day_str} | MODE: {mode.upper()}")
     
     # PHASE 1: DAILY RESEARCH
-    agent_sync(f"Начинаю фазу исследования для {'еженедельного иврита' if is_weekly_hebrew else 'ежедневного ролика'}")
+    agent_sync(f"Начинаю фазу исследования для режима: {mode}")
     try:
         content_data = run_daily_research()
         if not content_data:
             agent_sync("Исследование не дало результатов, использую Fallback")
             content_data = get_static_fallback()
+            
+        # Uniqueness check
+        topic = content_data.get('selected_topic', '')
+        if is_already_posted(topic):
+            agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
+            content_data = run_daily_research() # Retry once
+            if not content_data or is_already_posted(content_data.get('selected_topic', '')):
+                content_data = get_static_fallback() # Fallback ensures variety better now
     except Exception as e:
         agent_sync(f"Ошибка исследования: {e}")
         content_data = get_static_fallback()
@@ -95,11 +158,16 @@ def run_factory_production(is_weekly=False):
     agent_sync(f"Тема выбрана: {content_data.get('selected_topic')}")
 
     # 2. SELECTION
-    if is_weekly_hebrew:
+    if mode == "hebrew":
         content_data = generate_hebrew_content(content_data)
         script = content_data['script_he']
         lang = "he"
         prefix = "weekly_he"
+    elif mode == "english":
+        content_data = generate_english_content(content_data)
+        script = content_data['script_en']
+        lang = "en"
+        prefix = "weekly_en"
     else:
         script = content_data['script_ru']
         lang = "ru"
@@ -127,12 +195,13 @@ def run_factory_production(is_weekly=False):
     try:
         video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes)
         
-        # 5. UPLOAD (NEW)
+        # 5. UPLOAD
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
             agent_sync(f"Загружаю {prefix} ролик в Instagram...")
             caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
             if upload_reel(str(video_path), caption):
                 agent_sync("🚀 Ролик успешно загружен!")
+                mark_as_posted(content_data.get('selected_topic'), prefix, lang)
             else:
                 agent_sync("❌ Ошибка при загрузке ролика")
                 
@@ -141,4 +210,16 @@ def run_factory_production(is_weekly=False):
         agent_sync(f"Критическая ошибка фабрики: {e}")
 
 if __name__ == "__main__":
-    run_factory_production()
+    parser = argparse.ArgumentParser(description='Content Farm Scheduler')
+    parser.add_argument('--hebrew', action='store_true', help='Force Hebrew weekly special')
+    parser.add_argument('--english', action='store_true', help='Force English weekly special')
+    parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
+    
+    args = parser.parse_args()
+    
+    mode = "daily"
+    if args.hebrew: mode = "hebrew"
+    elif args.english: mode = "english"
+    elif args.auto: mode = "auto"
+    
+    run_factory_production(mode=mode)
