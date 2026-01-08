@@ -124,8 +124,9 @@ if _USE_FIRESTORE:
     db = FirestoreDB()
     logger.info("Using Firestore database")
 else:
-    db = UserContextDB()
-    logger.info("Using SQLite database (local mode)")
+    db_path = config.get("SQLITE_DB_PATH", "user_context.db")
+    db = UserContextDB(db_path=db_path)
+    logger.info(f"Using SQLite database (local mode): {db_path}")
 
 auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 conv_manager = ConversationManager()
@@ -163,6 +164,10 @@ USER_ALIASES = {
     "toxicfi7h": 578363419,
     "igor": 708531393,
     "игорь": 708531393,
+    "igoreha9": 708531393,
+    "игореха": 708531393,
+    "игореха9": 708531393,
+    "admin": 708531393,
 }
 
 ADMIN_ID = 708531393 # Primary admin for notifications
@@ -928,18 +933,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         target_id = None
         
         # Resolve target
-        if target_name.isdigit():
-            target_id = int(target_name)
-        elif target_name.lower() in USER_ALIASES:
-            target_id = USER_ALIASES[target_name.lower()]
+        target_clean = target_name.strip().lower().lstrip('@')
+        if target_clean.isdigit():
+            target_id = int(target_clean)
+        elif target_clean in USER_ALIASES:
+            target_id = USER_ALIASES[target_clean]
         else:
             # Fallback scan DB for username
-            all_users = db.get_inactive_users(hours=0)
-            clean_target = target_name.lstrip('@').lower()
-            for u in all_users:
-                if u.get('username', '').lower() == clean_target:
-                    target_id = u['user_id']
-                    break
+            try:
+                # get_inactive_users(hours=0) should return all users if DB isn't empty
+                all_users = db.get_inactive_users(hours=0) 
+                for u in all_users:
+                    if u.get('username', '').lower() == target_clean:
+                        target_id = u['user_id']
+                        break
+            except Exception as db_err:
+                logger.error(f"[MSG] DB resolution error: {db_err}")
         
         if target_id:
             try:
@@ -950,13 +959,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n{msg_text}",
                     parse_mode='Markdown'
                 )
-                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"✅ _(Отправлено пользователю {target_name})_")
+                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"✅ _(Отправлено {target_name})_")
                 logger.info(f"[MSG] AI forwarded message from {user_id} to {target_id}")
             except Exception as e:
-                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Ошибка отправки: {e})_")
+                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Ошибка отправки пользователю {target_name}: {e})_")
                 logger.error(f"[MSG] AI failed to forward message to {target_id}: {e}")
         else:
             ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Пользователь {target_name} не найден)_")
+            logger.warning(f"[MSG] Could not resolve target: {target_name}")
 
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
