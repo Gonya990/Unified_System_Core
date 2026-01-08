@@ -32,7 +32,7 @@ tailscale ssh gonya@100.110.209.49 "
     echo '--- RESTARTING SERVICES ---'
     cd Projects/AI_Core
     # Перезапуск бота с локальным билдом
-    docker compose --profile local up -d ai-bot-local
+    docker compose --profile local up -d --build ai-bot-local
     
     echo '--- REMOTE SYSTEM CHECK ---'
     docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
@@ -111,11 +111,24 @@ def broadcast(msg):
     }, headers=headers)
     print(f'Registration: {r_reg.text}')
 
+    # Parse registration response
+    try:
+        reg_data = r_reg.json()
+        if 'result' in reg_data and 'structuredContent' in reg_data['result']:
+             agent_name = reg_data['result']['structuredContent']['name']
+        else:
+             agent_name = 'Antigravity'
+    except Exception as e:
+        print(f"Error parsing registration: {e}")
+        agent_name = 'Antigravity'
+            
+    print(f"Using identity: {agent_name}")
+
     import time
     time.sleep(1) # Wait for registration to propagate
 
-    # Update sender to Antigravity
-    payload['params']['arguments']['sender_name'] = 'Antigravity'
+    # Update sender to actual registered name
+    payload['params']['arguments']['sender_name'] = agent_name
     
     r = requests.post(URL, json=payload, headers=headers)
     print(f'Broadcast: {r.text}')

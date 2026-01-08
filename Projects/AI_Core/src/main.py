@@ -78,6 +78,8 @@ USER_ALIASES = {
     "nibbler": 578363419,
     "nibbler420": 578363419,
     "toxicfi7h": 578363419,
+    "igor": 708531393,
+    "игорь": 708531393,
 }
 
 # System prompt for AI responses
