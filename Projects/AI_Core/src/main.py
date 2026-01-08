@@ -148,11 +148,21 @@ AI: "Включаю. [[RUN:SAY:Включи свет]]"
 # Authorized users are loaded dynamically from config/env
 # Expects comma-separated string in env var ALLOWED_USERS
 def get_allowed_users():
-    users_str = config.get("ALLOWED_USERS", "708531393,5569219290")
+    users_str = config.get("ALLOWED_USERS")
+    logger.info(f"Raw ALLOWED_USERS from config: '{users_str}'")
+    
+    if not users_str:
+        logger.warning("ALLOWED_USERS is empty, using default fallback")
+        users_str = "708531393,5569219290,578363419"
+        
     try:
-        return [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
-    except ValueError:
-        logger.error(f"Invalid ALLOWED_USERS format: {users_str}")
+        users = [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
+        logger.info(f"Parsed ALLOWED_USERS: {users}")
+        if not users:
+             raise ValueError("Empty list after parsing")
+        return users
+    except ValueError as e:
+        logger.error(f"Invalid ALLOWED_USERS format: {users_str} ({e})")
         return [708531393] # Fallback to admin
 
 ALLOWED_USERS = get_allowed_users()
