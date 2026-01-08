@@ -164,6 +164,9 @@ USER_ALIASES = {
     "toxicfi7h": 578363419,
     "igor": 708531393,
     "игорь": 708531393,
+    "игорьку": 708531393,
+    "игорю": 708531393,
+    "игорек": 708531393,
     "igoreha9": 708531393,
     "игореха": 708531393,
     "игореха9": 708531393,
@@ -678,6 +681,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
             return
 
+    # If message starts with / but is actually a Russian text (user mistake), treat as text
+    if user_text.startswith('/') and len(user_text) > 1:
+        # Check if it's one of our registered commands
+        registered_cmds = ["start", "help", "status", "models", "scan", "imagine", "search", "todo", "ha", "clear", "mail", "calendar", "brief", "settings", "memory", "beads", "agent"]
+        first_word = user_text[1:].split()[0].lower()
+        if first_word not in registered_cmds:
+             # It's a text request starting with /
+             logger.info(f"[MESSAGE] Treating slash-text as regular input: {user_text}")
+             # We proceed to process it as text
+        else:
+             # It's a real command, ignore here if it's handled by CommandHandler
+             # But actually MessageHandler(TEXT) usually doesn't catch commands anyway
+             pass
+
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
     
@@ -1137,11 +1154,15 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         "- Yandex Alice TTS: If user asks to SAY something via Alice/station.\n"
         "  Format: [[ALICE:text_to_say]]\n\n"
 
-        "📩 MESSAGING (Telegram):\n"
-        "- Send message to another user: [[RUN:MSG:<target>:<text>]]\n"
-        "- Target MUST be: 'kostya', 'igor', or a numeric ID.\n"
-        "IMPORTANT: DO NOT just write the message text. You MUST use the [[RUN:MSG:...]] tag to actually send it.\n"
-        "Example: If user says 'Tell Igor hello', you respond: 'Sending hello... [[RUN:MSG:igor:Привет!]]'\n\n"
+        "📩 MESSAGING (RELAY SYSTEM):\n"
+        "You serve as a relay between users. If User A asks to tell/send/message User B, you MUST NOT respond to User A as if you are talking to User B. You MUST use the relay tag.\n"
+        "- Relay tag format: [[RUN:MSG:<target>:<text>]]\n"
+        "- Valid targets: 'kostya', 'igor', or numeric ID.\n"
+        "RULES:\n"
+        "1. NEVER output plain text intended for the target directly in the chat with the sender.\n"
+        "2. ALWAYS wrap the relayed message in the [[RUN:MSG:...]] tag.\n"
+        "3. Example of WRONG response: 'Игорь, нам нужно встретиться...'\n"
+        "4. Example of CORRECT response: 'Хорошо, передаю Игорю. [[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
         
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
@@ -3001,7 +3022,7 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
     application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(MessageHandler(filters.TEXT, handle_message))
     logger.info("[STARTUP] All handlers registered")
 
     logger.info("[STARTUP] Starting polling...")
