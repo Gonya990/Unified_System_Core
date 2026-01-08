@@ -111,12 +111,15 @@ def run_daily_research():
     
     try:
         response = get_client().chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "You are a master content strategist and AI trend researcher."},
-                      {"role": "user", "content": prompt}],
-            response_format={ "type": "json_object" }
+            model="gpt-4-turbo",
+            messages=[{"role": "system", "content": "You are a master content strategist and AI trend researcher. Return ONLY a JSON object."},
+                      {"role": "user", "content": prompt}]
         )
-        data = json.loads(response.choices[0].message.content)
+        # Handle both JSON mode and text response
+        content = response.choices[0].message.content
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        data = json.loads(content)
         return data
     except Exception as e:
         print(f"❌ LLM Deep Research failed: {e}")
