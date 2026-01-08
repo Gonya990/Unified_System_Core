@@ -152,6 +152,19 @@ except Exception as e:
     logger.error(f"Failed to parse ALLOWED_USERS: {e}")
     ALLOWED_IDS = [708531393, 5569219290, 578363419]
 
+# User aliases for messaging (name -> Telegram user ID)
+USER_ALIASES = {
+    "костя": 578363419,
+    "kostya": 578363419,
+    "kosta": 578363419,
+    "коста": 578363419,
+    "nibbler": 578363419,
+    "nibbler420": 578363419,
+    "toxicfi7h": 578363419,
+    "igor": 708531393,
+    "игорь": 708531393,
+}
+
 ADMIN_ID = 708531393 # Primary admin for notifications
 
 # keyboards
@@ -909,6 +922,42 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
              ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"❌ _(HA недоступен)_")
 
+    # 3. DIRECT MESSAGING (Telegram)
+    msg_matches = re.findall(r'\[\[RUN:MSG:(.*?):(.*?)\]\]', ai_response)
+    for target_name, msg_text in msg_matches:
+        target_id = None
+        
+        # Resolve target
+        if target_name.isdigit():
+            target_id = int(target_name)
+        elif target_name.lower() in USER_ALIASES:
+            target_id = USER_ALIASES[target_name.lower()]
+        else:
+            # Fallback scan DB for username
+            all_users = db.get_inactive_users(hours=0)
+            clean_target = target_name.lstrip('@').lower()
+            for u in all_users:
+                if u.get('username', '').lower() == clean_target:
+                    target_id = u['user_id']
+                    break
+        
+        if target_id:
+            try:
+                # Get sender info
+                sender_name = update.effective_user.username or update.effective_user.first_name
+                await context.bot.send_message(
+                    chat_id=target_id,
+                    text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n{msg_text}",
+                    parse_mode='Markdown'
+                )
+                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"✅ _(Отправлено пользователю {target_name})_")
+                logger.info(f"[MSG] AI forwarded message from {user_id} to {target_id}")
+            except Exception as e:
+                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Ошибка отправки: {e})_")
+                logger.error(f"[MSG] AI failed to forward message to {target_id}: {e}")
+        else:
+            ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Пользователь {target_name} не найден)_")
+
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
     
@@ -1035,10 +1084,13 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         "🏠 HOME ASSISTANT & ALICE:\n"
         "- Control smart home: You can output COMMANDS to control devices.\n"
         "  Format: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
-        "  Example: If user says 'turn on kitchen light', you output: 'Turning it on... [[HA:light_on:kitchen]]'\n"
         "- Yandex Alice TTS: If user asks to SAY something via Alice/station.\n"
-        "  Format: [[ALICE:text_to_say]]\n"
-        "  Example: [[ALICE:Спокойной ночи!]]\n\n"
+        "  Format: [[ALICE:text_to_say]]\n\n"
+
+        "📩 MESSAGING (Telegram):\n"
+        "- Send message to another user: [[RUN:MSG:<target>:<text>]]\n"
+        "- Target can be: 'kostya', 'igor', or a numeric ID.\n"
+        "Example: [[RUN:MSG:kostya:Привет, как дела?]]\n\n"
         
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
@@ -1049,9 +1101,12 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         
         "=== USER CONTEXT ===\n"
         + mem_text + "\n\n"
+        "Known Aliases:\n"
+        "- Kostya (Nibbler420): target='kostya'\n"
+        "- Igor (Owner): target='igor'\n\n"
         
         "=== INSTRUCTIONS ===\n"
-        "1. Be proactive - if user asks about mail/calendar, guide them to use commands.\n"
+        "1. Be proactive - if user asks to tell/send something to Kostya, use [[RUN:MSG:kostya:text]].\n"
         "2. Remember: timezone is Asia/Jerusalem (IST).\n"
         "3. Give short, helpful answers in user's language.\n"
         "4. If you can help with a task directly, do it or explain how."
