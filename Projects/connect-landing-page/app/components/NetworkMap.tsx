@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Globe, Database, Zap, Activity } from "lucide-react"
 
 import { Translation } from "@/app/data/translations"
+import { WORLD_MAP_PATH } from "@/app/data/worldMapPath"
 
 interface Node {
     id: number
@@ -88,32 +89,14 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                             stroke="currentColor"
                             strokeWidth="0.5"
                         >
-                            {/* Authentic World Map - Manually Constructed High-Fidelity Paths */}
-                            <g className={`transition-colors duration-500 ${isDark ? 'fill-white' : 'fill-zinc-900'}`} opacity="0.15">
-                                {/* North America */}
-                                <path d="M 150 100 L 120 120 L 100 110 L 80 130 L 60 110 L 50 80 L 80 50 L 150 40 L 250 30 L 320 40 L 350 80 L 300 150 L 250 180 L 220 220 L 180 200 L 160 160 L 150 100 Z" />
-
-                                {/* South America */}
-                                <path d="M 280 240 L 350 220 L 400 260 L 420 300 L 380 400 L 350 480 L 320 450 L 300 350 L 280 280 L 280 240 Z" />
-
-                                {/* Europe */}
-                                <path d="M 450 150 L 480 120 L 520 110 L 550 80 L 600 80 L 620 120 L 600 150 L 550 160 L 520 180 L 480 170 L 460 190 L 450 150 Z" />
-
-                                {/* Africa */}
-                                <path d="M 460 200 L 520 190 L 580 200 L 600 250 L 620 300 L 580 400 L 520 420 L 480 350 L 450 280 L 460 200 Z" />
-
-                                {/* Asia */}
-                                <path d="M 620 120 L 680 100 L 750 80 L 850 80 L 900 100 L 950 150 L 920 200 L 850 250 L 800 280 L 750 250 L 700 220 L 650 200 L 620 150 L 620 120 Z" />
-
-                                {/* Australia */}
-                                <path d="M 780 350 L 850 330 L 920 350 L 900 420 L 820 440 L 780 400 L 780 350 Z" />
-
-                                {/* Islands & Details */}
-                                <path d="M 850 150 L 870 140 L 880 160 L 860 170 L 850 150 Z" /> {/* Japan */}
-                                <path d="M 750 300 L 780 290 L 800 310 L 770 320 L 750 300 Z" /> {/* Indonesia */}
-                                <path d="M 420 120 L 440 110 L 450 130 L 430 140 L 420 120 Z" /> {/* UK */}
-                                <path d="M 920 450 L 940 440 L 950 460 L 930 470 L 920 450 Z" /> {/* NZ */}
-                            </g>
+                            {/* Authentic World Map - Imported High Fidelity SVG */}
+                            <svg viewBox="30.767 241.591 784.077 458.627" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full">
+                                <path
+                                    d={WORLD_MAP_PATH}
+                                    className={`transition-colors duration-500 ${isDark ? 'fill-white' : 'fill-zinc-900'}`}
+                                    opacity="0.15"
+                                />
+                            </svg>
                         </svg>
 
                         {/* Node Connections (Animated Lines) */}
