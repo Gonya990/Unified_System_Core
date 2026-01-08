@@ -12,7 +12,12 @@ from dotenv import load_dotenv
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
-load_dotenv(ROOT_DIR / ".env")
+env_path = ROOT_DIR / ".env"
+load_success = load_dotenv(env_path)
+
+print(f"DEBUG: ROOT_DIR is {ROOT_DIR}")
+print(f"DEBUG: Loading .env from {env_path}, Success: {load_success}")
+print(f"DEBUG: OPENAI_API_KEY present: {bool(os.getenv('OPENAI_API_KEY'))}")
 
 # Configuration
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
