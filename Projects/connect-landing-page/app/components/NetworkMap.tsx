@@ -172,7 +172,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                             </div>
                             <div>
                                 <div className={`text-[10px] uppercase font-black tracking-widest ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{network.active_nodes}</div>
-                                <div className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-zinc-900'}`}>
+                                <div suppressHydrationWarning className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-zinc-900'}`}>
                                     {activeNodes.toLocaleString('en-US')}
                                 </div>
                             </div>
@@ -184,7 +184,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                             </div>
                             <div>
                                 <div className={`text-[10px] uppercase font-black tracking-widest ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{network.global_traffic}</div>
-                                <div className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-zinc-900'}`}>
+                                <div suppressHydrationWarning className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-zinc-900'}`}>
                                     {traffic} <span className="text-sm opacity-50">PB/s</span>
                                 </div>
                             </div>
