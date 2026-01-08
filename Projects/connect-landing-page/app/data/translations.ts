@@ -72,7 +72,7 @@ export const translations: Record<string, Translation> = {
       "api": "API"
     },
     "hero": {
-      "b2c_tag": "Global roaming is cancelled",
+      "b2c_tag": "Freedom from Roaming Fees",
       "b2c_title_1": "The World is Yours.",
       "b2c_title_2": "Just Connect.",
       "b2c_desc": "Instant access to eSIM internet in 190+ countries. Prepaid data packages with no hidden fees.",
@@ -290,7 +290,7 @@ export const translations: Record<string, Translation> = {
       "api": "API"
     },
     "hero": {
-      "b2c_tag": "Глобальный роуминг отменен",
+      "b2c_tag": "Свобода от платы за роуминг",
       "b2c_title_1": "Мир Твой.",
       "b2c_title_2": "Просто подключись.",
       "b2c_desc": "Мгновенный доступ к eSIM интернету в 190+ странах. Предоплаченные пакеты трафика без скрытых комиссий.",
@@ -508,7 +508,7 @@ export const translations: Record<string, Translation> = {
       "api": "API"
     },
     "hero": {
-      "b2c_tag": "נדידה גלובלית בוטלה",
+      "b2c_tag": "חופש מעמלות נדידה",
       "b2c_title_1": "העולם שלך.",
       "b2c_title_2": "פשוט להתחבר.",
       "b2c_desc": "גישה מיידית לאינטרנט eSIM ב-190+ מדינות. חבילות גלישה בתשלום מראש ללא עמלות נסתרות.",
