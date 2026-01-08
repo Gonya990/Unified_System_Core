@@ -37,14 +37,13 @@ for the full logical layout.
 
 **Location**: `skills/`
 
-| Pillar | Purpose | Skills |
-|--------|---------|--------|
-| `Data/` | Permanent local data | `Local/` (SQLite DBs) |
-| `learning-pillar/` | Optimize for learning | iterative-development, feedback-driven-design, experimental-workflow, deployment-pipeline-designer, empirical-measurement |
-| `complexity-pillar/` | Manage complexity | separation-of-concerns-enforcer, modularity-architect, cohesion-coach, abstraction-patterns, coupling-minimizer |
-| `supporting-skills/` | Supporting practices | refactoring-mastery, high-performance-simplicity, frontend-aesthetics, youth-brand-ux |
-| `project-skills/` | Project-specific | continuous-integration-practice |
-| `architecture-skills/` | Architecture patterns | python-hexagonal-development, python-test-strategy |
+- **Learning Pillar**: `iterative-development`, `feedback-driven-design`,
+  `experimental-workflow`, `deployment-pipeline-designer`, `empirical-measurement`
+- **Complexity Pillar**: `separation-of-concerns-enforcer`, `modularity-architect`,
+  `cohesion-coach`, `abstraction-patterns`, `coupling-minimizer`
+- **Supporting Skills**: `refactoring-mastery`, `high-performance-simplicity`,
+  `frontend-aesthetics`, `youth-brand-ux`
+- **Architecture Skills**: `python-hexagonal-development`, `python-test-strategy`
 
 **Index**: `skills/README.md`
 
@@ -54,17 +53,14 @@ for the full logical layout.
 
 **Location**: `.claude/agents/`
 
-| Category | Agents |
-|----------|--------|
-| `discovery/` | code-explorer, api-discoverer, dependency-mapper |
-| `architecture/` | code-architect, hexagonal-architecture-guardian, performance-optimizer |
-| `implementation/` | implementer, bug-fixer |
-| `review/` | code-reviewer |
-| `testing/` | tdd-cycle-driver |
-| `workflow/` | feedback-loop-optimizer |
-| `coordination/` | code-quality-coordinator, devops-workflow-orchestrator |
-| `devops/` | security-hardening-worker, performance-optimization-worker |
-| `ui-ux/` | senior-ui-ux-designer |
+- **Discovery**: `code-explorer`, `api-discoverer`, `dependency-mapper`
+- **Architecture**: `code-architect`, `hexagonal-architecture-guardian`,
+  `performance-optimizer`
+- **Implementation**: `implementer`, `bug-fixer`
+- **Review/Test**: `code-reviewer`, `tdd-cycle-driver`
+- **Coordination**: `code-quality-coordinator`, `devops-workflow-orchestrator`
+- **DevOps**: `security-hardening-worker`, `performance-optimization-worker`
+- **UI/UX**: `senior-ui-ux-designer`
 
 **Index**: `.claude/agents/README.md`
 
@@ -184,7 +180,7 @@ uv run pytest --cov=src           # Coverage
 
 ## Directory Structure
 
-```
+```text
 Unified_System_Core/
 ├── .claude/
 │   └── agents/           # 16 AI agent definitions
