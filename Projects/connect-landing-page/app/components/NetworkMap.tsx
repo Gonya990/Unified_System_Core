@@ -89,6 +89,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                             strokeWidth="0.5"
                         >
                             {/* Authentic World Map Path - Simplified Standard Projection */}
+                            {/* Authentic World Map Path - Simplified Standard Projection */}
                             <path
                                 className={`transition-colors duration-500 ${isDark ? 'fill-white' : 'fill-zinc-900'}`}
                                 d="M843.3,348.6c-4.8,0-8.9,0.7-12.7,2.2c-3.1,1.2-5.7,2.8-8,4.9c-1.9,1.7-4.1,4.4-4.8,6.8c-1.6,5.8-0.6,13.7,2.6,18.4c1.1,1.6,2.3,2.8,3,3.1
@@ -114,7 +115,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                                 c1.2-2,2.8-3.3,4.6-3.8c0.8-0.2,1.3-1,1.1-1.8C170.3,168.9,169.1,168.5,168,168.8z M65,123.6c-3.6,1.4-6.4,4.5-7.5,8.8
                                 c-1.6,6.3,0.7,13.7,5.3,18.3c0.6,0.6,1.4,1.1,2.4,1.5c4.1,1.6,9.1,0.8,13.5-1.8c0.7-0.4,0.9-1.3,0.5-2c-0.4-0.7-1.3-0.9-2-0.5
                                 c-3.5,2.1-7.4,2.7-10.4,1.6c-0.6-0.2-1.1-0.6-1.5-1c-3.6-3.6-5.3-9.1-4.1-13.8c0.8-3.1,2.8-5.3,5.4-6.3c0.8-0.3,1.2-1.1,0.9-1.9
-                                C67.2,124,66.2,123.2,65,123.6z M500,50c-248.5,0-450,111.9-450,250s201.5,250,450,250s450-111.9,450-250S698.5,50,500,50z"
+                                C67.2,124,66.2,123.2,65,123.6z"
                                 opacity="0.15"
                             />
                         </svg>
