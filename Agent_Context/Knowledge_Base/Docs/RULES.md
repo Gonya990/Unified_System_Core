@@ -1,6 +1,7 @@
 # Organization Rules
 
 ## Structure Overview
+
 - **00_NAV/**: Navigation data, registries, logs.
 - **01_Projects/**: Active and archived project folders.
 - **02_Shared/**: Resources used across multiple projects (Scripts, Installers).
@@ -8,7 +9,16 @@
 - **90_Inbox_ToSort/**: Things that need manual review.
 - **99_Archive_Original/**: Only for original structure snapshots (empty by default).
 
+## ROOT RULES (ROYAL DECREES)
+
+1. **The Royal 429 Protocol**: When using browser automation tools or headless browsers, you MUST adhere to the following to prevent 429 Rate Limit errors:
+   - **Smart Pauses**: Always wait at least 5 seconds (`wait_ms: 5000`) before taking actions (screenshots, clicks) after navigation.
+   - **Throttling**: Do not spam requests. Respect the "breath" of the server.
+   - **Graceful Retries**: If a 429 occurs, do not panic. Wait exponentially longer before retrying.
+   - *Verified Success Mechanism: 08 Jan 2026 - The Map Verification Incident.*
+
 ## Project Assignment Logic
+
 1. **Home Assistant (PRJ-001)**:
    - Filenames starting with `ha_`, `hass`, `dashboard_`.
    - `.homeassistant` and `hass` directories.
@@ -38,12 +48,14 @@
    - `opencode-server` folder.
 
 ## Special Handling
+
 - **System Files**: `.bashrc`, `.profile`, `.status`, `.ssh`, `.config` -> **DO NOT MOVE**. Leave in Root.
 - **Installers**: `miniconda.sh`, `install.sh` -> Move to `02_Shared/Installers` or keep in Project if specific.
 - **Unknowns**: If confidence < 0.7, move to `90_Inbox_ToSort/NEEDS_REVIEW` with a note.
 - **Naming Conflicts**: Append `_v2`, `_v3` etc.
 
 ## Folder template for Projects
+
 - `00_README.md`
 - `01_Docs` (Markdown reports, docs)
 - `02_Dev` (Code, scripts, configs, JSONs)
