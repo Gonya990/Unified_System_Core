@@ -6,6 +6,7 @@ import asyncio
 import logging
 import signal
 import sys
+import os
 
 from telegram import Update, BotCommand
 from telegram.ext import (
@@ -64,7 +65,20 @@ homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
-gmail_client = GmailClient()
+# Init Gmail Client with credentials loading
+gmail_creds = None
+try:
+    import json
+    import os
+    creds_path = os.path.join("config", "gmail_credentials.json")
+    if os.path.exists(creds_path):
+        with open(creds_path, 'r') as f:
+            gmail_creds = json.load(f)
+            logger.info("Loaded Gmail credentials from file")
+except Exception as e:
+    logger.error(f"Failed to load Gmail credentials: {e}")
+
+gmail_client = GmailClient(gmail_creds)
 
 # Admin ID for sensitive commands (update)
 ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
@@ -123,6 +137,12 @@ User: "Че там с сервером?"
 AI: "Проверяю системы... [[RUN:STATUS]]
 ---
 Checking systems..."
+
+User: "Скажи Косте купить хлеб"
+AI: "Передаю сообщение. [[RUN:MSG:kostya:Купи хлеб пожалуйста]]"
+
+User: "Скажи Алисе включить свет"
+AI: "Включаю. [[RUN:SAY:Включи свет]]"
 """
 
 # Authorized users are loaded dynamically from config/env

@@ -119,10 +119,10 @@ def broadcast(msg):
         else:
              agent_name = 'Antigravity'
     except Exception as e:
-        print(f"Error parsing registration: {e}")
+        print(f'Error parsing registration: {e}')
         agent_name = 'Antigravity'
             
-    print(f"Using identity: {agent_name}")
+    print(f'Using identity: {agent_name}')
 
     import time
     time.sleep(1) # Wait for registration to propagate
