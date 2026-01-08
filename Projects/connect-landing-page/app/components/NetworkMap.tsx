@@ -83,7 +83,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                     <div className="relative w-full aspect-[2/1] md:h-full md:absolute md:inset-0" suppressHydrationWarning>
                         <svg
                             viewBox="0 0 1000 500"
-                            className="w-full h-full opacity-20 pointer-events-none"
+                            className="w-full h-full pointer-events-none"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="0.5"
@@ -136,7 +136,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                                 c3.4,0.2,4.9,4.8,8.4,4.2c2.4-0.4,3.2-3.6,5.5-3.4c3.4,0.3,4.8,5.1,8.4,4.5c2.6-0.5,3.5-3.8,6.1-3.7c0.1,0,0.3,0,0.4,0
                                 c3.7,0.2,5.5,5.2,9.2,4.7c2.3-0.3,3.3-3.3,5.5-3.2c3,0.2,4.3,4.3,7.1,4.2c2.7-0.1,3.8-3.9,6.6-3.4
                                 C162.7,110.4,163.5,113.8,164.8,114.6z"
-                                opacity="0.15"
+                                opacity="0.3"
                             />
                         </svg>
 
