@@ -45,7 +45,7 @@ from .gmail_client import GmailClient
 setup_logging()
 logger = logging.getLogger(__name__)
 
-# Global instances
+# Global instances - initialize lazily or inside main
 config = ConfigManager()
 inference = InferenceClient(config)
 conv_manager = ConversationManager(storage_path="conversations")
@@ -65,23 +65,28 @@ homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
-# Init Gmail Client with credentials loading
-gmail_creds = None
-try:
-    import json
-    import os
-    creds_path = os.path.join("config", "gmail_credentials.json")
-    if os.path.exists(creds_path):
-        with open(creds_path, 'r') as f:
-            gmail_creds = json.load(f)
-            logger.info("Loaded Gmail credentials from file")
-except Exception as e:
-    logger.error(f"Failed to load Gmail credentials: {e}")
 
-gmail_client = GmailClient(gmail_creds)
+# Init Gmail Client - only if running as main or when needed
+gmail_client = None
+
+def init_gmail():
+    global gmail_client
+    gmail_creds = None
+    try:
+        import json
+        import os
+        creds_path = os.path.join("config", "gmail_credentials.json")
+        if os.path.exists(creds_path):
+            with open(creds_path, 'r') as f:
+                gmail_creds = json.load(f)
+                logger.info("Loaded Gmail credentials from file")
+    except Exception as e:
+        logger.error(f"Failed to load Gmail credentials: {e}")
+
+    gmail_client = GmailClient(gmail_creds)
 
 # Admin ID for sensitive commands (update)
-ADMIN_ID = int(config.get("ALLOWED_USERS", "").split(",")[0] or 0)
+ADMIN_ID = 0 # Default, will be updated in main()
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
