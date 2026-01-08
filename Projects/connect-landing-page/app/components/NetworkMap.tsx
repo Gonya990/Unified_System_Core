@@ -173,7 +173,7 @@ export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark"
                             <div>
                                 <div className={`text-[10px] uppercase font-black tracking-widest ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{network.active_nodes}</div>
                                 <div className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-zinc-900'}`}>
-                                    {activeNodes.toLocaleString()}
+                                    {activeNodes.toLocaleString('en-US')}
                                 </div>
                             </div>
                         </div>
