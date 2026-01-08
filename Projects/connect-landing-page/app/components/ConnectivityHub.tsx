@@ -1601,9 +1601,9 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             <div>
               <h4 className={`font-bold mb-6 text-sm uppercase tracking-widest ${isDark ? 'text-white' : 'text-zinc-900'}`}>Legal</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
-                <li><button onClick={() => alert('Terms of Service: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.terms || 'Terms'}</button></li>
-                <li><button onClick={() => alert('Privacy Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.privacy || 'Privacy'}</button></li>
-                <li><button onClick={() => alert('Refund Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.refund || 'Refunds'}</button></li>
+                <li><Link href="/terms" className="hover:text-blue-500 transition-colors">{t.legal?.terms || 'Terms'}</Link></li>
+                <li><Link href="/privacy" className="hover:text-blue-500 transition-colors">{t.legal?.privacy || 'Privacy'}</Link></li>
+                <li><Link href="/refund" className="hover:text-blue-500 transition-colors">{t.legal?.refund || 'Refunds'}</Link></li>
               </ul>
             </div>
           </div>
