@@ -755,8 +755,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "תזכיר", "פגישה", "הוסף", "קבע", "תזמן", "אירוע", "הזכר"
     ]
 
+    # Exclude messaging keywords from event detection to prevent hijacking
+    MSG_START_KEYWORDS = ["tell", "say", "send", "скажи", "передай", "отправь", "сообщи", "напиши"]
+    
     # Check for "Add Event" intent
-    if any(k in lower_text for k in EVENT_KEYWORDS):
+    if any(k in lower_text for k in EVENT_KEYWORDS) and not any(m in lower_text for m in MSG_START_KEYWORDS):
         event_details = await parse_event_details(user_text)
         if event_details and 'summary' in event_details:
             summary = event_details['summary']
@@ -808,12 +811,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             VACANCY_KEYWORDS = ["вакансий", "вакансии", "вакансия", "vacancy", "vacancies", "job", "работа", "работу", "предложения", "резюме"]
             is_vacancy_query = any(v in lower_text for v in VACANCY_KEYWORDS)
             
-            # Extract count if mentioned (e.g., "30 вакансий")
+            # Extract count if mentioned (e.g., "30 писем")
             import re
-            count_match = re.search(r'(\d+)\s*(вакансий|писем|emails?|messages?)', lower_text)
+            count_match = re.search(r'(\d+)', lower_text)
             requested_count = int(count_match.group(1)) if count_match else 10
-            max_count = min(requested_count, 100)  # Increase cap to 100
+            max_count = min(requested_count, 50)  # Cap at 50 for context window safety
             
+            is_analysis_requested = any(a in lower_text for a in ["анализ", "проанализируй", "analyze", "summarize", "обзор", "проверь"])
+
             if is_vacancy_query:
                 # Search for job-related emails
                 query = "(vacancy OR job OR вакансия OR предложение OR recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
@@ -860,12 +865,47 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     except Exception as e:
                         logger.error(f"AI Analysis failed: {e}")
                         await update.message.reply_text("❌ Произошла ошибка при анализе писем. Попробуйте уменьшить выборку (`/mail search query`).", reply_markup=get_main_menu(user_id))
-
-
                 else:
                     await update.message.reply_text("📭 Писем о вакансиях не найдено.", reply_markup=get_main_menu(user_id))
                 return
 
+            elif is_analysis_requested:
+                await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+                emails = gmail.get_recent_emails(max_results=max_count)
+                if not emails:
+                    await update.message.reply_text("📭 Входящих писем не найдено.", reply_markup=get_main_menu(user_id))
+                    return
+                
+                await update.message.reply_text(f"🔍 Загрузил последние {len(emails)} писем. Анализирую на предмет критических уведомлений и предупреждений...", reply_markup=get_main_menu(user_id))
+                
+                email_context = "ПОСЛЕДНИЕ ПИСЬМА (ДЛЯ АНАЛИЗА):\n"
+                for i, email in enumerate(emails, 1):
+                    sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+                    snippet = (email.get('snippet', '') or '')[:200].replace('\n', ' ')
+                    email_context += f"{i}. От: {sender} | Тема: {email['subject']} | Суть: {snippet}\n"
+                
+                full_analysis_prompt = (
+                    f"Проанализируй следующий список из {len(emails)} писем.\n"
+                    f"Контекст запроса пользователя: '{user_text}'\n"
+                    "ИНСТРУКЦИИ:\n"
+                    "1. Игнорируй предложения о работе/вакансии (если пользователь так просил).\n"
+                    "2. Выдели КРИТИЧЕСКИЕ предупреждения, счета, уведомления безопасности или важные личные сообщения.\n"
+                    "3. Сгруппируй по важности.\n"
+                    "4. Отвечай кратко и по делу на языке пользователя.\n\n"
+                    f"{email_context}"
+                )
+                
+                try:
+                    ai_response = await query_ollama_with_context(user_id, full_analysis_prompt)
+                    if ai_response and ai_response.strip():
+                        conv_manager.add_message(user_id, "assistant", ai_response)
+                        await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
+                    else:
+                        await update.message.reply_text("🤔 Я просмотрел письма, но ничего критичного не обнаружил.", reply_markup=get_main_menu(user_id))
+                except Exception as e:
+                    logger.error(f"Deep analysis failed: {e}")
+                    await update.message.reply_text("❌ Ошибка при глубоком анализе почты.", reply_markup=get_main_menu(user_id))
+                return
             
             # Check if user wants to search
             if any(w in lower_text for w in ["найди", "поиск", "search", "find", "ищи"]):
@@ -1012,12 +1052,12 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     client = get_calendar_client(user_id)
     
     if not client:
-        await update.effective_message.reply_text("❌ Calendar not connected. Please run /start to connect.")
+        await update.effective_message.reply_text("❌ Календарь не подключен. Используйте /start.")
         return
     
     events = client.get_upcoming_events(days=1)
     if not events:
-        await update.effective_message.reply_text("You have no events scheduled for today. Ready for new tasks!")
+        await update.effective_message.reply_text("🗓 Совсем нет планов на сегодня! Можно заняться новыми делами.")
     else:
         # Get stored contexts using db abstraction
         contexts = db.get_event_contexts(user_id)
@@ -1099,8 +1139,9 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
 
         "📩 MESSAGING (Telegram):\n"
         "- Send message to another user: [[RUN:MSG:<target>:<text>]]\n"
-        "- Target can be: 'kostya', 'igor', or a numeric ID.\n"
-        "Example: [[RUN:MSG:kostya:Привет, как дела?]]\n\n"
+        "- Target MUST be: 'kostya', 'igor', or a numeric ID.\n"
+        "IMPORTANT: DO NOT just write the message text. You MUST use the [[RUN:MSG:...]] tag to actually send it.\n"
+        "Example: If user says 'Tell Igor hello', you respond: 'Sending hello... [[RUN:MSG:igor:Привет!]]'\n\n"
         
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
