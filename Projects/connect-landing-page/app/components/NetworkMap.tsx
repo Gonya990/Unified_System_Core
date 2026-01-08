@@ -17,18 +17,18 @@ interface Node {
 }
 
 const NODES: Node[] = [
-    { id: 1, x: 120, y: 170, name: "San Francisco", latency: "12ms", load: 65 },  // Shifted Left -30, Up -10
-    { id: 2, x: 250, y: 175, name: "New York", latency: "18ms", load: 42 },       // Shifted Left -30, Up -10
-    { id: 3, x: 450, y: 130, name: "London", latency: "14ms", load: 88 },         // Shifted Left -35, Up -15 (UK positioning)
-    { id: 4, x: 480, y: 140, name: "Frankfurt", latency: "16ms", load: 74 },      // Shifted Left -30, Up -10
-    { id: 5, x: 560, y: 180, name: "Tel Aviv", latency: "8ms", load: 92 },        // Shifted Left -25, Up -25 (Israel)
-    { id: 6, x: 595, y: 210, name: "Dubai", latency: "22ms", load: 55 },          // Shifted Left -25, Up -25
-    { id: 7, x: 740, y: 290, name: "Singapore", latency: "28ms", load: 48 },      // Shifted Left -25, Up -35
-    { id: 8, x: 840, y: 170, name: "Tokyo", latency: "32ms", load: 61 },          // Shifted Left -25, Up -15
-    { id: 9, x: 860, y: 390, name: "Sydney", latency: "42ms", load: 35 },         // Shifted Left -25, Up -35
-    { id: 10, x: 310, y: 360, name: "São Paulo", latency: "38ms", load: 29 },     // Shifted Left -35, Up -25
-    { id: 11, x: 500, y: 400, name: "Cape Town", latency: "45ms", load: 15 },     // Shifted Left -35, Up -25
-    { id: 12, x: 660, y: 240, name: "Mumbai", latency: "24ms", load: 44 },        // Shifted Left -25, Up -25
+    { id: 1, x: 150, y: 180, name: "San Francisco", latency: "12ms", load: 65 },
+    { id: 2, x: 280, y: 185, name: "New York", latency: "18ms", load: 42 },
+    { id: 3, x: 485, y: 145, name: "London", latency: "14ms", load: 88 },
+    { id: 4, x: 510, y: 150, name: "Frankfurt", latency: "16ms", load: 74 },
+    { id: 5, x: 585, y: 205, name: "Tel Aviv", latency: "8ms", load: 92 },
+    { id: 6, x: 620, y: 235, name: "Dubai", latency: "22ms", load: 55 },
+    { id: 7, x: 765, y: 325, name: "Singapore", latency: "28ms", load: 48 },
+    { id: 8, x: 865, y: 185, name: "Tokyo", latency: "32ms", load: 61 },
+    { id: 9, x: 885, y: 425, name: "Sydney", latency: "42ms", load: 35 },
+    { id: 10, x: 345, y: 385, name: "São Paulo", latency: "38ms", load: 29 },
+    { id: 11, x: 535, y: 425, name: "Cape Town", latency: "45ms", load: 15 },
+    { id: 12, x: 685, y: 265, name: "Mumbai", latency: "24ms", load: 44 },
 ]
 
 export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark" | "light" }) {
