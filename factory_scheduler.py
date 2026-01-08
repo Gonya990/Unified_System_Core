@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import random
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -30,18 +31,29 @@ REELS_AUTO_UPLOAD = False
 
 def get_static_fallback():
     """
-    Emergency fallback if deep research fails.
+    Emergency fallback if deep research fails. 
+    Improved with date-based variety.
     """
-    print("⚠️ Using static fallback content...")
+    day_str = datetime.now().strftime('%Y-%m-%d')
+    topics = [
+        ("AI Agents Revolution", "How autonomous agents are taking over digital tasks."),
+        ("Quantum Supremacy", "The race for the first practical quantum computer."),
+        ("Space Exploration 2026", "Mars colonization and the moon gateway mission."),
+        ("Neural interface evolution", "Connecting human brains directly to the cloud."),
+        ("Sustainable Fusion Energy", "Clean, infinite power is finally within reach.")
+    ]
+    topic, desc = random.choice(topics)
+    
+    print(f"⚠️ Using static fallback content: {topic}")
     return {
-        "selected_topic": "The AI Singularity 2026",
-        "description": "Exploring the point where AI exceeds human intelligence.",
-        "script_ru": "Мы перешли черту. 2026 год стал моментом... когда искусственный интеллект перестал быть инструментом... и стал реальностью. Ваша жизнь уже изменилась... пока вы спали. Это не просто прогресс... это симбиоз человеческой воли и цифровой мощи.",
+        "selected_topic": f"{topic} ({day_str})",
+        "description": desc,
+        "script_ru": f"Будущее наступило незаметно. Сегодня, {day_str}, мы видим... как технологии {topic.lower()} меняют правила игры. Мы больше не просто наблюдатели... мы творцы новой реальности. Это момент истины... для всего человечества.",
         "scenes": [
-            {"image": f"scene_{i}", "keyword": kw} for i, kw in enumerate([
-                "futuristic cyborg city 4k", "digital matrix rain motion", "humanoid robot portrait cinematic",
-                "holographic dashboard futuristic", "planet earth neural network", "sunrise over tech city",
-                "digital brain neurons firing", "abstract ink water cinematic"
+            {"image": f"fallback_s{i}", "keyword": kw} for i, kw in enumerate([
+                "futuristic technology high tech", "digital connection networking", 
+                "cyber city night lights", "abstract data visualization",
+                "innovation inspiration vision", "global communication earth"
             ])
         ]
     }
