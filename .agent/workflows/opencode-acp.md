@@ -1,13 +1,9 @@
 # OpenCode ACP Integration
 
----
+> Connect to OpenCode server for ACP-based task management.
+> // turbo
 
-description: Connect to OpenCode server for ACP-based task management
----
-
-// turbo
-
-## OpenCode ACP Integration Workflow
+## Workflow
 
 > Connect to an OpenCode server to view and manage tasks via the ACP protocol.
 
@@ -48,7 +44,8 @@ Alternative using Tailscale hostname:
 opencode attach http://unified-home-core-cloud.tail5e8a72.ts.net:4096
 ```
 
-**Note:** Server started via: `nohup opencode serve --port 4096 --hostname 0.0.0.0 &`
+**Note:** Server started via:
+`nohup opencode serve --port 4096 --hostname 0.0.0.0 &`
 
 ---
 
