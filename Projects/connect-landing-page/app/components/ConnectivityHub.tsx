@@ -388,7 +388,9 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                               onClick={() => setCurrency(cur)}
                               className={cn(
                                 "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all",
-                                currency.code === cur.code ? "bg-blue-600 border-blue-600 text-white" : "border-white/10 text-white/50"
+                                currency.code === cur.code
+                                  ? "bg-blue-600 border-blue-600 text-white"
+                                  : (isDark ? "border-white/10 text-white/50" : "border-black/10 text-zinc-600 hover:border-black/20")
                               )}
                             >
                               {cur.code}
@@ -401,7 +403,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                         <span className={`text-sm font-bold ${mutedTextClass}`}>Language</span>
                         <Popover open={langMobileOpen} onOpenChange={setLangMobileOpen}>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="bg-transparent border-white/10 text-white text-xs">
+                            <Button variant="outline" size="sm" className={`bg-transparent text-xs ${isDark ? 'border-white/10 text-white' : 'border-zinc-200 text-zinc-900'}`}>
                               {ALL_LANGUAGES.find(l => l.value === lang)?.label || lang}
                             </Button>
                           </PopoverTrigger>
@@ -426,7 +428,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                           variant="ghost"
                           size="sm"
                           onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                          className="gap-2 text-white"
+                          className={`gap-2 ${isDark ? 'text-white' : 'text-zinc-900'}`}
                         >
                           {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                           {isDark ? 'Light Mode' : 'Dark Mode'}
@@ -1557,7 +1559,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white italic">C</div>
-                <span className="text-xl font-bold tracking-tighter text-white">CONNECT.GLOBAL</span>
+                <span className={`text-xl font-bold tracking-tighter ${isDark ? 'text-white' : 'text-zinc-900'}`}>CONNECT.GLOBAL</span>
               </div>
               <p className={`text-sm ${mutedTextClass} max-w-xs mb-8`}>
                 Next-generation eSIM infrastructure for global travelers and enterprises.
@@ -1577,7 +1579,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             </div>
 
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">{t.nav.coverage}</h4>
+              <h4 className={`font-bold mb-6 text-sm uppercase tracking-widest ${isDark ? 'text-white' : 'text-zinc-900'}`}>{t.nav.coverage}</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
                 <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Europe</button></li>
                 <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-500 transition-colors">Asia</button></li>
@@ -1587,7 +1589,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             </div>
 
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Contact</h4>
+              <h4 className={`font-bold mb-6 text-sm uppercase tracking-widest ${isDark ? 'text-white' : 'text-zinc-900'}`}>Contact</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
                 <li><a href={`mailto:${t.contact?.email}`} className="hover:text-blue-500 transition-colors">{t.contact?.email || 'Email Support'}</a></li>
                 <li><a href={`tel:${t.contact?.phone}`} className="hover:text-blue-500 transition-colors">{t.contact?.phone || 'Call Us'}</a></li>
@@ -1597,7 +1599,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
             </div>
 
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Legal</h4>
+              <h4 className={`font-bold mb-6 text-sm uppercase tracking-widest ${isDark ? 'text-white' : 'text-zinc-900'}`}>Legal</h4>
               <ul className="space-y-4 text-sm opacity-50 font-medium">
                 <li><button onClick={() => alert('Terms of Service: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.terms || 'Terms'}</button></li>
                 <li><button onClick={() => alert('Privacy Policy: Coming Soon')} className="hover:text-blue-500 transition-colors">{t.legal?.privacy || 'Privacy'}</button></li>
@@ -1607,8 +1609,8 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
           </div>
 
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold uppercase tracking-widest opacity-30">
-            <div className="text-white">{t.footer}</div>
-            <div className="flex gap-8 text-white">
+            <div className={isDark ? 'text-white' : 'text-zinc-900'}>{t.footer}</div>
+            <div className={`flex gap-8 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
               <span>Status: {t.legal?.status || 'Operational'}</span>
               <span>v1.2.0</span>
             </div>
