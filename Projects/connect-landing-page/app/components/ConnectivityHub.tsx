@@ -433,10 +433,10 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                         </Button>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                      <div className={`flex items-center justify-between p-4 rounded-2xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-white">Service Mode</span>
-                          <span className="text-[10px] opacity-40 uppercase tracking-widest">{mode === 'personal' ? 'B2C' : 'B2B'} Active</span>
+                          <span className={`text-xs font-bold ${textClass}`}>Service Mode</span>
+                          <span className={`text-[10px] opacity-40 uppercase tracking-widest ${textClass}`}>{mode === 'personal' ? 'B2C' : 'B2B'} Active</span>
                         </div>
                         <Switch
                           checked={mode === "business"}
@@ -845,7 +845,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
       </section>
 
       {/* Global Network Section */}
-      <NetworkMap t={t} />
+      <NetworkMap t={t} theme={theme} />
 
       {/* Marquee Section - Forced LTR to maintain animation direction */}
       <div className="py-12 overflow-hidden bg-zinc-900 border-y border-white/5" dir="ltr">
