@@ -27,7 +27,7 @@ def agent_sync(msg):
         print(f"⚠️ Sync Error: {e}")
 
 # Configuration
-REELS_AUTO_UPLOAD = False
+REELS_AUTO_UPLOAD = True
 
 def get_static_fallback():
     """
@@ -125,9 +125,20 @@ def run_factory_production(is_weekly=False):
     # 4. PRODUCTION
     out_name = f"{prefix}_{day_str.replace('-', '')}"
     try:
-        run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes)
+        video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes)
+        
+        # 5. UPLOAD (NEW)
+        if REELS_AUTO_UPLOAD and video_path and video_path.exists():
+            agent_sync(f"Загружаю {prefix} ролик в Instagram...")
+            caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
+            if upload_reel(str(video_path), caption):
+                agent_sync("🚀 Ролик успешно загружен!")
+            else:
+                agent_sync("❌ Ошибка при загрузке ролика")
+                
     except Exception as e:
         print(f"❌ Factory Crash: {e}")
+        agent_sync(f"Критическая ошибка фабрики: {e}")
 
 if __name__ == "__main__":
     run_factory_production()
