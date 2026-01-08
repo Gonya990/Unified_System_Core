@@ -4,20 +4,40 @@ import sys
 import feedparser
 import json
 import requests
+import random
 from bs4 import BeautifulSoup
 from pathlib import Path
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# Setup paths
+ROOT_DIR = Path(__file__).parent.resolve()
+load_dotenv(ROOT_DIR / ".env")
 
 # Configuration
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+def get_client():
+    """Lazy initialization of OpenAI client"""
+    return OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def get_latest_tech_news(query="artificial intelligence future tech"):
+def get_latest_tech_news():
     """
-    Fetches news from Google News RSS.
+    Fetches news from Google News RSS with randomized experimental topics.
     """
+    topics = [
+        "artificial intelligence future tech",
+        "quantum computing breakthroughs 2026",
+        "neuralink brain computer interface",
+        "humanoid robots boston dynamics",
+        "spacex mars colonization progress",
+        "metaverse web3 evolution",
+        "biotechnology longevity research",
+        "autonomous vehicles level 5"
+    ]
+    query = random.choice(topics)
+    print(f"📡 Researching topic: {query}")
+    
     import urllib.parse
     encoded_query = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded_query}+when:1d&hl=en-US&gl=US&ceid=US:en"
@@ -90,7 +110,7 @@ def run_daily_research():
     """
     
     try:
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "system", "content": "You are a master content strategist and AI trend researcher."},
                       {"role": "user", "content": prompt}],
@@ -107,7 +127,7 @@ def translate_to_hebrew(text):
     High-quality translation to Hebrew for the Weekly Special.
     """
     try:
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "system", "content": "Translate the following futuristic script to HEBREW. Maintain the 'Impact Vision' energy. Return ONLY text."},
                       {"role": "user", "content": text}]

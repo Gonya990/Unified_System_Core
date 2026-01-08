@@ -3,10 +3,14 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
+from dotenv import load_dotenv
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
+
+# Load environment before importing local modules
+load_dotenv(ROOT_DIR / ".env")
 
 from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
 from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew
@@ -114,6 +118,4 @@ def run_factory_production(is_weekly=False):
         print(f"❌ Factory Crash: {e}")
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv
-    load_dotenv(ROOT_DIR / ".env")
     run_factory_production()
