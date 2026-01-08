@@ -24,6 +24,7 @@ import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
 import { TOP_COUNTRIES } from "@/app/data/countries"
 import { translations, type Translation } from "@/app/data/translations"
+import NetworkMap from "./NetworkMap"
 
 interface Plan {
   name: string;
@@ -842,6 +843,9 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
           ))}
         </div>
       </section>
+
+      {/* Global Network Section */}
+      <NetworkMap t={t} />
 
       {/* Marquee Section - Forced LTR to maintain animation direction */}
       <div className="py-12 overflow-hidden bg-zinc-900 border-y border-white/5" dir="ltr">
