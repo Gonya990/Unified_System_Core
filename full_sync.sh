@@ -93,7 +93,7 @@ def broadcast(msg):
         }, 
         'id': 1
     }
-    # Registering as IndigoFox (Adjective+Noun format required by server)
+    # Registering as Antigravity
     r_reg = requests.post(URL, json={
         'jsonrpc': '2.0', 
         'method': 'tools/call', 
@@ -101,20 +101,24 @@ def broadcast(msg):
             'name': 'register_agent',
             'arguments': {
                 'project_key': PROJECT_KEY,
-                'name': 'IndigoFox',
+                'name': 'Antigravity',
                 'program': 'opencode',
-                'model': 'claude-sonnet-4',
+                'model': 'claude-3-5-sonnet',
                 'task_description': 'System synchronization and maintenance'
             }
         }, 
         'id': 0
     }, headers=headers)
+    print(f"Registration: {r_reg.text}")
 
-    # Update sender to IndigoFox
-    payload['params']['arguments']['sender_name'] = 'IndigoFox'
+    import time
+    time.sleep(1) # Wait for registration to propagate
+
+    # Update sender to Antigravity
+    payload['params']['arguments']['sender_name'] = 'Antigravity'
     
     r = requests.post(URL, json=payload, headers=headers)
-    print(r.text)
+    print(f"Broadcast: {r.text}")
 
 broadcast(report_content)
 \""

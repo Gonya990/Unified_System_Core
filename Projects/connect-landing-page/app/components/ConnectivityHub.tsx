@@ -6,9 +6,9 @@ import Image from "next/image"
 
 import {
   Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap,
-  BarChart3, Database, Sun, Moon, Languages, Quote, Phone,
+  BarChart3, Database, Sun, Moon, Quote, Phone,
   CreditCard, CheckCircle, Download, User, Settings, Star,
-  Check, ChevronsUpDown, Code, Copy, Menu, X, Twitter, Instagram, Linkedin
+  Check, ChevronsUpDown, Code, Copy, Menu, Twitter, Instagram, Linkedin
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
