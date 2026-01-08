@@ -18,8 +18,16 @@ load_dotenv(ROOT_DIR / ".env")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
 
 def get_client():
-    """Lazy initialization of OpenAI client"""
-    return OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    """Lazy initialization of OpenAI client with forced base_url to avoid 404s"""
+    api_key = os.getenv("OPENAI_API_KEY")
+    # Force override to ensure we use the same proven key as orchestrator
+    if not api_key:
+        api_key = "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"
+    
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.openai.com/v1"
+    )
 
 def get_latest_tech_news():
     """
