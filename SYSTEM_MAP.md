@@ -11,11 +11,11 @@ Unified System workspace. **Always refer to this map for navigation.**
 | `Scripts/` | Automation & specialized logic | `Orchestration`, `External` |
 | `Career/` | Personal professional assets | Resumes, Vacancy scans |
 | `Reports/` | System status & audit history | `Archived_Status`, Audit logs |
-| `Management/` | High-level planning & tasks | `MASTER_TASKS.md`, `CHANGELOG.md` |
+| `Management/` | Planning & tasks | `MASTER_TASKS.md`, `CHANGELOG.md` |
 | `Infra/` | System setup & config | HA states, Setup guides |
 | `Data/` | Local data | `Local/` (SQLite DBs) |
 | `Docs/` | Documentation & Guides | Tool guides, Scenario plans, Manuals |
-| `Local_Dev/` | Transient development files | `Cache`, `Venv`, `Media` (inputs/outputs) |
+| `Local_Dev/` | Transient dev files | `Cache`, `Venv`, `Media` (inputs) |
 | `Archive/` | Legacy & obsolete files | Versioned backups, old orchestrators |
 
 ## 🔗 Logical Connections
