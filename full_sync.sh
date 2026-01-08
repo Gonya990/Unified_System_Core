@@ -68,9 +68,10 @@ tailscale ssh gonya@100.110.209.49 "
     ./venv/bin/python3 -c \"
 import requests
 import json
+import os
 
 URL = 'http://localhost:8765/mcp'
-TOKEN = 'c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb'
+TOKEN = os.getenv('AGENT_HUB_TOKEN', 'antigravity_secret')
 PROJECT_KEY = '/Gonya990/Unified_System_Core'
 
 with open('/tmp/mcp_report.md', 'r') as f:
