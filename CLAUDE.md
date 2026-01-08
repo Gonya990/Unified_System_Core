@@ -1,6 +1,24 @@
 # Unified System Core - Development Guide
 
-This is the central routing guide for the Modern Software Engineering skills and AI agent framework.
+This is the central routing guide for the Modern Software Engineering skills
+and AI agent framework.
+
+---
+
+## Project Structure & Logic
+
+Refer to [SYSTEM_MAP.md](file:///Users/macbook/Documents/Unified_System/SYSTEM_MAP.md)
+for the full logical layout.
+
+- `Career/`: Personal and professional development assets.
+- `Management/`: Project planning, tasks (Beads), and logs.
+- **AI Bot**: Located in `Projects/AI_Core`.
+- **Sync Logic**: `Scripts/Orchestration/full_sync.sh` links states.
+- `Scripts/Orchestration/`: Core system-wide automation.
+- `Scripts/Production_Factory/`: Video and content generation pipeline.
+- `Reports/Archived_Status/`: History of system audits and fix reports.
+- `Infra/`: Infrastructure setup and environment configurations.
+- `Local_Dev/`: Transient development files (Cache, Venv, Media).
 
 ---
 
@@ -21,10 +39,11 @@ This is the central routing guide for the Modern Software Engineering skills and
 
 | Pillar | Purpose | Skills |
 |--------|---------|--------|
+| `Data/` | Permanent local data | `Local/` (SQLite DBs) |
 | `learning-pillar/` | Optimize for learning | iterative-development, feedback-driven-design, experimental-workflow, deployment-pipeline-designer, empirical-measurement |
 | `complexity-pillar/` | Manage complexity | separation-of-concerns-enforcer, modularity-architect, cohesion-coach, abstraction-patterns, coupling-minimizer |
 | `supporting-skills/` | Supporting practices | refactoring-mastery, high-performance-simplicity, frontend-aesthetics, youth-brand-ux |
-| `project-skills/` | Project-specific | continuous-integration-practice, global1sim-development (with subskills) |
+| `project-skills/` | Project-specific | continuous-integration-practice |
 | `architecture-skills/` | Architecture patterns | python-hexagonal-development, python-test-strategy |
 
 **Index**: `skills/README.md`
