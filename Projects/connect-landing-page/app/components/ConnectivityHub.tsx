@@ -8,7 +8,7 @@ import {
   Globe, Wifi, Building2, Smartphone, ArrowRight, ShieldCheck, Zap,
   BarChart3, Database, Sun, Moon, Languages, Quote, Phone,
   CreditCard, CheckCircle, Download, User, Settings, Star,
-  Check, ChevronsUpDown, Code, Copy
+  Check, ChevronsUpDown, Code, Copy, Menu, X, Twitter, Instagram, Linkedin
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 
 import { ALL_LANGUAGES } from "@/app/data/languages"
 import { TRAVEL_PHOTOS, OFFICE_PHOTOS } from "@/app/data/photos"
@@ -290,83 +291,163 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
               </PopoverContent>
             </Popover>
 
-            <Popover open={langMobileOpen} onOpenChange={setLangMobileOpen}>
-              <PopoverTrigger asChild>
-                <Button suppressHydrationWarning variant="ghost" size="icon" className={`md:hidden ${navTextClass}`}>
-                  <Languages className="w-5 h-5" />
-                </Button>
-              </PopoverTrigger>
 
-              <PopoverContent className="w-[200px] p-0 max-h-[400px]">
-                <Command>
-                  <CommandInput placeholder="Search language..." className="h-9" />
-                  <CommandList>
-                    <CommandGroup className="max-h-[300px] overflow-y-auto">
-                      {ALL_LANGUAGES.map((language) => (
-                        <CommandItem
-                          key={language.value}
-                          value={language.value}
-                          onSelect={(currentValue) => {
-                            handleSetLang(currentValue)
-                            setLangMobileOpen(false)
-                          }}
+
+            <div className="hidden md:flex items-center gap-4">
+              <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+                <PopoverTrigger asChild>
+                  <Button suppressHydrationWarning variant="ghost" size="sm" className={`h-8 gap-1 ${navTextClass} font-bold`}>
+                    {currency.symbol} {currency.code}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[120px] p-0 overflow-hidden" align="end">
+                  <div className={cn("grid", isDark ? "bg-zinc-900" : "bg-white")}>
+                    {CURRENCIES.map((cur) => (
+                      <button
+                        key={cur.code}
+                        onClick={() => {
+                          setCurrency(cur)
+                          setCurrencyOpen(false)
+                        }}
+                        className={cn(
+                          "flex items-center justify-between px-3 py-2 text-xs font-bold hover:bg-blue-500/10 transition-colors",
+                          currency.code === cur.code ? "text-blue-500 bg-blue-500/5" : mutedTextClass
+                        )}
+                      >
+                        <span>{cur.code}</span>
+                        <span className="opacity-50">{cur.symbol}</span>
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className={`w-8 h-8 ${navTextClass}`}
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
+
+              <div className="w-px h-4 bg-zinc-700/50 mx-1"></div>
+
+              <div className="flex items-center gap-3">
+                <span className={`text-xs font-bold tracking-wider ${mode === 'personal' ? 'text-blue-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2C</span>
+                <Switch
+                  checked={mode === "business"}
+                  onCheckedChange={(c) => setMode(c ? "business" : "personal")}
+                  className="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-blue-600 scale-75"
+                />
+                <span className={`text-xs font-bold tracking-wider ${mode === 'business' ? 'text-purple-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2B</span>
+              </div>
+            </div>
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className={navTextClass}>
+                    <Menu className="w-6 h-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side={isRTL ? "right" : "left"} className={`${bgClass} border-white/10`}>
+                  <SheetTitle className="text-left mb-8 flex items-center gap-2 px-2">
+                    <Globe className={cn("w-5 h-5", mode === 'personal' ? 'text-blue-500' : 'text-purple-500')} />
+                    <span className={cn(textClass, "font-bold tracking-tight")}>Connect.Global</span>
+                  </SheetTitle>
+                  <div className="flex flex-col gap-6 mt-8">
+                    <div className="flex flex-col gap-1">
+                      <a href="#stats" className={`text-lg font-bold px-2 py-3 rounded-xl hover:bg-white/5 transition-colors ${textClass}`}>{t.nav.coverage}</a>
+                      <a href="#pricing" className={`text-lg font-bold px-2 py-3 rounded-xl hover:bg-white/5 transition-colors ${textClass}`}>{t.nav.pricing}</a>
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById('app-showcase');
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                            // Sheet close handled by trigger usually but adding manual just in case
+                          }
+                        }}
+                        className={`text-lg font-bold text-left px-2 py-3 rounded-xl hover:bg-white/5 transition-colors ${textClass}`}
+                      >
+                        {t.nav.tech}
+                      </button>
+                      <a href="#" className={`text-lg font-bold px-2 py-3 rounded-xl hover:bg-white/5 transition-colors ${textClass}`}>{t.nav.api}</a>
+                    </div>
+
+                    <div className="h-px bg-white/10 my-4" />
+
+                    {/* Mobile Only Toggles */}
+                    <div className="space-y-6 px-2">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${mutedTextClass}`}>Currency</span>
+                        <div className="flex gap-2">
+                          {CURRENCIES.map((cur) => (
+                            <button
+                              key={cur.code}
+                              onClick={() => setCurrency(cur)}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all",
+                                currency.code === cur.code ? "bg-blue-600 border-blue-600 text-white" : "border-white/10 text-white/50"
+                              )}
+                            >
+                              {cur.code}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${mutedTextClass}`}>Language</span>
+                        <Popover open={langMobileOpen} onOpenChange={setLangMobileOpen}>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="bg-transparent border-white/10 text-white text-xs">
+                              {ALL_LANGUAGES.find(l => l.value === lang)?.label || lang}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[200px] p-0">
+                            <Command>
+                              <CommandInput placeholder="Search language..." />
+                              <CommandList className="max-h-[200px]">
+                                {ALL_LANGUAGES.map((l) => (
+                                  <CommandItem key={l.value} onSelect={() => { handleSetLang(l.value); setLangMobileOpen(false); }}>
+                                    {l.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${mutedTextClass}`}>Appearance</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                          className="gap-2 text-white"
                         >
-                          {language.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                          {isDark ? 'Light Mode' : 'Dark Mode'}
+                        </Button>
+                      </div>
 
-            <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
-              <PopoverTrigger asChild>
-                <Button suppressHydrationWarning variant="ghost" size="sm" className={`h-8 gap-1 ${navTextClass} font-bold`}>
-                  {currency.symbol} {currency.code}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[120px] p-0 overflow-hidden" align="end">
-                <div className={cn("grid", isDark ? "bg-zinc-900" : "bg-white")}>
-                  {CURRENCIES.map((cur) => (
-                    <button
-                      key={cur.code}
-                      onClick={() => {
-                        setCurrency(cur)
-                        setCurrencyOpen(false)
-                      }}
-                      className={cn(
-                        "flex items-center justify-between px-3 py-2 text-xs font-bold hover:bg-blue-500/10 transition-colors",
-                        currency.code === cur.code ? "text-blue-500 bg-blue-500/5" : mutedTextClass
-                      )}
-                    >
-                      <span>{cur.code}</span>
-                      <span className="opacity-50">{cur.symbol}</span>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className={`w-8 h-8 ${navTextClass}`}
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
-
-            <div className="w-px h-4 bg-zinc-700/50 mx-1"></div>
-
-            <span className={`text-xs font-bold tracking-wider ${mode === 'personal' ? 'text-blue-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2C</span>
-            <Switch
-              checked={mode === "business"}
-              onCheckedChange={(c) => setMode(c ? "business" : "personal")}
-              className="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-blue-600"
-            />
-            <span className={`text-xs font-bold tracking-wider ${mode === 'business' ? 'text-purple-500' : (isDark ? 'text-zinc-400' : 'text-stone-500')}`}>B2B</span>
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white">Service Mode</span>
+                          <span className="text-[10px] opacity-40 uppercase tracking-widest">{mode === 'personal' ? 'B2C' : 'B2B'} Active</span>
+                        </div>
+                        <Switch
+                          checked={mode === "business"}
+                          onCheckedChange={(c) => setMode(c ? "business" : "personal")}
+                          className="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-blue-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </nav>
@@ -475,17 +556,16 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                     </div>
 
                     {/* Popular Destinations Chips */}
-                    <div className="flex flex-wrap justify-center gap-2 max-w-3xl">
-                      <span className={`text-xs font-bold uppercase tracking-widest ${mutedTextClass} w-full mb-2`}>
+                    <div className="flex flex-wrap justify-center gap-3 max-w-3xl">
+                      <span className={`text-xs font-bold uppercase tracking-widest ${mutedTextClass} w-full mb-3`}>
                         {t.hero.popular_dest}
                       </span>
                       {TOP_COUNTRIES.slice(0, 10).map((c) => (
                         <Link
                           key={c.code}
                           href={`/countries/${c.slug}`}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all hover:scale-105 active:scale-95 ${isDark ? 'bg-zinc-900 border-white/5 hover:border-blue-500/50 hover:bg-blue-500/10' : 'bg-white border-zinc-200 hover:border-blue-500/50 hover:bg-blue-50/50'}`}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all hover:scale-105 active:scale-95 ${isDark ? 'bg-zinc-900 border-white/5 hover:border-blue-500/50 hover:bg-blue-500/10' : 'bg-white border-zinc-200 hover:border-blue-500/50 hover:bg-blue-50/50'}`}
                         >
-
                           <span>{c.flag}</span>
                           <span>{c.name}</span>
                         </Link>
@@ -748,6 +828,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                   alt="stat bg"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </motion.div>
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 dark:to-white/5 z-0" />
@@ -785,7 +866,9 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                 sizes="(max-width: 768px) 280px, 280px"
               />
               <div className="absolute bottom-4 left-4 z-20 font-bold text-white text-sm drop-shadow-md">
-                {mode === 'personal' ? 'Connect.Global Traveler' : 'Connect.Global Enterprise'}
+                {mode === 'personal'
+                  ? ['Tokyo Underground', 'Alpine Crossing', 'Sahara Sunset', 'City Blur', 'Blue Lagoon', 'Highland Mist'][i % 6]
+                  : ['Edge Node 04', 'Terminal Access', 'Traffic Map', 'Backend Core', 'Security Layer', 'Cluster Alpha'][i % 6]}
               </div>
             </motion.div>
           ))}
@@ -868,6 +951,7 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                 width={400}
                 height={800}
                 className="rounded-[3rem] border-8 border-zinc-900 shadow-2xl relative z-10"
+                sizes="(max-width: 768px) 300px, 400px"
               />
               <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/20 blur-3xl -z-10" />
             </div>
@@ -1476,9 +1560,13 @@ export default function ConnectivityHub({ initialCountry }: ConnectivityHubProps
                 Reliable connectivity in 190+ countries.
               </p>
               <div className="flex gap-4">
-                {['Twitter', 'Instagram', 'LinkedIn'].map(s => (
-                  <button key={s} onClick={() => alert(`${s} page: Coming Soon`)} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors group">
-                    <Star className="w-4 h-4 opacity-50 group-hover:text-blue-500 transition-colors" />
+                {[
+                  { icon: Twitter, label: 'Twitter' },
+                  { icon: Instagram, label: 'Instagram' },
+                  { icon: Linkedin, label: 'LinkedIn' }
+                ].map((s, i) => (
+                  <button key={i} onClick={() => alert(`${s.label} page: Coming Soon`)} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors group">
+                    <s.icon className="w-4 h-4 opacity-50 group-hover:text-blue-500 transition-colors" />
                   </button>
                 ))}
               </div>
