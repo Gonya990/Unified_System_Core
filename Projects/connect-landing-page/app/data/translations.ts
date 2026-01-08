@@ -61,6 +61,14 @@ export interface Translation {
     refund: string;
     status: string;
   };
+  network?: {
+    title: string;
+    subtitle: string;
+    active_nodes: string;
+    global_traffic: string;
+    uptime_guarantee: string;
+    node_latency: string;
+  };
 }
 
 export const translations: Record<string, Translation> = {
@@ -280,6 +288,14 @@ export const translations: Record<string, Translation> = {
       "privacy": "Privacy Policy",
       "refund": "Refund Policy",
       "status": "All Systems Operational"
+    },
+    "network": {
+      "title": "Global Edge Network",
+      "subtitle": "High-performance nodes distributed across every continent, ensuring sub-100ms latency globally.",
+      "active_nodes": "Active Nodes",
+      "global_traffic": "Global Traffic",
+      "uptime_guarantee": "Uptime Guarantee",
+      "node_latency": "Latency"
     }
   },
   "ru": {
@@ -498,6 +514,14 @@ export const translations: Record<string, Translation> = {
       "privacy": "Политика конфиденциальности",
       "refund": "Политика возврата",
       "status": "Все системы работают штатно"
+    },
+    "network": {
+      "title": "Глобальная Сеть Edge",
+      "subtitle": "Высокопроизводительные узлы распределены по всем континентам, обеспечивая задержку менее 100 мс по всему миру.",
+      "active_nodes": "Активные узлы",
+      "global_traffic": "Глобальный трафик",
+      "uptime_guarantee": "Гарантия аптайма",
+      "node_latency": "Задержка"
     }
   },
   "he": {
@@ -716,6 +740,14 @@ export const translations: Record<string, Translation> = {
       "privacy": "מדיניות פרטיות",
       "refund": "מדיניות החזרים",
       "status": "כל המערכות פועלות כסדרן"
+    },
+    "network": {
+      "title": "רשת קצה גלובלית",
+      "subtitle": "צמתים בעלי ביצועים גבוהים הפרוסים בכל היבשות, המבטיחים שיהוי של פחות מ-100 מילי-שנייה ברחבי העולם.",
+      "active_nodes": "צמתים פעילים",
+      "global_traffic": "תעבורה גלובלית",
+      "uptime_guarantee": "התחייבות לזמינות",
+      "node_latency": "שיהוי"
     }
   },
   "es": {
