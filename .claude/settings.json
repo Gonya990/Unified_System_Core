@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/skill-eval.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if git rev-parse --abbrev-ref HEAD 2>/dev/null | grep -qE '^(main|master)$'; then echo '{\"block\": true, \"message\": \"Direct edits to main/master branch are blocked. Create a feature branch first.\"}'; else echo '{\"continue\": true}'; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // .filePath // empty' 2>/dev/null); if [ -n \"$FILE\" ] && command -v prettier &>/dev/null; then case \"$FILE\" in *.js|*.ts|*.jsx|*.tsx|*.json|*.md|*.css|*.scss) prettier --write \"$FILE\" 2>/dev/null && echo '{\"feedback\": \"Auto-formatted with Prettier\"}' || echo '{\"continue\": true}' ;; *) echo '{\"continue\": true}' ;; esac; else echo '{\"continue\": true}'; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CMD=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.command // empty' 2>/dev/null); if echo \"$CMD\" | grep -qE 'npm install|yarn add|pnpm add'; then echo '{\"feedback\": \"Dependencies changed. Consider running tests.\"}'; else echo '{\"continue\": true}'; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "INSIDE_CLAUDE_CODE": "1",
+    "BASH_DEFAULT_TIMEOUT_MS": "420000"
+  }
+}
