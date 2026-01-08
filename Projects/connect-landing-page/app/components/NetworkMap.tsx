@@ -17,18 +17,18 @@ interface Node {
 }
 
 const NODES: Node[] = [
-    { id: 1, x: 150, y: 180, name: "San Francisco", latency: "12ms", load: 65 },
-    { id: 2, x: 280, y: 185, name: "New York", latency: "18ms", load: 42 },
-    { id: 3, x: 485, y: 145, name: "London", latency: "14ms", load: 88 },
-    { id: 4, x: 510, y: 150, name: "Frankfurt", latency: "16ms", load: 74 },
-    { id: 5, x: 585, y: 205, name: "Tel Aviv", latency: "8ms", load: 92 },
-    { id: 6, x: 620, y: 235, name: "Dubai", latency: "22ms", load: 55 },
-    { id: 7, x: 765, y: 325, name: "Singapore", latency: "28ms", load: 48 },
-    { id: 8, x: 865, y: 185, name: "Tokyo", latency: "32ms", load: 61 },
-    { id: 9, x: 885, y: 425, name: "Sydney", latency: "42ms", load: 35 },
-    { id: 10, x: 345, y: 385, name: "São Paulo", latency: "38ms", load: 29 },
-    { id: 11, x: 535, y: 425, name: "Cape Town", latency: "45ms", load: 15 },
-    { id: 12, x: 685, y: 265, name: "Mumbai", latency: "24ms", load: 44 },
+    { id: 1, x: 130, y: 180, name: "San Francisco", latency: "12ms", load: 65 },  // Left 20
+    { id: 2, x: 260, y: 185, name: "New York", latency: "18ms", load: 42 },       // Left 20
+    { id: 3, x: 465, y: 135, name: "London", latency: "14ms", load: 88 },         // Left 20, Up 10
+    { id: 4, x: 495, y: 140, name: "Frankfurt", latency: "16ms", load: 74 },      // Left 15, Up 10
+    { id: 5, x: 575, y: 215, name: "Tel Aviv", latency: "8ms", load: 92 },        // Left 10, Down 10
+    { id: 6, x: 620, y: 235, name: "Dubai", latency: "22ms", load: 55 },          // Unchanged
+    { id: 7, x: 780, y: 325, name: "Singapore", latency: "28ms", load: 48 },      // Right 15
+    { id: 8, x: 865, y: 185, name: "Tokyo", latency: "32ms", load: 61 },          // Unchanged
+    { id: 9, x: 910, y: 440, name: "Sydney", latency: "42ms", load: 35 },         // Right 25, Down 15
+    { id: 10, x: 345, y: 385, name: "São Paulo", latency: "38ms", load: 29 },     // Unchanged
+    { id: 11, x: 535, y: 425, name: "Cape Town", latency: "45ms", load: 15 },     // Unchanged
+    { id: 12, x: 700, y: 265, name: "Mumbai", latency: "24ms", load: 44 },        // Right 15
 ]
 
 export default function NetworkMap({ t, theme }: { t: Translation, theme: "dark" | "light" }) {
