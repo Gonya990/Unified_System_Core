@@ -9,15 +9,41 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 
+# Setup logging first
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    filename='bot_journal.log',
+    filemode='a'
+)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger('').addHandler(console)
+
+logger = logging.getLogger(__name__)
+
+# Configuration
+from config_manager import ConfigManager
+config = ConfigManager()
+
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
+try:
+    from dashboard import DashboardService
+    logger.info("DashboardService imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import DashboardService: {e}")
+    DashboardService = None
+except Exception as e:
+    logger.error(f"Unexpected error importing DashboardService: {e}")
+    DashboardService = None
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, BotCommand
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.constants import ChatAction
-from config_manager import ConfigManager
 from inference_client import InferenceClient
 
 # Try Firestore first, fallback to SQLite
@@ -109,41 +135,6 @@ try:
 except ImportError:
     proxmox = None
 
-try:
-    from dashboard import DashboardService
-    logger.info("DashboardService imported successfully")
-except ImportError as e:
-    logger.error(f"Failed to import DashboardService: {e}")
-    DashboardService = None
-except Exception as e:
-    logger.error(f"Unexpected error importing DashboardService: {e}")
-    DashboardService = None
-
-# Setup logging first
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO,
-    filename='bot_journal.log',
-    filemode='a'
-)
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-logging.getLogger('').addHandler(console)
-
-logger = logging.getLogger(__name__)
-
-try:
-    from dashboard import DashboardService
-    logger.info("DashboardService imported successfully")
-except ImportError as e:
-    logger.error(f"Failed to import DashboardService: {e}")
-    DashboardService = None
-except Exception as e:
-    logger.error(f"Unexpected error importing DashboardService: {e}")
-    DashboardService = None
-
-# Configuration
-config = ConfigManager()
 
 inference = InferenceClient(config)
 

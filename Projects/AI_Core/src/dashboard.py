@@ -47,13 +47,27 @@ async def read_root(request: Request):
     if inference and inference.swarm:
         swarm_count = inference.swarm.get_stats().get("gemini_keys_active", 0)
     
+    # Get Kostik's Agent Status (MCP Mail)
+    kosta_status = "Working ⚡" # Default to active as it's part of the mesh
+    try:
+        # Quick check if MCP server is reachable locally
+        import requests
+        r = requests.get("http://localhost:8765", timeout=0.1)
+        if r.status_code < 500:
+            kosta_status = "Working ⚡"
+        else:
+            kosta_status = "Resting 💤"
+    except:
+        kosta_status = "Busy ⚙️"
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "nodes": infra_data,
         "bot_status": "Online 🟢",
         "stats": stats,
         "gpu_status": gpu_status,
-        "swarm_count": swarm_count
+        "swarm_count": swarm_count,
+        "kosta_status": kosta_status
     })
 
 @app.get("/logs")
