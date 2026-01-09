@@ -126,6 +126,7 @@ def generate_dalle_assets(scenes, output_dir: Path):
     resolved = []
     client = get_client()
     for s in scenes:
+        time.sleep(2.0) # User requested tactical pause
         try:
             prompt = f"3D animation style, Pixar inspired, high quality, vibrant colors, VERTICAL 9:16, {s['keyword']}"
             res = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1792", n=1)
@@ -147,6 +148,7 @@ def generate_banana_assets(scenes, output_dir: Path):
     resolved = []
     model_key = os.getenv("BANANA_MODEL_KEY", "stable-diffusion-xl")
     for s in scenes:
+        time.sleep(2.0) # Tactical pause
         try:
             inputs = {"prompt": f"Cartoon style, 3d animation, vibrant, vertical, {s['keyword']}"}
             res = banana.run(api_key, model_key, inputs)
@@ -165,6 +167,7 @@ def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
     print(f"🎬 Trying Pexels ({style}) for {len(scenes)} scenes...")
     resolved = []
     for s in scenes:
+        time.sleep(1.0) # Tactical pause
         try:
             kw = s['keyword']
             if style == "cartoon": kw = f"cartoon illustration animation {kw}"
