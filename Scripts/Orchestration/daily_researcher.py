@@ -110,7 +110,27 @@ def run_daily_research(style="impact"):
             if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
         except Exception as e:
-            print(f"❌ All Research models failed: {e}")
+            print(f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)...")
+            
+    # Strategy 3: Ollama (Rock Solid Local Fallback)
+    if not data:
+        try:
+            print("🦙 Attempting Research via Ollama (llama3)...")
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama3",
+                    "prompt": f"{prompt}\nReturn ONLY JSON.",
+                    "stream": False,
+                    "format": "json"
+                },
+                timeout=60
+            )
+            data = response.json().get('response')
+            if isinstance(data, str): data = json.loads(data)
+            print("✅ Ollama Research successful!")
+        except Exception as e:
+            print(f"❌ All Research models failed (including Ollama): {e}")
             return None
 
     # Strict Scene Label Cleanup
