@@ -82,7 +82,7 @@ tailscale ssh gonya@100.110.209.49 "
     pkill -f 'run_server_with_token.sh' || true
     pkill -f 'mcp_server' || true
     cd /home/gonya/Unified_System
-    nohup bash Scripts/External/start_mail_server.sh > mcp_mail.log 2>&1 < /dev/null &
+    ( nohup bash Scripts/External/start_mail_server.sh > mcp_mail.log 2>&1 < /dev/null & )
     exit 0
 " || echo "⚠️ Warning: SSH session closed with error (likely background job), continuing..."
 
