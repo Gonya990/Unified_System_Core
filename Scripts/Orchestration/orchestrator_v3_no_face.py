@@ -18,9 +18,10 @@ ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
 # Load API keys from potential locations - OVERRIDE to ensure new key is used
+# Load API keys from potential locations
 load_dotenv(ROOT_DIR / ".env", override=True)
+load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
 load_dotenv(ROOT_DIR / "LLM_Council" / ".env", override=True)
-load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 # Masked key debug
 openai_key = os.getenv("OPENAI_API_KEY", "")
@@ -104,7 +105,16 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     mp3_path = output_path.with_suffix(".mp3")
     edge_tts_cmd = "edge-tts"
     venv_bin = ROOT_DIR / "venv_content/bin/edge-tts"
-    if venv_bin.exists(): edge_tts_cmd = str(venv_bin)
+    system_venv_bin = ROOT_DIR.parent.parent / "venv/bin/edge-tts"
+    if venv_bin.exists(): 
+        edge_tts_cmd = str(venv_bin)
+    elif system_venv_bin.exists():
+        edge_tts_cmd = str(system_venv_bin)
+    else:
+        # Try to find in PATH
+        import shutil
+        found = shutil.which("edge-tts")
+        if found: edge_tts_cmd = found
         
     # FIX: Pass --rate as a single argument string or ensure it's correctly handled
     cmd = [

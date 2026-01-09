@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
 load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
 
 # Configuration
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
@@ -231,6 +232,24 @@ def generate_dalle_assets(scenes, output_dir: Path):
             print(f"   ✅ DALL-E Asset ready: {scene['image']}")
         except Exception as e:
             print(f"   ⚠️ DALL-E Asset failed for {scene['keyword']}: {e}")
+            # FALLBACK to Pexels with Cartoon Keywords
+            print(f"   🔄 Falling back to Pexels (Cartoon variant) for {scene['keyword']}...")
+            try:
+                # Augment keyword for cartoon style on Pexels
+                orig_kw = scene['keyword']
+                scene['keyword'] = f"cartoon illustration animation {orig_kw}"
+                pexels_assets = generate_vision_assets([scene], output_dir, style="impact")
+                if pexels_assets:
+                    resolved.append(pexels_assets[0])
+                    print(f"   ✅ Pexels Fallback ready: {scene['image']}")
+                else:
+                    # Final fallback: just try the original keyword on Pexels
+                    scene['keyword'] = orig_kw
+                    pexels_assets = generate_vision_assets([scene], output_dir, style="impact")
+                    if pexels_assets:
+                        resolved.append(pexels_assets[0])
+            except:
+                pass
             
     return resolved
 
