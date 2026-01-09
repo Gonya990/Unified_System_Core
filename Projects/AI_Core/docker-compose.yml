@@ -10,7 +10,7 @@ x-ai-bot-common: &ai-bot-common
     - ./bot.log:/app/bot.log
     - ./user_context.db:/app/user_context.db
     - ./conversations:/app/conversations
-    - ./client_secret.json:/app/client_secret.json
+    - ./config/gmail_credentials.json:/app/config/gmail_credentials.json
     - ./gcp-service-account.json:/app/gcp-service-account.json:ro
   environment:
     - PYTHONUNBUFFERED=1
