@@ -142,56 +142,35 @@ def run_daily_research(style="impact"):
     return data
 
 def generate_gemini_images(scenes, output_dir: Path):
-    """💎 Gemini 2.0 Flash Image - FREE Tier 1 (Highest Quality)"""
-    print(f"🌠 Trying Gemini 2.0 Flash Image for {len(scenes)} scenes...")
-    resolved = []
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model = genai.GenerativeModel("models/gemini-2.0-flash-exp-image-generation")
-        
-        for s in scenes:
-            time.sleep(1.5)
-            try:
-                prompt = f"Create a vibrant 9:16 vertical cartoon-style illustration: {s['keyword']}. Pixar quality, colorful, fun, high detail."
-                response = model.generate_content([prompt])
-                
-                # Gemini returns image data
-                if hasattr(response, 'candidates') and response.candidates:
-                    for part in response.candidates[0].content.parts:
-                        if hasattr(part, 'inline_data'):
-                            img_data = part.inline_data.data
-                            path = output_dir / f"{s['image']}.jpg"
-                            with open(path, "wb") as f:
-                                f.write(img_data)
-                            s["resolved_path"] = str(path)
-                            resolved.append(s)
-                            print(f"   ✅ Gemini: {s['image']}")
-                            break
-            except Exception as e:
-                print(f"   ⚠️ Gemini failed for {s['image']}: {e}")
-    except Exception as e:
-        print(f"❌ Gemini Image setup failed: {e}")
-    return resolved
+    """💎 Gemini 2.0 Flash Image - DISABLED (API not available yet)"""
+    print(f"⚠️ Gemini Image Generation not available (experimental API)")
+    return []  # Skip for now, will be enabled when API is stable
 
 def generate_flux_images(scenes, output_dir: Path):
     """⚡ Flux.1 Schnell - FREE Local (Fast & Quality)"""
-    print(f"⚡ Trying Flux.1 Schnell (local) for {len(scenes)} scenes...")
+    print(f"⚡ Checking Flux.1 Schnell server...")
     resolved = []
     try:
         import requests
-        # Check if local Flux server is running
         flux_url = "http://localhost:8080/generate"
         
+        # Quick health check (1 second timeout)
+        try:
+            requests.get("http://localhost:8080/", timeout=1)
+        except:
+            print(f"❌ Flux server not running (install in progress)")
+            return []
+        
+        print(f"✅ Flux server online! Generating {len(scenes)} scenes...")
         for s in scenes:
-            time.sleep(0.5)  # Flux is fast!
+            time.sleep(0.5)
             try:
                 prompt = f"cartoon style, 3d animation, pixar quality, vibrant colors, vertical 9:16 format, {s['keyword']}"
                 response = requests.post(flux_url, json={
                     "prompt": prompt,
                     "width": 1080,
                     "height": 1920,
-                    "num_steps": 4,  # Schnell optimized for 1-4 steps
+                    "num_steps": 4,
                     "guidance": 3.5
                 }, timeout=30)
                 
@@ -204,18 +183,27 @@ def generate_flux_images(scenes, output_dir: Path):
                     print(f"   ✅ Flux: {s['image']}")
             except Exception as e:
                 print(f"   ⚠️ Flux failed for {s['image']}: {e}")
+                break  # Stop trying if one fails
     except Exception as e:
-        print(f"❌ Flux server not available: {e}")
+        print(f"❌ Flux error: {e}")
     return resolved
 
 def generate_sdxl_images(scenes, output_dir: Path):
     """🎨 Stable Diffusion XL - FREE Local (Backup)"""
-    print(f"🎨 Trying SDXL (local) for {len(scenes)} scenes...")
+    print(f"🎨 Checking SDXL server...")
     resolved = []
     try:
         import requests
         sdxl_url = "http://localhost:8188/generate"
         
+        # Quick health check (1 second timeout)
+        try:
+            requests.get("http://localhost:8188/", timeout=1)
+        except:
+            print(f"❌ SDXL server not running (install in progress)")
+            return []
+        
+        print(f"✅ SDXL server online! Generating {len(scenes)} scenes...")
         for s in scenes:
             time.sleep(1.0)
             try:
@@ -237,8 +225,9 @@ def generate_sdxl_images(scenes, output_dir: Path):
                     print(f"   ✅ SDXL: {s['image']}")
             except Exception as e:
                 print(f"   ⚠️ SDXL failed for {s['image']}: {e}")
+                break  # Stop trying if one fails
     except Exception as e:
-        print(f"❌ SDXL server not available: {e}")
+        print(f"❌ SDXL error: {e}")
     return resolved
 
 def generate_dalle_assets(scenes, output_dir: Path):
