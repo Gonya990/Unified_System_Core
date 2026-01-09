@@ -3003,52 +3003,51 @@ def main():
     application.add_error_handler(error_handler)
     logger.info("[STARTUP] Error handler registered")
 
-    # Register command handlers
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('help', help_command))
-    application.add_handler(CommandHandler('brief', brief_command))
-    application.add_handler(CommandHandler('memory', memory_command))
-    application.add_handler(CommandHandler('newtask', newtask_command))
-    application.add_handler(CommandHandler('msg', msg_command))
-    application.add_handler(CommandHandler('agent', agent_command))
-    application.add_handler(CommandHandler('pipeline', pipeline_command))
-    application.add_handler(CommandHandler('img', img_command))
-    application.add_handler(CommandHandler('image', img_command))
-    application.add_handler(CommandHandler('tl', tl_command))
-    application.add_handler(CommandHandler('set_key', set_key))
-    application.add_handler(CommandHandler('approve', approve_user))
-    application.add_handler(CommandHandler('status', status_command))
-    application.add_handler(CommandHandler('search', search_command))
-    application.add_handler(CommandHandler('ha', ha_command))
-    application.add_handler(CommandHandler('models', models_command))
-    application.add_handler(CommandHandler('clear', clear_command))
-    application.add_handler(CommandHandler('infra', infra_command))
-    application.add_handler(CommandHandler('setprovider', setprovider_command))
-    application.add_handler(CommandHandler('usage', usage_command))
-    application.add_handler(CommandHandler('costs', costs_command))
-    application.add_handler(CommandHandler('imagine', imagine_command))
-    application.add_handler(CommandHandler('scan', scan_command))
-    application.add_handler(CommandHandler('say', say_command))
-    application.add_handler(CommandHandler('speak', speak_command))
-    application.add_handler(CommandHandler('mail', mail_command))
-    application.add_handler(CommandHandler('notify', notify_command))
-    application.add_handler(CommandHandler('remind', remind_command))
-    application.add_handler(CommandHandler('note', note_command))
-    application.add_handler(CommandHandler('digest', digest_command))
-    application.add_handler(CommandHandler('backup', backup_command))
-    application.add_handler(CommandHandler('update', update_command))
-    application.add_handler(CommandHandler('health', health_command))
-    application.add_handler(CommandHandler('calendar', calendar_command))
-    application.add_handler(CommandHandler('linear', linear_command))
-    application.add_handler(CommandHandler('todo', todo_command))
-    application.add_handler(CommandHandler('beads', beads_command))
-    application.add_handler(CommandHandler('settings', settings_command))
+    async def safe_add_command_handler(cmd_name: str, handler_func):
+        """Safely add a command handler, logging failures instead of crashing."""
+        try:
+            # Command names must be alphanumeric/underscores for Telegram
+            import re
+            if not re.match(r'^[a-z0-9_]+$', cmd_name.lower()):
+                logger.warning(f"⚠️ [VIBRANIUM] Skipping invalid command name: '{cmd_name}'")
+                return
+            application.add_handler(CommandHandler(cmd_name, handler_func))
+        except Exception as e:
+            logger.error(f"❌ [VIBRANIUM] Failed to register command '{cmd_name}': {e}")
+
+    # Register command handlers safely
+    commands_to_register = {
+        'start': start, 'help': help_command, 'brief': brief_command,
+        'memory': memory_command, 'newtask': newtask_command, 'msg': msg_command,
+        'agent': agent_command, 'pipeline': pipeline_command, 'img': img_command,
+        'image': img_command, 'tl': tl_command, 'set_key': set_key,
+        'approve': approve_user, 'status': status_command, 'search': search_command,
+        'ha': ha_command, 'models': models_command, 'clear': clear_command,
+        'infra': infra_command, 'setprovider': setprovider_command, 'usage': usage_command,
+        'costs': costs_command, 'imagine': imagine_command, 'scan': scan_command,
+        'say': say_command, 'speak': speak_command, 'mail': mail_command,
+        'notify': notify_command, 'remind': remind_command, 'note': note_command,
+        'digest': digest_command, 'backup': backup_command, 'update': update_command,
+        'health': health_command, 'calendar': calendar_command, 'linear': linear_command,
+        'todo': todo_command, 'beads': beads_command, 'settings': settings_command
+    }
+
+    for cmd, func in commands_to_register.items():
+        # CommandHandler is synchronous but we use it in a safe way
+        try:
+            if re.match(r'^[a-z0-9_]+$', cmd.lower()):
+                application.add_handler(CommandHandler(cmd, func))
+            else:
+                logger.warning(f"🚫 [VIBRANIUM] Invalid command skipped: {cmd}")
+        except Exception as e:
+            logger.error(f"❌ Error adding {cmd}: {e}")
+
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.VOICE, handle_voice))
     application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     application.add_handler(MessageHandler(filters.TEXT, handle_message))
-    logger.info("[STARTUP] All handlers registered")
+    logger.info("[STARTUP] All handlers registered (Vibranium Secure Mode)")
 
     logger.info("[STARTUP] Starting polling...")
     print(f'Bot V2 (AI_Core) is running...')
