@@ -267,10 +267,26 @@ class InferenceClient:
             }
 
         else: # ollama
-            base_url = self.config.get("OLLAMA_BASE_URL", "http://localhost:11434")
-            # ... existing ollama code ...
+            # Distributed AI Routing
+            # Primary: Linux (Titan RTX) - http://host.docker.internal:11434
+            # Secondary: Windows (Igor Gaming) - http://100.127.194.111:11434
+            
+            default_url = self.config.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+            windows_url = "http://100.127.194.111:11434"
+            
+            model = self.config.get("OLLAMA_MODEL", self.config.get("MODEL_NAME", "llama3.2"))
+            
+            # Models delegated to Windows (Fast/Light)
+            WINDOWS_MODELS = ["mistral", "gemma", "codellama", "qwen:0.5b", "qwen:1.8b"]
+            
+            if any(m in model.lower() for m in WINDOWS_MODELS):
+                base_url = windows_url
+                logger.info(f"⚡️ Distributed AI: Routing '{model}' to Windows Node (Igor Gaming)")
+            else:
+                base_url = default_url
+                logger.info(f"🧠 Distributed AI: Routing '{model}' to Primary Linux Node (Titan RTX)")
+
             url = f"{base_url.rstrip('/')}/api/chat"
-            model = self.config.get("OLLAMA_MODEL", "llama3.2")
             headers = {}
             payload = {
                 "model": model,
