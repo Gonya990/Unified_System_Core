@@ -131,6 +131,10 @@ def run_daily_research(style="impact"):
     1. Identify the most impactful 'vibe' or 'mindset shift' this technology brings.
     {style_prompt}
     
+    CRITICAL: The "script_ru" must be a clean narration. 
+    DO NOT include labels like "Scene 1:", "Narrator:", or "Action:". 
+    ONLY the words to be spoken. Use "..." for brief pauses.
+    
     Format output as JSON:
     {{
         "selected_topic": "Dynamic Title",
@@ -154,6 +158,14 @@ def run_daily_research(style="impact"):
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         data = json.loads(content)
+        
+        # Vibranium Double-Safety Cleanup: Remove "Сцена X:", "Scene X:", "Narrator:", etc.
+        import re
+        script = data.get('script_ru', '')
+        script = re.sub(r'(?i)(сцена|scene|кадр|shot)\s*\d+[:.-]*\s*', '', script)
+        script = re.sub(r'(?i)(диктор|narrator|вокал|voiceover)[:.-]*\s*', '', script)
+        data['script_ru'] = script.strip()
+        
         return data
     except Exception as e:
         print(f"❌ LLM Deep Research failed: {e}")
