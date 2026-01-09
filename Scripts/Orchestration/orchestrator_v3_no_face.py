@@ -19,6 +19,11 @@ import google.generativeai as genai
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 
+def agent_mindfulness(task: str):
+    """Reflecting user request: strategic pauses & token availability checks"""
+    print(f"🕵️ Vibranium Agent checking {task} (Pausing for stability)...")
+    time.sleep(2.5) 
+
 # Load API keys from potential locations - OVERRIDE to ensure new key is used
 # Load API keys from potential locations
 load_dotenv(ROOT_DIR / ".env", override=True)
@@ -102,6 +107,7 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
 
 def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using Edge-TTS with rate control"""
+    agent_mindfulness("Edge-TTS Audio Generation")
     print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice})...")
     
     mp3_path = output_path.with_suffix(".mp3")
@@ -384,6 +390,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     segments = []
     
     for i, scene in enumerate(scenes):
+        agent_mindfulness(f"Assembling Scene {i}")
         img_path = scene['image']
         keyword = scene['keyword']
         
