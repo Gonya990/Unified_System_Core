@@ -291,6 +291,7 @@ async def login_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🔐 **Dashboard Login**\n\n"
         f"Ваша персональная ссылка для входа:\n"
         f"🔗 [ОТКРЫТЬ ПАНЕЛЬ УПРАВЛЕНИЯ]({login_link})\n\n"
+        f"⚠️ **Внимание**: Для открытия дашборда необходимо, чтобы на вашем устройстве был включен **Tailscale**.\n\n"
         f"_Ссылка действительна 24 часа._",
         parse_mode="Markdown",
         disable_web_page_preview=True
@@ -308,18 +309,42 @@ if _DIGEST_AVAILABLE and usage_tracker and task_manager:
 else:
     digest_service = None
 
-# Admin access configuration
-allowed_users_str = config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
-logger.info(f"Raw ALLOWED_USERS from config: '{allowed_users_str}'")
-try:
-    # Hardcoded admins + env var users
-    DEFAULT_ADMINS = [708531393, 5569219290, 578363419]
-    parsed_ids = [int(i.strip()) for i in allowed_users_str.split(",") if i.strip()]
-    ALLOWED_IDS = list(set(DEFAULT_ADMINS + parsed_ids))
-    logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
-except Exception as e:
-    logger.error(f"Failed to parse ALLOWED_USERS: {e}")
-    ALLOWED_IDS = [708531393, 5569219290, 578363419]
+# Admin access configuration & User Authorization
+def get_allowed_users():
+    """Load allowed users from .env and config/users.yaml."""
+    # 1. Get from Env/ConfigManager
+    users_str = config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
+    allowed = []
+    try:
+        allowed = [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
+    except ValueError as e:
+        logger.error(f"Invalid ALLOWED_USERS format: {e}")
+        allowed = [708531393, 5569219290, 578363419] # Fallback to admins
+
+    # 2. Add from config/users.yaml
+    try:
+        import yaml
+        users_file = Path(__file__).parent.parent / "config" / "users.yaml"
+        if not users_file.exists():
+            # Try same directory as script if not found (for docker)
+            users_file = Path(__file__).parent / "config" / "users.yaml"
+            
+        if users_file.exists():
+            with open(users_file, "r") as f:
+                data = yaml.safe_load(f)
+                if data and "users" in data:
+                    for u in data["users"]:
+                        uid = u.get("id")
+                        if uid and uid > 0 and uid not in allowed:
+                            allowed.append(uid)
+            logger.info(f"Loaded users from users.yaml. Total allowed: {len(allowed)}")
+    except Exception as e:
+        logger.error(f"Failed to load users.yaml: {e}")
+
+    return allowed
+
+ALLOWED_IDS = get_allowed_users()
+logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
@@ -485,12 +510,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Use HTML parse mode to avoid Markdown breaking URLs with underscores
             await query.edit_message_text(
                 f"🔗 <b>Connect Google Calendar</b>\n\n"
-                f"1. Click this link:\n{auth_url}\n\n"
-                f"2. Authorize access to your calendar\n\n"
-                f"3. You'll be redirected to a page (it may show an error - that's OK!)\n\n"
-                f"4. Copy the <code>code=</code> value from the URL and paste it here.\n\n"
-                f"Example: if URL is <code>http://localhost/...?code=4/0ABC...</code> "
-                f"then paste: <code>4/0ABC...</code>",
+                f"1. Нажмите на ссылку ниже:\n{auth_url}\n\n"
+                f"2. Авторизуйте бота в своем аккаунте Гугл.\n\n"
+                f"3. 🚨 <b>ВАЖНО</b>: После авторизации браузер может показать ошибку <i>«Не удается открыть страницу»</i> (так как он пытается открыть <code>localhost</code>).\n\n"
+                f"4. <b>НЕ ПАНИКУЙТЕ!</b> Просто скопируйте текст из адресной строки вашего браузера и <b>отправьте его сюда сообщением</b>.\n\n"
+                f"Бот сам найдет нужный код в ссылке и завершит настройку. 🦾",
                 parse_mode='HTML'
             )
         else:
@@ -866,16 +890,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
     
-    # Handle OAuth code - can start with "4/" or be a full URL
+    # Handle OAuth code - can start with "4/" or be a full URL (often Sent from mobile)
     auth_code = None
     if user_text.strip().startswith("4/"):
         auth_code = user_text.strip()
     elif "code=" in user_text:
         # Extract code from URL like http://localhost:8085/oauth2callback?code=4/0ABC...
+        # Also handles long URLs with other parameters
         import re
         match = re.search(r'code=([^&\s]+)', user_text)
         if match:
             auth_code = match.group(1)
+            # URL decoding may be needed if character is encoded
+            if "%2F" in auth_code:
+                auth_code = auth_code.replace("%2F", "/")
 
     if auth_code:
         await update.message.reply_text("🔄 Verifying code...")
