@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Wrapper for mcp_agent_mail server
-MAIL_DIR="/Users/macbook/Documents/Unified_System/External_Tools/Stack/mcp_agent_mail"
+# Determine script directory and correct relative path
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+MAIL_DIR="$SCRIPT_DIR/../../External_Tools/Stack/mcp_agent_mail"
 
 if [ ! -d "$MAIL_DIR" ]; then
     echo "Error: mcp_agent_mail not found in $MAIL_DIR"
