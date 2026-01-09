@@ -23,8 +23,9 @@ class DailyScheduler:
             try:
                 await self.check_and_nudge()
                 await self.check_upcoming_events()
-                # Check every hour
-                await asyncio.sleep(3600)
+                await self.schedule_daily_briefs()
+                # Check every minute to catch the 7:00 AM slot
+                await asyncio.sleep(60)
             except Exception as e:
                 logger.error(f"Error in scheduler loop: {e}")
                 await asyncio.sleep(60)
@@ -67,6 +68,19 @@ class DailyScheduler:
     async def check_upcoming_events(self):
         """Logic to remind about upcoming events (e.g., in 15 mins)."""
         # This implementation requires scanning all connected users' calendars.
-        # In a real system, we'd have a more efficient way to track this.
-        # For small scale, we can iterate.
+        pass
+
+    async def schedule_daily_briefs(self):
+        """Send daily brief at 7:00 AM local time."""
+        now = datetime.now()
+        # For simplicity, we assume server time is local or adjust. 
+        # Ideally, use user's timezone.
+        if now.hour == 7 and now.minute == 0:
+            logger.info("Seven AM! Sending daily briefs.")
+            users = self.db.list_users() # Assuming this exists or we fetch from config
+            for user in users:
+                await self.send_daily_brief(user['user_id'])
+    
+    async def send_daily_brief(self, user_id):
+        # Implementation to be connected to /brief logic
         pass

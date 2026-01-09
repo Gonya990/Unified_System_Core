@@ -13,6 +13,7 @@ users:
     email: "arturgoncarenko92@gmail.com"
     role: "premium"
     status: "active"
+    tailscale_ip: "100.84.74.35" # iphone-11.tailc6c438.ts.net
 
   - id: 0 # Replace with actual Telegram ID
     name: "Oksana"
