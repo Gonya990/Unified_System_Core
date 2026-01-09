@@ -11,7 +11,9 @@ import os
 from pathlib import Path
 from typing import List, Dict
 import json
+import time
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
@@ -141,39 +143,79 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
         print(f"❌ Edge-TTS general error: {e}")
         return False
 
+def transcribe_audio_gemini(audio_path: Path) -> List[Dict]:
+    """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
+    print("🌠 Falling back to Gemini for transcription...")
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("❌ Gemini Transcription failed: No API Key")
+        return []
+        
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
+        # Gemini expects files to be uploaded or passed as bytes for small files
+        # We'll use the simplest method: pass as a blob
+        with open(audio_path, "rb") as f:
+            audio_data = f.read()
+            
+        # Prompt for word-level timestamps in JSON
+        prompt = "Transcribe this audio. Return ONLY a JSON list of words with start and end timestamps in seconds: [{\"word\": \"text\", \"start\": 0.0, \"end\": 0.5}, ...]"
+        
+        response = model.generate_content([
+            prompt,
+            {"mime_type": "audio/wav", "data": audio_data}
+        ])
+        
+        text = response.text
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        
+        words = json.loads(text)
+        print(f"✅ Gemini Transcription successful: {len(words)} words found.")
+        return words
+    except Exception as e:
+        print(f"❌ Gemini Transcription failed: {e}")
+        return []
+
 def transcribe_audio_whisper(audio_path: Path) -> List[Dict]:
-    """Get word-level timestamps using OpenAI Whisper API (compressed for size)"""
+    """Get word-level timestamps using OpenAI Whisper API with Gemini Fallback"""
+    # Rate limit protection
+    time.sleep(1.5)
+    
     print("🧠 Transcribing audio for word-level subtitles...")
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: 
-        print("❌ Transcription failed: No API Key")
-        return []
     
-    # OpenAI Whisper has a 25MB limit. WAVs can be large, so convert to MP3 for upload.
-    temp_mp3 = audio_path.with_suffix(".mp3")
-    try:
-        subprocess.run([
-            "ffmpeg", "-y", "-i", str(audio_path),
-            "-b:a", "128k", str(temp_mp3)
-        ], check=True, capture_output=True)
-        
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
-        
-        with open(temp_mp3, "rb") as f:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=f,
-                response_format="verbose_json",
-                timestamp_granularities=["word"]
-            )
-        
-        if temp_mp3.exists(): temp_mp3.unlink()
-        return transcript.words if hasattr(transcript, 'words') else []
-    except Exception as e:
-        print(f"❌ Transcription failed: {e}")
-        if temp_mp3.exists(): temp_mp3.unlink()
-        return []
+    # 1. Main Strategy: OpenAI Whisper
+    if api_key:
+        temp_mp3 = audio_path.with_suffix(".mp3")
+        try:
+            subprocess.run([
+                "ffmpeg", "-y", "-i", str(audio_path),
+                "-b:a", "128k", str(temp_mp3)
+            ], check=True, capture_output=True)
+            
+            from openai import OpenAI
+            client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
+            
+            with open(temp_mp3, "rb") as f:
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    response_format="verbose_json",
+                    timestamp_granularities=["word"]
+                )
+            
+            if temp_mp3.exists(): temp_mp3.unlink()
+            words = transcript.words if hasattr(transcript, 'words') else []
+            if words: return words
+        except Exception as e:
+            print(f"⚠️ OpenAI Whisper failed: {e}")
+            if temp_mp3.exists(): temp_mp3.unlink()
+
+    # 2. Strategy 2: Gemini Fallback
+    return transcribe_audio_gemini(audio_path)
 
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     """Main audio generation with premium support and fallback"""
