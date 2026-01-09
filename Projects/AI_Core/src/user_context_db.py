@@ -23,6 +23,8 @@ class UserContextDB:
                     is_approved BOOLEAN DEFAULT 0,
                     is_google_connected BOOLEAN DEFAULT 0,
                     google_creds TEXT,
+                    branch_id TEXT DEFAULT 'HOME_HQ',
+                    role TEXT DEFAULT 'MEMBER',
                     last_interaction TIMESTAMP,
                     created_at TIMESTAMP
                 )
@@ -60,13 +62,13 @@ class UserContextDB:
             ''')
             conn.commit()
 
-    def add_user(self, user_id: int, username: str, full_name: str):
+    def add_user(self, user_id: int, username: str, full_name: str, branch_id: str = 'HOME_HQ', role: str = 'MEMBER'):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT OR IGNORE INTO users (user_id, username, full_name, last_interaction, created_at)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (user_id, username, full_name, datetime.now(), datetime.now()))
+                INSERT OR IGNORE INTO users (user_id, username, full_name, branch_id, role, last_interaction, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (user_id, username, full_name, branch_id, role, datetime.now(), datetime.now()))
             conn.commit()
 
     def add_memory(self, user_id: int, fact_short: str, fact_full: str):

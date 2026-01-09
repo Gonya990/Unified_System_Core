@@ -73,13 +73,14 @@ class FirestoreDB:
             doc_ref = self.db.collection("users").document(str(user_id))
             doc = doc_ref.get()
             if not doc.exists:
-                doc_ref.set({
                     "user_id": user_id,
                     "username": username,
                     "full_name": full_name,
                     "is_approved": False,
                     "is_google_connected": False,
                     "google_creds": None,
+                    "branch_id": "HOME_HQ",
+                    "role": "MEMBER",
                     "last_interaction": firestore.SERVER_TIMESTAMP,
                     "created_at": firestore.SERVER_TIMESTAMP
                 })

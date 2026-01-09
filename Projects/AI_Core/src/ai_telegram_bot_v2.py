@@ -151,8 +151,14 @@ else:
 async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /play command - switch to gaming mode."""
     user_id = update.effective_user.id
-    if not db.is_approved(user_id):
+    user_data = db.get_user(user_id)
+    if not user_data or not user_data.get('is_approved'):
         await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    # Branch Check: Only HOME_HQ can control Proxmox (User's family)
+    if user_data.get('branch_id') != 'HOME_HQ' and user_id != ADMIN_ID:
+        await update.message.reply_text("⛔️ Your branch does not have access to hardware control.")
         return
 
     if not proxmox:
@@ -245,14 +251,17 @@ async def share_key_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Not a valid Gemini key.")
         return
 
+    user_data = db.get_user(user_id)
+    branch_id = user_data.get('branch_id', 'HOME_HQ') if user_data else 'HOME_HQ'
+
     if inference.swarm:
         try:
             user_name = update.effective_user.first_name
-            inference.swarm.add_gemini_key(api_key, owner=user_name)
-            await update.message.reply_text("🐝 **Thanks!** Key added to the family swarm cluster. 🦾")
+            inference.swarm.add_gemini_key(api_key, owner=user_name, branch_id=branch_id)
+            await update.message.reply_text(f"🐝 **Thanks!** Key added to the family swarm cluster for branch **{branch_id}**. 🦾", parse_mode="Markdown")
             # Notify ADMIN
             if user_id != ADMIN_ID:
-                await context.bot.send_message(chat_id=ADMIN_ID, text=f"🐝 User {user_name} contributed a Gemini API key to the swarm!")
+                await context.bot.send_message(chat_id=ADMIN_ID, text=f"🐝 User {user_name} contributed a Gemini API key to the {branch_id} swarm!")
         except Exception as e:
             await update.message.reply_text(f"❌ Error: {e}")
     else:
@@ -1107,8 +1116,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    # Regular AI query with context
-    ai_response = await query_ollama_with_context(user_id, user_text)
+    # Regular AI query with context (Federation Aware)
+    user_data = db.get_user(user_id)
+    branch_id = user_data.get('branch_id', 'HOME_HQ') if user_data else 'HOME_HQ'
+    
+    # Detect "Unified Core" project context
+    UNIFIED_KEYWORDS = ["unified", "core", "gonya", "system", "federation", "vibranium", "swarm"]
+    project_context = "PERSONAL"
+    if any(k in lower_text for k in UNIFIED_KEYWORDS):
+        project_context = "UNIFIED_CORE"
+        logger.info(f"[FEDERATION] Detected UNIFIED_CORE context for user {user_id}")
+
+    ai_response = await query_ollama_with_context(
+        user_id, user_text, 
+        branch_id=branch_id, 
+        project_context=project_context
+    )
     
     # Validate response is not empty
     if not ai_response or not ai_response.strip():
@@ -1274,8 +1297,8 @@ async def digest_chat_memory(user_id: int):
     except Exception as e:
         logger.error(f"Failed to digest memory JSON: {e}")
 
-async def query_ollama_with_context(user_id: int, prompt: str) -> str:
-    logger.info(f"[AI] Querying AI for user {user_id}, prompt length: {len(prompt)}")
+async def query_ollama_with_context(user_id: int, prompt: str, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL") -> str:
+    logger.info(f"[AI] Querying AI for user {user_id} (Branch: {branch_id}, Context: {project_context}), prompt length: {len(prompt)}")
 
     # 1. Get Long-term memories
     memories = db.get_memories(user_id, limit=5)
@@ -1288,8 +1311,13 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
 
     system_prompt = (
         "You are Gonya, a powerful multilingual personal AI assistant. "
+        "You serve as a core component of the Unified System Federation.\n\n"
+        "=== FEDERATION CONTEXT ===\n"
+        f"Branch: {branch_id}\n"
+        f"Project: {project_context}\n\n"
         "You fluently understand and respond in English, Russian (русский), and Hebrew (עברית). "
         "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you.\n\n"
+        # ... rest of system prompt
         
         "=== YOUR CAPABILITIES ===\n"
         "You have REAL access to the user's data and can perform actions:\n\n"
@@ -1344,7 +1372,12 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
 
 
     try:
-        response_text, _ = await inference.chat(history + [{"role": "user", "content": prompt}], system_prompt=system_prompt)
+        response_text, _ = await inference.chat(
+            history + [{"role": "user", "content": prompt}], 
+            system_prompt=system_prompt,
+            branch_id=branch_id,
+            project_context=project_context
+        )
         logger.info(f"[AI] Got response for user {user_id}, length: {len(response_text)}")
         return response_text
     except Exception as e:

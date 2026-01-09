@@ -38,16 +38,23 @@ class SwarmManager:
         except Exception as e:
             logger.error(f"Failed to load swarm resources: {e}")
 
-    def get_gemini_key(self) -> Optional[str]:
-        """Get the next available Gemini API key using round-robin."""
-        if not self.gemini_pool:
+    def get_gemini_key(self, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL") -> Optional[str]:
+        """Get the next available Gemini API key with branch awareness."""
+        pool = self.gemini_pool
+        
+        # If not a shared project, filter by branch
+        if project_context != "UNIFIED_CORE":
+            pool = [k for k in self.gemini_pool if k.get("branch_id", "HOME_HQ") == branch_id]
+        
+        if not pool:
             return None
         
-        # Round-robin rotation
-        key_data = self.gemini_pool[self._current_gemini_idx]
-        self._current_gemini_idx = (self._current_gemini_idx + 1) % len(self.gemini_pool)
+        # Simple cyclic rotation
+        idx = self._current_gemini_idx % len(pool)
+        key_data = pool[idx]
+        self._current_gemini_idx += 1
         
-        logger.debug(f"Using Gemini key from swarm member: {key_data.get('owner', 'Unknown')}")
+        logger.debug(f"Using Gemini key from: {key_data.get('owner', 'Unknown')} (Branch: {key_data.get('branch_id', 'Unknown')})")
         return key_data.get("api_key")
 
     def add_gemini_key(self, api_key: str, owner: str):
