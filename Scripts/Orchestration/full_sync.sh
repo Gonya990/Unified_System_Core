@@ -46,7 +46,7 @@ tailscale ssh gonya@100.110.209.49 "
     git reset --hard origin/main
     
     # Восстановление подмодулей
-    # git submodule update --init --recursive || echo 'Submodules failed, skipping'
+    git submodule update --init --recursive || echo 'Submodules failed, skipping'
 "
 
 # 5. ПЕРЕЗАПУСК СЕРВИСОВ
@@ -61,6 +61,14 @@ tailscale ssh gonya@100.110.209.49 "
     docker compose --profile local down --remove-orphans || true
     docker compose --profile local build --pull ai-bot-local
     docker compose --profile local up -d --force-recreate ai-bot-local watchtower
+    
+    # Перезапуск MCP Agent Mail (если он был убит или не запущен)
+    echo '--- Restarting MCP Agent Mail ---'
+    pkill -f 'run_server_with_token.sh' || true
+    pkill -f 'mcp_server' || true
+    cd /home/gonya/Unified_System
+    nohup bash Scripts/External/start_mail_server.sh > mcp_mail.log 2>&1 &
+
 "
 
 # 6. ВЕРИФИКАЦИЯ (ГЛАВНЫЙ ЭТАП)
