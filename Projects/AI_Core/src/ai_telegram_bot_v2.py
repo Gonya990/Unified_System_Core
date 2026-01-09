@@ -132,6 +132,16 @@ logging.getLogger('').addHandler(console)
 
 logger = logging.getLogger(__name__)
 
+try:
+    from dashboard import DashboardService
+    logger.info("DashboardService imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import DashboardService: {e}")
+    DashboardService = None
+except Exception as e:
+    logger.error(f"Unexpected error importing DashboardService: {e}")
+    DashboardService = None
+
 # Configuration
 config = ConfigManager()
 
