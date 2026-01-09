@@ -51,8 +51,8 @@ class InferenceClient:
     def __init__(self, config: ConfigManager):
         self.config = config
         self.provider = config.get("INFERENCE_PROVIDER", "ollama")
-        self.model = config.get("MODEL_NAME", "llama3")
-        self.endpoint = config.get("INFERENCE_ENDPOINT", "http://localhost:11434")
+        self.model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+        self.endpoint = config.get("OLLAMA_BASE_URL", config.get("INFERENCE_BASE_URL", "http://localhost:11434"))
         self.api_key = config.get("INFERENCE_API_KEY", "")
         
         # Load resources for swarm
@@ -139,9 +139,12 @@ class InferenceClient:
 
     async def _chat_ollama(self, messages: list, system_prompt: Optional[str] = None):
         """Ollama API request."""
-        url = f"{self.endpoint}/api/chat"
+        endpoint = self.config.get("OLLAMA_BASE_URL", self.endpoint)
+        model = self.config.get("OLLAMA_MODEL", self.model)
+        
+        url = f"{endpoint}/api/chat"
         payload = {
-            "model": self.model,
+            "model": model,
             "messages": messages,
             "stream": False
         }
