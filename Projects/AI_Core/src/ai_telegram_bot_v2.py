@@ -22,14 +22,14 @@ logging.getLogger('').addHandler(console)
 
 logger = logging.getLogger(__name__)
 
-# Configuration
-from config_manager import ConfigManager
-config = ConfigManager()
-
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
+
+# Configuration
+from config_manager import ConfigManager
+config = ConfigManager()
 
 try:
     from dashboard import DashboardService
