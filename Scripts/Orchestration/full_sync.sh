@@ -102,7 +102,7 @@ payload = {
         'arguments': {
             'project_key': 'home-kosta-documents-unified-system-core',
             'sender_name': 'OrangeStone',
-            'to': ['PinkLake'],
+            'to': ['PinkLake', 'FuchsiaCat'],
             'subject': 'SYSTEM STATUS: VIBRANIUM',
             'body_md': msg_body
         }
