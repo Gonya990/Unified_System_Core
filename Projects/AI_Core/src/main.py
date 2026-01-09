@@ -36,7 +36,7 @@ from .linear_client import LinearClient
 from .digest_service import DigestService
 from .calendar_client import CalendarClient
 from .homekit_bridge import HomeKitBridge
-from .notion_client import NotionClient
+from .notion_service import NotionClient
 from .device_monitor import DeviceMonitor
 from .health_integration import HealthIntegration
 from .gmail_client import GmailClient
