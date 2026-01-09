@@ -59,8 +59,8 @@ tailscale ssh gonya@100.110.209.49 "
     
     docker rm -f ai_telegram_bot || true
     docker compose --profile local down --remove-orphans || true
-    docker compose --profile local build --pull
-    docker compose --profile local up -d --force-recreate
+    docker compose --profile local build --pull ai-bot-local
+    docker compose --profile local up -d --force-recreate ai-bot-local watchtower
 "
 
 # 6. ВЕРИФИКАЦИЯ (ГЛАВНЫЙ ЭТАП)
