@@ -1,6 +1,5 @@
 # Common configuration shared between pre-built and local-build services
-x-ai-bot-common: &ai-bot-common
-  container_name: ai_telegram_bot
+x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
   restart: always
   env_file:
     - .env
