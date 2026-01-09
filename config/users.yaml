@@ -8,11 +8,11 @@ users:
     role: "admin"
     status: "active"
 
-  - id: 0 # Replace with actual Telegram ID
-    name: "Family Member 1"
-    email: ""
-    role: "member"
-    status: "pending"
+  - id: 5981377998
+    name: "Artur"
+    email: "arturgoncarenko92@gmail.com"
+    role: "premium"
+    status: "active"
 
   - id: 0 # Replace with actual Telegram ID
     name: "Family Member 2"
