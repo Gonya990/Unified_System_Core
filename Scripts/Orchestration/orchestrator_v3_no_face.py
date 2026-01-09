@@ -146,32 +146,41 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
 def transcribe_audio_gemini(audio_path: Path) -> List[Dict]:
     """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
     print("🌠 Falling back to Gemini for transcription...")
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
-        print("❌ Gemini Transcription failed: No API Key")
+        print("❌ Gemini Transcription failed: No API Key (checked GEMINI_API_KEY and GOOGLE_API_KEY)")
         return []
         
+    print(f"🔑 Using Gemini Key: {api_key[:8]}... (len={len(api_key)})")
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
         
-        # Gemini expects files to be uploaded or passed as bytes for small files
-        # We'll use the simplest method: pass as a blob
         with open(audio_path, "rb") as f:
             audio_data = f.read()
             
-        # Prompt for word-level timestamps in JSON
-        prompt = "Transcribe this audio. Return ONLY a JSON list of words with start and end timestamps in seconds: [{\"word\": \"text\", \"start\": 0.0, \"end\": 0.5}, ...]"
+        prompt = "Transcribe this audio. Return ONLY a JSON list of words with start and end timestamps in seconds: [{\"word\": \"text\", \"start\": 0.0, \"end\": 0.5}, ...]. Do not include markdown formatting, just raw JSON."
         
+        # Structure payload correctly for Gemini
         response = model.generate_content([
             prompt,
             {"mime_type": "audio/wav", "data": audio_data}
         ])
         
-        text = response.text
+        text = response.text.strip()
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
         
+        # Final cleanup for raw JSON
+        if not text.startswith("["):
+            # Try to find the first [ and last ]
+            start = text.find("[")
+            end = text.rfind("]") + 1
+            if start != -1 and end != 0:
+                text = text[start:end]
+
         words = json.loads(text)
         print(f"✅ Gemini Transcription successful: {len(words)} words found.")
         return words
@@ -219,6 +228,7 @@ def transcribe_audio_whisper(audio_path: Path) -> List[Dict]:
 
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     """Main audio generation with premium support and fallback"""
+    time.sleep(1.0) # Tactical pause
     voice = VOICES.get(lang, VOICES["en"])
     
     # 1. Try OpenAI (Premium)
