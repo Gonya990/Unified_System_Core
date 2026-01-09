@@ -67,7 +67,18 @@ tailscale ssh gonya@100.110.209.49 "
 echo "📌 [5.1/7] Перезапуск MCP Agent Mail..."
 tailscale ssh gonya@100.110.209.49 "
     echo '--- Restarting MCP Agent Mail ---'
-
+    
+    # Ensure uv is installed and in PATH
+    if ! command -v uv &> /dev/null; then
+        if [ -f \"\$HOME/.local/bin/uv\" ]; then
+            export PATH=\"\$HOME/.local/bin:\$PATH\"
+        else
+            echo 'Installing uv...'
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            export PATH=\"\$HOME/.local/bin:\$PATH\"
+        fi
+    fi
+    
     pkill -f 'run_server_with_token.sh' || true
     pkill -f 'mcp_server' || true
     cd /home/gonya/Unified_System
