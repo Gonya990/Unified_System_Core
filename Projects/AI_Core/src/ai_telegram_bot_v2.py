@@ -5,6 +5,7 @@ import sys
 import asyncio
 import aiohttp
 import json
+from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 
@@ -110,7 +111,12 @@ except ImportError:
 
 try:
     from dashboard import DashboardService
-except ImportError:
+    logger.info("DashboardService imported successfully")
+except ImportError as e:
+    logger.error(f"Failed to import DashboardService: {e}")
+    DashboardService = None
+except Exception as e:
+    logger.error(f"Unexpected error importing DashboardService: {e}")
     DashboardService = None
 
 # Setup logging first
@@ -1375,15 +1381,20 @@ async def post_init(application: Application) -> None:
 
     # Start Web Dashboard
     if DashboardService:
-        dashboard = DashboardService(port=8096, context={
-            "infra": infra_manager,
-            "usage": usage_tracker,
-            "notion": notion_client,
-            "proxmox": proxmox,
-            "inference": inference
-        })
-        dashboard.start()
-        logger.info("Web Dashboard started on port 8096")
+        try:
+            dashboard = DashboardService(port=8096, context={
+                "infra": infra_manager,
+                "usage": usage_tracker,
+                "notion": notion_client,
+                "proxmox": proxmox,
+                "inference": inference
+            })
+            dashboard.start()
+            logger.info("🚀 Web Dashboard started on port 8096")
+        except Exception as e:
+            logger.error(f"❌ Failed to start Web Dashboard: {e}")
+    else:
+        logger.warning("⚠️ DashboardService not available, skipping startup")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
