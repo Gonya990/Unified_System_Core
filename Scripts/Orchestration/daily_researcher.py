@@ -5,6 +5,7 @@ import feedparser
 import json
 import requests
 import random
+import re
 from bs4 import BeautifulSoup
 from pathlib import Path
 from openai import OpenAI
@@ -19,50 +20,26 @@ load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
 
 def get_client():
-    """Lazy initialization of OpenAI client with forced base_url to avoid 404s"""
+    """Lazy initialization of OpenAI client"""
     api_key = os.getenv("OPENAI_API_KEY")
-    # Force override to ensure we use the same proven key as orchestrator
-    if not api_key:
-        api_key = "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"
-    
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://api.openai.com/v1"
-    )
+    return OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
 
 def get_latest_tech_news():
-    """
-    Fetches news from Google News RSS with randomized experimental topics.
-    """
+    """Fetches news from Google News RSS"""
     topics = [
-        "artificial intelligence future tech",
-        "quantum computing breakthroughs 2026",
-        "neuralink brain computer interface",
-        "humanoid robots boston dynamics",
-        "spacex mars colonization progress",
-        "metaverse web3 evolution",
-        "biotechnology longevity research",
-        "autonomous vehicles level 5",
-        "renewable energy revolution 2026",
-        "robotics in healthcare surgery",
-        "ai in cybersecurity threat hunting",
-        "blockchain beyond crypto 2026",
-        "nanotechnology in medicine",
-        "6G network release and edge computing",
-        "smart cities and digital twins"
+        "artificial intelligence future tech", "quantum computing breakthroughs 2026",
+        "neuralink brain computer interface", "humanoid robots boston dynamics",
+        "biotechnology longevity research", "autonomous vehicles level 5",
+        "nanotechnology in medicine", "6G network release", "smart cities"
     ]
     query = random.choice(topics)
     print(f"📡 Researching topic: {query}")
-    
     import urllib.parse
     encoded_query = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded_query}+when:1d&hl=en-US&gl=US&ceid=US:en"
-    
     try:
         feed = feedparser.parse(url)
-        items = []
-        for entry in feed.entries[:5]: # Take top 5
-            items.append({"title": entry.title, "link": entry.link})
+        items = [{"title": entry.title, "link": entry.link} for entry in feed.entries[:5]]
         print(f"✅ Found {len(items)} news items.")
         return items
     except Exception as e:
@@ -70,218 +47,165 @@ def get_latest_tech_news():
         return []
 
 def get_page_content(url):
-    """
-    BROWSING: Extracts text from a web page to understand the 'mindset'.
-    """
+    """Extracts text from a web page"""
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+        headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
-        for s in soup(["script", "style"]):
-            s.decompose()
-        text = soup.get_text(separator=' ')
-        return " ".join(text.split())[:3000] # Cleaned text, max 3k chars
+        for s in soup(["script", "style"]): s.decompose()
+        return " ".join(soup.get_text(separator=' ').split())[:3000]
     except Exception as e:
         print(f"⚠️ Failed to browse {url}: {e}")
         return ""
 
 def run_daily_research(style="impact"):
-    """
-    DEEP RESEARCH: News -> Browsing -> LLM Insight
-    Style: 'impact' (Default) or 'cartoon' (Fun/3D)
-    """
-    print(f"🧠 Starting DEEP RESEARCH (Browsing + Sentiment Analysis) [Style: {style.upper()}]...")
+    """Deep research with failover between OpenAI and Gemini"""
+    print(f"🧠 Starting DEEP RESEARCH (Style: {style.upper()}) [Strategy: Multi-Model]")
     news = get_latest_tech_news()
-    
-    if not news:
-        return None
+    if not news: return None
         
-    research_context = ""
-    for item in news[:2]: # Browse top 2 links
+    context = ""
+    for item in news[:2]:
         print(f"🔍 Browsing: {item['title']}...")
-        content = get_page_content(item['link'])
-        research_context += f"TOPIC: {item['title']}\nCONTENT: {content}\n\n"
+        context += f"TOPIC: {item['title']}\nCONTENT: {get_page_content(item['link'])}\n\n"
 
-    print("🧠 Analyzing human mindset shifts and generating viral script...")
-    
-    # Style-Specific Prompts
-    if style == "cartoon":
-        style_prompt = """
-        2. Create a FUN, PLAYFUL, and EXCITING script in RUSSIAN.
-           - Tone: Enthusiastic, like a Pixar movie intro or a energetic YouTuber.
-           - Focus: Wonder, magic of tech, fun possibilities.
-           - Style: Simple words, lots of energy!
-        3. The script should be formatted for 15 scenes.
-        4. Provide 15 visual keywords:
-           - MUST include: "3d render", "cartoon style", "cute", "colorful", "animation".
-           - Avoid realistic terms.
-        """
-    else:
-        style_prompt = """
-        2. Create a high-energy, futuristic script in RUSSIAN (Impact Vision style).
-           - Tone: Epic, deep, motivational.
-        3. The script should be formatted for 15 scenes.
-        4. Provide 15 cinematic image keywords for Pexels (e.g. "cinematic 4k", "dark moody", "cyberpunk").
-        """
+    style_prompt = f"""
+    Tone: {'Enthusiastic, Pixar-like, fun' if style == 'cartoon' else 'Epic, deep, motivational'}.
+    Language: RUSSIAN. Length: 15 scenes.
+    Keywords: {'3d render, cartoon style, cute, colorful, animation' if style == 'cartoon' else 'cinematic 4k, futuristic, high quality'}.
+    """
     
     prompt = f"""
-    Analyze the following tech news and the deep content from the pages:
-    {research_context}
-    
-    Your task:
-    1. Identify the most impactful 'vibe' or 'mindset shift' this technology brings.
+    Context: {context}
+    Task: Viral RUSSIAN script for 15 scenes + 15 keywords.
     {style_prompt}
-    
-    CRITICAL: The "script_ru" must be a clean narration. 
-    DO NOT include labels like "Scene 1:", "Narrator:", or "Action:". 
-    ONLY the words to be spoken. Use "..." for brief pauses.
-    
-    Format output as JSON:
-    {{
-        "selected_topic": "Dynamic Title",
-        "description": "Short social media description",
-        "script_ru": "Full text with ... pauses",
-        "scenes": [
-            {{"image": "scene_1", "keyword": "cinematic keyword"}},
-            ... up to 15
-        ]
-    }}
+    CRITICAL: No scene labels. No "Scene 1:". ONLY spoken words. Use "..." for pauses.
+    Format: JSON {{"selected_topic": "", "description": "", "script_ru": "", "scenes": [{{"image": "scene_1", "keyword": ""}}]}}
     """
     
+    data = None
+    # Strategy 1: OpenAI
     try:
-        response = get_client().chat.completions.create(
+        print("🤖 Attempting Research via OpenAI (GPT-4)...")
+        res = get_client().chat.completions.create(
             model="gpt-4-turbo",
-            messages=[{"role": "system", "content": "You are a master content strategist and AI trend researcher. Return ONLY a JSON object."},
-                      {"role": "user", "content": prompt}]
+            messages=[{"role": "system", "content": "Return ONLY JSON."}, {"role": "user", "content": prompt}]
         )
-        # Handle both JSON mode and text response
-        content = response.choices[0].message.content
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0].strip()
+        content = res.choices[0].message.content
+        if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
         data = json.loads(content)
-        
-        # Vibranium Double-Safety Cleanup: Remove "Сцена X:", "Scene X:", "Narrator:", etc.
-        import re
-        script = data.get('script_ru', '')
-        script = re.sub(r'(?i)(сцена|scene|кадр|shot)\s*\d+[:.-]*\s*', '', script)
-        script = re.sub(r'(?i)(диктор|narrator|вокал|voiceover)[:.-]*\s*', '', script)
-        data['script_ru'] = script.strip()
-        
-        return data
     except Exception as e:
-        print(f"❌ LLM Deep Research failed: {e}")
-        return None
+        print(f"⚠️ OpenAI Research failed: {e}. Falling back to Gemini...")
+        
+    # Strategy 2: Gemini Fallback
+    if not data:
+        try:
+            print("🌠 Attempting Research via Gemini...")
+            import google.generativeai as genai
+            genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            res = model.generate_content(prompt)
+            content = res.text
+            if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
+            data = json.loads(content)
+        except Exception as e:
+            print(f"❌ All Research models failed: {e}")
+            return None
 
-def translate_to_hebrew(text):
-    """
-    High-quality translation to Hebrew for the Weekly Special.
-    """
-    try:
-        response = get_client().chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "Translate the following futuristic script to HEBREW. Maintain the 'Impact Vision' energy. Return ONLY text."},
-                      {"role": "user", "content": text}]
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        print(f"❌ Hebrew translation failed: {e}")
-        return "העתיד כבר כאן. בינה מלאכותית משנה את העולם."
-def translate_to_english(text):
-    """
-    High-quality translation to English for the Weekly Special.
-    """
-    try:
-        response = get_client().chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "Translate the following futuristic script to ENGLISH. Maintain the 'Impact Vision' energy. Return ONLY text."},
-                      {"role": "user", "content": text}]
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        print(f"❌ English translation failed: {e}")
-        return "The future is here. AI is transforming the world."
+    # Strict Scene Label Cleanup
+    script = data.get('script_ru', '')
+    script = re.sub(r'(?i)(сцена|scene|кадр|shot|narrator|диктор|voiceover)\s*\d*[:.-]*\s*', '', script)
+    data['script_ru'] = script.strip()
+    return data
 
 def generate_dalle_assets(scenes, output_dir: Path):
-    """
-    DALL-E 3 Image generation for the 'Cartoon' look.
-    """
-    print(f"🎨 Generating {len(scenes)} ORIGINAL CARTOON ASSETS via DALL-E 3...")
+    """DALL-E 3 Image generation"""
+    print(f"🎨 Trying DALL-E 3 for {len(scenes)} scenes...")
     resolved = []
     client = get_client()
-
-    for i, scene in enumerate(scenes):
+    for s in scenes:
         try:
-            prompt = f"3D animation style, Pixar inspired, high quality, vibrant colors, {scene['keyword']}. Vertical 9:16 aspect ratio focus."
-            
-            response = client.images.generate(
-                model="dall-e-3",
-                prompt=prompt,
-                size="1024x1792", # Portrait mode for Reels
-                quality="standard",
-                n=1
-            )
-            
-            img_url = response.data[0].url
-            img_data = requests.get(img_url).content
-            path = output_dir / f"{scene['image']}.jpg"
-            with open(path, "wb") as f:
-                f.write(img_data)
-            
-            scene["resolved_path"] = str(path)
-            resolved.append(scene)
-            print(f"   ✅ DALL-E Asset ready: {scene['image']}")
-        except Exception as e:
-            print(f"   ⚠️ DALL-E Asset failed for {scene['keyword']}: {e}")
-            # FALLBACK to Pexels with Cartoon Keywords
-            print(f"   🔄 Falling back to Pexels (Cartoon variant) for {scene['keyword']}...")
-            try:
-                # Augment keyword for cartoon style on Pexels
-                orig_kw = scene['keyword']
-                scene['keyword'] = f"cartoon illustration animation {orig_kw}"
-                pexels_assets = generate_vision_assets([scene], output_dir, style="impact")
-                if pexels_assets:
-                    resolved.append(pexels_assets[0])
-                    print(f"   ✅ Pexels Fallback ready: {scene['image']}")
-                else:
-                    # Final fallback: just try the original keyword on Pexels
-                    scene['keyword'] = orig_kw
-                    pexels_assets = generate_vision_assets([scene], output_dir, style="impact")
-                    if pexels_assets:
-                        resolved.append(pexels_assets[0])
-            except:
-                pass
-            
+            prompt = f"3D animation style, Pixar inspired, high quality, vibrant colors, VERTICAL 9:16, {s['keyword']}"
+            res = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1792", n=1)
+            img_data = requests.get(res.data[0].url).content
+            path = output_dir / f"{s['image']}.jpg"
+            with open(path, "wb") as f: f.write(img_data)
+            s["resolved_path"] = str(path)
+            resolved.append(s)
+            print(f"   ✅ DALL-E: {s['image']}")
+        except Exception as e: print(f"   ⚠️ DALL-E failed: {e}")
+    return resolved
+
+def generate_banana_assets(scenes, output_dir: Path):
+    """Banana.dev Image generation"""
+    api_key = os.getenv("BANANA_API_KEY")
+    if not api_key: return []
+    print(f"🍌 Trying Banana.dev for {len(scenes)} scenes...")
+    import banana_dev as banana
+    resolved = []
+    model_key = os.getenv("BANANA_MODEL_KEY", "stable-diffusion-xl")
+    for s in scenes:
+        try:
+            inputs = {"prompt": f"Cartoon style, 3d animation, vibrant, vertical, {s['keyword']}"}
+            res = banana.run(api_key, model_key, inputs)
+            img_b64 = res["modelOutputs"][0]["image_base64"]
+            path = output_dir / f"{s['image']}.jpg"
+            import base64
+            with open(path, "wb") as f: f.write(base64.b64decode(img_b64))
+            s["resolved_path"] = str(path)
+            resolved.append(s)
+            print(f"   ✅ Banana: {s['image']}")
+        except Exception as e: print(f"   ⚠️ Banana failed: {e}")
+    return resolved
+
+def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
+    """Pexels search with style-augmented keywords"""
+    print(f"🎬 Trying Pexels ({style}) for {len(scenes)} scenes...")
+    resolved = []
+    for s in scenes:
+        try:
+            kw = s['keyword']
+            if style == "cartoon": kw = f"cartoon illustration animation {kw}"
+            url = f"https://api.pexels.com/v1/search?query={kw}&per_page=1&orientation=portrait"
+            res = requests.get(url, headers={"Authorization": PEXELS_API_KEY}).json()
+            if res.get("photos"):
+                img_data = requests.get(res["photos"][0]["src"]["large2x"]).content
+                path = output_dir / f"{s['image']}.jpg"
+                with open(path, "wb") as f: f.write(img_data)
+                s["resolved_path"] = str(path)
+                resolved.append(s)
+                print(f"   ✅ Pexels: {s['image']}")
+        except Exception as e: print(f"   ⚠️ Pexels failed: {e}")
     return resolved
 
 def generate_vision_assets(scenes, output_dir: Path, style="impact"):
-    """
-    Pexels Image/Video or DALL-E asset generation based on style.
-    """
-    if style == "cartoon":
-        return generate_dalle_assets(scenes, output_dir)
-        
-    print(f"🎨 Generating {len(scenes)} visual assets via Pexels...")
-    resolved = []
+    """💎 THE ORCHESTRATOR: Parries between all providers"""
+    if style != "cartoon":
+        return generate_pexels_assets(scenes, output_dir, style="impact")
+
+    print("🚀 VIBRANIUM CARTOON PIPELINE: Multi-Model Parrying Active")
+    # Step 1: DALL-E
+    resolved = generate_dalle_assets(scenes, output_dir)
+    if len(resolved) == len(scenes): return resolved
     
-    for scene in scenes:
-        try:
-            url = "https://api.pexels.com/v1/search"
-            headers = {"Authorization": PEXELS_API_KEY}
-            params = {"query": scene["keyword"], "per_page": 1, "orientation": "portrait"}
-            
-            res = requests.get(url, headers=headers, params=params)
-            data = res.json()
-            
-            if data.get("photos"):
-                img_url = data["photos"][0]["src"]["large2x"]
-                img_data = requests.get(img_url).content
-                path = output_dir / f"{scene['image']}.jpg"
-                with open(path, "wb") as f:
-                    f.write(img_data)
-                scene["resolved_path"] = str(path)
-                resolved.append(scene)
-                print(f"   ✅ Asset ready: {scene['image']}")
-        except Exception as e:
-            print(f"   ⚠️ Asset failed for {scene['keyword']}: {e}")
-            
+    # Step 2: Banana (if missing)
+    missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
+    if missing: resolved.extend(generate_banana_assets(missing, output_dir))
+        
+    # Step 3: Pexels Cartoon (if still missing)
+    missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
+    if missing: resolved.extend(generate_pexels_assets(missing, output_dir, style="cartoon"))
+        
     return resolved
+
+def translate_to_hebrew(text):
+    try:
+        res = get_client().chat.completions.create(model="gpt-4o", messages=[{"role": "system", "content": "Translate to HEBREW. Return ONLY text."}, {"role": "user", "content": text}])
+        return res.choices[0].message.content
+    except: return "העתיд כבר כאן."
+
+def translate_to_english(text):
+    try:
+        res = get_client().chat.completions.create(model="gpt-4o", messages=[{"role": "system", "content": "Translate to ENGLISH. Return ONLY text."}, {"role": "user", "content": text}])
+        return res.choices[0].message.content
+    except: return "The future is here."
