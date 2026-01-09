@@ -68,10 +68,15 @@ echo "📌 [6/7] Верификация работы сервисов..."
 sleep 5 # Даем время на запуск
 tailscale ssh gonya@100.110.209.49 "
     echo '--- Проверка Docker ---'
-    docker ps | grep ai_telegram_bot || (echo '❌ БОТ НЕ ЗАПУСТИЛСЯ!' && exit 1)
+    # Ищем контейнер по образу, так как имя теперь динамическое
+    CONT_ID=\$(docker ps -q --filter ancestor=ai-telegram-bot:local)
+    if [ -z \"\$CONT_ID\" ]; then
+        echo '❌ БОТ НЕ ЗАПУСТИЛСЯ!' && exit 1
+    fi
+    echo \"✅ Бот запущен (ID: \$CONT_ID)\"
     
     echo '--- Проверка Логов на ошибки ---'
-    if docker logs ai_telegram_bot 2>&1 | grep -i 'ValueError\|Error\|Exception' | tail -n 10 | grep .; then
+    if docker logs \$CONT_ID 2>&1 | grep -i 'ValueError\|Error\|Exception' | tail -n 10 | grep .; then
         echo '⚠️ В логах обнаружены ошибки! Проверьте статус.'
     else
         echo '✅ Ошибок в логах не обнаружено.'
@@ -80,14 +85,16 @@ tailscale ssh gonya@100.110.209.49 "
 
 # 7. MCP УВЕДОМЛЕНИЕ
 echo "📌 [7/7] Отправка рапорта в MCP Mail (Консилиум)..."
-# (Используем OrangeStone как фиксированное имя)
-LAST_COMMITS=$(git log -n 3 --pretty=format:"- %s")
+# Подготовка коммитов для передачи (удаляем кавычки и переносы для безопасности)
+LAST_COMMITS_CLEAN=$(git log -n 3 --pretty=format:"* %s" | tr -d '"' | tr '\n' '; ')
+
 tailscale ssh gonya@100.110.209.49 "
     cd /home/gonya/Unified_System
     ./venv/bin/python3 -c \"
 import requests, os
 URL = 'http://localhost:8765/mcp'
 TOKEN = 'c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb'
+msg_body = '### ✅ Система синхронизирована (Vibranium Mode)\n\n**Правки:** $LAST_COMMITS_CLEAN'
 payload = {
     'jsonrpc': '2.0', 'method': 'tools/call', 'id': 1,
     'params': {
@@ -97,7 +104,7 @@ payload = {
             'sender_name': 'OrangeStone',
             'to': ['PinkLake'],
             'subject': 'SYSTEM STATUS: VIBRANIUM',
-            'body_md': '### ✅ Система синхронизирована и запущена\n\n**Последние правки:**\n$LAST_COMMITS\n\nВсе системы в норме.'
+            'body_md': msg_body
         }
     }
 }
