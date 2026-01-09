@@ -68,6 +68,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    continue-on-error: true
     permissions:
       contents: write
 
@@ -86,4 +87,3 @@ jobs:
           commit_message: "chore: update image tag to ${{ github.sha }}"
           file_pattern: "Projects/AI_Core/k8s/kustomization.yaml"
           branch: main
-
