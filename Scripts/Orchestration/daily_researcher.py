@@ -141,10 +141,110 @@ def run_daily_research(style="impact"):
     data['script_ru'] = script.strip()
     return data
 
+def generate_gemini_images(scenes, output_dir: Path):
+    """💎 Gemini 2.0 Flash Image - FREE Tier 1 (Highest Quality)"""
+    print(f"🌠 Trying Gemini 2.0 Flash Image for {len(scenes)} scenes...")
+    resolved = []
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel("models/gemini-2.0-flash-exp-image-generation")
+        
+        for s in scenes:
+            time.sleep(1.5)
+            try:
+                prompt = f"Create a vibrant 9:16 vertical cartoon-style illustration: {s['keyword']}. Pixar quality, colorful, fun, high detail."
+                response = model.generate_content([prompt])
+                
+                # Gemini returns image data
+                if hasattr(response, 'candidates') and response.candidates:
+                    for part in response.candidates[0].content.parts:
+                        if hasattr(part, 'inline_data'):
+                            img_data = part.inline_data.data
+                            path = output_dir / f"{s['image']}.jpg"
+                            with open(path, "wb") as f:
+                                f.write(img_data)
+                            s["resolved_path"] = str(path)
+                            resolved.append(s)
+                            print(f"   ✅ Gemini: {s['image']}")
+                            break
+            except Exception as e:
+                print(f"   ⚠️ Gemini failed for {s['image']}: {e}")
+    except Exception as e:
+        print(f"❌ Gemini Image setup failed: {e}")
+    return resolved
+
+def generate_flux_images(scenes, output_dir: Path):
+    """⚡ Flux.1 Schnell - FREE Local (Fast & Quality)"""
+    print(f"⚡ Trying Flux.1 Schnell (local) for {len(scenes)} scenes...")
+    resolved = []
+    try:
+        import requests
+        # Check if local Flux server is running
+        flux_url = "http://localhost:8080/generate"
+        
+        for s in scenes:
+            time.sleep(0.5)  # Flux is fast!
+            try:
+                prompt = f"cartoon style, 3d animation, pixar quality, vibrant colors, vertical 9:16 format, {s['keyword']}"
+                response = requests.post(flux_url, json={
+                    "prompt": prompt,
+                    "width": 1080,
+                    "height": 1920,
+                    "num_steps": 4,  # Schnell optimized for 1-4 steps
+                    "guidance": 3.5
+                }, timeout=30)
+                
+                if response.status_code == 200:
+                    path = output_dir / f"{s['image']}.jpg"
+                    with open(path, "wb") as f:
+                        f.write(response.content)
+                    s["resolved_path"] = str(path)
+                    resolved.append(s)
+                    print(f"   ✅ Flux: {s['image']}")
+            except Exception as e:
+                print(f"   ⚠️ Flux failed for {s['image']}: {e}")
+    except Exception as e:
+        print(f"❌ Flux server not available: {e}")
+    return resolved
+
+def generate_sdxl_images(scenes, output_dir: Path):
+    """🎨 Stable Diffusion XL - FREE Local (Backup)"""
+    print(f"🎨 Trying SDXL (local) for {len(scenes)} scenes...")
+    resolved = []
+    try:
+        import requests
+        sdxl_url = "http://localhost:8188/generate"
+        
+        for s in scenes:
+            time.sleep(1.0)
+            try:
+                prompt = f"cartoon illustration, pixar style, 3d render, colorful, vibrant, vertical composition, {s['keyword']}"
+                response = requests.post(sdxl_url, json={
+                    "prompt": prompt,
+                    "negative_prompt": "ugly, blurry, low quality, distorted",
+                    "width": 1080,
+                    "height": 1920,
+                    "steps": 25
+                }, timeout=60)
+                
+                if response.status_code == 200:
+                    path = output_dir / f"{s['image']}.jpg"
+                    with open(path, "wb") as f:
+                        f.write(response.content)
+                    s["resolved_path"] = str(path)
+                    resolved.append(s)
+                    print(f"   ✅ SDXL: {s['image']}")
+            except Exception as e:
+                print(f"   ⚠️ SDXL failed for {s['image']}: {e}")
+    except Exception as e:
+        print(f"❌ SDXL server not available: {e}")
+    return resolved
+
 def generate_dalle_assets(scenes, output_dir: Path):
-    """DALL-E 3 Image generation"""
+    """DALL-E 3 Image generation (PAID FALLBACK)"""
     time.sleep(1.2) # Vibranium Pause
-    print(f"🎨 Trying DALL-E 3 for {len(scenes)} scenes...")
+    print(f"💰 Trying DALL-E 3 for {len(scenes)} scenes (PAID)...")
     resolved = []
     client = get_client()
     for s in scenes:
@@ -206,20 +306,50 @@ def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
     return resolved
 
 def generate_vision_assets(scenes, output_dir: Path, style="impact"):
-    """💎 THE ORCHESTRATOR: Parries between all providers"""
+    """💎 VIBRANIUM TRIPLE-THREAT: Free-First Failover Chain"""
     if style != "cartoon":
         return generate_pexels_assets(scenes, output_dir, style="impact")
 
-    print("🚀 VIBRANIUM CARTOON PIPELINE: Multi-Model Parrying Active")
-    # Step 1: DALL-E
-    resolved = generate_dalle_assets(scenes, output_dir)
-    if len(resolved) == len(scenes): return resolved
+    print("🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Free → Paid Failover")
+    print("   Priority: Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels")
     
-    # Step 2: Banana (if missing)
+    # FREE TIER 1: Gemini 2.0 Flash Image (Best Quality, Free)
+    resolved = generate_gemini_images(scenes, output_dir)
+    if len(resolved) == len(scenes): 
+        print("✅ All images generated via Gemini 2.0 (FREE)")
+        return resolved
+    
+    # FREE TIER 2: Flux.1 Schnell (Fast, Local)
+    missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
+    if missing:
+        flux_results = generate_flux_images(missing, output_dir)
+        resolved.extend(flux_results)
+        if len(resolved) == len(scenes):
+            print("✅ All images completed via Gemini + Flux (FREE)")
+            return resolved
+    
+    # FREE TIER 3: SDXL (Backup, Local)
+    missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
+    if missing:
+        sdxl_results = generate_sdxl_images(missing, output_dir)
+        resolved.extend(sdxl_results)
+        if len(resolved) == len(scenes):
+            print("✅ All images completed via Free Tier (Gemini/Flux/SDXL)")
+            return resolved
+    
+    # PAID TIER 1: DALL-E 3 (if free options exhausted)
+    missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
+    if missing:
+        print(f"⚠️ {len(missing)} images need PAID generation...")
+        dalle_results = generate_dalle_assets(missing, output_dir)
+        resolved.extend(dalle_results)
+        if len(resolved) == len(scenes): return resolved
+    
+    # PAID TIER 2: Banana.dev
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing: resolved.extend(generate_banana_assets(missing, output_dir))
         
-    # Step 3: Pexels Cartoon (if still missing)
+    # FINAL FALLBACK: Pexels Cartoon
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing: resolved.extend(generate_pexels_assets(missing, output_dir, style="cartoon"))
         
