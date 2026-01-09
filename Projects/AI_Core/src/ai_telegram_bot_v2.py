@@ -3013,8 +3013,6 @@ def main():
     application.add_handler(CommandHandler('agent', agent_command))
     application.add_handler(CommandHandler('pipeline', pipeline_command))
     application.add_handler(CommandHandler('img', img_command))
-    application.add_handler(CommandHandler('имаж', img_command))
-    application.add_handler(CommandHandler('картинка', img_command))
     application.add_handler(CommandHandler('image', img_command))
     application.add_handler(CommandHandler('tl', tl_command))
     application.add_handler(CommandHandler('set_key', set_key))
