@@ -206,8 +206,8 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool
         text = text.upper().replace("'", "").replace(":", "").replace("\"", "").replace("\\", "")
         
         # Color: Golden Yellow (0xFFD700)
-        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=120:"
-             f"x=(w-text_w)/2:y=(h-text_h)/2+50:borderw=5:bordercolor=black:"
+        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=80:"
+             f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
              f"enable='between(t,{start},{end})'")
         filters.append(f)
         
