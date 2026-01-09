@@ -22,7 +22,7 @@ from insta_uploader import upload_reel
 import subprocess
 
 # Configuration
-REELS_AUTO_UPLOAD = True
+REELS_AUTO_UPLOAD = False  # 🧪 TEST MODE: Disabled for quality review
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
 def agent_sync(msg):
