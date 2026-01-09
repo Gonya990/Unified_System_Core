@@ -11,6 +11,8 @@ x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
     - ./conversations:/app/conversations
     - ./config:/app/config
     - ./data:/app/data
+    - ../../config/users.yaml:/app/config/users.yaml
+    - ../../config/resources.yaml:/app/config/resources.yaml
     - ./config/gmail_credentials.json:/app/config/gmail_credentials.json
     - ./gcp-service-account.json:/app/gcp-service-account.json:ro
   environment:
