@@ -9,5 +9,8 @@ if [ ! -d "$MAIL_DIR" ]; then
     exit 1
 fi
 
+# Set known token for Vibranium System compatibility
+export HTTP_BEARER_TOKEN="c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+
 cd "$MAIL_DIR" || exit 1
 bash scripts/run_server_with_token.sh "$@"
