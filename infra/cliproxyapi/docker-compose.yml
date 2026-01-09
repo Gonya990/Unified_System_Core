@@ -1,0 +1,30 @@
+services:
+  cliproxy:
+    image: eceasy/cli-proxy-api:latest
+    container_name: cliproxyapi
+    restart: unless-stopped
+    ports:
+      - "8317:8317"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./auth_db:/root/.cli-proxy-api:rw
+    environment:
+      - TZ=UTC
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: cliproxy_watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup --label-enable
+    environment:
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=true
+
+networks:
+  default:
+    name: centralized_net
+    external: true

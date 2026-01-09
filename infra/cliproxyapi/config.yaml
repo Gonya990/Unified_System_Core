@@ -1,0 +1,12 @@
+host: "0.0.0.0"
+port: 8317
+
+# TLS Configuration (Disabled by default for internal proxy)
+tls:
+  enable: false
+  cert: ""
+  key: ""
+
+# Auth Storage
+# Mapping /root/.cli-proxy-api to a volume in docker-compose ensures persistence
+# The tool typically uses a local DB or file structure by default.
