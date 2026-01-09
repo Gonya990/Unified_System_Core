@@ -136,10 +136,13 @@ def run_factory_production(mode="daily"):
 
     print(f"🏭 RUN: {day_str} | MODE: {mode.upper()}")
     
-    # PHASE 1: DAILY RESEARCH
-    agent_sync(f"Начинаю фазу исследования для режима: {mode}")
+    # PHASE 1. RESEARCH
+    agent_sync(f"🔍 Запускаю исследование (Mode: {mode})...")
+    
+    style = "cartoon" if mode == "cartoon" else "impact"
+    
     try:
-        content_data = run_daily_research()
+        content_data = run_daily_research(style=style)
         if not content_data:
             agent_sync("Исследование не дало результатов, использую Fallback")
             content_data = get_static_fallback()
@@ -168,6 +171,10 @@ def run_factory_production(mode="daily"):
         script = content_data['script_en']
         lang = "en"
         prefix = "weekly_en"
+    elif mode == "cartoon":
+        script = content_data['script_ru']
+        lang = "ru"
+        prefix = "cartoon_daily"
     else:
         script = content_data['script_ru']
         lang = "ru"
@@ -213,6 +220,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Content Farm Scheduler')
     parser.add_argument('--hebrew', action='store_true', help='Force Hebrew weekly special')
     parser.add_argument('--english', action='store_true', help='Force English weekly special')
+    parser.add_argument('--cartoon', action='store_true', help='Force Cartoon/Animation daily mode')
     parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
     
     args = parser.parse_args()
@@ -220,6 +228,7 @@ if __name__ == "__main__":
     mode = "daily"
     if args.hebrew: mode = "hebrew"
     elif args.english: mode = "english"
+    elif args.cartoon: mode = "cartoon"
     elif args.auto: mode = "auto"
     
     run_factory_production(mode=mode)

@@ -84,11 +84,12 @@ def get_page_content(url):
         print(f"⚠️ Failed to browse {url}: {e}")
         return ""
 
-def run_daily_research():
+def run_daily_research(style="impact"):
     """
     DEEP RESEARCH: News -> Browsing -> LLM Insight
+    Style: 'impact' (Default) or 'cartoon' (Fun/3D)
     """
-    print("🧠 Starting DEEP RESEARCH (Browsing + Sentiment Analysis)...")
+    print(f"🧠 Starting DEEP RESEARCH (Browsing + Sentiment Analysis) [Style: {style.upper()}]...")
     news = get_latest_tech_news()
     
     if not news:
@@ -102,15 +103,33 @@ def run_daily_research():
 
     print("🧠 Analyzing human mindset shifts and generating viral script...")
     
+    # Style-Specific Prompts
+    if style == "cartoon":
+        style_prompt = """
+        2. Create a FUN, PLAYFUL, and EXCITING script in RUSSIAN.
+           - Tone: Enthusiastic, like a Pixar movie intro or a energetic YouTuber.
+           - Focus: Wonder, magic of tech, fun possibilities.
+           - Style: Simple words, lots of energy!
+        3. The script should be formatted for 15 scenes.
+        4. Provide 15 visual keywords:
+           - MUST include: "3d render", "cartoon style", "cute", "colorful", "animation".
+           - Avoid realistic terms.
+        """
+    else:
+        style_prompt = """
+        2. Create a high-energy, futuristic script in RUSSIAN (Impact Vision style).
+           - Tone: Epic, deep, motivational.
+        3. The script should be formatted for 15 scenes.
+        4. Provide 15 cinematic image keywords for Pexels (e.g. "cinematic 4k", "dark moody", "cyberpunk").
+        """
+    
     prompt = f"""
     Analyze the following tech news and the deep content from the pages:
     {research_context}
     
     Your task:
     1. Identify the most impactful 'vibe' or 'mindset shift' this technology brings.
-    2. Create a high-energy, futuristic script in RUSSIAN (Impact Vision style).
-    3. The script should be formatted for 15 scenes.
-    4. Provide 15 cinematic image keywords for Pexels.
+    {style_prompt}
     
     Format output as JSON:
     {{
