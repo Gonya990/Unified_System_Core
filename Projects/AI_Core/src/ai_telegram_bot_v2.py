@@ -59,7 +59,7 @@ except ImportError:
     GMAIL_AVAILABLE = False
 
 try:
-    from notion_client import NotionClient
+    from notion_service import NotionClient
     notion_client = NotionClient()
 except ImportError:
     notion_client = None
