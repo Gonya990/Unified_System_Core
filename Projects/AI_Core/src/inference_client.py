@@ -303,28 +303,57 @@ class InferenceClient:
                 if response.status != 200:
                     error_text = await response.text()
                     logger.error(f"[{provider}] Error {response.status}: {error_text}")
+                    
+                    # --- VIBRANIUM FAILOVER (Ollama only) ---
+                    if provider == "ollama" and "100.127.194.111" in url:
+                        logger.warning("⚠️ Windows Node failed. Falling back to Linux Node...")
+                        alt_url = url.replace("100.127.194.111", "host.docker.internal")
+                        async with session.post(alt_url, json=payload, headers=headers, timeout=timeout) as alt_resp:
+                            if alt_resp.status == 200:
+                                data = await alt_resp.json()
+                                return self._parse_generic_response(data)
+                    elif provider == "ollama" and "host.docker.internal" in url:
+                        logger.warning("⚠️ Linux Node failed. Falling back to Windows Node...")
+                        alt_url = url.replace("host.docker.internal", "100.127.194.111")
+                        async with session.post(alt_url, json=payload, headers=headers, timeout=timeout) as alt_resp:
+                            if alt_resp.status == 200:
+                                data = await alt_resp.json()
+                                return self._parse_generic_response(data)
+                                
                     return f"[Error {response.status}]: {provider} failed", usage
                 
                 data = await response.json()
-                
-                # Parse
-                if "choices" in data:
-                    text = data["choices"][0]["message"]["content"]
-                    if "usage" in data: usage = data["usage"]
-                    return text, usage
-                elif "message" in data:
-                    text = data["message"]["content"]
-                    if "prompt_eval_count" in data:
-                         usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
-                         usage["completion_tokens"] = data.get("eval_count", 0)
-                         usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
-                    return text, usage
-                else:
-                    return str(data), usage
+                return self._parse_generic_response(data)
                     
         except Exception as e:
             logger.error(f"[{provider}] Exception: {e}")
+            # Final attempt failover on exception
+            if provider == "ollama":
+                try:
+                    alt_url = "http://host.docker.internal:11434/api/chat" if "100.127.194.111" in url else "http://100.127.194.111:11434/api/chat"
+                    logger.warning(f"🔄 Exception Failover to: {alt_url}")
+                    async with session.post(alt_url, json=payload, headers=headers, timeout=timeout) as alt_resp:
+                        if alt_resp.status == 200:
+                            data = await alt_resp.json()
+                            return self._parse_generic_response(data)
+                except: pass
             return f"[Error]: {str(e)}", usage
+
+    def _parse_generic_response(self, data: dict) -> tuple[str, dict]:
+        """Helper to parse API responses into standardized (text, usage) tuple."""
+        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        if "choices" in data:
+            text = data["choices"][0]["message"]["content"]
+            if "usage" in data: usage = data["usage"]
+            return text, usage
+        elif "message" in data:
+            text = data["message"]["content"]
+            if "prompt_eval_count" in data:
+                 usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
+                 usage["completion_tokens"] = data.get("eval_count", 0)
+                 usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
+            return text, usage
+        return str(data), usage
     
     async def _chat_gemini(self, messages: list[dict], system_prompt: str = "") -> tuple[str, dict]:
         """Handle Gemini API calls using the SDK."""
