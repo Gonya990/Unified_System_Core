@@ -65,6 +65,8 @@ homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
+from .modules.proxmox_manager import ProxmoxManager # We'll need to move/import this
+proxmox = ProxmoxManager()
 
 # Init Gmail Client - only if running as main or when needed
 gmail_client = None
@@ -722,6 +724,43 @@ async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     else:
         await update.message.reply_text(f"Unknown HA command: {cmd}")
+
+
+@require_auth
+async def cmd_play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /play command - switch to Gaming Mode."""
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("⛔ Только Администратор может переключать режимы GPU.")
+        return
+
+    await update.message.reply_text("🎮 **Запуск игрового режима...**\nОстанавливаю AI, запускаю Windows. Это займет ~60 секунд.")
+    
+    try:
+        # Run in executor to avoid blocking the bot
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, proxmox.switch_to_gaming)
+        await update.message.reply_text("✅ **Игровой режим готов!** Приятной игры.")
+    except Exception as e:
+        logger.error(f"Failed to switch to gaming: {e}")
+        await update.message.reply_text(f"❌ Ошибка переключения: {e}")
+
+
+@require_auth
+async def cmd_stop_play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /stop_play command - return to AI Mode."""
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("⛔ Только Администратор может переключать режимы GPU.")
+        return
+
+    await update.message.reply_text("🧠 **Возвращаю ресурсы в AI...**\nВыключаю Windows, запускаю AI-сервисы.")
+    
+    try:
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, proxmox.switch_to_ai)
+        await update.message.reply_text("✅ **AI Mode активен.** Консилиум снова в сборе.")
+    except Exception as e:
+        logger.error(f"Failed to switch to AI: {e}")
+        await update.message.reply_text(f"❌ Ошибка переключения: {e}")
 
 
 @require_auth
@@ -2318,6 +2357,8 @@ def main() -> None:
     application.add_handler(CommandHandler("notify", cmd_notify))
     application.add_handler(CommandHandler("update", cmd_update))
     application.add_handler(CommandHandler("scan", cmd_scan))
+    application.add_handler(CommandHandler("play", cmd_play))
+    application.add_handler(CommandHandler("stop_play", cmd_stop_play))
     application.add_handler(CommandHandler("speak", cmd_speak))
     application.add_handler(CommandHandler("note", cmd_note))
     application.add_handler(CommandHandler("health", cmd_health))
