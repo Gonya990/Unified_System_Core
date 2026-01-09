@@ -9,8 +9,14 @@ import aiohttp
 
 try:
     from .config_manager import ConfigManager
+    from .modules.swarm_manager import SwarmManager
 except ImportError:
     from config_manager import ConfigManager
+    try:
+        from modules.swarm_manager import SwarmManager
+    except ImportError:
+        # Fallback for direct testing
+        SwarmManager = None
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +53,13 @@ class InferenceClient:
         self.config = config
         self._session: Optional[aiohttp.ClientSession] = None
         self._session_api_key: str = ""  # Track the API key used for current session
+        
+        # Initialize Swarm Manager for multi-key support
+        self.swarm = None
+        if SwarmManager:
+            # Use path relative to the bot structure
+            resources_path = Path(__file__).parent.parent / "config" / "resources.yaml"
+            self.swarm = SwarmManager(resources_path=str(resources_path))
     
     @property
     def provider(self) -> str:
@@ -83,6 +96,13 @@ class InferenceClient:
         if provider == "openai":
             return self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY", ""))
         elif provider == "gemini":
+            # 1. Try to get key from Swarm (The Hive)
+            if self.swarm:
+                swarm_key = self.swarm.get_gemini_key()
+                if swarm_key:
+                    return swarm_key
+            
+            # 2. Fallback to single .env key
             return self.config.get("GEMINI_API_KEY", self.config.get("INFERENCE_API_KEY", ""))
         elif provider == "openrouter":
             return self.config.get("OPENROUTER_API_KEY", "")
@@ -444,6 +464,9 @@ class InferenceClient:
             
         except Exception as e:
             logger.exception(f"Gemini error: {e}")
+            if "429" in str(e) or "quota" in str(e).lower():
+                if self.swarm:
+                    self.swarm.mark_key_failed("gemini", self.api_key)
             return f"[Gemini Error]: {str(e)}", usage
             
     async def transcribe_audio(self, file_path: str) -> str:
