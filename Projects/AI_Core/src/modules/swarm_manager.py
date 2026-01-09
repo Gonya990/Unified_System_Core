@@ -50,6 +50,29 @@ class SwarmManager:
         logger.debug(f"Using Gemini key from swarm member: {key_data.get('owner', 'Unknown')}")
         return key_data.get("api_key")
 
+    def add_gemini_key(self, api_key: str, owner: str):
+        """Add a new Gemini key to the pool and persist it."""
+        new_key = {
+            "id": f"key_{random.randint(1000, 9999)}",
+            "owner": owner,
+            "api_key": api_key,
+            "status": "active"
+        }
+        
+        # Load existing data to avoid overwriting other pools
+        data = {"gemini_pool": [], "openai_pool": []}
+        if self.resources_path.exists():
+            with open(self.resources_path, "r") as f:
+                data = yaml.safe_load(f) or data
+        
+        data.setdefault("gemini_pool", []).append(new_key)
+        
+        with open(self.resources_path, "w") as f:
+            yaml.safe_dump(data, f, allow_unicode=True)
+        
+        self.load_resources()
+        return True
+
     def mark_key_failed(self, service: str, api_key: str):
         """Temporarily mark a key as failed (e.g. on 429)."""
         # For now, just log it. In the future, we could add a cooldown timer.

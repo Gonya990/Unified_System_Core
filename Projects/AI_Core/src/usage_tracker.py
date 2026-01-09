@@ -172,3 +172,31 @@ class UsageTracker:
             logger.error(f"Failed to get provider breakdown: {e}")
             return {}
 
+    def get_daily_usage(self, days: int = 7) -> dict:
+        """Get total token usage per day for the last N days."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT 
+                        date(timestamp) as date,
+                        SUM(total_tokens) as tokens
+                    FROM token_usage
+                    WHERE timestamp >= date('now', ?)
+                    GROUP BY date(timestamp)
+                    ORDER BY date ASC
+                """, (f'-{days} days',))
+                
+                dates = []
+                tokens = []
+                for row in cursor.fetchall():
+                    dates.append(row['date'])
+                    tokens.append(row['tokens'])
+                    
+                return {"dates": dates, "tokens": tokens}
+        except Exception as e:
+            logger.error(f"Failed to get daily usage: {e}")
+            return {"dates": [], "tokens": []}
+

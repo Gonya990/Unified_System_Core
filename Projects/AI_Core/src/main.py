@@ -421,29 +421,79 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(f"✅ Model set to: `{model}` ({provider})", parse_mode="Markdown")
 
 
-@require_auth
-async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /usage command - show token stats."""
-    user_id = update.effective_user.id
-    stats = usage_tracker.get_user_stats(user_id)
-    
-    if not stats:
-        await update.message.reply_text("📊 Статистики пока нет.")
-        return
-    
-    msg = (
-        f"📊 **Статистика за 30 дней**\n\n"
-        f"Всего запросов: `{stats['requests']}`\n"
-        f"Токенов всего: `{stats['total_tokens']}`\n"
-        f"Input: `{stats['prompt_tokens']}`\n"
-        f"Output: `{stats['completion_tokens']}`\n\n"
-        f"**По моделям:**\n"
-    )
-    
-    for model, tokens in stats["by_model"].items():
-        msg += f"- `{model}`: {tokens}\n"
-    
     await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+@require_auth
+async def cmd_family_stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /family_stats command - show token consumption for all users (Admin only)."""
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("⛔ Только администратор может видеть общую статистику.")
+        return
+        
+    stats = usage_tracker.get_all_users_stats(days=30)
+    users = stats.get("users", [])
+    
+    if not users:
+        await update.message.reply_text("📊 Статистики семейного роя пока нет.")
+        return
+        
+    msg = "📊 **Статистика Семейного Роя (30 дней)**\n\n"
+    grand_total = 0
+    
+    for u in users:
+        msg += f"👤 {u['username']}: `{u['total_tokens']}` токенов ({u['requests']} зап.)\n"
+        grand_total += u["total_tokens"]
+        
+    msg += f"\n📈 **Всего потрачено:** `{grand_total}` токенов."
+    
+    # Add Swarm health
+    if inference.swarm:
+        swarm_stats = inference.swarm.get_stats()
+        msg += f"\n🐝 **Активных ключей в Рое:** `{swarm_stats['gemini_keys_active']}`"
+        
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+@require_auth
+async def cmd_share_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /share_key <key> - allow a member to contribute a Gemini key to the pool."""
+    if not context.args:
+        await update.message.reply_text(
+            "🔑 **Как поделиться ключом?**\n\n"
+            "1. Получите ключ в [Google AI Studio](https://aistudio.google.com/app/apikey).\n"
+            "2. Отправьте команду: `/share_key ВАШ_КЛЮЧ`.\n\n"
+            "Ваш ключ будет добавлен в семейный Рой и поможет обойти ограничения лимитов!"
+        )
+        return
+        
+    api_key = context.args[0]
+    user_name = update.effective_user.first_name or "Unknown"
+    
+    if not api_key.startswith("AIza"):
+        await update.message.reply_text("❌ Это не похоже на Google API ключ (должен начинаться с AIza).")
+        return
+        
+    if inference.swarm:
+        try:
+            inference.swarm.add_gemini_key(api_key, owner=user_name)
+            await update.message.reply_text(
+                f"🌟 **Спасибо, {user_name}!**\n\n"
+                "Ваш ключ успешно добавлен в Семейный Рой. 🐝\n"
+                "Теперь мощности системы увеличены для всех."
+            )
+            
+            # Notify admin
+            if update.effective_user.id != ADMIN_ID:
+                await context.bot.send_message(
+                    chat_id=ADMIN_ID,
+                    text=f"🐝 **Новый вклад в Рой!**\nПользователь {user_name} добавил свой API ключ."
+                )
+        except Exception as e:
+            logger.error(f"Failed to add shared key: {e}")
+            await update.message.reply_text(f"❌ Ошибка при сохранении ключа: {e}")
+    else:
+        await update.message.reply_text("❌ Swarm Manager не инициализирован.")
 @require_auth
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming photos."""
@@ -2150,7 +2200,9 @@ async def post_init(application: Application) -> None:
     dashboard = DashboardService(port=8096, context={
         "infra": infra_manager,
         "usage": usage_tracker,
-        "notion": notion_client
+        "notion": notion_client,
+        "proxmox": proxmox,
+        "inference": inference
     })
     dashboard.start()
     logger.info("Web Dashboard started on port 8096")
@@ -2359,6 +2411,8 @@ def main() -> None:
     application.add_handler(CommandHandler("scan", cmd_scan))
     application.add_handler(CommandHandler("play", cmd_play))
     application.add_handler(CommandHandler("stop_play", cmd_stop_play))
+    application.add_handler(CommandHandler("family_stats", cmd_family_stats))
+    application.add_handler(CommandHandler("share_key", cmd_share_key))
     application.add_handler(CommandHandler("speak", cmd_speak))
     application.add_handler(CommandHandler("note", cmd_note))
     application.add_handler(CommandHandler("health", cmd_health))
