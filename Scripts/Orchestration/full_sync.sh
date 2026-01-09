@@ -57,6 +57,7 @@ tailscale ssh gonya@100.110.209.49 "
     # Удаляем старые логи перед запуском для чистоты
     # > bot_journal.log || true
     
+    docker rm -f ai_telegram_bot || true
     docker compose --profile local down --remove-orphans || true
     docker compose --profile local build --pull
     docker compose --profile local up -d --force-recreate
