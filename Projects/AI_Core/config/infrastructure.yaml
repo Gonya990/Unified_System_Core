@@ -47,13 +47,21 @@ nodes:
         port: 3389
 
   - id: proxmox
-    name: Proxmox VE
+    name: Proxmox VE (Control)
     fqdn: pve-antigravity-1.tail5e8a72.ts.net
     ip: 100.74.137.122
     type: server
     os: proxmox-ve
     services:
       - name: LXC Containers
+
+  - id: proxmox-gpu
+    name: Proxmox VE (GPU)
+    ip: 100.78.145.67
+    type: server
+    os: proxmox-ve
+    services:
+      - name: Titan RTX Passthrough
 
   - id: unified-home-core-cloud
     name: Cloud Gateway (GCP)
