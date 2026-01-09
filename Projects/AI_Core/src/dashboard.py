@@ -25,15 +25,36 @@ async def read_root(request: Request):
     infra_mgr = bot_context.get("infra")
     infra_data = infra_mgr.data.get("nodes", []) if infra_mgr else []
     
-    # Get Usage Data (Mock for now, or read from DB)
+    # Get Usage Data
     usage_tracker = bot_context.get("usage")
-    stats = usage_tracker.get_user_stats(0) if usage_tracker else "N/A" # 0 = all users if implemented
+    stats = usage_tracker.get_user_stats(0) if usage_tracker else "N/A"
+    
+    # Get GPU/Proxmox Status (Live)
+    proxmox = bot_context.get("proxmox")
+    gpu_status = "N/A"
+    if proxmox:
+        ai_vm_status = proxmox.get_vm_status(106)
+        gaming_vm_status = proxmox.get_vm_status(100)
+        if ai_vm_status == "running":
+            gpu_status = "🧠 AI Cluster (VM 106)"
+        elif gaming_vm_status == "running":
+            gpu_status = "🎮 Gaming (VM 100)"
+        else:
+            gpu_status = "💤 Off"
+
+    # Get Swarm Health
+    inference = bot_context.get("inference")
+    swarm_count = 0
+    if inference and inference.swarm:
+        swarm_count = inference.swarm.get_stats().get("gemini_keys_active", 0)
     
     return templates.TemplateResponse("index.html", {
         "request": request,
         "nodes": infra_data,
         "bot_status": "Online 🟢",
-        "stats": stats
+        "stats": stats,
+        "gpu_status": gpu_status,
+        "swarm_count": swarm_count
     })
 
 @app.get("/logs")
@@ -53,12 +74,7 @@ async def get_token_stats():
     if not usage_tracker:
         return {"dates": [], "tokens": []}
     
-    # Mock data for now (would need to query DB by date)
-    # TODO: Implement daily aggregation in UsageTracker
-    return {
-        "dates": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        "tokens": [1200, 1500, 900, 2100, 1800, 1300, 1600]
-    }
+    return usage_tracker.get_daily_usage(days=7)
 
 @app.get("/search/notes")
 async def search_notes(q: str):

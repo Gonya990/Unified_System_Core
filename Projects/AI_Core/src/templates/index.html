@@ -67,6 +67,17 @@
     <div class="container">
         <h1>🤖 Unified Bot Control Center <span class="status-badge">{{ bot_status }}</span></h1>
 
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div class="card" style="flex: 1; margin-bottom: 0;">
+                <h3 style="margin-top: 0; color: #666;">🕹 GPU Resource</h3>
+                <div style="font-size: 1.2em; font-weight: bold; color: #2d3748;">{{ gpu_status }}</div>
+            </div>
+            <div class="card" style="flex: 1; margin-bottom: 0;">
+                <h3 style="margin-top: 0; color: #666;">🐝 Swarm Health</h3>
+                <div style="font-size: 1.2em; font-weight: bold; color: #38a169;">{{ swarm_count }} Active Gemini Keys</div>
+            </div>
+        </div>
+
         <div class="card">
             <h2>🔎 Search Notes</h2>
             <div style="display: flex; gap: 10px;">
