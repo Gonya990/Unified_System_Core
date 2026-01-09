@@ -171,3 +171,91 @@ class InferenceClient:
     async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""
         return "OpenRouter integration stub", {}
+
+    async def list_models(self):
+        """List available models for the current provider."""
+        provider = self.config.get("INFERENCE_PROVIDER", self.provider)
+        
+        if provider == "ollama":
+            url = f"{self.endpoint}/api/tags"
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            return [m['name'] for m in data.get('models', [])]
+            except Exception as e:
+                logger.error(f"Failed to list Ollama models: {e}")
+            return ["llama3.2", "mistral", "gemma"] # Fallbacks
+            
+        elif provider == "gemini":
+            # Return standard Gemini models
+            return [
+                "gemini-2.0-flash-exp",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro"
+            ]
+        
+        return [self.model]
+
+    async def analyze_image(self, image_path: str, prompt: str):
+        """Analyze image using vision-capable models."""
+        provider = self.config.get("INFERENCE_PROVIDER", self.provider)
+        
+        if provider == "gemini":
+            api_key = self.api_key
+            if self.swarm:
+                swarm_key = self.swarm.get_gemini_key(branch_id="HOME_HQ", project_context="PERSONAL")
+                if swarm_key:
+                    api_key = swarm_key
+            
+            client = _get_gemini_client(api_key)
+            if not client:
+                return "Error: Gemini vision not configured."
+
+            try:
+                import asyncio
+                from google.genai.types import Part
+                
+                with open(image_path, "rb") as f:
+                    image_data = f.read()
+                
+                def call_sdk():
+                    return client.models.generate_content(
+                        model=self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+                        contents=[
+                            Part.from_bytes(data=image_data, mime_type="image/jpeg"),
+                            prompt
+                        ]
+                    )
+                
+                loop = asyncio.get_event_loop()
+                response = await loop.run_in_executor(None, call_sdk)
+                return response.text
+            except Exception as e:
+                logger.error(f"Gemini Vision Error: {e}")
+                return f"Error analyzing image: {e}"
+        
+        return "Vision is currently only supported via Gemini provider."
+
+    async def transcribe_audio(self, audio_path: str):
+        """Transcribe audio to text."""
+        # For now, use Gemini if available as it's multimodal
+        provider = self.config.get("INFERENCE_PROVIDER", self.provider)
+        if provider == "gemini":
+             # Similar to vision, Gemini 1.5/2.0 handles audio
+             return await self.analyze_image(audio_path, "Transcribe this audio exactly.")
+             
+        return "Audio transcription is currently only supported via Gemini provider."
+
+    async def health_check(self) -> bool:
+        """Check if the inference service is reachable."""
+        provider = self.config.get("INFERENCE_PROVIDER", self.provider)
+        if provider == "ollama":
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"{self.endpoint}/api/tags", timeout=5) as resp:
+                        return resp.status == 200
+            except:
+                return False
+        return True # Assume others are OK if configured
