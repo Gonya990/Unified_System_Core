@@ -6,6 +6,7 @@ import json
 import requests
 import random
 import re
+import time
 from bs4 import BeautifulSoup
 from pathlib import Path
 from openai import OpenAI
@@ -120,6 +121,7 @@ def run_daily_research(style="impact"):
 
 def generate_dalle_assets(scenes, output_dir: Path):
     """DALL-E 3 Image generation"""
+    time.sleep(1.2) # Vibranium Pause
     print(f"🎨 Trying DALL-E 3 for {len(scenes)} scenes...")
     resolved = []
     client = get_client()
