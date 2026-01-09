@@ -1,3 +1,6 @@
 [submodule "External_Tools/Stack/mcp_agent_mail"]
 	path = External_Tools/Stack/mcp_agent_mail
 	url = https://github.com/Dicklesworthstone/mcp_agent_mail.git
+[submodule "infra/cliproxyapi/src"]
+	path = infra/cliproxyapi/src
+	url = https://github.com/router-for-me/CLIProxyAPI
