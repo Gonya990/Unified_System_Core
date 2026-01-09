@@ -188,10 +188,47 @@ def translate_to_english(text):
         print(f"❌ English translation failed: {e}")
         return "The future is here. AI is transforming the world."
 
-def generate_vision_assets(scenes, output_dir: Path):
+def generate_dalle_assets(scenes, output_dir: Path):
     """
-    Pexels Image/Video asset generation.
+    DALL-E 3 Image generation for the 'Cartoon' look.
     """
+    print(f"🎨 Generating {len(scenes)} ORIGINAL CARTOON ASSETS via DALL-E 3...")
+    resolved = []
+    client = get_client()
+
+    for i, scene in enumerate(scenes):
+        try:
+            prompt = f"3D animation style, Pixar inspired, high quality, vibrant colors, {scene['keyword']}. Vertical 9:16 aspect ratio focus."
+            
+            response = client.images.generate(
+                model="dall-e-3",
+                prompt=prompt,
+                size="1024x1792", # Portrait mode for Reels
+                quality="standard",
+                n=1
+            )
+            
+            img_url = response.data[0].url
+            img_data = requests.get(img_url).content
+            path = output_dir / f"{scene['image']}.jpg"
+            with open(path, "wb") as f:
+                f.write(img_data)
+            
+            scene["resolved_path"] = str(path)
+            resolved.append(scene)
+            print(f"   ✅ DALL-E Asset ready: {scene['image']}")
+        except Exception as e:
+            print(f"   ⚠️ DALL-E Asset failed for {scene['keyword']}: {e}")
+            
+    return resolved
+
+def generate_vision_assets(scenes, output_dir: Path, style="impact"):
+    """
+    Pexels Image/Video or DALL-E asset generation based on style.
+    """
+    if style == "cartoon":
+        return generate_dalle_assets(scenes, output_dir)
+        
     print(f"🎨 Generating {len(scenes)} visual assets via Pexels...")
     resolved = []
     

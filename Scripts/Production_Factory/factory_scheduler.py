@@ -186,7 +186,7 @@ def run_factory_production(mode="daily"):
     assets_dir.mkdir(parents=True, exist_ok=True)
     
     final_scenes = []
-    assets = generate_vision_assets(content_data.get('scenes', []), assets_dir)
+    assets = generate_vision_assets(content_data.get('scenes', []), assets_dir, style=style)
     for a in assets:
         if a.get('resolved_path'):
             final_scenes.append({"image": a['resolved_path'], "keyword": a['keyword']})
@@ -200,7 +200,7 @@ def run_factory_production(mode="daily"):
     # 4. PRODUCTION
     out_name = f"{prefix}_{day_str.replace('-', '')}"
     try:
-        video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes)
+        video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style)
         
         # 5. UPLOAD
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
