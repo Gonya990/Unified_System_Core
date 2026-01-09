@@ -13,7 +13,7 @@ resources:
 
 images:
   - name: ghcr.io/gonya990/ai-telegram-bot
-    newTag: 2598aa0
+    newTag: 8f56167
 
 commonLabels:
   app.kubernetes.io/part-of: unified-system
