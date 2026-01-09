@@ -32,6 +32,13 @@ class UsageTracker:
                         total_tokens INTEGER
                     )
                 """)
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dashboard_sessions (
+                        token TEXT PRIMARY KEY,
+                        user_id INTEGER,
+                        expires_at DATETIME
+                    )
+                """)
                 conn.commit()
                 logger.info(f"Usage database initialized at {self.db_path}")
         except Exception as e:
@@ -199,4 +206,70 @@ class UsageTracker:
         except Exception as e:
             logger.error(f"Failed to get daily usage: {e}")
             return {"dates": [], "tokens": []}
+
+    def get_user_daily_total(self, user_id: int) -> int:
+        """Get total tokens used by a user today."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT SUM(total_tokens) 
+                    FROM token_usage 
+                    WHERE user_id = ? AND date(timestamp) = date('now')
+                """, (user_id,))
+                res = cursor.fetchone()
+                return res[0] if res and res[0] else 0
+        except Exception as e:
+            logger.error(f"Failed to get daily total for {user_id}: {e}")
+            return 0
+
+    def check_quota(self, user_id: int, role: str) -> tuple[bool, str]:
+        """Check if user has exceeded their daily quota based on role."""
+        TIER_LIMITS = {
+            "CO_CREATOR": float('inf'),
+            "PREMIUM": 500000,
+            "MEMBER": 100000,
+            "GUEST": 10000
+        }
+        
+        limit = TIER_LIMITS.get(role.upper(), 10000) # Default to guest limit
+        if limit == float('inf'):
+            return True, "Unlimited"
+            
+        current_usage = self.get_user_daily_total(user_id)
+        if current_usage >= limit:
+            return False, f"Quota exceeded: {current_usage:,}/{limit:,} tokens used today."
+            
+        return True, f"{current_usage:,}/{limit:,}"
+
+    def create_session(self, user_id: int, expiry_hours: int = 24) -> str:
+        """Create a dashboard session token."""
+        import uuid
+        from datetime import timedelta
+        token = str(uuid.uuid4())
+        expiry = datetime.now() + timedelta(hours=expiry_hours)
+        
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO dashboard_sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+                             (token, user_id, expiry))
+                conn.commit()
+            return token
+        except Exception as e:
+            logger.error(f"Failed to create session for {user_id}: {e}")
+            return None
+
+    def verify_session(self, token: str) -> int:
+        """Verify session token and return user_id if valid."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT user_id FROM dashboard_sessions WHERE token = ? AND expires_at > ?",
+                             (token, datetime.now()))
+                res = cursor.fetchone()
+                return res[0] if res else None
+        except Exception as e:
+            logger.error(f"Failed to verify token {token}: {e}")
+            return None
 
