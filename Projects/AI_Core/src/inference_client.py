@@ -59,12 +59,12 @@ class InferenceClient:
         resources_path = Path(__file__).parent.parent / "config" / "resources.yaml"
         self.swarm = SwarmManager(resources_path) if SwarmManager else None
 
-    async def chat(self, messages: list, system_prompt: Optional[str] = None):
-        """Routed chat request."""
+    async def chat(self, messages: list, system_prompt: Optional[str] = None, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"):
+        """Routed chat request with branch awareness."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
         
         if provider == "gemini":
-            return await self._chat_gemini(messages, system_prompt)
+            return await self._chat_gemini(messages, system_prompt, branch_id, project_context)
         elif provider == "openai":
             return await self._chat_openai(messages, system_prompt)
         elif provider == "openrouter":
@@ -72,13 +72,13 @@ class InferenceClient:
         else:
             return await self._chat_ollama(messages, system_prompt)
 
-    async def _chat_gemini(self, messages: list, system_prompt: Optional[str] = None):
-        """Gemini SDK integration with Swarm support."""
+    async def _chat_gemini(self, messages: list, system_prompt: Optional[str] = None, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"):
+        """Gemini SDK integration with Swarm support and branch isolation."""
         api_key = self.api_key
         
         # Priority: Swarm Key -> Config Key
         if self.swarm:
-            swarm_key = self.swarm.get_gemini_key()
+            swarm_key = self.swarm.get_gemini_key(branch_id=branch_id, project_context=project_context)
             if swarm_key:
                 api_key = swarm_key
                 
