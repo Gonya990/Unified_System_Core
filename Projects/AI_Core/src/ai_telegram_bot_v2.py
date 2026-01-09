@@ -1010,12 +1010,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
              ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"❌ _(HA недоступен)_")
 
     # 3. DIRECT MESSAGING (Telegram)
-    msg_matches = re.findall(r'\[\[RUN:MSG:(.*?):(.*?)\]\]', ai_response)
-    for target_name, msg_text in msg_matches:
+    # Fix: Use finditer to handle replacements correctly regardless of separators
+    msg_matches = list(re.finditer(r'\[\[RUN:MSG:([^,:]+)[,:]\s*(.*?)\]\]', ai_response))
+    for match in msg_matches:
+        full_tag = match.group(0)
+        target_name = match.group(1).strip()
+        msg_text = match.group(2).strip()
+        
         target_id = None
         
         # Resolve target
-        target_clean = target_name.strip().lower().lstrip('@')
+        target_clean = target_name.lower().lstrip('@')
         if target_clean.isdigit():
             target_id = int(target_clean)
         elif target_clean in USER_ALIASES:
@@ -1023,7 +1028,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             # Fallback scan DB for username
             try:
-                # get_inactive_users(hours=0) should return all users if DB isn't empty
                 all_users = db.get_inactive_users(hours=0) 
                 for u in all_users:
                     if u.get('username', '').lower() == target_clean:
@@ -1041,13 +1045,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n{msg_text}",
                     parse_mode='Markdown'
                 )
-                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"✅ _(Отправлено {target_name})_")
+                ai_response = ai_response.replace(full_tag, f"✅ _(Отправлено {target_name})_")
                 logger.info(f"[MSG] AI forwarded message from {user_id} to {target_id}")
             except Exception as e:
-                ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Ошибка отправки пользователю {target_name}: {e})_")
+                ai_response = ai_response.replace(full_tag, f"❌ _(Ошибка отправки {target_name}: {e})_")
                 logger.error(f"[MSG] AI failed to forward message to {target_id}: {e}")
         else:
-            ai_response = ai_response.replace(f"[[RUN:MSG:{target_name}:{msg_text}]]", f"❌ _(Пользователь {target_name} не найден)_")
+            ai_response = ai_response.replace(full_tag, f"❌ _(Пользователь {target_name} не найден)_")
             logger.warning(f"[MSG] Could not resolve target: {target_name}")
 
     conv_manager.add_message(user_id, "assistant", ai_response)
