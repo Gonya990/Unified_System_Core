@@ -1,46 +1,64 @@
-# CLIProxyAPI Infrastructure
+# CLIProxyAPI Deployment & Initialization Guide
 
-Centralized proxy and authentication management for AI services.
+This guide details how to deploy and initialize the centralized CLIProxyAPI on a Docker host.
 
-## Architecture
+## 📋 Prerequisites
+- Docker Engine installed
+- Docker Compose installed (or `docker compose` plugin)
+- Internet access (to pull images)
 
-- **Primary Service**: `cliproxyapi` (Writer)
-  - Handles authentication, key rotation, and proxying requests.
-  - Stores credentials in `./auth_db` (mapped to `/root/.cli-proxy-api`).
-- **Auto-Update**: `watchtower`
-  - Checks for updates to `eceasy/cli-proxy-api` every hour.
-  - Automatically restarts the service with the new image.
+## 🚀 Installation & Initialization
 
-## Directory Structure
-
-```
-infra/cliproxyapi/
-├── docker-compose.yml  # Service definition
-├── config.yaml         # App configuration
-└── auth_db/            # Persisted auth storage (SQLite/JSON)
+### 1. Prepare Directory
+Ensure you are in the directory containing the `docker-compose.yml` and `config.yaml`:
+```bash
+cd infra/cliproxyapi
 ```
 
-## Setup
+### 2. Create Network
+Create the shared network for your AI services if it doesn't exist:
+```bash
+docker network create centralized_net || true
+```
 
-1. **Network**: Ensure `centralized_net` exists:
-   ```bash
-   docker network create centralized_net || true
-   ```
+### 3. Initialize Authentication (CRITICAL STEP)
+Before starting the server for the first time, you must authenticate your accounts (OpenAI, Claude, Gemini, etc.).
+Run the login wizard using an ephemeral container that mounts your local `auth_db` folder. This prevents database locking issues.
 
-2. **Start**:
-   ```bash
-   docker-compose up -d
-   ```
+```bash
+# Ensure auth directory exists
+mkdir -p auth_db
 
-3. **Login**:
-   Run the login command interactively on the running container:
-   ```bash
-   docker exec -it cliproxyapi ./CLIProxyAPI --login
-   ```
-   Follow the on-screen instructions to authenticate your accounts.
+# Run the interactive login wizard
+docker run --rm -it \
+  -v $(pwd)/auth_db:/root/.cli-proxy-api \
+  eceasy/cli-proxy-api:latest \
+  /CLIProxyAPI/CLIProxyAPI --login
+```
+*Follow the on-screen prompts to paste your cookies/tokens.*
 
-## Usage for Clients
+### 4. Start the Service
+Once authenticated, start the proxy server in the background:
 
-Other services on the `centralized_net` network can access the proxy at:
-`http://cliproxyapi:8317`
+```bash
+docker-compose up -d
+```
 
+### 5. Verify Operation
+Check logs to ensure the server started and loaded the auths:
+```bash
+docker-compose logs -f cliproxy
+```
+
+## 🔄 Updates
+**Automatic:** The `watchtower` service is included and will automatically update the proxy image every hour.
+
+**Manual:**
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
+## 🔌 Connection Info
+- **Internal URL:** `http://cliproxyapi:8317` (for containers on `centralized_net`)
+- **External URL:** `http://<host-ip>:8317` (if ports are exposed)
