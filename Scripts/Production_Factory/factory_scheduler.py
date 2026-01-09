@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # Setup paths
 ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
+sys.path.append(str(ROOT_DIR.parent / "Orchestration"))
 
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
