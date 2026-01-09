@@ -156,19 +156,34 @@ def get_allowed_users():
     users_str = config.get("ALLOWED_USERS")
     logger.info(f"Raw ALLOWED_USERS from config: '{users_str}'")
     
-    if not users_str:
-        logger.warning("ALLOWED_USERS is empty, using default fallback")
-        users_str = "708531393,5569219290,578363419"
-        
+    allowed = []
+    if users_str:
+        try:
+            allowed = [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
+        except ValueError as e:
+            logger.error(f"Invalid ALLOWED_USERS format: {users_str} ({e})")
+    
+    # Also load from config/users.yaml
     try:
-        users = [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
-        logger.info(f"Parsed ALLOWED_USERS: {users}")
-        if not users:
-             raise ValueError("Empty list after parsing")
-        return users
-    except ValueError as e:
-        logger.error(f"Invalid ALLOWED_USERS format: {users_str} ({e})")
-        return [708531393] # Fallback to admin
+        import yaml
+        users_file = Path(__file__).parent.parent / "config" / "users.yaml"
+        if users_file.exists():
+            with open(users_file, "r") as f:
+                data = yaml.safe_load(f)
+                if data and "users" in data:
+                    for u in data["users"]:
+                        uid = u.get("id")
+                        if uid and uid > 0 and uid not in allowed:
+                            allowed.append(uid)
+            logger.info(f"Loaded users from users.yaml. Total allowed: {len(allowed)}")
+    except Exception as e:
+        logger.error(f"Failed to load users.yaml: {e}")
+
+    if not allowed:
+        logger.warning("No allowed users found, using default fallback")
+        allowed = [708531393, 5569219290, 578363419]
+        
+    return allowed
 
 ALLOWED_USERS = get_allowed_users()
 ADMIN_ID = ALLOWED_USERS[0] if ALLOWED_USERS else 708531393
@@ -1891,11 +1906,44 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             ALLOWED_USERS.append(user_id)
             
             # Save to file for persistence
-            config_path = Path(__file__).parent.parent / ".env"
+            env_path = Path(__file__).parent.parent / ".env"
+            users_file = Path(__file__).parent.parent / "config" / "users.yaml"
+            
             try:
-                with open(config_path, "a") as f:
+                # 1. Update .env (Legacy)
+                with open(env_path, "a") as f:
                     f.write(f"\n# Auto-approved user {user_id}\n")
-                logger.info(f"User {user_id} approved by admin")
+                
+                # 2. Update users.yaml (Vibranium)
+                import yaml
+                from telegram import User
+                user_obj = update.callback_query.message.reply_to_message.from_user if update.callback_query.message.reply_to_message else None
+                # Note: user_id is already known from query data
+                
+                if users_file.exists():
+                    with open(users_file, "r") as f:
+                        data = yaml.safe_load(f) or {"users": []}
+                    
+                    # Update existing or add new
+                    user_exists = False
+                    for u in data.get("users", []):
+                        if u.get("id") == user_id:
+                            u["status"] = "active"
+                            user_exists = True
+                            break
+                    
+                    if not user_exists:
+                        data.setdefault("users", []).append({
+                            "id": user_id,
+                            "name": f"User_{user_id}",
+                            "role": "member",
+                            "status": "active"
+                        })
+                    
+                    with open(users_file, "w") as f:
+                        yaml.safe_dump(data, f, allow_unicode=True)
+                
+                logger.info(f"User {user_id} approved and saved to config")
             except Exception as e:
                 logger.error(f"Failed to save approved user: {e}")
             

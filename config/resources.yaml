@@ -1,0 +1,28 @@
+# 🔋 Resource Pooling Configuration
+# Define API keys and hardware nodes for the "Family Swarm"
+
+gemini_pool:
+  - name: "Igor_Key"
+    api_key: "${GEMINI_API_KEY}" # Loaded from .env
+    status: "active"
+    owner: "Igor"
+
+  # Add family member keys here
+  # - name: "Member1_Key"
+  #   api_key: "AIza..."
+  #   status: "active"
+  #   owner: "Name"
+
+openai_pool:
+  - name: "Admin_Main"
+    api_key: "${OPENAI_API_KEY}" # Loaded from .env
+    status: "active"
+
+hardware:
+  pve_nodes:
+    - name: "pve"
+      ip: "100.78.145.67"
+      vms:
+        - id: 100
+          name: "Igor_Gaming"
+          gpu: true
