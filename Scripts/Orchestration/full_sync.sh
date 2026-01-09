@@ -61,16 +61,20 @@ tailscale ssh gonya@100.110.209.49 "
     docker compose --profile local down --remove-orphans || true
     docker compose --profile local build --pull ai-bot-local
     docker compose --profile local up -d --force-recreate ai-bot-local watchtower
-    
-    # Перезапуск MCP Agent Mail (если он был убит или не запущен)
+"
+
+# 5.1. ПЕРЕЗАПУСК MCP MAIL
+echo "📌 [5.1/7] Перезапуск MCP Agent Mail..."
+tailscale ssh gonya@100.110.209.49 "
     echo '--- Restarting MCP Agent Mail ---'
+
     pkill -f 'run_server_with_token.sh' || true
     pkill -f 'mcp_server' || true
     cd /home/gonya/Unified_System
     nohup bash Scripts/External/start_mail_server.sh > mcp_mail.log 2>&1 < /dev/null &
-    
     exit 0
-"
+" || echo "⚠️ Warning: SSH session closed with error (likely background job), continuing..."
+
 
 # 6. ВЕРИФИКАЦИЯ (ГЛАВНЫЙ ЭТАП)
 echo "📌 [6/7] Верификация работы сервисов..."
