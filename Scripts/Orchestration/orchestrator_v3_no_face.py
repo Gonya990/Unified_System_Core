@@ -178,9 +178,10 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-EmmaNeural")
     return generate_audio_edge(text, output_path, fallback_voice)
 
-def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool:
-    """Add dynamic word-by-word subtitles matching 'Impact Vision' style (Gold, Centered, Big)"""
-    print(f"📝 Burning 'Impact Vision' Style Subtitles...")
+def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: str = "impact") -> bool:
+    """Add dynamic word-by-word subtitles matching style"""
+    style_label = "Impact Vision" if style == "impact" else "Cartoon Fun"
+    print(f"📝 Burning '{style_label}' Style Subtitles...")
     
     # 1. Extract audio and transcribe
     temp_audio = OUTPUT_DIR / "temp_sub_audio.wav"
@@ -205,10 +206,17 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru") -> bool
         
         text = text.upper().replace("'", "").replace(":", "").replace("\"", "").replace("\\", "")
         
-        # Color: Golden Yellow (0xFFD700)
-        f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=80:"
-             f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
-             f"enable='between(t,{start},{end})'")
+        if style == "impact":
+            # Color: Golden Yellow (0xFFD700)
+            f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=80:"
+                 f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
+                 f"enable='between(t,{start},{end})'")
+        else:
+            # Cartoon Style: Vibrant Pink/Cyan with white border, bigger and slightly higher
+            color = random.choice(["0xFF69B4", "0x00FFFF", "0xFFFF00"]) # Pink, Cyan, Yellow
+            f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor={color}:fontsize=100:"
+                 f"x=(w-text_w)/2:y=h-(h*0.3):borderw=6:bordercolor=white:"
+                 f"enable='between(t,{start},{end})'")
         filters.append(f)
         
     filter_str = ",".join(filters)
@@ -296,12 +304,12 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
 # FORCE CORRECT API KEY (bypassing potentially bad environment)
 os.environ["OPENAI_API_KEY"] = "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"
 
-def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path):
+def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path, style: str = "impact"):
     """
-    Create a CINEMATIC high-energy video. 
-    Uses audio post-processing, background ambience, and aggressive editing.
+    Create a CINEMATIC or CARTOON high-energy video. 
     """
-    print(f"🎬 Producing CINEMATIC MASTERPIECE...")
+    kind = "CINEMATIC MASTERPIECE" if style == "impact" else "CARTOON ADVENTURE"
+    print(f"🎬 Producing {kind}...")
     
     audio_duration = float(subprocess.run([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -329,11 +337,16 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
             per_clip = broll_dur / len(broll_clips)
             for j, clip in enumerate(broll_clips):
                 seg_p = OUTPUT_DIR / f"cin_seg_{i}_b{j}.mp4"
-                # Color grading + subtle camera shake (via crop/pan)
+                # For cartoon style, we use brighter, more saturated colors without heavy vignetting
+                if style == "impact":
+                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.4:brightness=0.03,curves=strong_contrast,vignette=angle=0.4"
+                else:
+                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=saturation=1.6:brightness=0.05"
+                
                 subprocess.run([
                     "ffmpeg", "-y", "-i", str(clip),
                     "-t", str(per_clip),
-                    "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.4:brightness=0.03,curves=strong_contrast,vignette=angle=0.4",
+                    "-vf", vf,
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_p)
                 ], check=True, capture_output=True)
                 segments.append(seg_p)
@@ -342,11 +355,15 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
 
         # 2. Visionary AI Image Flash (STABLE ROBUST MOTION)
         seg_p_img = OUTPUT_DIR / f"cin_seg_{i}_img.mp4"
-        # We use a simple scale+crop to avoid zoompan issues
+        if style == "impact":
+            vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=white,vignette=angle=0.5"
+        else:
+            vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=pink"
+            
         subprocess.run([
             "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
             "-t", str(img_dur),
-            "-vf", "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=white,vignette=angle=0.5",
+            "-vf", vf_img,
             "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30", str(seg_p_img)
         ], check=True, capture_output=True)
         segments.append(seg_p_img)
@@ -366,12 +383,15 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     print("🔊 Mixing professional audio suite...")
     final_audio = OUTPUT_DIR / "final_cin_audio.wav"
     
-    # Simplified robust filter complex
-    audio_filter = (
-        "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
-        "aecho=0.8:0.88:40:0.3,"
-        "loudnorm"
-    )
+    if style == "impact":
+        audio_filter = (
+            "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
+            "aecho=0.8:0.88:40:0.3,"
+            "loudnorm"
+        )
+    else:
+        # Fun style: cleaner audio, less reverb, slightly more upbeat
+        audio_filter = "acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
     
     subprocess.run([
         "ffmpeg", "-y", "-i", str(audio_path),
@@ -394,9 +414,9 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     if concat_file.exists(): concat_file.unlink()
     return True
 
-def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: List[Dict] = None):
+def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: List[Dict] = None, style: str = "impact"):
     """Run pipeline without face usage"""
-    print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang})")
+    print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang}, style={style})")
     
     # 1. Audio
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
@@ -408,7 +428,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     raw_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
     
     if scenes:
-        assemble_hybrid_video(audio_path, scenes, raw_video)
+        assemble_hybrid_video(audio_path, scenes, raw_video, style=style)
     else:
         # Fallback to simple B-Roll logic if no scenes provided
         clips = semantic_search_broll(text, BROLL_DIR, num_clips=5)
@@ -419,7 +439,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
             return None
     
     # 3. Subtitles
-    if not add_subtitles(raw_video, final_video, lang):
+    if not add_subtitles(raw_video, final_video, lang, style=style):
         print("⚠️ Subtitles failed, using raw video.")
         if final_video.exists(): final_video.unlink()
         raw_video.rename(final_video)
