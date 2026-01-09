@@ -15,19 +15,19 @@ users:
     status: "active"
 
   - id: 0 # Replace with actual Telegram ID
-    name: "Family Member 2"
-    email: ""
+    name: "Oksana"
+    email: "OksanaGorodetski@gmail.com"
     role: "member"
-    status: "pending"
+    status: "active"
 
   - id: 0 # Replace with actual Telegram ID
-    name: "Family Member 3"
-    email: ""
+    name: "Valeryi"
+    email: "valeryikozachenko73@gmail.com"
     role: "member"
-    status: "pending"
+    status: "active"
 
   - id: 0 # Replace with actual Telegram ID
-    name: "Family Member 4"
-    email: ""
+    name: "Vichka"
+    email: "vichka.kozach@gmail.com"
     role: "member"
-    status: "pending"
+    status: "active"
