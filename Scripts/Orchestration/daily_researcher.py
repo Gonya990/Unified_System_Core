@@ -23,7 +23,9 @@ PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVftt
 def get_client():
     """Lazy initialization of OpenAI client"""
     api_key = os.getenv("OPENAI_API_KEY")
-    return OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
+    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    org_id = os.getenv("OPENAI_ORG_ID")
+    return OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
 def get_latest_tech_news():
     """Fetches news from Google News RSS"""
@@ -87,9 +89,9 @@ def run_daily_research(style="impact"):
     data = None
     # Strategy 1: OpenAI
     try:
-        print("🤖 Attempting Research via OpenAI (GPT-4)...")
+        print("🤖 Attempting Research via OpenAI (GPT-4o)...")
         res = get_client().chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             messages=[{"role": "system", "content": "Return ONLY JSON."}, {"role": "user", "content": prompt}]
         )
         content = res.choices[0].message.content
@@ -101,10 +103,10 @@ def run_daily_research(style="impact"):
     # Strategy 2: Gemini Fallback
     if not data:
         try:
-            print("🌠 Attempting Research via Gemini...")
+            print("🌠 Attempting Research via Gemini 2.0...")
             import google.generativeai as genai
             genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("models/gemini-2.0-flash")
             res = model.generate_content(prompt)
             content = res.text
             if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()

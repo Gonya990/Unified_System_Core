@@ -80,8 +80,10 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         
     try:
         from openai import OpenAI
-        # Force default base_url to avoid 404s from conflicting env vars
-        client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
+        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        org_id = os.getenv("OPENAI_ORG_ID")
+        
+        client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
         
         response = client.audio.speech.create(
             model="tts-1-hd",
@@ -160,7 +162,7 @@ def transcribe_audio_gemini(audio_path: Path) -> List[Dict]:
     print(f"🔑 Using Gemini Key: {api_key[:8]}... (len={len(api_key)})")
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("models/gemini-2.0-flash")
         
         with open(audio_path, "rb") as f:
             audio_data = f.read()
@@ -212,7 +214,9 @@ def transcribe_audio_whisper(audio_path: Path) -> List[Dict]:
             ], check=True, capture_output=True)
             
             from openai import OpenAI
-            client = OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
+            base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+            org_id = os.getenv("OPENAI_ORG_ID")
+            client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
             
             with open(temp_mp3, "rb") as f:
                 transcript = client.audio.transcriptions.create(
@@ -370,7 +374,7 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
     print(f"✅ Video assembled: {output_path}")
 
 # FORCE CORRECT API KEY (bypassing potentially bad environment)
-os.environ["OPENAI_API_KEY"] = "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"
+    # API Setup (loaded from .env)
 
 def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Path, style: str = "impact"):
     """
