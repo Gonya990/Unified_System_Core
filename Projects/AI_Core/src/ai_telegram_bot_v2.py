@@ -102,6 +102,17 @@ except ImportError:
     _DIGEST_AVAILABLE = False
     digest_service = None
 
+try:
+    from modules.proxmox_manager import ProxmoxManager
+    proxmox = ProxmoxManager()
+except ImportError:
+    proxmox = None
+
+try:
+    from dashboard import DashboardService
+except ImportError:
+    DashboardService = None
+
 # Setup logging first
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -128,6 +139,117 @@ else:
     db_path = config.get("SQLITE_DB_PATH", "user_context.db")
     db = UserContextDB(db_path=db_path)
     logger.info(f"Using SQLite database (local mode): {db_path}")
+
+# Vibranium commands
+async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /play command - switch to gaming mode."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not proxmox:
+        await update.message.reply_text("❌ Proxmox Manager not available.")
+        return
+
+    await update.message.reply_text("🎮 **Switching to Gaming Mode...**\nResource shifting in progress.", parse_mode="Markdown")
+    
+    try:
+        # 1. Stop AI VM if needed
+        # 2. Start Gaming VM
+        res = await proxmox.start_vm(100) # Assuming 100 is gaming
+        if res:
+            await update.message.reply_text("✅ **Gaming Mode Active!**\nWindows VM is starting. Enjoy!", parse_mode="Markdown")
+            # Notify ADMIN
+            if user_id != ADMIN_ID:
+                await context.bot.send_message(chat_id=ADMIN_ID, text=f"🕹 User {user_id} started Gaming Mode (VM 100).")
+        else:
+            await update.message.reply_text("❌ Failed to start Gaming VM.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+async def stop_play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /stop_play command - return resources to AI."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not proxmox:
+        await update.message.reply_text("❌ Proxmox Manager not available.")
+        return
+
+    await update.message.reply_text("🧠 **Reclaiming resources for AI...**", parse_mode="Markdown")
+    
+    try:
+        res = await proxmox.shutdown_vm(100)
+        if res:
+            await update.message.reply_text("✅ Resources released. Systems returning to AI Cluster.", parse_mode="Markdown")
+        else:
+            await update.message.reply_text("⚠️ Shutdown failed or VM already off.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+async def family_stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /family_stats command - aggregate swarm usage (Admin only)."""
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        await update.message.reply_text("⛔️ Admin only.")
+        return
+
+    if not usage_tracker:
+        await update.message.reply_text("❌ Usage tracker not available.")
+        return
+
+    stats = usage_tracker.get_all_users_stats(days=30)
+    users = stats.get("users", [])
+    
+    if not users:
+        await update.message.reply_text("📊 Статистики семейного роя пока нет.")
+        return
+        
+    msg = "📊 **Статистика Семейного Роя (30 дней)**\n\n"
+    grand_total = 0
+    for u in users:
+        msg += f"👤 {u['username']}: `{u['total_tokens']:,}` токенов\n"
+        grand_total += u["total_tokens"]
+        
+    msg += f"\n📈 **Всего потрачено:** `{grand_total:,}` токенов."
+    
+    if inference.swarm:
+        swarm_stats = inference.swarm.get_stats()
+        msg += f"\n🐝 **Активных ключей в Рое:** `{swarm_stats['gemini_keys_active']}`"
+        
+    await update.message.reply_text(msg, parse_mode="Markdown")
+
+async def share_key_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /share_key <key>."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("🔑 Usage: `/share_key AIza...`", parse_mode="Markdown")
+        return
+
+    api_key = context.args[0]
+    if not api_key.startswith("AIza"):
+        await update.message.reply_text("❌ Not a valid Gemini key.")
+        return
+
+    if inference.swarm:
+        try:
+            user_name = update.effective_user.first_name
+            inference.swarm.add_gemini_key(api_key, owner=user_name)
+            await update.message.reply_text("🐝 **Thanks!** Key added to the family swarm cluster. 🦾")
+            # Notify ADMIN
+            if user_id != ADMIN_ID:
+                await context.bot.send_message(chat_id=ADMIN_ID, text=f"🐝 User {user_name} contributed a Gemini API key to the swarm!")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error: {e}")
+    else:
+        await update.message.reply_text("❌ Swarm capability not initialized.")
 
 auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 conv_manager = ConversationManager()
@@ -1250,6 +1372,18 @@ async def post_init(application: Application) -> None:
     scheduler = DailyScheduler(application, db, inference=inference)
     asyncio.create_task(scheduler.start())
     logger.info("DailyScheduler background task started via post_init.")
+
+    # Start Web Dashboard
+    if DashboardService:
+        dashboard = DashboardService(port=8096, context={
+            "infra": infra_manager,
+            "usage": usage_tracker,
+            "notion": notion_client,
+            "proxmox": proxmox,
+            "inference": inference
+        })
+        dashboard.start()
+        logger.info("Web Dashboard started on port 8096")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
@@ -3034,7 +3168,9 @@ def main():
         'notify': notify_command, 'remind': remind_command, 'note': note_command,
         'digest': digest_command, 'backup': backup_command, 'update': update_command,
         'health': health_command, 'calendar': calendar_command, 'linear': linear_command,
-        'todo': todo_command, 'beads': beads_command, 'settings': settings_command
+        'todo': todo_command, 'beads': beads_command, 'settings': settings_command,
+        'play': play_command, 'stop_play': stop_play_command, 
+        'family_stats': family_stats_command, 'share_key': share_key_command
     }
 
     for cmd, func in commands_to_register.items():
