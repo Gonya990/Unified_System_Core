@@ -267,6 +267,35 @@ async def share_key_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("❌ Swarm capability not initialized.")
 
+async def login_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /login command - generate a session token for the dashboard."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    if not usage_tracker:
+        await update.message.reply_test("❌ Usage tracker not available.")
+        return
+
+    # Create session token
+    token = usage_tracker.create_session(user_id)
+    if not token:
+        await update.message.reply_text("❌ Failed to create session.")
+        return
+
+    # Use tailscale IP or configured domain
+    base_url = config.get("DASHBOARD_URL", "http://100.110.209.49:8096")
+    login_link = f"{base_url}/auth?token={token}"
+    
+    await update.message.reply_text(
+        f"🔐 **Dashboard Login**\n\n"
+        f"Ваша персональная ссылка для входа:\n"
+        f"🔗 [ОТКРЫТЬ ПАНЕЛЬ УПРАВЛЕНИЯ]({login_link})\n\n"
+        f"_Ссылка действительна 24 часа._",
+        parse_mode="Markdown",
+        disable_web_page_preview=True
+    )
+
 auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
@@ -1116,10 +1145,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    # Regular AI query with context (Federation Aware)
+    # Regular AI query with context (Federation Aware + Quota)
     user_data = db.get_user(user_id)
     branch_id = user_data.get('branch_id', 'HOME_HQ') if user_data else 'HOME_HQ'
-    
+    role = user_data.get('role', 'MEMBER') if user_data else 'GUEST'
+
+    # Check Quota
+    allowed, status_msg = usage_tracker.check_quota(user_id, role)
+    if not allowed:
+        logger.warning(f"[QUOTA] User {user_id} denied: {status_msg}")
+        await update.message.reply_text(f"⛔️ **Лимит исчерпан**\n\n{status_msg}", parse_mode='Markdown')
+        return
+
     # Detect "Unified Core" project context
     UNIFIED_KEYWORDS = ["unified", "core", "gonya", "system", "federation", "vibranium", "swarm"]
     project_context = "PERSONAL"
@@ -1372,13 +1409,24 @@ async def query_ollama_with_context(user_id: int, prompt: str, branch_id: str = 
 
 
     try:
-        response_text, _ = await inference.chat(
+        response_text, usage = await inference.chat(
             history + [{"role": "user", "content": prompt}], 
             system_prompt=system_prompt,
             branch_id=branch_id,
             project_context=project_context
         )
         logger.info(f"[AI] Got response for user {user_id}, length: {len(response_text)}")
+        
+        # Log usage
+        username = db.get_user(user_id).get('username', f'User_{user_id}') if db.get_user(user_id) else f'User_{user_id}'
+        usage_tracker.log_usage(
+            user_id=user_id, 
+            username=username, 
+            provider=inference.provider, 
+            model=inference.model, 
+            usage_stats=usage
+        )
+        
         return response_text
     except Exception as e:
         logger.error(f"[AI] Error querying AI for user {user_id}: {e}")
@@ -1405,6 +1453,7 @@ async def post_init(application: Application) -> None:
         BotCommand("img", "Generate image with DALL-E 3"),
         BotCommand("memory", "View your saved memories"),
         BotCommand("msg", "Message another user"),
+        BotCommand("login", "Login to Web Dashboard"),
     ]
     await application.bot.set_my_commands(commands)
     logger.info("Bot commands registered.")
@@ -1421,7 +1470,8 @@ async def post_init(application: Application) -> None:
                 "usage": usage_tracker,
                 "notion": notion_client,
                 "proxmox": proxmox,
-                "inference": inference
+                "inference": inference,
+                "db": db
             })
             dashboard.start()
             logger.info("🚀 Web Dashboard started on port 8096")
@@ -3215,7 +3265,8 @@ def main():
         'health': health_command, 'calendar': calendar_command, 'linear': linear_command,
         'todo': todo_command, 'beads': beads_command, 'settings': settings_command,
         'play': play_command, 'stop_play': stop_play_command, 
-        'family_stats': family_stats_command, 'share_key': share_key_command
+        'family_stats': family_stats_command, 'share_key': share_key_command,
+        'login': login_command
     }
 
     for cmd, func in commands_to_register.items():
