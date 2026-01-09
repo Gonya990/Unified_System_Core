@@ -7,6 +7,7 @@ import logging
 import signal
 import sys
 import os
+from pathlib import Path
 
 from telegram import Update, BotCommand
 from telegram.ext import (
