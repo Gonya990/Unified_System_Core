@@ -76,7 +76,7 @@ tailscale ssh gonya@100.110.209.49 "
     echo \"✅ Бот запущен (ID: \$CONT_ID)\"
     
     echo '--- Проверка Логов на ошибки ---'
-    if docker logs \$CONT_ID 2>&1 | grep -i 'ValueError\|Error\|Exception' | tail -n 10 | grep .; then
+    if docker logs $CONT_ID 2>&1 | grep -i 'ValueError\|Error\|Exception' | grep -v 'Error handler registered' | tail -n 10 | grep .; then
         echo '⚠️ В логах обнаружены ошибки! Проверьте статус.'
     else
         echo '✅ Ошибок в логах не обнаружено.'
