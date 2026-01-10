@@ -364,3 +364,80 @@ def translate_to_english(text):
         res = get_client().chat.completions.create(model="gpt-4o", messages=[{"role": "system", "content": "Translate to ENGLISH. Return ONLY text."}, {"role": "user", "content": text}])
         return res.choices[0].message.content
     except: return "The future is here."
+
+def main():
+    """Execute Full Daily Viral Content Pipeline"""
+    print("🚀 DAILY RESEARCHER PIPELINE INITIATED")
+    
+    # 1. Research & Scripting
+    data = run_daily_research(style="impact")
+    if not data:
+        print("❌ Pipeline aborted: Research failed.")
+        return
+
+    # Check for Output Directory
+    timestamp = time.strftime("%Y-%m-%d")
+    output_base = ROOT_DIR.parent / "Production_Factory/output"
+    daily_dir = output_base / timestamp
+    daily_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save Script Data
+    json_path = daily_dir / "script_data.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"📜 Script Data saved to: {json_path}")
+    
+    # 2. Image Generation (Visualization)
+    print("🎨 Generating Visual Assets...")
+    scenes = data.get("scenes", [])
+    if not scenes:
+        print("❌ No scenes found in script data.")
+        return
+        
+    resolved_scenes = generate_vision_assets(scenes, daily_dir, style="impact")
+    
+    # Update JSON with local paths
+    data["scenes"] = resolved_scenes
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    if len(resolved_scenes) < len(scenes):
+        print(f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated.")
+    
+    # 3. Handover to Orchestrator (Audio + Video Assembly)
+    print("🤝 Handing over to Orchestrator v3 (No-Face)...")
+    try:
+        # Add Production_Factory to path for internal imports
+        factory_path = ROOT_DIR.parent / "Production_Factory"
+        if str(factory_path) not in sys.path:
+            sys.path.append(str(factory_path))
+            
+        import orchestrator_v3_no_face as orchestrator
+        
+        # Override Orchestrator Output Dirs to match Daily Dir
+        orchestrator.OUTPUT_DIR = daily_dir
+        orchestrator.INPUT_DIR = daily_dir
+        orchestrator.BROLL_DIR = factory_path / "broll" # Shared B-roll library
+        
+        # Run RU Pipeline
+        script_ru = data.get("script_ru", "")
+        if script_ru:
+            final_video_ru = orchestrator.run_no_face_pipeline(
+                text=script_ru,
+                lang="ru",
+                output_name="daily_viral_ru",
+                scenes=resolved_scenes,
+                style="impact"
+            )
+            if final_video_ru:
+                print(f"🎉 SUCCESS! Video Ready: {final_video_ru}")
+            else:
+                print("❌ RU Video Assembly failed.")
+                
+    except ImportError as e:
+        print(f"❌ Failed to import orchestrator: {e}")
+    except Exception as e:
+        print(f"❌ Orchestration failed: {e}")
+
+if __name__ == "__main__":
+    main()
