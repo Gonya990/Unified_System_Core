@@ -171,8 +171,13 @@ async def get_system_stats():
     kosta_ok = False
     try:
         import requests
-        r = requests.get("http://localhost:8765", timeout=0.2)
-        if r.status_code < 500: kosta_ok = True
+        # Try local first, then remote
+        try:
+            r = requests.get("http://localhost:8765", timeout=0.2)
+            if r.status_code < 500: kosta_ok = True
+        except:
+            r = requests.get("http://100.110.209.49:8765", timeout=0.5)
+            if r.status_code < 500: kosta_ok = True
     except: pass
     
     return {
