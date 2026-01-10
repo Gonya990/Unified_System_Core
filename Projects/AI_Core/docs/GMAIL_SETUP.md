@@ -47,13 +47,13 @@
 
 Положи `gmail_credentials.json` в одну из папок:
 
-- MacBook: `/Users/macbook/Documents/Unified_System/Windows_AI_Core/config/`
-- Server: `/home/gonya/Documents/Unified_System/Windows_AI_Core/config/`
+- MacBook: `/Users/macbook/Documents/Unified_System/Projects/AI_Core/config/`
+- Server: `/home/gonya/Documents/Unified_System/Projects/AI_Core/config/`
 
 ## Шаг 6: Первый запуск (OAuth Flow)
 
 При первом использовании Gmail откроется браузер для авторизации.
-После авторизации создастся файл `gmail_token.pickle`.
+После авторизации создастся файл `gmail_token.json`.
 
 ---
 
@@ -67,7 +67,7 @@
 5. Test users → Add your email → Save
 6. Credentials → Create → OAuth client ID → Desktop app
 7. Download JSON → gmail_credentials.json
-8. Положить в Windows_AI_Core/config/
+8. Положить в Projects/AI_Core/config/
 ```
 
 ---

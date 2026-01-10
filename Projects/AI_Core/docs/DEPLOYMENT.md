@@ -18,7 +18,7 @@
 ## Local Development (Docker)
 
 ```bash
-cd Windows_AI_Core
+cd Projects/AI_Core
 
 # 1. Configure environment
 cp .env.example .env

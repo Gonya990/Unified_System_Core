@@ -6,7 +6,7 @@ Run this command from your MacBook to copy the project to the Windows machine:
 Выполните эту команду на MacBook для копирования проекта на Windows машину:
 
 ```bash
-scp -r /Users/macbook/Documents/Unified_System/Windows_AI_Core gonya@100.127.194.111:Desktop/
+scp -r /Users/macbook/Documents/Unified_System/Projects/AI_Core gonya@100.127.194.111:Desktop/
 ```
 
 ## 2. Remote Setup / Удаленная установка
@@ -16,7 +16,7 @@ Connect via SSH and run the setup script:
 
 ```bash
 ssh gonya@100.127.194.111
-cd Desktop/Windows_AI_Core/scripts
+cd Desktop/AI_Core/scripts
 powershell -ExecutionPolicy Bypass -File setup_with_uv.ps1
 ```
 

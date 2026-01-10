@@ -160,7 +160,7 @@ Watchtower checks for new images every 5 minutes.
 **Установка:**
 
 ```bash
-sudo cp Windows_AI_Core/config/ai-watchdog.service /etc/systemd/system/
+sudo cp Projects/AI_Core/config/ai-watchdog.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable ai-watchdog
 sudo systemctl start ai-watchdog
