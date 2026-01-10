@@ -16,8 +16,13 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 # Setup paths
-ROOT_DIR = Path(__file__).parent.resolve()
-sys.path.append(str(ROOT_DIR))
+SRC_DIR = Path(__file__).parent.parent.resolve()
+FACTORY_DIR = SRC_DIR.parent
+ROOT_DIR = FACTORY_DIR.parent # Unified_System
+
+# Add all source subdirectories to path
+for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
+    sys.path.append(str(SRC_DIR / d))
 
 def agent_mindfulness(task: str):
     """Reflecting user request: strategic pauses & token availability checks"""

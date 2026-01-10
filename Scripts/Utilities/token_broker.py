@@ -1,243 +1,204 @@
-import json
 import os
+import json
 import time
 import logging
 import base64
-import hashlib
-from typing import Optional, Dict, List, Any
+from typing import Dict, List, Optional, Any
 from itertools import cycle
+from pathlib import Path
+import yaml
+import requests
 
+# Optional cryptography for vault encryption
 try:
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives import hashes
     HAS_CRYPTO = True
 except ImportError:
     HAS_CRYPTO = False
 
-# Setup Logger
 logger = logging.getLogger("TokenBroker")
 
-
 class TokenBroker:
-    """
-    Manages API keys for the Unified System.
-    Loads keys from 'secrets/keys.json' (local vault) or Environment Variables.
-    Implements Round-Robin rotation, health tracking, and AES-256-GCM encryption.
-    """
+    """ centralizes API key management, rotation, and health monitoring. """
+    
+    def __init__(self, vault_path: str = "~/.config/unified-system/tokens.yaml"):
+        self.vault_path = os.path.expanduser(vault_path)
+        self.key_store: Dict[str, List[Dict]] = {}
+        self._blacklist: Dict[str, float] = {}  # key -> timestamp
+        self._blacklist_ttl = 3600  # 1 hour cooldown
+        self._indices: Dict[str, int] = {}
+        self._aes_key = self._derive_key()
+        
+        self.load_vault()
 
-    _instance = None
+    def _derive_key(self) -> Optional[bytes]:
+        """Derives a 256-bit key from AGENT_MAIL_TOKEN env var."""
+        master_token = os.getenv("AGENT_MAIL_TOKEN")
+        if not master_token or not HAS_CRYPTO:
+            return None
+        
+        salt = b"unified-system-vibranium-salt" # Static salt for simplicity
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=100000,
+        )
+        return kdf.derive(master_token.encode())
 
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(TokenBroker, cls).__new__(cls)
-        return cls._instance
-
-    def __init__(
-        self, secrets_path: Optional[str] = None, encryption_key: Optional[str] = None
-    ):
-        if hasattr(self, "initialized") and self.initialized:
+    def load_vault(self):
+        """Loads and decrypts the token vault."""
+        if not os.path.exists(self.vault_path):
+            logger.info("Token vault not found. Using legacy fallback.")
+            self._try_legacy_import()
             return
 
-        if not secrets_path:
-            # Default: Unified_System/secrets/keys.json
-            base_dir = os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            )
-            secrets_path = os.path.join(base_dir, "secrets", "keys.json")
+        try:
+            with open(self.vault_path, 'r') as f:
+                raw_data = yaml.safe_load(f) or {}
+            
+            # Decrypt keys if possible
+            if self._aes_key and HAS_CRYPTO:
+                for provider, pool in raw_data.items():
+                    for entry in pool:
+                        if "encrypted_key" in entry:
+                            decrypted = self.decrypt_value(entry["encrypted_key"])
+                            if decrypted:
+                                entry["key"] = decrypted
+            
+            self.key_store = raw_data
+            logger.info(f"Loaded {sum(len(v) for v in self.key_store.values())} tokens from vault.")
+        except Exception as e:
+            logger.error(f"Failed to load vault: {e}")
 
-        # Encryption key from param or env (32 bytes for AES-256)
-        self._encryption_key = encryption_key or os.getenv("TOKEN_BROKER_KEY")
-        if self._encryption_key and HAS_CRYPTO:
-            # Derive 32-byte key from passphrase
-            self._aes_key = hashlib.sha256(self._encryption_key.encode()).digest()
-        else:
-            self._aes_key = None
+    def save_vault(self):
+        """Encrypts and saves current keys to vault."""
+        os.makedirs(os.path.dirname(self.vault_path), exist_ok=True)
+        
+        vault_to_save = {}
+        for provider, pool in self.key_store.items():
+            encrypted_pool = []
+            for entry in pool:
+                # Copy entry without the plain 'key' if we have encryption
+                save_entry = {k: v for k, v in entry.items() if k != "key"}
+                if "key" in entry and self._aes_key and HAS_CRYPTO:
+                    encrypted = self.encrypt_value(entry["key"])
+                    if encrypted:
+                        save_entry["encrypted_key"] = encrypted
+                else:
+                    save_entry["key"] = entry.get("key")
+                encrypted_pool.append(save_entry)
+            vault_to_save[provider] = encrypted_pool
 
-        self.secrets_path = secrets_path
-        self.key_store = self._load_keys()
+        with open(self.vault_path, 'w') as f:
+            yaml.dump(vault_to_save, f)
+        logger.info(f"Vault saved to {self.vault_path}")
 
-        # Round-Robin iterators cache: { "provider_tier": iterator }
-        self._iterators = {}
-
-        # Blacklist for failed keys: { "key_value": timestamp_of_failure }
-        self._blacklist = {}
-        self._blacklist_ttl = 300  # Seconds to ignore a failed key (5 mins)
-
-        self.initialized = True
-
-    def _load_keys(self) -> Dict[str, List[Dict]]:
-        """Loads keys from JSON and Envs."""
-        data = {"gemini": [], "openai": [], "claude": [], "other": []}
-
-        # 1. Try JSON Vault
-        if os.path.exists(self.secrets_path):
+    def _try_legacy_import(self):
+        """Attempts to import from old keys.json if vault is missing."""
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        legacy_path = os.path.join(base_dir, "secrets", "keys.json")
+        
+        if os.path.exists(legacy_path):
             try:
-                with open(self.secrets_path, "r") as f:
-                    loaded = json.load(f)
-                    # Merge securely and dynamically
-                    for provider, keys in loaded.items():
-                        if provider not in data:
-                            data[provider] = []
-                        data[provider].extend(keys)
+                with open(legacy_path, 'r') as f:
+                    data = json.load(f)
+                
+                # Convert keys.json structure to our pool structure if needed
+                # If it's already structured by provider, we use it
+                self.key_store = data
+                logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
+                self.save_vault()
             except Exception as e:
-                logger.error(f"Failed to load secrets/keys.json: {e}")
-
-        # 2. Fallback to Env Vars (Legacy Support)
-        if not data["gemini"] and os.getenv("GEMINI_API_KEY"):
-            data["gemini"].append(
-                {
-                    "alias": "Env_Legacy",
-                    "key": os.getenv("GEMINI_API_KEY"),
-                    "tier": "free",
-                    "owner": "System",
-                }
-            )
-
-        if not data["openai"] and os.getenv("OPENAI_API_KEY"):
-            data["openai"].append(
-                {
-                    "alias": "Env_Legacy",
-                    "key": os.getenv("OPENAI_API_KEY"),
-                    "tier": "tier1",
-                    "owner": "System",
-                }
-            )
-
-        return data
+                logger.error(f"Legacy import failed: {e}")
 
     def get_key(self, provider: str, tier: str = None) -> Optional[str]:
         """
-        Get a valid API Key for the provider using Round-Robin.
-        Skips keys currently in the blacklist (cooldown).
+        Get a valid API Key for the provider using Round-Robin and Health Checks.
         """
         provider = provider.lower()
         pool = self.key_store.get(provider, [])
-
-        # Filter by tier if requested
+        
         if tier:
             pool = [k for k in pool if k.get("tier") == tier]
 
         if not pool:
-            logger.warning(f"No keys found for provider: {provider} (Tier: {tier})")
             return None
-
-        # Filter out blacklisted keys
-        valid_pool = []
+            
+        # Filter blacklist
         now = time.time()
-        for k in pool:
-            key_val = k["key"]
-            if key_val in self._blacklist:
-                if now - self._blacklist[key_val] < self._blacklist_ttl:
-                    continue  # Still in cooldown
-                else:
-                    del self._blacklist[key_val]  # Cooldown expired
-            valid_pool.append(k)
-
+        valid_pool = [k for k in pool if k['key'] not in self._blacklist or (now - self._blacklist[k['key']] > self._blacklist_ttl)]
+        
         if not valid_pool:
-            logger.error(f"All keys for {provider} are currently blacklisted/failed!")
+            logger.error(f"All keys for {provider} are silent.")
             return None
 
-        # Get iterator identifier
-        iter_id = f"{provider}_{tier if tier else 'any'}"
-
-        # Create or update iterator if pool size changed (naive check)
-        if iter_id not in self._iterators:
-            self._iterators[iter_id] = cycle(valid_pool)
-
-        # Get next key
-        # Reset cycle if valid_pool changed drastically or we hit next
-        # For simplicity in Phase 1, we just create a fresh cycle from the valid pool every time
-        # wait, proper round robin requires persistence.
-        # Let's simple implementation: use a persistent cycle, but if next yields a blacklisted key (race condition), skip it.
-        # Actually simplest for Phase 1:
-        # Just use the index logic:
-
-        if not hasattr(self, "_indices"):
-            self._indices = {}
-
-        current_idx = self._indices.get(iter_id, 0)
-
-        # Try to find a valid key starting from current_idx
-        for _ in range(len(valid_pool)):
-            idx = current_idx % len(valid_pool)
-            candidate = valid_pool[idx]
-
-            # Use this one
-            self._indices[iter_id] = idx + 1
-
-            # Log usage
-            alias = candidate.get("alias", "Unknown")
-            logger.info(
-                f"TokenBroker: Provided key '{alias}' for {provider} (Owner: {candidate.get('owner')})"
-            )
-
-            return candidate["key"]
-
+        # Round Robin
+        iter_id = f"{provider}_{tier or 'any'}"
+        start_idx = self._indices.get(iter_id, 0)
+        num_tokens = len(valid_pool)
+        
+        for i in range(num_tokens):
+            idx = (start_idx + i) % num_tokens
+            token_info = valid_pool[idx]
+            
+            if self._check_health(token_info):
+                self._indices[iter_id] = (idx + 1) % num_tokens
+                # Log usage
+                alias = token_info.get("alias", "Unknown")
+                logger.info(f"TokenBroker: Provided key '{alias}' for {provider}")
+                return token_info['key']
+            else:
+                self.report_failure(token_info['key'], provider)
+        
         return None
 
+    def _check_health(self, token_info: Dict[str, Any]) -> bool:
+        """Kosta's Health Check: HTTP GET /health, 5s timeout, 3 retries."""
+        health_url = token_info.get('health_url')
+        if not health_url:
+            return True # Legacy keys don't have health URLs
+            
+        for _ in range(3):
+            try:
+                resp = requests.get(health_url, timeout=5)
+                if resp.status_code == 200:
+                    return True
+            except:
+                pass
+            time.sleep(0.5)
+        return False
+
     def report_failure(self, key: str, provider: str):
-        """
-        Report a key failure (429/401).
-        Adds key to temporary blacklist.
-        """
-        logger.warning(
-            f"TokenBroker: Key failure reported for {provider}. Blacklisting for {self._blacklist_ttl}s."
-        )
+        logger.warning(f"Key failure for {provider}. Cooldown initiated.")
         self._blacklist[key] = time.time()
 
-    def list_available_pools(self) -> Dict[str, Dict[str, int]]:
-        """Debug helper to see what's loaded."""
-        summary = {}
-        for prov, keys in self.key_store.items():
-            active = len([k for k in keys if k["key"] not in self._blacklist])
-            summary[prov] = {"total": len(keys), "active": active}
-        return summary
-
     def encrypt_value(self, plaintext: str) -> Optional[str]:
-        """Encrypt a value with AES-256-GCM. Returns base64-encoded ciphertext."""
-        if not self._aes_key or not HAS_CRYPTO:
-            logger.warning("Encryption unavailable: missing key or cryptography lib")
-            return None
-
-        nonce = os.urandom(12)  # 96-bit nonce for GCM
-        aesgcm = AESGCM(self._aes_key)  # type: ignore[possibly-undefined]
+        """Encrypt a value with AES-256-GCM."""
+        if not self._aes_key or not HAS_CRYPTO: return None
+        nonce = os.urandom(12)
+        aesgcm = AESGCM(self._aes_key)
         ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
-        # Format: base64(nonce + ciphertext)
         return base64.b64encode(nonce + ciphertext).decode()
 
     def decrypt_value(self, encrypted: str) -> Optional[str]:
         """Decrypt an AES-256-GCM encrypted value."""
-        if not self._aes_key or not HAS_CRYPTO:
-            logger.warning("Decryption unavailable: missing key or cryptography lib")
-            return None
-
+        if not self._aes_key or not HAS_CRYPTO: return None
         try:
             data = base64.b64decode(encrypted)
-            nonce = data[:12]
-            ciphertext = data[12:]
-            aesgcm = AESGCM(self._aes_key)  # type: ignore[possibly-undefined]
-            plaintext = aesgcm.decrypt(nonce, ciphertext, None)
-            return plaintext.decode()
-        except Exception as e:
-            logger.error(f"Decryption failed: {e}")
-            return None
+            nonce, ciphertext = data[:12], data[12:]
+            aesgcm = AESGCM(self._aes_key)
+            return aesgcm.decrypt(nonce, ciphertext, None).decode()
+        except: return None
 
-    def health_check(self) -> Dict[str, Any]:
-        """
-        Health check endpoint for monitoring.
-        Returns broker status, pool counts, and blacklist info.
-        """
-        pools = self.list_available_pools()
-        total_keys = sum(p["total"] for p in pools.values())
-        active_keys = sum(p["active"] for p in pools.values())
-        blacklisted = len(self._blacklist)
-
-        return {
-            "status": "healthy" if active_keys > 0 else "degraded",
-            "total_keys": total_keys,
-            "active_keys": active_keys,
-            "blacklisted_keys": blacklisted,
-            "encryption_enabled": self._aes_key is not None,
-            "pools": pools,
-            "timestamp": time.time(),
-        }
+if __name__ == "__main__":
+    # Migration CLI
+    import sys
+    logging.basicConfig(level=logging.INFO)
+    broker = TokenBroker()
+    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
+        print("🚀 Migrating to encrypted vault...")
+        broker._try_legacy_import()
+        print("✅ Done.")

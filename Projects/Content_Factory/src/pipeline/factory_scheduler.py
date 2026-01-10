@@ -9,9 +9,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Setup paths
-ROOT_DIR = Path(__file__).parent.resolve()
-sys.path.append(str(ROOT_DIR))
-sys.path.append(str(ROOT_DIR.parent / "Orchestration"))
+SRC_DIR = Path(__file__).parent.parent.resolve()
+FACTORY_DIR = SRC_DIR.parent
+ROOT_DIR = FACTORY_DIR.parent # Unified_System
+
+# Add all source subdirectories to path
+for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
+    sys.path.append(str(SRC_DIR / d))
 
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
@@ -22,7 +26,7 @@ from insta_uploader import upload_reel
 import subprocess
 
 # Configuration
-REELS_AUTO_UPLOAD = False  # 🧪 TEST MODE: Disabled for quality review
+REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
 def agent_sync(msg):
@@ -224,8 +228,14 @@ if __name__ == "__main__":
     parser.add_argument('--cartoon', action='store_true', help='Force Cartoon/Animation daily mode')
     parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
     
+    parser.add_argument('--auto-upload', action='store_true', help='Force enable auto upload')
+    
     args = parser.parse_args()
     
+    # Allow CLI override for upload
+    if args.auto_upload:
+        REELS_AUTO_UPLOAD = True
+
     mode = "daily"
     if args.hebrew: mode = "hebrew"
     elif args.english: mode = "english"
