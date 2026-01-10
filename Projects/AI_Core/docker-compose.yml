@@ -15,6 +15,7 @@ x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
     - ../../config/resources.yaml:/app/config/resources.yaml
     - ./config/gmail_credentials.json:/app/config/gmail_credentials.json
     - ./secrets:/app/secrets
+    - ../../secrets:/app/unified_secrets:ro
     - ./gcp-service-account.json:/app/gcp-service-account.json:ro
   environment:
     - PYTHONUNBUFFERED=1

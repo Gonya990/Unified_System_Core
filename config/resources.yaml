@@ -1,23 +1,51 @@
-# 🔋 Resource Pooling Configuration
-# Define API keys and hardware nodes for the "Family Swarm"
+# 🔋 Resource Pooling Configuration v2
+# Define API keys, hardware nodes, and encryption settings for the "Family Swarm"
+# Schema: v2 (META_ORCHESTRATION compatible)
 
-gemini_pool:
-  - name: "Igor_Key"
-    api_key: "${GEMINI_API_KEY}" # Loaded from .env
-    status: "active"
-    owner: "Igor"
+version: "2.0"
 
-  # Add family member keys here
-  # - name: "Member1_Key"
-  #   api_key: "AIza..."
-  #   status: "active"
-  #   owner: "Name"
+# TokenBroker settings
+token_broker:
+  encryption:
+    algorithm: "AES-256-GCM"
+    key_env: "TOKEN_BROKER_KEY"  # 32-byte key from environment
+  health_check:
+    endpoint: "/health"
+    timeout_seconds: 5
+    retry_count: 3
+  rotation:
+    strategy: "round-robin"
+    fallback_on_failure: true
+    blacklist_ttl_seconds: 300
 
-openai_pool:
-  - name: "Admin_Main"
-    api_key: "${OPENAI_API_KEY}" # Loaded from .env
-    status: "active"
+# API Key Pools
+pools:
+  gemini:
+    - name: "Igor_Key"
+      api_key: "${GEMINI_API_KEY}"
+      status: "active"
+      owner: "Igor"
+      priority: 1
+    # Add family member keys here
+    # - name: "Member1_Key"
+    #   api_key: "AIza..."
+    #   status: "active"
+    #   owner: "Name"
+    #   priority: 2
 
+  openai:
+    - name: "Admin_Main"
+      api_key: "${OPENAI_API_KEY}"
+      status: "active"
+      priority: 1
+
+  anthropic:
+    - name: "System_Main"
+      api_key: "${ANTHROPIC_API_KEY}"
+      status: "active"
+      priority: 1
+
+# Hardware Resources
 hardware:
   pve_nodes:
     - name: "pve"
@@ -26,3 +54,8 @@ hardware:
         - id: 100
           name: "Igor_Gaming"
           gpu: true
+
+# RBAC Configuration (reference)
+rbac:
+  config_path: "~/.config/unified-system/rbac.yaml"
+  default_policy: "deny"
