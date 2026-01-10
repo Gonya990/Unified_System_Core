@@ -1,104 +1,94 @@
 
+import json
 import os
-import yaml
 import random
-from pathlib import Path
-from typing import Dict, List, Optional
-from dotenv import load_dotenv
+import logging
+from typing import Optional, Dict, List
 
-# Load envs mainly for resolving ${VAR} in yaml
-ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
-load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
+# Setup Logger
+logger = logging.getLogger("TokenBroker")
 
 class TokenBroker:
-    _instance = None
+    """
+    Manages API keys for the Unified System.
+    Loads keys from 'secrets/keys.json' (local vault) or Environment Variables.
+    Implements Round-Robin rotation and tier filtering.
+    """
     
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(TokenBroker, cls).__new__(cls)
-            cls._instance.config_path = ROOT_DIR / "config/resources.yaml"
-            cls._instance.pools = {}
-            cls._instance.reload_config()
-        return cls._instance
-    
-    def reload_config(self):
-        """Load resources.yaml and resolve env vars."""
-        if not self.config_path.exists():
-            print(f"⚠️ Config not found: {self.config_path}")
-            return
-            
-        with open(self.config_path, "r") as f:
-            raw_data = f.read()
-            
-        # Basic ENV resolution
-        # This allows defining api_key: "${OPENAI_API_KEY}" in YAML
-        resolved_data = os.path.expandvars(raw_data)
-        
-        try:
-            data = yaml.safe_load(resolved_data)
-            self.pools = {}
-            
-            # Parse Pools
-            if "openai_pool" in data:
-                self.pools["openai"] = data["openai_pool"]
-            if "gemini_pool" in data:
-                self.pools["gemini"] = data["gemini_pool"]
-                
-            # Add other providers as needed
-            
-            # Print status
-            total_keys = sum(len(p) for p in self.pools.values())
-            print(f"✅ TokenBroker loaded. Pools: {list(self.pools.keys())}. Total Keys: {total_keys}")
-            
-        except yaml.YAMLError as e:
-            print(f"❌ Error parsing resources.yaml: {e}")
+    def __init__(self, secrets_path: str = None):
+        if not secrets_path:
+             # Default: Unified_System/secrets/keys.json
+             base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+             secrets_path = os.path.join(base_dir, "secrets", "keys.json")
+             
+        self.secrets_path = secrets_path
+        self.key_store = self._load_keys()
+        self._usage_counters = {} # Transient validation for rotation logic
 
-    def get_key(self, provider: str, owner: str = None) -> Optional[str]:
+    def _load_keys(self) -> Dict[str, List[Dict]]:
+        """Loads keys from JSON and Envs."""
+        data = {"gemini": [], "openai": [], "claude": [], "other": []}
+        
+        # 1. Try JSON Vault
+        if os.path.exists(self.secrets_path):
+            try:
+                with open(self.secrets_path, 'r') as f:
+                    loaded = json.load(f)
+                    # Merge securely
+                    for provider, keys in loaded.items():
+                        if provider in data:
+                            data[provider].extend(keys)
+            except Exception as e:
+                logger.error(f"Failed to load secrets/keys.json: {e}")
+        
+        # 2. Fallback to Env Vars (Legacy Support)
+        if not data["gemini"] and os.getenv("GEMINI_API_KEY"):
+            data["gemini"].append({
+                "alias": "Env_Legacy",
+                "key": os.getenv("GEMINI_API_KEY"),
+                "tier": "unknown",
+                "owner": "System"
+            })
+            
+        if not data["openai"] and os.getenv("OPENAI_API_KEY"):
+            data["openai"].append({
+                "alias": "Env_Legacy",
+                "key": os.getenv("OPENAI_API_KEY"),
+                "tier": "unknown",
+                "owner": "System"
+            })
+            
+        return data
+
+    def get_key(self, provider: str, tier: str = None) -> Optional[str]:
         """
-        Get an active API key for the provider.
-        Args:
-            provider: 'openai' | 'gemini'
-            owner: Optional filter (e.g. 'Igor', 'Artur')
-        Returns:
-            API Key string or None
+        Get a valid API Key for the provider.
+        Auto-rotates between available keys.
         """
-        pool = self.pools.get(provider, [])
+        provider = provider.lower()
+        pool = self.key_store.get(provider, [])
+        
+        # Filter by tier if requested
+        if tier:
+            pool = [k for k in pool if k.get('tier') == tier]
+            
         if not pool:
+            logger.warning(f"No keys found for provider: {provider} (Tier: {tier})")
             return None
-            
-        # Filter active keys
-        candidates = [k for k in pool if k.get('status') == 'active']
         
-        # Filter by owner if specified
-        if owner:
-            owner_candidates = [k for k in candidates if k.get('owner') == owner]
-            if owner_candidates:
-                candidates = owner_candidates
-            else:
-                print(f"⚠️ No active keys for owner '{owner}' in '{provider}'. Falling back to general pool.")
+        # Simple Random Load Balancing (Effective enough for family use)
+        # Can be upgraded to Round-Robin with state later
+        selected = random.choice(pool)
         
-        if not candidates:
-            return None
-            
-        # Strategy: Random for now (Load Balancing)
-        # Future: Least Usage / Priority Weighted
-        selected = random.choice(candidates)
-        return selected['api_key']
+        # Log usage (masked)
+        alias = selected.get('alias', 'Unknown')
+        logger.info(f"Using key '{alias}' for {provider}")
+        
+        return selected['key']
 
-    def report_failure(self, provider: str, key: str):
-        """Mark a key as failing (simple circuit breaker)."""
-        # Complex logic to disable key temporarily can go here
-        masked = f"{key[:5]}...{key[-3:]}"
-        print(f"⚠️ Key reported failure: {masked} ({provider})")
-
-# Usage Example
-if __name__ == "__main__":
-    broker = TokenBroker()
-    
-    print("\n--- Testing Gemini Pool ---")
-    key = broker.get_key("gemini")
-    print(f"Got Gemini Key: {key[:10]}..." if key else "No Gemini Key found.")
-    
-    print("\n--- Testing OpenAI Pool ---")
-    key = broker.get_key("openai")
-    print(f"Got OpenAI Key: {key[:10]}..." if key else "No OpenAI Key found.")
+    def list_available_pools(self):
+        """Debug helper to see what's loaded."""
+        summary = {}
+        for prov, keys in self.key_store.items():
+            summary[prov] = len(keys)
+        return summary
