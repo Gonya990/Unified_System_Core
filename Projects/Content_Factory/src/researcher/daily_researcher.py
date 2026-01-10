@@ -13,20 +13,23 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 # Setup paths
-SRC_DIR = Path(__file__).parent.parent.resolve()
-FACTORY_DIR = SRC_DIR.parent
-ROOT_DIR = FACTORY_DIR.parent # Unified_System
+SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
+FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
+PROJECTS_DIR = FACTORY_DIR.parent # /Projects
+ROOT_DIR = PROJECTS_DIR.parent # Unified_System (Root)
 
-# Add all source subdirectories to path
-for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
-    sys.path.append(str(SRC_DIR / d))
+# Add Script Subdirectories and Utilities
+sys.path.append(str(SRC_DIR / "researcher"))
+sys.path.append(str(SRC_DIR / "pipeline"))
+sys.path.append(str(SRC_DIR / "assets"))
+sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 
 load_dotenv(ROOT_DIR / ".env")
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 # Import TokenBroker
 try:
-    from Scripts.Utilities.token_broker import TokenBroker
+    from token_broker import TokenBroker
     BROKER = TokenBroker()
     print("✅ TokenBroker imported successfully")
 except ImportError:
@@ -403,9 +406,7 @@ def main():
         return
 
     # Check for Output Directory
-    timestamp = time.strftime("%Y-%m-%d")
-    output_base = ROOT_DIR.parent / "Production_Factory/output"
-    daily_dir = output_base / timestamp
+    daily_dir = FACTORY_DIR / "outputs" / timestamp
     daily_dir.mkdir(parents=True, exist_ok=True)
     
     # Save Script Data
