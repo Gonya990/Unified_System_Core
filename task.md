@@ -23,7 +23,7 @@
 ## 📋 Ближайшие шаги (Next Actions)
 
 - [ ] **Council Approval:** Получить "OK" на архитектуру от Кости.
-- [ ] **Token Broker:** Реализовать `Scripts/Utilities/token_broker.py` по новой архитектуре.
+- [x] **Token Broker:** Реализовано `Scripts/Utilities/token_broker.py` по новой архитектуре.
 - [x] **Keys Injection:** Добавить ключи (Arthur, Igor, ...) в безопасное хранилище (Реализовано через `family_map.json`).
 - [x] **Identity Pattern:** Создан скрипт `Scripts/Templates/identity_setup_pattern.py` для передачи Косте.
 - [ ] **Visas:** Разобраться с `VioletCastle` (это Костя или нет?) - (Arthur подтвержден как child-account).

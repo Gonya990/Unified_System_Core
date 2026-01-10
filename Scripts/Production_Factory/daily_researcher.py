@@ -99,7 +99,17 @@ async def deliberate_on_trends(topics):
     """
     
     try:
-        council = LLMCouncil.from_env()
+        # Use TokenBroker for keys
+        from Scripts.Utilities.token_broker import TokenBroker
+        broker = TokenBroker()
+        
+        # Try to use broker, fallback to env if broker fails/empty
+        try:
+            council = LLMCouncil.from_token_broker(broker)
+        except ValueError:
+            logger.warning("TokenBroker has no keys. Trying .env...")
+            council = LLMCouncil.from_env()
+            
         session = await council.deliberate(prompt, verbose=True)
         final_answer = session.stage3_consensus
         await council.close()
