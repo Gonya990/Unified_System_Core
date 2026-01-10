@@ -61,6 +61,13 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 
+
+# Directory for persistent tokens (mounted from ./secrets in docker-compose)
+SECRETS_DIR = "/app/secrets"
+if not os.path.exists(SECRETS_DIR):
+    # Fallback for local dev without docker
+    SECRETS_DIR = "."
+
 class GoogleAuthManager:
     def __init__(self, client_secrets_file="client_secret.json"):
         self.client_secrets_file = client_secrets_file
@@ -110,11 +117,32 @@ class GoogleAuthManager:
                 )
 
             flow.fetch_token(code=code)
+            creds = flow.credentials
+            
+            # Save to persistent file
+            if user_id:
+                token_path = os.path.join(SECRETS_DIR, f"token_{user_id}.json")
+                with open(token_path, 'w') as token_file:
+                    token_file.write(creds.to_json())
+                logger.info(f"Saved persistent token to {token_path}")
+            
             logger.info(f"Successfully exchanged code for user {user_id}")
-            return flow.credentials
+            return creds
         except Exception as e:
             logger.error(f"Error exchanging code: {e}")
             return None
+
+
+    def load_credentials(self, user_id: int):
+        """Load credentials from persistent file."""
+        try:
+            token_path = os.path.join(SECRETS_DIR, f"token_{user_id}.json")
+            if os.path.exists(token_path):
+                logger.info(f"Loading persistent token for {user_id} from {token_path}")
+                return Credentials.from_authorized_user_file(token_path, SCOPES)
+        except Exception as e:
+            logger.error(f"Error loading persistent credentials: {e}")
+        return None
 
     def start_local_server(self, timeout: int = 120):
         """
