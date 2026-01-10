@@ -15,7 +15,23 @@
       "date": "10 Jan 2026 20:22:48 +0200",
       "category": "urgent",
       "body_preview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns:XSLExtentions=\"urn:XSLExtentions\">\r\n  <head>\r\n    <META http-equiv=\"Content-T"
+    },
+    {
+      "id": "19ba9a7eb8b9e2ae",
+      "subject": "Gonya990/Unified_System_Core - 1 internal incident detected",
+      "sender": "GitGuardian Team <support@gitguardian.com>",
+      "date": "Sat, 10 Jan 2026 20:45:11 +0000 (UTC)",
+      "category": "info",
+      "body_preview": "<html xmlns=\"https://www.w3.org/1999/xhtml\" lang=\"en\" style=\"min-height: 100%; background: #f4f6f7\">\r\n\r\n<head>\r\n  <!-- The character set should be utf-8 -->\r\n  \r\n  <meta name=\"viewport\" content=\"width"
+    },
+    {
+      "id": "19ba988f3fa00283",
+      "subject": "Gonya990/Unified_System_Core - 2 internal incidents detected",
+      "sender": "GitGuardian Team <support@gitguardian.com>",
+      "date": "Sat, 10 Jan 2026 20:11:21 +0000 (UTC)",
+      "category": "info",
+      "body_preview": "<html xmlns=\"https://www.w3.org/1999/xhtml\" lang=\"en\" style=\"min-height: 100%; background: #f4f6f7\">\r\n\r\n<head>\r\n  <!-- The character set should be utf-8 -->\r\n  \r\n  <meta name=\"viewport\" content=\"width"
     }
   ],
-  "last_check": "2026-01-10T22:02:14.335126"
+  "last_check": "2026-01-10T23:20:59.398821"
 }

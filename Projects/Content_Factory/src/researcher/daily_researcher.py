@@ -13,9 +13,14 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 # Setup paths
-# Setup paths
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
-sys.path.append(str(ROOT_DIR))
+SRC_DIR = Path(__file__).parent.parent.resolve()
+FACTORY_DIR = SRC_DIR.parent
+ROOT_DIR = FACTORY_DIR.parent # Unified_System
+
+# Add all source subdirectories to path
+for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
+    sys.path.append(str(SRC_DIR / d))
+
 load_dotenv(ROOT_DIR / ".env")
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
