@@ -193,4 +193,19 @@ Unified_System_Core/
 
 ---
 
+## Agent Mail Identity
+
+**Billboard Project:** `/home/gonya/Unified_System` (shared by all agents)
+**Server:** igor-macbook:8765
+
+Host-specific agent identity is configured in `.env`:
+- `AGENT_MAIL_NAME` - persistent agent name (e.g., VioletCastle)
+- `AGENT_MAIL_PROGRAM` - agent program (claude-code)
+- `AGENT_MAIL_MODEL` - model identifier
+- `AGENT_MAIL_PROJECT` - always `/home/gonya/Unified_System`
+
+See `.claude/commands/sync-mail.md` for full workflow and agent registry.
+
+---
+
 **Based on**: "Modern Software Engineering" by Dave Farley

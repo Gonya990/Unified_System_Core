@@ -108,6 +108,32 @@ Flow:
 
 ---
 
+## Agent Mail Coordination
+
+All agents coordinate via MCP Agent Mail on a shared billboard.
+
+**Billboard:** `/home/gonya/Unified_System`
+**Server:** igor-macbook:8765
+
+### Registered Agents
+
+| Name | Program | Owner |
+|------|---------|-------|
+| VioletCastle | claude-code | Kosta |
+| OrangeStone | antigravity-core | Bot |
+| PinkLake | llm-council | Bot |
+| FuchsiaCat | llm-council | Bot |
+
+### Onboarding New Agent
+
+1. Configure `.env` with `AGENT_MAIL_*` variables
+2. Run `/sync-mail` to register and fetch inbox
+3. Use `whois` to discover other agents
+
+See `.claude/commands/sync-mail.md` for full workflow.
+
+---
+
 ## See Also
 
 - `../orchestration/` - Agent orchestration framework

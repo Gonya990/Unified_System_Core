@@ -11,138 +11,203 @@ This workflow helps agents sync with each other to ensure coordination and avoid
 
 ---
 
-## Prerequisites
+## Billboard Project (Shared by All Agents)
 
-Set these environment variables in your `.env` or session:
-
-```bash
-AGENT_NAME=FuchsiaCat          # Your assigned agent name
-AGENT_PROJECT_KEY=/Gonya990/Unified_System_Core
+```
+PROJECT_KEY: /home/gonya/Unified_System
+SERVER: igor-macbook (MCP Agent Mail)
 ```
 
-Your agent name is assigned once during initial registration. Use `$AGENT_NAME` throughout.
+All agents on this swarm use the SAME project key regardless of local working directory.
 
 ---
 
-## Step 1: Fetch Inbox
+## Agent Registry
 
-Check for new messages from other agents or the user.
+| Agent Name | Program | Host | Owner |
+|------------|---------|------|-------|
+| **VioletCastle** | claude-code (opus-4.5) | kosta-laptop | Kosta |
+| **OrangeStone** | antigravity-core (gemini) | igor-macbook | Bot |
+| **PinkLake** | llm-council (gemini) | igor-macbook | Bot |
+| **FuchsiaCat** | llm-council (gemini) | igor-macbook | Bot |
+
+---
+
+## First-Time Onboarding
+
+### 1. Check your local `.env` file
+
+```bash
+# grep for Agent Mail config
+grep "AGENT_MAIL" .env
+```
+
+### 2. If not configured, add these lines to `.env`:
+
+```bash
+# Agent Mail Identity (host-specific)
+AGENT_MAIL_NAME=YourAgentName        # e.g., VioletCastle
+AGENT_MAIL_PROGRAM=claude-code       # or opencode, antigravity-core
+AGENT_MAIL_MODEL=opus-4.5            # your model
+AGENT_MAIL_PROJECT=/home/gonya/Unified_System  # ALWAYS this billboard
+```
+
+See `.env.example` for template.
+
+### 3. Register with the billboard
 
 ```
-agent_mail_fetch_inbox(
-  project_key="$AGENT_PROJECT_KEY",
-  agent_name="$AGENT_NAME",
+mcp__mcp-agent-mail__register_agent(
+  project_key="/home/gonya/Unified_System",
+  program="$AGENT_MAIL_PROGRAM",
+  model="$AGENT_MAIL_MODEL",
+  name="$AGENT_MAIL_NAME",
+  task_description="<what you're working on>"
+)
+```
+
+### 4. Set contact policy (optional, for privacy)
+
+```
+mcp__mcp-agent-mail__set_contact_policy(
+  project_key="/home/gonya/Unified_System",
+  agent_name="$AGENT_MAIL_NAME",
+  policy="contacts_only"  # or "open", "auto", "block_all"
+)
+```
+
+---
+
+## Regular Sync Workflow
+
+### Step 1: Fetch Inbox
+
+```
+mcp__mcp-agent-mail__fetch_inbox(
+  project_key="/home/gonya/Unified_System",
+  agent_name="$AGENT_MAIL_NAME",
   include_bodies=true,
   limit=20
 )
 ```
 
 **Actions**:
-- **URGENT messages**: STOP this workflow and handle immediately
-- **Coordination messages** (e.g., "I'm editing file X"): Respect file reservations
-- **Ack-required messages**: Acknowledge with `agent_mail_acknowledge_message`
+- **URGENT messages**: STOP and handle immediately
+- **Coordination messages**: Respect file reservations
+- **Ack-required messages**: Call `acknowledge_message`
 
----
-
-## Step 2: Check File Reservations
-
-Before editing files, check if another agent has reserved them.
+### Step 2: Check File Reservations (before editing)
 
 ```
-agent_mail_file_reservation_paths(
-  project_key="$AGENT_PROJECT_KEY",
-  agent_name="$AGENT_NAME",
+mcp__mcp-agent-mail__file_reservation_paths(
+  project_key="/home/gonya/Unified_System",
+  agent_name="$AGENT_MAIL_NAME",
   paths=["<files-you-plan-to-edit>"],
   exclusive=true,
-  reason="<what you're doing>"
+  ttl_seconds=3600,
+  reason="bd-123: <task description>"
 )
 ```
 
-If conflicts are reported, coordinate with the holder or wait.
+If conflicts reported, coordinate with holder or wait.
 
----
-
-## Step 3: Sync Task Board (Beads)
-
-Ensure your task list is up to date.
+### Step 3: Sync Task Board (Beads)
 
 ```bash
 bd sync
-bd ready
+bd ready --json
 ```
 
 **Actions**:
-- Check if your current task was modified or closed by another agent
+- Check if your task was modified/closed by another agent
 - Look for new high-priority blockers
 - Claim work with `bd update <id> --status=in_progress`
 
----
-
-## Step 4: Check Workflow Locks
-
-Check if another agent is performing a critical operation.
-
-```bash
-if [ -f .agent/.workflow-lock ]; then
-  echo "LOCK FOUND:"
-  cat .agent/.workflow-lock
-else
-  echo "No active workflow locks."
-fi
-```
-
-If lock exists and is recent (< 5 min), wait before starting conflicting workflows.
-
----
-
-## Step 5: Broadcast Status (Optional)
-
-If you completed significant work or are starting a major task, notify other agents:
+### Step 4: Broadcast Status (if needed)
 
 ```
-agent_mail_send_message(
-  project_key="$AGENT_PROJECT_KEY",
-  sender_name="$AGENT_NAME",
-  to=["<other-agents>"],
-  subject="Status Update",
-  body_md="Starting work on <task>. Will be editing <files>."
+mcp__mcp-agent-mail__send_message(
+  project_key="/home/gonya/Unified_System",
+  sender_name="$AGENT_MAIL_NAME",
+  to=["OrangeStone", "VioletCastle"],  # relevant agents
+  subject="[bd-123] Starting work",
+  body_md="Working on <task>. Reserved <files>.",
+  thread_id="bd-123",
+  ack_required=false
 )
 ```
-
----
-
-## Step 6: Summary Report
-
-After syncing, report:
-
-- **Inbox**: X new messages (Y urgent)
-- **File Reservations**: Any conflicts?
-- **Tasks**: Any status changes from beads?
-- **Locks**: Active workflow locks?
-
-If all clear, proceed with your work.
 
 ---
 
 ## Quick Sync (One-liner)
 
-For fast syncs, just fetch inbox and check beads:
+For fast syncs between work steps:
 
 ```
-1. agent_mail_fetch_inbox(project_key="$AGENT_PROJECT_KEY", agent_name="$AGENT_NAME", include_bodies=true)
+1. mcp__mcp-agent-mail__fetch_inbox(project_key="/home/gonya/Unified_System", agent_name="$AGENT_MAIL_NAME")
 2. bd sync && bd ready
 ```
 
 ---
 
-## First-Time Setup
+## Discovery Commands
 
-If you're a new agent and don't have `$AGENT_NAME` yet:
+### Who's online?
 
-1. Ask Kostya to assign you an agent name (e.g., FuchsiaCat, PurpleCastle)
-2. Add to your `.env`:
-   ```
-   AGENT_NAME=YourAssignedName
-   AGENT_PROJECT_KEY=/Gonya990/Unified_System_Core
-   ```
-3. Registration is done once via `agent_mail_register_agent` at session start (handled by your agent framework)
+```
+mcp__mcp-agent-mail__whois(
+  project_key="/home/gonya/Unified_System",
+  agent_name="OrangeStone"  # or any agent name
+)
+```
+
+### Search messages
+
+```
+mcp__mcp-agent-mail__search_messages(
+  project_key="/home/gonya/Unified_System",
+  query="bd-123 OR deployment",
+  limit=20
+)
+```
+
+### My contacts
+
+```
+mcp__mcp-agent-mail__list_contacts(
+  project_key="/home/gonya/Unified_System",
+  agent_name="$AGENT_MAIL_NAME"
+)
+```
+
+---
+
+## Reference Documentation
+
+For detailed MCP Agent Mail usage, see:
+- `External_Tools/Stack/mcp_agent_mail/AGENTS.md` - Section: "## MCP Agent Mail"
+- `External_Tools/Stack/mcp_agent_mail/project_idea_and_guide.md` - Full design docs
+
+Key sections to grep:
+
+```bash
+# How to use effectively
+grep -A 50 "How to use effectively" External_Tools/Stack/mcp_agent_mail/AGENTS.md
+
+# Beads integration
+grep -A 30 "Integrating with Beads" External_Tools/Stack/mcp_agent_mail/AGENTS.md
+
+# File reservations
+grep -A 20 "File ownership & conflict" External_Tools/Stack/mcp_agent_mail/project_idea_and_guide.md
+```
+
+---
+
+## Troubleshooting
+
+| Error | Solution |
+|-------|----------|
+| `from_agent not registered` | Run `register_agent` first |
+| `FILE_RESERVATION_CONFLICT` | Wait for expiry or coordinate |
+| `Agent not found` | Check spelling, names are adjective+noun |
+| Can't reach server | Check network to igor-macbook:8765 |
