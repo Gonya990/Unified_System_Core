@@ -32,9 +32,31 @@ OUTPUT_FILE = BASE_DIR / "Projects" / "AI_Core" / "src" / "emails_4_months.json"
 
 
 def get_gmail_service():
+    """Authenticate and return Gmail service with proper credential refresh."""
     creds = None
     if TOKEN_PATH.exists():
         creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            print("Refreshing expired credentials...")
+            creds.refresh(Request())
+        else:
+            if not CREDENTIALS_PATH.exists():
+                print(f"❌ Missing credentials file: {CREDENTIALS_PATH}")
+                print("Please run gmail_agent.py first to set up OAuth.")
+                sys.exit(1)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                str(CREDENTIALS_PATH), SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+
+        # Save refreshed/new credentials
+        CREDS_DIR.mkdir(parents=True, exist_ok=True)
+        with open(TOKEN_PATH, "w") as token_file:
+            token_file.write(creds.to_json())
+        print("✅ Credentials saved.")
+
     return build("gmail", "v1", credentials=creds)
 
 
