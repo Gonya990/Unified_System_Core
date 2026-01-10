@@ -1,9 +1,8 @@
-
 # 🏭 Content Factory
 
 Autonomous AI Video Production Pipeline for Instagram, LinkedIn, and more.
 
-## 🏗 Structure
+### 🏗 Structure
 
 - `src/researcher/`: Trend analysis and script generation (Gemini/OpenAI).
 - `src/pipeline/`: Core orchestration (Text-to-Video) and scheduling.
@@ -11,13 +10,13 @@ Autonomous AI Video Production Pipeline for Instagram, LinkedIn, and more.
 - `src/video/`: Assembly, TTS, and subtitle burning.
 - `src/uploaders/`: Social media integration (Instagram, LinkedIn).
 
-## 🚀 Quick Start
+### 🚀 Quick Start
 
 ```bash
 ./src/pipeline/factory_scheduler.py --auto
 ```
 
-## 🛡 Features
+### 🛡 Features
 
 - **Meta-Orchestration**: Integrated with `TokenBroker` for secure API key rotation.
 - **Multilingual**: Supports Russian, English, and Hebrew content.
@@ -25,4 +24,5 @@ Autonomous AI Video Production Pipeline for Instagram, LinkedIn, and more.
 - **Vibranium Level**: Fully automated, secure, and production-ready.
 
 ---
-*Vibranium Era - 2026*
+
+#### Vibranium Era - 2026

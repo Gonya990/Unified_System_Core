@@ -9,9 +9,10 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Setup paths
-SRC_DIR = Path(__file__).parent.parent.resolve()
-FACTORY_DIR = SRC_DIR.parent
-ROOT_DIR = FACTORY_DIR.parent # Unified_System
+SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
+FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
+PROJECTS_DIR = FACTORY_DIR.parent # /Projects
+ROOT_DIR = PROJECTS_DIR.parent # Unified_System (Root)
 
 # Add all source subdirectories to path
 for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
@@ -30,9 +31,15 @@ REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
 def agent_sync(msg):
-    """Синхронизация с агентом Кости (FuchsiaCat) через MCP"""
+    """Синхронизация с агентом Кости (VioletCastle) через MCP"""
     try:
-        subprocess.run(["python3", "sync_agent.py", msg], capture_output=True, text=True)
+        sync_script = ROOT_DIR / "Scripts/Orchestration/sync_agent.py"
+        env = os.environ.copy()
+        # Ensure AGENT_MAIL_TOKEN is passed if not in env
+        if "AGENT_MAIL_TOKEN" not in env:
+            env["AGENT_MAIL_TOKEN"] = "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+        
+        subprocess.run(["python3", str(sync_script), msg], capture_output=True, text=True, env=env)
         print(f"🔄 Agent Sync: {msg[:50]}...")
     except Exception as e:
         print(f"⚠️ Sync Error: {e}")

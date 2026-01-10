@@ -16,20 +16,31 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 # Setup paths
-SRC_DIR = Path(__file__).parent.parent.resolve()
-FACTORY_DIR = SRC_DIR.parent
-ROOT_DIR = FACTORY_DIR.parent # Unified_System
+SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
+FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
+PROJECTS_DIR = FACTORY_DIR.parent # /Projects
+ROOT_DIR = PROJECTS_DIR.parent # Unified_System (Root)
 
 # Add all source subdirectories to path
 for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
     sys.path.append(str(SRC_DIR / d))
+
+# Add Scripts/Utilities to path for TokenBroker
+sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 
 def agent_mindfulness(task: str):
     """Reflecting user request: strategic pauses & token availability checks"""
     print(f"🕵️ Vibranium Agent checking {task} (Pausing for stability)...")
     time.sleep(2.5) 
 
-# Load API keys from potential locations - OVERRIDE to ensure new key is used
+# Load TokenBroker
+try:
+    from token_broker import TokenBroker
+    broker = TokenBroker()
+except ImportError:
+    print("⚠️ TokenBroker not found. Falling back to environment variables.")
+    broker = None
+
 # Load API keys from potential locations
 load_dotenv(ROOT_DIR / ".env", override=True)
 load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
@@ -74,9 +85,9 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using OpenAI TTS with Studio Post-Processing"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
     
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
     if not api_key:
-        print("❌ Error: OPENAI_API_KEY not found in environment.")
+        print("❌ Error: OPENAI_API_KEY not found via TokenBroker or Environment.")
         return False
         
     # Masked key debug
@@ -119,14 +130,20 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     
     mp3_path = output_path.with_suffix(".mp3")
     edge_tts_cmd = "edge-tts"
-    venv_bin = ROOT_DIR / "venv_content/bin/edge-tts"
-    system_venv_bin = ROOT_DIR.parent.parent / "venv/bin/edge-tts"
-    if venv_bin.exists(): 
-        edge_tts_cmd = str(venv_bin)
-    elif system_venv_bin.exists():
-        edge_tts_cmd = str(system_venv_bin)
+    
+    # Search paths for edge-tts binary
+    search_paths = [
+        FACTORY_DIR / "venv/bin/edge-tts",
+        ROOT_DIR / "venv_content/bin/edge-tts",
+        ROOT_DIR.parent.parent / "venv/bin/edge-tts"
+    ]
+    
+    for p in search_paths:
+        if p.exists():
+            edge_tts_cmd = str(p)
+            break
     else:
-        # Try to find in PATH
+        # Fallback to which
         import shutil
         found = shutil.which("edge-tts")
         if found: edge_tts_cmd = found
@@ -159,9 +176,9 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
 def transcribe_audio_gemini(audio_path: Path) -> List[Dict]:
     """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
     print("🌠 Falling back to Gemini for transcription...")
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    api_key = broker.get_key("gemini") if broker else (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
     if not api_key:
-        print("❌ Gemini Transcription failed: No API Key (checked GEMINI_API_KEY and GOOGLE_API_KEY)")
+        print("❌ Gemini Transcription failed: No API Key found.")
         return []
         
     print(f"🔑 Using Gemini Key: {api_key[:8]}... (len={len(api_key)})")

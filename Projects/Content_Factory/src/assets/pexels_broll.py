@@ -20,8 +20,10 @@ def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
     try:
         # Add path to find Utilities
         current_dir = Path(__file__).parent.resolve()
-        sys.path.append(str(current_dir.parent.parent)) # Root
-        from Scripts.Utilities.token_broker import TokenBroker
+        # Projects/Content_Factory/src/assets -> Up 4 levels to Root
+        root_dir = current_dir.parent.parent.parent.parent
+        sys.path.append(str(root_dir / "Scripts/Utilities"))
+        from token_broker import TokenBroker
         
         broker = TokenBroker()
         broker_key = broker.get_key("pexels", "free") or broker.get_key("pexels")
@@ -31,7 +33,7 @@ def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
         pass
 
     if not api_key:
-        print("⚠️ PEXELS_API_KEY not set (checked env and TokenBroker). Using mock data.")
+        print("⚠️ PEXELS_API_KEY not set (checked env and TokenBroker).")
         return []
     
     url = "https://api.pexels.com/videos/search"
