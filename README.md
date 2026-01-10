@@ -133,4 +133,13 @@ The Unified AI Bot is now a **complete life management system**:
 
 ---
 
+## 🌍 Communication & Translation
+
+All agents operating in this system follow the **English Translation Protocol**:
+- Final output is always in **English**.
+- The tag **[russian]** is added if the original context was Russian.
+- Original Russian text is **removed** to maintain clarity.
+
+---
+
 *Powered by Antigravity Agent* 🚀

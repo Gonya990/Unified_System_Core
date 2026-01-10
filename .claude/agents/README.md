@@ -60,6 +60,16 @@
 
 ---
 
+## Communication & Translation Protocol
+
+All agents MUST follow the **English Translation Protocol**:
+1.  **Language**: Final output must be in **English**.
+2.  **Tagging**: Add the tag **[russian]** if the content originated from Russian or follows the RU/EN mandate.
+3.  **Cleanup**: NEVER include original Russian text in the response.
+4.  **Integrity**: Preserve 100% of the original meaning and technical context.
+
+---
+
 ## Orchestration Patterns
 
 ### Level 1: Single Agent (< 60s)

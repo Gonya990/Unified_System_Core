@@ -26,8 +26,8 @@ for the full logical layout.
 
 **Primary Preference**:
 
-- **Bilingual Responses**: Answer in **Russian** and duplicate in **English**.
-- **Context**: Ensure technical terms are clear in both.
+- **English Translation Protocol**: Answer in **English**. If the original source or intent was in Russian, add the tag **[russian]** at the beginning of the response. DO NOT include the original Russian text.
+- **Context**: Ensure technical terms are clear and context is preserved.
 
 ---
 

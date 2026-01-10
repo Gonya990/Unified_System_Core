@@ -4,7 +4,7 @@ set password "GarYk6550"
 set host "gonya@100.127.194.111"
 
 send_user "\nInstalling missing dependency: aiohttp...\n"
-spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core && uv add aiohttp"
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Projects/AI_Core && uv add aiohttp"
 expect {
     "password:" { send "$password\r"; exp_continue }
     "Resolved" { send_user "Dependency installed.\n" }
@@ -13,7 +13,7 @@ expect {
 catch wait
 
 send_user "\nRetrying bot launch...\n"
-spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core/src && start /B uv run python ai_telegram_bot.py"
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Projects/AI_Core/src && start /B uv run python ai_telegram_bot.py"
 expect {
     "password:" { send "$password\r"; exp_continue }
     eof
