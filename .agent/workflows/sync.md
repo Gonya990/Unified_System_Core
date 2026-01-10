@@ -1,48 +1,16 @@
 ---
-description: Safe sync of git and tasks (no destructive operations)
+description: Full system orchestration (Commit, Push, Tasks, and Remote Server Update)
 ---
 
-// turbo
+# 💎 Vibranium Full Sync
 
-# Safe Sync
+This is the ultimate command to unify the entire Unified System across all nodes.
+It ensures that local changes, task statuses, and the remote server are 100% in sync.
 
-Sync git repository and task board without destructive operations.
+// turbo-all
 
-## Quick Sync
+1. Run the Vibranium Sync orchestrator:
+   `bash Scripts/Orchestration/vibranium-sync.sh`
 
-```bash
-bash Scripts/Orchestration/sync.sh
-```
-
-This runs:
-1. **Git sync** - fetch, pull/push with rebase, handle conflicts
-2. **Tasks sync** - `bd sync` + show ready tasks
-
-## Individual Syncs
-
-```bash
-# Git only
-bash Scripts/Orchestration/sync.sh git
-
-# Tasks only
-bash Scripts/Orchestration/sync.sh tasks
-```
-
-## Deployment (Separate)
-
-Deployment is intentionally separate from sync:
-
-```bash
-# Update code on remote server
-bash Scripts/Orchestration/deploy/remote-update.sh
-
-# Restart services (bot, mcp, or all)
-bash Scripts/Orchestration/deploy/restart-services.sh all
-```
-
-## Safety Features
-
-- **No auto-commit** - warns if uncommitted changes exist
-- **No force push** - handles conflicts via rebase
-- **No hard reset** - preserves work on remote
-- **Separate deploy** - sync code ≠ restart services
+2. Verify that the final state is clean:
+   `git status`
