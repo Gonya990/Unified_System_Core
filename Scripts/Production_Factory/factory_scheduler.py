@@ -13,6 +13,17 @@ ROOT_DIR = Path(__file__).parent.resolve()
 sys.path.append(str(ROOT_DIR))
 sys.path.append(str(ROOT_DIR.parent / "Orchestration"))
 
+# --- PYTHON 3.9 COMPATIBILITY PATCH ---
+if sys.version_info < (3, 10):
+    try:
+        import importlib_metadata
+        import importlib.metadata
+        if not hasattr(importlib.metadata, "packages_distributions"):
+            importlib.metadata.packages_distributions = importlib_metadata.packages_distributions
+    except ImportError:
+        pass
+# --------------------------------------
+
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
 
