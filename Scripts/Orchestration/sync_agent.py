@@ -8,7 +8,7 @@ from datetime import datetime
 # CONFIGURATION
 URL = "http://localhost:8765/mcp"
 TOKEN = "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
-PROJECT_KEY = "/Gonya990/Unified_System_Core"
+PROJECT_KEY = "/home/gonya/Unified_System"
 MY_NAME = "Antigravity"
 TARGET_AGENT = "FuchsiaCat"
 
