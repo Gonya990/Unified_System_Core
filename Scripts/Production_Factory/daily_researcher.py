@@ -17,16 +17,12 @@ from pathlib import Path
 current_dir = Path(__file__).parent.resolve()
 sys.path.append(str(current_dir))
 
-# Import sibling modules
-try:
-    from viral_content_generator import generate_script
-    from pexels_broll import semantic_search_broll
-except ImportError:
-    # If running standalone
-    pass
+# Add Project Root (Unified_System) to path for absolute imports
+project_root = current_dir.parent.parent
+sys.path.append(str(project_root))
 
 # Add LLM Council to path
-council_dir = current_dir.parent.parent / "LLM_Council"
+council_dir = project_root / "LLM_Council"
 sys.path.append(str(council_dir))
 
 try:
@@ -235,11 +231,15 @@ def generate_vision_assets(scenes, assets_dir: Path, style="impact"):
     try:
         from Scripts.Utilities.token_broker import TokenBroker
         broker = TokenBroker()
-        key = broker.get_key("openai", tier="paid") # Images are expensive
+        # Explicitly request OpenAI key from broker
+        key = broker.get_key("openai", tier="paid") 
         if key:
             client = OpenAI(api_key=key)
-    except:
-        pass
+            logger.info("TokenBroker: Successfully acquired OpenAI key for DALL-E.")
+        else:
+            logger.warning("TokenBroker: No 'paid' OpenAI key available. DALL-E generation will be skipped.")
+    except Exception as e:
+        logger.error(f"Failed to init TokenBroker/OpenAI: {e}")
         
     resolved_assets = []
     

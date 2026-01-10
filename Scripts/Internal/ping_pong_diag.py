@@ -40,23 +40,28 @@ async def check_bot_health(bot_container="ai_core-ai-bot-local-1"):
     return True
 
 async def main():
-    logger.info("🚀 Initiating Vibranium Ping-Pong Protocol...")
+    logger.info("🚀 Initiating Vibranium Ping-Pong Protocol (Continuous Mode)...")
     
-    # 1. Check Bot
-    bot_alive = await check_bot_health()
-    
-    # 2. Ping Kostya (FuchsiaCat)
-    kostya_status = await ping_mcp_agent("FuchsiaCat", "System Reboot Complete. Status?")
-    
-    # 3. Ping Council (PinkLake)
-    council_status = await ping_mcp_agent("PinkLake", "Council quorum call.")
-    
-    # 4. Report
-    if kostya_status and council_status:
-        logger.info("🌟 SYSTEM GREEN. All agents synced.")
-        logger.info("👉 To User: Connections are stable. Please retry your failed command now.")
-    else:
-        logger.warning("⚠️ SYSTEM AMBER. Some agents are silent.")
+    while True:
+        # 1. Check Bot
+        bot_alive = await check_bot_health()
+        
+        # 2. Ping Kostya (FuchsiaCat)
+        kostya_status = await ping_mcp_agent("FuchsiaCat", "Heartbeat check")
+        
+        # 3. Ping Council (PinkLake)
+        council_status = await ping_mcp_agent("PinkLake", "Council quorum check")
+        
+        # 4. Report
+        if kostya_status and council_status:
+            logger.info("🌟 SYSTEM GREEN. All agents synced.")
+        else:
+            logger.warning("⚠️ SYSTEM AMBER. Some agents are silent.")
+            
+        await asyncio.sleep(30) # Check every 30 seconds
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("🛑 Ping-Pog Protocol Stopped.")

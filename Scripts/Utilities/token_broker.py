@@ -52,10 +52,11 @@ class TokenBroker:
             try:
                 with open(self.secrets_path, 'r') as f:
                     loaded = json.load(f)
-                    # Merge securely
+                    # Merge securely and dynamically
                     for provider, keys in loaded.items():
-                        if provider in data:
-                            data[provider].extend(keys)
+                        if provider not in data:
+                            data[provider] = []
+                        data[provider].extend(keys)
             except Exception as e:
                 logger.error(f"Failed to load secrets/keys.json: {e}")
         
