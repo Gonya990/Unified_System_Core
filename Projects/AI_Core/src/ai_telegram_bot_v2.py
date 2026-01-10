@@ -59,7 +59,10 @@ from calendar_client import CalendarClient
 from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
 from telegram_schema_expert import TelegramSchemaExpert
+from conversation_manager import ConversationManager
+from telegram_schema_expert import TelegramSchemaExpert
 from agent_orchestrator import AgentOrchestrator, PIPELINES
+from identity_orchestrator import IdentityOrchestrator
 
 # Optional imports with fallbacks
 try:
@@ -298,6 +301,7 @@ async def login_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
+identity = IdentityOrchestrator(db, config, auth_manager)
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
 agent_orchestrator = AgentOrchestrator(inference)
@@ -310,40 +314,7 @@ else:
     digest_service = None
 
 # Admin access configuration & User Authorization
-def get_allowed_users():
-    """Load allowed users from .env and config/users.yaml."""
-    # 1. Get from Env/ConfigManager
-    users_str = config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
-    allowed = []
-    try:
-        allowed = [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
-    except ValueError as e:
-        logger.error(f"Invalid ALLOWED_USERS format: {e}")
-        allowed = [708531393, 5569219290, 578363419] # Fallback to admins
-
-    # 2. Add from config/users.yaml
-    try:
-        import yaml
-        users_file = Path(__file__).parent.parent / "config" / "users.yaml"
-        if not users_file.exists():
-            # Try same directory as script if not found (for docker)
-            users_file = Path(__file__).parent / "config" / "users.yaml"
-            
-        if users_file.exists():
-            with open(users_file, "r") as f:
-                data = yaml.safe_load(f)
-                if data and "users" in data:
-                    for u in data["users"]:
-                        uid = u.get("id")
-                        if uid and uid > 0 and uid not in allowed:
-                            allowed.append(uid)
-            logger.info(f"Loaded users from users.yaml. Total allowed: {len(allowed)}")
-    except Exception as e:
-        logger.error(f"Failed to load users.yaml: {e}")
-
-    return allowed
-
-ALLOWED_IDS = get_allowed_users()
+ALLOWED_IDS = identity.allowed_users
 logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
@@ -401,27 +372,12 @@ def get_settings_menu():
     return InlineKeyboardMarkup(keyboard)
 
 def get_calendar_client(user_id: int) -> Optional[CalendarClient]:
-    user_data = db.get_user(user_id)
-    if user_data and user_data['is_google_connected'] and user_data['google_creds']:
-        try:
-            creds_dict = json.loads(user_data['google_creds'])
-            return CalendarClient(credentials_dict=creds_dict)
-        except Exception as e:
-            logger.error(f"Failed to create CalendarClient for {user_id}: {e}")
-    return None
+    services = identity.get_google_services(user_id)
+    return services.get("calendar")
 
 def get_gmail_client(user_id: int) -> Optional[GmailClient]:
-    """Get Gmail client for user using their OAuth credentials from Firestore."""
-    if not GMAIL_AVAILABLE:
-        return None
-    user_data = db.get_user(user_id)
-    if user_data and user_data['is_google_connected'] and user_data['google_creds']:
-        try:
-            creds_dict = json.loads(user_data['google_creds'])
-            return GmailClient(credentials_dict=creds_dict)
-        except Exception as e:
-            logger.error(f"Failed to create GmailClient for {user_id}: {e}")
-    return None
+    services = identity.get_google_services(user_id)
+    return services.get("gmail")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -434,46 +390,39 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user.id)
     logger.info(f"[CMD] User {user.id} registered/updated in DB")
 
-    # 2. Check Auth/Approval
-    if not db.is_approved(user.id):
-        # Auto-approve if in ALLOWED_IDS
-        logger.info(f"[CMD] Checking if user {user.id} is in global ALLOWED_IDS: {ALLOWED_IDS}")
-
-        if user.id in ALLOWED_IDS:
-            db.approve_user(user.id, True)
-            logger.info(f"[CMD] Auto-approved user {user.id}")
-        else:
-            logger.warning(f"[CMD] User {user.id} not in ALLOWED_IDS, denying access")
-            await update.message.reply_text(
-                f"⛔️ **Доступ ограничен**\n\n"
-                f"Ваш ID: `{user.id}`\n"
-                f"Заявка отправлена администратору.\n\n"
-                f"Ожидайте одобрения.",
-                parse_mode='Markdown'
+    # 3. Check Auth/Approval
+    if not identity.check_access(user.id):
+        logger.warning(f"[CMD] User {user.id} denied access by IdentityOrchestrator")
+        await update.message.reply_text(
+            f"⛔️ **Доступ ограничен**\n\n"
+            f"Ваш ID: `{user.id}`\n"
+            f"Заявка отправлена администратору.\n\n"
+            f"Ожидайте одобрения.",
+            parse_mode='Markdown'
+        )
+        # Notify admin about new user request with approve button
+        try:
+            keyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton(f"✅ Одобрить", callback_data=f"approve_user:{user.id}"),
+                    InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_user:{user.id}")
+                ]
+            ])
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=(
+                    f"🆕 **Новая заявка на доступ**\n\n"
+                    f"👤 {user.full_name}\n"
+                    f"📱 @{user.username or 'нет username'}\n"
+                    f"🆔 `{user.id}`"
+                ),
+                parse_mode="Markdown",
+                reply_markup=keyboard
             )
-            # Notify admin about new user request with approve button
-            try:
-                keyboard = InlineKeyboardMarkup([
-                    [
-                        InlineKeyboardButton(f"✅ Одобрить", callback_data=f"approve_user:{user.id}"),
-                        InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_user:{user.id}")
-                    ]
-                ])
-                await context.bot.send_message(
-                    chat_id=ADMIN_ID,
-                    text=(
-                        f"🆕 **Новая заявка на доступ**\n\n"
-                        f"👤 {user.full_name}\n"
-                        f"📱 @{user.username or 'нет username'}\n"
-                        f"🆔 `{user.id}`"
-                    ),
-                    parse_mode="Markdown",
-                    reply_markup=keyboard
-                )
-                logger.info(f"[CMD] Sent approval request to admin {ADMIN_ID} for user {user.id}")
-            except Exception as e:
-                logger.error(f"[CMD] Failed to notify admin about new user: {e}")
-            return
+            logger.info(f"[CMD] Sent approval request to admin {ADMIN_ID} for user {user.id}")
+        except Exception as e:
+            logger.error(f"[CMD] Failed to notify admin about new user: {e}")
+        return
 
     # 3. Check Google Connection
     user_data = db.get_user(user.id)

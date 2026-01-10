@@ -29,6 +29,11 @@
 
 ## 📋 Ближайшие шаги (Next Actions)
 
+- [x] **Restoration:** Перезапуск терминалов (Ping-Pong, Landing Page).
+- [ ] **Integration Phase:**
+  - [x] **Factory Refactor:** Обновить `daily_researcher.py` для использования `TokenBroker`.
+  - [x] **Bot Refactor:** Перевести Telegram Bot на `IdentityOrchestrator` (Google Auth).
+
 - [x] **Council Approval:** Получено одобрение Phase 1 (10.01.2026).
 - [x] **Token Broker Phase 1:** Реализован Round-Robin, Blacklist,
   и интеграция в Council.
