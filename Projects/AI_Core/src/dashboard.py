@@ -145,6 +145,39 @@ async def get_token_stats():
     
     return usage_tracker.get_daily_usage(days=7)
 
+@app.get("/api/stats/system")
+async def get_system_stats():
+    """Get real-time system statistics for frontend widgets."""
+    import psutil
+    import time
+    
+    # System Metrics
+    cpu_percent = psutil.cpu_percent()
+    ram_obj = psutil.virtual_memory()
+    ram_percent = ram_obj.percent
+    
+    # Swarm Status
+    inference = bot_context.get("inference")
+    active_keys = 0
+    if inference and inference.swarm:
+        active_keys = inference.swarm.get_stats().get("gemini_keys_active", 0)
+        
+    # Kosta Status
+    kosta_ok = False
+    try:
+        import requests
+        r = requests.get("http://localhost:8765", timeout=0.2)
+        if r.status_code < 500: kosta_ok = True
+    except: pass
+    
+    return {
+        "cpu": cpu_percent,
+        "ram": ram_percent,
+        "swarm_keys": active_keys,
+        "kosta_status": "Online" if kosta_ok else "Offline",
+        "timestamp": time.time()
+    }
+
 @app.get("/search/notes")
 async def search_notes(q: str):
     """Search Notion notes."""
