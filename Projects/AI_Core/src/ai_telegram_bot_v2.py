@@ -3259,6 +3259,32 @@ def main():
         return
 
     logger.info("[STARTUP] Building application...")
+    
+    # Try to restore Google sessions for allowed users from persistent storage
+    try:
+        if auth_manager:
+            for uid in ALLOWED_IDS:
+                creds = auth_manager.load_credentials(uid)
+                if creds and creds.valid:
+                    logger.info(f"[STARTUP] Restored Google Session for user {uid}")
+                    # Update internal DB state if possible
+                    try:
+                        import sqlite3
+                        with sqlite3.connect("user_context.db") as conn:
+                            cursor = conn.cursor()
+                            # Check if user exists first to avoid error
+                            cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (uid,))
+                            if cursor.fetchone():
+                                cursor.execute(
+                                    "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+                                    (creds.to_json(), uid)
+                                )
+                                conn.commit()
+                    except Exception as db_e:
+                        logger.warning(f"Failed to update DB for restored session: {db_e}")
+    except Exception as e:
+        logger.error(f"[STARTUP] Error restoring sessions: {e}")
+
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Register error handler
