@@ -5,6 +5,7 @@ Uses Sentence Transformers for semantic search on Pexels videos
 """
 
 import os
+import sys
 import json
 import requests
 from pathlib import Path
@@ -13,9 +14,24 @@ from typing import List, Optional
 # Pexels API
 def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
     """Search Pexels for videos matching query"""
+    # Try to load API Key from Token Broker, fallback to env
     api_key = os.getenv("PEXELS_API_KEY", "")
+    
+    try:
+        # Add path to find Utilities
+        current_dir = Path(__file__).parent.resolve()
+        sys.path.append(str(current_dir.parent.parent)) # Root
+        from Scripts.Utilities.token_broker import TokenBroker
+        
+        broker = TokenBroker()
+        broker_key = broker.get_key("pexels", "free") or broker.get_key("pexels")
+        if broker_key and "YOUR_" not in broker_key:
+            api_key = broker_key
+    except ImportError:
+        pass
+
     if not api_key:
-        print("⚠️ PEXELS_API_KEY not set. Using mock data.")
+        print("⚠️ PEXELS_API_KEY not set (checked env and TokenBroker). Using mock data.")
         return []
     
     url = "https://api.pexels.com/videos/search"
