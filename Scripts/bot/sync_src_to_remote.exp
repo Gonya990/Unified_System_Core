@@ -17,7 +17,7 @@ set files {
 }
 
 foreach file $files {
-    spawn scp -o StrictHostKeyChecking=no Projects/AI_Core/src/$file $host:Desktop/Windows_AI_Core/src/
+    spawn scp -o StrictHostKeyChecking=no Projects/AI_Core/src/$file $host:Desktop/Projects/AI_Core/src/
     expect {
         "password:" { send "$password\r"; exp_continue }
         eof

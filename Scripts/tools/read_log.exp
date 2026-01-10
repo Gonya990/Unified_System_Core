@@ -3,7 +3,7 @@ set timeout 10
 set password "GarYk6550"
 set host "gonya@100.127.194.111"
 
-spawn ssh -o StrictHostKeyChecking=no $host "type Desktop\\Windows_AI_Core\\src\\bot_journal.log"
+spawn ssh -o StrictHostKeyChecking=no $host "type Desktop\\Projects/AI_Core\\src\\bot_journal.log"
 expect {
     "password:" { send "$password\r"; exp_continue }
     "The system cannot find the file specified" { send_user "[ERROR] Log file not found (Bot never started?)\n" }

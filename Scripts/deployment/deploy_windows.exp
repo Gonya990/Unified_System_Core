@@ -2,9 +2,9 @@
 set timeout -1
 set password "Gonya990"
 
-# Copy the entire Windows_AI_Core directory to the Desktop of the remote machine
-# Using relative path on remote to land in C:\Users\gonya\Desktop\Windows_AI_Core
-spawn scp -r -o StrictHostKeyChecking=no /Users/macbook/Documents/Unified_System/Windows_AI_Core gonya@100.127.194.111:Desktop/
+# Copy the entire Projects/AI_Core directory to the Desktop of the remote machine
+# Using relative path on remote to land in C:\Users\gonya\Desktop\Projects/AI_Core
+spawn scp -r -o StrictHostKeyChecking=no /home/kosta/Documents/Unified_System_Core/Projects/AI_Core gonya@100.127.194.111:Desktop/
 
 expect {
   "password:" { send "$password\r"; exp_continue }

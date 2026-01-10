@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/Gonya990/Unified_System_Core.git
     targetRevision: main
-    path: Windows_AI_Core/k8s
+    path: Projects/AI_Core/k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: telegram-bot

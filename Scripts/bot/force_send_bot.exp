@@ -4,7 +4,7 @@ set password "GarYk6550"
 set host "gonya@100.127.194.111"
 
 # Copy v2 local file to REMOTE as the main 'ai_telegram_bot.py'
-spawn scp -o StrictHostKeyChecking=no /Users/macbook/Documents/Unified_System/Projects/AI_Core/src/ai_telegram_bot_v2.py $host:Desktop/Windows_AI_Core/src/ai_telegram_bot.py
+spawn scp -o StrictHostKeyChecking=no /Users/macbook/Documents/Unified_System/Projects/AI_Core/src/ai_telegram_bot_v2.py $host:Desktop/Projects/AI_Core/src/ai_telegram_bot.py
 expect {
     "password:" {
         send "$password\r"
