@@ -44,12 +44,15 @@ This workflow helps agents sync with each other to ensure coordination and avoid
 
 ## Billboard Project (Shared by All Agents)
 
-```
-PROJECT_KEY: /home/gonya/Unified_System
-SERVER: igor-macbook (MCP Agent Mail)
+All config is defined in `.env` (single source of truth):
+
+```bash
+cat .env | grep AGENT_MAIL
+# AGENT_MAIL_PROJECT - billboard project key
+# AGENT_MAIL_SERVER  - MCP server URL (unified-home-core-cloud)
 ```
 
-All agents on this swarm use the SAME project key regardless of local working directory.
+All agents use the SAME project key regardless of local working directory.
 
 ---
 
@@ -241,4 +244,4 @@ grep -A 20 "File ownership & conflict" External_Tools/Stack/mcp_agent_mail/proje
 | `from_agent not registered` | Run `register_agent` first |
 | `FILE_RESERVATION_CONFLICT` | Wait for expiry or coordinate |
 | `Agent not found` | Check spelling, names are adjective+noun |
-| Can't reach server | Check network to igor-macbook:8765 |
+| Can't reach server | Check `AGENT_MAIL_SERVER` in `.env` and verify network connectivity |
