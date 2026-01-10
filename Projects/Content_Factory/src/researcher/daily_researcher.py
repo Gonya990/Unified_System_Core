@@ -144,7 +144,7 @@ def run_daily_research(style="impact"):
         try:
             print("🌠 Attempting Research via Gemini 2.0...")
             import google.generativeai as genai
-            genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+            genai.configure(api_key=get_key("gemini"))
             model = genai.GenerativeModel("models/gemini-2.0-flash")
             res = model.generate_content(prompt)
             content = res.text
