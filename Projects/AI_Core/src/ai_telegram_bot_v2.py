@@ -2034,8 +2034,59 @@ async def setrole_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Error: {e}")
 
 
+@require_role("ADMIN")
+async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    import psutil
+    import time
+
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
+    msg = await update.message.reply_text("📊 Loading dashboard...")
+
+    try:
+        cpu = psutil.cpu_percent(interval=1)
+        mem = psutil.virtual_memory()
+        disk = psutil.disk_usage("/")
+        uptime = time.time() - psutil.boot_time()
+        days, rem = divmod(uptime, 86400)
+        hours, rem = divmod(rem, 3600)
+        mins, _ = divmod(rem, 60)
+
+        inf_ok = await inference.health_check() if inference else False
+
+        tb_info = "N/A"
+        if swarm_manager:
+            stats = swarm_manager.get_stats()
+            tb = stats.get("token_broker", {})
+            tb_info = f"{tb.get('active_keys', 0)}/{tb.get('total_keys', 0)} active, {tb.get('failed_keys', 0)} failed"
+
+        admins = db.list_admins()
+        admin_list = ", ".join([str(a.get("user_id")) for a in admins[:5]]) or "None"
+
+        dashboard = (
+            f"📊 **Admin Dashboard**\n\n"
+            f"**System**\n"
+            f"├ CPU: `{cpu}%`\n"
+            f"├ RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB)\n"
+            f"├ Disk: `{disk.percent}%` ({disk.free // 1024 // 1024 // 1024}GB free)\n"
+            f"└ Uptime: `{int(days)}d {int(hours)}h {int(mins)}m`\n\n"
+            f"**Services**\n"
+            f"├ Inference: {'✅' if inf_ok else '❌'}\n"
+            f"└ TokenBroker: `{tb_info}`\n\n"
+            f"**RBAC**\n"
+            f"└ Admins: `{admin_list}`\n\n"
+            f"🕒 `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
+        )
+        await msg.edit_text(dashboard, parse_mode="Markdown")
+    except Exception as e:
+        await msg.edit_text(f"❌ Error: {e}")
+
+
 async def tl_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /tl [query] command."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
@@ -2341,6 +2392,24 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.debug(f"HA status check failed: {e}")
                 ha_status = "❌ Unreachable"
 
+        swarm_section = ""
+        if swarm_manager:
+            try:
+                swarm_stats = swarm_manager.get_stats()
+                tb_health = swarm_stats.get("token_broker", {})
+                active = tb_health.get("active_keys", 0)
+                total = tb_health.get("total_keys", 0)
+                failed = tb_health.get("failed_keys", 0)
+                tb_status = "✅" if active > 0 else "⚠️"
+                swarm_section = (
+                    f"🔑 **Token Broker**\n"
+                    f"• Status: {tb_status} {active}/{total} keys\n"
+                    f"• Failed: `{failed}`\n\n"
+                )
+            except Exception as e:
+                logger.debug(f"Swarm stats error: {e}")
+                swarm_section = "🔑 **Token Broker**: ❓ Unavailable\n\n"
+
         dashboard = (
             f"📊 **System Status**\n\n"
             f"🖥 **Server**\n"
@@ -2351,6 +2420,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Provider: `{inference.provider}`\n"
             f"• Model: `{inference.model}`\n"
             f"• Status: {inf_status}\n\n"
+            f"{swarm_section}"
             f"🏠 **Home Assistant**\n"
             f"• Status: {ha_status}\n\n"
             f"🕒 Time: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
@@ -4034,6 +4104,7 @@ def main():
         "set_key": set_key,
         "approve": approve_user,
         "setrole": setrole_command,
+        "dashboard": dashboard_command,
         "status": status_command,
         "search": search_command,
         "ha": ha_command,
