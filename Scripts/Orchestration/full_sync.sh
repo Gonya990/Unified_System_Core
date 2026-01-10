@@ -110,7 +110,7 @@ tailscale ssh gonya@100.110.209.49 "
 # 7. MCP УВЕДОМЛЕНИЕ
 echo "📌 [7/7] Отправка рапорта в MCP Mail (Консилиум)..."
 # Подготовка коммитов для передачи (удаляем кавычки и переносы для безопасности)
-LAST_COMMITS_CLEAN=$(git log -n 3 --pretty=format:"* %s" | tr -d '"' | tr '\n' '; ')
+LAST_COMMITS_CLEAN=$(git log -n 3 --pretty=format:"* %s" | tr -d '"' | tr -d "'" | tr '\n' '; ')
 
 tailscale ssh gonya@100.110.209.49 "
     cd /home/gonya/Unified_System
