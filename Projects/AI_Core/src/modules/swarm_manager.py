@@ -57,13 +57,14 @@ class SwarmManager:
         logger.debug(f"Using Gemini key from: {key_data.get('owner', 'Unknown')} (Branch: {key_data.get('branch_id', 'Unknown')})")
         return key_data.get("api_key")
 
-    def add_gemini_key(self, api_key: str, owner: str):
+    def add_gemini_key(self, api_key: str, owner: str, branch_id: str = "HOME_HQ"):
         """Add a new Gemini key to the pool and persist it."""
         new_key = {
             "id": f"key_{random.randint(1000, 9999)}",
             "owner": owner,
             "api_key": api_key,
-            "status": "active"
+            "status": "active",
+            "branch_id": branch_id
         }
         
         # Load existing data to avoid overwriting other pools
