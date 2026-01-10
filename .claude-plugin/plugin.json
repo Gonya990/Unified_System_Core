@@ -1,0 +1,8 @@
+{
+  "name": "agent-mail-notifier",
+  "version": "1.0.0",
+  "description": "Alerts agent when new mail arrives via agent-mail-mcp after subagent tasks complete",
+  "author": {
+    "name": "Unified System Core"
+  }
+}
