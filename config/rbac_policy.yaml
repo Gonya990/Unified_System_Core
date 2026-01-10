@@ -1,0 +1,25 @@
+roles:
+  researcher:
+    allow:
+      - provider: openai
+        tier: paid
+      - provider: gemini
+        tier: free
+  
+  maintenance_bot:
+    allow:
+      - provider: gemini
+        tier: free
+      - provider: openrouter
+        tier: free
+
+  admin:
+    allow:
+      - provider: "*"
+        tier: "*"
+
+agents:
+  OrangeStone: [researcher, maintenance_bot]
+  VioletCastle: [admin]
+  PinkLake: [maintenance_bot]
+  FuchsiaCat: [admin]
