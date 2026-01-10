@@ -56,7 +56,7 @@
 
 - **Location**: `/Users/macbook/Documents/Unified_System`
 - **Modules**:
-  - `Windows_AI_Core`: RTX AI setup (Cleaned & Structured: src/scripts/docs).
+  - `Projects/AI_Core`: AI Telegram bot (Cleaned & Structured: src/scripts/docs).
   - `_Archive/Home_Assistant_Config`: Archived (Old config).
   - `Sandbox`: Testing and script development area.
 

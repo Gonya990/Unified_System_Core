@@ -15,7 +15,7 @@ Guide for developing and testing the bot locally.
 ### 2. Clone and Configure
 
 ```bash
-cd Windows_AI_Core
+cd Projects/AI_Core
 
 # Create virtual environment
 python -m venv venv
@@ -87,7 +87,7 @@ curl http://localhost:8080/health
 ## Project Structure
 
 ```plaintext
-Windows_AI_Core/
+Projects/AI_Core/
 ├── src/
 │   ├── __init__.py
 │   ├── main.py            # Entry point, Telegram handlers

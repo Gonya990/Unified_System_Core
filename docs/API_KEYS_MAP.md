@@ -44,9 +44,9 @@
 |----------|-------|
 | **Type** | systemd (system) |
 | **Status** | ✅ Running |
-| **WorkingDir** | `/home/gonya/Documents/.../Windows_AI_Core` |
+| **WorkingDir** | `/home/gonya/Documents/.../Projects/AI_Core` |
 | **ExecStart** | `python -m src.main` |
-| **EnvFile** | `/home/gonya/Documents/.../Windows_AI_Core/.env` |
+| **EnvFile** | `/home/gonya/Documents/.../Projects/AI_Core/.env` |
 
 #### Environment Variables (from /proc)
 
@@ -303,7 +303,7 @@ WEBHOOK_URL=http://localhost:5678/
 ```text
 /home/gonya/
 ├── Documents/Unified_System/
-│   └── Windows_AI_Core/
+│   └── Projects/AI_Core/
 │       ├── .env                           # ← MAIN BOT CONFIG
 │       │   ├── TELEGRAM_BOT_TOKEN
 │       │   ├── GEMINI_API_KEY
@@ -344,7 +344,7 @@ WEBHOOK_URL=http://localhost:5678/
 │  systemd starts ai-bot.service                                               │
 │         │                                                                    │
 │         ▼                                                                    │
-│  EnvironmentFile=/home/gonya/.../Windows_AI_Core/.env                       │
+│  EnvironmentFile=/home/gonya/.../Projects/AI_Core/.env                       │
 │         │                                                                    │
 │         ▼ (injects into process env)                                        │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
