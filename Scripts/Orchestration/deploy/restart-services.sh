@@ -31,7 +31,7 @@ restart_bot() {
 restart_mcp() {
     echo -e "\n${YELLOW}Restarting MCP Agent Mail...${NC}"
     tailscale ssh "$REMOTE_HOST" "
-        pkill -f 'mcp_server' || true
+        pkill -f 'mcp_agent_mail' || true
         cd $REMOTE_PATH
         nohup bash Scripts/External/start_mail_server.sh > mcp_mail.log 2>&1 &
         sleep 2
