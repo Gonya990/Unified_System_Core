@@ -14,11 +14,19 @@ PROJECT_KEY = '/home/gonya/Unified_System'
 MY_AGENT = 'OrangeStone'
 TARGET_AGENTS = ['FuchsiaCat', 'VioletCastle']
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Determine paths based on environment
+if os.path.exists("/home/gonya/Unified_System"):
+    BASE_PATH = "/home/gonya/Unified_System"
+else:
+    BASE_PATH = ROOT_DIR
+
 # DB Path for Approvals
-DB_PATH = "/home/gonya/Unified_System/Projects/AI_Core/user_context.db"
+DB_PATH = os.path.join(BASE_PATH, "Projects/AI_Core/user_context.db")
 
 # Ensure log directory exists
-LOG_FILE = '/home/gonya/Unified_System/logs/fox_watch.log'
+LOG_FILE = os.path.join(BASE_PATH, "logs/fox_watch.log")
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 logging.basicConfig(

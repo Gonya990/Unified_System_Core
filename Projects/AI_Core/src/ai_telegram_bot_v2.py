@@ -3140,6 +3140,42 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
 
+async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /factory command to trigger Content Farm."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    # Check arguments
+    topic = " ".join(context.args) if context.args else None
+    
+    await update.message.reply_text(
+        "🏭 **Content Factory 2.0**\n"
+        f"Preparing to launch pipeline...\n"
+        f"Topic: `{topic or 'Auto-Trend'}`\n"
+        "⏳ _Connecting to TokenBroker & Server..._",
+        parse_mode="Markdown"
+    )
+    
+    script_path = "/app/Scripts/Orchestration/daily_researcher.py"
+    if not os.path.exists(script_path):
+         script_path = "/Users/macbook/Documents/Unified_System/Scripts/Orchestration/daily_researcher.py"
+
+    cmd = ["python3", script_path]
+    if topic:
+        cmd.extend(["--topic", topic])
+        
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=os.path.dirname(script_path)
+        )
+        await update.message.reply_text(f"🚀 Pipeline Started! PID: `{process.pid}`")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Failed to start factory: {e}")
+
 async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /settings command."""
     user_id = update.effective_user.id
@@ -3269,7 +3305,7 @@ def main():
         'todo': todo_command, 'beads': beads_command, 'settings': settings_command,
         'play': play_command, 'stop_play': stop_play_command, 
         'family_stats': family_stats_command, 'share_key': share_key_command,
-        'login': login_command
+        'login': login_command, 'factory': factory_command
     }
 
     for cmd, func in commands_to_register.items():

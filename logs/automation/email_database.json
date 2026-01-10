@@ -1,0 +1,21 @@
+{
+  "emails": [
+    {
+      "id": "19ba9509921cb2b4",
+      "subject": "כל המשרות שעלו הסופ\"ש ב-AllJobs ויכולות להתאים לך",
+      "sender": "AllJobs <AllJobs@alljob.co.il>",
+      "date": "10 Jan 2026 21:09:35 +0200",
+      "category": "urgent",
+      "body_preview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns:XSLExtentions=\"urn:XSLExtentions\">\r\n  <head>\r\n    <META http-equiv=\"Content-T"
+    },
+    {
+      "id": "19ba925c9ff46ffc",
+      "subject": "איגור, עלו 3 משרות חדשות שיכולות להתאים לך",
+      "sender": "AllJobs <Alljobs@alljob.co.il>",
+      "date": "10 Jan 2026 20:22:48 +0200",
+      "category": "urgent",
+      "body_preview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns:XSLExtentions=\"urn:XSLExtentions\">\r\n  <head>\r\n    <META http-equiv=\"Content-T"
+    }
+  ],
+  "last_check": "2026-01-10T22:02:14.335126"
+}

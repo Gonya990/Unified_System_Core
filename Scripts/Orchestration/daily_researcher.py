@@ -13,16 +13,38 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 # Setup paths
-ROOT_DIR = Path(__file__).parent.resolve()
+# Setup paths
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(ROOT_DIR))
 load_dotenv(ROOT_DIR / ".env")
-load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+
+# Import TokenBroker
+try:
+    from Scripts.Utilities.token_broker import TokenBroker
+    BROKER = TokenBroker()
+    print("✅ TokenBroker imported successfully")
+except ImportError:
+    print("⚠️ TokenBroker not found, falling back to ENV")
+    BROKER = None
 
 # Configuration
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
+def get_key(provider, owner=None):
+    if BROKER:
+        k = BROKER.get_key(provider, owner)
+        if k: return k
+    
+    # Fallback
+    if provider == "openai": return os.getenv("OPENAI_API_KEY")
+    if provider == "gemini": return os.getenv("GEMINI_API_KEY")
+    if provider == "pexels": return os.getenv("PEXELS_API_KEY")
+    return None
+
+PEXELS_API_KEY = get_key("pexels") or "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
 
 def get_client():
-    """Lazy initialization of OpenAI client"""
-    api_key = os.getenv("OPENAI_API_KEY")
+    """Lazy initialization of OpenAI client with TokenBroker"""
+    api_key = get_key("openai")
     base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
     org_id = os.getenv("OPENAI_ORG_ID")
     return OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
