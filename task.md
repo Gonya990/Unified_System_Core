@@ -22,7 +22,8 @@
 
 ## 📋 Ближайшие шаги (Next Actions)
 
-- [ ] **Council Approval:** Получить "OK" на архитектуру от Кости.
+- [x] **Council Approval:** Получено одобрение Phase 1 (10.01.2026).
+- [x] **Token Broker Phase 1:** Реализован Round-Robin, Blacklist, и интеграция в Council.
 - [x] **Token Broker:** Реализовано `Scripts/Utilities/token_broker.py` по новой архитектуре.
 - [x] **Keys Injection:** Добавить ключи (Arthur, Igor, ...) в безопасное хранилище (Реализовано через `family_map.json`).
 - [x] **Identity Pattern:** Создан скрипт `Scripts/Templates/identity_setup_pattern.py` для передачи Косте.

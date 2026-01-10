@@ -143,21 +143,24 @@ class LLMCouncil:
         )
 
     @classmethod
-    def from_token_broker(cls, broker) -> "LLMCouncil":
+    def from_token_broker(cls, broker, tier: Optional[str] = None) -> "LLMCouncil":
         """Create council using keys from TokenBroker."""
         providers = []
         
         # OpenAI
-        openai_key = broker.get_key("openai")
-        if openai_key and "sk-" in openai_key:
+        openai_key = broker.get_key("openai", tier=tier)
+        if openai_key:
             providers.append(OpenAIProvider(
                 api_key=openai_key,
                 model="gpt-4o", # Default high quality
                 store=False
             ))
-            logger.info(f"✓ OpenAI provider initialized via TokenBroker")
+            logger.info(f"✓ OpenAI provider initialized via TokenBroker (Tier: {tier})")
+        else:
+            logger.warning(f"TokenBroker returned no key for OpenAI (Tier: {tier})")
             
         # Add other providers as needed (Gemini, etc.) when supported by Council classes
+        # TODO: Add GeminiProvider support when available in imports
         
         if not providers:
             raise ValueError("TokenBroker returned no valid keys for supported providers.")

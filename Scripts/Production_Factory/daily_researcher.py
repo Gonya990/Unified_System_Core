@@ -104,17 +104,11 @@ async def deliberate_on_trends(topics):
         broker = TokenBroker()
         
         # Initialize Council with Broker-managed keys
-        # We specifically ask for the 'openai' pool for the Editor-in-Chief role (usually GPT-4)
-        openai_key = broker.get_key("openai", tier="paid")
-        
-        if openai_key:
-             # Manually passing key to environment for legacy Council if needed, 
-             # OR using from_api_key if supported. 
-             # Assuming LLMCouncil.from_api_key exists or we monkeypatch env.
-             os.environ["OPENAI_API_KEY"] = openai_key
-             council = LLMCouncil.from_env() 
-        else:
-             logger.warning("TokenBroker returned no OPENAI key. Trying fallback/legacy env...")
+        try:
+             # Use the clean factory method
+             council = LLMCouncil.from_token_broker(broker, tier="paid")
+        except (ValueError, AttributeError) as e:
+             logger.warning(f"TokenBroker/Council init failed ({e}). Trying fallback/legacy env...")
              council = LLMCouncil.from_env()
             
         session = await council.deliberate(prompt, verbose=True)
