@@ -155,6 +155,15 @@ class UserContextDB:
             )
             conn.commit()
 
+    def set_google_creds(self, user_id: int, credentials: str):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET google_creds = ? WHERE user_id = ?",
+                (credentials, user_id),
+            )
+            conn.commit()
+
     def is_approved(self, user_id: int) -> bool:
         user = self.get_user(user_id)
         if user:
