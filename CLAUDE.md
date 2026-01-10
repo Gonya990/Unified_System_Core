@@ -195,14 +195,15 @@ Unified_System_Core/
 
 ## Agent Mail Identity
 
-**Billboard Project:** `/home/gonya/Unified_System` (shared by all agents)
-**Server:** igor-macbook:8765
+All configuration is in `.env` (see `.env.example` for template):
 
-Host-specific agent identity is configured in `.env`:
-- `AGENT_MAIL_NAME` - persistent agent name (e.g., VioletCastle)
-- `AGENT_MAIL_PROGRAM` - agent program (claude-code)
-- `AGENT_MAIL_MODEL` - model identifier
-- `AGENT_MAIL_PROJECT` - always `/home/gonya/Unified_System`
+| Variable | Description |
+|----------|-------------|
+| `AGENT_MAIL_NAME` | Persistent agent name (e.g., VioletCastle) |
+| `AGENT_MAIL_PROGRAM` | Agent program (claude-code) |
+| `AGENT_MAIL_MODEL` | Model identifier |
+| `AGENT_MAIL_PROJECT` | Billboard project path (shared by all agents) |
+| `AGENT_MAIL_SERVER` | MCP server URL (unified-home-core-cloud) |
 
 See `.claude/commands/sync-mail.md` for full workflow and agent registry.
 
