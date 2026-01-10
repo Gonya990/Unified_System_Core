@@ -14,9 +14,9 @@ This document serves as the directory for all agents operating within the Unifie
 | :--- | :--- | :--- | :--- | :--- |
 | **OrangeStone** | 🧠 Orchestrator | `gemini-2.0-flash-exp` | 🟢 Online | System Admin, CI/CD, Factory Control |
 | **PinkLake** | ⚖️ Council | `gemini-2.0-flash-exp` | 🟢 Online | High-level decision making |
-| **FuchsiaCat** | 🐱 Kostya / Rocinante | `claude-3-opus` | 🟡 Connecting | Remote agent, Dev, Fixer |
+| ~~FuchsiaCat~~ | 🐱 *(Retired)* | `claude-3-opus` | ⚫ Retired | Replaced by VioletCastle |
 | **Arthur** | 👶 Apprentice | `gemini-pro` | 🔵 Restricted | Identity: `Artur Goncharenko` (Family Link) |
-| **VioletCastle** | 🛡️ Council | `unknown` | 🟣 Clarifying | ID verification in progress |
+| **VioletCastle** | 🧑‍💻 Kosta / kosta-laptop | `claude-code (opus-4.5)` | 🟢 Online | Dev, Code Review, Coordination |
 
 ## 🆔 Identity Binding (New)
 

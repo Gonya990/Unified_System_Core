@@ -7,6 +7,37 @@ description: Sync mail, fetch tasks, and update agent status
 
 > Synchronizing with Centralized Agent Hub...
 
+**EXECUTE THIS SYNC NOW** - Do not just display documentation. Perform the following actions:
+
+## Immediate Actions
+
+1. **Register/Update Agent Status**:
+```
+mcp__mcp-agent-mail__register_agent(
+  project_key="/home/gonya/Unified_System",
+  program="claude-code",
+  model="opus-4.5",
+  name="VioletCastle",
+  task_description="Active session"
+)
+```
+
+2. **Fetch Inbox** (check for urgent messages):
+```
+mcp__mcp-agent-mail__fetch_inbox(
+  project_key="/home/gonya/Unified_System",
+  agent_name="VioletCastle",
+  include_bodies=true,
+  limit=20
+)
+```
+
+3. **Report Results**: Summarize any messages found, especially urgent ones.
+
+---
+
+## Reference Documentation
+
 This workflow helps agents sync with each other to ensure coordination and avoid conflicts.
 
 ---
