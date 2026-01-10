@@ -406,6 +406,29 @@ USER_ALIASES = {
 ADMIN_ID = 708531393  # Primary admin for notifications
 
 
+def require_role(required_role: str):
+    """Decorator to restrict command access based on user role in database."""
+    from functools import wraps
+
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(
+            update: Update, context: ContextTypes.DEFAULT_TYPE, *args, **kwargs
+        ):
+            user_id = update.effective_user.id
+            if not db.has_permission(user_id, required_role):
+                role_names = {"ADMIN": "администратора", "MEMBER": "участника"}
+                await update.message.reply_text(
+                    f"⛔️ Требуется уровень доступа: {role_names.get(required_role, required_role)}"
+                )
+                return
+            return await func(update, context, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 # keyboards
 def get_main_menu(user_id: int):
     keyboard = [
@@ -1962,10 +1985,9 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@require_role("ADMIN")
 async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if user_id not in ALLOWED_IDS:
-        return
 
     if not context.args:
         await update.message.reply_text("Usage: `/approve USER_ID`")
@@ -1979,6 +2001,35 @@ async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=target_id,
             text="🚀 Your access has been approved! Send /start to begin.",
         )
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+@require_role("ADMIN")
+async def setrole_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if len(context.args) < 2:
+        await update.message.reply_text(
+            "Usage: `/setrole USER_ID ROLE`\nRoles: ADMIN, MEMBER, GUEST",
+            parse_mode="Markdown",
+        )
+        return
+
+    try:
+        target_id = int(context.args[0])
+        role = context.args[1].upper()
+
+        if role not in ("ADMIN", "MEMBER", "GUEST"):
+            await update.message.reply_text(
+                "❌ Invalid role. Use: ADMIN, MEMBER, GUEST"
+            )
+            return
+
+        if db.set_role(target_id, role):
+            await update.message.reply_text(f"✅ User {target_id} role set to {role}")
+        else:
+            await update.message.reply_text(f"❌ User {target_id} not found")
+    except ValueError:
+        await update.message.reply_text("❌ Invalid user ID")
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -3222,12 +3273,9 @@ async def digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Не удалось создать дайджест: {e}")
 
 
+@require_role("ADMIN")
 async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /backup command - create and send database backup."""
     user_id = update.effective_user.id
-    if user_id != ADMIN_ID:
-        await update.message.reply_text("⛔️ Admin only command.")
-        return
 
     await context.bot.send_chat_action(
         chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_DOCUMENT
@@ -3273,14 +3321,9 @@ async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Backup error: {e}")
 
 
+@require_role("ADMIN")
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
-    if user_id != ADMIN_ID:
-        await update.message.reply_text(
-            "❌ Только главный администратор может обновлять бота."
-        )
-        return
 
     await update.message.reply_text(
         "🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)..."
@@ -3990,6 +4033,7 @@ def main():
         "tl": tl_command,
         "set_key": set_key,
         "approve": approve_user,
+        "setrole": setrole_command,
         "status": status_command,
         "search": search_command,
         "ha": ha_command,
