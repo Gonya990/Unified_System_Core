@@ -6,6 +6,7 @@ Uses web research and AI to create engaging scripts
 
 import os
 from pathlib import Path
+import json
 
 # Trending Topics Research (Jan 2026)
 TRENDS_2026 = {
@@ -157,8 +158,28 @@ def find_untranslated_viral_content(source_lang: str = "en", target_langs: list 
     return opportunities
 
 if __name__ == "__main__":
-    # Generate AI tools script
-    script = generate_script("AI инструменты 2026", "secret_reveal", "ru")
+    # Check for daily topic from daily_researcher.py
+    daily_topic_path = Path(__file__).parent / "current_daily_topic.json"
+    
+    if daily_topic_path.exists():
+        print(f"Loading daily topic from {daily_topic_path}...")
+        try:
+            with open(daily_topic_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                topic_data = data.get('topic', {})
+                topic_title = topic_data.get('title', "AI Tools 2026")
+                topic_angle = topic_data.get('angle', "secret_reveal")
+                script = generate_script(topic_title, "secret_reveal", "ru")
+                # Inject the angle/reason into the script context if possible, 
+                # but for now we just use the title to generate the script.
+                print(f"✅ Uses Council Selected Topic: {topic_title}")
+                print(f"📐 Angle: {topic_angle}")
+        except Exception as e:
+            print(f"❌ Failed to load daily topic: {e}")
+            script = generate_script("AI инструменты 2026", "secret_reveal", "ru")
+    else:
+        print("⚠️ No daily topic found. Using default.")
+        script = generate_script("AI инструменты 2026", "secret_reveal", "ru")
     
     print("=" * 50)
     print(f"📹 SCRIPT: {script['title']}")
