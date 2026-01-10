@@ -2,6 +2,7 @@
 """
 Daily Researcher
 Fetches trending topics from RSS feeds and uses the LLM Council to select the most viral one.
+Now exports API for factory_scheduler.py
 """
 
 import os
@@ -12,16 +13,26 @@ import feedparser
 from datetime import datetime
 from pathlib import Path
 
-# Add LLM Council to path
+# Add paths
 current_dir = Path(__file__).parent.resolve()
+sys.path.append(str(current_dir))
+
+# Import sibling modules
+try:
+    from viral_content_generator import generate_script
+    from pexels_broll import semantic_search_broll
+except ImportError:
+    # If running standalone
+    pass
+
+# Add LLM Council to path
 council_dir = current_dir.parent.parent / "LLM_Council"
 sys.path.append(str(council_dir))
 
 try:
     from council.council import LLMCouncil
 except ImportError:
-    print("Error: Could not import LLMCouncil. Make sure the path is correct.")
-    sys.exit(1)
+    pass
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -67,7 +78,7 @@ async def deliberate_on_trends(topics):
     logger.info(f"Collected {len(topics)} topics. asking Council...")
     
     # Format topics for the prompt
-    topics_list = "\n".join([f"{i+1}. {t['title']} ({t['link']})" for i, t in enumerate(topics[:15])]) # Limit to 15 to save context
+    topics_list = "\n".join([f"{i+1}. {t['title']} ({t['link']})" for i, t in enumerate(topics[:15])]) 
     
     prompt = f"""
     You are the Editor-in-Chief of a viral tech video channel (TikTok/Reels).
@@ -93,7 +104,7 @@ async def deliberate_on_trends(topics):
         final_answer = session.stage3_consensus
         await council.close()
         
-        # Cleanup markdown formatting if present
+        # Cleanup markdown formatting
         clean_json = final_answer.replace("```json", "").replace("```", "").strip()
         data = json.loads(clean_json)
         return data
@@ -101,47 +112,146 @@ async def deliberate_on_trends(topics):
     except Exception as e:
         logger.error(f"Council deliberation failed: {e}")
         logger.info("Falling back to Heuristic Selection (Mock Council)...")
-        # Fallback: Pick the first valid topic and format it
         if topics:
             best = topics[0]
             logger.info(f"Fallback selected: {best['title']}")
             return {
                 "title": best['title'],
                 "angle": "Breaking News (Fallback)",
-                "reason": "Top trending item selected by heuristic fallback due to AI service unavailability.",
+                "reason": "Top trending item selected by heuristic fallback.",
                 "source_link": best['link']
             }
         return None
 
-def main():
+def flatten_script(script_obj):
+    """Convert script object to narrative string"""
+    text_parts = []
+    # Hook isn't always part of sections in viral_content_generator structure?
+    # Actually viral_content_generator has sections.
+    # We should use sections text.
+    
+    if "sections" in script_obj:
+        for sec in script_obj["sections"]:
+            text_parts.append(sec["text"])
+    else:
+        # Fallback if structure is different
+        text_parts.append(script_obj.get("hook", ""))
+    
+    return " ".join(text_parts)
+
+def extract_scenes(script_obj):
+    """Extract visual instructions as scenes"""
+    scenes = []
+    if "sections" in script_obj:
+        for sec in script_obj["sections"]:
+            scenes.append({
+                "image": sec.get("visual", "abstract tech"), # placeholder desc
+                "keyword": sec.get("visual", "technology")   # keyword for search
+            })
+    return scenes
+
+# --- API for Factory Scheduler ---
+
+def run_daily_research(style="impact"):
+    """
+    Main entry point called by factory_scheduler.py
+    Returns dict: {selected_topic, description, script_ru, scenes}
+    """
     import asyncio
     
-    logger.info("Starting Daily Research...")
+    logger.info(f"Running Daily Research (Style: {style})...")
     
-    # 1. Research
+    # 1. Research Topic
     topics = fetch_rss_trends()
-    if not topics:
-        logger.error("No topics found from RSS feeds.")
-        return
-
-    # 2. Deliberate
-    best_topic = asyncio.run(deliberate_on_trends(topics))
+    best_topic_data = asyncio.run(deliberate_on_trends(topics))
     
-    if best_topic:
-        logger.info(f"Selected Topic: {best_topic['title']}")
+    if not best_topic_data:
+        logger.error("No topic selected.")
+        return None
+
+    topic_title = best_topic_data["title"]
+    logger.info(f"Selected Topic: {topic_title}")
+
+    # 2. Generate Script
+    # We use viral_content_generator logic
+    # Try to import if not already
+    try:
+        from viral_content_generator import generate_script
+    except ImportError:
+        logger.error("Could not import viral_content_generator")
+        return None
+
+    script_obj = generate_script(topic_title, template_type="secret_reveal", lang="ru")
+    
+    # 3. Format for Scheduler
+    script_text = flatten_script(script_obj)
+    scenes = extract_scenes(script_obj)
+    description = f"{script_obj.get('hook', '')}\n\n{script_obj.get('cta', '')}\n{' '.join(script_obj.get('hashtags', []))}"
+
+    return {
+        "selected_topic": topic_title,
+        "description": description,
+        "script_ru": script_text,
+        "scenes": scenes,
+        "raw_data": best_topic_data
+    }
+
+def generate_vision_assets(scenes, assets_dir: Path, style="impact"):
+    """
+    Generate or download assets for scenes.
+    """
+    logger.info(f"Generating assets for {len(scenes)} scenes in {assets_dir}...")
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    
+    resolved_assets = []
+    
+    # Use Pexels for B-Roll if available
+    try:
+        from pexels_broll import semantic_search_broll
+        use_pexels = True
+    except ImportError:
+        use_pexels = False
         
-        output_data = {
-            "date": datetime.now().isoformat(),
-            "topic": best_topic,
-            "raw_candidates_count": len(topics)
-        }
+    for i, scene in enumerate(scenes):
+        keyword = scene.get("keyword", "technology")
+        output_path = assets_dir / f"scene_{i}.mp4"
         
-        # 3. Save
+        found_path = None
+        if use_pexels:
+            # Try to find 1 clip
+            clips = semantic_search_broll(keyword, assets_dir, num_clips=1)
+            if clips:
+                found_path = clips[0]
+        
+        # If pexels failed or not used, we might need a placeholder or let the assembler handle it.
+        # For now, we return what we found.
+        
+        resolved_assets.append({
+            "keyword": keyword,
+            "resolved_path": str(found_path) if found_path else None
+        })
+        
+    return resolved_assets
+
+def translate_to_hebrew(text):
+    # Mock translation or use a service
+    return f"[HEBREW TRANSLATION] {text}"
+
+def translate_to_english(text):
+    # Mock translation
+    return f"[ENGLISH TRANSLATION] {text}"
+
+# --- Main CLI ---
+
+def main():
+    # CLI Mode
+    result = run_daily_research()
+    if result:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        
+        # Also save to json for ref
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-            json.dump(output_data, f, indent=2, ensure_ascii=False)
-        logger.info(f"Saved to {OUTPUT_FILE}")
-    else:
-        logger.error("Failed to select a topic.")
+            json.dump(result, f, indent=2, ensure_ascii=False)
 
 if __name__ == "__main__":
     main()
