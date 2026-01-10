@@ -15,6 +15,16 @@ This document serves as the directory for all agents operating within the Unifie
 | **OrangeStone** | 🧠 Orchestrator | `gemini-2.0-flash-exp` | 🟢 Online | System Admin, CI/CD, Factory Control |
 | **PinkLake** | ⚖️ Council | `gemini-2.0-flash-exp` | 🟢 Online | High-level decision making |
 | **FuchsiaCat** | 🐱 Kostya / Rocinante | `claude-3-opus` | 🟡 Connecting | Remote agent, Dev, Fixer |
+| **Arthur** | 👶 Apprentice | `gemini-pro` | 🔵 Restricted | Identity: `Artur Goncharenko` (Family Link) |
+| **VioletCastle** | 🛡️ Council | `unknown` | 🟣 Clarifying | ID verification in progress |
+
+## 🆔 Identity Binding (New)
+
+The system now supports **Local Identity Mapping** to link Agents to physical humans (Family/Team).
+
+- **Source of Truth:** `/secrets/family_map.json` (Local only, .gitignored).
+- **Purpose:** Context-aware permissions (e.g., "Child Account" restrictions for Arthur).
+- **Setup:** Run `Scripts/Templates/identity_setup_pattern.py` to generate your local map.
 
 ## 📨 Communication Protocol (How to Mail)
 
