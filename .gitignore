@@ -5,6 +5,7 @@ Sandbox/
 WARP.md
 
 # Secrets
+.env
 *.key
 *.pem
 *.odt
