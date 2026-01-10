@@ -81,8 +81,17 @@ def run_daily_research(style="impact"):
     prompt = f"""
     Context: {context}
     Task: Viral RUSSIAN script for 15 scenes + 15 keywords.
+    Target Audience: Tech enthusiasts, futurists, AI early adopters.
+    
     {style_prompt}
-    CRITICAL: No scene labels. No "Scene 1:". ONLY spoken words. Use "..." for pauses.
+    
+    CRITICAL RESTRICTIONS:
+    1. NO ANIMALS. NO MICE. NO FAIRY TALES. NO "ONCE UPON A TIME".
+    2. STRICTLY FUTURISTIC / TECH / AI themes.
+    3. If news/context is weak, invent a realistic near-future AI scenario (e.g., "AI cures disease", "Robots build Mars base", "Neuralink update").
+    4. Tone must be grounded in sci-fi reality, not fantasy.
+    5. No scene labels. No "Scene 1:". ONLY spoken words. Use "..." for pauses.
+
     Format: JSON {{"selected_topic": "", "description": "", "script_ru": "", "scenes": [{{"image": "scene_1", "keyword": ""}}]}}
     """
     
