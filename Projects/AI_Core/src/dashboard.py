@@ -136,6 +136,11 @@ async def get_logs():
             return {"logs": lines[-50:]}
     return {"logs": ["Log file not found"]}
 
+@app.get("/stats")
+async def get_stats_redirect():
+    """Redirect /stats to /api/stats/system for backward compatibility or ease."""
+    return await get_system_stats()
+
 @app.get("/stats/tokens")
 async def get_token_stats():
     """Get token usage statistics for chart."""

@@ -29,22 +29,27 @@
 
 ## 📋 Ближайшие шаги (Next Actions)
 
-- [x] **Restoration:** Перезапуск терминалов (Ping-Pong, Landing Page).
-- [ ] **Integration Phase:**
-  - [x] **Factory Refactor:** Обновить `daily_researcher.py` для использования `TokenBroker`.
-  - [x] **Bot Refactor:** Перевести Telegram Bot на `IdentityOrchestrator` (Google Auth).
+### 🤖 Фаза 5: Продвинутая Автоматизация (Advanced Automation)
+>
+> *Статус: В РАБОТЕ (ПО ЗАПРОСУ)*
 
-- [x] **Council Approval:** Получено одобрение Phase 1 (10.01.2026).
-- [x] **Token Broker Phase 1:** Реализован Round-Robin, Blacklist,
-  и интеграция в Council.
-- [x] **Keys Injection:** Добавить ключи (Arthur, Igor) в безопасное хранилище
-  (Реализовано через `family_map.json`).
-- [ ] **Visas:** Разобраться с `VioletCastle` (это Костя или нет?) -
-  (Arthur подтвержден как child-account).
-- [ ] **Full Launch:** Запустить Фабрику в боевом режиме с новыми токенами.
+- [x] **Семейный Ассистент (Family Assistant):**
+  - [x] **Morning Brief:** Скрипт для утренних брифингов (Календарь + Погода + Задачи) для Артура (07:00).
+  - [x] **Homework Sentinel:** Сканирование почты Артура на предмет "Homework" / "School" и саммари дедлайнов.
+- [ ] **Интеграция Фабрики Контента 2.0:**
+  - [x] **Orchestrator Link:** Добавить команду `/factory` в бота для ручного запуска генерации видео.
+  - [ ] **Status Monitoring:** Уведомления в Telegram о статусе рендера (`daily_researcher` -> Bot).
+- [ ] **MCP Mail Intelligence:**
+  - [ ] **Council Feedback:** Авто-обработка ответов от Кости (FuchsiaCat/VioletCastle).
+  - [ ] **Alert System:** Уведомлять Админа только о важных письмах ("High Priority").
 
-## 🔮 Будущее / Бэклог
+### 🏗️ Интеграция Инфраструктуры (Meta-Orchestration)
 
-- [ ] **Dashboard:** Починить `/stats` эндпоинт.
-- [ ] **Git Worktree:** Внедрить идею с Worktrees для безопасных тестов.
+- [x] **TokenBroker Integration:** Обновить `daily_researcher.py` для использования семейных ключей через Брокера.
+- [ ] **Account Vizier:** Создать систему управления аккаунтами (Google/Insta) для агентов.
+
+## 🔮 Бэклог (Backlog)
+
+- [ ] **Dashboard:** Починить UI для `/stats` (API готово, нужен фронт).
+- [ ] **Git Worktree:** Безопасные тесты веток.
 - [ ] **SmartThings:** Добить очистку API.
