@@ -215,33 +215,83 @@ def run_daily_research(style="impact"):
 
 def generate_vision_assets(scenes, assets_dir: Path, style="impact"):
     """
-    Generate or download assets for scenes.
+    Generate or download assets for scenes. Using Style Presets + DALL-E 3.
     """
-    logger.info(f"Generating assets for {len(scenes)} scenes in {assets_dir}...")
+    logger.info(f"Generating assets for {len(scenes)} scenes in {assets_dir} (Style: {style})...")
     assets_dir.mkdir(parents=True, exist_ok=True)
     
-    resolved_assets = []
-    
-    # Use Pexels for B-Roll if available
+    # Import Presets
+    try:
+        from style_presets import get_style_prompt, STYLES
+    except ImportError:
+        # Fallback inline
+        def get_style_prompt(s, subj): return f"{subj}, cinematic, 8k"
+        STYLES = {"cartoon": {"model": "dalle-3"}, "impact": {"model": "dalle-3"}}
+
+    # Setup Pexels
     try:
         from pexels_broll import semantic_search_broll
         use_pexels = True
     except ImportError:
         use_pexels = False
         
+    # Setup OpenAI for DALL-E
+    from openai import OpenAI
+    client = None
+    try:
+        from Scripts.Utilities.token_broker import TokenBroker
+        broker = TokenBroker()
+        key = broker.get_key("openai", tier="paid") # Images are expensive
+        if key:
+            client = OpenAI(api_key=key)
+    except:
+        pass
+        
+    resolved_assets = []
+    
     for i, scene in enumerate(scenes):
         keyword = scene.get("keyword", "technology")
-        output_path = assets_dir / f"scene_{i}.mp4"
+        output_path = assets_dir / f"scene_{i}.png" # Default to PNG for images
         
         found_path = None
-        if use_pexels:
-            # Try to find 1 clip
+        
+        # Strategy: Mix of Real B-Roll and AI Images
+        # If 'impact' style, prefer B-Roll. If 'cartoon', prefer AI.
+        
+        prefer_ai = (style == "cartoon")
+        
+        if not prefer_ai and use_pexels:
             clips = semantic_search_broll(keyword, assets_dir, num_clips=1)
             if clips:
                 found_path = clips[0]
-        
-        # If pexels failed or not used, we might need a placeholder or let the assembler handle it.
-        # For now, we return what we found.
+                
+        # If no B-Roll or AI preferred, generate Image
+        if not found_path and client:
+            try:
+                full_prompt = get_style_prompt(style, keyword)
+                logger.info(f"🎨 Generating Image: {full_prompt[:50]}...")
+                
+                response = client.images.generate(
+                    model="dall-e-3",
+                    prompt=full_prompt,
+                    size="1024x1792", # Vertical
+                    quality="hd",
+                    n=1
+                )
+                
+                image_url = response.data[0].url
+                
+                # Download
+                import requests
+                img_data = requests.get(image_url).content
+                with open(output_path, 'wb') as f:
+                    f.write(img_data)
+                
+                found_path = str(output_path)
+                logger.info(f"✅ Generated: {output_path.name}")
+                
+            except Exception as e:
+                logger.error(f"❌ DALL-E Gen failed: {e}")
         
         resolved_assets.append({
             "keyword": keyword,

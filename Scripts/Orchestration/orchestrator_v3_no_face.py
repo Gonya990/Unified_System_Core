@@ -241,6 +241,10 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     time.sleep(1.0) # Tactical pause
     voice = VOICES.get(lang, VOICES["en"])
     
+    # Special case for Hebrew with Onyx (it works well for deep voice)
+    if lang == "he":
+        voice = VOICES["en"] # Use Onyx (multilingual model) for Hebrew
+
     # 1. Try OpenAI (Premium)
     if generate_audio_openai(text, output_path, voice):
         return True
