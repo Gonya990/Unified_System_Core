@@ -1,6 +1,7 @@
 #!/bin/bash
-# 💎 Vibranium Sync - One command to unify everything
-# Коммитит локально, пушит, синкает задачи и обновляет сервер.
+# 💎 Vibranium Sync - Official Unified System Entry Point
+# Core of the /sync workflow. Combines local save, git sync, task sync, and deployment.
+# Logic: Save Progress -> Sync (pull/push/tasks) -> Deploy (remote update)
 
 set -euo pipefail
 

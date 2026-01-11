@@ -92,6 +92,12 @@ class CalendarClient:
             return None
         
         try:
+            duration_minutes = int(str(duration_minutes).split()[0])
+        except (ValueError, TypeError, IndexError):
+            logger.warning(f"Invalid duration_minutes: {duration_minutes}, defaulting to 60")
+            duration_minutes = 60
+            
+        try:
             end_time = start_time + timedelta(minutes=duration_minutes)
             
             # Use Israel timezone (configurable via TZ env var)

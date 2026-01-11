@@ -22,13 +22,13 @@ adapt their output based on the current user's preferences.
 
 | Component | Path | Description |
 | :--- | :--- | :--- |
-| AI Telegram Bot | `Projects/AI_Core/` | Main AI bot with calendar, memory, |
-| | | multi-provider inference |
-| Content Factory | `Projects/Content_Factory/` | Video generation pipeline with |
-| | | Sora2/Pexels |
-| ChatKit Dashboard | `Projects/ChatKit_Dashboard/` | Web dashboard for bot management |
-| TokenBroker | `Scripts/Utilities/token_broker.py` | Encrypted API key management |
-| | | (AES-256-GCM + Argon2id) |
+| AI Bot | `Projects/AI_Core/` | Main AI bot with calendar, memory, |
+| | | and multi-provider inference |
+| Content | `Projects/Content_Factory/` | Video generation pipeline with |
+| Factory | | Sora2 and Pexels integration |
+| ChatKit | `Projects/ChatKit/` | Web dashboard for management |
+| TokenBroker | `Scripts/Utilities/` | Encrypted API key management |
+| | `token_broker.py` | (AES-256-GCM + Argon2id) |
 
 **Note**: The old `Windows_AI_Core` directory has been migrated to
 `Projects/AI_Core`.

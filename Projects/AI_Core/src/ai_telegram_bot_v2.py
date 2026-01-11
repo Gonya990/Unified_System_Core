@@ -1697,7 +1697,16 @@ async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
         start = response.find("{")
         end = response.rfind("}") + 1
         if start != -1 and end != -1:
-            return json.loads(response[start:end])
+            data = json.loads(response[start:end])
+            # Sanitize duration_minutes
+            if "duration_minutes" in data:
+                try:
+                    # Handle cases like "60 minutes" or string "60"
+                    val = str(data["duration_minutes"]).split()[0]
+                    data["duration_minutes"] = int(val)
+                except (ValueError, TypeError, IndexError):
+                    data["duration_minutes"] = 60
+            return data
     except Exception as e:
         logger.error(f"Failed to parse event JSON: {e} | Response: {response}")
     return None
