@@ -1,0 +1,24 @@
+{
+  "links": [
+    {
+      "url": "https://t.me/vitalycontentcreate",
+      "category": "Content Creation / AI Tools",
+      "priority": "high",
+      "notes": "Successful Russian AI content creator - analyzed for Content Factory strategy"
+    },
+    {
+      "url": "https://news.ycombinator.com",
+      "category": "Tech News",
+      "priority": "medium",
+      "notes": "Hacker News - trending tech discussions"
+    },
+    {
+      "url": "https://www.reddit.com/r/artificial",
+      "category": "AI Discussion",
+      "priority": "high",
+      "notes": "Latest AI developments and community insights"
+    }
+  ],
+  "instructions": "Add any URLs you want the Content Factory to analyze for script ideas. Format: {url, category, priority (high/medium/low), notes}",
+  "last_updated": "2026-01-11T15:00:00"
+}
