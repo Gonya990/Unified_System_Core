@@ -1,0 +1,193 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    UNIFIED SYSTEM - AGENT MAIL INTEGRATION                 ║
+║                              Architecture Diagram                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          DATA SOURCES                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐
+    │ Telegram Channel │
+    │ @vitalycontentcr │      Public API (Web Scraping)
+    │     (Public)     │      OR Telethon (Full Access)
+    └────────┬─────────┘
+             │
+             ▼
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        RESEARCH & ANALYSIS LAYER                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────────────┐
+    │  scrape_telegram_web.py  │  analyze_telegram_channel.py      │
+    │  (No API required)       │  (Telethon - needs credentials)   │
+    └──────────────┬──────────────────────────┬────────────────────┘
+                   │                          │
+                   ▼                          ▼
+             ┌───────────┐            ┌──────────────┐
+             │ JSON Data │            │ Full Metadata│
+             │  (77 posts)│            │ (Enhanced)   │
+             └─────┬─────┘            └──────┬───────┘
+                   │                          │
+                   └─────────┬────────────────┘
+                             ▼
+                   ┌──────────────────┐
+                   │  vitalycontentcr │
+                   │  _ANALYSIS.md    │  ◄─── Comprehensive Report
+                   └──────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     AGENT MAIL MCP INTEGRATION                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────────────┐
+    │               telegram_to_mail.py                            │
+    │  • Monitors for new posts                                    │
+    │  • Analyzes engagement                                       │
+    │  • Formats updates                                           │
+    │  • Tracks state (.telegram_monitor_state.json)               │
+    └──────────────┬───────────────────────────────────────────────┘
+                   │
+                   ▼
+    ┌──────────────────────────────────────────────────────────────┐
+    │               agent_mail_client.py                           │
+    │  • Health checks                                             │
+    │  • Send/receive messages                                     │
+    │  • Broadcast to all agents                                   │
+    │  • Thread management                                         │
+    └──────────────┬───────────────────────────────────────────────┘
+                   │
+                   │ MCP JSON-RPC 2.0 over HTTP
+                   │ Bearer Token: c2bb2cf04...
+                   │
+                   ▼
+    ┌──────────────────────────────────────────────────────────────┐
+    │         Agent Mail MCP Server                                │
+    │         http://100.110.209.49:8765/mcp                       │
+    │  • Message routing                                           │
+    │  • Agent registry                                            │
+    │  • Thread management                                         │
+    │  • Search & summarization                                    │
+    └──────────────┬───────────────────────────────────────────────┘
+                   │
+      ┌────────────┼────────────┬─────────────┬─────────────┐
+      ▼            ▼            ▼             ▼             ▼
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AGENT ECOSYSTEM                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  CalmSnow    │  │ VioletCastle │  │  WhiteMill   │  │ IvoryOtter   │
+│   (ID: 22)   │  │   (Kostik)   │  │  (Infra)     │  │  (Content)   │
+│              │  │              │  │              │  │              │
+│ • Research   │  │ • Dev &      │  │ • Monitor    │  │ • Generate   │
+│ • Analysis   │  │   Orchestrate│  │ • Deploy     │  │ • Produce    │
+│ • Telegram   │  │ • Content    │  │ • Maintain   │  │ • Distribute │
+│   Monitor    │  │   Factory    │  │              │  │              │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+      │                  │                 │                 │
+      │                  │                 │                 │
+      └──────────────────┴─────────────────┴─────────────────┘
+                              │
+                              ▼
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      CONTENT FACTORY PIPELINE                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    1. CalmSnow → Identifies trending topics from Telegram
+           │
+           ▼
+    2. VioletCastle → Queues content generation tasks
+           │
+           ▼
+    3. IvoryOtter → Produces video assets (Sora, VEO, Nanobanana)
+           │
+           ▼
+    4. WhiteMill → Deploys to YouTube, monitors metrics
+           │
+           ▼
+    5. Feedback Loop → Updates strategy based on performance
+
+    All coordination via Agent Mail MCP
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AUTOMATION LAYER                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────────────┐
+    │  macOS launchd (com.unified.telegram-monitor.plist)          │
+    │  Runs every 6 hours:                                         │
+    │    1. scrape_telegram_web.py                                 │
+    │    2. telegram_to_mail.py                                    │
+    │  Logs: Reports/.telegram_monitor.log                         │
+    └──────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          DATA FLOW EXAMPLE                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    [New Post on Telegram] 
+         │
+         │ (6 hours later, or manual run)
+         ▼
+    [Scraper Detects Post #117]
+         │
+         ▼
+    [telegram_to_mail.py]
+         │ Analyzes: 1,500 views, "Sora 3 exploit" topic
+         │
+         ▼
+    [agent_mail_client.py]
+         │ Formats broadcast message
+         │
+         ▼
+    [MCP Server] → Routes to all agents
+         │
+         ├──► [CalmSnow] ✉️  Inbox: New post detected
+         ├──► [VioletCastle] ✉️  Inbox: High engagement topic
+         ├──► [WhiteMill] ✉️  Inbox: Infrastructure alert (if needed)
+         └──► [IvoryOtter] ✉️  Inbox: Content opportunity
+
+    [VioletCastle responds]
+         │ "Acknowledged. Queuing Sora 3 explainer video."
+         │
+         ▼
+    [IvoryOtter receives task]
+         │ Generates video using identified workflow
+         │
+         ▼
+    [WhiteMill deploys]
+         │ Publishes to YouTube, monitors engagement
+         │
+         ▼
+    [Feedback to CalmSnow]
+         │ "Video published: 2,000 views in 24h"
+         │
+         ▼
+    [Cycle repeats]
+
+═══════════════════════════════════════════════════════════════════════════════
+
+KEY TECHNOLOGIES:
+
+• Telegram Web Scraping: requests + BeautifulSoup (no auth)
+• Telegram API: Telethon (full access, needs credentials)
+• Agent Mail: MCP JSON-RPC 2.0 over HTTP
+• State Management: JSON files in Reports/
+• Automation: macOS launchd (6-hour intervals)
+• Coordination: Agent Mail broadcast messages
+
+METRICS:
+
+• 77 posts analyzed (first run)
+• 4 agents in ecosystem
+• 2 messages sent (research complete + monitor alert)
+• 6-hour monitoring interval
+• 90KB JSON data + comprehensive analysis
+
+STATUS: ✅ Production Ready
+
+═══════════════════════════════════════════════════════════════════════════════
