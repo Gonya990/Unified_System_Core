@@ -174,11 +174,14 @@ async def main():
     """Test the Threads browser automation"""
     import sys
     
-    threads = ThreadsBrowser(headless=False)
+    # Default to headless=True for server environment
+    threads = ThreadsBrowser(headless=True)
     
     if len(sys.argv) > 1 and sys.argv[1] == "login":
-        await threads.start()
-        await threads.login_manual()
+        # Cannot run headed on server without Xvfb
+        print("⚠️ Interactive login requires local browser or Xvfb.")
+        print("Please upload .threads_state.json manually to this directory.")
+        return
     else:
         await threads.start()
         await threads.post("🚀 Testing Unified System automation! #AI #Future")
