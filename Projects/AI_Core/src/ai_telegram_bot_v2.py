@@ -4162,10 +4162,12 @@ def main():
             "bot": "running",
             "version": "v2",
         }
-        if swarm:
-            info["swarm"] = swarm.get_stats()
+        if inference.swarm:
+            try:
+                info["swarm"] = inference.swarm.get_stats()
+            except Exception as e:
+                info["swarm_error"] = str(e)
         return info
-
     start_health_server(port=8095, health_callback=get_health_info)
     logger.info("[STARTUP] Health server started on port 8095")
 
