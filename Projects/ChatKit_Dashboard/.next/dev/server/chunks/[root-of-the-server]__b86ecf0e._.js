@@ -112,54 +112,28 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$serv
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$openai$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/openai/index.mjs [app-route] (ecmascript) <locals>");
 ;
 ;
-const openai = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$openai$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"]({
-    apiKey: process.env.OPENAI_API_KEY
-});
+const client = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$openai$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"]();
 async function POST(request) {
     try {
         const { messages } = await request.json();
-        // Use Responses API (new) with fallback to Chat Completions
-        let responseText;
-        try {
-            // New Responses API
-            const response = await openai.responses.create({
-                model: 'gpt-4o',
-                input: messages[messages.length - 1].content,
-                instructions: `You are "Unified System AI" - a powerful assistant managing the Unified System infrastructure.
-        You have access to:
-        - Content Factory (YouTube/Instagram automation)
-        - AI Telegram Bot
-        - Family Assistant (Homework Sentinel)
-        - Token Broker (API key management)
-        - MCP Mail Agent (inter-agent communication)
-        
-        Be helpful, concise, and professional. Use emojis sparingly for clarity.`
-            });
-            responseText = response.output_text;
-        } catch  {
-            // Fallback to Chat Completions
-            const completion = await openai.chat.completions.create({
-                model: 'gpt-4o',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are "Unified System AI" - a powerful assistant managing the Unified System infrastructure.
-            You have access to:
-            - Content Factory (YouTube/Instagram automation)
-            - AI Telegram Bot
-            - Family Assistant (Homework Sentinel)
-            - Token Broker (API key management)
-            - MCP Mail Agent (inter-agent communication)
-            
-            Be helpful, concise, and professional. Use emojis sparingly for clarity.`
-                    },
-                    ...messages
-                ]
-            });
-            responseText = completion.choices[0].message.content || 'No response';
-        }
+        const userMessage = messages[messages.length - 1].content;
+        // Use new Responses API with GPT-5.2
+        const response = await client.responses.create({
+            model: 'gpt-5.2',
+            input: userMessage,
+            instructions: `You are "Unified System AI" - a powerful assistant managing the Unified System infrastructure.
+You have access to:
+- Content Factory (YouTube/Instagram/Threads automation)
+- AI Telegram Bot  
+- Family Assistant (Homework Sentinel)
+- Token Broker (API key management)
+- MCP Mail Agent (inter-agent communication)
+- ChatKit Dashboard (this interface)
+
+Be helpful, concise, and professional. Respond in the same language as the user. Use emojis sparingly for clarity.`
+        });
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            message: responseText
+            message: response.output_text
         });
     } catch (error) {
         console.error('Chat API Error:', error);
