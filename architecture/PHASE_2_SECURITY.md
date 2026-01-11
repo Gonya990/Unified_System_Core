@@ -8,16 +8,36 @@ Secure the `TokenBroker` by encrypting stored keys and enforcing Role-Based Acce
 
 ### Implementation
 
-- **Algorithm:** AES (Fernet via `cryptography` library).
-- **Storage:** Keys stored in `secrets/keys.enc` (replacing `keys.json`).
-- **Master Key:** Provided via Environment Variable `UNIFIED_VAULT_KEY`.
+- **Algorithm:** AES-256-GCM (AEAD via `cryptography` library)
+- **Key Derivation:** Argon2id (memory-hard, side-channel resistant)
+  - Parameters: `memory=65536 KB`, `iterations=3`, `parallelism=4`
+  - Fallback: PBKDF2-SHA256 with 600,000 iterations (OWASP 2023)
+- **Nonce Handling:** 96-bit random nonce per encryption (cryptographically secure RNG)
+- **Storage Format:** `salt (16B) || nonce (12B) || ciphertext || tag (16B)`
+- **Storage Location:** `secrets/keys.enc` (replacing `keys.json`)
+- **Master Key:** Provided via Environment Variable `UNIFIED_VAULT_KEY`
   - Key generated once, distributed securely to `pve-antigravity-1`, `macbook`, etc.
-  - **Never** stored in git.
+  - **Never** stored in git
+
+### Post-Quantum Posture
+
+- AES-256 provides 128-bit security margin against Grover's algorithm
+- Hybrid Kyber wrapping reserved for future enhancement (NIST PQC)
+- Current symmetric encryption is quantum-resistant for foreseeable future
 
 ### Workflow
 
-1. **Setup:** Admin runs `python setup_vault.py` -> enters keys -> generates `keys.enc`.
-2. **Runtime:** `TokenBroker` reads `UNIFIED_VAULT_KEY` -> decrypts `keys.enc` in memory.
+1. **Setup:** Admin runs `python setup_vault.py` -> enters keys -> derives key via Argon2id -> generates `keys.enc`
+2. **Runtime:** `TokenBroker` reads `UNIFIED_VAULT_KEY` -> derives key -> decrypts `keys.enc` in memory
+3. **Re-encryption:** New nonce generated on every write (safe with AES-GCM)
+
+## 2.1 SessionStore Encryption
+
+SessionStore delegates encryption to TokenBroker's vault mechanism. No separate encryption layer.
+
+- **At-rest:** Session data encrypted with same AES-256-GCM + Argon2id
+- **In-memory:** Decrypted only during active session
+- **Key isolation:** Each session can use derived subkey (HKDF) if multi-tenant
 
 ## 3. Role-Based Access Control (RBAC)
 
@@ -57,7 +77,7 @@ agents:
 
 ## 5. Implementation Plan
 
-1. **Dependency:** Add `cryptography` to `pyproject.toml` / `requirements.txt`.
+1. **Dependency:** Add `cryptography` and `argon2-cffi` to `pyproject.toml` / `requirements.txt`.
 2. **Tooling:** Create `Scripts/Utilities/vault_manager.py` (CLI for encrypt/decrypt).
 3. **Broker Update:** Modify `TokenBroker` to support decryption.
 4. **RBAC:** Add `check_permission` method to Broker.
