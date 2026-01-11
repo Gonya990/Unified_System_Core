@@ -29,14 +29,17 @@ TOKEN_FILE = CREDENTIALS_DIR / "youtube_token.json"
 
 CREDENTIALS_DIR.mkdir(parents=True, exist_ok=True)
 
-def get_authenticated_service():
+def get_authenticated_service(token_file=None):
     """Authenticates the user and returns the YouTube API service."""
     creds = None
     
+    # Use provided token_file or default
+    active_token_file = Path(token_file) if token_file else TOKEN_FILE
+    
     # Check if token exists
-    if TOKEN_FILE.exists():
+    if active_token_file.exists():
         try:
-            creds = Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
+            creds = Credentials.from_authorized_user_file(str(active_token_file), SCOPES)
         except Exception as e:
             print(f"⚠️ Error loading token: {e}")
             creds = None
@@ -62,9 +65,9 @@ def get_authenticated_service():
             creds = flow.run_local_server(port=0)
         
         # Save the credentials for the next run
-        with open(TOKEN_FILE, 'w') as token:
+        with open(active_token_file, 'w') as token:
             token.write(creds.to_json())
-            print(f"✅ Token saved to {TOKEN_FILE}")
+            print(f"✅ Token saved to {active_token_file}")
 
     try:
         return build('youtube', 'v3', credentials=creds)
@@ -72,12 +75,12 @@ def get_authenticated_service():
         print(f"❌ An HTTP error occurred: {e}")
         return None
 
-def upload_video(file_path: Path, title, description, tags=None, category_id="28", privacy_status="private"):
+def upload_video(file_path: Path, title, description, tags=None, category_id="28", privacy_status="private", token_file=None):
     """
     Uploads a video to YouTube.
     category_id "28" is 'Science & Technology'. "22" is 'People & Blogs'. "25" is 'News & Politics'.
     """
-    youtube = get_authenticated_service()
+    youtube = get_authenticated_service(token_file=token_file)
     if not youtube:
         return False
 

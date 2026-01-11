@@ -8,11 +8,21 @@ try:
     from google_auth import GoogleAuthManager
     from calendar_client import CalendarClient
     from gmail_client import GmailClient
+    
+    # Import TokenBroker from Utilities
+    import sys
+    from pathlib import Path
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+    UTILS_DIR = ROOT_DIR / "Scripts" / "Utilities"
+    if str(UTILS_DIR) not in sys.path:
+        sys.path.insert(0, str(UTILS_DIR))
+    from token_broker import TokenBroker
 except ImportError:
     # Fallback for when running setup without full env
     GoogleAuthManager = None
     CalendarClient = None
     GmailClient = None
+    TokenBroker = None
 
 logger = logging.getLogger("IdentityOrchestrator")
 
@@ -26,62 +36,24 @@ class IdentityOrchestrator:
         self.db = db
         self.config = config_manager
         self.auth_manager = auth_manager
-        self._aes_key = self._derive_key()
+        
+        # Unified TokenBroker for encryption/decryption
+        self.token_broker = TokenBroker()
 
         # Load Admin Config
         self.allowed_users = self._load_allowed_users()
 
-    def _derive_key(self) -> Optional[bytes]:
-        """Unified AES-256-GCM key derivation from AGENT_MAIL_TOKEN."""
-        master_token = os.getenv("AGENT_MAIL_TOKEN")
-        if not master_token:
-            return None
-
-        try:
-            from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-            from cryptography.hazmat.primitives import hashes
-
-            salt = b"unified-system-vibranium-salt"
-            kdf = PBKDF2HMAC(
-                algorithm=hashes.SHA256(),
-                length=32,
-                salt=salt,
-                iterations=100000,
-            )
-            return kdf.derive(master_token.encode())
-        except ImportError:
-            return None
-
     def decrypt_value(self, encrypted: str) -> Optional[str]:
-        """Unified AES-256-GCM decryption."""
-        if not self._aes_key:
+        """Unified AES-256-GCM decryption via TokenBroker."""
+        if not self.token_broker:
             return None
-        try:
-            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-            import base64
-
-            data = base64.b64decode(encrypted)
-            nonce, ciphertext = data[:12], data[12:]
-            aesgcm = AESGCM(self._aes_key)
-            return aesgcm.decrypt(nonce, ciphertext, None).decode()
-        except Exception:
-            return None
+        return self.token_broker.decrypt_value(encrypted)
 
     def encrypt_value(self, plaintext: str) -> Optional[str]:
-        """Unified AES-256-GCM encryption."""
-        if not self._aes_key:
+        """Unified AES-256-GCM encryption via TokenBroker."""
+        if not self.token_broker:
             return None
-        try:
-            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-            import base64
-            import os
-
-            nonce = os.urandom(12)
-            aesgcm = AESGCM(self._aes_key)
-            ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
-            return base64.b64encode(nonce + ciphertext).decode()
-        except Exception:
-            return None
+        return self.token_broker.encrypt_value(plaintext)
 
     def _load_allowed_users(self) -> List[int]:
         """Loads allowed users from Env and YAML via ConfigManager logic."""

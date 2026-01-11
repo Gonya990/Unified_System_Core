@@ -246,12 +246,11 @@ class TokenBroker:
         logger.warning(f"Key failure for {provider}. Cooldown initiated.")
         self._blacklist[key] = time.time()
 
-    def encrypt_value(self, plaintext: str) -> Optional[str]:
-        """Encrypt a single value with AES-256-GCM (for external use)."""
+    def encrypt_value(self, plaintext: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
+        """Encrypt a single value with AES-256-GCM (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
 
-        salt = b"session-store-salt-fixed"
         key = self._derive_key(salt)
         if not key:
             return None
@@ -261,12 +260,11 @@ class TokenBroker:
         ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
         return base64.b64encode(nonce + ciphertext).decode()
 
-    def decrypt_value(self, encrypted: str) -> Optional[str]:
-        """Decrypt a single AES-256-GCM encrypted value."""
+    def decrypt_value(self, encrypted: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
+        """Decrypt a single AES-256-GCM encrypted value (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
         try:
-            salt = b"session-store-salt-fixed"
             key = self._derive_key(salt)
             if not key:
                 return None
@@ -341,28 +339,38 @@ class TokenBroker:
     def check_permission(self, agent_name: str, provider: str, tier: str = None) -> bool:
         """
         RBAC Check: Does this agent have access to this resource?
-        Default role is 'worker' which can access 'free' and 'standard' tiers.
-        'admin' can access anything.
+        Loads from config/rbac_policy.yaml (canonical) or falls back to runtime.
         """
-        # Load RBAC from config or use defaults
-        rbac_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
-        policy = {}
-        if os.path.exists(rbac_path):
-             try:
-                 with open(rbac_path, 'r') as f:
-                     policy = yaml.safe_load(f) or {}
-             except:
-                 pass
+        # 1. Try Canonical Config Folder (Unified_System/config/rbac_policy.yaml)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        canonical_path = os.path.join(root_dir, "config", "rbac_policy.yaml")
+        runtime_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
         
-        agent_role = policy.get("agents", {}).get(agent_name, "worker")
+        policy = {}
+        for path in [canonical_path, runtime_path]:
+            if os.path.exists(path):
+                try:
+                    with open(path, 'r') as f:
+                        data = yaml.safe_load(f) or {}
+                        if "agents" in data:
+                            policy.setdefault("agents", {}).update(data["agents"])
+                        if "roles" in data:
+                            policy.setdefault("roles", {}).update(data["roles"])
+                        if not policy.get("default_role") and "default_role" in data:
+                            policy["default_role"] = data["default_role"]
+                except Exception as e:
+                    logger.warning(f"Failed to load RBAC from {path}: {e}")
+        
+        default_role = policy.get("default_role", "worker")
+        agent_role = policy.get("agents", {}).get(agent_name, default_role)
         
         if agent_role == "admin":
             return True
         
-        if tier == "pro" or tier == "tier1":
+        if tier and tier in ["pro", "tier1", "high"]:
             return agent_role in ["admin", "pro_agent"]
             
-        return True # Default access for free/standard
+        return True # Default access for lower tiers
 
 
 if __name__ == "__main__":

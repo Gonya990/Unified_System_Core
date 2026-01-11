@@ -94,14 +94,16 @@ def get_page_content(url):
         print(f"⚠️ Failed to browse {url}: {e}")
         return ""
 
-def run_daily_research(style="impact"):
+def run_daily_research(style="impact", deep=False):
     """Deep research with Megaforma Style (Geopolitics/Mystery)"""
-    print(f"🧠 Starting MEGAFORMA RESEARCH (Style: {style.upper()})")
+    print(f"🧠 Starting MEGAFORMA {'DEEP ' if deep else ''}RESEARCH (Style: {style.upper()})")
     news = get_latest_geo_news()
     if not news: return None
         
     context = ""
-    for item in news[:2]:
+    # Deep research: Browse more articles (up to 10)
+    max_articles = 10 if deep else 2
+    for item in news[:max_articles]:
         print(f"🔍 Browsing: {item['title']}...")
         context += f"TOPIC: {item['title']}\nCONTENT: {get_page_content(item['link'])}\n\n"
 
@@ -148,31 +150,37 @@ def run_daily_research(style="impact"):
     """
     
     data = None
-    # Strategy 1: OpenAI Responses API (New, Recommended)
-    try:
-        print("🤖 Attempting Research via OpenAI Responses API (GPT-4o)...")
-        client = get_client()
-        # Try new Responses API first
+    
+    # Strategy: Gemini (Primary for DEEP RESEARCH due to context window)
+    if deep:
         try:
+            print(f"🌠 DEEP RESEARCH: Attempting via Gemini (Context size: {len(context)})")
+            import google.generativeai as genai
+            genai.configure(api_key=get_key("gemini"))
+            model = genai.GenerativeModel("models/gemini-1.5-pro") # Using Pro for deep research
+            res = model.generate_content(prompt)
+            content = res.text
+            if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
+            data = json.loads(content)
+        except Exception as e:
+            print(f"⚠️ Gemini Deep Research failed: {e}. Falling back to OpenAI...")
+
+    # Strategy 1: OpenAI Responses API
+    if not data:
+        try:
+            print("🤖 Attempting Research via OpenAI Responses API (GPT-4o)...")
+            client = get_client()
+            # Try new Responses API first
             res = client.responses.create(
                 model="gpt-4o",
                 input=prompt,
                 instructions="Return ONLY valid JSON. No markdown, no explanations."
             )
             content = res.output_text
-        except AttributeError:
-            # Fallback to legacy Chat Completions if Responses API not available
-            print("⚠️ Responses API not available, using Chat Completions...")
-            res = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "system", "content": "Return ONLY JSON."}, {"role": "user", "content": prompt}]
-            )
-            content = res.choices[0].message.content
-        
-        if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
-        data = json.loads(content)
-    except Exception as e:
-        print(f"⚠️ OpenAI Research failed: {e}. Falling back to Gemini...")
+            if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
+            data = json.loads(content)
+        except Exception as e:
+            print(f"⚠️ OpenAI Research failed: {e}. Checking legacy fallback...")
         
     # Strategy 2: Gemini Fallback
     if not data:
