@@ -58,7 +58,7 @@ All agents communicate via:
 All agents use the **same project slug** (not absolute paths):
 
 ```
-PROJECT_KEY = "/Gonya990/Unified_System_Core"
+PROJECT_KEY = "home-gonya-unified-system"
 ```
 
 This allows agents on different machines to coordinate via the shared hub server.
@@ -68,7 +68,7 @@ This allows agents on different machines to coordinate via the shared hub server
 ```bash
 # At session start, register yourself:
 agent_mail_register_agent(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   program="opencode",  # or "claude-code", "codex", etc.
   model="claude-sonnet-4",
   name="YourAgentName",  # Adjective+Noun format (e.g., BlueLake)
@@ -82,11 +82,11 @@ agent_mail_register_agent(
 
 ```bash
 # Check who's available
-agent_mail_whois(project_key="/Gonya990/Unified_System_Core", agent_name="PinkLake")
+agent_mail_whois(project_key="home-gonya-unified-system", agent_name="PinkLake")
 
 # Send a message
 agent_mail_send_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   sender_name="YourName",
   to=["PinkLake"],
   subject="Coordination request",

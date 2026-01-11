@@ -84,7 +84,7 @@ cat .env | grep HTTP_BEARER_TOKEN
 **Example / Пример:**
 
 ```text
-/Gonya990/Unified_System_Core
+home-gonya-unified-system
 ```
 
 **Why slug instead of path? / Почему слаг вместо пути?**
@@ -172,7 +172,7 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 Tool: agent_mail_register_agent
 
 Parameters:
-  project_key: "/Gonya990/Unified_System_Core"  # Project slug, NOT absolute path
+  project_key: "home-gonya-unified-system"  # Project slug, NOT absolute path
   program: "claude-code" (or "opencode", "codex", "gemini", etc.)
   model: "claude-sonnet-4" (or your model name)
   name: (optional, system will auto-generate like "BlueMountain")
@@ -185,7 +185,7 @@ Parameters:
 
 ```text
 Please register yourself with Agent Mail using the register_agent tool.
-Use project_key: /Gonya990/Unified_System_Core
+Use project_key: home-gonya-unified-system
 Your program is: Claude
 Your model is: claude-3.5-sonnet
 ```
@@ -194,7 +194,7 @@ Your model is: claude-3.5-sonnet
 
 ```text
 Пожалуйста, зарегистрируйтесь в Agent Mail используя инструмент register_agent.
-Используйте project_key: /Gonya990/Unified_System_Core
+Используйте project_key: home-gonya-unified-system
 Ваша программа: Claude
 Ваша модель: claude-3.5-sonnet
 ```
@@ -302,7 +302,7 @@ Parameters:
 
 ```python
 agent_mail_file_reservation_paths(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
@@ -315,7 +315,7 @@ agent_mail_file_reservation_paths(
 
 ```python
 agent_mail_file_reservation_paths(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
@@ -330,7 +330,7 @@ agent_mail_file_reservation_paths(
 
 ```python
 agent_mail_send_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   sender_name="BlueMountain",
   to=["OtherAgent"],
   thread_id="FEAT-123",
@@ -343,7 +343,7 @@ agent_mail_send_message(
 
 ```python
 agent_mail_send_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   sender_name="BlueMountain",
   to=["OtherAgent"],
   thread_id="FEAT-123",
@@ -358,14 +358,14 @@ agent_mail_send_message(
 
 ```python
 # At the start of each work session
-agent_mail_fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="home-gonya-unified-system", agent_name="BlueMountain", limit=20)
 ```
 
 **Русский:**
 
 ```python
 # В начале каждой рабочей сессии
-agent_mail_fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="home-gonya-unified-system", agent_name="BlueMountain", limit=20)
 ```
 
 ### 4. Acknowledge Important Messages / Подтверждайте важные сообщения
@@ -374,7 +374,7 @@ agent_mail_fetch_inbox(project_key="/Gonya990/Unified_System_Core", agent_name="
 
 ```python
 agent_mail_acknowledge_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   message_id=123  # Integer, not string
 )
@@ -384,7 +384,7 @@ agent_mail_acknowledge_message(
 
 ```python
 agent_mail_acknowledge_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   message_id=123  # Целое число, не строка
 )

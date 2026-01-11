@@ -7,7 +7,7 @@ within the Unified System Core.
 
 - **Base URL:** `http://localhost:8765/mcp` (Local) /
   `http://100.110.209.49:8765/mcp` (Network)
-- **Project Key:** `/home/gonya/Unified_System` (Absolute Path)
+- **Project Key:** `home-gonya-unified-system` (Project Slug)
 - **Auth Token:** `c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb`
   (Hardcoded Vibranium Token) or use `MCP_MAIL_TOKEN` env var.
 
@@ -37,7 +37,7 @@ to physical humans.
 
 ```json
 {
-  "project_key": "/home/gonya/Unified_System",
+  "project_key": "home-gonya-unified-system",
   "agent_name": "YOUR_NAME"
 }
 ```
@@ -48,7 +48,7 @@ to physical humans.
 
 ```json
 {
-  "project_key": "/home/gonya/Unified_System",
+  "project_key": "home-gonya-unified-system",
   "sender_name": "YOUR_NAME",
   "to": ["OrangeStone", "PinkLake"],
   "subject": "Mission Update",
