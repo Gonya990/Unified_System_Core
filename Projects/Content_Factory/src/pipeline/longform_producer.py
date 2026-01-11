@@ -11,9 +11,18 @@ import os
 import sys
 import json
 import time
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger("LongFormProducer")
 
 # Setup paths
 SRC_DIR = Path(__file__).parent.parent.resolve()
@@ -109,10 +118,13 @@ def deep_research_with_council(topic: str) -> Dict:
             # Try research tier, fallback to pro, then tier1, then any
             for t in ["research", "pro", "tier1", None]:
                 try:
+                    print(f"🔍 Attempting Council Tier: {t}")
                     council = LLMCouncil.from_token_broker(BROKER, tier=t)
                     if council and council.providers:
                         print(f"✅ Council using tier: {t}")
                         break
+                    else:
+                        print(f"⚠️ Tier {t} yielded no providers")
                 except Exception as e:
                     print(f"⚠️ Tier {t} failed: {e}")
                     council = None
@@ -192,7 +204,7 @@ def deep_research_with_council(topic: str) -> Dict:
         # Track approximate tokens (estimate based on response length)
         TRACKER.log("openai", len(query) // 4, len(consensus) // 4)
         
-        council.close()
+        asyncio.run(council.close())
         return data
         
     except Exception as e:
