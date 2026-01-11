@@ -80,6 +80,7 @@ from telegram_schema_expert import TelegramSchemaExpert
 from conversation_manager import ConversationManager
 from telegram_schema_expert import TelegramSchemaExpert
 from agent_orchestrator import AgentOrchestrator, PIPELINES
+from agent_mail_client import AgentMailClient
 from identity_orchestrator import IdentityOrchestrator
 
 # Optional imports with fallbacks
@@ -3682,9 +3683,6 @@ async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg, parse_mode="Markdown")
 
     elif subcmd == "done":
-        if len(context.args) < 2:
-            await update.message.reply_text("Usage: /todo done <id>")
-            return
         try:
             task_id = int(context.args[1])
             if task_manager.complete_task(user_id, task_id):
@@ -3697,6 +3695,102 @@ async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
         except ValueError:
             await update.message.reply_text("❌ ID должен быть числом.")
+
+
+async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /am command - Agent Mail inter-agent communication."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    # Initialize Agent Mail Client
+    # Uses values from .env (AGENT_MAIL_SERVER, AGENT_MAIL_TOKEN, etc.)
+    client = AgentMailClient()
+
+    if not context.args:
+        await update.message.reply_text(
+            "✉️ **Agent Mail (MCP)**\n\n"
+            "Usage:\n"
+            "`/am list` - Recent messages\n"
+            "`/am read <id>` - Read message\n"
+            "`/am send <to> | <subja> | <body>` - Send message\n"
+            "`/am broadcast <msg>` - Message all agents",
+            parse_mode="Markdown",
+        )
+        return
+
+    cmd = context.args[0].lower()
+
+    if cmd == "list":
+        try:
+            messages = client.fetch_inbox(limit=10)
+            if not messages:
+                await update.message.reply_text("📭 Входящих сообщений нет.")
+                return
+
+            msg = "📬 **Agent Mail Inbox:**\n\n"
+            for m in messages:
+                status = "✉️" if not m.get("read") else "📖"
+                msg += f"{status} `#{m['id']}` From: **{m['from']}**\n   _{m['subject']}_\n\n"
+            
+            msg += "Используйте `/am read <id>` для подробностей."
+            await update.message.reply_text(msg, parse_mode="Markdown")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error fetching mail: {e}")
+
+    elif cmd == "read":
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /am read <id>")
+            return
+        
+        try:
+            msg_id = int(context.args[1])
+            # fetch_inbox doesn't give full bodies in some versions, but we'll try
+            # For simplicity, we search in the batch (since Fetch Inbox includes bodies in this MCP)
+            messages = client.fetch_inbox(limit=20)
+            target = next((m for m in messages if m["id"] == msg_id), None)
+            
+            if target:
+                resp = (
+                    f"📧 **Message #{msg_id}**\n"
+                    f"From: **{target['from']}**\n"
+                    f"Subject: **{target['subject']}**\n"
+                    f"Time: `{target.get('created_ts', 'N/A')}`\n\n"
+                    f"{target.get('body_md', target.get('body', 'No content'))}"
+                )
+                await update.message.reply_text(resp, parse_mode="Markdown")
+                client.mark_read(msg_id)
+            else:
+                await update.message.reply_text(f"❌ Message #{msg_id} not found.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error: {e}")
+
+    elif cmd == "send":
+        # /am send AgentName | Subject | Body
+        full_text = " ".join(context.args[1:])
+        parts = [p.strip() for p in full_text.split("|")]
+        if len(parts) < 3:
+            await update.message.reply_text("❌ Format: `/am send Agent | Subject | Body`")
+            return
+        
+        try:
+            client.send_message(to=[parts[0]], subject=parts[1], body_md=parts[2])
+            await update.message.reply_text(f"✅ Отправлено агенту {parts[0]}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error sending: {e}")
+
+    elif cmd == "broadcast":
+        body = " ".join(context.args[1:])
+        if not body:
+            await update.message.reply_text("Usage: /am broadcast <message>")
+            return
+        
+        try:
+            client.broadcast(subject="Broadcast from Bot", body_md=body)
+            await update.message.reply_text("✅ Рассылка завершена.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error: {e}")
 
 
 async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4082,6 +4176,21 @@ def main():
     except Exception as e:
         logger.error(f"[STARTUP] Error restoring sessions: {e}")
 
+    # Agent Mail Startup Notification (Vibranium Integration)
+    try:
+        am_client = AgentMailClient()
+        am_client.register()
+        am_client.broadcast(
+            subject="Unified Bot Online",
+            body_md=f"🤖 **Unified AI Bot v2** is now online on `{os.uname().nodename}`.\n"
+                    f"Ready for cross-agent task coordination.\n"
+                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            importance="low"
+        )
+        logger.info("[STARTUP] Agent Mail notification sent (Vibranium Sync)")
+    except Exception as am_e:
+        logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
+
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Register error handler
@@ -4152,6 +4261,7 @@ def main():
         "share_key": share_key_command,
         "login": login_command,
         "factory": factory_command,
+        "am": am_command,
     }
 
     for cmd, func in commands_to_register.items():
