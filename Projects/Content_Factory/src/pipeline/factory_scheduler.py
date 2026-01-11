@@ -35,11 +35,13 @@ import subprocess
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
-# --- MONETIZATION SAFETY LIMITS ---
-DAILY_VIDEOS_LIMIT = 2  # Max 2 videos per day across all modes
-MIN_INTERVAL_HOURS = 4  # Minimum gap between any two posts
-INSTA_ACTION_DELAY = 60 # Seconds between Instagram operations
-# ----------------------------------
+# --- MONETIZATION SAFETY LIMITS (OPTIMIZED - ToS SAFE) ---
+DAILY_VIDEOS_LIMIT = 3  # Optimized: 3 videos per day (quality + reach)
+MIN_INTERVAL_HOURS = 4  # 4-hour gap for better algorithm treatment
+INSTA_ACTION_DELAY = 90 # Seconds between Instagram operations (safer)
+# YouTube: 3/day safe | Instagram: 1-2/day safe | Threads: 3/day safe
+# NO TikTok - excluded by user preference
+# ----------------------------------------------------------
 
 def agent_sync(msg):
     """Синхронизация с агентом Кости (VioletCastle) через MCP"""
@@ -304,22 +306,27 @@ def run_factory_production(mode="daily"):
         agent_sync(f"Критическая ошибка фабрики: {e}")
 
 def start_scheduler():
-    """Бесконечный цикл планировщика (Время скорректировано под Израиль UTC+2)"""
-    agent_sync("⏰ Планировщик фабрики запущен (Синхронизация с Израилем)")
+    """Бесконечный цикл планировщика (OPTIMIZED - Время по Израилю UTC+2)"""
+    agent_sync("⏰ Планировщик фабрики запущен (OPTIMIZED MODE - 3 видео/день)")
     
-    # Ежедневно в 09:00 по Израилю -> 07:00 UTC
+    # === ОПТИМИЗИРОВАННОЕ РАСПИСАНИЕ (3 видео/день) ===
+    
+    # Утро 09:00 по Израилю -> 07:00 UTC - Daily Russian (пик активности)
     schedule.every().day.at("07:00").do(run_factory_production, mode="daily")
     
-    # По воскресеньям в 10:00 по Израилю -> 08:00 UTC
+    # День 14:00 по Израилю -> 12:00 UTC - Daily English (обеденный контент)
+    schedule.every().day.at("12:00").do(run_factory_production, mode="english")
+    
+    # Вечер 20:00 по Израилю -> 18:00 UTC - Cartoon/Creative (вечерний прайм-тайм)
+    schedule.every().day.at("18:00").do(run_factory_production, mode="cartoon")
+    
+    # === ЕЖЕНЕДЕЛЬНЫЕ СПЕЦИАЛЬНЫЕ ВЫПУСКИ ===
+    
+    # По воскресеньям в 10:00 по Израилю -> 08:00 UTC - Hebrew Special
     schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
-    
-    # По средам в 11:00 по Израилю -> 09:00 UTC
-    schedule.every().wednesday.at("09:00").do(run_factory_production, mode="english")
-    
-    # Каждый вечер в 19:00 по Израилю -> 17:00 UTC
-    schedule.every().day.at("17:00").do(run_factory_production, mode="cartoon")
 
-    print("🚀 Scheduler is running (Aligned with Israel Time). Waiting...")
+    print("🚀 OPTIMIZED Scheduler running (3 videos/day, Israel Time). Waiting...")
+    print("📅 Schedule: 09:00 RU | 14:00 EN | 20:00 Cartoon | Sun 10:00 Hebrew")
     while True:
         schedule.run_pending()
         time.sleep(60)
