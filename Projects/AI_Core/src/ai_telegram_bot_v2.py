@@ -965,9 +965,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def process_event_creation(query, user_id, client, pending, start_time, context):
+    duration_mins = pending.get("duration_minutes", 60)
     success = client.create_event(
         summary=pending["summary"],
         start_time=start_time,
+        duration_minutes=duration_mins,
         description=pending.get("context", ""),
     )
 
@@ -976,7 +978,8 @@ async def process_event_creation(query, user_id, client, pending, start_time, co
             user_id, pending["summary"], pending.get("context", ""), start_time
         )
         await query.edit_message_text(
-            f"✅ Запланировано: **{pending['summary']}**\nВремя: {pending['time']}",
+            f"✅ Запланировано: **{pending['summary']}**\n"
+            f"Время: {pending['time']} ({duration_mins} мин)",
             parse_mode="Markdown",
         )
     else:
@@ -1195,6 +1198,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if event_details and "summary" in event_details:
             summary = event_details["summary"]
             time_str = event_details.get("time", "Unknown")
+            duration_mins = event_details.get("duration_minutes", 60)
             context_desc = event_details.get("context", "No context provided")
 
             keyboard = [
@@ -1212,6 +1216,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"📅 **Found Event:**\n"
                 f"📝 Title: {summary}\n"
                 f"⏰ Time: {time_str}\n"
+                f"⏱ Duration: {duration_mins} min\n"
                 f"💡 Context: {context_desc}\n\n"
                 "Should I add this to your calendar?",
                 parse_mode="Markdown",
@@ -1681,7 +1686,8 @@ async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
     prompt = (
         "Extract event details from this text for a calendar: '" + text + "'. "
         "Current local time: " + datetime.now().isoformat() + ". "
-        "Return ONLY a JSON object with keys: summary, time (ISO format), context (reason for event)."
+        "Return ONLY a JSON object with keys: summary, time (ISO format), "
+        "duration_minutes (integer, default 60 if not specified), context (reason for event)."
     )
 
     response = await query_ollama(
