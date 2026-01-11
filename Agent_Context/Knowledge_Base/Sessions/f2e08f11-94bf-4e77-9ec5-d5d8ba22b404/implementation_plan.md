@@ -23,7 +23,7 @@ I will create a root folder `Unified_System` (System_Core) to house all active p
 
 - A dedicated directory for testing scripts and unsafe operations.
 
-#### [MOVE] windows-rtx-ai-setup -> /Unified_System/Windows_AI_Core
+#### [MOVE] windows-rtx-ai-setup -> /Unified_System/Projects/AI_Core
 
 - Rename for clarity. Contains all RTX AI setup scripts.
 

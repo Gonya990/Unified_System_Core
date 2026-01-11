@@ -8,7 +8,7 @@ We have successfully consolidated the working zones for the "igor/gonya" admin e
 
 - **Consolidated Directory**: Created `/Users/macbook/Documents/Unified_System`.
 - **Relocated Resources**:
-  - Moved `windows-rtx-ai-setup` to `Windows_AI_Core`.
+  - Moved `windows-rtx-ai-setup` to `Projects/AI_Core`.
   - Moved `home-assistant` to `Home_Assistant_Config`.
 - **Created Sandbox**: Dedicated testing area `Sandbox`.
 - **Documentation**:
