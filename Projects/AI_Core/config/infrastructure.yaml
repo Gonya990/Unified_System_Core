@@ -62,6 +62,33 @@ nodes:
     os: proxmox-ve
     services:
       - name: Titan RTX Passthrough
+    storage:
+      - name: nvme-thin
+        type: lvmthin
+        size: 957G
+        usage: fast VM disks (OS, databases)
+      - name: ent-ssd
+        type: lvm
+        size: 1.8T
+        usage: secondary VM storage
+      - name: Backup
+        type: dir
+        size: 3.6T
+        usage: VM backups
+    vms:
+      - vmid: 100
+        name: Gaming VM
+        purpose: Windows gaming with GPU passthrough
+        disks:
+          - scsi0: ent-ssd:500G
+      - vmid: 106
+        name: unified-home-core-cloud
+        purpose: Main AI workloads, Telegram bot, automation
+        cpu: 8 cores
+        ram: 25G
+        disks:
+          - scsi0: nvme-thin:100G (OS)
+          - scsi1: nvme-thin:300G (data, mounted /mnt/data)
 
   - id: unified-home-core-cloud
     name: Cloud Gateway (GCP)
