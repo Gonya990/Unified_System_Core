@@ -31,6 +31,15 @@ from uploaders.threads_browser import ThreadsBrowser
 import asyncio
 import subprocess
 
+# Long-form documentary producer
+try:
+    from longform_producer import run_longform_production
+    LONGFORM_ENABLED = True
+    print("✅ Long-form Documentary Producer loaded")
+except ImportError:
+    LONGFORM_ENABLED = False
+    print("⚠️ Long-form producer not available")
+
 # Configuration
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
@@ -324,9 +333,15 @@ def start_scheduler():
     
     # По воскресеньям в 10:00 по Израилю -> 08:00 UTC - Hebrew Special
     schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
+    
+    # По субботам в 18:00 по Израилю -> 16:00 UTC - 30-MIN DOCUMENTARY
+    if LONGFORM_ENABLED:
+        schedule.every().saturday.at("16:00").do(run_longform_production)
+        print("🎬 Long-form Documentary: Saturday 18:00 Israel Time")
 
-    print("🚀 OPTIMIZED Scheduler running (3 videos/day, Israel Time). Waiting...")
-    print("📅 Schedule: 09:00 RU | 14:00 EN | 20:00 Cartoon | Sun 10:00 Hebrew")
+    print("🚀 OPTIMIZED Scheduler running (3 videos/day + Weekly Documentary). Waiting...")
+    print("📅 Daily: 09:00 RU | 14:00 EN | 20:00 Cartoon")
+    print("📅 Weekly: Sun 10:00 Hebrew | Sat 18:00 Documentary (30 min)")
     while True:
         schedule.run_pending()
         time.sleep(60)
@@ -338,6 +353,8 @@ if __name__ == "__main__":
     parser.add_argument('--cartoon', action='store_true', help='Force Cartoon/Animation daily mode')
     parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
     parser.add_argument('--scheduler', action='store_true', help='Run in infinity loop mode')
+    parser.add_argument('--longform', action='store_true', help='Force 30-min Documentary mode')
+    parser.add_argument('--longform-topic', type=str, help='Topic for documentary')
     
     parser.add_argument('--auto-upload', action='store_true', help='Force enable auto upload')
     
@@ -349,6 +366,11 @@ if __name__ == "__main__":
 
     if args.scheduler:
         start_scheduler()
+    elif args.longform:
+        if LONGFORM_ENABLED:
+            run_longform_production(args.longform_topic)
+        else:
+            print("❌ Long-form producer not available")
     else:
         mode = "daily"
         if args.hebrew: mode = "hebrew"
