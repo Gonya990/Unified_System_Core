@@ -57,18 +57,21 @@ def get_client():
     org_id = os.getenv("OPENAI_ORG_ID")
     return OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-def get_latest_tech_news():
-    """Fetches news from Google News RSS"""
+def get_latest_geo_news():
+    """Fetches high-stakes Geopolitics & Tech news (Positive Future Focus)"""
+    # MEGAFORMA STRATEGY: Future Tech, Scientific Breakthroughs, Global Unity
     topics = [
-        "artificial intelligence future tech", "quantum computing breakthroughs 2026",
-        "neuralink brain computer interface", "humanoid robots boston dynamics",
-        "biotechnology longevity research", "autonomous vehicles level 5",
-        "nanotechnology in medicine", "6G network release", "smart cities"
+        "ai curing diseases breakthrough", "fusion energy infinite power",
+        "mars colonization progress 2026", "global reforestation projects ai",
+        "quantum computing solving climate change", "flying cars commercial launch",
+        "universal language translator ai", "ocean cleaning autonomous drones",
+        "neuralink restoring sight", "vertical farming feeding the world"
     ]
     query = random.choice(topics)
-    print(f"📡 Researching topic: {query}")
+    print(f"📡 Researching MEGAFORMA topic: {query}")
     import urllib.parse
     encoded_query = urllib.parse.quote(query)
+    # Search Google News
     url = f"https://news.google.com/rss/search?q={encoded_query}+when:1d&hl=en-US&gl=US&ceid=US:en"
     try:
         feed = feedparser.parse(url)
@@ -92,9 +95,9 @@ def get_page_content(url):
         return ""
 
 def run_daily_research(style="impact"):
-    """Deep research with failover between OpenAI and Gemini"""
-    print(f"🧠 Starting DEEP RESEARCH (Style: {style.upper()}) [Strategy: Multi-Model]")
-    news = get_latest_tech_news()
+    """Deep research with Megaforma Style (Geopolitics/Mystery)"""
+    print(f"🧠 Starting MEGAFORMA RESEARCH (Style: {style.upper()})")
+    news = get_latest_geo_news()
     if not news: return None
         
     context = ""
@@ -102,27 +105,46 @@ def run_daily_research(style="impact"):
         print(f"🔍 Browsing: {item['title']}...")
         context += f"TOPIC: {item['title']}\nCONTENT: {get_page_content(item['link'])}\n\n"
 
-    style_prompt = f"""
-    Tone: {'Enthusiastic, Pixar-like, fun' if style == 'cartoon' else 'Epic, deep, motivational'}.
-    Language: RUSSIAN. Length: 15 scenes.
-    Keywords: {'3d render, cartoon style, cute, colorful, animation' if style == 'cartoon' else 'cinematic 4k, futuristic, high quality'}.
-    """
+    # Style definitions
+    if style == 'cartoon':
+        tone = 'Satirical, sharp, funny politics'
+        visuals = 'political cartoon style, caricature, vibrant 3d'
+    else:
+        # The "Megaforma" signature style (Peace & Tech Edition)
+        tone = 'Inspiring, Visionary, Optimistic, Deep Documentary, Unifying'
+        visuals = 'cinematic documentary footage, solar punk, high tech city, bright future, digital connections, nebula'
     
     prompt = f"""
     Context: {context}
-    Task: Viral RUSSIAN script for 15 scenes + 15 keywords.
-    Target Audience: Tech enthusiasts, futurists, AI early adopters.
+    Task: Write a viral 'Megaforma-style' RUSSIAN script (15 scenes).
+    Theme: Future Tech, Human Progress, Global Unity.
     
-    {style_prompt}
+    Target Audience: People looking for inspiration and "The Future" of humanity.
+    Tone: {tone} (But structured like a viral educational video - Maksim Nikolashin style).
+    Visual Style: {visuals}
     
-    CRITICAL RESTRICTIONS:
-    1. NO ANIMALS. NO MICE. NO FAIRY TALES. NO "ONCE UPON A TIME".
-    2. STRICTLY FUTURISTIC / TECH / AI themes.
-    3. If news/context is weak, invent a realistic near-future AI scenario (e.g., "AI cures disease", "Robots build Mars base", "Neuralink update").
-    4. Tone must be grounded in sci-fi reality, not fantasy.
+    STRUCTURE (The 'Listicle' Format):
+    - Scene 1-2: THE HOOK. Use a "Negative/Warning" or "Secret" framing. (e.g., "You won't believe what AI can do...", "Stop ignoring this technology...").
+    - Scene 3: The Intro. "Here are 5 technologies changing everything."
+    - Scene 4-13: THE LIST. Rapid fire facts/technologies. (e.g. "Number 1...", "Number 2...").
+    - Scene 14-15: THE CONCLUSION. Evaluation & Call for Unity.
+    
+    CRITICAL: 
+    - Text must be in RUSSIAN.
+    - VISUAL KEYWORDS must be English descriptions for Pexels/AI.
+    - Do NOT use "Once upon a time". START WITH IMPACT.
+    - Narrator should sound like a wise visionary.
+    3. If news/context is weak, invent a realistic near-future AI scenario.
+    4. Tone must be grounded in sci-fi reality.
     5. No scene labels. No "Scene 1:". ONLY spoken words. Use "..." for pauses.
 
-    Format: JSON {{"selected_topic": "", "description": "", "script_ru": "", "scenes": [{{"image": "scene_1", "keyword": ""}}]}}
+    Format: JSON {{
+        "selected_topic": "Viral Title (e.g. 7 Insane AI Tools)", 
+        "description": "YouTube Description with hashtags", 
+        "script_ru": "Full spoken text...", 
+        "pinned_comment": "Question to audience? (e.g. Which tech do you want?)",
+        "scenes": [{{"image": "scene_1", "keyword": ""}}]
+    }}
     """
     
     data = None
