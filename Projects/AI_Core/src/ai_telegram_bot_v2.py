@@ -162,6 +162,31 @@ except ImportError:
     _DIGEST_AVAILABLE = False
     digest_service = None
 
+# MCP Agent Mail Integration
+try:
+    # Ensure we can find the Scripts/Orchestration regardless of where we run from
+    # If running from Projects/AI_Core/src, we need to go up 3 levels to root, then Scripts/Orchestration
+    # or use absolute path if we can rely on standard structure.
+    # Current dir is .../Projects/AI_Core/src
+    
+    # Try finding the root Unified_System directory
+    root_path = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+    if os.path.basename(root_path) != "Unified_System": 
+         # Fallback or try relatively if we are just in src
+         root_path = os.path.abspath(os.path.join(current_dir, "../../../"))
+    
+    agent_mail_path = os.path.join(root_path, 'Scripts', 'Orchestration')
+    
+    if agent_mail_path not in sys.path:
+        sys.path.append(agent_mail_path)
+        
+    from agent_mail_client import AgentMailClient
+    agent_mail = AgentMailClient()
+    logger.info("AgentMailClient initialized")
+except Exception as e:
+    agent_mail = None
+    logger.warning(f"AgentMailClient not available: {e}")
+
 try:
     from modules.proxmox_manager import ProxmoxManager
 
@@ -1929,6 +1954,24 @@ async def post_init(application: Application) -> None:
     else:
         logger.warning("⚠️ DashboardService not available, skipping startup")
 
+    # Broadcast Online Status via MCP Mail
+    if agent_mail:
+        try:
+            # Run in executor to avoid blocking async loop with sync requests
+            loop = asyncio.get_running_loop()
+            is_healthy = await loop.run_in_executor(None, agent_mail.health_check)
+            if is_healthy:
+                await loop.run_in_executor(None, lambda: agent_mail.broadcast(
+                    subject="Unified Bot Online (Vibranium Core)",
+                    body_md="The AI Telegram Bot V2 (Vibranium Core) has successfully started and is listening for commands.",
+                    importance="normal"
+                ))
+                logger.info("Broadcasted 'Unified Bot Online' via MCP Mail")
+            else:
+                logger.warning("MCP Mail Server unhealthy, skipping broadcast")
+        except Exception as e:
+            logger.error(f"Failed to broadcast online status: {e}")
+
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
@@ -3019,11 +3062,35 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Get per-user Gmail client
     gmail = get_gmail_client(user_id)
+    cmd = context.args[0].lower() if context.args else None
+
+    if cmd == "agent" or (not gmail and agent_mail):
+        # Check MCP Agent Mail
+        if not agent_mail:
+             await update.message.reply_text("❌ MCP Mail Client not available.")
+             return
+             
+        await update.message.reply_text("🔄 Checking Agent Mail...")
+        try:
+            loop = asyncio.get_running_loop()
+            messages = await loop.run_in_executor(None, lambda: agent_mail.fetch_inbox(limit=5))
+            if not messages:
+                await update.message.reply_text("📭 Agent Inbox empty.")
+            else:
+                msg_text = f"📬 **Agent Inbox ({len(messages)}):**\n\n"
+                for m in messages:
+                    status = '📖' if m.get('read') else '✉️'
+                    msg_text += f"{status} From: `{m['from']}`\nSubject: {m['subject']}\n\n"
+                await update.message.reply_text(msg_text, parse_mode="Markdown")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error fetching agent mail: {e}")
+        return
+
     if not gmail or not gmail.is_valid():
         await update.message.reply_text(
             "❌ Gmail не подключен.\n\n"
             "Используйте /start → 🔗 Connect Google для подключения.\n"
-            "(Gmail использует те же OAuth credentials, что и Calendar)"
+            "Или `/mail agent` для проверки внутренней почты."
         )
         return
 
@@ -3034,6 +3101,8 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
         summary = gmail.get_email_summary()
         await update.message.reply_text(summary, parse_mode="Markdown")
+        if agent_mail:
+             await update.message.reply_text("💡 Tip: Use `/mail agent` to check internal agent messages.")
         return
 
     cmd = context.args[0].lower()

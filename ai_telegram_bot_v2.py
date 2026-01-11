@@ -101,6 +101,18 @@ except ImportError:
     _DIGEST_AVAILABLE = False
     digest_service = None
 
+# MCP Agent Mail Integration
+try:
+    agent_mail_path = os.path.join(current_dir, 'Scripts', 'Orchestration')
+    if agent_mail_path not in sys.path:
+        sys.path.append(agent_mail_path)
+    from agent_mail_client import AgentMailClient
+    agent_mail = AgentMailClient()
+    logger.info("AgentMailClient initialized")
+except Exception as e:
+    agent_mail = None
+    logger.warning(f"AgentMailClient not available: {e}")
+
 # Setup logging first
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -1246,6 +1258,23 @@ async def post_init(application: Application) -> None:
     asyncio.create_task(scheduler.start())
     logger.info("DailyScheduler background task started via post_init.")
 
+    # Broadcast Online Status via MCP Mail
+    if agent_mail:
+        try:
+            # Run in executor to avoid blocking async loop with sync requests
+            loop = asyncio.get_running_loop()
+            if await loop.run_in_executor(None, agent_mail.health_check):
+                await loop.run_in_executor(None, lambda: agent_mail.broadcast(
+                    subject="Unified Bot Online",
+                    body_md="The AI Telegram Bot V2 has successfully started and is listening for commands.",
+                    importance="normal"
+                ))
+                logger.info("Broadcasted 'Unified Bot Online' via MCP Mail")
+            else:
+                logger.warning("MCP Mail Server unhealthy, skipping broadcast")
+        except Exception as e:
+            logger.error(f"Failed to broadcast online status: {e}")
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
     logger.info(f"[CMD] /help from {update.effective_user.id}")
@@ -2121,13 +2150,37 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    # Get per-user Gmail client
     gmail = get_gmail_client(user_id)
+    cmd = context.args[0].lower() if context.args else None
+    
+    if cmd == "agent" or (not gmail and agent_mail):
+        # Check MCP Agent Mail
+        if not agent_mail:
+             await update.message.reply_text("❌ MCP Mail Client not available.")
+             return
+             
+        await update.message.reply_text("🔄 Checking Agent Mail...")
+        try:
+            loop = asyncio.get_running_loop()
+            messages = await loop.run_in_executor(None, lambda: agent_mail.fetch_inbox(limit=5))
+            if not messages:
+                await update.message.reply_text("📭 Agent Inbox empty.")
+            else:
+                msg_text = f"📬 **Agent Inbox ({len(messages)}):**\n\n"
+                for m in messages:
+                    status = '📖' if m.get('read') else '✉️'
+                    msg_text += f"{status} From: `{m['from']}`\nSubject: {m['subject']}\n\n"
+                await update.message.reply_text(msg_text, parse_mode="Markdown")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Error fetching agent mail: {e}")
+        return
+
+    # Fallback to Gmail if no arg or arg is not agent
     if not gmail or not gmail.is_valid():
         await update.message.reply_text(
             "❌ Gmail не подключен.\n\n"
             "Используйте /start → 🔗 Connect Google для подключения.\n"
-            "(Gmail использует те же OAuth credentials, что и Calendar)"
+            "Или `/mail agent` для проверки внутренней почты."
         )
         return
 
@@ -2136,13 +2189,16 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
         summary = gmail.get_email_summary()
         await update.message.reply_text(summary, parse_mode="Markdown")
+        # Also mention agent mail
+        if agent_mail:
+             await update.message.reply_text("💡 Tip: Use `/mail agent` to check internal agent messages.")
         return
 
     cmd = context.args[0].lower()
 
     if cmd == "unread":
         count = gmail.get_unread_count()
-        await update.message.reply_text(f"📬 Непрочитанных писем: **{count}**", parse_mode="Markdown")
+        await update.message.reply_text(f"📬 Непрочитанных писем (Gmail): **{count}**", parse_mode="Markdown")
 
     elif cmd == "search":
         if len(context.args) < 2:
