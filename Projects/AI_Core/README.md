@@ -1,6 +1,7 @@
 # Unified AI Bot (Gonya)
 
-Мощный Telegram бот, объединяющий управление умным домом, задачи, генерацию контента и поиск информации. Работает на базе `python-telegram-bot` и интегрируется с Gemini, OpenAI, Ollama, Home Assistant и Yandex Alice.
+Мощный Telegram бот, объединяющий управление умным домом, задачи, генерацию контента и поиск информации.
+Работает на базе `python-telegram-bot` и интегрируется с Gemini, OpenAI, Ollama, Home Assistant и Yandex Alice.
 
 ## 🚀 Функциональность
 
@@ -13,17 +14,17 @@
 | **Reminders** | Напоминания по времени. | `/remind 10m text` |
 | **Infra Map** | Статус серверов и сервисов. | `/infra` |
 | **Vision** | Анализ изображений (Gemini Vision). | Отправь фото (+caption) |
-| **Voice Msgs** | Распознавание речи (Whisper) и ответ текстом. | Голосовое сообщение |
-| **Home Control** | Управление светом и статусом Home Assistant. | `/ha status`, `/ha lights on/off` |
+| **Voice Msgs** | Распознавание речи и ответ текстом. | Голосовое сообщение |
+| **Home Control** | Управление HA. | `/ha status`, `/ha lights` |
 | **Auto-Update** | Самообновление (Git + Pip + Restart). | `/update` |
 | **Backup** | Бэкап баз данных в чат. | `/backup` |
 | **Dashboard** | Веб-панель управления и логов. | `http://<ip>:8096` |
 | **Linear** | Профессиональный таск-трекер. | `/linear me`, `/linear create` |
 | **Daily Digest** | Ежедневная сводка (09:00). | `/digest` |
-| **HomeKit Bridge** | Мост для Apple Home (lights, switches, sensors). | `/homekit start` |
-| **Cost Tracking** | Учет использования токенов. | `/usage` |
+| **HomeKit** | Мост для Apple Home (lights, switches). | `/homekit start` |
+| **Cost Track** | Учет использования токенов. | `/usage` |
 | **Job Hunter** | Запуск скрипта поиска вакансий. | `/scan` |
-| **Alice Skill** | Голосовое управление через Яндекс Алису. | Webhook port 8090 |
+| **Alice Skill** | Голосовое управление (Яндекс). | Webhook port 8090 |
 
 ## 🛠 Установка и Запуск
 
@@ -127,7 +128,8 @@ docker compose up -d
 docker compose --profile local up -d ai-bot-local
 ```
 
-> **Note:** Both services use the same container name, so only one can run at a time. Stop the running service before switching.
+> **Note:** Both services use the same container name, so only one can run at a time.
+> Stop the running service before switching.
 
 ### Auto-Update with Watchtower
 
@@ -137,15 +139,20 @@ Watchtower automatically pulls and deploys new images from GHCR.
 
 1. Create a GitHub Personal Access Token with `read:packages` permission
 2. Generate base64 credentials:
+
    ```bash
    echo -n 'github-username:ghp_your_token' | base64
    ```
+
 3. Copy the example config and add your credentials:
+
    ```bash
    cp watchtower-config.json.example watchtower-config.json
    # Edit watchtower-config.json and replace BASE64_ENCODED_STRING
    ```
+
 4. Deploy:
+
    ```bash
    docker compose up -d
    ```
