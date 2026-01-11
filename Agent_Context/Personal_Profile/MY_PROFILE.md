@@ -20,7 +20,7 @@
 
 - **GitHub:** [@Gonya990](https://github.com/Gonya990)
 - **Email:** <garyk927@yandex.ru>
-- **LinkedIn:** [Profile](https://linkedin.com/in/igor-goncharenko)
+- **LinkedIn:** [Profile](https://linkedin.com/in/igor-goncha)
 - **Languages:** English, Russian, Hebrew (Английский, Русский, עברית)
 
 ---
