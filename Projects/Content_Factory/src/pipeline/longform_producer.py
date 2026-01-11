@@ -108,10 +108,14 @@ def deep_research_with_council(topic: str) -> Dict:
         if BROKER:
             # Try research tier, fallback to pro, then tier1, then any
             for t in ["research", "pro", "tier1", None]:
-                council = LLMCouncil.from_token_broker(BROKER, tier=t)
-                if council.primary_client: # Double check if it actually got a key
-                    print(f"✅ Council using tier: {t}")
-                    break
+                try:
+                    council = LLMCouncil.from_token_broker(BROKER, tier=t)
+                    if council and council.providers:
+                        print(f"✅ Council using tier: {t}")
+                        break
+                except Exception as e:
+                    print(f"⚠️ Tier {t} failed: {e}")
+                    council = None
         else:
             council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
         
@@ -216,8 +220,24 @@ def fallback_research(topic: str) -> Dict:
 
         genai.configure(api_key=api_key)
         
-        # Use available models from list (gemini-2.0-flash is standard in 2026)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        # Try several models for fallback
+        models_to_try = ["gemini-pro-latest", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
+        model = None
+        for m_name in models_to_try:
+            try:
+                print(f"   → Trying Gemini model: {m_name}")
+                model = genai.GenerativeModel(m_name)
+                # Test with a very small prompt
+                model.generate_content("test", generation_config={"max_output_tokens": 10})
+                print(f"   ✅ Model {m_name} is active!")
+                break
+            except Exception as e:
+                print(f"   ⚠️ Model {m_name} failed: {e}")
+                model = None
+        
+        if not model:
+            print("❌ All Gemini models failed quota or 404")
+            return None
         
         prompt = f"""
         Create a 28-minute DOCUMENTARY script about: {topic}
