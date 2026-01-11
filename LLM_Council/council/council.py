@@ -17,6 +17,7 @@ from .providers import (
     OpenAIProvider,
     GitHubCopilotProvider,
     NVIDIANIMProvider,
+    GeminiProvider,
 )
 from .providers.base import PeerReview
 
@@ -159,8 +160,16 @@ class LLMCouncil:
         else:
             logger.warning(f"TokenBroker returned no key for OpenAI (Tier: {tier})")
             
-        # Add other providers as needed (Gemini, etc.) when supported by Council classes
-        # TODO: Add GeminiProvider support when available in imports
+        # Gemini
+        gemini_key = broker.get_key("gemini", tier=tier)
+        if gemini_key:
+            providers.append(GeminiProvider(
+                api_key=gemini_key,
+                model="models/nano-banana-pro-preview" # Priority: Nana Banana
+            ))
+            logger.info(f"✓ Gemini provider initialized via TokenBroker (Tier: {tier})")
+        else:
+            logger.warning(f"TokenBroker returned no key for Gemini (Tier: {tier})")
         
         if not providers:
             raise ValueError("TokenBroker returned no valid keys for supported providers.")

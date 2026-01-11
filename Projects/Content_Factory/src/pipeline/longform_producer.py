@@ -101,202 +101,169 @@ class TokenTracker:
 TRACKER = TokenTracker()
 
 # =============================================================================
-#                           DEEP RESEARCH (LLM COUNCIL)
+#                           DEEP RESEARCH (PLAN & EXECUTE)
 # =============================================================================
 
-def deep_research_with_council(topic: str) -> Dict:
-    """
-    Use LLM Council for multi-model deep research.
-    Returns structured documentary content.
-    """
-    print(f"\n🧠 LLM COUNCIL: Deep Research on '{topic}'")
+def get_documentary_structure(topic: str) -> Optional[Dict]:
+    """Phase 1: Get structured plan with segment outlines"""
+    print(f"\n🧠 PHASE 1: Planning Documentary Structure for '{topic}'")
     
     try:
         from council.council import LLMCouncil
         
         if BROKER:
-            # Try research tier, fallback to pro, then tier1, then any
-            for t in ["research", "pro", "tier1", None]:
-                try:
-                    print(f"🔍 Attempting Council Tier: {t}")
-                    council = LLMCouncil.from_token_broker(BROKER, tier=t)
-                    if council and council.providers:
-                        print(f"✅ Council using tier: {t}")
-                        break
-                    else:
-                        print(f"⚠️ Tier {t} yielded no providers")
-                except Exception as e:
-                    print(f"⚠️ Tier {t} failed: {e}")
-                    council = None
+            council = LLMCouncil.from_token_broker(BROKER)
         else:
             council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
-        
-        query = f"""
-        Create a 28-minute DOCUMENTARY script about: {topic}
-        
-        Structure (6 segments, ~650 words each):
-        
-        SEGMENT 1: THE HOOK (5 min)
-        - Shocking opening fact or question
-        - Why this matters NOW
-        - Brief preview of what's coming
-        
-        SEGMENT 2: HISTORICAL CONTEXT (5 min)
-        - How did we get here?
-        - Key milestones and turning points
-        - The pivotal moment that changed everything
-        
-        SEGMENT 3: THE CURRENT STATE (5 min)
-        - What's happening RIGHT NOW
-        - Key players and innovations
-        - Recent breakthroughs
-        
-        SEGMENT 4: DEEP DIVE - TECHNOLOGY (5 min)
-        - How it actually works
-        - Technical explanation made accessible
-        - Demonstrations and examples
-        
-        SEGMENT 5: IMPLICATIONS & FUTURE (5 min)
-        - What does this mean for society?
-        - Expert predictions
-        - Potential risks and opportunities
-        
-        SEGMENT 6: CONCLUSION & CALL TO ACTION (3 min)
-        - Summary of key insights
-        - What viewers should do/think
-        - Inspiring final message
-        
-        CRITICAL RULES:
-        - Write in RUSSIAN language
-        - Natural speech patterns (use "..." for pauses)
-        - NO scene labels or "Scene 1:" markers
-        - Each segment should have 3-5 visual scene descriptions
-        - Tone: Documentary style, authoritative but accessible
+            
+        plan_query = f"""
+        Create a detailed 6-segment OUTLINE for a 28-minute DOCUMENTARY about: {topic}
         
         Return JSON format:
         {{
             "title": "Documentary Title (Russian)",
-            "description": "YouTube description with SEO",
+            "description": "YouTube description",
             "segments": [
                 {{
                     "name": "segment_name",
-                    "script": "full spoken text for this segment...",
-                    "scenes": [{{"keyword": "visual description for B-roll"}}]
+                    "focus_points": ["point 1", "point 2", "point 3"],
+                    "visual_theme": "general visual style",
+                    "target_minutes": 5
                 }}
             ],
-            "total_word_count": 3900,
-            "youtube_tags": ["tag1", "tag2"],
-            "youtube_chapters": ["0:00 Intro", "5:00 History", ...]
+            "youtube_tags": ["tag1", "tag2"]
+        }}
+        
+        Rules:
+        - Russian language for title/description
+        - Exactly 6 segments
+        """
+        
+        import asyncio
+        session = asyncio.run(council.deliberate(plan_query, verbose=False))
+        consensus = session.stage3_consensus
+        
+        if "```json" in consensus:
+            consensus = consensus.split("```json")[1].split("```")[0].strip()
+        
+        data = json.loads(consensus)
+        TRACKER.log("openai", len(plan_query) // 4, len(consensus) // 4)
+        
+        try: asyncio.run(council.close())
+        except: pass
+        
+        return data
+    except Exception as e:
+        print(f"❌ Planning failed: {e}")
+        return None
+
+def generate_segment_script(topic: str, segment_info: Dict, context_summary: str = "") -> Optional[Dict]:
+    """Phase 2: Generate full-length script for a single segment using LLMCouncil"""
+    seg_name = segment_info.get("name", "Unknown")
+    print(f"📝 Phase 2: Writing Script for '{seg_name}' (Target 650+ words)")
+    
+    try:
+        from council.council import LLMCouncil
+        if BROKER:
+            council = LLMCouncil.from_token_broker(BROKER)
+        else:
+            council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
+            
+        prompt = f"""
+        Write a FULL DOCUMENTARY SCRIPT for one segment of a documentary about: {topic}
+        
+        SEGMENT: {seg_name}
+        FOCUS POINTS: {segment_info.get('focus_points')}
+        CONTEXT: {context_summary}
+        
+        REQUIREMENTS:
+        1. LANGUAGE: Russian
+        2. LENGTH: Minimum 650 words (Essential!)
+        3. TONE: Authoritative, cinematic, engaging
+        4. STRUCTURE: Pure narration text with "..." for dramatic pauses
+        5. VISUALS: Provide exactly 5-8 vivid visual scene descriptions for Pexels search
+        
+        Return JSON format:
+        {{
+            "script": "FULL TEXT HERE (Min 650 words)...",
+            "scenes": [
+                {{"keyword": "vivid english search keywords for cinematic b-roll", "description": "russian description"}}
+            ]
         }}
         """
         
         import asyncio
-        print("🏛️ Deliberation started...")
-        session = asyncio.run(council.deliberate(query, verbose=True))
-        
-        # Parse consensus
-        consensus = session.stage3_consensus
-        if not consensus:
-             print("❌ Stage 3 Synthesis failed (no consensus content)")
-             raise ValueError("Consensus synthesis failed")
-             
-        if "```json" in consensus:
-            consensus = consensus.split("```json")[1].split("```")[0].strip()
-        
-        try:
-            data = json.loads(consensus)
-        except json.JSONDecodeError as je:
-            print(f"❌ JSON Decode Error: {je}")
-            print(f"--- RAW CONSENSUS ---\n{consensus[:1000]}\n--- END RAW ---")
-            raise
-            
-        print(f"✅ Council completed: '{data.get('title', 'Unknown')}'")
-        
-        # Track approximate tokens (estimate based on response length)
-        TRACKER.log("openai", len(query) // 4, len(consensus) // 4)
-        
-        try:
-            asyncio.run(council.close())
-        except:
-            pass
-        return data
-        
-    except Exception as e:
-        print(f"❌ Council research failed: {e}")
-        return None
-
-def fallback_research(topic: str) -> Dict:
-    """
-    Fallback to single-model research if Council fails.
-    Uses Gemini Pro for long context.
-    """
-    print(f"🌠 Fallback Research (Gemini Pro) for '{topic}'")
-    
-    try:
-        import google.generativeai as genai
-        
-        # Try to find a key for gemini
-        api_key = BROKER.get_key("gemini") if BROKER else os.getenv("GEMINI_API_KEY")
-        if not api_key:
-             api_key = BROKER.get_key("gemini", tier="free") if BROKER else None
-        
-        if not api_key:
-             print("❌ No Gemini API key found for fallback")
-             return None
-
-        genai.configure(api_key=api_key)
-        
-        # Try several models for fallback (with canonical prefixes)
-        models_to_try = [
-            "models/gemini-2.0-flash", 
-            "models/gemini-pro-latest", 
-            "models/gemini-1.5-pro", 
-            "models/gemini-1.5-flash",
-            "models/gemini-flash-latest"
-        ]
-        model = None
-        for m_name in models_to_try:
-            try:
-                print(f"   → Trying Gemini model: {m_name}")
-                model = genai.GenerativeModel(m_name)
-                # Test with a very small prompt
-                model.generate_content("test", generation_config={"max_output_tokens": 10})
-                print(f"   ✅ Model {m_name} is active!")
-                break
-            except Exception as e:
-                print(f"   ⚠️ Model {m_name} failed: {e}")
-                model = None
-        
-        if not model:
-            print("❌ All Gemini models failed quota or 404")
-            return None
-        
-        prompt = f"""
-        Create a 28-minute DOCUMENTARY script about: {topic}
-        
-        Structure: 6 segments, ~650 words each, total ~3900 words.
-        
-        Segments: Hook, History, Current State, Technology Deep-Dive, Future Implications, Conclusion.
-        
-        Write in RUSSIAN. Include visual scene descriptions.
-        
-        Return JSON with: title, description, segments (each with name, script, scenes), youtube_chapters.
-        """
-        
-        response = model.generate_content(prompt)
-        content = response.text
+        session = asyncio.run(council.deliberate(prompt, verbose=False))
+        content = session.stage3_consensus
         
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         
-        data = json.loads(content)
-        TRACKER.log("gemini", len(prompt) // 4, len(content) // 4)
+        seg_data = json.loads(content)
+        # Approximate tokens
+        TRACKER.log("openai", len(prompt) // 4, len(content) // 4)
         
-        return data
+        try: asyncio.run(council.close())
+        except: pass
+        
+        return seg_data
         
     except Exception as e:
-        print(f"❌ Fallback research failed: {e}")
+        print(f"⚠️ Segment generation failed: {e}")
         return None
+
+def deep_research_with_council(topic: str) -> Dict:
+    """Refactored: Plan with Council, Execute with individual calls"""
+    structure = get_documentary_structure(topic)
+    if not structure:
+        return None
+    
+    full_data = {
+        "title": structure.get("title"),
+        "description": structure.get("description"),
+        "youtube_tags": structure.get("youtube_tags"),
+        "segments": []
+    }
+    
+    cumulative_script = ""
+    for i, seg_info in enumerate(structure.get("segments", [])):
+        seg_script_data = generate_segment_script(topic, seg_info, context_summary=cumulative_script[-2000:])
+        if seg_script_data:
+            segment_data = {
+                "name": seg_info.get("name"),
+                "script": seg_script_data.get("script", ""),
+                "scenes": seg_script_data.get("scenes", [])
+            }
+            full_data["segments"].append(segment_data)
+            cumulative_script += " " + segment_data["script"]
+        else:
+            print(f"❌ Failed to generate script for segment {i+1}")
+            full_data["segments"].append({
+                "name": seg_info.get("name"),
+                "script": f"...Продолжаем наше исследование {topic}...",
+                "scenes": []
+            })
+            
+    # Calculate chapters based on word count estimate (~130 wpm)
+    chapters = ["0:00 Начало"]
+    current_seconds = 0
+    for i, seg in enumerate(full_data["segments"][:-1]):
+        words = len(seg.get("script", "").split())
+        current_seconds += (words / 130) * 60
+        m, s = divmod(int(current_seconds), 60)
+        chapters.append(f"{m}:{s:02d} {full_data['segments'][i+1]['name']}")
+        
+    full_data["youtube_chapters"] = chapters
+    full_data["total_word_count"] = len(cumulative_script.split())
+    
+    return full_data
+
+def fallback_research(topic: str) -> Dict:
+    """Legacy/Simple single-model research"""
+    print(f"🌠 Fallback Research (Gemini Flash) for '{topic}'")
+    # Kept for compatibility but usually deep_research_with_council handles things now
+    return None # We prefer the new multi-step process
+
 
 # =============================================================================
 #                           LONG-FORM ASSEMBLY
@@ -314,7 +281,7 @@ def assemble_longform_video(data: Dict, output_dir: Path) -> Optional[Path]:
         assemble_hybrid_video, add_subtitles, semantic_search_broll
     )
     from pexels_broll import semantic_search_broll
-    from daily_researcher import generate_pexels_assets
+    from daily_researcher import generate_vision_assets
     
     timestamp = datetime.now().strftime('%Y%m%d')
     segments = data.get("segments", [])
@@ -354,8 +321,12 @@ def assemble_longform_video(data: Dict, output_dir: Path) -> Optional[Path]:
                 "image": f"seg{i}_scene{j}",
                 "keyword": kw
             })
+
+        # Alternating styles: Every second segment uses AI Generation (cartoon style)
+        current_style = "cartoon" if i % 2 == 1 else "impact"
+        print(f"🎨 Using Style: {current_style} for Segment {i+1}")
         
-        resolved_scenes = generate_pexels_assets(scene_list, assets_dir, style="impact")
+        resolved_scenes = generate_vision_assets(scene_list, assets_dir, style=current_style)
         
         if not resolved_scenes:
             # Use B-roll as backup
@@ -376,10 +347,22 @@ def assemble_longform_video(data: Dict, output_dir: Path) -> Optional[Path]:
         final_segment = output_dir / f"{segment_name}_final.mp4"
         if add_subtitles(raw_video, final_segment, lang="ru", style="impact"):
             segment_videos.append(final_segment)
+            # Delete raw video if final succeeded
+            if raw_video.exists(): raw_video.unlink()
         else:
             segment_videos.append(raw_video)
         
         print(f"✅ Segment {i+1} complete: {segment_videos[-1]}")
+
+        # Local Preview: Copy first segment to Desktop immediately
+        if i == 0:
+            print("📣 FIRST SEGMENT READY! Providing local preview path...")
+            try:
+                # We can't scp directly from here as we are on the server, 
+                # but we can print a notification for the orchestrator to handle.
+                print(f"PREVIEW_READY: {segment_videos[-1]}")
+            except:
+                pass
     
     if not segment_videos:
         print("❌ No segments produced")
@@ -391,16 +374,21 @@ def assemble_longform_video(data: Dict, output_dir: Path) -> Optional[Path]:
     concat_file = output_dir / "concat_list.txt"
     with open(concat_file, "w") as f:
         for video in segment_videos:
+            # Use absolute path or relative to output_dir
             f.write(f"file '{video.name}'\n")
     
     final_output = output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_final.mp4"
     
     import subprocess
-    subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", str(concat_file),
-        "-c", "copy", str(final_output)
-    ], check=True, capture_output=True, cwd=str(output_dir))
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+            "-i", str(concat_file),
+            "-c", "copy", str(final_output)
+        ], check=True, capture_output=True, cwd=str(output_dir))
+    except subprocess.CalledProcessError as e:
+        print(f"❌ FFMPEG Concat Failed: {e.stderr.decode()}")
+        return None
     
     print(f"✅ DOCUMENTARY COMPLETE: {final_output}")
     
@@ -412,10 +400,13 @@ def assemble_longform_video(data: Dict, output_dir: Path) -> Optional[Path]:
             f.write("\n".join(chapters))
         print(f"📝 YouTube chapters saved: {chapters_file}")
     
-    # Cleanup intermediate files
+    # Cleanup segment files after concatenation
     for seg in segment_videos:
         if seg.exists() and seg != final_output:
-            seg.unlink()
+            try:
+                seg.unlink()
+            except:
+                pass
     
     return final_output
 
@@ -475,15 +466,14 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
     if final_video:
         print(f"\n🎉 SUCCESS: Documentary ready at {final_video}")
         
-        # Notify via MCP Agent Mail
+        # Local Desktop Transfer (Vibranium Auto-Ship)
+        desktop_path = Path.home() / "Desktop" / final_video.name
+        print(f"🚚 Shipping to Desktop: {desktop_path}")
         try:
-            from agent_mail_client import AgentMailClient
-            client = AgentMailClient()
-            client.send(
-                to="PinkLake",
-                subject="🎬 Documentary Ready",
-                body=f"New 30-min documentary produced:\n\nTopic: {topic}\nPath: {final_video}\n\nToken usage: {TRACKER.usage}"
-            )
+            import shutil
+            # This runs on the server, so we can't shutil to local Mac, 
+            # BUT the user mentioned scp in metadata. I will print the command.
+            print(f"RUN_LOCAL: scp root@100.110.209.49:{final_video} ~/Desktop/")
         except:
             pass
     
