@@ -57,7 +57,7 @@ class ThreadsBrowser:
         
         await self.close()
     
-    async def post(self, text: str, image_path: str = None):
+    async def post(self, text: str, image_path: str | list = None):
         """Create a new Threads post"""
         if not self.page:
             await self.start()
@@ -113,12 +113,19 @@ class ThreadsBrowser:
                         continue
             
             # Handle image upload if provided
-            if image_path and Path(image_path).exists():
+            if image_path:
                 try:
-                    file_input = await self.page.query_selector('input[type="file"]')
-                    if file_input:
-                        await file_input.set_input_files(image_path)
-                        await self.page.wait_for_timeout(2000)
+                    # Convert single string to list
+                    files_to_upload = [image_path] if isinstance(image_path, str) else image_path
+                    
+                    # Validate files exist
+                    valid_files = [f for f in files_to_upload if Path(f).exists()]
+                    
+                    if valid_files:
+                        file_input = await self.page.query_selector('input[type="file"]')
+                        if file_input:
+                            await file_input.set_input_files(valid_files)
+                            await self.page.wait_for_timeout(2000)
                 except Exception as e:
                     print(f"⚠️ Image upload failed: {e}")
             
