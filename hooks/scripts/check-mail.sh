@@ -13,8 +13,8 @@ if [[ -f "${PROJECT_ROOT}/.env" ]]; then
 fi
 
 # Configuration
-PROJECT_KEY="${AGENT_MAIL_PROJECT:-/home/gonya/Unified_System}"
-AGENT_NAME="${AGENT_MAIL_NAME:-VioletCastle}"
+PROJECT_KEY="${AGENT_MAIL_PROJECT:-/Gonya990/Unified_System_Core}"
+AGENT_NAME="${AGENT_MAIL_NAME:-Antigravity}"
 MCP_SERVER="${AGENT_MAIL_SERVER:-http://100.110.209.49:8765}"
 
 # Track last check time to avoid spamming
@@ -55,7 +55,7 @@ if check_server; then
 
 Check for urgent messages:
 \`\`\`
-mcp__mcp-agent-mail__fetch_inbox(
+agent_mail_fetch_inbox(
   project_key="${PROJECT_KEY}",
   agent_name="${AGENT_NAME}",
   urgent_only=true,

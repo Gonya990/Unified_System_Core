@@ -2,9 +2,9 @@
 # mission_sync.sh
 # Enhanced task synchronization using MCP Agent Mail for coordination
 
-HUB_URL="http://100.88.65.71:8765/mcp"
-AUTH_TOKEN="antigravity_secret"
-PROJECT_KEY="/main"
+HUB_URL="http://100.110.209.49:8765/mcp"
+AUTH_TOKEN="${AGENT_HUB_TOKEN:-c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb}"
+PROJECT_KEY="/Gonya990/Unified_System_Core"
 AGENT_STATE_FILE="$HOME/.cache/agent_comm_state"
 TASK_CACHE_DIR="$HOME/.cache/mission_tasks"
 

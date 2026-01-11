@@ -4,7 +4,7 @@
 
 - **Agent ID:** `antigravity`
 - **Role:** Cross-machine coordination & System Autonomy
-- **Primary Human:** kosta
+- **Primary Human:** igor
 - **Runtime:** Gemini 2.0 Pro / Antigravity framework
 
 ## Resources
