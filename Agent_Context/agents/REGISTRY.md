@@ -7,6 +7,7 @@
 | Agent Name | Project | Program | Model | Role | Last Active |
 |------------|---------|---------|-------|------|-------------|
 | `PinkLake` | Unified_System_Core | opencode | claude-sonnet-4 | Main orchestration | 2026-01-07 |
+| `Antigravity` | Unified_System_Core | antigravity | gemini-2.0-pro | Cross-machine coordination | 2026-01-11 |
 
 ## Legacy Agents (Pre Agent-Mail)
 
@@ -47,6 +48,7 @@
 ## Communication
 
 All agents communicate via:
+
 - **MCP Agent Mail:** `http://127.0.0.1:8765` (shared server - ALL agents connect here)
 - **Git repo:** This repository (shared filesystem)
 - **Task board:** `.beads/` (Beads issue tracker)
