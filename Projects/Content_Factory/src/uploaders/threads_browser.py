@@ -8,6 +8,7 @@ import asyncio
 import os
 import json
 from pathlib import Path
+from typing import Union
 from playwright.async_api import async_playwright
 
 # Paths
@@ -57,7 +58,7 @@ class ThreadsBrowser:
         
         await self.close()
     
-    async def post(self, text: str, image_path: str | list = None):
+    async def post(self, text: str, image_path: Union[str, list] = None):
         """Create a new Threads post"""
         if not self.page:
             await self.start()
