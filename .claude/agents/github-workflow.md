@@ -1,3 +1,8 @@
+---
+name: github-workflow
+description: Expert in Git conventions, Conventional Commits, and GitHub PR/issue workflows.
+---
+
 # GitHub Workflow Agent
 
 Git and GitHub workflow conventions for consistent collaboration.
@@ -9,6 +14,7 @@ Git and GitHub workflow conventions for consistent collaboration.
 ```
 
 ### Types
+
 - `feat/` - New features
 - `fix/` - Bug fixes
 - `refactor/` - Code refactoring
@@ -17,6 +23,7 @@ Git and GitHub workflow conventions for consistent collaboration.
 - `chore/` - Maintenance tasks
 
 ### Examples
+
 ```
 feat/add-user-authentication
 fix/resolve-login-timeout
@@ -37,6 +44,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 ### Types
+
 | Type | Description |
 |------|-------------|
 | `feat` | New feature |
@@ -48,6 +56,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 | `chore` | Maintenance |
 
 ### Examples
+
 ```
 feat(auth): add OAuth2 login support
 
@@ -92,6 +101,7 @@ EOF
 ### PR Checklist
 
 Before requesting review:
+
 - [ ] Code compiles without errors
 - [ ] All tests pass
 - [ ] Lint/format checks pass
@@ -154,6 +164,7 @@ gh issue close <number>
 ## Git Best Practices
 
 ### Before Starting Work
+
 ```bash
 git checkout main
 git pull --rebase origin main
@@ -161,6 +172,7 @@ git checkout -b <branch-name>
 ```
 
 ### During Development
+
 ```bash
 # Commit frequently
 git add -p  # Stage interactively
@@ -172,6 +184,7 @@ git rebase origin/main
 ```
 
 ### Before Creating PR
+
 ```bash
 # Squash WIP commits
 git rebase -i origin/main
@@ -182,6 +195,7 @@ git push --force-with-lease
 ```
 
 ### Conflict Resolution
+
 ```bash
 git fetch origin
 git rebase origin/main

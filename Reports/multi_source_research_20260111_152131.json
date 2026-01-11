@@ -1,0 +1,704 @@
+{
+  "timestamp": "2026-01-11T15:21:31.310968",
+  "sources_summary": {
+    "telegram": 10,
+    "user_links": 3,
+    "google_news": 4,
+    "reddit": 20,
+    "hackernews": 10,
+    "wikipedia": 8
+  },
+  "total_insights": 55,
+  "top_insights": [
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 88,
+      "text": "Моменты по прошлому уроку. Ссылки, промты, уроки.-ОБЗОР НА ЛУЧШУЮ ПРИВАТКУ ПО ЗАРАБОТКУ НА ЮТУБ ИСПОЛЬЗУЯ НЕЙРОСЕТИ-https://t.me/vitalycontentcreate/68-ИНСТРУКЦИЯ ПО РАБОТЕ С NANOBANANA -https://www.youtube.com/watch?v=ORaN__RNWFc&t=1s&pp=0gcJCSkKAYcqIYzv-ИНСТРУКЦИЯ ПО РАБОТЕ С VEO 3.1-https://www.y",
+      "views": 1940,
+      "date": "2025-12-14T15:17:43+00:00",
+      "media": null,
+      "score": 1940
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 95,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю.Пользуйтесь, кому надо)ССЫЛКА НА ВИДЕО:https://youtu.be/kGyxC5oxVa8",
+      "views": 1730,
+      "date": "2025-12-18T14:01:48+00:00",
+      "media": "photo",
+      "score": 1730
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 96,
+      "text": "Ссылки из видео:Сервис DIGEN AI-https://digen.ai/Сервис Temp mail-https://temp-mail.org/Для апскейла используйте:-Topaz ai-Hitpaw video enhancer",
+      "views": 1710,
+      "date": "2025-12-18T14:01:53+00:00",
+      "media": null,
+      "score": 1710
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 102,
+      "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙМеня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане берут деньги. Но зато в моём блоге вы увидит",
+      "views": 1680,
+      "date": "2025-12-22T16:12:09+00:00",
+      "media": "photo",
+      "score": 1680
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 106,
+      "text": "ОппаА я еще монеточка подошла)8 лонгов ушло чтоб часы закрыть)В планах так вывести на монету еще 2 канала. Все делаются на нейронках, но ниши чуть ли не вечные и белоснежно-белые. Потом уже начать делегировать и в хайп ниши также залетать с двух ног.",
+      "views": 1680,
+      "date": "2025-12-25T12:30:30+00:00",
+      "media": "photo",
+      "score": 1680
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 105,
+      "text": "Даю вам топовый лайфхак, как выиграть 90% конкурентов на РУ рынке в Ютуб.Находите свежее видео по теме вашего канала на английском или испанском языке (не больше месяца ролику). Видео должно выстрелить.Скачиваете его, получаете транскрибацию в нейронке (можно через субтитры на самом YouTube перевест",
+      "views": 1670,
+      "date": "2025-12-22T17:51:28+00:00",
+      "media": null,
+      "score": 1670
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 97,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+      "views": 1560,
+      "date": "2025-12-18T14:13:36+00:00",
+      "media": null,
+      "score": 1560
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 104,
+      "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙ  Меня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.  Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане…",
+      "views": 1530,
+      "date": "2025-12-22T16:13:30+00:00",
+      "media": null,
+      "score": 1530
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 98,
+      "text": "Держите разбор нейронки для генерации видео. Нейронка на сегодня стоит копейки, а пользоваться ей можно практически безлимитно (если будете делать, как я объясняю — получите 4500 генераций видеокадров) + безлимитная НаноБанана будет.  На сегодня — лучшее решение…",
+      "views": 1490,
+      "date": "2025-12-18T15:29:47+00:00",
+      "media": "photo",
+      "score": 1490
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 100,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+      "views": 1480,
+      "date": "2025-12-19T16:54:54+00:00",
+      "media": null,
+      "score": 1480
+    },
+    {
+      "source": "user_link",
+      "url": "https://t.me/vitalycontentcreate",
+      "category": "Content Creation / AI Tools",
+      "priority": "high",
+      "notes": "Successful Russian AI content creator - analyzed for Content Factory strategy",
+      "content": "Telegram: View @vitalycontentcreate Download for Mac Виталий Андреевич - Делаю бабло на контенте! 1 553 subscribers Пишу правду о заработке на контенте, без розовых очков. Все способы зарабатывать — в одном месте. С камерой или без. Короткие рилсы, длинные видео, нейросети. По вопросам писать - @vitalysolonetwork View in Telegram Preview channel If you have Telegram , you can view and join Виталий Андреевич - Делаю бабло на контенте! right away.",
+      "score": 100
+    },
+    {
+      "source": "user_link",
+      "url": "https://www.reddit.com/r/artificial",
+      "category": "AI Discussion",
+      "priority": "high",
+      "notes": "Latest AI developments and community insights",
+      "content": "Reddit - The heart of the internet Skip to main content r/artificial members online Create Post Feed About Best Open sort options Best Hot New Top Rising Change post view Card Compact Community highlights Geoffrey Hinton says LLMs are no longer just predicting the next word - new models learn by reasoning and identifying contradictions in their own logic. This unbounded self-improvement will \"end up making it much smarter than us.\" u/MetaKnowing • Geoffrey Hinton says LLMs are no longer just pre",
+      "score": 100
+    },
+    {
+      "source": "reddit",
+      "subreddit": "technology",
+      "title": "Instagram Data Leak Exposes Sensitive Info of 17.5M Accounts",
+      "url": "https://reddit.com/r/technology/comments/1q99t5d/instagram_data_leak_exposes_sensitive_info_of/",
+      "upvotes": 13343,
+      "score": 100
+    },
+    {
+      "source": "reddit",
+      "subreddit": "science",
+      "title": "People prescribed new weight loss drugs like Ozempic may not receive sufficient nutritional guidance and be vulnerable to nutritional deficiencies and muscle loss. Evidence suggests that lean body mass – including muscle – can constitute up to 40% of total weight lost during treatment.",
+      "url": "https://reddit.com/r/science/comments/1q91hsy/people_prescribed_new_weight_loss_drugs_like/",
+      "upvotes": 5362,
+      "score": 53.62
+    },
+    {
+      "source": "user_link",
+      "url": "https://news.ycombinator.com",
+      "category": "Tech News",
+      "priority": "medium",
+      "notes": "Hacker News - trending tech discussions",
+      "content": "Hacker News Hacker News new | past | comments | ask | show | jobs | submit login 1. C++ std::move doesn't move anything: A deep dive into Value Categories ( 0xghost.dev ) 116 points by signa11 5 hours ago | hide | 66 comments 2. Think of Pavlov ( boz.com ) 26 points by kiyanwang 2 hours ago | hide | 4 comments 3. Gentoo Linux 2025 Review ( gentoo.org ) 17 points by akhuettel 1 hour ago | hide | 2 comments 4. The Concise TypeScript Book ( github.com/gibbok ) 125 points by javatuts 7 hours ago | h",
+      "score": 50
+    },
+    {
+      "source": "hackernews",
+      "title": "Finding and fixing Ghostty's largest memory leak",
+      "url": "https://mitchellh.com/writing/ghostty-memory-leak-fix",
+      "score": 49.6
+    },
+    {
+      "source": "wikipedia",
+      "title": "Fernando Mendoza",
+      "url": "https://en.wikipedia.org/wiki/Fernando_Mendoza",
+      "views": 480508,
+      "score": 48.0508
+    },
+    {
+      "source": "wikipedia",
+      "title": "Curt Cignetti",
+      "url": "https://en.wikipedia.org/wiki/Curt_Cignetti",
+      "views": 445569,
+      "score": 44.5569
+    },
+    {
+      "source": "reddit",
+      "subreddit": "technology",
+      "title": "Stop posting on X",
+      "url": "https://reddit.com/r/technology/comments/1q9h934/stop_posting_on_x/",
+      "upvotes": 4380,
+      "score": 43.8
+    },
+    {
+      "source": "hackernews",
+      "title": "Show HN: I used Claude Code to discover connections between 100 books",
+      "url": "https://trails.pieterma.es/",
+      "score": 39.4
+    }
+  ],
+  "script_ideas": [
+    {
+      "Title": "Unlock Your YouTube Earnings: The Ultimate Guide to Monetization!",
+      "Hook": "Warning: Are you missing out on YouTube revenue? Here’s how to unlock it!",
+      "Key Points": [
+        "Introduction to monetization strategies on YouTube.",
+        "Top private methods for earning money through YouTube.",
+        "Step-by-step guide on maximizing ad revenue and affiliate marketing.",
+        "Real-life success stories from content creators.",
+        "Free tools and resources to kickstart your journey."
+      ],
+      "Source Mix": "Telegram",
+      "Viral Potential": 8
+    },
+    {
+      "Title": "Hacking Sora 2: Unlimited Access Without Registration!",
+      "Hook": "Listicle: 5 Game-Changing Hacks to access Sora 2 for FREE!",
+      "Key Points": [
+        "What is Sora 2 and why it matters for creators.",
+        "Detailed methods to hack Sora 2 for unlimited access.",
+        "Pros and cons of using Sora 2 for content creation.",
+        "Safety measures to consider while using hacks.",
+        "User testimonials on the effectiveness of the hacks."
+      ],
+      "Source Mix": "Telegram",
+      "Viral Potential": 9
+    },
+    {
+      "Title": "Get Ahead on YouTube: Winning Strategies to Beat Your Competition!",
+      "Hook": "Warning: The competition is fierce! Here’s how to gain the upper hand!",
+      "Key Points": [
+        "Identifying and analyzing your competition on YouTube.",
+        "Top strategies to find trending topics and create engaging content.",
+        "Using AI tools like DIGEN AI for video generation.",
+        "Practical examples of content that succeeded in the competitive market.",
+        "Engagement tactics to build a loyal audience."
+      ],
+      "Source Mix": "Telegram, Reddit",
+      "Viral Potential": 8
+    },
+    {
+      "Title": "The Secret to Effective Video Generation: Neural Networks Explained!",
+      "Hook": "Listicle: 5 reasons neural networks are revolutionizing video content creation!",
+      "Key Points": [
+        "Overview of how neural networks work in video generation.",
+        "Comparing costs of current tools versus traditional methods.",
+        "Step-by-step guide on using affordable neural networks for video creation.",
+        "Impact of AI on the future of content creation.",
+        "Real examples of creators successfully using these tools."
+      ],
+      "Source Mix": "Telegram",
+      "Viral Potential": 7
+    },
+    {
+      "Title": "Surviving Weight Loss Drugs: Essential Tips You Need to Know!",
+      "Hook": "Warning: Are you taking weight loss drugs? Watch this before it’s too late!",
+      "Key Points": [
+        "Overview of new weight loss drugs like Ozempic and their effects.",
+        "Nutritional guidance for users prescribed weight loss medications.",
+        "Risks of muscle loss and nutritional deficiencies.",
+        "Expert interviews and advice from nutritionists.",
+        "Practical tips for maintaining a balanced diet while on medication."
+      ],
+      "Source Mix": "Reddit",
+      "Viral Potential": 8
+    }
+  ],
+  "sources_data": {
+    "telegram": [
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 88,
+        "text": "Моменты по прошлому уроку. Ссылки, промты, уроки.-ОБЗОР НА ЛУЧШУЮ ПРИВАТКУ ПО ЗАРАБОТКУ НА ЮТУБ ИСПОЛЬЗУЯ НЕЙРОСЕТИ-https://t.me/vitalycontentcreate/68-ИНСТРУКЦИЯ ПО РАБОТЕ С NANOBANANA -https://www.youtube.com/watch?v=ORaN__RNWFc&t=1s&pp=0gcJCSkKAYcqIYzv-ИНСТРУКЦИЯ ПО РАБОТЕ С VEO 3.1-https://www.y",
+        "views": 1940,
+        "date": "2025-12-14T15:17:43+00:00",
+        "media": null,
+        "score": 1940
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 95,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю.Пользуйтесь, кому надо)ССЫЛКА НА ВИДЕО:https://youtu.be/kGyxC5oxVa8",
+        "views": 1730,
+        "date": "2025-12-18T14:01:48+00:00",
+        "media": "photo",
+        "score": 1730
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 96,
+        "text": "Ссылки из видео:Сервис DIGEN AI-https://digen.ai/Сервис Temp mail-https://temp-mail.org/Для апскейла используйте:-Topaz ai-Hitpaw video enhancer",
+        "views": 1710,
+        "date": "2025-12-18T14:01:53+00:00",
+        "media": null,
+        "score": 1710
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 102,
+        "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙМеня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане берут деньги. Но зато в моём блоге вы увидит",
+        "views": 1680,
+        "date": "2025-12-22T16:12:09+00:00",
+        "media": "photo",
+        "score": 1680
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 106,
+        "text": "ОппаА я еще монеточка подошла)8 лонгов ушло чтоб часы закрыть)В планах так вывести на монету еще 2 канала. Все делаются на нейронках, но ниши чуть ли не вечные и белоснежно-белые. Потом уже начать делегировать и в хайп ниши также залетать с двух ног.",
+        "views": 1680,
+        "date": "2025-12-25T12:30:30+00:00",
+        "media": "photo",
+        "score": 1680
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 105,
+        "text": "Даю вам топовый лайфхак, как выиграть 90% конкурентов на РУ рынке в Ютуб.Находите свежее видео по теме вашего канала на английском или испанском языке (не больше месяца ролику). Видео должно выстрелить.Скачиваете его, получаете транскрибацию в нейронке (можно через субтитры на самом YouTube перевест",
+        "views": 1670,
+        "date": "2025-12-22T17:51:28+00:00",
+        "media": null,
+        "score": 1670
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 97,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+        "views": 1560,
+        "date": "2025-12-18T14:13:36+00:00",
+        "media": null,
+        "score": 1560
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 104,
+        "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙ  Меня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.  Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане…",
+        "views": 1530,
+        "date": "2025-12-22T16:13:30+00:00",
+        "media": null,
+        "score": 1530
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 98,
+        "text": "Держите разбор нейронки для генерации видео. Нейронка на сегодня стоит копейки, а пользоваться ей можно практически безлимитно (если будете делать, как я объясняю — получите 4500 генераций видеокадров) + безлимитная НаноБанана будет.  На сегодня — лучшее решение…",
+        "views": 1490,
+        "date": "2025-12-18T15:29:47+00:00",
+        "media": "photo",
+        "score": 1490
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 100,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+        "views": 1480,
+        "date": "2025-12-19T16:54:54+00:00",
+        "media": null,
+        "score": 1480
+      }
+    ],
+    "google_news": [
+      {
+        "source": "google_news",
+        "title": "MicroCloud Hologram to invest $200M in digital currency assets - MSN",
+        "link": "https://news.google.com/rss/articles/CBMizAJBVV95cUxQRGxFY0JrbjJQMEw5c3N1d0c1WGhsZ1NEZTltRDlVcVlFUV84WlJUcmQ4U3U1TDd1NVFwUjFNZ2FoVGZreGtTQTIzWkh2U28xb0cybmsxU0h1WldPaDhQQTdXcmR0OFFYeVZubThBNXBpbmtnNEtUcGFueVdYOW42QlhXTDhPZGdCZFhVa1k0Wmk1LWZkZU1BMUxKUmF0ZzdXWDczWUFraEFSMGhDeHNlY1BKdlJ5R25ERnNBOU1mYVl3UzF2dFFudGp2VkVSdTVaS1c5aXdsRklrSVRXendZek5hVmVtZVdSbGRMeEtWVFFwZGZOMzRTOE9JNXpqOEtQVGNDVXRCZEJLelZ1WGdRZjJSdW92ZTNFZ2lZNlJZdmdKY1hqMHJFZFBsQUM2TE1lRTJvNEx5dzFRR3NEazI4Y1A0cFZDMWJJM0I2YQ?oc=5",
+        "published": "Sun, 11 Jan 2026 06:33:31 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "Quantum Antyodaya: How India's 6000 Crore Bet Is About Development, Not Dominance - Swarajyamag",
+        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPaGR4MU4yaXhNWjdtMm9Oa004ZUREZFNselBBM2pEczFXWHN0VEU0emhibkVQRklsRGVaSkVibGp2UENjWFZNbk9NZVhFQURvc251dDY2dUh4MkZRM1htcXZOd1hyMzNxMFdFcjJPTUFRWkl2RWRLd0dGbjdnMmJOZXlfVDM0WllyZzdOVzhFLXlLUmNMaEw2LV8yVlJyMjdpQ3ZaVHp0RUZxWjNE0gG8AUFVX3lxTE9PaXdMUVRLOWY0U0IwenpqVGQ3WGhvVS0zS0RrYXNTcjl4bEdKNHhWUGdaUG1vSmVwbmcwZDRoaS1HRzR1aElOckRlQk5kNkNSRUhwcUhveFo4aTNUVFJ6eWMzdUE0RS1pdmJ2Ym1GU1ZxSW9TRTlXSHFOWC1UZ05MRTc3M0tjR3dsQnphVEFXZzFFV2JrdVZXY1ctaHJqUThwc0J3ZHRzZjFTUE9kdmUwTG9qTXJseU9FdG1f?oc=5",
+        "published": "Sun, 11 Jan 2026 01:30:00 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "Up 1,200%, Should You Buy IonQ Right Now? - AOL.com",
+        "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5MY0tSOGY1TS1TLWczczcxSnB0dWVNOURZbzV1Mk5KSzJRSUt0N2tqLUZEa25YTEtiUjJqall5Rld1dTBXYmVSZVNFbXRvYjZibnJsMDJuN3V1a21vMU1VQnVnVGFFUTVRTkFxcWZROA?oc=5",
+        "published": "Sun, 11 Jan 2026 12:39:56 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "Gpu-accelerated Cholesky Factorization Advances Block Tridiagonal Matrix Solutions 25x - Quantum Zeitgeist",
+        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPb1lvdVM3Z1lJZ2NXMXNEWm5tM20yWjU1X3pQdTZHR2F1VjZBWTNjVEs3QjBoN21hOVU0TzFLV19USW5QU2VBX1lhMVJBR0VxcTZlYlc2MTU1MXdxbWU0a28xRFFwRDRrb1htYmJKeWpPUlNuQTE2TWNFbjEzeUs2b0dwN01ZTl94c0FDbGZMYjM?oc=5",
+        "published": "Sat, 10 Jan 2026 13:29:03 GMT",
+        "score": 30
+      }
+    ],
+    "user_links": [
+      {
+        "source": "user_link",
+        "url": "https://t.me/vitalycontentcreate",
+        "category": "Content Creation / AI Tools",
+        "priority": "high",
+        "notes": "Successful Russian AI content creator - analyzed for Content Factory strategy",
+        "content": "Telegram: View @vitalycontentcreate Download for Mac Виталий Андреевич - Делаю бабло на контенте! 1 553 subscribers Пишу правду о заработке на контенте, без розовых очков. Все способы зарабатывать — в одном месте. С камерой или без. Короткие рилсы, длинные видео, нейросети. По вопросам писать - @vitalysolonetwork View in Telegram Preview channel If you have Telegram , you can view and join Виталий Андреевич - Делаю бабло на контенте! right away.",
+        "score": 100
+      },
+      {
+        "source": "user_link",
+        "url": "https://news.ycombinator.com",
+        "category": "Tech News",
+        "priority": "medium",
+        "notes": "Hacker News - trending tech discussions",
+        "content": "Hacker News Hacker News new | past | comments | ask | show | jobs | submit login 1. C++ std::move doesn't move anything: A deep dive into Value Categories ( 0xghost.dev ) 116 points by signa11 5 hours ago | hide | 66 comments 2. Think of Pavlov ( boz.com ) 26 points by kiyanwang 2 hours ago | hide | 4 comments 3. Gentoo Linux 2025 Review ( gentoo.org ) 17 points by akhuettel 1 hour ago | hide | 2 comments 4. The Concise TypeScript Book ( github.com/gibbok ) 125 points by javatuts 7 hours ago | h",
+        "score": 50
+      },
+      {
+        "source": "user_link",
+        "url": "https://www.reddit.com/r/artificial",
+        "category": "AI Discussion",
+        "priority": "high",
+        "notes": "Latest AI developments and community insights",
+        "content": "Reddit - The heart of the internet Skip to main content r/artificial members online Create Post Feed About Best Open sort options Best Hot New Top Rising Change post view Card Compact Community highlights Geoffrey Hinton says LLMs are no longer just predicting the next word - new models learn by reasoning and identifying contradictions in their own logic. This unbounded self-improvement will \"end up making it much smarter than us.\" u/MetaKnowing • Geoffrey Hinton says LLMs are no longer just pre",
+        "score": 100
+      }
+    ],
+    "youtube_trending": [],
+    "reddit": [
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Hacker Dressed As Pink Power Ranger Dismantles Racist Websites Live on Stage",
+        "url": "https://reddit.com/r/technology/comments/1q9ua2u/hacker_dressed_as_pink_power_ranger_dismantles/",
+        "upvotes": 1692,
+        "score": 16.92
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "I Came to CES to Check Out Energy and Solar Power Innovations and Found That China Is Running Laps Around Us",
+        "url": "https://reddit.com/r/technology/comments/1q9vqau/i_came_to_ces_to_check_out_energy_and_solar_power/",
+        "upvotes": 1242,
+        "score": 12.42
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "China’s ‘artificial sun’ breaks nuclear fusion limit thought to be impossible",
+        "url": "https://reddit.com/r/technology/comments/1q9mzma/chinas_artificial_sun_breaks_nuclear_fusion_limit/",
+        "upvotes": 2071,
+        "score": 20.71
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Stop posting on X",
+        "url": "https://reddit.com/r/technology/comments/1q9h934/stop_posting_on_x/",
+        "upvotes": 4380,
+        "score": 43.8
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Instagram Data Leak Exposes Sensitive Info of 17.5M Accounts",
+        "url": "https://reddit.com/r/technology/comments/1q99t5d/instagram_data_leak_exposes_sensitive_info_of/",
+        "upvotes": 13343,
+        "score": 100
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "I’m watching myself on YouTube saying things I would never say. This is the deepfake menace we must confront",
+        "url": "https://reddit.com/r/Futurology/comments/1q9c4vq/im_watching_myself_on_youtube_saying_things_i/",
+        "upvotes": 983,
+        "score": 9.83
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "AI is intensifying a 'collapse' of trust online, experts say | From Venezuela to Minneapolis, the rapid rollout of deepfakes around major news events is stirring confusion and suspicion about real news.",
+        "url": "https://reddit.com/r/Futurology/comments/1q9e7cq/ai_is_intensifying_a_collapse_of_trust_online/",
+        "upvotes": 538,
+        "score": 5.38
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "US job creation in 2025 slows to weakest since Covid",
+        "url": "https://reddit.com/r/Futurology/comments/1q95kxs/us_job_creation_in_2025_slows_to_weakest_since/",
+        "upvotes": 1135,
+        "score": 11.35
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "Microsoft AI CEO Warns of Existential Risks, Urges Global Regulations",
+        "url": "https://reddit.com/r/Futurology/comments/1q9yk35/microsoft_ai_ceo_warns_of_existential_risks_urges/",
+        "upvotes": 19,
+        "score": 0.19
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "Will planned obsolescence be prohibited or penalized?",
+        "url": "https://reddit.com/r/Futurology/comments/1q9x0t2/will_planned_obsolescence_be_prohibited_or/",
+        "upvotes": 18,
+        "score": 0.18
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "Geoffrey Hinton says LLMs are no longer just predicting the next word - new models learn by reasoning and identifying contradictions in their own logic. This unbounded self-improvement will \"end up making it much smarter than us.\"",
+        "url": "https://reddit.com/r/artificial/comments/1q9an1z/geoffrey_hinton_says_llms_are_no_longer_just/",
+        "upvotes": 269,
+        "score": 2.69
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "One-Minute Daily AI News 1/10/2026",
+        "url": "https://reddit.com/r/artificial/comments/1q9rf5i/oneminute_daily_ai_news_1102026/",
+        "upvotes": 2,
+        "score": 0.02
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "Alignment tax isn’t global: a few attention heads cause most capability loss",
+        "url": "https://reddit.com/r/artificial/comments/1q9c1qr/alignment_tax_isnt_global_a_few_attention_heads/",
+        "upvotes": 5,
+        "score": 0.05
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "Terrence Tao: \"Erdos problem #728 was solved more or less autonomously by AI\"",
+        "url": "https://reddit.com/r/artificial/comments/1q8qvey/terrence_tao_erdos_problem_728_was_solved_more_or/",
+        "upvotes": 51,
+        "score": 0.51
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "X Restricts Grok's Image Generation to Paid Users After Global Backlash",
+        "url": "https://reddit.com/r/artificial/comments/1q8v56s/x_restricts_groks_image_generation_to_paid_users/",
+        "upvotes": 26,
+        "score": 0.26
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "US states with abortion restrictions have worse outcomes for patients using fertility treatment. Abortion restrictions don’t exist in vacuum, and affect everyone who needs reproductive healthcare. Factors include exodus of abortion providers from restrictive states and national shortage of OB/GYNs.",
+        "url": "https://reddit.com/r/science/comments/1q9wqqf/us_states_with_abortion_restrictions_have_worse/",
+        "upvotes": 447,
+        "score": 4.47
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Women with high levels of psychopathy are more likely to engage in physical, verbal, and indirect aggression against other women. While women generally favor covert competitive tactics, those with specific dark personality traits may bypass these social norms to target rivals directly.",
+        "url": "https://reddit.com/r/science/comments/1q9wufr/women_with_high_levels_of_psychopathy_are_more/",
+        "upvotes": 217,
+        "score": 2.17
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Study finds Whooping cough vaccination during pregnancy strengthens the immune system in newborns",
+        "url": "https://reddit.com/r/science/comments/1q9ogjk/study_finds_whooping_cough_vaccination_during/",
+        "upvotes": 751,
+        "score": 7.51
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Men who seek sex primarily to cope with negative emotions or to affirm their self-worth may be more likely to engage in sexually aggressive behaviors. Men who use sex to cope are attempting to escape distress. When they face sexual rejection, this may threaten their ability to manage that distress.",
+        "url": "https://reddit.com/r/science/comments/1q9f69h/men_who_seek_sex_primarily_to_cope_with_negative/",
+        "upvotes": 1584,
+        "score": 15.84
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "People prescribed new weight loss drugs like Ozempic may not receive sufficient nutritional guidance and be vulnerable to nutritional deficiencies and muscle loss. Evidence suggests that lean body mass – including muscle – can constitute up to 40% of total weight lost during treatment.",
+        "url": "https://reddit.com/r/science/comments/1q91hsy/people_prescribed_new_weight_loss_drugs_like/",
+        "upvotes": 5362,
+        "score": 53.62
+      }
+    ],
+    "hackernews": [
+      {
+        "source": "hackernews",
+        "title": "C++ std::move doesn't move anything: A deep dive into Value Categories",
+        "url": "https://0xghost.dev/blog/std-move-deep-dive/",
+        "score": 11.6
+      },
+      {
+        "source": "hackernews",
+        "title": "Gentoo Linux 2025 Review",
+        "url": "https://www.gentoo.org/news/2026/01/05/new-year.html",
+        "score": 1.8
+      },
+      {
+        "source": "hackernews",
+        "title": "Think of Pavlov",
+        "url": "https://boz.com/articles/think-pavlov",
+        "score": 2.6
+      },
+      {
+        "source": "hackernews",
+        "title": "\"Food JPEGs\" in Super Smash Bros. & Kirby Air Riders",
+        "url": "https://sethmlarson.dev/food-jpegs-in-super-smash-bros-and-kirby-air-riders",
+        "score": 2.9
+      },
+      {
+        "source": "hackernews",
+        "title": "The Concise TypeScript Book",
+        "url": "https://github.com/gibbok/typescript-book",
+        "score": 12.5
+      },
+      {
+        "source": "hackernews",
+        "title": "Vojtux – Unofficial Linux Distribution Aimed at Visually Impaired Users",
+        "url": "https://github.com/vojtapolasek/vojtux",
+        "score": 7.2
+      },
+      {
+        "source": "hackernews",
+        "title": "More than one hundred years of Film Sizes",
+        "url": "https://wichm.home.xs4all.nl/filmsize.html",
+        "score": 4.5
+      },
+      {
+        "source": "hackernews",
+        "title": "Finding and fixing Ghostty's largest memory leak",
+        "url": "https://mitchellh.com/writing/ghostty-memory-leak-fix",
+        "score": 49.6
+      },
+      {
+        "source": "hackernews",
+        "title": "Show HN: I used Claude Code to discover connections between 100 books",
+        "url": "https://trails.pieterma.es/",
+        "score": 39.4
+      },
+      {
+        "source": "hackernews",
+        "title": "Iran Shuts Down Starlink Internet for First Time",
+        "url": "https://www.forbes.com/sites/zakdoffman/2026/01/11/kill-switch-iran-shuts-down-starlink-internet-for-first-time/",
+        "score": 2.2
+      }
+    ],
+    "wikipedia": [
+      {
+        "source": "wikipedia",
+        "title": "Fernando Mendoza",
+        "url": "https://en.wikipedia.org/wiki/Fernando_Mendoza",
+        "views": 480508,
+        "score": 48.0508
+      },
+      {
+        "source": "wikipedia",
+        "title": "Curt Cignetti",
+        "url": "https://en.wikipedia.org/wiki/Curt_Cignetti",
+        "views": 445569,
+        "score": 44.5569
+      },
+      {
+        "source": "wikipedia",
+        "title": "The RajaSaab",
+        "url": "https://en.wikipedia.org/wiki/The_RajaSaab",
+        "views": 324596,
+        "score": 32.4596
+      },
+      {
+        "source": "wikipedia",
+        "title": "Wikipedia:Featured pictures",
+        "url": "https://en.wikipedia.org/wiki/Wikipedia:Featured_pictures",
+        "views": 276517,
+        "score": 27.6517
+      },
+      {
+        "source": "wikipedia",
+        "title": "Killing of Renée Good",
+        "url": "https://en.wikipedia.org/wiki/Killing_of_Renée_Good",
+        "views": 252145,
+        "score": 25.2145
+      },
+      {
+        "source": "wikipedia",
+        "title": "Greenland",
+        "url": "https://en.wikipedia.org/wiki/Greenland",
+        "views": 229192,
+        "score": 22.9192
+      },
+      {
+        "source": "wikipedia",
+        "title": "John Rooney (footballer)",
+        "url": "https://en.wikipedia.org/wiki/John_Rooney_(footballer)",
+        "views": 209357,
+        "score": 20.9357
+      },
+      {
+        "source": "wikipedia",
+        "title": "Macclesfield F.C.",
+        "url": "https://en.wikipedia.org/wiki/Macclesfield_F.C.",
+        "views": 205744,
+        "score": 20.5744
+      }
+    ]
+  }
+}

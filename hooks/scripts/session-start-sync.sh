@@ -27,11 +27,27 @@ if check_server; then
     # Load language preference for current agent
     PREF_FILE="${PROJECT_ROOT}/.claude/settings/language-preferences.json"
     if [[ -f "$PREF_FILE" ]]; then
-        # Simple extraction of user name for the agent from json
-        USER_NAME=$(grep -A 2 "\"$AGENT_NAME\":" "$PREF_FILE" | grep "\"user\":" | cut -d'"' -f4)
-        LANG=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"output_language\":" | cut -d'"' -f4)
-        TAG=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"translation_tag\":" | cut -d'"' -f4)
-        STRIP=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"strip_original\":" | cut -d' ' -f6 | tr -d ',')
+        # Use jq if available, otherwise fallback to simple grep
+        if command -v jq >/dev/null 2>&1; then
+            USER_NAME=$(jq -r ".agents[\"$AGENT_NAME\"].user // \"default\"" "$PREF_FILE")
+            LANG=$(jq -r ".users[\"$USER_NAME\"].output_language // .defaults.output_language" "$PREF_FILE")
+            TAG=$(jq -r ".users[\"$USER_NAME\"].translation_tag // .defaults.translation_tag" "$PREF_FILE")
+            STRIP=$(jq -r ".users[\"$USER_NAME\"].strip_original // .defaults.strip_original" "$PREF_FILE")
+        else
+            # Best effort grep
+            USER_NAME=$(grep -A 2 "\"$AGENT_NAME\":" "$PREF_FILE" | grep "\"user\":" | cut -d'"' -f4 || echo "default")
+            USER_NAME="${USER_NAME:-default}"
+            
+            if [[ "$USER_NAME" != "default" ]]; then
+                LANG=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"output_language\":" | cut -d'"' -f4 || echo "en")
+                TAG=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"translation_tag\":" | cut -d'"' -f4 || echo "[translated]")
+                STRIP=$(grep -A 5 "\"$USER_NAME\":" "$PREF_FILE" | grep "\"strip_original\":" | cut -d' ' -f6 | tr -d ',' || echo "true")
+            else
+                LANG="en"
+                TAG="[translated]"
+                STRIP="true"
+            fi
+        fi
     else
         USER_NAME="default"
         LANG="en"

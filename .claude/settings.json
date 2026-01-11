@@ -3,6 +3,13 @@
     "INSIDE_CLAUDE_CODE": "1",
     "BASH_DEFAULT_TIMEOUT_MS": "420000"
   },
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(tee:*)",
+      "Bash(ffprobe:*)"
+    ]
+  },
   "hooks": {
     "Notification": [
       {
@@ -10,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "hooks/scripts/session-start-sync.sh"
+            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/session-start-sync.sh"
           }
         ]
       }
@@ -61,15 +68,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "hooks/scripts/check-mail.sh"
+            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/check-mail.sh"
           }
         ]
       }
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(tree:*)"
     ]
   }
 }

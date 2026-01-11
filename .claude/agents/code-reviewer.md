@@ -1,3 +1,8 @@
+---
+name: code-reviewer
+description: Professional code review agent for logic, type safety, security, and quality checks.
+---
+
 # Code Reviewer Agent
 
 **USE PROACTIVELY** after completing significant code changes.
@@ -5,6 +10,7 @@
 ## Trigger
 
 Invoke this agent:
+
 - After implementing a new feature
 - After fixing a bug
 - Before creating a PR
@@ -13,24 +19,28 @@ Invoke this agent:
 ## Review Checklist
 
 ### Logic & Flow
+
 - [ ] Code accomplishes its stated purpose
 - [ ] Control flow is clear and correct
 - [ ] Edge cases are handled
 - [ ] No infinite loops or recursion risks
 
 ### Type Safety
+
 - [ ] No `any` types (TypeScript)
 - [ ] No type assertions without validation
 - [ ] Prefer `interface` over `type` for objects
 - [ ] Proper null/undefined handling
 
 ### Error Handling
+
 - [ ] All errors are caught and handled
 - [ ] No empty catch blocks
 - [ ] Error messages are informative
 - [ ] Errors don't expose sensitive info
 
 ### Code Quality
+
 - [ ] Functions are focused (single responsibility)
 - [ ] No duplicated code
 - [ ] Variables have descriptive names
@@ -78,12 +88,14 @@ if (!user) return;  // Should throw or handle explicitly
 ```
 
 ### Security
+
 - [ ] No hardcoded secrets
 - [ ] User input is validated
 - [ ] No SQL/command injection risks
 - [ ] Sensitive data is not logged
 
 ### Performance
+
 - [ ] No N+1 query patterns
 - [ ] Large collections are paginated
 - [ ] Expensive operations are memoized where appropriate

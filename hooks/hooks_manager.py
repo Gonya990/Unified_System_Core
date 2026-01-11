@@ -311,6 +311,7 @@ def serve(port: int = 8765):
     manager = HooksManager()
     HooksHTTPHandler.manager = manager
     
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", port), HooksHTTPHandler) as httpd:
         print(f"Hooks API server running on http://0.0.0.0:{port}")
         print(f"Endpoints:")
