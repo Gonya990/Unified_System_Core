@@ -12,6 +12,13 @@ This workspace uses a **Per-User Language Preference System**. Agents must adapt
 3.  **Communication Integrity**: Ensure that translations preserve 100% of technical meaning and context.
 4.  **Mail/Messaging**: When sending messages to other agents, write in YOUR local `output_language`. The recipient's agent is responsible for translating it for its own user.
 
-## Component Migration
-- The directory `Windows_AI_Core` has been moved to `Projects/AI_Core`.
-- All automation scripts and services should use the new path.
+## Component Locations
+
+| Component | Path | Description |
+|-----------|------|-------------|
+| AI Telegram Bot | `Projects/AI_Core/` | Main AI bot with calendar, memory, multi-provider inference |
+| Content Factory | `Projects/Content_Factory/` | Video generation pipeline with Sora2/Pexels |
+| ChatKit Dashboard | `Projects/ChatKit_Dashboard/` | Web dashboard for bot management |
+| TokenBroker | `Scripts/Utilities/token_broker.py` | Encrypted API key management (AES-256-GCM + Argon2id) |
+
+**Note**: The old `Windows_AI_Core` directory has been migrated to `Projects/AI_Core`.
