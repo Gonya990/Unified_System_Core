@@ -83,7 +83,7 @@ class AgentMailClient:
 
         result = self._call_tool('register_agent', {
             'project_key': self.config.project_key,
-            'agent_name': name,
+            'name': name,
             'program': program,
             'model': model
         })

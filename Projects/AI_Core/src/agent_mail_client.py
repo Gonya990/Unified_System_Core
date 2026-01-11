@@ -83,7 +83,7 @@ class AgentMailClient:
 
         result = self._call_tool('register_agent', {
             'project_key': self.config.project_key,
-            'agent_name': name,
+            'name': name,
             'program': program,
             'model': model
         })
@@ -118,7 +118,8 @@ class AgentMailClient:
         result = self._call_tool('fetch_inbox', {
             'project_key': self.config.project_key,
             'agent_name': self.config.agent_name,
-            'limit': limit
+            'limit': limit,
+            'include_bodies': True
         })
 
         return result.get('structuredContent', {}).get('result', [])
@@ -158,12 +159,13 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Agent Mail MCP Client')
-    parser.add_argument('action', choices=['health', 'register', 'inbox', 'send', 'broadcast'])
+    parser.add_argument('action', choices=['health', 'register', 'inbox', 'send', 'broadcast', 'read'])
     parser.add_argument('--to', nargs='+', help='Recipients (for send)')
     parser.add_argument('--subject', help='Message subject')
     parser.add_argument('--body', help='Message body (markdown)')
     parser.add_argument('--importance', choices=['low', 'normal', 'high'], default='normal')
     parser.add_argument('--limit', type=int, default=20, help='Inbox limit')
+    parser.add_argument('--id', type=int, help='Message ID for read')
 
     args = parser.parse_args()
 
@@ -204,6 +206,24 @@ def main():
             importance=args.importance
         )
         print(f"✅ Message sent (ID: {result['deliveries'][0]['payload']['id']})")
+
+    elif args.action == 'read':
+        if not args.id:
+            print('❌ --id <message_id> required')
+            exit(1)
+        messages = client.fetch_inbox(limit=100)
+        target = next((m for m in messages if m['id'] == args.id), None)
+        if target:
+            print(f"DEBUG: {json.dumps(target, indent=2)}")
+            print(f"📧 Message #{target['id']}")
+            print(f"From: {target['from']}")
+            print(f"Subject: {target['subject']}")
+            print(f"Time: {target['created_ts']}")
+            print("-" * 40)
+            print(target.get('body_md') or target.get('body'))
+            client.mark_read(target['id'])
+        else:
+            print(f"❌ Message #{args.id} not found")
 
     elif args.action == 'broadcast':
         if not args.subject or not args.body:
