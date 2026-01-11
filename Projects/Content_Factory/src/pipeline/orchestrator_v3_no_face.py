@@ -436,8 +436,20 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     
     for i, scene in enumerate(scenes):
         agent_mindfulness(f"Assembling Scene {i}")
-        img_path = scene['image']
-        keyword = scene['keyword']
+        
+        # 🧪 Robust Image Path Resolution (Vibranium Standard)
+        img_path = scene.get('resolved_path') or scene.get('image')
+        if img_path and not os.path.isabs(img_path):
+            # Try with various extensions in INPUT_DIR
+            potential_path = INPUT_DIR / img_path
+            if not potential_path.exists():
+                for ext in [".jpg", ".png", ".webp", ".jpeg"]:
+                    if (INPUT_DIR / f"{img_path}{ext}").exists():
+                        potential_path = INPUT_DIR / f"{img_path}{ext}"
+                        break
+            img_path = str(potential_path)
+            
+        keyword = scene.get('keyword', 'abstract technology')
         
         # Timing: 75% B-Roll, 25% Image Flash
         # Adjust broll_dur and img_dur based on the new scene_duration
