@@ -4,6 +4,8 @@ import sys
 import random
 import json
 import argparse
+import schedule
+import time
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -214,19 +216,68 @@ def run_factory_production(mode="daily"):
     try:
         video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style)
         
-        # 5. UPLOAD
+        # 5. UPLOAD (Instagram + YouTube)
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
+            # 5.1 Instagram
             agent_sync(f"Загружаю {prefix} ролик в Instagram...")
             caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
-            if upload_reel(str(video_path), caption):
-                agent_sync("🚀 Ролик успешно загружен!")
-                mark_as_posted(content_data.get('selected_topic'), prefix, lang)
-            else:
-                agent_sync("❌ Ошибка при загрузке ролика")
+            
+            insta_success = False
+            try:
+                insta_success = upload_reel(str(video_path), caption)
+                if insta_success:
+                    agent_sync("🚀 Instagram: Ролик успешно загружен!")
+                else:
+                    agent_sync("❌ Instagram: Ошибка при загрузке")
+            except Exception as e:
+                agent_sync(f"❌ Instagram Exception: {e}")
+
+            # 5.2 YouTube
+            agent_sync(f"Загружаю {prefix} ролик в YouTube...")
+            title = content_data.get('selected_topic', f"New AI Video {day_str}")
+            desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
+            tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
+            
+            yt_success = False
+            try:
+                # Late import to avoid circular dependency issues if any
+                from youtube_uploader import upload_video
+                yt_success = upload_video(video_path, title=title, description=desc_yt, tags=tags, privacy_status="public")
+                if yt_success:
+                    agent_sync("🚀 YouTube: Ролик успешно загружен!")
+                else:
+                    agent_sync("❌ YouTube: Ошибка при загрузке")
+            except Exception as e:
+                agent_sync(f"❌ YouTube Exception: {e}")
+
+            if yt_success or insta_success: 
+                 mark_as_posted(content_data.get('selected_topic'), prefix, lang)
+
                 
     except Exception as e:
         print(f"❌ Factory Crash: {e}")
         agent_sync(f"Критическая ошибка фабрики: {e}")
+
+def start_scheduler():
+    """Бесконечный цикл планировщика (Время скорректировано под Израиль UTC+2)"""
+    agent_sync("⏰ Планировщик фабрики запущен (Синхронизация с Израилем)")
+    
+    # Ежедневно в 09:00 по Израилю -> 07:00 UTC
+    schedule.every().day.at("07:00").do(run_factory_production, mode="daily")
+    
+    # По воскресеньям в 10:00 по Израилю -> 08:00 UTC
+    schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
+    
+    # По средам в 11:00 по Израилю -> 09:00 UTC
+    schedule.every().wednesday.at("09:00").do(run_factory_production, mode="english")
+    
+    # Каждый вечер в 19:00 по Израилю -> 17:00 UTC
+    schedule.every().day.at("17:00").do(run_factory_production, mode="cartoon")
+
+    print("🚀 Scheduler is running (Aligned with Israel Time). Waiting...")
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Content Farm Scheduler')
@@ -234,6 +285,7 @@ if __name__ == "__main__":
     parser.add_argument('--english', action='store_true', help='Force English weekly special')
     parser.add_argument('--cartoon', action='store_true', help='Force Cartoon/Animation daily mode')
     parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
+    parser.add_argument('--scheduler', action='store_true', help='Run in infinity loop mode')
     
     parser.add_argument('--auto-upload', action='store_true', help='Force enable auto upload')
     
@@ -243,10 +295,13 @@ if __name__ == "__main__":
     if args.auto_upload:
         REELS_AUTO_UPLOAD = True
 
-    mode = "daily"
-    if args.hebrew: mode = "hebrew"
-    elif args.english: mode = "english"
-    elif args.cartoon: mode = "cartoon"
-    elif args.auto: mode = "auto"
-    
-    run_factory_production(mode=mode)
+    if args.scheduler:
+        start_scheduler()
+    else:
+        mode = "daily"
+        if args.hebrew: mode = "hebrew"
+        elif args.english: mode = "english"
+        elif args.cartoon: mode = "cartoon"
+        elif args.auto: mode = "auto"
+        
+        run_factory_production(mode=mode)

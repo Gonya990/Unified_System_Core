@@ -70,11 +70,11 @@ import random
 
 # Voice options (OpenAI TTS preferred, Edge-TTS fallback)
 VOICES = {
-    "en": "onyx",        # Deep, authoritative
+    "en": "alloy",        # Neutral, clear (No accent/burring)
     "en_female": "shimmer",
-    "ru": "onyx",        # Deep, professional
+    "ru": "alloy",        # Neutral, professional
     "ru_female": "shimmer",
-    "he": "onyx",        # Using Onyx for Hebrew (Multilingual v2 supports it)
+    "he": "alloy",        # Neutral (Best for Hebrew without heavy accent)
     "he_female": "shimmer",
     "fallback_ru": "ru-RU-DmitryNeural",
     "fallback_en": "en-US-EmmaNeural",
@@ -419,14 +419,30 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     
     segments = []
     
+    # Calculate duration per scene dynamically based on audio length
+    # Default fallback: 4 seconds (faster pacing)
+    scene_duration = 4 
+    # To use audio_clip.duration, we would need to load the audio into moviepy AudioFileClip
+    # For now, we'll use the ffmpeg-derived audio_duration
+    if audio_duration:
+        scene_duration = audio_duration / len(scenes)
+        # Clamp duration to keep it punchy (min 5.0s, max 6s) - Increased min to 5.0s
+        scene_duration = max(5.0, min(scene_duration, 6.0))
+    
+    print(f"⏱️ Dynamic Scene Duration: {scene_duration:.2f}s")
+
+    # Generate unique prefix based on output filename to prevent collisions in parallel runs
+    unique_prefix = output_path.stem
+    
     for i, scene in enumerate(scenes):
         agent_mindfulness(f"Assembling Scene {i}")
         img_path = scene['image']
         keyword = scene['keyword']
         
         # Timing: 75% B-Roll, 25% Image Flash
-        broll_dur = seg_duration * 0.75
-        img_dur = seg_duration * 0.25
+        # Adjust broll_dur and img_dur based on the new scene_duration
+        broll_dur = scene_duration * 0.75
+        img_dur = scene_duration * 0.25
         
         # Get multiple clips for energy
         broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=3)
@@ -435,7 +451,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         if broll_clips:
             per_clip = broll_dur / len(broll_clips)
             for j, clip in enumerate(broll_clips):
-                seg_p = OUTPUT_DIR / f"cin_seg_{i}_b{j}.mp4"
+                seg_p = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_b{j}.mp4"
                 # For cartoon style, we use brighter, more saturated colors without heavy vignetting
                 if style == "impact":
                     vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.4:brightness=0.03,curves=strong_contrast,vignette=angle=0.4"
@@ -453,7 +469,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
             img_dur += broll_dur
 
         # 2. Visionary AI Image Flash (STABLE ROBUST MOTION)
-        seg_p_img = OUTPUT_DIR / f"cin_seg_{i}_img.mp4"
+        seg_p_img = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_img.mp4"
         if style == "impact":
             vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=white,vignette=angle=0.5"
         else:
@@ -468,7 +484,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         segments.append(seg_p_img)
 
     # Concat visuals
-    concat_file = OUTPUT_DIR / "cin_concat.txt"
+    concat_file = OUTPUT_DIR / f"{unique_prefix}_concat.txt"
     with open(concat_file, "w") as f:
         for seg in segments: f.write(f"file '{seg.name}'\n")
             
