@@ -38,7 +38,12 @@ class IdentityOrchestrator:
         self.auth_manager = auth_manager
         
         # Unified TokenBroker for encryption/decryption
-        self.token_broker = TokenBroker()
+        if TokenBroker:
+            self.token_broker = TokenBroker()
+        else:
+            self.token_broker = None
+            if hasattr(logging.getLogger("IdentityOrchestrator"), "warning"):
+                 logging.getLogger("IdentityOrchestrator").warning("TokenBroker not available")
 
         # Load Admin Config
         self.allowed_users = self._load_allowed_users()
