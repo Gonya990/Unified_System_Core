@@ -13,8 +13,8 @@ if [[ -f "${PROJECT_ROOT}/.env" ]]; then
 fi
 
 # Configuration
-PROJECT_KEY="${AGENT_MAIL_PROJECT:-/home/gonya/Unified_System}"
-AGENT_NAME="${AGENT_MAIL_NAME:-VioletCastle}"
+PROJECT_KEY="${AGENT_MAIL_PROJECT:-/Gonya990/Unified_System_Core}"
+AGENT_NAME="${AGENT_MAIL_NAME:-Antigravity}"
 MCP_SERVER="${AGENT_MAIL_SERVER:-http://100.110.209.49:8765}"
 
 # Check server health first
@@ -55,15 +55,15 @@ Project: ${PROJECT_KEY}
 
 Run sync workflow:
 \`\`\`
-mcp__mcp-agent-mail__register_agent(
+agent_mail_register_agent(
   project_key="${PROJECT_KEY}",
-  program="claude-code",
-  model="opus-4.5",
+  program="antigravity",
+  model="gemini-2.0-pro",
   name="${AGENT_NAME}",
   task_description="Session started - Operating in ${LANG}"
 )
 
-mcp__mcp-agent-mail__fetch_inbox(
+agent_mail_fetch_inbox(
   project_key="${PROJECT_KEY}",
   agent_name="${AGENT_NAME}",
   include_bodies=true,
