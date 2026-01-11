@@ -29,4 +29,4 @@
 
 ## Last Updated
 
-- 2026-01-11
+- 2026-01-11 (Remote Agent Mail configured)
