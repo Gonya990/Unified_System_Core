@@ -191,20 +191,34 @@ def deep_research_with_council(topic: str) -> Dict:
         """
         
         import asyncio
+        print("🏛️ Deliberation started...")
         session = asyncio.run(council.deliberate(query, verbose=True))
         
         # Parse consensus
         consensus = session.stage3_consensus
+        if not consensus:
+             print("❌ Stage 3 Synthesis failed (no consensus content)")
+             raise ValueError("Consensus synthesis failed")
+             
         if "```json" in consensus:
             consensus = consensus.split("```json")[1].split("```")[0].strip()
         
-        data = json.loads(consensus)
+        try:
+            data = json.loads(consensus)
+        except json.JSONDecodeError as je:
+            print(f"❌ JSON Decode Error: {je}")
+            print(f"--- RAW CONSENSUS ---\n{consensus[:1000]}\n--- END RAW ---")
+            raise
+            
         print(f"✅ Council completed: '{data.get('title', 'Unknown')}'")
         
         # Track approximate tokens (estimate based on response length)
         TRACKER.log("openai", len(query) // 4, len(consensus) // 4)
         
-        asyncio.run(council.close())
+        try:
+            asyncio.run(council.close())
+        except:
+            pass
         return data
         
     except Exception as e:
@@ -232,8 +246,14 @@ def fallback_research(topic: str) -> Dict:
 
         genai.configure(api_key=api_key)
         
-        # Try several models for fallback
-        models_to_try = ["gemini-pro-latest", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
+        # Try several models for fallback (with canonical prefixes)
+        models_to_try = [
+            "models/gemini-2.0-flash", 
+            "models/gemini-pro-latest", 
+            "models/gemini-1.5-pro", 
+            "models/gemini-1.5-flash",
+            "models/gemini-flash-latest"
+        ]
         model = None
         for m_name in models_to_try:
             try:
