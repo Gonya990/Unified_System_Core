@@ -11,9 +11,11 @@ import requests
 from pathlib import Path
 from typing import List, Optional
 
-# Pexels API
-def search_pexels_videos(query: str, per_page: int = 5) -> List[dict]:
-    """Search Pexels for videos matching query"""
+# Global state for variety
+SEEN_VIDEO_IDS = set()
+
+def search_pexels_videos(query: str, per_page: int = 15) -> List[dict]:
+    """Search Pexels for videos matching query. High per_page for variety."""
     # Try to load API Key from Token Broker, fallback to env
     api_key = os.getenv("PEXELS_API_KEY", "")
     
@@ -96,16 +98,25 @@ def semantic_search_broll(text: str, output_dir: Path, num_clips: int = 3) -> Li
     output_dir.mkdir(exist_ok=True)
     
     for i, keyword in enumerate(keywords[:num_clips]):
-        videos = search_pexels_videos(keyword, per_page=1)
-        if videos:
-            video = videos[0]
+        videos = search_pexels_videos(keyword, per_page=15)
+        # Filter out seen videos
+        fresh_videos = [v for v in videos if v.get("id") not in SEEN_VIDEO_IDS]
+        
+        # If no fresh videos, just use what we have (fallback)
+        final_video_list = fresh_videos if fresh_videos else videos
+        
+        if final_video_list:
+            import random
+            video = random.choice(final_video_list[:5]) # Pick from top 5 fresh ones
+            SEEN_VIDEO_IDS.add(video.get("id"))
+            
             url = get_best_video_file(video, "hd")
             if url:
-                output_path = output_dir / f"broll_{i}_{keyword}.mp4"
+                output_path = output_dir / f"broll_{i}_{keyword}_{video.get('id')}.mp4"
                 if download_video(url, output_path):
                     downloaded.append(output_path)
     
-    print(f"✅ Downloaded {len(downloaded)} B-Roll clips")
+    print(f"✅ Downloaded {len(downloaded)} B-Roll clips (Variety ensured)")
     return downloaded
 
 def extract_keywords(text: str) -> List[str]:

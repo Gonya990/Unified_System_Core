@@ -415,21 +415,15 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     ], capture_output=True, text=True).stdout.strip())
     
     num_scenes = len(scenes)
-    seg_duration = audio_duration / num_scenes
+    # Calculate duration per scene to exactly cover audio duration
+    if num_scenes > 0:
+        duration_per_scene = audio_duration / num_scenes
+    else:
+        duration_per_scene = 5.0 # Fallback
+    
+    print(f"⏱️ Exact Scene Duration: {duration_per_scene:.2f}s (Total: {audio_duration:.2f}s)")
     
     segments = []
-    
-    # Calculate duration per scene dynamically based on audio length
-    # Default fallback: 4 seconds (faster pacing)
-    scene_duration = 4 
-    # To use audio_clip.duration, we would need to load the audio into moviepy AudioFileClip
-    # For now, we'll use the ffmpeg-derived audio_duration
-    if audio_duration:
-        scene_duration = audio_duration / len(scenes)
-        # Clamp duration to keep it punchy (min 5.0s, max 6s) - Increased min to 5.0s
-        scene_duration = max(5.0, min(scene_duration, 6.0))
-    
-    print(f"⏱️ Dynamic Scene Duration: {scene_duration:.2f}s")
 
     # Generate unique prefix based on output filename to prevent collisions in parallel runs
     unique_prefix = output_path.stem
@@ -451,32 +445,41 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
             
         keyword = scene.get('keyword', 'abstract technology')
         
-        # Timing: 75% B-Roll, 25% Image Flash
-        # Adjust broll_dur and img_dur based on the new scene_duration
-        broll_dur = scene_duration * 0.75
-        img_dur = scene_duration * 0.25
+        # Timing: 80% B-Roll, 20% Image Flash
+        broll_dur = duration_per_scene * 0.8
+        img_dur = duration_per_scene * 0.2
         
-        # Get multiple clips for energy
-        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=3)
+        # Get more clips to ensure we cover the duration
+        broll_clips = semantic_search_broll(keyword, BROLL_DIR, num_clips=5)
         
         # 1. B-Roll Sequence (2-3 clips per scene for fast rhythm)
         if broll_clips:
-            per_clip = broll_dur / len(broll_clips)
-            for j, clip in enumerate(broll_clips):
-                seg_p = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_b{j}.mp4"
-                # For cartoon style, we use brighter, more saturated colors without heavy vignetting
+            # We need to cover broll_dur. If clips are too short, we loop or use multiple.
+            accumulated_broll = 0
+            clip_idx = 0
+            while accumulated_broll < broll_dur:
+                clip = broll_clips[clip_idx % len(broll_clips)]
+                clip_idx += 1
+                
+                remaining = broll_dur - accumulated_broll
+                this_clip_dur = min(get_video_duration(clip), remaining)
+                # If clip is extremely short (<1s), skip to avoid ffmpeg errors
+                if this_clip_dur < 0.5: break 
+                
+                seg_p = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_b{clip_idx}.mp4"
                 if style == "impact":
-                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.4:brightness=0.03,curves=strong_contrast,vignette=angle=0.4"
+                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:saturation=1.3,vignette=angle=0.3"
                 else:
-                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=saturation=1.6:brightness=0.05"
+                    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=saturation=1.5"
                 
                 subprocess.run([
                     "ffmpeg", "-y", "-i", str(clip),
-                    "-t", str(per_clip),
+                    "-t", str(this_clip_dur),
                     "-vf", vf,
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_p)
                 ], check=True, capture_output=True)
                 segments.append(seg_p)
+                accumulated_broll += this_clip_dur
         else:
             img_dur += broll_dur
 
@@ -511,9 +514,10 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
     final_audio = OUTPUT_DIR / "final_cin_audio.wav"
     
     if style == "impact":
+        # Reduced reverb (aecho) for clarity, kept compression for punch
         audio_filter = (
             "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
-            "aecho=0.8:0.88:40:0.3,"
+            "aecho=0.8:0.7:30:0.2," 
             "loudnorm"
         )
     else:
