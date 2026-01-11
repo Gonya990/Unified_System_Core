@@ -9,6 +9,7 @@ import re
 import time
 from bs4 import BeautifulSoup
 from pathlib import Path
+from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -94,11 +95,23 @@ def get_page_content(url):
         print(f"⚠️ Failed to browse {url}: {e}")
         return ""
 
+def get_evergreen_topics():
+    """Fallback topics for autonomous operation"""
+    return [
+        {"title": "The Rise of Universal Translators and Global Unity", "link": "https://en.wikipedia.org/wiki/Universal_translator"},
+        {"title": "Quantum Computing Solving the Climate Crisis", "link": "https://en.wikipedia.org/wiki/Quantum_computing"},
+        {"title": "Mars Colonization: The Next Step for Humanity", "link": "https://en.wikipedia.org/wiki/Colonization_of_Mars"},
+        {"title": "Biotechnology: Curing All Diseases by 2050", "link": "https://en.wikipedia.org/wiki/Biotechnology"},
+        {"title": "The Energy Revolution: Fusion Power is Near", "link": "https://en.wikipedia.org/wiki/Fusion_power"}
+    ]
+
 def run_daily_research(style="impact", deep=False):
     """Deep research with Megaforma Style (Geopolitics/Mystery)"""
     print(f"🧠 Starting MEGAFORMA {'DEEP ' if deep else ''}RESEARCH (Style: {style.upper()})")
     news = get_latest_geo_news()
-    if not news: return None
+    if not news:
+        print("⚠️ No fresh news found. Using evergreen fallback topics...")
+        news = get_evergreen_topics()
         
     context = ""
     # Deep research: Browse more articles (up to 10)
@@ -170,14 +183,28 @@ def run_daily_research(style="impact", deep=False):
         try:
             print("🤖 Attempting Research via OpenAI Responses API (GPT-4o)...")
             client = get_client()
-            # Try new Responses API first
-            res = client.responses.create(
-                model="gpt-4o",
-                input=prompt,
-                instructions="Return ONLY valid JSON. No markdown, no explanations."
-            )
-            content = res.output_text
-            if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
+            # Try new Responses API first (or fallback to Chat Completions)
+            try:
+                res = client.responses.create(
+                    model="gpt-4o",
+                    input=prompt,
+                    instructions="Return ONLY valid JSON. No markdown, no explanations."
+                )
+                content = res.output_text
+            except Exception as e:
+                print(f"⚠️ Responses API not available ({e}), trying standard Chat Completions...")
+                res = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "Return ONLY valid JSON. No markdown, no explanations."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    response_format={"type": "json_object"}
+                )
+                content = res.choices[0].message.content
+
+            if content and "```json" in content: 
+                content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
         except Exception as e:
             print(f"⚠️ OpenAI Research failed: {e}. Checking legacy fallback...")
@@ -441,6 +468,7 @@ def translate_to_english(text):
 def main():
     """Execute Full Daily Viral Content Pipeline"""
     print("🚀 DAILY RESEARCHER PIPELINE INITIATED")
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     
     # 1. Research & Scripting
     data = run_daily_research(style="impact")
@@ -488,7 +516,7 @@ def main():
         # Override Orchestrator Output Dirs to match Daily Dir
         orchestrator.OUTPUT_DIR = daily_dir
         orchestrator.INPUT_DIR = daily_dir
-        orchestrator.BROLL_DIR = factory_path / "broll" # Shared B-roll library
+        orchestrator.BROLL_DIR = ROOT_DIR / "broll" # Shared B-roll library
         
         # Run RU Pipeline
         script_ru = data.get("script_ru", "")
