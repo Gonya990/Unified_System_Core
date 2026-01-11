@@ -22,6 +22,15 @@ in
   ];
 
   # https://devenv.sh/languages/
+  languages.python = {
+    enable = true;
+    package = pkgs.python312;
+    venv.enable = true;
+    venv.requirements = ''
+      python-dotenv
+      requests
+    '';
+  };
   # languages.rust.enable = true;
 
   # https://devenv.sh/processes/
