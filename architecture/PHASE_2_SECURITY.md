@@ -12,6 +12,9 @@ Secure the `TokenBroker` by encrypting stored keys and enforcing Role-Based Acce
 - **Key Derivation:** Argon2id (memory-hard, side-channel resistant)
   - Parameters: `memory=65536 KB`, `iterations=3`, `parallelism=4`
   - Fallback: PBKDF2-SHA256 with 600,000 iterations (OWASP 2023)
+  - **Rationale:** Argon2id resists GPU/ASIC brute-force attacks that PBKDF2 is vulnerable to.
+    Modern password managers (1Password, Bitwarden) use Argon2. Winner of Password Hashing
+    Competition (2015). Adds `argon2-cffi` dependency (~50KB, C extension via wheel).
 - **Nonce Handling:** 96-bit random nonce per encryption (cryptographically secure RNG)
 - **Storage Format:** `salt (16B) || nonce (12B) || ciphertext || tag (16B)`
 - **Storage Location:** `secrets/keys.enc` (replacing `keys.json`)
