@@ -26,11 +26,18 @@ load_dotenv(ROOT_DIR / ".env")
 from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
 from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew, translate_to_english
 from insta_uploader import upload_reel
+from account_manager import AccountManager
 import subprocess
 
 # Configuration
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
+
+# --- MONETIZATION SAFETY LIMITS ---
+DAILY_VIDEOS_LIMIT = 2  # Max 2 videos per day across all modes
+MIN_INTERVAL_HOURS = 4  # Minimum gap between any two posts
+INSTA_ACTION_DELAY = 60 # Seconds between Instagram operations
+# ----------------------------------
 
 def agent_sync(msg):
     """Синхронизация с агентом Кости (VioletCastle) через MCP"""
@@ -218,37 +225,45 @@ def run_factory_production(mode="daily"):
         
         # 5. UPLOAD (Instagram + YouTube)
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
-            # 5.1 Instagram
-            agent_sync(f"Загружаю {prefix} ролик в Instagram...")
-            caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
+            # 5.1 Instagram (Multi-account)
+            acc_manager = AccountManager()
+            insta_accounts = acc_manager.get_accounts("instagram")
             
-            insta_success = False
-            try:
-                insta_success = upload_reel(str(video_path), caption)
-                if insta_success:
-                    agent_sync("🚀 Instagram: Ролик успешно загружен!")
-                else:
-                    agent_sync("❌ Instagram: Ошибка при загрузке")
-            except Exception as e:
-                agent_sync(f"❌ Instagram Exception: {e}")
+            for acc in insta_accounts:
+                agent_sync(f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})...")
+                caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
+                
+                try:
+                    # Respect action delay
+                    time.sleep(INSTA_ACTION_DELAY)
+                    insta_success = upload_reel(str(video_path), caption, session_id=acc.get("session_id"))
+                    if insta_success:
+                        agent_sync(f"🚀 Instagram ({acc.get('username')}): Успешно!")
+                    else:
+                        agent_sync(f"❌ Instagram ({acc.get('username')}): Ошибка")
+                except Exception as e:
+                    agent_sync(f"❌ Instagram Exception: {e}")
 
-            # 5.2 YouTube
-            agent_sync(f"Загружаю {prefix} ролик в YouTube...")
-            title = content_data.get('selected_topic', f"New AI Video {day_str}")
-            desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
-            tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
-            
-            yt_success = False
-            try:
-                # Late import to avoid circular dependency issues if any
-                from youtube_uploader import upload_video
-                yt_success = upload_video(video_path, title=title, description=desc_yt, tags=tags, privacy_status="public")
-                if yt_success:
-                    agent_sync("🚀 YouTube: Ролик успешно загружен!")
-                else:
-                    agent_sync("❌ YouTube: Ошибка при загрузке")
-            except Exception as e:
-                agent_sync(f"❌ YouTube Exception: {e}")
+            # 5.2 YouTube (Multi-channel)
+            yt_accounts = acc_manager.get_accounts("youtube")
+            for acc in yt_accounts:
+                agent_sync(f"Загружаю {prefix} в YouTube ({acc.get('name') or 'Channel'})...")
+                title = content_data.get('selected_topic', f"New AI Video {day_str}")
+                desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
+                tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
+                
+                try:
+                    from youtube_uploader import upload_video
+                    token_file = acc.get("token_file")
+                    # If relative path, prefix with CREDENTIALS_DIR from uploader or use absolute
+                    yt_success = upload_video(video_path, title=title, description=desc_yt, tags=tags, 
+                                            privacy_status="public", token_file=token_file)
+                    if yt_success:
+                        agent_sync(f"🚀 YouTube ({acc.get('name')}): Успешно!")
+                    else:
+                        agent_sync(f"❌ YouTube ({acc.get('name')}): Ошибка")
+                except Exception as e:
+                    agent_sync(f"❌ YouTube Exception: {e}")
 
             if yt_success or insta_success: 
                  mark_as_posted(content_data.get('selected_topic'), prefix, lang)

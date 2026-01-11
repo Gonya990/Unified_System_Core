@@ -12,18 +12,21 @@ INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD")
 INSTAGRAM_SESSION_ID = os.getenv("INSTAGRAM_SESSION_ID") # For 2FA/Meta login
 SESSION_FILE = "insta_session.json"
 
-def upload_reel(video_path: str, caption: str):
+def upload_reel(video_path: str, caption: str, session_id: str = None):
     """
     Uploads a video as an Instagram Reel using instagrapi.
     Supports Login via Username/Password or SessionID (bypasses 2FA).
     """
     cl = Client()
     
+    # Use provided session_id or fallback to env
+    active_session_id = session_id or INSTAGRAM_SESSION_ID
+    
     # 1. Try Session ID (Most robust for 2FA/Facebook login)
-    if INSTAGRAM_SESSION_ID and INSTAGRAM_SESSION_ID != "your_session_id":
+    if active_session_id and active_session_id != "your_session_id":
         try:
             print("🔑 Attempting login via Session ID...")
-            cl.login_by_sessionid(INSTAGRAM_SESSION_ID)
+            cl.login_by_sessionid(active_session_id)
             print("✅ Login via Session ID successful!")
         except Exception as e:
             print(f"⚠️ Session ID login failed: {e}")
