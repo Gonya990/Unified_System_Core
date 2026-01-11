@@ -106,10 +106,12 @@ def deep_research_with_council(topic: str) -> Dict:
         from council.council import LLMCouncil
         
         if BROKER:
-            # Try research tier, fallback to any
-            council = LLMCouncil.from_token_broker(BROKER, tier="research")
-            if not council.primary_client: # Double check if it actually got a key
-                 council = LLMCouncil.from_token_broker(BROKER, tier=None)
+            # Try research tier, fallback to pro, then tier1, then any
+            for t in ["research", "pro", "tier1", None]:
+                council = LLMCouncil.from_token_broker(BROKER, tier=t)
+                if council.primary_client: # Double check if it actually got a key
+                    print(f"✅ Council using tier: {t}")
+                    break
         else:
             council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
         
@@ -214,8 +216,8 @@ def fallback_research(topic: str) -> Dict:
 
         genai.configure(api_key=api_key)
         
-        # Use Flash for higher reliability/speed as fallback
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # Use available models from list (gemini-2.0-flash is standard in 2026)
+        model = genai.GenerativeModel("gemini-2.0-flash")
         
         prompt = f"""
         Create a 28-minute DOCUMENTARY script about: {topic}
