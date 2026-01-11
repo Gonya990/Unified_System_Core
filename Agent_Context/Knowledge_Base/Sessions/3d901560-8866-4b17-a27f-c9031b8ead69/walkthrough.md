@@ -3,7 +3,7 @@
 ## 1. System Consolidation / Консолидация
 
 - **Cleaned**: Removed old `Home_Assistant_Config` to `_Archive`.
-- **Structured**: Reorganized `Windows_AI_Core` into `src`, `scripts`, `docs`.
+- **Structured**: Reorganized `Projects/AI_Core` into `src`, `scripts`, `docs`.
 - **Verified**: Network connectivity between Mac, Windows, and Proxmox is active (Tailscale Mesh).
 
 ## 2. Windows AI Core (Node: `igor-gaming`)
@@ -15,7 +15,7 @@
 
   ```bash
   ssh gonya@100.127.194.111
-  cd Desktop/Windows_AI_Core
+  cd Desktop/Projects/AI_Core
   ```
 
 ## 3. Proxmox Virtual Environment (Node: `pve`)

@@ -10,7 +10,7 @@
 
 | Директория | Назначение | Статус |
 | :--- | :--- | :--- |
-| **Windows_AI_Core** | Скрипты настройки RTX AI и Windows среды (бывший `windows-rtx-ai-setup`) | ✅ Перемещено |
+| **Projects/AI_Core** | Скрипты настройки RTX AI и Windows среды (бывший `windows-rtx-ai-setup`) | ✅ Перемещено |
 | **Home_Assistant_Config** | Конфигурации и ключи Home Assistant (бывший `home-assistant`) | ✅ Перемещено |
 | **Sandbox** | Песочница для тестов и администрирования | ✅ Создано |
 

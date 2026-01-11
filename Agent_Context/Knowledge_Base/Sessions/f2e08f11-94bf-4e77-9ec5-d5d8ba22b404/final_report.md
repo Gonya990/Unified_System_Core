@@ -12,7 +12,7 @@
 
 | Компонент | Путь | Назначение |
 | :--- | :--- | :--- |
-| **Windows_AI_Core** | `/Windows_AI_Core` | Настройка RTX AI, Python скрипты, движок инференса. |
+| **Projects/AI_Core** | `/Projects/AI_Core` | Настройка RTX AI, Python скрипты, движок инференса. |
 | **Home_Assistant** | `/Home_Assistant_Config` | Конфиги умного дома и ключи автоматизации. |
 | **Sandbox** | `/Sandbox` | **Инструменты админа**, Аудит безопасности, Тесты. |
 

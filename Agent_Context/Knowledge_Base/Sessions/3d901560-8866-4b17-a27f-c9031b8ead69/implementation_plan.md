@@ -4,7 +4,7 @@
 
 # Goal Description / Описание цели
 
-Consolidate the existing working zones (`Windows_AI_Core`, `Home_Assistant_Config`, `Sandbox`) into a cohesive structure. Refactor the main check script `admin_check.sh` to be a central utility, fully localized to Russian, and ensure it correctly validates the compiled resources (Admins: igor/gonya).
+Consolidate the existing working zones (`Projects/AI_Core`, `Home_Assistant_Config`, `Sandbox`) into a cohesive structure. Refactor the main check script `admin_check.sh` to be a central utility, fully localized to Russian, and ensure it correctly validates the compiled resources (Admins: igor/gonya).
 Объединить существующие рабочие зоны в единую структуру. Рефакторинг `admin_check.sh` в центральную утилиту на русском языке.
 
 ## User Review Required / Требуется проверка пользователя
@@ -30,10 +30,10 @@ Reorganize `Unified_System` to have a dedicated scripts area.
 
 - **Move** to `Unified_System/Scripts/admin_check.sh`.
 - **Translate** all comments to Russian.
-- **Refactor** to verify existence of `Windows_AI_Core` and `Home_Assistant_Config`.
+- **Refactor** to verify existence of `Projects/AI_Core` and `Home_Assistant_Config`.
 - **Update** "Resource Inventory" section to be dynamic (check if folders exist).
 
-### Component: Windows_AI_Core
+### Component: Projects/AI_Core
 
 - No code changes planned, but will be referenced in the central check script.
 - Без изменений кода, но будет добавлен в проверку.
