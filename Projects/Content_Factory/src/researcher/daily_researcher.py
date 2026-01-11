@@ -148,14 +148,27 @@ def run_daily_research(style="impact"):
     """
     
     data = None
-    # Strategy 1: OpenAI
+    # Strategy 1: OpenAI Responses API (New, Recommended)
     try:
-        print("🤖 Attempting Research via OpenAI (GPT-4o)...")
-        res = get_client().chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "Return ONLY JSON."}, {"role": "user", "content": prompt}]
-        )
-        content = res.choices[0].message.content
+        print("🤖 Attempting Research via OpenAI Responses API (GPT-4o)...")
+        client = get_client()
+        # Try new Responses API first
+        try:
+            res = client.responses.create(
+                model="gpt-4o",
+                input=prompt,
+                instructions="Return ONLY valid JSON. No markdown, no explanations."
+            )
+            content = res.output_text
+        except AttributeError:
+            # Fallback to legacy Chat Completions if Responses API not available
+            print("⚠️ Responses API not available, using Chat Completions...")
+            res = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "system", "content": "Return ONLY JSON."}, {"role": "user", "content": prompt}]
+            )
+            content = res.choices[0].message.content
+        
         if "```json" in content: content = content.split("```json")[1].split("```")[0].strip()
         data = json.loads(content)
     except Exception as e:
