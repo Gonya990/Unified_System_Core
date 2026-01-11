@@ -30,6 +30,7 @@ This framework provides:
 | Clarify code | [cohesion-coach](complexity-pillar/cohesion-coach/) |
 | Create interfaces | [abstraction-patterns](complexity-pillar/abstraction-patterns/) |
 | Manage dependencies | [coupling-minimizer](complexity-pillar/coupling-minimizer/) |
+| Reduce cognitive load | [guard-clause-enforcer](complexity-pillar/guard-clause-enforcer/) |
 | Refactor safely | [refactoring-mastery](supporting-skills/refactoring-mastery/) |
 | Optimize performance | [high-performance-simplicity](supporting-skills/high-performance-simplicity/) |
 | Set up CI/CD | [deployment-pipeline-designer](learning-pillar/deployment-pipeline-designer/) |
@@ -86,6 +87,7 @@ Systems are complex. To succeed, we must become **experts at managing complexity
 - `cohesion-coach` - Related together
 - `abstraction-patterns` - Information hiding
 - `coupling-minimizer` - Minimize dependencies
+- `guard-clause-enforcer` - Flatten happy path, early returns
 
 ---
 
@@ -135,7 +137,7 @@ Systems are complex. To succeed, we must become **experts at managing complexity
 ```
 skills/
 ├── learning-pillar/          # Learning optimization skills (5)
-├── complexity-pillar/        # Complexity management skills (5)
+├── complexity-pillar/        # Complexity management skills (6)
 ├── supporting-skills/        # Supporting practices (4)
 ├── project-skills/           # Project-specific skills (2)
 └── architecture-skills/      # Architecture patterns (2)
