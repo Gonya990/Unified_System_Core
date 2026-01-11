@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "Notification": [
+      {
+        "matcher": "session-start",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hooks/scripts/session-start-sync.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
@@ -38,6 +49,15 @@
           {
             "type": "command",
             "command": "CMD=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.command // empty' 2>/dev/null); if echo \"$CMD\" | grep -qE 'npm install|yarn add|pnpm add'; then echo '{\"feedback\": \"Dependencies changed. Consider running tests.\"}'; else echo '{\"continue\": true}'; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hooks/scripts/check-mail.sh"
           }
         ]
       }
