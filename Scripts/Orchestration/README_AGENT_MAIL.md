@@ -319,6 +319,14 @@ curl -H "Authorization: Bearer <token>" \
 - Token rotation: Contact server admin
 - Agent names are case-insensitive but must match registry
 
+### RBAC Status (Service Node)
+
+The hub on `unified-home-core-cloud` (`100.110.209.49:8765`) is currently running with `HTTP_RBAC_ENABLED=false`.
+
+Reason: during recovery we observed `403 Forbidden` for `POST /mcp` (including basic tool calls like `health_check`) with RBAC enabled but no remote auth/roles configured. Disabling RBAC restored basic remote write capability so agents could register/send while the service is being stabilized.
+
+Follow-up: re-enable RBAC once a concrete auth mechanism (token/JWT) + default roles/policy is configured and validated for all agents.
+
 ## Future Enhancements
 
 1. **File Attachments**: Share reports, logs, configs
