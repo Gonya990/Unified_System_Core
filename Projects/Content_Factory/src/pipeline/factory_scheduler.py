@@ -27,6 +27,8 @@ from orchestrator_v3_no_face import run_no_face_pipeline, OUTPUT_DIR
 from daily_researcher import run_daily_research, generate_vision_assets, translate_to_hebrew, translate_to_english
 from insta_uploader import upload_reel
 from account_manager import AccountManager
+from uploaders.threads_browser import ThreadsBrowser
+import asyncio
 import subprocess
 
 # Configuration
@@ -265,7 +267,35 @@ def run_factory_production(mode="daily"):
                 except Exception as e:
                     agent_sync(f"❌ YouTube Exception: {e}")
 
-            if yt_success or insta_success: 
+            # 5.3 Threads (Browser Automation)
+            threads_success = False
+            try:
+                agent_sync(f"Загружаю {prefix} в Threads (Automated)...")
+                threads_bot = ThreadsBrowser(headless=True)
+                
+                # Check for saved session, otherwise skip
+                # State file relative to ThreadsBrowser file
+                threads_state = ROOT_DIR / "Projects/Content_Factory/src/uploaders/.threads_state.json"
+                
+                # We simply run the post method. It handles login state internally if configured.
+                # Since we are in sync function, we need to run async code
+                threads_text = f"{content_data.get('selected_topic', '')}\n\n{content_data.get('description', '')[:450]}...\n\n#AI #Future"
+                
+                # Use asyncio.run for calling async code from sync
+                threads_success = asyncio.run(threads_bot.post(threads_text, str(video_path)))
+                
+                if threads_success:
+                    agent_sync("🚀 Threads: Успешно опубликован!")
+                else:
+                     agent_sync("⚠️ Threads: Не удалось опубликовать (Check session)")
+                
+                asyncio.run(threads_bot.close())
+                
+            except Exception as e:
+                # Often async loop issues in mixed context, catch silently-ish
+                print(f"Threads Error: {e}")
+                
+            if yt_success or insta_success or threads_success: 
                  mark_as_posted(content_data.get('selected_topic'), prefix, lang)
 
                 
