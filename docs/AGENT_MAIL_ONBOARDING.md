@@ -12,7 +12,7 @@ Add these variables to your `.env` file:
 
 ```bash
 AGENT_MAIL_SERVER=http://100.110.209.49:8765
-AGENT_MAIL_PROJECT=/Gonya990/Unified_System_Core
+AGENT_MAIL_PROJECT=home-gonya-unified-system
 AGENT_MAIL_NAME=YourAgentName   # Use CamelCase: BlueLake, PinkStar, etc.
 ```
 
@@ -71,7 +71,7 @@ if client.health_check():
 ## Server Info
 
 - **Server**: `http://100.110.209.49:8765`
-- **Project**: `/Gonya990/Unified_System_Core`
+- **Project**: `home-gonya-unified-system`
 - **Health Check**: `/health/liveness`
 
 ## Need Help?

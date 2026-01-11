@@ -370,7 +370,7 @@ All agents communicate via a **shared Agent Mail server**. Use `/sync-mail` work
 **Project Key (CRITICAL):** All agents use the same slug, NOT absolute paths:
 
 ```
-PROJECT_KEY = "/Gonya990/Unified_System_Core"
+PROJECT_KEY = "home-gonya-unified-system"
 ```
 
 **Core Tools:**
@@ -388,7 +388,7 @@ PROJECT_KEY = "/Gonya990/Unified_System_Core"
 
 ```python
 agent_mail_register_agent(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   program="opencode",      # or "claude-code", "codex"
   model="claude-sonnet-4",
   task_description="What you're working on"

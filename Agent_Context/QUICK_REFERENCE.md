@@ -7,7 +7,7 @@
 ## Constants
 
 ```
-PROJECT_KEY = "/Gonya990/Unified_System_Core"
+PROJECT_KEY = "home-gonya-unified-system"
 AGENT_MAIL_SERVER = "http://127.0.0.1:8765"
 BEADS_SYNC_BRANCH = "beads-sync"
 ```
@@ -29,7 +29,7 @@ BEADS_SYNC_BRANCH = "beads-sync"
 ```python
 # Register (at session start)
 agent_mail_register_agent(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   program="opencode",
   model="claude-sonnet-4",
   task_description="..."
@@ -37,7 +37,7 @@ agent_mail_register_agent(
 
 # Fetch inbox
 agent_mail_fetch_inbox(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="YourName",
   include_bodies=True,
   limit=20
@@ -45,7 +45,7 @@ agent_mail_fetch_inbox(
 
 # Send message
 agent_mail_send_message(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   sender_name="YourName",
   to=["RecipientName"],
   subject="...",
@@ -54,7 +54,7 @@ agent_mail_send_message(
 
 # Reserve files
 agent_mail_file_reservation_paths(
-  project_key="/Gonya990/Unified_System_Core",
+  project_key="home-gonya-unified-system",
   agent_name="YourName",
   paths=["path/to/file.py"],
   ttl_seconds=3600,

@@ -142,7 +142,7 @@ All settings via `.env` file:
 ```bash
 # Agent Mail Configuration
 AGENT_MAIL_NAME=CalmSnow
-AGENT_MAIL_PROJECT=/Gonya990/Unified_System_Core
+AGENT_MAIL_PROJECT=home-gonya-unified-system
 AGENT_MAIL_SERVER=http://100.110.209.49:8765
 
 # Telegram Monitoring
@@ -152,7 +152,7 @@ START_MESSAGE_ID=1
 
 ## Agent Registry
 
-Current active agents in `/Gonya990/Unified_System_Core`:
+Current active agents in `home-gonya-unified-system`:
 
 | Agent | ID | Role | Machine |
 |-------|-----|------|---------|
@@ -309,7 +309,7 @@ docker restart <container_id>
 # Check recipient agent exists
 curl -H "Authorization: Bearer <token>" \
   http://100.110.209.49:8765/mcp \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"whois","arguments":{"project_key":"/Gonya990/Unified_System_Core","agent_name":"VioletCastle"}},"id":1}'
+  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"whois","arguments":{"project_key":"home-gonya-unified-system","agent_name":"VioletCastle"}},"id":1}'
 ```
 
 ## Security Notes

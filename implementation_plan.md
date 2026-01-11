@@ -120,7 +120,7 @@ TELEGRAM_BOT_TOKEN=<your_bot_token>
 
 # Already configured:
 AGENT_MAIL_SERVER=http://100.110.209.49:8765
-AGENT_MAIL_PROJECT=/Gonya990/Unified_System_Core
+AGENT_MAIL_PROJECT=home-gonya-unified-system
 AGENT_MAIL_NAME=Antigravity
 ```
 
