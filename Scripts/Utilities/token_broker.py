@@ -421,7 +421,22 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
     broker = TokenBroker()
-    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
-        print("🚀 Migrating to encrypted vault...")
-        broker._try_legacy_import()
-        print("✅ Done.")
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        if cmd == "migrate":
+            print("🚀 Migrating to encrypted vault (legacy import)...")
+            broker._try_legacy_import()
+            print("✅ Done.")
+        elif cmd == "migrate-argon2":
+            if not HAS_ARGON2:
+                print("❌ Cannot migrate: argon2-cffi not installed.")
+                sys.exit(1)
+            print("🚀 Re-encrypting vault with Argon2id...")
+            broker.save_vault(force_kdf="argon2id")
+            print("✅ Done. Vault is now secured with Argon2id.")
+        elif cmd == "status":
+            import pprint
+            pprint.pprint(broker.health_check())
+        else:
+            print(f"Unknown command: {cmd}")
+            print("Available: migrate, migrate-argon2, status")
