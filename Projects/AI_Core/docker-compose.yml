@@ -17,6 +17,7 @@ x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
     - ./secrets:/app/secrets
     - ../../secrets:/app/unified_secrets:ro
     - ./gcp-service-account.json:/app/gcp-service-account.json:ro
+    - ../../Scripts:/app/Scripts:ro
   environment:
     - PYTHONUNBUFFERED=1
     - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
