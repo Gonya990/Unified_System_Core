@@ -282,7 +282,7 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: 
     print(f"📝 Burning '{style_label}' Style Subtitles...")
     
     # 1. Extract audio and transcribe
-    temp_audio = OUTPUT_DIR / "temp_sub_audio.wav"
+    temp_audio = output_path.parent / f"temp_{output_path.stem}_sub.wav"
     subprocess.run(["ffmpeg", "-y", "-i", str(video_path), "-vn", "-ac", "1", str(temp_audio)], check=True, capture_output=True)
     
     words = transcribe_audio_whisper(temp_audio)
@@ -359,7 +359,7 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
         remaining = audio_duration - current_time
         target_duration = min(clip_duration, remaining)
         
-        trimmed_path = OUTPUT_DIR / f"temp_clip_{len(final_clips)}.mp4"
+        trimmed_path = output_path.parent / f"temp_{output_path.stem}_clip_{len(final_clips)}.mp4"
         subprocess.run([
             "ffmpeg", "-y", "-i", str(clip),
             "-t", str(target_duration),
@@ -373,17 +373,17 @@ def assemble_broll_only_video(audio_path: Path, clips: List[Path], output_path: 
         clip_idx += 1
         
     # 3. Concatenate clips
-    concat_list = OUTPUT_DIR / "concat_list.txt"
+    concat_list = output_path.parent / f"temp_{output_path.stem}_concat.txt"
     with open(concat_list, "w") as f:
         for clip in final_clips:
             f.write(f"file '{clip.name}'\n")
             
-    video_no_audio = OUTPUT_DIR / "temp_video_no_audio.mp4"
+    video_no_audio = output_path.parent / f"temp_{output_path.stem}_no_audio.mp4"
     subprocess.run([
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_list),
         "-c", "copy", str(video_no_audio)
-    ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
+    ], check=True, capture_output=True, cwd=str(output_path.parent))
     
     # 4. Merge with audio
     subprocess.run([
@@ -466,7 +466,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
                 # If clip is extremely short (<1s), skip to avoid ffmpeg errors
                 if this_clip_dur < 0.5: break 
                 
-                seg_p = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_b{clip_idx}.mp4"
+                seg_p = output_path.parent / f"{unique_prefix}_seg_{i}_b{clip_idx}.mp4"
                 if style == "impact":
                     vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.1:saturation=1.3,vignette=angle=0.3"
                 else:
@@ -484,7 +484,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
             img_dur += broll_dur
 
         # 2. Visionary AI Image Flash (STABLE ROBUST MOTION)
-        seg_p_img = OUTPUT_DIR / f"{unique_prefix}_seg_{i}_img.mp4"
+        seg_p_img = output_path.parent / f"{unique_prefix}_seg_{i}_img.mp4"
         if style == "impact":
             vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=white,vignette=angle=0.5"
         else:
@@ -499,43 +499,54 @@ def assemble_hybrid_video(audio_path: Path, scenes: List[Dict], output_path: Pat
         segments.append(seg_p_img)
 
     # Concat visuals
-    concat_file = OUTPUT_DIR / f"{unique_prefix}_concat.txt"
+    concat_file = output_path.parent / f"{unique_prefix}_concat.txt"
     with open(concat_file, "w") as f:
         for seg in segments: f.write(f"file '{seg.name}'\n")
             
-    raw_visuals = OUTPUT_DIR / "temp_cin_visuals.mp4"
-    subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
-        "-c", "copy", str(raw_visuals)
-    ], check=True, capture_output=True, cwd=str(OUTPUT_DIR))
+    raw_visuals = output_path.parent / f"temp_{unique_prefix}_visuals.mp4"
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
+            "-c", "copy", str(raw_visuals)
+        ], check=True, capture_output=True, cwd=str(output_path.parent))
+    except subprocess.CalledProcessError as e:
+        print(f"❌ FFmpeg Concat Error: {e.stderr.decode()}")
+        raise
     
     # 3. PRO AUDIO ENGINE: Compression + Reverb
     print("🔊 Mixing professional audio suite...")
-    final_audio = OUTPUT_DIR / "final_cin_audio.wav"
+    final_audio = output_path.parent / f"temp_{unique_prefix}_audio.wav"
     
     if style == "impact":
-        # Reduced reverb (aecho) for clarity, kept compression for punch
+        # Ultra-clean audio with minimal reverb for heavy documentaries
         audio_filter = (
             "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
-            "aecho=0.8:0.7:30:0.2," 
+            "aecho=0.8:0.3:20:0.1," 
             "loudnorm"
         )
     else:
-        # Fun style: cleaner audio, less reverb, slightly more upbeat
         audio_filter = "acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
     
-    subprocess.run([
-        "ffmpeg", "-y", "-i", str(audio_path),
-        "-af", audio_filter,
-        str(final_audio)
-    ], check=True, capture_output=True)
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(audio_path),
+            "-af", audio_filter,
+            str(final_audio)
+        ], check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ FFmpeg Audio Error: {e.stderr.decode()}")
+        raise
 
     # 4. Final Final Merge
-    subprocess.run([
-        "ffmpeg", "-y", "-i", str(raw_visuals), "-i", str(final_audio),
-        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", "-shortest",
-        str(output_path)
-    ], check=True, capture_output=True)
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(raw_visuals), "-i", str(final_audio),
+            "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", "-shortest",
+            str(output_path)
+        ], check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ FFmpeg Merge Error: {e.stderr.decode()}")
+        raise
     
     # Cleanup
     for seg in segments: 
