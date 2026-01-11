@@ -8,9 +8,16 @@ in
 
   # https://devenv.sh/basics/
   env.GREET = "devenv";
+  # Ensure libstdc++.so.6 is visible to dynamically linked binaries (e.g. opencode/bun/node)
+  env.LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ];
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs-unstable.beads ];
+  # Include git, beads, and GCC's C++ runtime (libstdc++).
+  packages = [
+    pkgs.git
+    pkgs-unstable.beads
+    pkgs.stdenv.cc.cc
+  ];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
