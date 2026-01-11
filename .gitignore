@@ -56,3 +56,8 @@ venv_content/
 outputs/
 inputs/
 broll/
+
+# Credentials and Tokens
+.credentials/
+*_token.json
+email_database.json
