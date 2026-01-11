@@ -6,6 +6,8 @@ in
 {
   cachix.enable = false; #disable cacheix for binaries
 
+  dotenv.enable = true;
+
   # https://devenv.sh/basics/
   env.GREET = "devenv";
   # Ensure libstdc++.so.6 is visible to dynamically linked binaries (e.g. opencode/bun/node)
