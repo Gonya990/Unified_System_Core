@@ -152,7 +152,7 @@ try:
                     tags=YT_TAGS,
                     privacy_status="public",
                     token_file=acc.get("token_file"),
-                    category="28"  # Science & Technology
+                    category_id="28"  # Science & Technology
                 )
 
                 if success:
