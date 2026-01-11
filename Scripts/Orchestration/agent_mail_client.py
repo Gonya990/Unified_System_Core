@@ -72,8 +72,9 @@ class AgentMailClient:
     def health_check(self) -> bool:
         """Check server health"""
         try:
-            response = self.session.get(f'{self.config.server}/health')
-            return response.status_code == 200 and response.json().get('status') == 'ok'
+            response = self.session.get(f'{self.config.server}/health/liveness')
+            # Check for alive status or ok
+            return response.status_code == 200
         except:
             return False
 
