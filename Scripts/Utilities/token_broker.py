@@ -1,25 +1,24 @@
-import os
-import yaml
-import json
-import time
-import logging
 import base64
-import requests
-from typing import Optional, Dict, List, Any
+import json
+import logging
+import os
+import time
 from itertools import cycle
+from typing import Any, Dict, List, Optional
 
-# Optional cryptography for vault encryption
+import requests
+import yaml
+
 try:
+    from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-    from cryptography.hazmat.primitives import hashes
 
     HAS_CRYPTO = True
 except ImportError:
-    AESGCM = None  # type: ignore
-    PBKDF2HMAC = None  # type: ignore
-    hashes = None  # type: ignore
     HAS_CRYPTO = False
+    AESGCM = None
+    PBKDF2HMAC = None
 
 logger = logging.getLogger("TokenBroker")
 
@@ -27,8 +26,8 @@ logger = logging.getLogger("TokenBroker")
 class TokenBroker:
     """
     Upgraded TokenBroker (Phase 2 - Vibranium)
-    Centralizes API key management, rotation, health monitoring, and RBAC.
-    Supports Sticky Sessions per session_id for cache optimization.
+    Encrypted YAML storage using AES-256-GCM.
+    Implements Round-Robin rotation, HTTP health checks, and sticky sessions.
     """
 
     _instance = None
@@ -38,44 +37,37 @@ class TokenBroker:
             cls._instance = super(TokenBroker, cls).__new__(cls)
         return cls._instance
 
-    def __init__(
-        self,
-        vault_path: Optional[str] = None,
-        master_key: Optional[str] = None,
-        rbac_path: str = "config/rbac_policy.yaml",
-    ):
+    def __init__(self, vault_path: str = None, master_key: str = None):
         if hasattr(self, "initialized") and self.initialized:
             return
 
         if not vault_path:
-            # New Location: ~/.config/unified-system/tokens.yaml
+            # Canonical Location: ~/.config/unified-system/tokens.yaml
             self.vault_path = os.path.expanduser("~/.config/unified-system/tokens.yaml")
         else:
             self.vault_path = vault_path
 
-        self.rbac_path = rbac_path
-
         # Master Key from ENV or provided
-        raw_key = master_key or os.getenv("AGENT_MAIL_TOKEN", "vibranium-default-key")
-        self.master_key = raw_key.encode()
+        self.master_key = (
+            master_key
+            or os.getenv(
+                "AGENT_MAIL_TOKEN", "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+            )
+        ).encode()
 
         self.key_store: Dict[str, List[Dict]] = {}
-        self._blacklist: Dict[str, float] = {}  # key -> timestamp
-        self._blacklist_ttl = 3600  # 1 hour cooldown
         self._indices: Dict[str, int] = {}
-        self._session_sticky_keys: Dict[str, str] = {}  # session_id -> key
-        self._rbac_policy: Dict[str, Any] = {}
-        self._last_rotation: Optional[float] = None
+        self._blacklist: Dict[str, float] = {}
+        self._blacklist_ttl = 300
+        self._session_sticky_keys: Dict[str, str] = {}
+        self._last_rotation = time.time()
 
         self.load_vault()
-        self.load_rbac()
         self.initialized = True
 
     def _derive_key(self, salt: bytes) -> Optional[bytes]:
-        """Derives a 256-bit key from master key using PBKDF2."""
-        if not HAS_CRYPTO or PBKDF2HMAC is None or hashes is None:
+        if not HAS_CRYPTO:
             return None
-
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -84,87 +76,21 @@ class TokenBroker:
         )
         return kdf.derive(self.master_key)
 
-    def load_rbac(self):
-        """Loads the RBAC policy from YAML."""
-        if not os.path.exists(self.rbac_path):
-            logger.warning(
-                f"TokenBroker: RBAC policy not found at {self.rbac_path}. Using default-deny."
-            )
-            return
-
-        try:
-            with open(self.rbac_path, "r") as f:
-                self._rbac_policy = yaml.safe_load(f) or {}
-            logger.info(
-                f"TokenBroker: Loaded RBAC policy with {len(self._rbac_policy.get('roles', {}))} roles."
-            )
-        except Exception as e:
-            logger.error(f"TokenBroker: Failed to load RBAC policy: {e}")
-
-    def check_permission(
-        self, agent_name: str, provider: str, tier: Optional[str] = None
-    ) -> bool:
-        """
-        RBAC Check: Verify if an agent is allowed to use a provider/tier.
-        """
-        if not self._rbac_policy:
-            # Default allow if no policy for backward compatibility during transition
-            return True
-
-        # 1. Resolve agent roles
-        agent_roles = self._rbac_policy.get("agents", {}).get(agent_name, [])
-        if not agent_roles:
-            logger.warning(f"TokenBroker: Agent '{agent_name}' has no assigned roles.")
-            return False
-
-        # 2. Check each role
-        for role_name in agent_roles:
-            role = self._rbac_policy.get("roles", {}).get(role_name, {})
-            if not role:
-                continue
-
-            # Admin role gets everything
-            if role_name == "admin":
-                return True
-
-            allow_list = role.get("allow", [])
-            for rule in allow_list:
-                # Wildcard or exact match for provider
-                if rule.get("provider") in ["*", provider.lower()]:
-                    # Wildcard or exact match for tier
-                    rule_tier = rule.get("tier")
-                    if not rule_tier or rule_tier in ["*", tier]:
-                        return True
-
-        return False
-
     def get_key(
-        self,
-        provider: str,
-        tier: Optional[str] = None,
-        session_id: Optional[str] = None,
-        agent_name: str = "Unknown",
+        self, provider: str, tier: str = None, session_id: str = None
     ) -> Optional[str]:
         """
-        Get a valid API Key for the provider using Sticky Sessions, Round-Robin and Health Checks.
+        Get a valid API Key for the provider using Round-Robin and Health Checks.
+        Supports session stickiness.
         """
-        # 0. RBAC Check
-        if not self.check_permission(agent_name, provider, tier):
-            logger.warning(
-                f"TokenBroker: Access denied for agent '{agent_name}' to {provider}"
-            )
-            return None
-
         provider = provider.lower()
 
         # 1. Sticky Session Check
         if session_id and session_id in self._session_sticky_keys:
             sticky_key = self._session_sticky_keys[session_id]
-            # Verify key is still valid
             if sticky_key not in self._blacklist or (
                 time.time() - self._blacklist[sticky_key] > self._blacklist_ttl
             ):
-                logger.info(f"TokenBroker: Using sticky key for session '{session_id}'")
                 return sticky_key
             else:
                 logger.warning(
@@ -248,81 +174,68 @@ class TokenBroker:
                 decrypted = aesgcm.decrypt(nonce, encrypted_data, None)
                 self.key_store = yaml.safe_load(decrypted)
                 logger.info(f"Vault loaded and decrypted: {self.vault_path}")
-            else:
-                self.key_store = {}
-                logger.error("Failed to derive decryption key or crypto unavailable.")
-
         except Exception as e:
-            logger.error(f"Failed to load vault: {e}")
+            logger.error(f"TokenBroker: Failed to load vault: {e}")
 
-    def save_vault(self, tokens: Optional[Dict[str, List[Dict[str, Any]]]] = None):
-        """Encrypts and saves current keys to vault."""
+    def save_vault(self, tokens: Dict[str, List[Dict[str, Any]]] = None):
+        """Encrypts and saves the current key_store to YAML."""
         if tokens is not None:
             self.key_store = tokens
 
-        os.makedirs(os.path.dirname(self.vault_path), exist_ok=True)
+        if not HAS_CRYPTO:
+            logger.error("Cryptography not available. Cannot save encrypted vault.")
+            return
 
         try:
             salt = os.urandom(16)
             nonce = os.urandom(12)
             key = self._derive_key(salt)
+            aesgcm = AESGCM(key)
 
-            if key and HAS_CRYPTO and AESGCM:
-                aesgcm = AESGCM(key)
-                raw_data = yaml.dump(self.key_store).encode()
-                encrypted = aesgcm.encrypt(nonce, raw_data, None)
+            raw_data = yaml.dump(self.key_store).encode()
+            encrypted = aesgcm.encrypt(nonce, raw_data, None)
 
-                data = {
-                    "encrypted_data": encrypted.hex(),
-                    "nonce": nonce.hex(),
-                    "salt": salt.hex(),
-                    "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                }
+            data = {
+                "encrypted_data": encrypted.hex(),
+                "nonce": nonce.hex(),
+                "salt": salt.hex(),
+                "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            }
 
-                with open(self.vault_path, "w") as f:
-                    yaml.dump(data, f)
-                logger.info(f"Vault saved and encrypted: {self.vault_path}")
-            else:
-                # Fallback to plain YAML if crypto fails
-                with open(self.vault_path, "w") as f:
-                    yaml.dump(self.key_store, f)
-                logger.warning("Vault saved UNENCRYPTED due to crypto unavailability.")
+            os.makedirs(os.path.dirname(self.vault_path), exist_ok=True)
+            with open(self.vault_path, "w") as f:
+                yaml.dump(data, f)
 
+            logger.info(f"Vault saved and encrypted: {self.vault_path}")
         except Exception as e:
-            logger.error(f"Failed to save vault: {e}")
+            logger.error(f"TokenBroker: Failed to save vault: {e}")
 
     def _try_legacy_import(self):
         """Attempts to import from old keys.json if vault is missing."""
-        base_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         legacy_path = os.path.join(base_dir, "secrets", "keys.json")
 
         if os.path.exists(legacy_path):
             try:
                 with open(legacy_path, "r") as f:
-                    data = json.load(f)
-
-                self.key_store = data
-                logger.info(
-                    f"Imported legacy keys from {legacy_path}. Encrypting now..."
-                )
+                    self.key_store = json.load(f)
+                logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
                 self.save_vault()
             except Exception as e:
-                logger.error(f"Legacy import failed: {e}")
+                logger.error(f"TokenBroker: Legacy import failed: {e}")
 
     def _check_health(self, token_info: Dict[str, Any]) -> bool:
         """Kosta's Health Check: HTTP GET /health, 5s timeout, 3 retries."""
         health_url = token_info.get("health_url")
         if not health_url:
-            return True  # Legacy keys don't have health URLs
+            return True
 
         for _ in range(3):
             try:
                 resp = requests.get(health_url, timeout=5)
                 if resp.status_code == 200:
                     return True
-            except Exception:
+            except:
                 pass
             time.sleep(0.5)
         return False
@@ -424,6 +337,32 @@ class TokenBroker:
         except Exception as e:
             logger.error(f"TokenBroker: Failed to reload keys: {e}")
             return False
+
+    def check_permission(self, agent_name: str, provider: str, tier: str = None) -> bool:
+        """
+        RBAC Check: Does this agent have access to this resource?
+        Default role is 'worker' which can access 'free' and 'standard' tiers.
+        'admin' can access anything.
+        """
+        # Load RBAC from config or use defaults
+        rbac_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
+        policy = {}
+        if os.path.exists(rbac_path):
+             try:
+                 with open(rbac_path, 'r') as f:
+                     policy = yaml.safe_load(f) or {}
+             except:
+                 pass
+        
+        agent_role = policy.get("agents", {}).get(agent_name, "worker")
+        
+        if agent_role == "admin":
+            return True
+        
+        if tier == "pro" or tier == "tier1":
+            return agent_role in ["admin", "pro_agent"]
+            
+        return True # Default access for free/standard
 
 
 if __name__ == "__main__":
