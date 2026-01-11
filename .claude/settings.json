@@ -1,4 +1,8 @@
 {
+  "env": {
+    "INSIDE_CLAUDE_CODE": "1",
+    "BASH_DEFAULT_TIMEOUT_MS": "420000"
+  },
   "hooks": {
     "Notification": [
       {
@@ -63,8 +67,9 @@
       }
     ]
   },
-  "env": {
-    "INSIDE_CLAUDE_CODE": "1",
-    "BASH_DEFAULT_TIMEOUT_MS": "420000"
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)"
+    ]
   }
 }
