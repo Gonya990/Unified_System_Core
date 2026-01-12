@@ -364,6 +364,78 @@ curl -v --http1.1 \
 - [ ] Multi-project support
 - [ ] Message threading UI
 
+## Mail Processor (Systemd)
+
+The `Mail Processor` (`Scripts/Orchestration/mail_processor.py`) is the background service that polls the billboard inbox and performs automation (mark-read, auto-ack for `ack_required`, Telegram alerts for high-priority messages when configured).
+
+### Non-blocking preflight (no systemd changes)
+
+Run a single poll cycle to validate `.env` rehydration and server connectivity:
+
+```bash
+devenv shell -- bash -c 'python3 Scripts/Orchestration/mail_processor.py --once'
+```
+
+Expected:
+- `Mail server not available` should not appear
+- If inbox is empty, it exits cleanly
+
+### User service (no sudo)
+
+Use this when you cannot (or do not want to) use `sudo`.
+
+1. Install the unit:
+
+```bash
+mkdir -p ~/.config/systemd/user
+cp infra/mail-processor.user.service ~/.config/systemd/user/mail-processor.service
+# NixOS note: the unit uses /run/current-system/sw/bin/bash + /run/current-system/sw/bin/devenv
+systemctl --user daemon-reload
+```
+
+2. Start/enable:
+
+```bash
+systemctl --user enable --now mail-processor.service
+```
+
+3. Verify:
+
+```bash
+systemctl --user status mail-processor.service
+journalctl --user -u mail-processor.service -n 200 --no-pager
+```
+
+### System service (requires sudo)
+
+Use this when deploying centrally on a server.
+
+1. Install the unit:
+
+```bash
+sudo cp infra/mail-processor.service /etc/systemd/system/mail-processor.service
+# NixOS note: the unit uses /run/current-system/sw/bin/bash + /run/current-system/sw/bin/devenv
+sudo systemctl daemon-reload
+```
+
+2. Start/enable:
+
+```bash
+sudo systemctl enable --now mail-processor.service
+```
+
+3. Verify:
+
+```bash
+sudo systemctl status mail-processor.service
+sudo journalctl -u mail-processor.service -n 200 --no-pager
+```
+
+### Notes
+
+- The processor reads `.env` from the repo root; ensure `AGENT_MAIL_SERVER`, `AGENT_MAIL_PROJECT`, and `AGENT_MAIL_NAME` match the billboard.
+- Telegram alerts require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID`.
+
 ## Support & Maintenance
 
 ### Restart Hub

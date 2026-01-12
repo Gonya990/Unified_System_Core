@@ -34,6 +34,11 @@ $RECYCLE.BIN/
 
 # Agent identity (local to each runtime)
 .agent-identity
+
+# Local agent runs
+.sisyphus/
+Scripts/Orchestration/logs/
+Scripts/Orchestration/.mail_processor_state.json
 secrets/
 Agent_Context/Personal_Profile/RESUME_VARIANTS.md
 logs/automation/resume_attachments/
