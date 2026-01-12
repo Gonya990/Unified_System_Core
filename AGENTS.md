@@ -32,3 +32,10 @@ adapt their output based on the current user's preferences.
 
 **Note**: The old `Windows_AI_Core` directory has been migrated to
 `Projects/AI_Core`.
+
+## Archive Management (CRITICAL)
+
+The `Agent_Context/Archive/` directory is a permanent record of system activity.
+1. **No Data Loss**: Never perform any operations that result in the loss of information within the `Archive/` directory.
+2. **No Compression**: Do not compress or zip files within the archive. Content must remain in its original, readable format.
+3. **Immutability**: Treat archived files as read-only. Avoid modifying their content.
