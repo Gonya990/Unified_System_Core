@@ -207,17 +207,33 @@ class AgentMailClient:
         except:
             return None
 
-    def list_agents(self) -> List[str]:
-        """List known agents (checks which are registered via whois)"""
-        # Known agents in the system
+    def list_agents(self, include_inactive: bool = False) -> List[Dict[str, Any]]:
+        """List agents in the project using native list_agents tool.
+
+        Returns list of agent dicts with: name, program, model, task_description, last_active_ts
+        Falls back to whois-based discovery if native tool unavailable.
+        """
+        # Try native list_agents tool first
+        try:
+            result = self._call_tool(
+                "list_agents",
+                {
+                    "project_key": self.config.project_key,
+                    "include_inactive": include_inactive,
+                },
+            )
+            agents_data = result.get("structuredContent", {}).get("agents", [])
+            # Filter out self
+            return [a for a in agents_data if a.get("name") != self.config.agent_name]
+        except Exception:
+            pass
+
+        # Fallback: whois-based discovery
         known_agents = [
-            # Kosta's agents
             "VioletCastle",
-            # Igor's bot agents
             "OrangeStone",
             "PinkLake",
             "FuchsiaCat",
-            # Other known agents
             "WhiteMill",
             "IvoryOtter",
             "CalmSnow",
@@ -231,16 +247,21 @@ class AgentMailClient:
                 continue
             info = self.whois(agent)
             if info and info.get("id"):
-                registered.append(agent)
+                registered.append(info)
 
         return registered
 
     def broadcast(self, subject: str, body_md: str, importance: str = "normal"):
         """Broadcast message to all registered agents in project"""
-        agents = self.list_agents()
+        agents_data = self.list_agents()
+        agent_names: List[str] = []
+        for a in agents_data:
+            name = a.get("name") if isinstance(a, dict) else str(a)
+            if name:
+                agent_names.append(name)
 
-        if not agents:
-            known_agents = [
+        if not agent_names:
+            fallback = [
                 "VioletCastle",
                 "OrangeStone",
                 "PinkLake",
@@ -250,13 +271,13 @@ class AgentMailClient:
                 "CalmSnow",
                 "CobaltRidge",
             ]
-            agents = [a for a in known_agents if a != self.config.agent_name]
+            agent_names = [a for a in fallback if a != self.config.agent_name]
 
-        if not agents:
+        if not agent_names:
             raise Exception("No agents found to broadcast to")
 
         return self.send_message(
-            to=agents, subject=subject, body_md=body_md, importance=importance
+            to=agent_names, subject=subject, body_md=body_md, importance=importance
         )
 
 
@@ -354,9 +375,9 @@ def main():
         else:
             print(f"👥 {len(agents)} registered agents:\n")
             for agent in agents:
-                info = client.whois(agent)
-                status = info.get("task_description", "Unknown") if info else "Unknown"
-                print(f"  • {agent}: {status}")
+                name = agent.get("name", "Unknown")
+                status = agent.get("task_description", "Unknown")
+                print(f"  • {name}: {status}")
 
 
 if __name__ == "__main__":
