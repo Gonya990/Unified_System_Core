@@ -44,16 +44,13 @@ class MashovClient:
         """
         self.username = username or os.getenv("MASHOV_USER")
         self.password = password or os.getenv("MASHOV_PASS")
-        self.school_id = school_id or self._parse_school_id(
-            os.getenv("MASHOV_SCHOOL")
-        )
+        self.school_id = school_id or self._parse_school_id(os.getenv("MASHOV_SCHOOL"))
         self.session = None
         self.student_data = None
         self.authenticated = False
 
         logger.debug(
-            f"MashovClient initialized: username={'***' if self.username else 'None'}, "
-            f"school_id={self.school_id}"
+            f"MashovClient initialized: username={'***' if self.username else 'None'}, school_id={self.school_id}"
         )
 
     @staticmethod
@@ -101,9 +98,7 @@ class MashovClient:
         try:
             # Run login in executor to avoid blocking async loop
             loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(
-                None, self._login_sync
-            )
+            result = await loop.run_in_executor(None, self._login_sync)
 
             if result:
                 self.authenticated = True
@@ -152,9 +147,7 @@ class MashovClient:
                 logger.debug(f"[MASHOV] Login response: {len(str(self.student_data))} bytes")
                 return True
             else:
-                logger.warning(
-                    f"[MASHOV] Login failed with status {response.status_code}"
-                )
+                logger.warning(f"[MASHOV] Login failed with status {response.status_code}")
                 return False
 
         except Exception as e:
@@ -177,9 +170,7 @@ class MashovClient:
 
         try:
             loop = asyncio.get_event_loop()
-            homework = await loop.run_in_executor(
-                None, self._fetch_homework_sync, user_id
-            )
+            homework = await loop.run_in_executor(None, self._fetch_homework_sync, user_id)
 
             if homework:
                 logger.info(f"[MASHOV] Fetched {len(homework)} homework items for {user_id}")
@@ -210,9 +201,7 @@ class MashovClient:
                 self.authenticated = False
                 return None
             else:
-                logger.warning(
-                    f"[MASHOV] Homework fetch failed: {response.status_code}"
-                )
+                logger.warning(f"[MASHOV] Homework fetch failed: {response.status_code}")
                 return None
 
         except Exception as e:
@@ -235,9 +224,7 @@ class MashovClient:
 
         try:
             loop = asyncio.get_event_loop()
-            grades = await loop.run_in_executor(
-                None, self._fetch_grades_sync, user_id
-            )
+            grades = await loop.run_in_executor(None, self._fetch_grades_sync, user_id)
 
             if grades:
                 logger.info(f"[MASHOV] Fetched {len(grades)} grades for {user_id}")
@@ -293,9 +280,7 @@ class MashovClient:
 
         return None
 
-    def _cache_session(
-        self, username: str, session: requests.Session, ttl: int = 3600
-    ) -> None:
+    def _cache_session(self, username: str, session: requests.Session, ttl: int = 3600) -> None:
         """
         Cache session with TTL (time-to-live).
 
@@ -307,10 +292,7 @@ class MashovClient:
         cache_key = f"mashov_{username}"
         expires_at = datetime.now() + timedelta(seconds=ttl)
         self._session_cache[cache_key] = (session, expires_at)
-        logger.info(
-            f"[MASHOV] Cached session for {username} "
-            f"(expires: {expires_at.strftime('%H:%M:%S')})"
-        )
+        logger.info(f"[MASHOV] Cached session for {username} (expires: {expires_at.strftime('%H:%M:%S')})")
 
     def _invalidate_cache(self, username: str) -> None:
         """Invalidate cached session (e.g., on 401 errors)."""
@@ -332,9 +314,7 @@ class MashovClient:
         """
         try:
             loop = asyncio.get_event_loop()
-            schools = await loop.run_in_executor(
-                None, MashovClient._find_school_sync, query
-            )
+            schools = await loop.run_in_executor(None, MashovClient._find_school_sync, query)
             logger.info(f"[MASHOV] Found {len(schools)} schools matching '{query}'")
             return schools
 
@@ -347,7 +327,7 @@ class MashovClient:
         """Synchronous school search."""
         try:
             response = requests.get(
-                f"{MASHOV_URL}/login/schools",
+                f"{MASHOV_URL}/schools",
                 timeout=10,
             )
 
@@ -358,8 +338,7 @@ class MashovClient:
                 return [
                     s
                     for s in schools
-                    if query_lower in s.get("name", "").lower()
-                    or query_lower in str(s.get("semel", "")).lower()
+                    if query_lower in s.get("name", "").lower() or query_lower in str(s.get("semel", "")).lower()
                 ]
             else:
                 logger.warning(f"[MASHOV] Schools fetch failed: {response.status_code}")

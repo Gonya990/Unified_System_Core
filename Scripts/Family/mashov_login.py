@@ -1,10 +1,10 @@
-
 import logging
 import os
 import sys
 from pathlib import Path
 
 import requests
+import json
 
 # Setup Paths
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -12,19 +12,21 @@ sys.path.append(str(ROOT_DIR))
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv(ROOT_DIR / ".env")
 except ImportError:
     pass
 
 # Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("MashovLogin")
 
 # MASHOV CONFIG
-# TODO: User to fill this or provide via ENV
+# SCHOOL_SYMBOL: 220020 is Psagot Carmiel
 MASHOV_URL = "https://web.mashov.info/api"
-SCHOOL_SYMBOL = 0 # Replace with School ID
+SCHOOL_SYMBOL = 220020
 YEAR = 2026
+
 
 def login_mashov(username, password, school_id):
     """
@@ -39,16 +41,11 @@ def login_mashov(username, password, school_id):
 
     # 2. Login
     login_url = f"{MASHOV_URL}/login"
-    payload = {
-        "username": username,
-        "password": password,
-        "semel": school_id,
-        "year": YEAR
-    }
+    payload = {"username": username, "password": password, "semel": school_id, "year": YEAR}
 
     headers = {
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
     try:
@@ -70,6 +67,7 @@ def login_mashov(username, password, school_id):
         logger.error(f"Connection Error: {e}")
         return None, None
 
+
 def fetch_grades(session, user_id):
     """Fetch recent grades"""
     url = f"{MASHOV_URL}/students/{user_id}/grades"
@@ -80,6 +78,7 @@ def fetch_grades(session, user_id):
         return []
     except Exception:
         return []
+
 
 def fetch_homework(session, user_id):
     """Fetch pending homework"""
@@ -92,24 +91,31 @@ def fetch_homework(session, user_id):
     except Exception:
         return []
 
+
 def get_all_schools():
     """Fetch all schools from Mashov API"""
     try:
         res = requests.get(f"{MASHOV_URL}/schools")
         if res.status_code == 200:
-            return res.json()
+            schools = res.json()
+            logger.info(f"Fetched {len(schools)} schools.")
+            return schools
         return []
     except Exception as e:
         logger.error(f"Failed to fetch schools: {e}")
         return []
 
+
 def search_school(query):
-    """Search for a school by name"""
+    """Search for a school by name or symbol"""
     schools = get_all_schools()
-    return [s for s in schools if query in s['name']]
+    query_str = str(query)
+    return [s for s in schools if query_str in s["name"] or query_str == str(s.get("semel"))]
+
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="Mashov Login & Test")
     parser.add_argument("--user", help="Username", default=os.getenv("MASHOV_USER"))
     parser.add_argument("--pwd", help="Password", default=os.getenv("MASHOV_PASS"))
@@ -141,13 +147,13 @@ if __name__ == "__main__":
         print(f"Student Data: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
         # Try fetching grades
-        if 'credential' in data:
-            uid = data['credential'].get('userId')
+        if "credential" in data:
+            uid = data["credential"].get("userId")
             if uid:
                 print("\n📊 Fetching Grades...")
                 grades = fetch_grades(log, uid)
                 print(f"Found {len(grades)} grades.")
                 if grades:
-                    print(grades[:5]) # Show first 5
+                    print(grades[:5])  # Show first 5
     else:
         print("❌ Login Failed.")

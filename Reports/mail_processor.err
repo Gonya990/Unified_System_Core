@@ -75,3 +75,4 @@
 2026-01-12 22:28:03 - MailProcessor - INFO -    Poll interval: 60s
 2026-01-12 22:28:03 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
 2026-01-12 22:28:03 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-13 01:09:22 - MailProcessor - WARNING - Mail server not available, skipping poll
