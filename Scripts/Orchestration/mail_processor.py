@@ -353,6 +353,14 @@ class MailProcessor:
     def run(self):
         """Run the processor loop"""
         self.logger.info("🚀 Mail Processor starting...")
+        
+        # Ensure agent is registered
+        try:
+            reg = self.client.register(task_description="Monitoring inbox for alerts")
+            self.logger.info(f"✅ Registered as agent: {reg.get('name')} (ID: {reg.get('id')})")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Registration failed: {e}")
+
         self.logger.info(f"   Poll interval: {self.config.poll_interval_seconds}s")
         self.logger.info(f"   Council agents: {', '.join(self.config.council_agents)}")
         self.logger.info(
