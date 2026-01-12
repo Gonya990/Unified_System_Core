@@ -28,7 +28,7 @@ def main():
     parser = argparse.ArgumentParser(description="Agent Mail MCP Client (AI Core)")
     parser.add_argument(
         "action",
-        choices=["health", "register", "inbox", "send", "broadcast", "read", "agents"],
+        choices=["health", "register", "inbox", "send", "broadcast", "read", "agents", "reserve"],
     )
     parser.add_argument("--to", nargs="+", help="Recipients (for send)")
     parser.add_argument("--subject", help="Message subject")
@@ -36,6 +36,8 @@ def main():
     parser.add_argument("--importance", choices=["low", "normal", "high"], default="normal")
     parser.add_argument("--limit", type=int, default=20, help="Inbox limit")
     parser.add_argument("--id", type=int, help="Message ID for read")
+    parser.add_argument("--files", nargs="+", help="Files to reserve")
+    parser.add_argument("--reason", help="Reason for reservation")
 
     args = parser.parse_args()
 
@@ -115,6 +117,24 @@ def main():
                 status = agent.get("task_description", "Unknown")
                 marker = " (you)" if agent.get("is_self") else ""
                 print(f"  • {name}{marker}: {status}")
+
+    elif args.action == "reserve":
+        if not args.files or not args.reason:
+            print("❌ --files and --reason required")
+            exit(1)
+        
+        try:
+            result = client.reserve_files(paths=args.files, reason=args.reason)
+            # The result structure depends on the tool output, assuming standard success/fail 
+            # or a list of reserved paths. 
+            # Example response: {"reserved": ["file1"], "conflicts": []}
+            print(f"✅ Reservation request sent for {len(args.files)} files")
+            print(f"Response: {json.dumps(result, indent=2)}")
+        except Exception as e:
+            print(f"❌ Reservation failed: {e}")
+            exit(1)
+
+
 
 
 if __name__ == "__main__":

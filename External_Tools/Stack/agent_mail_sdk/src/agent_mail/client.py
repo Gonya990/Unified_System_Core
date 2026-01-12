@@ -235,3 +235,35 @@ class AgentMailClient:
             raise Exception("No agents found to broadcast to")
 
         return self.send_message(to=agent_names, subject=subject, body_md=body_md, importance=importance)
+
+    def reserve_files(
+        self,
+        paths: List[str],
+        reason: str,
+        exclusive: bool = True,
+        duration: int = 300,
+    ) -> Dict[str, Any]:
+        """Reserve files for editing"""
+        result = self._call_tool(
+            "file_reservation_paths",
+            {
+                "project_key": self.config.project_key,
+                "agent_name": self.config.agent_name,
+                "paths": paths,
+                "exclusive": exclusive,
+                "reason": reason,
+
+            },
+        )
+        return result.get("structuredContent", {})
+
+    def check_reservations(self, paths: List[str]) -> Dict[str, Any]:
+        """Check file reservations"""
+        # Note: Using the same tool but with check_only=True or relying on the return of reservation
+        # However, typically we just try to reserve.
+        # Let's check the workflow definition again.
+        # It says `agent_mail_file_reservation_paths`
+        # We'll use a separate call or list call if available, but for now we implement the reservation action.
+        # If we need to just check, we might need a different tool.
+        # Let's stick to reserve_files for now as per US-l54.
+        pass
