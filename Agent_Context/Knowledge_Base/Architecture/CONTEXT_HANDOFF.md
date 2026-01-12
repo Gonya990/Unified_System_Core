@@ -62,6 +62,7 @@
 | `b32255f1-fc4d-...` | **Docker GPU Access Check** | ✅ Complete | Workflow verification |
 | `8c34a8bc-20df-...` | **Chrome Remote Debugging** | ✅ Complete | Docker CDP setup |
 | `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan, navigation |
+| `2026-01-12_mail_processor_deployment` | **Mail Processor Deployment** | ✅ Complete | task.md, walkthrough.md, systemd unit |
 
 ### Brain Artifact Types
 
@@ -130,6 +131,16 @@ Each conversation folder may contain:
 - [x] Set up Family Link
 - [/] Install Tasker and automation apps
 - [ ] Configure Home Assistant integration
+```
+
+### From `2026-01-12_mail_processor_deployment` (Mail Processor) - COMPLETE ✅
+
+```markdown
+- [x] Configure systemd service for Mail Processor
+- [x] Ensure agent registration (AmberOwl) on server
+- [x] Test Telegram alerts integration
+- [x] Consolidate diagnostic scripts to Scripts/Maintenance/Diagnostics
+- [x] Clean up Workspace root directory
 ```
 
 ### General Outstanding Items
