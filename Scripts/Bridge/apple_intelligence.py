@@ -34,11 +34,11 @@ def summarize_text(text):
 def trigger_shortcut(shortcut_name, input_data=None):
     """Trigger a macOS Shortcut."""
     cmd = ['shortcuts', 'run', shortcut_name]
-    if input_data:
-        cmd.extend(['-i', input_data])
-
+    
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        print(f"DEBUG: Running command: {cmd}")
+        print(f"DEBUG: Input data length: {len(input_data) if input_data else 0}")
+        result = subprocess.run(cmd, input=input_data, capture_output=True, text=True)
         return result.stdout.strip() if result.returncode == 0 else f"Error: {result.stderr}"
     except FileNotFoundError:
         return "Error: 'shortcuts' CLI not found. maintain macOS Monterey or newer."
