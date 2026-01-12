@@ -91,6 +91,10 @@ class ConfigManager:
             "LOG_LEVEL": os.environ.get("LOG_LEVEL", "INFO"),
             # User management
             "ALLOWED_USERS": os.environ.get("ALLOWED_USERS", ""),
+            # Dynamic Ports & Identity
+            "HEALTH_PORT": os.environ.get("HEALTH_PORT", "8095"),
+            "DASHBOARD_PORT": os.environ.get("DASHBOARD_PORT", "8096"),
+            "AGENT_MAIL_NAME": os.environ.get("AGENT_MAIL_NAME", ""),
         }
 
         # Override with persisted config if exists
