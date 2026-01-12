@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-import os
 from pathlib import Path
 
 # Add current dir and src to path
@@ -13,7 +12,7 @@ sys.path.append(str(src_dir))
 
 # Import the factory scheduler content or just execute it
 try:
-    from pipeline.factory_scheduler import start_scheduler, run_factory_production
+    from pipeline.factory_scheduler import run_factory_production, start_scheduler
 except ImportError as e:
     print(f"Error importing factory_scheduler: {e}")
     print(f"Sys Path: {sys.path}")

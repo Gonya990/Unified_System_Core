@@ -1,7 +1,7 @@
 
-import os
 import csv
 import datetime
+import os
 import re
 
 ROOT_DIR = "/home/gonya"
@@ -9,12 +9,12 @@ OUTPUT_FILE = os.path.join(ROOT_DIR, "00_NAV/INVENTORY.csv")
 
 # Directories to exclude from scanning (System & Output folders)
 EXCLUDE_DIRS = {
-    "00_NAV", "01_Projects", "02_Shared", "03_Operations", 
+    "00_NAV", "01_Projects", "02_Shared", "03_Operations",
     "90_Inbox_ToSort", "99_Archive_Original",
     "node_modules", "__pycache__", "dist", "build",
-    ".git", ".vscode", ".vscode-server", ".cache", ".local", 
-    ".config", ".ssh", ".npm", ".nvm", "miniconda3", "snap", 
-    ".venv", ".gemini", ".homeassistant", ".node-red", "ha_env", 
+    ".git", ".vscode", ".vscode-server", ".cache", ".local",
+    ".config", ".ssh", ".npm", ".nvm", "miniconda3", "snap",
+    ".venv", ".gemini", ".homeassistant", ".node-red", "ha_env",
     "tuya_env", "ml_env", "ha_condavenv", "ha_venv", "lib", "bin"
 }
 
@@ -40,12 +40,11 @@ def get_file_info(filepath):
 
 def guess_project(filename):
     lower_name = filename.lower()
-    best_match = None
-    
+
     for project, pattern in PROJECT_PATTERNS:
         if re.search(pattern, lower_name):
             return project, 0.9 # High confidence based on keyword
-            
+
     return "UNKNOWN", 0.0
 
 def main():
@@ -57,17 +56,17 @@ def main():
         for root, dirs, files in os.walk(ROOT_DIR):
             # Modify dirs in-place to skip excluded directories
             dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS and not d.startswith('.')]
-            
+
             # Special check: Do not exclude hidden *files* if they are relevant (user said no .git, but maybe .env?)
             # But for safety in root, ignore all starting with .
-            
+
             for name in files:
                 if name.startswith('.') or name in EXCLUDE_FILES:
                     continue
-                    
+
                 filepath = os.path.join(root, name)
                 rel_path = os.path.relpath(filepath, ROOT_DIR)
-                
+
                 # Double check we are not in an excluded dir (os.walk modifies dirs BUT for the current root it might be one)
                 parts = rel_path.split(os.sep)
                 if any(p in EXCLUDE_DIRS or p.startswith('.') for p in parts[:-1]):
@@ -77,9 +76,9 @@ def main():
                 try:
                     size, mtime = get_file_info(filepath)
                     project, confidence = guess_project(name)
-                    
+
                     category = "Doc" if ext in ['.md', '.txt', '.pdf', '.csv'] else "Code"
-                    
+
                     writer.writerow({
                         'path': rel_path,
                         'filename': name,

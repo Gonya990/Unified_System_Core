@@ -6,7 +6,7 @@ Manages system hooks - read, list, execute, and provide API endpoints.
 
 Supports hook types:
 - SessionStart: Triggered when a new agent session starts
-- SessionEnd: Triggered when an agent session ends  
+- SessionEnd: Triggered when an agent session ends
 - SubagentStart: Triggered when a subagent task begins
 - SubagentStop: Triggered when a subagent task completes
 - FileChange: Triggered when specific files are modified
@@ -20,18 +20,18 @@ Usage:
     python hooks_manager.py --serve             # Start HTTP API server
 """
 
+import argparse
+import http.server
 import json
 import os
-import subprocess
-import argparse
-import sys
-from pathlib import Path
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, asdict
-from datetime import datetime
-import http.server
 import socketserver
+import subprocess
+import sys
 import urllib.parse
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Optional
 
 # Configuration
 HOOKS_DIR = Path(__file__).parent
@@ -48,11 +48,11 @@ class HookDefinition:
     timeout: int = 30
     enabled: bool = True
     description: str = ""
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
-@dataclass  
+@dataclass
 class HookResult:
     """Result of hook execution."""
     hook_type: str
@@ -66,25 +66,25 @@ class HookResult:
 
 class HooksManager:
     """Manages all system hooks."""
-    
+
     def __init__(self, config_path: Path = HOOKS_CONFIG):
         self.config_path = config_path
-        self.hooks: Dict[str, List[HookDefinition]] = {}
+        self.hooks: dict[str, list[HookDefinition]] = {}
         self._load_hooks()
-    
+
     def _load_hooks(self) -> None:
         """Load hooks from JSON configuration file."""
         if not self.config_path.exists():
             self.hooks = {}
             return
-            
+
         try:
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path) as f:
                 data = json.load(f)
-            
+
             self.description = data.get("description", "")
             hooks_data = data.get("hooks", {})
-            
+
             for hook_type, hook_list in hooks_data.items():
                 self.hooks[hook_type] = []
                 for entry in hook_list:
@@ -102,52 +102,52 @@ class HooksManager:
         except json.JSONDecodeError as e:
             print(f"Error parsing hooks.json: {e}", file=sys.stderr)
             self.hooks = {}
-    
-    def get_all_hooks(self) -> Dict[str, List[Dict]]:
+
+    def get_all_hooks(self) -> dict[str, list[dict]]:
         """Get all registered hooks."""
         return {
             hook_type: [h.to_dict() for h in hooks]
             for hook_type, hooks in self.hooks.items()
         }
-    
-    def get_hooks_by_type(self, hook_type: str) -> List[Dict]:
+
+    def get_hooks_by_type(self, hook_type: str) -> list[dict]:
         """Get hooks of a specific type."""
         hooks = self.hooks.get(hook_type, [])
         return [h.to_dict() for h in hooks]
-    
-    def list_scripts(self) -> List[str]:
+
+    def list_scripts(self) -> list[str]:
         """List all available hook scripts."""
         if not SCRIPTS_DIR.exists():
             return []
         return [f.name for f in SCRIPTS_DIR.iterdir() if f.is_file()]
-    
-    def execute_hooks(self, hook_type: str, context: Optional[Dict] = None) -> List[HookResult]:
+
+    def execute_hooks(self, hook_type: str, context: Optional[dict] = None) -> list[HookResult]:
         """Execute all hooks of a given type."""
         results = []
         hooks = self.hooks.get(hook_type, [])
-        
+
         for hook in hooks:
             if not hook.enabled:
                 continue
-                
+
             command = hook.command
             if hook.script:
                 script_path = SCRIPTS_DIR / hook.script
                 if script_path.exists():
                     command = str(script_path)
-            
+
             if not command:
                 continue
-            
+
             # Expand environment variables
             env = os.environ.copy()
             if context:
                 for key, value in context.items():
                     env[f"HOOK_{key.upper()}"] = str(value)
-            
+
             # Expand ${CLAUDE_PLUGIN_ROOT} and similar
             expanded_cmd = os.path.expandvars(command)
-            
+
             start_time = datetime.now()
             try:
                 result = subprocess.run(
@@ -160,7 +160,7 @@ class HooksManager:
                     cwd=str(HOOKS_DIR.parent)
                 )
                 duration = (datetime.now() - start_time).total_seconds() * 1000
-                
+
                 results.append(HookResult(
                     hook_type=hook_type,
                     command=expanded_cmd,
@@ -190,10 +190,10 @@ class HooksManager:
                     duration_ms=0,
                     timestamp=datetime.now().isoformat()
                 ))
-        
+
         return results
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get hooks system status."""
         return {
             "config_path": str(self.config_path),
@@ -209,13 +209,13 @@ class HooksManager:
 
 class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
     """HTTP handler for hooks API."""
-    
+
     manager: HooksManager = None  # Set by server
-    
+
     def log_message(self, format, *args):
         """Suppress default logging."""
         pass
-    
+
     def _send_json(self, data: Any, status: int = 200):
         """Send JSON response."""
         self.send_response(status)
@@ -223,31 +223,31 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(json.dumps(data, indent=2).encode())
-    
+
     def do_GET(self):
         """Handle GET requests."""
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        query = urllib.parse.parse_qs(parsed.query)
-        
+        urllib.parse.parse_qs(parsed.query)
+
         if path == "/hooks/all" or path == "/hooks":
             self._send_json({
                 "status": "ok",
                 "hooks": self.manager.get_all_hooks()
             })
-        
+
         elif path == "/hooks/status":
             self._send_json({
                 "status": "ok",
                 **self.manager.get_status()
             })
-        
+
         elif path == "/hooks/scripts":
             self._send_json({
                 "status": "ok",
                 "scripts": self.manager.list_scripts()
             })
-        
+
         elif path.startswith("/hooks/type/"):
             hook_type = path.split("/")[-1]
             hooks = self.manager.get_hooks_by_type(hook_type)
@@ -256,10 +256,10 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
                 "hook_type": hook_type,
                 "hooks": hooks
             })
-        
+
         elif path == "/health" or path == "/health/liveness":
             self._send_json({"status": "ok", "service": "hooks-manager"})
-        
+
         else:
             self._send_json({
                 "status": "error",
@@ -272,15 +272,15 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
                     "POST /hooks/run/<type> - Execute hooks of type"
                 ]
             }, status=404)
-    
+
     def do_POST(self):
         """Handle POST requests."""
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        
+
         if path.startswith("/hooks/run/"):
             hook_type = path.split("/")[-1]
-            
+
             # Read body for context
             content_length = int(self.headers.get('Content-Length', 0))
             context = {}
@@ -290,7 +290,7 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
                     context = json.loads(body)
                 except json.JSONDecodeError:
                     pass
-            
+
             results = self.manager.execute_hooks(hook_type, context)
             self._send_json({
                 "status": "ok",
@@ -298,10 +298,10 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
                 "executed": len(results),
                 "results": [asdict(r) for r in results]
             })
-        
+
         else:
             self._send_json({
-                "status": "error", 
+                "status": "error",
                 "message": "Method not allowed"
             }, status=405)
 
@@ -310,16 +310,16 @@ def serve(port: int = 8765):
     """Start HTTP API server."""
     manager = HooksManager()
     HooksHTTPHandler.manager = manager
-    
+
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", port), HooksHTTPHandler) as httpd:
         print(f"Hooks API server running on http://0.0.0.0:{port}")
-        print(f"Endpoints:")
-        print(f"  GET  /hooks/all     - List all hooks")
-        print(f"  GET  /hooks/status  - System status")
-        print(f"  GET  /hooks/scripts - Available scripts")
-        print(f"  GET  /hooks/type/<t> - Hooks by type")
-        print(f"  POST /hooks/run/<t>  - Execute hooks")
+        print("Endpoints:")
+        print("  GET  /hooks/all     - List all hooks")
+        print("  GET  /hooks/status  - System status")
+        print("  GET  /hooks/scripts - Available scripts")
+        print("  GET  /hooks/type/<t> - Hooks by type")
+        print("  POST /hooks/run/<t>  - Execute hooks")
         httpd.serve_forever()
 
 
@@ -333,10 +333,10 @@ def main():
     parser.add_argument("--serve", action="store_true", help="Start HTTP server")
     parser.add_argument("--port", "-p", type=int, default=8766, help="Server port (default: 8766)")
     parser.add_argument("--json", "-j", action="store_true", help="Output as JSON")
-    
+
     args = parser.parse_args()
     manager = HooksManager()
-    
+
     if args.list:
         hooks = manager.get_all_hooks()
         if args.json:
@@ -348,7 +348,7 @@ def main():
                     cmd = h.get('command') or h.get('script', 'N/A')
                     status = "✓" if h.get('enabled', True) else "✗"
                     print(f"  {status} [{h['matcher']}] {cmd[:60]}...")
-    
+
     elif args.get:
         hooks = manager.get_hooks_by_type(args.get)
         if args.json:
@@ -356,7 +356,7 @@ def main():
         else:
             for h in hooks:
                 print(f"  - {h.get('command') or h.get('script')}")
-    
+
     elif args.run:
         results = manager.execute_hooks(args.run)
         if args.json:
@@ -369,7 +369,7 @@ def main():
                     print(f"   Output: {r.output[:100]}...")
                 if r.error:
                     print(f"   Error: {r.error[:100]}...")
-    
+
     elif args.status:
         status = manager.get_status()
         if args.json:
@@ -380,7 +380,7 @@ def main():
             print(f"Total hooks: {status['total_hooks']}")
             print(f"Hook types: {', '.join(status['hook_types'])}")
             print(f"Scripts: {', '.join(status['scripts_available'])}")
-    
+
     elif args.scripts:
         scripts = manager.list_scripts()
         if args.json:
@@ -388,10 +388,10 @@ def main():
         else:
             for s in scripts:
                 print(f"  - {s}")
-    
+
     elif args.serve:
         serve(args.port)
-    
+
     else:
         parser.print_help()
 

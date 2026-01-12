@@ -5,6 +5,7 @@ Uses GitHub's API with Copilot-enabled tokens.
 
 import logging
 from typing import Optional
+
 import httpx
 
 from .base import BaseProvider, ProviderResponse
@@ -14,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 class GitHubCopilotProvider(BaseProvider):
     """GitHub Copilot API provider."""
-    
+
     name = "github_copilot"
-    
+
     # GitHub Copilot uses OpenAI-compatible API via GitHub
     DEFAULT_BASE_URL = "https://api.githubcopilot.com"
-    
+
     def __init__(
-        self, 
+        self,
         api_key: str,  # GitHub token (ghp_...)
         model: str = "gpt-4o",
         base_url: Optional[str] = None
@@ -37,14 +38,14 @@ class GitHubCopilotProvider(BaseProvider):
             },
             timeout=60.0
         )
-    
+
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
         """Generate response using GitHub Copilot API."""
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
-        
+
         with self._measure_time() as timer:
             try:
                 response = await self._client.post(
@@ -58,10 +59,10 @@ class GitHubCopilotProvider(BaseProvider):
                 )
                 response.raise_for_status()
                 data = response.json()
-                
+
                 content = data["choices"][0]["message"]["content"]
                 tokens = data.get("usage", {}).get("total_tokens", 0)
-                
+
                 return ProviderResponse(
                     provider_name=self.name,
                     model=self.model,
@@ -70,7 +71,7 @@ class GitHubCopilotProvider(BaseProvider):
                     tokens_used=tokens,
                     metadata={"source": "github_copilot"}
                 )
-                
+
             except httpx.HTTPStatusError as e:
                 logger.error(f"GitHub Copilot HTTP error: {e.response.status_code}")
                 return ProviderResponse(
@@ -89,7 +90,7 @@ class GitHubCopilotProvider(BaseProvider):
                     latency_ms=getattr(timer, 'elapsed_ms', 0),
                     error=str(e)
                 )
-    
+
     async def health_check(self) -> bool:
         """Check if GitHub Copilot API is reachable."""
         try:
@@ -99,7 +100,7 @@ class GitHubCopilotProvider(BaseProvider):
         except Exception as e:
             logger.warning(f"GitHub Copilot health check failed: {e}")
             return False
-    
+
     async def close(self):
         """Close the HTTP client."""
         await self._client.aclose()

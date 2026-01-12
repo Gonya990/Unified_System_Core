@@ -4,7 +4,7 @@ Agent Mail Client Implementation
 import json
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import requests
 from dotenv import load_dotenv
@@ -56,7 +56,7 @@ class AgentMailClient:
             }
         )
 
-    def _call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def _call_tool(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         """Call MCP tool"""
         payload = {
             "jsonrpc": "2.0",
@@ -79,7 +79,7 @@ class AgentMailClient:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Connection failed: {e}")
 
-    def ensure_project(self, human_key: Optional[str] = None) -> Dict[str, Any]:
+    def ensure_project(self, human_key: Optional[str] = None) -> dict[str, Any]:
         """Ensure project exists on server"""
         key = human_key or self.config.project_key
         return self._call_tool(
@@ -101,7 +101,7 @@ class AgentMailClient:
         program: Optional[str] = None,
         model: Optional[str] = None,
         task_description: str = "Active session",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Register agent with server.
         Returns dict with 'name', 'id', etc.
@@ -135,13 +135,13 @@ class AgentMailClient:
 
     def send_message(
         self,
-        to: List[str],
+        to: list[str],
         subject: str,
         body_md: str,
         importance: str = "normal",
-        cc: Optional[List[str]] = None,
+        cc: Optional[list[str]] = None,
         ack_required: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Send message to agents"""
         result = self._call_tool(
             "send_message",
@@ -158,7 +158,7 @@ class AgentMailClient:
         )
         return result.get("structuredContent", {})
 
-    def fetch_inbox(self, limit: int = 20) -> List[Dict[str, Any]]:
+    def fetch_inbox(self, limit: int = 20) -> list[dict[str, Any]]:
         """Fetch inbox messages"""
         result = self._call_tool(
             "fetch_inbox",
@@ -194,7 +194,7 @@ class AgentMailClient:
             },
         )
 
-    def whois(self, agent_name: str) -> Optional[Dict[str, Any]]:
+    def whois(self, agent_name: str) -> Optional[dict[str, Any]]:
         """Look up agent info by name"""
         try:
             result = self._call_tool(
@@ -208,7 +208,7 @@ class AgentMailClient:
         except:
             return None
 
-    def list_agents(self, include_inactive: bool = False) -> List[Dict[str, Any]]:
+    def list_agents(self, include_inactive: bool = False) -> list[dict[str, Any]]:
         """List all agents"""
         try:
             result = self._call_tool(
@@ -238,11 +238,11 @@ class AgentMailClient:
 
     def reserve_files(
         self,
-        paths: List[str],
+        paths: list[str],
         reason: str,
         exclusive: bool = True,
         duration: int = 300,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Reserve files for editing"""
         result = self._call_tool(
             "file_reservation_paths",
@@ -257,7 +257,7 @@ class AgentMailClient:
         )
         return result.get("structuredContent", {})
 
-    def check_reservations(self, paths: List[str]) -> Dict[str, Any]:
+    def check_reservations(self, paths: list[str]) -> dict[str, Any]:
         """Check file reservations"""
         # Note: Using the same tool but with check_only=True or relying on the return of reservation
         # However, typically we just try to reserve.

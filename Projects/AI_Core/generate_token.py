@@ -3,10 +3,10 @@
 Run this script locally to generate Google OAuth token.
 The token will be saved and can be uploaded to the server.
 """
-import os
 import json
+import os
+
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2.credentials import Credentials
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 CLIENT_SECRET_FILE = 'client_secret.json'

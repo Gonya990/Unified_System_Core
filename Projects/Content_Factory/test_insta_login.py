@@ -1,9 +1,10 @@
 
-from instagrapi import Client
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 import urllib.parse
+from pathlib import Path
+
+from dotenv import load_dotenv
+from instagrapi import Client
 
 # Load env from Root
 ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
