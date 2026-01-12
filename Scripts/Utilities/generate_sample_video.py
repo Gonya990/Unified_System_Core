@@ -113,7 +113,7 @@ async def generate_sample():
                 # Use a specific valid font if possible, or None to let it find one.
                 # Hebrew might need special font handling.
                 pass
-            except:
+            except Exception:
                 pass
 
             video_clip = video_clip.set_audio(audio_clip)

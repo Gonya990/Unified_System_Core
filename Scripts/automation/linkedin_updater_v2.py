@@ -91,14 +91,14 @@ async def main():
                 await intro_edit.click()
                 print("   ✅ Нажата кнопка редактирования intro")
                 await asyncio.sleep(2)
-        except:
+        except Exception:
             # Alternative: look for first pencil button
             try:
                 first_edit = await page.query_selector('button[class*="profile-topcard"] svg, section button[aria-label*="Edit"]')
                 if first_edit:
                     await first_edit.click()
                     await asyncio.sleep(2)
-            except:
+            except Exception:
                 print("   ⚠️ Не могу найти кнопку редактирования")
 
         # Now try to find headline field in modal
@@ -132,7 +132,7 @@ async def main():
                     print(f"   ✅ Новый headline: {NEW_HEADLINE}")
                     headline_found = True
                     break
-            except:
+            except Exception:
                 continue
 
         if not headline_found:
@@ -151,7 +151,7 @@ async def main():
                 await save_btn.click()
                 print("✅ Изменения сохранены!")
                 await asyncio.sleep(2)
-        except:
+        except Exception:
             pass
 
         print("\n" + "="*60)

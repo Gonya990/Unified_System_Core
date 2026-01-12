@@ -7,7 +7,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import yaml
 
@@ -21,8 +21,8 @@ class AgentConfig:
     system_prompt: str
     category: str
     color: str = "blue"
-    tools: List[str] = field(default_factory=list)
-    skills: List[str] = field(default_factory=list)
+    tools: list[str] = field(default_factory=list)
+    skills: list[str] = field(default_factory=list)
     time_budget: int = 30  # seconds
 
     @property
@@ -60,7 +60,7 @@ class AgentOrchestrator:
             inference_client: InferenceClient instance for LLM calls
         """
         self.inference = inference_client
-        self.agents: Dict[str, AgentConfig] = {}
+        self.agents: dict[str, AgentConfig] = {}
         self._load_agents()
 
     def _load_agents(self) -> None:
@@ -119,7 +119,7 @@ class AgentOrchestrator:
             skills=skills,
         )
 
-    def _extract_tools(self, prompt: str) -> List[str]:
+    def _extract_tools(self, prompt: str) -> list[str]:
         """Extract allowed tools from agent prompt."""
         tools = []
         # Look for tools section
@@ -135,9 +135,8 @@ class AgentOrchestrator:
             tools.append("Write")
         return tools
 
-    def _extract_skills(self, prompt: str) -> List[str]:
+    def _extract_skills(self, prompt: str) -> list[str]:
         """Extract activated skills from agent prompt."""
-        skills = []
         # Look for skill references
         skill_pattern = r'\*\*`([a-z-]+)`\*\*'
         matches = re.findall(skill_pattern, prompt)
@@ -233,9 +232,9 @@ Provide a focused, actionable response. Use code references (file:line) where ap
 
     async def run_pipeline(
         self,
-        tasks: List[Tuple[str, str]],
+        tasks: list[tuple[str, str]],
         initial_context: str = ""
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Run agents in sequence, passing context between them.
 
@@ -247,7 +246,6 @@ Provide a focused, actionable response. Use code references (file:line) where ap
             Dict mapping agent names to their responses
         """
         results = {}
-        context = initial_context
 
         for agent_name, task in tasks:
             logger.info(f"[PIPELINE] Stage: {agent_name}")
@@ -264,15 +262,14 @@ Provide a focused, actionable response. Use code references (file:line) where ap
 
             result = await self.run(agent_name, task, full_context)
             results[agent_name] = result
-            context = result  # Pass to next agent
 
         return results
 
     async def run_parallel(
         self,
-        tasks: List[Tuple[str, str]],
+        tasks: list[tuple[str, str]],
         context: str = ""
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Run multiple agents in parallel.
 
@@ -285,7 +282,7 @@ Provide a focused, actionable response. Use code references (file:line) where ap
         """
         logger.info(f"[PARALLEL] Running {len(tasks)} agents in parallel")
 
-        async def run_single(agent_name: str, task: str) -> Tuple[str, str]:
+        async def run_single(agent_name: str, task: str) -> tuple[str, str]:
             result = await self.run(agent_name, task, context)
             return agent_name, result
 
@@ -302,7 +299,7 @@ Provide a focused, actionable response. Use code references (file:line) where ap
 
         return results
 
-    def format_results(self, results: Dict[str, str], mode: str = "detailed") -> str:
+    def format_results(self, results: dict[str, str], mode: str = "detailed") -> str:
         """Format agent results for display."""
         if mode == "summary":
             lines = ["**Agent Results Summary:**\n"]

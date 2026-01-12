@@ -7,7 +7,7 @@ Falls back to SQLite if Firestore is not configured.
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ class FirestoreDB:
         else:
             self._sqlite.add_user(user_id, username, full_name)
 
-    def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_user(self, user_id: int) -> Optional[dict[str, Any]]:
         """Get user by ID."""
         if self.use_firestore:
             doc = self.db.collection("users").document(str(user_id)).get()
@@ -138,7 +138,7 @@ class FirestoreDB:
         else:
             self._sqlite.set_google_connected(user_id, connected)
 
-    def get_inactive_users(self, hours: int = 72) -> List[Dict[str, Any]]:
+    def get_inactive_users(self, hours: int = 72) -> list[dict[str, Any]]:
         """Get users who haven't interacted for N hours.
 
         Note: For hours=0, returns all users (for admin panel).
@@ -182,7 +182,7 @@ class FirestoreDB:
         else:
             self._sqlite.add_memory(user_id, fact_short, fact_full)
 
-    def get_memories(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_memories(self, user_id: int, limit: int = 10) -> list[dict[str, Any]]:
         """Get user's memories."""
         if self.use_firestore:
             docs = self.db.collection("users").document(str(user_id))\
@@ -219,7 +219,7 @@ class FirestoreDB:
         else:
             self._sqlite.add_event_context(user_id, event_title, context_description, event_time)
 
-    def get_event_contexts(self, user_id: int) -> Dict[str, str]:
+    def get_event_contexts(self, user_id: int) -> dict[str, str]:
         """Get all event contexts for user (title -> description mapping)."""
         if self.use_firestore:
             docs = self.db.collection("users").document(str(user_id))\
@@ -251,7 +251,7 @@ class FirestoreDB:
                 "timestamp": firestore.SERVER_TIMESTAMP
             })
 
-    def get_usage_stats(self, user_id: int, days: int = 30) -> Dict[str, Any]:
+    def get_usage_stats(self, user_id: int, days: int = 30) -> dict[str, Any]:
         """Get usage statistics for user."""
         if self.use_firestore:
             cutoff = datetime.now() - timedelta(days=days)
@@ -301,7 +301,7 @@ class FirestoreDB:
 
     # ==================== CONVERSATION HISTORY ====================
 
-    def save_conversation(self, user_id: int, messages: List[Dict[str, str]]):
+    def save_conversation(self, user_id: int, messages: list[dict[str, str]]):
         """Save conversation history."""
         if self.use_firestore:
             self.db.collection("users").document(str(user_id)).update({
@@ -309,7 +309,7 @@ class FirestoreDB:
                 "conversation_updated": firestore.SERVER_TIMESTAMP
             })
 
-    def get_conversation(self, user_id: int) -> List[Dict[str, str]]:
+    def get_conversation(self, user_id: int) -> list[dict[str, str]]:
         """Get conversation history."""
         if self.use_firestore:
             doc = self.db.collection("users").document(str(user_id)).get()
@@ -319,7 +319,7 @@ class FirestoreDB:
 
     # ==================== HEALTH CHECK ====================
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         """Check database health and connection."""
         result = {
             "backend": "firestore" if self.use_firestore else "sqlite",

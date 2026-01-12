@@ -15,8 +15,7 @@ def run_command(command, cwd):
             command,
             cwd=cwd,
             shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             text=True
         )
         return result.returncode == 0, result.stdout + result.stderr
@@ -35,7 +34,7 @@ def generate_report():
     ]
 
     structure_results = []
-    for name, path, required in structure_checks:
+    for name, path, _required in structure_checks:
         exists = os.path.exists(path)
         status = "✅ Found" if exists else "❌ Missing"
         structure_results.append({"name": name, "status": status, "path": path})
@@ -52,7 +51,7 @@ def generate_report():
             content = f.read()
             if "searchNotes" not in content:
                 dashboard_status = "⚠️ Warning: Search feature missing in template"
-    except:
+    except Exception:
         dashboard_status = "❌ Template Missing"
 
     # 4. Check Notion Configuration
@@ -69,14 +68,14 @@ def generate_report():
                 else:
                     notion_status = "⚠️ Keys Missing in .env"
                     notion_badge = "badge-warning"
-    except:
+    except Exception:
         pass
 
     # 5. Run Functionality Tests
     func_results = run_functionality_tests()
 
     # 4. Generate HTML (Premium Design)
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Calculate stats
     total_checks = len(structure_results) + 3 + len(func_results) # +3 for dashboard, notion, search + func tests
@@ -137,7 +136,7 @@ def generate_report():
             --danger: #da3633;
             --warning: #d29922;
         }}
-        
+
         body {{
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
@@ -147,18 +146,18 @@ def generate_report():
             padding: 40px;
             min-height: 100vh;
         }}
-        
+
         .container {{
             max-width: 1000px;
             margin: 0 auto;
         }}
-        
+
         .header {{
             text-align: center;
             margin-bottom: 50px;
             animation: fadeIn 1s ease-out;
         }}
-        
+
         h1 {{
             font-size: 3rem;
             margin: 0;
@@ -166,13 +165,13 @@ def generate_report():
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
-        
+
         .meta {{
             color: var(--text-secondary);
             font-size: 1.1rem;
             margin-top: 10px;
         }}
-        
+
         .stats-grid {{
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -180,7 +179,7 @@ def generate_report():
             margin-bottom: 40px;
             animation: slideDown 0.8s ease-out;
         }}
-        
+
         .stat-card {{
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -189,20 +188,20 @@ def generate_report():
             backdrop-filter: blur(12px);
             text-align: center;
         }}
-        
+
         .stat-value {{
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--accent);
         }}
-        
+
         .stat-label {{
             color: var(--text-secondary);
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }}
-        
+
         .section {{
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -213,7 +212,7 @@ def generate_report():
             animation: fadeIn 1.2s ease-out;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }}
-        
+
         h2 {{
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
@@ -222,7 +221,7 @@ def generate_report():
             align-items: center;
             gap: 10px;
         }}
-        
+
         /* Terminal Style */
         .terminal-window {{
             background: #0d0d0d;
@@ -232,55 +231,55 @@ def generate_report():
             padding: 15px;
             overflow-x: auto;
         }}
-        
+
         .test-output {{
             color: #e6edf3;
             font-size: 0.9rem;
             line-height: 1.5;
         }}
-        
+
         .test-line.passed {{ color: var(--success); }}
         .test-line.failed {{ color: var(--danger); }}
         .test-line.warning {{ color: var(--warning); }}
-        
+
         /* Status Table */
         .status-table {{
             width: 100%;
             border-collapse: collapse;
         }}
-        
+
         .status-item td {{
             padding: 15px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }}
-        
+
         .status-item:last-child td {{
             border-bottom: none;
         }}
-        
+
         .badge {{
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
         }}
-        
+
         .badge-success {{ background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid rgba(35, 134, 54, 0.4); }}
         .badge-danger {{ background: rgba(218, 54, 51, 0.2); color: #f85149; border: 1px solid rgba(218, 54, 51, 0.4); }}
         .badge-warning {{ background: rgba(210, 153, 34, 0.2); color: #e3b341; border: 1px solid rgba(210, 153, 34, 0.4); }}
         .badge-neutral {{ background: rgba(139, 148, 158, 0.2); color: #8b949e; border: 1px solid rgba(139, 148, 158, 0.4); }}
-        
+
         .path-text {{
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
             color: var(--text-secondary);
         }}
-        
+
         @keyframes fadeIn {{
             from {{ opacity: 0; transform: translateY(10px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
-        
+
         @keyframes slideDown {{
             from {{ opacity: 0; transform: translateY(-20px); }}
             to {{ opacity: 1; transform: translateY(0); }}
@@ -293,7 +292,7 @@ def generate_report():
             <h1>Отчёт Системного Аудита</h1>
             <div class="meta">Сгенерировано <strong>Unified_System Core</strong> • {{ timestamp }}</div>
         </header>
-        
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-value">{success_rate}%</div>

@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 try:
     # Import TokenBroker from Utilities
@@ -58,7 +58,7 @@ class IdentityOrchestrator:
             return None
         return self.token_broker.encrypt_value(plaintext)
 
-    def _load_allowed_users(self) -> List[int]:
+    def _load_allowed_users(self) -> list[int]:
         """Loads allowed users from Env and YAML via ConfigManager logic."""
         # Simplified replication of previous logic, ideally ConfigManager handles this
         users_str = self.config.get("ALLOWED_USERS", "708531393,5569219290,578363419")
@@ -82,11 +82,11 @@ class IdentityOrchestrator:
             return False
         return True
 
-    def get_google_services(self, user_id: int) -> Dict[str, Any]:
+    def get_google_services(self, user_id: int) -> dict[str, Any]:
         """
         Returns initialized clients for Google Services (Calendar, Gmail) if authorized.
         """
-        services: Dict[str, Any] = {"calendar": None, "gmail": None}
+        services: dict[str, Any] = {"calendar": None, "gmail": None}
 
         user_data = self.db.get_user(user_id)
         if (

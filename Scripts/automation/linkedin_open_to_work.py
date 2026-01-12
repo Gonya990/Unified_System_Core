@@ -123,7 +123,7 @@ async def main():
                 job = {"title": title.strip(), "company": company.strip()[:30]}
                 jobs.append(job)
                 print(f"   {i+1}. {job['title'][:45]} @ {job['company']}")
-            except:
+            except Exception:
                 continue
 
         results["jobs_found"] = jobs

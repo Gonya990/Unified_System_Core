@@ -92,7 +92,7 @@ async def main():
                 await save_btn.click()
                 await asyncio.sleep(2)
                 print("   ✅ Сохранено!")
-        except:
+        except Exception:
             print("   ⚠️ Кнопка сохранения не найдена")
 
         # Step 5: Update About section
@@ -130,7 +130,7 @@ async def main():
             if headline_el:
                 current = await headline_el.inner_text()
                 print(f"   Текущий headline: {current[:50]}...")
-        except:
+        except Exception:
             pass
 
         print("\n" + "="*60)

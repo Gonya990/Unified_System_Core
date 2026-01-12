@@ -4,7 +4,7 @@ Integration with Notion API for creating notes and tasks.
 """
 import logging
 import os
-from typing import Dict, List, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class NotionClient:
         else:
             logger.warning("NOTION_API_KEY not set")
 
-    async def create_page(self, title: str, content: str = "", tags: List[str] = None) -> Optional[str]:
+    async def create_page(self, title: str, content: str = "", tags: list[str] = None) -> Optional[str]:
         """Create a new page in the database."""
         if not self.client or not self.database_id:
             logger.error("Notion client not configured (missing key or DB ID)")
@@ -67,7 +67,7 @@ class NotionClient:
             logger.error(f"Failed to create Notion page: {e}")
             return None
 
-    async def search_pages(self, query: str) -> List[Dict]:
+    async def search_pages(self, query: str) -> list[dict]:
         """Search for pages."""
         if not self.client:
             return []
@@ -80,7 +80,7 @@ class NotionClient:
                     title = "Untitled"
                     # Try to find title in properties
                     props = page.get("properties", {})
-                    for key, val in props.items():
+                    for _key, val in props.items():
                         if val["id"] == "title":
                              if val["title"]:
                                  title = val["title"][0]["text"]["content"]

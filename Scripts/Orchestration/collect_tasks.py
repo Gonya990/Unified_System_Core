@@ -8,7 +8,7 @@ def collect_tasks():
     all_tasks = {}
 
     # Iterate through all subdirectories in brain dir
-    for root, dirs, files in os.walk(BRAIN_DIR):
+    for root, _dirs, files in os.walk(BRAIN_DIR):
         for file in files:
             if file == "task.md":
                 file_path = os.path.join(root, file)
@@ -19,7 +19,6 @@ def collect_tasks():
                         lines = f.readlines()
 
                     pending_tasks = []
-                    current_context = "General"
 
                     for line in lines:
                         line = line.strip()

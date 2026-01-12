@@ -2,7 +2,7 @@
 """
 Identity Setup Pattern for Unified System
 -----------------------------------------
-This script demonstrates the secure pattern for establishing "Agent Awareness" 
+This script demonstrates the secure pattern for establishing "Agent Awareness"
 of detailed human identities (Family/Team) WITHOUT leaking sensitive data to git.
 
 USE CASE:

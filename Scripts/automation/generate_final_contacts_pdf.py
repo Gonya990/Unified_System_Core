@@ -121,7 +121,7 @@ def create_pdf():
     try:
         pdfmetrics.registerFont(TTFont('Arial', FONT_PATH))
         font_name = 'Arial'
-    except:
+    except Exception:
         font_name = 'Helvetica'
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=18)

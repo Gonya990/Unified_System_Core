@@ -23,7 +23,7 @@ class NotificationManager:
     def __init__(self, quiet_start: time = time(23, 0), quiet_end: time = time(8, 0)):
         """
         Initialize notification manager.
-        
+
         Args:
             quiet_start: Start of quiet hours (default 23:00)
             quiet_end: End of quiet hours (default 08:00)
@@ -53,7 +53,7 @@ class NotificationManager:
     ) -> bool:
         """
         Send notification respecting quiet hours and priority.
-        
+
         Args:
             bot: Telegram Bot instance
             chat_id: Target chat ID
@@ -61,7 +61,7 @@ class NotificationManager:
             priority: Priority level (CRITICAL, HIGH, NORMAL, LOW)
             parse_mode: Telegram parse mode
             **kwargs: Additional arguments for send_message
-            
+
         Returns:
             True if sent immediately, False if queued/skipped
         """

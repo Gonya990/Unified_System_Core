@@ -13,18 +13,18 @@ Sources:
 7. Wikipedia trending topics
 """
 
-import os
-import sys
 import json
-import requests
-import feedparser
+import os
 import random
-from pathlib import Path
+import sys
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import feedparser
+import requests
 from bs4 import BeautifulSoup
-from typing import List, Dict, Any
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Setup paths
 SRC_DIR = Path(__file__).parent.parent.resolve()
@@ -87,7 +87,7 @@ class MultiSourceResearcher:
         }
         return os.getenv(env_map.get(provider))
 
-    def fetch_telegram_insights(self) -> List[Dict]:
+    def fetch_telegram_insights(self) -> list[dict]:
         """Load latest Telegram channel analysis"""
         print("📱 Fetching Telegram insights...")
 
@@ -127,7 +127,7 @@ class MultiSourceResearcher:
             print(f"   ❌ Telegram fetch failed: {e}")
             return []
 
-    def fetch_user_links(self) -> List[Dict]:
+    def fetch_user_links(self) -> list[dict]:
         """Load user-provided research links"""
         print("🔗 Fetching user-provided links...")
 
@@ -177,7 +177,7 @@ class MultiSourceResearcher:
             print(f"   ❌ User links fetch failed: {e}")
             return []
 
-    def fetch_google_news(self, topics: List[str] = None) -> List[Dict]:
+    def fetch_google_news(self, topics: list[str] = None) -> list[dict]:
         """Fetch Google News RSS (existing functionality)"""
         print("📰 Fetching Google News...")
 
@@ -215,7 +215,7 @@ class MultiSourceResearcher:
             print(f"   ❌ News fetch failed: {e}")
             return []
 
-    def fetch_reddit_trending(self, subreddits: List[str] = None) -> List[Dict]:
+    def fetch_reddit_trending(self, subreddits: list[str] = None) -> list[dict]:
         """Fetch trending from Reddit"""
         print("🔴 Fetching Reddit trending...")
 
@@ -250,7 +250,7 @@ class MultiSourceResearcher:
         self.sources_data['reddit'] = insights
         return insights
 
-    def fetch_hackernews(self) -> List[Dict]:
+    def fetch_hackernews(self) -> list[dict]:
         """Fetch Hacker News top stories"""
         print("🟠 Fetching Hacker News...")
 
@@ -280,7 +280,7 @@ class MultiSourceResearcher:
             print(f"   ❌ HN fetch failed: {e}")
             return []
 
-    def fetch_wikipedia_trending(self) -> List[Dict]:
+    def fetch_wikipedia_trending(self) -> list[dict]:
         """Fetch Wikipedia trending topics"""
         print("📚 Fetching Wikipedia trending...")
 
@@ -334,7 +334,7 @@ class MultiSourceResearcher:
             print(f"   ⚠️  Failed to fetch {url}: {e}")
             return ""
 
-    def aggregate_all_sources(self) -> List[Dict]:
+    def aggregate_all_sources(self) -> list[dict]:
         """Fetch from all sources and aggregate"""
         print("\n🔍 MULTI-SOURCE RESEARCH AGGREGATION")
         print("=" * 60)
@@ -362,7 +362,7 @@ class MultiSourceResearcher:
 
         return all_insights
 
-    def generate_script_ideas(self, insights: List[Dict], count: int = 5) -> List[Dict]:
+    def generate_script_ideas(self, insights: list[dict], count: int = 5) -> list[dict]:
         """Use OpenAI to generate script ideas from aggregated insights"""
         print(f"\n🎬 Generating {count} script ideas from insights...")
 
@@ -427,7 +427,7 @@ Output as JSON array."""
             print(f"   ❌ Script generation failed: {e}")
             return []
 
-    def save_research_report(self, insights: List[Dict], ideas: List[Dict]):
+    def save_research_report(self, insights: list[dict], ideas: list[dict]):
         """Save research results to Reports"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_file = REPORTS_DIR / f"multi_source_research_{timestamp}.json"
@@ -481,7 +481,7 @@ Output as JSON array."""
                     importance="normal"
                 )
                 print("   ✅ Sent via Agent Mail")
-            except:
+            except Exception:
                 print("   ⚠️  Agent Mail send failed")
 
         return report_file

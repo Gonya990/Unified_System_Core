@@ -4,9 +4,8 @@ YouTube User Analyzer
 Analyzes the authorized user's channel, playlists, and liked videos to determine content preferences.
 """
 
-import os
-import json
 from pathlib import Path
+
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -35,7 +34,7 @@ def analyze_profile():
     # 1. Get Channel Details
     request = youtube.channels().list(mine=True, part="snippet,contentDetails,statistics")
     response = request.execute()
-    
+
     if not response['items']:
         print("❌ No channel found.")
         return
@@ -46,7 +45,7 @@ def analyze_profile():
     views = channel['statistics']['viewCount']
     subs = channel['statistics']['subscriberCount']
     likes_playlist_id = channel['contentDetails']['relatedPlaylists']['likes']
-    uploads_playlist_id = channel['contentDetails']['relatedPlaylists']['uploads']
+    channel['contentDetails']['relatedPlaylists']['uploads']
 
     print(f"👤 Channel: {title}")
     print(f"📊 Stats: {subs} Subs | {views} Views")
@@ -60,11 +59,11 @@ def analyze_profile():
         maxResults=20
     )
     liked_res = liked_req.execute()
-    
+
     liked_keywords = []
     for item in liked_res['items']:
         vid_title = item['snippet']['title']
-        vid_desc = item['snippet']['description'][:100].replace('\n', ' ')
+        item['snippet']['description'][:100].replace('\n', ' ')
         print(f"   - {vid_title}")
         liked_keywords.append(vid_title)
 
@@ -76,7 +75,7 @@ def analyze_profile():
         maxResults=10
     )
     pl_res = pl_req.execute()
-    
+
     for item in pl_res['items']:
         pl_title = item['snippet']['title']
         count = item['contentDetails']['itemCount']
@@ -87,7 +86,7 @@ def analyze_profile():
     print("   Based on your 'Likes' and 'Playlists', the system detects these core interests:")
     # Simple keyword extraction
     all_text = " ".join(liked_keywords).lower()
-    
+
     if "ai" in all_text or "gpt" in all_text:
         print("   ✅ High Interest: Artificial Intelligence")
     if "news" in all_text or "war" in all_text or "israel" in all_text:

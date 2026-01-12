@@ -51,7 +51,7 @@ def send_telegram_message(message, token=None, chat_id=None):
              try:
                  payload["text"] = "⚠️ Notification failed to render. Check server logs."
                  requests.post(url, json=payload, timeout=10)
-             except:
+             except Exception:
                  pass
         return False
 

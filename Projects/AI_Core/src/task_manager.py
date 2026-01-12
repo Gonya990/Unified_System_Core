@@ -4,7 +4,6 @@ Stores tasks in SQLite database.
 """
 import logging
 import sqlite3
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +46,7 @@ class TaskManager:
             logger.error(f"Failed to add task: {e}")
             return -1
 
-    def list_tasks(self, user_id: int, status: str = "pending") -> List[Dict]:
+    def list_tasks(self, user_id: int, status: str = "pending") -> list[dict]:
         """List tasks for a user."""
         try:
             with sqlite3.connect(self.db_path) as conn:

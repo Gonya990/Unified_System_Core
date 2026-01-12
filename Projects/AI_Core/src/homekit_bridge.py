@@ -125,7 +125,7 @@ class HomeKitBridge:
     def __init__(self, ha_controller, port=51826):
         """
         Initialize HomeKit Bridge.
-        
+
         Args:
             ha_controller: Home Assistant controller instance
             port: Port for HomeKit server (default 51826)

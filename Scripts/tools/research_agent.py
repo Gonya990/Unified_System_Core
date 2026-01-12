@@ -45,15 +45,15 @@ async def conduct_research():
     prompt = f"""
     You are the Carpathian Council (AI Consensus System).
     Analyze the following search results about 'OpenRouter', 'OpenCloud', and 'GPT-5.2'.
-    
+
     Search Data:
     {compiled_knowledge}
-    
+
     Your Task:
     1. Explain how to integrate OpenRouter specifically (Endpoint, Auth).
     2. Confirm if GPT-5.2 exists or if it's a future/rumored model.
     3. Define what 'OpenCloud' likely refers to in this context.
-    
+
     output formatted markdown.
     """
 

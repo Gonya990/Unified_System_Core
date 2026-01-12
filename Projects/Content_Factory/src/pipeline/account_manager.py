@@ -1,6 +1,7 @@
-import os
 import json
+import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load environment
@@ -11,13 +12,13 @@ ACCOUNTS_CONFIG = ROOT_DIR / "accounts_config.json"
 
 class AccountManager:
     """Manages multiple social media accounts for content distribution."""
-    
+
     def __init__(self):
         self.accounts = self._load_accounts()
-        
+
     def _load_accounts(self):
         if ACCOUNTS_CONFIG.exists():
-            with open(ACCOUNTS_CONFIG, "r") as f:
+            with open(ACCOUNTS_CONFIG) as f:
                 return json.load(f)
         return {
             "instagram": [

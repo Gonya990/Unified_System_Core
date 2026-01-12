@@ -78,7 +78,7 @@ def fetch_grades(session, user_id):
         if res.status_code == 200:
             return res.json()
         return []
-    except:
+    except Exception:
         return []
 
 def fetch_homework(session, user_id):
@@ -89,7 +89,7 @@ def fetch_homework(session, user_id):
         if res.status_code == 200:
             return res.json()
         return []
-    except:
+    except Exception:
         return []
 
 def get_all_schools():

@@ -4,7 +4,7 @@ Integrates with Linear.app for professional issue tracking.
 """
 import logging
 import os
-from typing import Dict, List, Optional
+from typing import Optional
 
 import requests
 
@@ -22,7 +22,7 @@ class LinearClient:
         }
         self.team_id = None  # Will be fetched on first use
 
-    def _query(self, query: str, variables: Optional[Dict] = None) -> Dict:
+    def _query(self, query: str, variables: Optional[dict] = None) -> dict:
         """Execute GraphQL query."""
         try:
             response = requests.post(
@@ -43,7 +43,7 @@ class LinearClient:
             logger.error(f"Linear API request failed: {e}")
             return None
 
-    def get_viewer(self) -> Optional[Dict]:
+    def get_viewer(self) -> Optional[dict]:
         """Get current user info."""
         query = """
         query {
@@ -57,7 +57,7 @@ class LinearClient:
         result = self._query(query)
         return result.get("viewer") if result else None
 
-    def get_teams(self) -> List[Dict]:
+    def get_teams(self) -> list[dict]:
         """Get all teams."""
         query = """
         query {
@@ -83,10 +83,10 @@ class LinearClient:
                 self.team_id = teams[0]["id"]  # Use first team
                 logger.info(f"Using Linear team: {teams[0]['name']}")
 
-    def create_issue(self, title: str, description: str = "", priority: int = 0) -> Optional[Dict]:
+    def create_issue(self, title: str, description: str = "", priority: int = 0) -> Optional[dict]:
         """
         Create a new issue.
-        
+
         Args:
             title: Issue title
             description: Issue description
@@ -126,7 +126,7 @@ class LinearClient:
             return result["issueCreate"]["issue"]
         return None
 
-    def get_my_issues(self, limit: int = 10) -> List[Dict]:
+    def get_my_issues(self, limit: int = 10) -> list[dict]:
         """Get issues assigned to current user."""
         query = """
         query {

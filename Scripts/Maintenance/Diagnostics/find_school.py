@@ -15,7 +15,7 @@ def find_school(query):
         for s in schools:
             # Search in all string values
             found_key = False
-            for k, v in s.items():
+            for _k, v in s.items():
                  if isinstance(v, str) and query in v:
                      found_key = True
             if found_key:

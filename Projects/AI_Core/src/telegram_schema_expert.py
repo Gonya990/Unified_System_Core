@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class TelegramSchemaExpert:
 
         return f"🔍 Nothing found for `{query}` in TL Schema."
 
-    def _format_obj(self, obj: Dict[str, Any], label: str) -> str:
+    def _format_obj(self, obj: dict[str, Any], label: str) -> str:
         name = obj.get("predicate") or obj.get("method")
         params = obj.get("params", [])
         param_str = "\n".join([f"  - `{p['name']}`: `{p['type']}`" for p in params])

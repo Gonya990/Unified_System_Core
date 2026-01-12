@@ -198,7 +198,6 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 @require_auth
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /status command - show full system dashboard."""
-    user_id = update.effective_user.id
 
     # Send "typing"
     await update.message.chat.send_action("typing")
@@ -233,7 +232,7 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             ha_status = f"✅ Online ({ha_res.get('version', 'unknown')})"
         else:
             ha_status = f"❌ Error: {ha_res.get('message', 'unknown')}"
-    except:
+    except Exception:
         ha_status = "❌ Unreachable"
 
     # 4. DB Stats
@@ -375,7 +374,6 @@ async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 @require_auth
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming photos."""
-    user_id = update.effective_user.id
 
     # Get the largest photo
     photo = update.message.photo[-1]
@@ -475,7 +473,7 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         # Run asynchronously in background so we don't block the bot
         # But for simplicity here using subprocess.Popen or asyncio.create_subprocess_exec
-        process = await asyncio.create_subprocess_exec(
+        await asyncio.create_subprocess_exec(
             venv_python, script_path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
@@ -1830,7 +1828,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         text = "❌ Произошла внутренняя ошибка. Администратор уведомлен."
         try:
             await update.effective_message.reply_text(text)
-        except:
+        except Exception:
             pass
 
     # Send traceback to admins (optional, maybe too noisy)

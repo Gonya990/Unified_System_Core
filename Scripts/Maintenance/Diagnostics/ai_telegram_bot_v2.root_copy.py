@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import aiohttp
 
@@ -245,7 +245,6 @@ def get_gmail_client(user_id: int) -> Optional[GmailClient]:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    chat_id = update.effective_chat.id
 
     logger.info(f"[CMD] /start from {user.id} (@{user.username})")
 
@@ -1084,7 +1083,7 @@ async def show_memory_context(update: Update, context: ContextTypes.DEFAULT_TYPE
         keyboard = [[InlineKeyboardButton("🗑 Clear Memory", callback_data="clear_memory")]]
         await update.effective_message.reply_text(resp, parse_mode='Markdown', reply_markup=InlineKeyboardMarkup(keyboard))
 
-async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
+async def parse_event_details(text: str) -> Optional[dict[str, Any]]:
     prompt = (
         "Extract event details from this text for a calendar: '" + text + "'. "
         "Current local time: " + datetime.now().isoformat() + ". "
@@ -1510,7 +1509,7 @@ async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stage_names = " → ".join([s[0] for s in pipeline_stages])
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-    status_msg = await update.message.reply_text(
+    await update.message.reply_text(
         f"🔄 Запускаю пайплайн `{pipeline_type}`\n\n"
         f"Этапы: {stage_names}\n\n"
         f"⏱ Это может занять 2-5 минут...",
@@ -2082,7 +2081,7 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
 
     try:
-        process = await asyncio.create_subprocess_exec(
+        await asyncio.create_subprocess_exec(
             venv_python, script_path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE

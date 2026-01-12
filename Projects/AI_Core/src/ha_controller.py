@@ -2,7 +2,7 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class HAController:
         # TODO: Move tokens to .env
         self.client = HomeAssistantClient()
 
-    async def get_status(self) -> Dict[str, Any]:
+    async def get_status(self) -> dict[str, Any]:
         """Check HA connection status."""
         if not self.client:
             return {"status": "error", "message": "Client not loaded"}

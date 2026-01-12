@@ -195,7 +195,7 @@ def main():
     )
 
     agent_prefs_path = Path("/Users/macbook/Documents/Unified_System/Agent_Context/agent_preferences.json")
-    agent_prefs = create_agent_preferences(profile, agent_prefs_path)
+    create_agent_preferences(profile, agent_prefs_path)
 
     print_bilingual(
         f"✓ Created agent preferences at {agent_prefs_path}",

@@ -61,11 +61,11 @@ class ReuseAddrHTTPServer(HTTPServer):
 def start_health_server(port: int = 8080, health_callback: Optional[Callable[[], dict]] = None) -> HTTPServer:
     """
     Start the health check HTTP server in a background thread.
-    
+
     Args:
         port: Port to listen on
         health_callback: Optional callback that returns additional health info
-    
+
     Returns:
         The HTTPServer instance
     """

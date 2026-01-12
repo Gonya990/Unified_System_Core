@@ -33,7 +33,6 @@ def scan_bills():
         print("📭 No recent bills found.")
         return
 
-    total_est = 0
     print("\n📄 **Found Documents:**")
     for msg in messages:
         subject = msg.get('subject', 'No Subject')

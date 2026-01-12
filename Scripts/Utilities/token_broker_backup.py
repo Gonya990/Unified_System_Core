@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import requests
 import yaml
@@ -33,7 +33,7 @@ class TokenBroker:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(TokenBroker, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self, vault_path: str = None, master_key: str = None):
@@ -54,11 +54,11 @@ class TokenBroker:
             )
         ).encode()
 
-        self.key_store: Dict[str, List[Dict]] = {}
-        self._indices: Dict[str, int] = {}
-        self._blacklist: Dict[str, float] = {}
+        self.key_store: dict[str, list[dict]] = {}
+        self._indices: dict[str, int] = {}
+        self._blacklist: dict[str, float] = {}
         self._blacklist_ttl = 300
-        self._session_sticky_keys: Dict[str, str] = {}
+        self._session_sticky_keys: dict[str, str] = {}
         self._last_rotation = time.time()
 
         self.load_vault()
@@ -176,7 +176,7 @@ class TokenBroker:
         except Exception as e:
             logger.error(f"TokenBroker: Failed to load vault: {e}")
 
-    def save_vault(self, tokens: Dict[str, List[Dict[str, Any]]] = None):
+    def save_vault(self, tokens: dict[str, list[dict[str, Any]]] = None):
         """Encrypts and saves the current key_store to YAML."""
         if tokens is not None:
             self.key_store = tokens
@@ -223,7 +223,7 @@ class TokenBroker:
             except Exception as e:
                 logger.error(f"TokenBroker: Legacy import failed: {e}")
 
-    def _check_health(self, token_info: Dict[str, Any]) -> bool:
+    def _check_health(self, token_info: dict[str, Any]) -> bool:
         """Kosta's Health Check: HTTP GET /health, 5s timeout, 3 retries."""
         health_url = token_info.get("health_url")
         if not health_url:
@@ -234,7 +234,7 @@ class TokenBroker:
                 resp = requests.get(health_url, timeout=5)
                 if resp.status_code == 200:
                     return True
-            except:
+            except Exception:
                 pass
             time.sleep(0.5)
         return False
@@ -277,7 +277,7 @@ class TokenBroker:
         except Exception:
             return None
 
-    def list_available_pools(self) -> Dict[str, Dict[str, int]]:
+    def list_available_pools(self) -> dict[str, dict[str, int]]:
         """List all provider pools with active/total counts."""
         now = time.time()
         result = {}
@@ -296,7 +296,7 @@ class TokenBroker:
             result[provider] = {"total": len(pool), "active": active}
         return result
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         """Health check endpoint for monitoring."""
         pools = self.list_available_pools()
         total_keys = sum(p["total"] for p in pools.values())
@@ -314,7 +314,7 @@ class TokenBroker:
             "timestamp": time.time(),
         }
 
-    def rotate_keys(self) -> Dict[str, Any]:
+    def rotate_keys(self) -> dict[str, Any]:
         """Force rotation by clearing blacklist and resetting indices."""
         self._blacklist.clear()
         self._indices.clear()
@@ -350,7 +350,7 @@ class TokenBroker:
              try:
                  with open(rbac_path) as f:
                      policy = yaml.safe_load(f) or {}
-             except:
+             except Exception:
                  pass
 
         agent_role = policy.get("agents", {}).get(agent_name, "worker")

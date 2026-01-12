@@ -7,7 +7,7 @@ import base64
 import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Dict, List, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ except ImportError as e:
 class GmailClient:
     """Client for Gmail API - read and compose emails."""
 
-    def __init__(self, credentials_dict: Dict = None):
+    def __init__(self, credentials_dict: dict = None):
         """
         Initialize with OAuth credentials (same format as CalendarClient).
         :param credentials_dict: Dictionary of OAuth credentials from Firestore
@@ -70,7 +70,7 @@ class GmailClient:
             logger.error(f"Failed to get unread count: {e}")
             return -1
 
-    def get_recent_emails(self, max_results: int = 10, unread_only: bool = False) -> List[Dict]:
+    def get_recent_emails(self, max_results: int = 10, unread_only: bool = False) -> list[dict]:
         """Get recent emails from inbox."""
         if not self.authenticated:
             return []
@@ -135,7 +135,7 @@ class GmailClient:
             logger.error(f"Failed to get email body: {e}")
             return None
 
-    def _extract_body(self, payload: Dict) -> str:
+    def _extract_body(self, payload: dict) -> str:
         """Extract text body from email payload."""
         body = ""
 
@@ -184,7 +184,7 @@ class GmailClient:
 
         return summary
 
-    def search_emails(self, query: str, max_results: int = 10) -> List[Dict]:
+    def search_emails(self, query: str, max_results: int = 10) -> list[dict]:
         """Search emails with Gmail query syntax."""
         if not self.authenticated:
             return []
@@ -223,7 +223,7 @@ class GmailClient:
             logger.error(f"Search failed: {e}")
             return []
 
-    def send_email(self, to: str, subject: str, body: str, html: bool = False) -> Optional[Dict]:
+    def send_email(self, to: str, subject: str, body: str, html: bool = False) -> Optional[dict]:
         """
         Send an email.
         :param to: Recipient email address
@@ -260,7 +260,7 @@ class GmailClient:
             logger.error(f"Failed to send email: {e}")
             return None
 
-    def reply_to_email(self, message_id: str, body: str, html: bool = False) -> Optional[Dict]:
+    def reply_to_email(self, message_id: str, body: str, html: bool = False) -> Optional[dict]:
         """
         Reply to an existing email.
         :param message_id: Original message ID to reply to
@@ -383,7 +383,7 @@ class GmailClient:
             logger.error(f"Failed to trash email: {e}")
             return False
 
-    def get_labels(self) -> List[Dict]:
+    def get_labels(self) -> list[dict]:
         """Get all Gmail labels."""
         if not self.authenticated:
             return []

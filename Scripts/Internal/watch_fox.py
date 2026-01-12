@@ -97,7 +97,7 @@ def main():
             content_str = result.get('content', [{}])[0].get('text', '[]')
             try:
                 messages = json.loads(content_str)
-            except:
+            except Exception:
                 messages = []
 
             for msg in messages:

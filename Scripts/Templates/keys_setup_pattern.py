@@ -32,7 +32,7 @@ def main():
             with open(KEYS_FILE) as f:
                 current_data = json.load(f)
             print(f"✅ Found existing keys file with {sum(len(v) for v in current_data.values())} keys.")
-         except:
+         except Exception:
             print("⚠️ Existing file corrupted, starting fresh.")
 
     while True:

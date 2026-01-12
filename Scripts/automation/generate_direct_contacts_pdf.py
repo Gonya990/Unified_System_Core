@@ -69,7 +69,7 @@ def create_pdf():
     try:
         pdfmetrics.registerFont(TTFont('Arial', FONT_PATH))
         font_name = 'Arial'
-    except:
+    except Exception:
         print("Arial font not found in System. Using Helvetica (No Cyrillic support!).")
         font_name = 'Helvetica' # Fallback, will fail for Russian text display
 

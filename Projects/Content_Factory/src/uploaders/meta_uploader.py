@@ -27,45 +27,45 @@ def upload_reel_instagram(
 ) -> bool:
     """
     Upload Reel to Instagram using Instagrapi
-    
+
     Args:
         video_path: Path to video file
         caption: Reel caption
         thumbnail_path: Optional thumbnail image
-    
+
     Returns:
         True if upload successful
     """
     if not INSTAGRAPI_AVAILABLE:
         print("❌ instagrapi not available")
         return False
-    
+
     if not INSTAGRAM_USERNAME or not INSTAGRAM_PASSWORD:
         print("⚠️ Instagram credentials not set")
         print("Set INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
         return False
-    
+
     if not video_path.exists():
         print(f"❌ Video not found: {video_path}")
         return False
-    
+
     print(f"📤 Uploading Reel to Instagram: {video_path}")
-    
+
     try:
         client = Client()
         client.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
         print("✅ Instagram login successful")
-        
+
         # Upload as Reel
         media = client.clip_upload(
             video_path,
             caption=caption,
             thumbnail=thumbnail_path
         )
-        
+
         print(f"✅ Reel uploaded! Media ID: {media.pk}")
         return True
-        
+
     except Exception as e:
         print(f"❌ Instagram upload error: {e}")
         return False
@@ -75,21 +75,21 @@ def upload_story_instagram(video_path: Path) -> bool:
     if not INSTAGRAPI_AVAILABLE:
         print("❌ instagrapi not available")
         return False
-    
+
     if not INSTAGRAM_USERNAME or not INSTAGRAM_PASSWORD:
         print("⚠️ Instagram credentials not set")
         return False
-    
+
     print(f"📤 Uploading Story to Instagram: {video_path}")
-    
+
     try:
         client = Client()
         client.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
-        
+
         media = client.video_upload_to_story(video_path)
         print(f"✅ Story uploaded! Media ID: {media.pk}")
         return True
-        
+
     except Exception as e:
         print(f"❌ Instagram Story error: {e}")
         return False
@@ -119,7 +119,7 @@ Created using:
 
 #AI #ContentCreation #Automation #Tech
     """.strip()
-    
+
     if test_video.exists():
         upload_reel_instagram(test_video, test_caption)
     else:

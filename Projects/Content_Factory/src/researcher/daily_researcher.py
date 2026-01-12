@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-import os
-import sys
-import feedparser
 import json
-import requests
+import os
 import random
 import re
+import sys
 import time
-from bs4 import BeautifulSoup
-from pathlib import Path
 from datetime import datetime
-from openai import OpenAI
+from pathlib import Path
+
+import feedparser
+import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Setup paths
 SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
@@ -42,7 +43,7 @@ def get_key(provider, owner=None):
     if BROKER:
         k = BROKER.get_key(provider, owner)
         if k: return k
-    
+
     # Fallback
     if provider == "openai": return os.getenv("OPENAI_API_KEY")
     if provider == "gemini": return os.getenv("GEMINI_API_KEY")
@@ -112,7 +113,7 @@ def run_daily_research(style="impact", deep=False):
     if not news:
         print("⚠️ No fresh news found. Using evergreen fallback topics...")
         news = get_evergreen_topics()
-        
+
     context = ""
     # Deep research: Browse more articles (up to 10)
     max_articles = 10 if deep else 2
@@ -128,23 +129,23 @@ def run_daily_research(style="impact", deep=False):
         # The "Megaforma" signature style (Peace & Tech Edition)
         tone = 'Inspiring, Visionary, Optimistic, Deep Documentary, Unifying'
         visuals = 'cinematic documentary footage, solar punk, high tech city, bright future, digital connections, nebula'
-    
+
     prompt = f"""
     Context: {context}
     Task: Write a viral 'Megaforma-style' RUSSIAN script (15 scenes).
     Theme: Future Tech, Human Progress, Global Unity.
-    
+
     Target Audience: People looking for inspiration and "The Future" of humanity.
     Tone: {tone} (But structured like a viral educational video - Maksim Nikolashin style).
     Visual Style: {visuals}
-    
+
     STRUCTURE (The 'Listicle' Format):
     - Scene 1-2: THE HOOK. Use a "Negative/Warning" or "Secret" framing. (e.g., "You won't believe what AI can do...", "Stop ignoring this technology...").
     - Scene 3: The Intro. "Here are 5 technologies changing everything."
     - Scene 4-13: THE LIST. Rapid fire facts/technologies. (e.g. "Number 1...", "Number 2...").
     - Scene 14-15: THE CONCLUSION. Evaluation & Call for Unity.
-    
-    CRITICAL: 
+
+    CRITICAL:
     - Text must be in RUSSIAN.
     - VISUAL KEYWORDS must be English descriptions for Pexels/AI.
     - Do NOT use "Once upon a time". START WITH IMPACT.
@@ -154,16 +155,16 @@ def run_daily_research(style="impact", deep=False):
     5. No scene labels. No "Scene 1:". ONLY spoken words. Use "..." for pauses.
 
     Format: JSON {{
-        "selected_topic": "Viral Title (e.g. 7 Insane AI Tools)", 
-        "description": "YouTube Description with hashtags", 
-        "script_ru": "Full spoken text...", 
+        "selected_topic": "Viral Title (e.g. 7 Insane AI Tools)",
+        "description": "YouTube Description with hashtags",
+        "script_ru": "Full spoken text...",
         "pinned_comment": "Question to audience? (e.g. Which tech do you want?)",
         "scenes": [{{"image": "scene_1", "keyword": ""}}]
     }}
     """
-    
+
     data = None
-    
+
     # Strategy: Gemini (Primary for DEEP RESEARCH due to context window)
     if deep:
         try:
@@ -203,12 +204,12 @@ def run_daily_research(style="impact", deep=False):
                 )
                 content = res.choices[0].message.content
 
-            if content and "```json" in content: 
+            if content and "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
         except Exception as e:
             print(f"⚠️ OpenAI Research failed: {e}. Checking legacy fallback...")
-        
+
     # Strategy 2: Gemini Fallback
     if not data:
         try:
@@ -222,7 +223,7 @@ def run_daily_research(style="impact", deep=False):
             data = json.loads(content)
         except Exception as e:
             print(f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)...")
-            
+
     # Strategy 3: Ollama (Rock Solid Local Fallback)
     if not data:
         try:
@@ -252,24 +253,24 @@ def run_daily_research(style="impact", deep=False):
 
 def generate_gemini_images(scenes, output_dir: Path):
     """💎 Gemini 2.0 Flash Image - DISABLED (API not available yet)"""
-    print(f"⚠️ Gemini Image Generation not available (experimental API)")
+    print("⚠️ Gemini Image Generation not available (experimental API)")
     return []  # Skip for now, will be enabled when API is stable
 
 def generate_flux_images(scenes, output_dir: Path):
     """⚡ Flux.1 Schnell - FREE Local (Fast & Quality)"""
-    print(f"⚡ Checking Flux.1 Schnell server...")
+    print("⚡ Checking Flux.1 Schnell server...")
     resolved = []
     try:
         import requests
         flux_url = "http://localhost:8080/generate"
-        
+
         # Quick health check (1 second timeout)
         try:
             requests.get("http://localhost:8080/", timeout=1)
-        except:
-            print(f"❌ Flux server not running (install in progress)")
+        except Exception:
+            print("❌ Flux server not running (install in progress)")
             return []
-        
+
         print(f"✅ Flux server online! Generating {len(scenes)} scenes...")
         for s in scenes:
             time.sleep(0.5)
@@ -282,7 +283,7 @@ def generate_flux_images(scenes, output_dir: Path):
                     "num_steps": 4,
                     "guidance": 3.5
                 }, timeout=30)
-                
+
                 if response.status_code == 200:
                     path = output_dir / f"{s['image']}.jpg"
                     with open(path, "wb") as f:
@@ -299,19 +300,19 @@ def generate_flux_images(scenes, output_dir: Path):
 
 def generate_sdxl_images(scenes, output_dir: Path):
     """🎨 Stable Diffusion XL - FREE Local (Backup)"""
-    print(f"🎨 Checking SDXL server...")
+    print("🎨 Checking SDXL server...")
     resolved = []
     try:
         import requests
         sdxl_url = "http://localhost:8188/generate"
-        
+
         # Quick health check (1 second timeout)
         try:
             requests.get("http://localhost:8188/", timeout=1)
-        except:
-            print(f"❌ SDXL server not running (install in progress)")
+        except Exception:
+            print("❌ SDXL server not running (install in progress)")
             return []
-        
+
         print(f"✅ SDXL server online! Generating {len(scenes)} scenes...")
         for s in scenes:
             time.sleep(1.0)
@@ -324,7 +325,7 @@ def generate_sdxl_images(scenes, output_dir: Path):
                     "height": 1920,
                     "steps": 25
                 }, timeout=60)
-                
+
                 if response.status_code == 200:
                     path = output_dir / f"{s['image']}.jpg"
                     with open(path, "wb") as f:
@@ -410,13 +411,13 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
 
     print("🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Free → Paid Failover")
     print("   Priority: Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels")
-    
+
     # FREE TIER 1: Gemini 2.0 Flash Image (Best Quality, Free)
     resolved = generate_gemini_images(scenes, output_dir)
-    if len(resolved) == len(scenes): 
+    if len(resolved) == len(scenes):
         print("✅ All images generated via Gemini 2.0 (FREE)")
         return resolved
-    
+
     # FREE TIER 2: Flux.1 Schnell (Fast, Local)
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing:
@@ -425,7 +426,7 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         if len(resolved) == len(scenes):
             print("✅ All images completed via Gemini + Flux (FREE)")
             return resolved
-    
+
     # FREE TIER 3: SDXL (Backup, Local)
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing:
@@ -434,7 +435,7 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         if len(resolved) == len(scenes):
             print("✅ All images completed via Free Tier (Gemini/Flux/SDXL)")
             return resolved
-    
+
     # PAID TIER 1: DALL-E 3 (if free options exhausted)
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing:
@@ -442,15 +443,15 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         dalle_results = generate_dalle_assets(missing, output_dir)
         resolved.extend(dalle_results)
         if len(resolved) == len(scenes): return resolved
-    
+
     # PAID TIER 2: Banana.dev
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing: resolved.extend(generate_banana_assets(missing, output_dir))
-        
+
     # FINAL FALLBACK: Pexels Cartoon
     missing = [s for s in scenes if s['image'] not in {r['image'] for r in resolved}]
     if missing: resolved.extend(generate_pexels_assets(missing, output_dir, style="cartoon"))
-        
+
     return resolved
 
 def translate_to_hebrew(text):
@@ -469,7 +470,7 @@ def main():
     """Execute Full Daily Viral Content Pipeline"""
     print("🚀 DAILY RESEARCHER PIPELINE INITIATED")
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    
+
     # 1. Research & Scripting
     data = run_daily_research(style="impact")
     if not data:
@@ -479,22 +480,22 @@ def main():
     # Check for Output Directory
     daily_dir = FACTORY_DIR / "outputs" / timestamp
     daily_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Save Script Data
     json_path = daily_dir / "script_data.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"📜 Script Data saved to: {json_path}")
-    
+
     # 2. Image Generation (Visualization)
     print("🎨 Generating Visual Assets...")
     scenes = data.get("scenes", [])
     if not scenes:
         print("❌ No scenes found in script data.")
         return
-        
+
     resolved_scenes = generate_vision_assets(scenes, daily_dir, style="impact")
-    
+
     # Update JSON with local paths
     data["scenes"] = resolved_scenes
     with open(json_path, "w", encoding="utf-8") as f:
@@ -502,7 +503,7 @@ def main():
 
     if len(resolved_scenes) < len(scenes):
         print(f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated.")
-    
+
     # 3. Handover to Orchestrator (Audio + Video Assembly)
     print("🤝 Handing over to Orchestrator v3 (No-Face)...")
     try:
@@ -510,14 +511,14 @@ def main():
         factory_path = ROOT_DIR.parent / "Production_Factory"
         if str(factory_path) not in sys.path:
             sys.path.append(str(factory_path))
-            
+
         import orchestrator_v3_no_face as orchestrator
-        
+
         # Override Orchestrator Output Dirs to match Daily Dir
         orchestrator.OUTPUT_DIR = daily_dir
         orchestrator.INPUT_DIR = daily_dir
         orchestrator.BROLL_DIR = ROOT_DIR / "broll" # Shared B-roll library
-        
+
         # Run RU Pipeline
         script_ru = data.get("script_ru", "")
         if script_ru:
@@ -532,7 +533,7 @@ def main():
                 print(f"🎉 SUCCESS! Video Ready: {final_video_ru}")
             else:
                 print("❌ RU Video Assembly failed.")
-                
+
     except ImportError as e:
         print(f"❌ Failed to import orchestrator: {e}")
     except Exception as e:

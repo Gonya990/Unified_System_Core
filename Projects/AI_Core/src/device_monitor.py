@@ -3,7 +3,6 @@ Device Monitor Service
 Monitors critical Home Assistant entities and alerts on failure.
 """
 import logging
-from typing import Dict, List, Set
 
 from .ha_controller import HAController
 
@@ -17,12 +16,12 @@ class DeviceMonitor:
         self.notify_callback = notify_callback
 
         # Configuration
-        self.monitored_entities: Set[str] = set()
-        self.ignored_entities: Set[str] = set()
-        self.recovery_map: Dict[str, str] = {}
+        self.monitored_entities: set[str] = set()
+        self.ignored_entities: set[str] = set()
+        self.recovery_map: dict[str, str] = {}
 
         # State tracking
-        self.unavailable_entities: Set[str] = set()
+        self.unavailable_entities: set[str] = set()
         self.is_monitoring = False
 
     def add_entity(self, entity_id: str):
@@ -35,7 +34,7 @@ class DeviceMonitor:
         if entity_id in self.monitored_entities:
             self.monitored_entities.remove(entity_id)
 
-    async def check_devices(self) -> List[str]:
+    async def check_devices(self) -> list[str]:
         """Check all monitored devices and return list of new failures."""
         if not self.ha:
             logger.warning("HA Controller not available for monitoring")
@@ -87,7 +86,7 @@ class DeviceMonitor:
             logger.error(f"Device check failed: {e}")
             return []
 
-    async def attempt_recovery(self, failures: List[str]):
+    async def attempt_recovery(self, failures: list[str]):
         """Attempt to recover failed devices by reloading integrations."""
         reloaded_integrations = set()
 
