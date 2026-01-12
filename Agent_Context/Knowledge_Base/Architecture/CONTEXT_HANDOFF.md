@@ -143,7 +143,8 @@ Each conversation folder may contain:
 - [x] Configure systemd service for Mail Processor
 - [x] Ensure agent registration (AmberOwl) on server
 - [x] Test Telegram alerts integration
-- [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
+- [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics`
+  <!-- id: 202 -->
 - [x] Clean up Workspace root directory
 
 ```
