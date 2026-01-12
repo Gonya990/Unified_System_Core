@@ -39,7 +39,7 @@ class AgentMailConfig:
             server=os.getenv("AGENT_MAIL_SERVER", "http://100.110.209.49:8765"),
             token=os.getenv("AGENT_MAIL_TOKEN", "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"),
             project_key=project_key,
-            agent_name=os.getenv("AGENT_MAIL_NAME", "Antigravity"),
+            agent_name=os.getenv("AGENT_MAIL_NAME", "OrangeStone"),
         )
 
 
