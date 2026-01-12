@@ -356,6 +356,7 @@ class MailProcessor:
         
         # Ensure agent is registered
         try:
+            self.client.ensure_project()
             reg = self.client.register(task_description="Monitoring inbox for alerts")
             self.logger.info(f"✅ Registered as agent: {reg.get('name')} (ID: {reg.get('id')})")
         except Exception as e:

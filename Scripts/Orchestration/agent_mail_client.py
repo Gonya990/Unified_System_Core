@@ -84,6 +84,15 @@ class AgentMailClient:
 
         return result.get("result", {})
 
+    def ensure_project(self, human_key: Optional[str] = None) -> Dict[str, Any]:
+        """Ensure project exists on server"""
+        key = human_key or self.config.project_key
+        result = self._call_tool(
+            "ensure_project",
+            {"human_key": key},
+        )
+        return result
+
     def health_check(self) -> bool:
         """Check server health"""
         try:
