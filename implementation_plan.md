@@ -16,8 +16,8 @@
 | Morning Brief | ✅ Complete | `Scripts/Family/morning_brief.py` |
 | MCP Mail Client | ✅ Complete | `Scripts/Orchestration/agent_mail_client.py` |
 | Mail Processor Service | ✅ Complete | `Scripts/Orchestration/mail_processor.py` |
-| Telegram Alert Integration | 🔄 Pending | Needs env vars configuration |
-| Systemd Service Deployment | 🔄 Pending | Deploy mail_processor as service |
+| Telegram Alert Integration | ✅ Complete | Configured in `.env` and tested |
+| Systemd Service Deployment | ✅ Complete | Deployed as `launchd` service on Mac |
 
 ---
 

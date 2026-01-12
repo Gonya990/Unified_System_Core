@@ -10,6 +10,12 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(ROOT_DIR))
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(ROOT_DIR / ".env")
+except ImportError:
+    pass
+
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("MashovLogin")
@@ -51,9 +57,10 @@ def login_mashov(username, password, school_id):
         
         if res.status_code == 200:
             logger.info("Login Successful!")
-            # Extract token/simbol/uniqueid
-            # Note: Mashov API changes properly. This is a generic robust attempt.
             data = res.json()
+            # Mashov usually returns a user object. We need the student's UUID/ID.
+            # Structure usually: { "credential": { "userId": "...", ... }, "accessToken": "..." }
+            # But let's return the whole data for inspection on first run.
             return session, data
         else:
             logger.error(f"Login Failed: {res.status_code} - {res.text}")
@@ -62,6 +69,28 @@ def login_mashov(username, password, school_id):
     except Exception as e:
         logger.error(f"Connection Error: {e}")
         return None, None
+
+def fetch_grades(session, user_id):
+    """Fetch recent grades"""
+    url = f"{MASHOV_URL}/students/{user_id}/grades"
+    try:
+        res = session.get(url)
+        if res.status_code == 200:
+            return res.json()
+        return []
+    except:
+        return []
+
+def fetch_homework(session, user_id):
+    """Fetch pending homework"""
+    url = f"{MASHOV_URL}/students/{user_id}/homework"
+    try:
+        res = session.get(url)
+        if res.status_code == 200:
+            return res.json()
+        return []
+    except:
+        return []
 
 if __name__ == "__main__":
     # Test Credentials (ENV or Hardcoded for test)
