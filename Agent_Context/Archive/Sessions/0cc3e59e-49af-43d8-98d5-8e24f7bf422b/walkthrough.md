@@ -79,7 +79,8 @@
 ### Интеграция Telegram
 
 - **Статус:** ✅ ПОДКЛЮЧЕН
-- **Бот:** @igoreha9_bot
+- **Бот:** Multi-admin setup (Igor + Kostya instances).
+  See Projects/AI_Core/MULTI_ADMIN_SETUP.md for current configuration.
 - **Chat ID:** 708531393
 - **Воркфлоу:** Тестовый сценарий n8n развернут.
 
