@@ -66,3 +66,4 @@ broll/
 .credentials/
 *_token.json
 email_database.json
+hooks/hooks_server.err
