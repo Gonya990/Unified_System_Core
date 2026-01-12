@@ -13,7 +13,7 @@
 
 ### Directory Structure
 
-```
+```text
 /home/gonya/
 ├── 00_NAV/                      # 📍 Navigation & Documentation
 │   ├── NAVIGATION.md            # Quick navigation guide
@@ -61,8 +61,8 @@
 | `bc334b70-7153-...` | **Grant Mac Service Access** | ✅ Complete | Host configuration guide |
 | `b32255f1-fc4d-...` | **Docker GPU Access Check** | ✅ Complete | Workflow verification |
 | `8c34a8bc-20df-...` | **Chrome Remote Debugging** | ✅ Complete | Docker CDP setup |
-| `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan, navigation |
-| `2026-01-12_mail_processor_deployment` | **Mail Processor Deployment** | ✅ Complete | task.md, walkthrough.md, systemd unit |
+| `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan |
+| `2026-01-12_m_dep` | **Mail Processor Deployment** | ✅ Complete | task.md, walkthrough.md |
 
 ### Brain Artifact Types
 
@@ -148,7 +148,8 @@ Each conversation folder may contain:
 - **📬 96 items** in `90_Inbox_ToSort/NEEDS_REVIEW` need attention
 - **PRJ-006_OpenCode** is paused, needs restart decision
 - **Google Cloud credentials** pending (credentials.json not yet obtained)
-- **BIOS Update (Proxmox):** Target 6203 (Stable) for ROG STRIX X370-F GAMING. Current 5220. USB at `/Volumes/Ventoy` (ExFAT).
+- **BIOS Update (Proxmox):** Target 6203 (Stable) for ROG STRIX X370-F GAMING.
+  Current 5220. USB at `/Volumes/Ventoy` (ExFAT).
 
 ---
 
@@ -242,7 +243,7 @@ flowchart TD
 
 **Location:** `/home/gonya/antigravity-mcp-server`
 
-```
+```text
 antigravity-mcp-server/
 ├── src/
 │   ├── index.ts          # SSE server on port 3005
@@ -334,7 +335,8 @@ For the next session, ensure:
 - [ ] Review any pending tasks in `90_Inbox_ToSort/`
 - [ ] Check for Proxmox upgrade completion status
 - [ ] Verify Tailscale connectivity
-- [ ] **BIOS Update:** Download version 6203. Put on `/Volumes/Ventoy`. Alert: ASUS EZ Flash 3 may require FAT32.
+- [ ] **BIOS Update:** Download version 6203. Put on `/Volumes/Ventoy`.
+  Alert: ASUS EZ Flash 3 may require FAT32.
 
 ---
 

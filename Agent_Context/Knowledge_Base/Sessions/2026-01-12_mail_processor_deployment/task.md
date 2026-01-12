@@ -10,7 +10,7 @@
 ## Phase 2: Workspace Structurization <!-- id: 200 -->
 
 - [x] Identify and remove temporary logs/screenshots <!-- id: 201 -->
-- [x] Consolidate diagnostic scripts into `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
+- [x] Consolidate diagnostic scripts to `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
 - [x] Clean up root directory <!-- id: 203 -->
 
 ## Phase 3: System Synchronization <!-- id: 300 -->
