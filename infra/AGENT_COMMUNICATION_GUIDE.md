@@ -42,7 +42,7 @@ This document defines how agents communicate within the Unified System. All agen
 | **VioletCastle** | claude-code | opus-4.5 | kosta-laptop | Kosta | Primary dev agent |
 | **OrangeStone** | antigravity-core | gemini | igor-macbook | Igor (Bot) | Factory scheduler |
 | **PinkLake** | llm-council | gemini | igor-macbook | Igor (Bot) | Swarm coordinator |
-| **FuchsiaCat** | llm-council | gemini | igor-macbook | Igor (Bot) | Council member |
+| **FuchsiaCat** | opencode | - | kosta-laptop | Kosta | Secondary agent (inactive) |
 | **AmberOwl** | mail-processor | - | server | System | Inbox monitor |
 
 ### Agent Naming Convention
