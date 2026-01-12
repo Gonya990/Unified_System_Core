@@ -30,6 +30,7 @@ class ConfigManager:
         "GEMINI_API_KEY",
         "OPENAI_API_KEY",
         "OPENROUTER_API_KEY",
+        "VAPI_API_KEY",
     }
 
     def __init__(self):
@@ -95,6 +96,11 @@ class ConfigManager:
             "HEALTH_PORT": os.environ.get("HEALTH_PORT", "8095"),
             "DASHBOARD_PORT": os.environ.get("DASHBOARD_PORT", "8096"),
             "AGENT_MAIL_NAME": os.environ.get("AGENT_MAIL_NAME", ""),
+            # VAPI.ai voice interface settings
+            "VAPI_API_KEY": os.environ.get("VAPI_API_KEY", ""),
+            "VAPI_PHONE_NUMBER_ID": os.environ.get("VAPI_PHONE_NUMBER_ID", ""),
+            "VAPI_ASSISTANT_ID": os.environ.get("VAPI_ASSISTANT_ID", ""),
+            "VAPI_VOICE_ID": os.environ.get("VAPI_VOICE_ID", "rachel"),
         }
 
         # Override with persisted config if exists
