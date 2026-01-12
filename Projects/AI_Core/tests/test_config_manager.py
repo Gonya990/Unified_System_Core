@@ -1,31 +1,31 @@
-import pytest
-import os
 import json
-import shutil
-from pathlib import Path
+import os
+
+import pytest
 from src.config_manager import ConfigManager
+
 
 @pytest.fixture
 def temp_config_file(tmp_path):
     config_file = tmp_path / "bot_config.json"
-    
+
     # Save original state
     original_config_file = ConfigManager.CONFIG_FILE
     original_env = dict(os.environ)
-    
+
     # Patch class attribute and relevant env vars to ensure deterministic tests
     ConfigManager.CONFIG_FILE = config_file
     os.environ["TELEGRAM_BOT_TOKEN"] = "test_token_123456789"
     os.environ["MODEL_NAME"] = "llama3.2"
     os.environ["INFERENCE_PROVIDER"] = "ollama" # Force provider for consistency
-    
+
     # Clear interfering keys
     for key in ["INFERENCE_API_KEY", "GEMINI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"]:
         if key in os.environ:
             del os.environ[key]
 
     yield config_file
-    
+
     # Restore state
     ConfigManager.CONFIG_FILE = original_config_file
     os.environ.clear()
@@ -40,7 +40,7 @@ def test_config_manager_set_get(temp_config_file):
     cm = ConfigManager()
     cm.set("MODEL_NAME", "phi3")
     assert cm.get("MODEL_NAME") == "phi3"
-    
+
     # Reload to verify persistence
     cm2 = ConfigManager()
     assert cm2.get("MODEL_NAME") == "phi3"
@@ -49,13 +49,13 @@ def test_config_manager_encryption(temp_config_file):
     cm = ConfigManager()
     test_key = "secret_api_key_value"
     cm.set("INFERENCE_API_KEY", test_key)
-    
+
     # Check that the file content is actually encrypted
-    with open(temp_config_file, "r") as f:
+    with open(temp_config_file) as f:
         data = json.load(f)
         encrypted_val = data["INFERENCE_API_KEY"]
         assert encrypted_val != test_key
-    
+
     # Reload to verify decryption
     cm2 = ConfigManager()
     assert cm2.get("INFERENCE_API_KEY") == test_key
@@ -63,12 +63,12 @@ def test_config_manager_encryption(temp_config_file):
 def test_config_manager_status(temp_config_file):
     cm = ConfigManager()
     cm.set("INFERENCE_BASE_URL", "http://test-url")
-    
+
     # Ensure no API key is set initially (env vars cleared in fixture)
     status = cm.get_status()
     assert status["inference_url"] == "http://test-url"
-    assert status["api_key_set"] == False
-    
+    assert not status["api_key_set"]
+
     cm.set("INFERENCE_API_KEY", "some-key")
     status = cm.get_status()
-    assert status["api_key_set"] == True
+    assert status["api_key_set"]

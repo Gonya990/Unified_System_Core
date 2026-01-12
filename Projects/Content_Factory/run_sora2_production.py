@@ -3,11 +3,10 @@
 Quick production run using multi-source research
 Based on Sora 2 script idea (Viral Potential: 9/10)
 """
-import os
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.parent.parent
@@ -136,8 +135,8 @@ try:
     print()
     print("🎬 NEXT STEPS:")
     print(f"1. Review assets in: {assets_dir}")
-    print(f"2. Run video production with orchestrator_v3_no_face.py")
-    print(f"3. Script text is in production_config.json")
+    print("2. Run video production with orchestrator_v3_no_face.py")
+    print("3. Script text is in production_config.json")
     print()
     print("📊 VIRAL POTENTIAL: 9/10")
     print("🎯 BASED ON: 1,730 views on Telegram @vitalycontentcreate")

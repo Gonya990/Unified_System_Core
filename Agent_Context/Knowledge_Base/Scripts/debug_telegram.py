@@ -1,7 +1,7 @@
 import os
-import requests
-import json
 import sys
+
+import requests
 
 # Load from env or hardcode from artifact if needed (using passed arg for safety)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")  # Set via env var
@@ -17,11 +17,11 @@ try:
     resp = requests.get(url, timeout=10)
     print(f"getMe Status: {resp.status_code}")
     print(f"getMe Body: {resp.text}")
-    
+
     if resp.status_code == 200:
         bot_venom = resp.json()
         print(f"Bot Name: {bot_venom['result']['username']}")
-        
+
         # Try sending message
         msg_url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
         payload = {"chat_id": CHAT_ID, "text": "🤖 DEBUG: Connection Restored. I am listening."}

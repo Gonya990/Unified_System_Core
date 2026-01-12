@@ -3,11 +3,9 @@
 Multi-platform upload for Sora 2 video
 Upload to: Instagram, YouTube, TikTok (via Threads as alternative)
 """
-import os
-import sys
 import json
+import sys
 from pathlib import Path
-from datetime import datetime
 
 # Setup paths
 ROOT_DIR = Path(__file__).parent.parent.parent
@@ -17,6 +15,7 @@ sys.path.insert(0, str(SRC_DIR / "uploaders"))
 sys.path.insert(0, str(SRC_DIR / "pipeline"))
 
 from dotenv import load_dotenv
+
 load_dotenv(ROOT_DIR / ".env")
 
 # Video and config paths
@@ -31,7 +30,7 @@ print("🚀 MULTI-PLATFORM UPLOAD")
 print("=" * 60)
 print(f"📹 Video: {VIDEO_PATH.name}")
 print(f"📊 Viral Potential: {config['script_idea']['Viral Potential']}/10")
-print(f"🎯 Based on: 1,730 Telegram views")
+print("🎯 Based on: 1,730 Telegram views")
 print()
 
 # Prepare captions
@@ -90,8 +89,8 @@ print("📱 PHASE 1: INSTAGRAM REELS")
 print("-" * 60)
 
 try:
-    from insta_uploader import upload_reel
     from account_manager import AccountManager
+    from insta_uploader import upload_reel
 
     acc_manager = AccountManager()
     insta_accounts = acc_manager.get_accounts("instagram")
@@ -131,8 +130,8 @@ print("🎬 PHASE 2: YOUTUBE SHORTS")
 print("-" * 60)
 
 try:
-    from youtube_uploader import upload_video
     from account_manager import AccountManager
+    from youtube_uploader import upload_video
 
     acc_manager = AccountManager()
     yt_accounts = acc_manager.get_accounts("youtube")
@@ -174,6 +173,7 @@ print("-" * 60)
 
 try:
     import asyncio
+
     from threads_browser import ThreadsBrowser
 
     print("\n📤 Uploading to Threads...")

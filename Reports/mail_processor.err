@@ -45,3 +45,33 @@
 2026-01-12 20:43:32 - MailProcessor - WARNING - Mail server not available, skipping poll
 2026-01-12 20:55:17 - MailProcessor - WARNING - Mail server not available, skipping poll
 2026-01-12 21:01:27 - MailProcessor - WARNING - Mail server not available, skipping poll
+2026-01-12 22:22:37 - MailProcessor - INFO - Loaded 220 processed message IDs
+2026-01-12 22:22:37 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 22:22:37 - MailProcessor - WARNING - ⚠️ Registration failed: Connection failed: 403 Client Error: Forbidden for url: http://100.110.209.49:8765/mcp
+2026-01-12 22:22:37 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 22:22:37 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 22:22:37 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-12 22:23:22 - MailProcessor - INFO - Loaded 220 processed message IDs
+2026-01-12 22:23:22 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 22:23:22 - MailProcessor - WARNING - ⚠️ Registration failed: Connection failed: 403 Client Error: Forbidden for url: http://100.110.209.49:8765/mcp
+2026-01-12 22:23:22 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 22:23:22 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 22:23:22 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-12 22:26:22 - MailProcessor - INFO - Loaded 220 processed message IDs
+2026-01-12 22:26:22 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 22:26:22 - MailProcessor - WARNING - ⚠️ Registration failed: Connection failed: 403 Client Error: Forbidden for url: http://100.110.209.49:8765/mcp
+2026-01-12 22:26:22 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 22:26:22 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 22:26:22 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-12 22:26:32 - MailProcessor - INFO - Loaded 220 processed message IDs
+2026-01-12 22:26:32 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 22:26:32 - MailProcessor - WARNING - ⚠️ Registration failed: Connection failed: 403 Client Error: Forbidden for url: http://100.110.209.49:8765/mcp
+2026-01-12 22:26:32 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 22:26:32 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 22:26:32 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-12 22:28:03 - MailProcessor - INFO - Loaded 220 processed message IDs
+2026-01-12 22:28:03 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 22:28:03 - MailProcessor - WARNING - ⚠️ Registration failed: Connection failed: 403 Client Error: Forbidden for url: http://100.110.209.49:8765/mcp
+2026-01-12 22:28:03 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 22:28:03 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 22:28:03 - MailProcessor - INFO -    Alert keywords: 29 configured

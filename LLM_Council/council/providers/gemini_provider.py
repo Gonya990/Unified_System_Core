@@ -3,9 +3,10 @@ Gemini Provider for LLM Council.
 Supports Gemini 2.0 Flash (Nana Banana), Pro, etc.
 """
 
-import logging
 import asyncio
+import logging
 from typing import Optional
+
 import google.generativeai as genai
 
 from .base import BaseProvider, ProviderResponse
@@ -14,12 +15,12 @@ logger = logging.getLogger(__name__)
 
 class GeminiProvider(BaseProvider):
     """Google Gemini API provider (Gemini 2.0 Flash, Pro)."""
-    
+
     name = "gemini"
-    
+
     def __init__(
-        self, 
-        api_key: str, 
+        self,
+        api_key: str,
         model: str = "models/gemini-2.0-flash",
         base_url: Optional[str] = None
     ):
@@ -35,7 +36,7 @@ class GeminiProvider(BaseProvider):
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
         """Generate response with fallback logic, prioritizing Nana Banana."""
         models_to_try = [
-            "models/nano-banana-pro-preview", 
+            "models/nano-banana-pro-preview",
             self._model_name,
             "models/gemini-2.5-pro",
             "models/gemini-2.5-flash",
@@ -43,24 +44,24 @@ class GeminiProvider(BaseProvider):
             "models/gemini-flash-latest",
             "models/gemini-pro-latest"
         ]
-        
+
         last_error = None
         for m_name in models_to_try:
             with self._measure_time() as timer:
                 try:
                     # Setup model if it's a fallback
                     model = genai.GenerativeModel(m_name)
-                    
+
                     full_prompt = prompt
                     if system_prompt:
                         full_prompt = f"SYSTEM: {system_prompt}\n\nUSER: {prompt}"
 
                     loop = asyncio.get_event_loop()
                     response = await loop.run_in_executor(
-                        None, 
+                        None,
                         lambda: model.generate_content(full_prompt)
                     )
-                    
+
                     if not response.text:
                         raise ValueError("Empty response from Gemini")
 
@@ -83,7 +84,7 @@ class GeminiProvider(BaseProvider):
                         continue
                     else:
                         logger.error(f"Gemini {m_name} error: {last_error}")
-                        # If it's not a rate limit, maybe try next model anyway? 
+                        # If it's not a rate limit, maybe try next model anyway?
                         # Some models might not be enabled.
                         continue
 

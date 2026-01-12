@@ -1,10 +1,8 @@
 from docx import Document
-from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
+from docx.shared import Pt, RGBColor
 
-from docx.oxml import OxmlElement
 
 def set_rtl(paragraph):
     """Sets the paragraph direction to RTL."""
@@ -20,13 +18,13 @@ def set_rtl(paragraph):
 
 def create_resume():
     document = Document()
-    
+
     # Define Styles
     style = document.styles['Normal']
     font = style.font
     font.name = 'Arial'
     font.size = Pt(11)
-    
+
     # ---------------- Header ----------------
     # Name
     name_paragraph = document.add_paragraph()
@@ -36,7 +34,7 @@ def create_resume():
     run.bold = True
     run.font.size = Pt(24)
     run.font.color.rgb = RGBColor(44, 62, 80) # Dark Blue
-    
+
     # Subtitle
     title_paragraph = document.add_paragraph()
     set_rtl(title_paragraph)
@@ -51,9 +49,9 @@ def create_resume():
     set_rtl(contact_paragraph)
     contact_paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     contact_paragraph.add_run("[Email] | [Phone] | מרטין בובר 7, קרית ביאליק")
-    
+
     document.add_heading('תמצית מקצועית', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    
+
     summary_p = document.add_paragraph()
     set_rtl(summary_p)
     summary_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -69,7 +67,7 @@ def create_resume():
     run = job1_header.add_run("Schindler Group | סופרוויזור (BEYOND Tower)")
     run.bold = True
     run.font.size = Pt(12)
-    
+
     job1_meta = document.add_paragraph()
     set_rtl(job1_meta)
     job1_meta.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -103,7 +101,7 @@ def create_resume():
     run = job2_header.add_run("URICOMS (Partner Communications) | מומחה סיבים אופטיים / ראש צוות")
     run.bold = True
     run.font.size = Pt(12)
-    
+
     job2_meta = document.add_paragraph()
     set_rtl(job2_meta)
     job2_meta.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -131,7 +129,7 @@ def create_resume():
     run = job3_header.add_run("וירה והרכבות בע״מ | טכנאי מעליות")
     run.bold = True
     run.font.size = Pt(12)
-    
+
     job3_meta = document.add_paragraph()
     set_rtl(job3_meta)
     job3_meta.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -172,7 +170,7 @@ def create_resume():
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("כלים ותוכנות: ").bold = True
     p.add_run("שליטה מלאה ביישומי Office, מערכות לניהול פרויקטים, ויכולת קריאה והבנה של שרטוטים טכניים.")
-    
+
     document.add_paragraph() # Spacer
 
     # Project Sub-header
@@ -181,7 +179,7 @@ def create_resume():
     pr_h.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     run = pr_h.add_run('פרויקט אישי: "תשתיות חכמות ואוטומציה"')
     run.bold = True
-    
+
     pr_desc = document.add_paragraph()
     set_rtl(pr_desc)
     pr_desc.alignment = WD_ALIGN_PARAGRAPH.RIGHT

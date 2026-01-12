@@ -1,6 +1,6 @@
 
-import os
 import csv
+import os
 
 ROOT_DIR = "/home/gonya"
 NAV_DIR = os.path.join(ROOT_DIR, "00_NAV")
@@ -16,8 +16,8 @@ def main():
     by_project = {}
     inbox_count = 0
     inbox_items = []
-    
-    with open(LOG_FILE, 'r') as f:
+
+    with open(LOG_FILE) as f:
         reader = csv.DictReader(f)
         for row in reader:
             if "Moved" in row['status']:
@@ -42,18 +42,18 @@ def main():
         f.write("## 🚀 Projects\n")
         f.write("| Project | Status | Path | Key Files |\n")
         f.write("|---|---|---|---|\n")
-        
+
         if os.path.exists(PROJECTS_ROOT):
             projects = sorted(os.listdir(PROJECTS_ROOT))
             for p in projects:
                  f.write(f"| **{p}** | Active | `01_Projects/{p}` | [README](01_Projects/{p}/00_README.md) |\n")
-        
+
         f.write("\n## 📬 Inbox / Needs Review\n")
         f.write(f"**{inbox_count}** items require attention in `90_Inbox_ToSort/NEEDS_REVIEW`.\n")
         f.write("\n## 📚 Shared & Operations\n")
         f.write("- **Shared**: `02_Shared/` (Installers, Global Scripts)\n")
         f.write("- **Operations**: `03_Operations/`\n")
-        
+
         f.write("\n## Quick Jump\n")
         f.write("- [Migration Log](MIGRATION_LOG.csv)\n")
         f.write("- [Full Inventory](INVENTORY.csv)\n")
@@ -66,11 +66,11 @@ def main():
         f.write(f"**Successful**: {succeeded}\n")
         f.write(f"**Failed/Skipped**: {failed}\n")
         f.write(f"**Items in Inbox**: {inbox_count}\n\n")
-        
+
         f.write("## Project Breakdown\n")
         for prj, count in by_project.items():
             f.write(f"- {prj}: {count} items\n")
-            
+
         f.write("\n## Top 20 Inbox Items\n")
         for item in inbox_items:
             f.write(f"- {item}\n")

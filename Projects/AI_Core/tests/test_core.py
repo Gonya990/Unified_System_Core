@@ -1,11 +1,11 @@
 """
 Tests for Core Components (Usage Tracker, Task Manager).
 """
-import pytest
 import os
-import sqlite3
-from src.usage_tracker import UsageTracker
+
+import pytest
 from src.task_manager import TaskManager
+from src.usage_tracker import UsageTracker
 
 # Use in-memory DB or temp file
 TEST_DB = "test_core.db"
@@ -20,7 +20,7 @@ def clean_db():
 
 def test_usage_tracker(clean_db):
     tracker = UsageTracker(db_path=clean_db)
-    
+
     # Log usage
     tracker.log_usage(
         user_id=123,
@@ -29,7 +29,7 @@ def test_usage_tracker(clean_db):
         model="gpt-4",
         usage_stats={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30}
     )
-    
+
     # Verify
     stats = tracker.get_user_stats(123)
     assert stats is not None
@@ -40,21 +40,21 @@ def test_usage_tracker(clean_db):
 def test_task_manager(clean_db):
     tm = TaskManager(db_path=clean_db)
     user_id = 999
-    
+
     # Add task
     task_id = tm.add_task(user_id, "Buy milk")
     assert task_id > 0
-    
+
     # List tasks
     tasks = tm.list_tasks(user_id)
     assert len(tasks) == 1
     assert tasks[0]["text"] == "Buy milk"
     assert tasks[0]["status"] == "pending"
-    
+
     # Complete task
     success = tm.complete_task(user_id, task_id)
     assert success
-    
+
     # Verify list empty (pending)
     tasks = tm.list_tasks(user_id)
     assert len(tasks) == 0
