@@ -11,8 +11,23 @@ from dotenv import load_dotenv
 
 # Setup Paths
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+FAMILY_DIR = Path(__file__).resolve().parent
 sys.path.append(str(ROOT_DIR))
+
+# Load both AI_Core and Family environment configurations
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
+load_dotenv(FAMILY_DIR / ".env")
+
+# Import VAPIClient for voice delivery
+VAPI_AVAILABLE = False
+try:
+    sys.path.insert(0, str(ROOT_DIR / "Projects/AI_Core/src"))
+    from vapi_client import VAPIClient
+
+    VAPI_AVAILABLE = True
+except ImportError as e:
+    logger_init = logging.getLogger("MorningBrief")
+    logger_init.debug(f"VAPI client not available: {e}")
 
 # Logging
 LOG_DIR = ROOT_DIR / "logs/family"
@@ -27,11 +42,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger("MorningBrief")
 
-# Chat IDs
+# User Configuration with Phone Numbers
 USERS = {
-    "Admin": 708531393,
-    "Kostya": 578363419
+    "Admin": {
+        "telegram_id": 708531393,
+        "phone": os.getenv("PHONE_ADMIN", ""),
+        "name": "Igor"
+    },
+    "Kostya": {
+        "telegram_id": 578363419,
+        "phone": os.getenv("PHONE_KOSTYA", ""),
+        "name": "Kostya"
+    }
 }
+
+# Delivery Settings
+ENABLE_VOICE = os.getenv("BRIEF_ENABLE_VOICE", "false").lower() == "true"
+ENABLE_TELEGRAM = os.getenv("BRIEF_ENABLE_TELEGRAM", "true").lower() == "true"
 
 def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
     """Fetch real weather from OpenMeteo"""
@@ -49,7 +76,7 @@ def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
         logger.error(f"Weather error: {e}")
         return "Unavailable"
 
-def get_homework_summary():
+async def get_homework_summary():
     """Fetch homework from Sentinel + Mashov"""
     report = []
 
@@ -68,31 +95,86 @@ def get_homework_summary():
 
     # 2. Mashov (if configured)
     try:
-        from Scripts.Family.mashov_login import fetch_homework, login_mashov
+        from Projects.AI_Core.src.mashov_client import MashovClient
+
         user = os.getenv("MASHOV_USER")
         pwd = os.getenv("MASHOV_PASS")
         school = os.getenv("MASHOV_SCHOOL")
 
         if user and pwd and school and school != "0":
-            session, data = login_mashov(user, pwd, int(school))
-            if session and data:
-                uid = data['credential']['userId']
-                hw = fetch_homework(session, uid)
-                if hw:
-                    report.append(f"🏫 **Mashov:** {len(hw)} заданий в ожидании.")
-                else:
-                    report.append("🏫 Mashov: Нет активных заданий.")
-            else:
-                report.append("🏫 Mashov: Ошибка входа.")
-        else:
-            # report.append("🏫 Mashov: Не настроен (нет символа школы).")
-            pass # Silent if not configured
+            # Initialize Mashov client
+            mashov = MashovClient(
+                username=user,
+                password=pwd,
+                school_id=int(school)
+            )
 
-    except Exception:
-        # logger.error(f"Mashov error: {e}")
-        pass # Silent error
+            if not mashov.is_valid():
+                logger.warning("[MASHOV] Invalid configuration in morning_brief")
+                report.append("🏫 Mashov: Ошибка конфигурации")
+            else:
+                # Attempt login
+                login_ok = await mashov.login()
+                if login_ok:
+                    student_id = mashov.get_student_id()
+                    if student_id:
+                        hw = await mashov.fetch_homework(student_id)
+                        if hw:
+                            report.append(f"🏫 **Mashov:** {len(hw)} заданий в ожидании")
+                        else:
+                            report.append("🏫 Mashov: Нет активных заданий")
+                    else:
+                        logger.warning("[MASHOV] Could not extract student ID in morning_brief")
+                        report.append("🏫 Mashov: Ошибка получения данных ученика")
+                else:
+                    logger.warning("[MASHOV] Login failed in morning_brief")
+                    report.append("🏫 Mashov: Ошибка входа (проверьте учетные данные)")
+        else:
+            logger.debug("[MASHOV] Mashov not configured in morning_brief (silent)")
+
+    except ImportError as e:
+        logger.error(f"[MASHOV] Import error in morning_brief: {e}")
+        report.append(f"🏫 Mashov: Ошибка импорта модуля")
+    except Exception as e:
+        logger.error(f"[MASHOV] Error in morning_brief: {e}")
+        report.append(f"🏫 Mashov: Ошибка подключения")
 
     return "\n\n".join(report)
+
+
+async def send_voice_brief(vapi_client: "VAPIClient", phone: str, name: str, message: str):
+    """Send morning brief as voice call via VAPI."""
+    if not phone or not phone.startswith("+"):
+        logger.warning(f"Invalid phone number for {name}: {phone}")
+        return False
+
+    try:
+        # Convert text brief to natural speech format (remove Markdown)
+        speech_message = message.replace("**", "").replace("*", "").replace("🌅", "").replace("🌡️", "").replace("📚", "").replace("🚀", "")
+
+        # Create system prompt for voice assistant
+        system_prompt = (
+            f"You are a friendly morning briefing assistant. "
+            f"Read the following information clearly in Russian to {name}: {speech_message}"
+        )
+
+        call_info = await vapi_client.create_phone_call(
+            phone_number=phone,
+            system_message=system_prompt
+        )
+
+        if call_info:
+            call_id = call_info.get("id", "unknown")
+            logger.info(f"Voice call initiated for {name} to {phone}: {call_id}")
+            return True
+        else:
+            logger.error(f"Failed to initiate call for {name}")
+            return False
+
+    except Exception as e:
+        logger.error(f"Voice call failed for {name}: {e}")
+        return False
+
 
 async def send_brief():
     logger.info("Generating Morning Brief...")
@@ -107,7 +189,7 @@ async def send_brief():
 
     weather = get_weather()
     # news = get_news_summary() # Keep mock or remove if irrelevant
-    homework = get_homework_summary()
+    homework = await get_homework_summary()
 
     message = f"🌅 **Утренняя Сводка** | {date_str}\n\n" \
               f"🌡️ **Погода:** {weather}\n\n" \
@@ -116,26 +198,57 @@ async def send_brief():
 
     logger.info(f"Brief Content:\n{message}")
 
-    # Send via Bot API
-    token = os.getenv("TELEGRAM_BOT_TOKEN") or "8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk"
+    # Initialize VAPI client for voice delivery
+    vapi_client = None
+    if ENABLE_VOICE and VAPI_AVAILABLE:
+        vapi_key = os.getenv("VAPI_API_KEY")
+        if vapi_key:
+            try:
+                vapi_client = VAPIClient(vapi_key)
+                if not vapi_client.is_valid():
+                    logger.warning("VAPI client invalid, voice calls disabled")
+                    vapi_client = None
+            except Exception as e:
+                logger.error(f"Failed to init VAPI: {e}")
+    elif ENABLE_VOICE:
+        logger.warning("Voice delivery enabled but VAPI SDK not available")
 
-    if token:
-        for name, chat_id in USERS.items():
-            if chat_id:
-                url = f"https://api.telegram.org/bot{token}/sendMessage"
-                try:
-                    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
-                    res = requests.post(url, json=payload, timeout=5)
-                    if res.status_code == 200:
-                        logger.info(f"Sent to {name} ({chat_id})")
-                    else:
-                        logger.error(f"Failed to send to {name}: {res.text}")
-                except Exception as e:
-                    logger.error(f"Failed to send to {name}: {e}")
-            else:
-                logger.warning(f"Skipping {name} (No Chat ID)")
+    # Telegram delivery
+    if ENABLE_TELEGRAM:
+        token = os.getenv("TELEGRAM_BOT_TOKEN") or "8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk"
+
+        if token:
+            for name, user_info in USERS.items():
+                chat_id = user_info.get("telegram_id")
+                if chat_id:
+                    url = f"https://api.telegram.org/bot{token}/sendMessage"
+                    try:
+                        payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
+                        res = requests.post(url, json=payload, timeout=5)
+                        if res.status_code == 200:
+                            logger.info(f"Telegram brief sent to {name}")
+                        else:
+                            logger.error(f"Failed to send to {name}: {res.text}")
+                    except Exception as e:
+                        logger.error(f"Telegram send failed for {name}: {e}")
+                else:
+                    logger.warning(f"Skipping {name} (No Telegram ID)")
+        else:
+            logger.warning("Bot Token missing. Telegram delivery skipped.")
     else:
-        logger.warning("Bot Token missing. Brief generated but not sent.")
+        logger.info("Telegram delivery disabled")
+
+    # Voice delivery
+    if ENABLE_VOICE and vapi_client:
+        for name, user_info in USERS.items():
+            phone = user_info.get("phone")
+            user_name = user_info.get("name", name)
+            if phone:
+                success = await send_voice_brief(vapi_client, phone, user_name, message)
+                if success:
+                    logger.info(f"Voice brief sent to {name}")
+            else:
+                logger.info(f"No phone number for {name}, skipping voice delivery")
 
 if __name__ == "__main__":
     asyncio.run(send_brief())

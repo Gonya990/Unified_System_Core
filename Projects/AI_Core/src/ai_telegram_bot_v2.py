@@ -1935,6 +1935,8 @@ async def post_init(application: Application) -> None:
         BotCommand("img", "Generate image with DALL-E 3"),
         BotCommand("generate_video", "Generate video from prompt"),
         BotCommand("video_status", "Check video generation status"),
+        BotCommand("mashov_homework", "Show homework from Mashov"),
+        BotCommand("mashov_find_school", "Search for school by name"),
         BotCommand("memory", "View your saved memories"),
         BotCommand("msg", "Message another user"),
         BotCommand("login", "Login to Web Dashboard"),
@@ -2600,6 +2602,217 @@ async def generate_video_background(job_id: str, prompt: str, user_id: int, cont
             )
         except Exception as notify_err:
             logger.error(f"[VIDEO] Failed to notify user of error: {notify_err}")
+
+
+# Mashov Homework Integration Commands
+async def mashov_homework_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /mashov_homework command - show pending homework from Mashov."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    # Check if Mashov is configured
+    mashov_user = os.getenv("MASHOV_USER")
+    mashov_pass = os.getenv("MASHOV_PASS")
+    mashov_school = os.getenv("MASHOV_SCHOOL")
+
+    if not mashov_user or not mashov_pass or not mashov_school or mashov_school == "0":
+        await update.message.reply_text(
+            "🏫 **Mashov не настроен**\n\n"
+            "Для настройки:\n"
+            "1. Найдите ID школы: `/mashov_find_school <название>`\n"
+            "2. Обновите переменную `MASHOV_SCHOOL` в `.env`\n\n"
+            "Текущее значение: " + (f"`{mashov_school}`" if mashov_school else "`не установлено`"),
+            parse_mode="Markdown",
+        )
+        return
+
+    # Show typing indicator
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
+
+    try:
+        from Projects.AI_Core.src.mashov_client import MashovClient
+
+        # Initialize Mashov client
+        mashov = MashovClient(
+            username=mashov_user,
+            password=mashov_pass,
+            school_id=int(mashov_school),
+        )
+
+        if not mashov.is_valid():
+            await update.message.reply_text("❌ Ошибка конфигурации Mashov.")
+            logger.error("[MASHOV] Invalid client configuration")
+            return
+
+        # Login to Mashov
+        logger.info(f"[MASHOV] Attempting login for user {user_id}")
+        login_success = await mashov.login()
+
+        if not login_success:
+            await update.message.reply_text(
+                "❌ **Ошибка входа в Mashov**\n\n"
+                "Проверьте:\n"
+                "• Логин (MASHOV_USER)\n"
+                "• Пароль (MASHOV_PASS)\n"
+                "• ID школы (MASHOV_SCHOOL)",
+                parse_mode="Markdown",
+            )
+            logger.error("[MASHOV] Login failed")
+            return
+
+        # Get student ID
+        student_id = mashov.get_student_id()
+        if not student_id:
+            await update.message.reply_text(
+                "⚠️ Не удалось найти данные ученика.\n\n"
+                "Проверьте учетные данные Mashov."
+            )
+            logger.warning("[MASHOV] Could not extract student ID")
+            return
+
+        logger.info(f"[MASHOV] Student ID: {student_id}")
+
+        # Fetch homework
+        homework = await mashov.fetch_homework(student_id)
+
+        if homework is None:
+            # Try to use cached data
+            cached_hw = db.get_cached_homework(user_id)
+            if cached_hw:
+                await update.message.reply_text(
+                    "⚠️ **Не удалось подключиться к Mashov**\n\n"
+                    "_Показываю кэшированные данные:_\n\n"
+                    + _format_homework_list(cached_hw),
+                    parse_mode="Markdown",
+                )
+                return
+            else:
+                await update.message.reply_text(
+                    "❌ **Не удалось загрузить домашние задания**\n\n"
+                    "Проверьте:\n"
+                    "• Подключение к интернету\n"
+                    "• Доступность сервера Mashov\n"
+                    "• Правильность учетных данных"
+                )
+                return
+
+        if not homework or len(homework) == 0:
+            await update.message.reply_text(
+                "✅ **Нет активных заданий!**\n\n"
+                "Все домашние задания выполнены. Отдыхайте! 🎉"
+            )
+        else:
+            msg = f"📚 **Домашние задания** ({len(homework)})\n\n"
+            msg += _format_homework_list(homework)
+
+            await update.message.reply_text(msg, parse_mode="Markdown")
+
+            # Cache the homework
+            db.cache_homework(user_id, homework)
+            logger.info(f"[MASHOV] Cached {len(homework)} homework items for user {user_id}")
+
+    except ImportError as e:
+        await update.message.reply_text("❌ Ошибка: модуль MashovClient не найден.")
+        logger.error(f"[MASHOV] Import error: {e}")
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ **Ошибка при загрузке домашних заданий**\n\n`{str(e)[:100]}`",
+            parse_mode="Markdown",
+        )
+        logger.error(f"[MASHOV] Unexpected error: {e}", exc_info=True)
+
+
+async def mashov_find_school_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /mashov_find_school command - search for school by name."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        await update.message.reply_text(
+            "🔍 **Поиск школ Mashov**\n\n"
+            "Использование: `/mashov_find_school <название>`\n\n"
+            "Примеры:\n"
+            "• `/mashov_find_school ГОШ`\n"
+            "• `/mashov_find_school Школа 1`",
+            parse_mode="Markdown",
+        )
+        return
+
+    query = " ".join(context.args)
+    logger.info(f"[MASHOV] School search: '{query}'")
+
+    # Show typing indicator
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
+
+    try:
+        from Projects.AI_Core.src.mashov_client import MashovClient
+
+        schools = await MashovClient.find_school(query)
+
+        if schools:
+            msg = f"🔍 **Найдено школ: {len(schools)}**\n\n"
+            for i, school in enumerate(schools[:10], 1):
+                school_name = school.get("name", "Unknown")
+                school_id = school.get("semel", "N/A")
+                msg += f"{i}. **{school_name}**\n   ID: `{school_id}`\n\n"
+
+            if len(schools) > 10:
+                msg += f"_... и еще {len(schools) - 10} школ_"
+
+            msg += (
+                "\n\n💡 **Как настроить:**\n"
+                "1. Скопируйте ID нужной школы\n"
+                "2. Обновите `MASHOV_SCHOOL` в `.env`\n"
+                "3. Перезагрузите бота"
+            )
+
+            await update.message.reply_text(msg, parse_mode="Markdown")
+        else:
+            await update.message.reply_text(
+                f"❌ Школы с названием `{query}` не найдены.",
+                parse_mode="Markdown",
+            )
+
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ **Ошибка поиска школ**\n\n`{str(e)[:100]}`",
+            parse_mode="Markdown",
+        )
+        logger.error(f"[MASHOV] School search error: {e}", exc_info=True)
+
+
+def _format_homework_list(homework: list) -> str:
+    """Format homework list for display."""
+    lines = []
+    for hw in homework[:15]:  # Limit to 15 items
+        subject = hw.get("subject", "Предмет")
+        title = hw.get("title", hw.get("description", "Без названия"))
+        due_date = hw.get("dueDate", hw.get("due_date", "Не указано"))
+
+        # Truncate long titles
+        if len(title) > 80:
+            title = title[:77] + "..."
+
+        lines.append(f"📖 **{subject}**")
+        lines.append(f"   {title}")
+        lines.append(f"   📅 `{due_date}`\n")
+
+    if len(homework) > 15:
+        lines.append(f"_... и еще {len(homework) - 15} заданий_")
+
+    return "\n".join(lines)
 
 
 async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4578,6 +4791,8 @@ def main():
         "am": am_command,
         "generate_video": generate_video_command,
         "video_status": video_status_command,
+        "mashov_homework": mashov_homework_command,
+        "mashov_find_school": mashov_find_school_command,
     }
 
     for cmd, func in commands_to_register.items():
