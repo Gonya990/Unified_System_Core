@@ -1,21 +1,18 @@
-
-
 import requests
 
-URL = 'http://localhost:8765/mcp'
-TOKEN = 'c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb'
-PROJECT = '/home/gonya/Unified_System'
+URL = "http://localhost:8765/mcp"
+TOKEN = "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+PROJECT = "/home/gonya/Unified_System"
+
 
 def call(name, args):
-    payload = {
-        "jsonrpc": "2.0", "method": "tools/call", "id": 1,
-        "params": {"name": name, "arguments": args}
-    }
+    payload = {"jsonrpc": "2.0", "method": "tools/call", "id": 1, "params": {"name": name, "arguments": args}}
     try:
-        r = requests.post(URL, json=payload, headers={'Authorization': f'Bearer {TOKEN}'}, timeout=5)
+        r = requests.post(URL, json=payload, headers={"Authorization": f"Bearer {TOKEN}"}, timeout=5)
         print(f"{name}: {r.status_code} - {r.text[:200]}...")
     except Exception as e:
         print(f"{name}: Error {e}")
+
 
 # 1. Ensure Project
 call("ensure_project", {"human_key": PROJECT})
@@ -24,7 +21,7 @@ call("ensure_project", {"human_key": PROJECT})
 agents = [
     {"name": "OrangeStone", "program": "antigravity-core", "model": "gemini-2.0-flash-exp"},
     {"name": "PinkLake", "program": "llm-council", "model": "gemini-2.0-flash-exp"},
-    {"name": "FuchsiaCat", "program": "llm-council", "model": "gemini-2.0-flash-exp"}
+    {"name": "VioletCastle", "program": "claude-code", "model": "opus-4.5"},
 ]
 
 for a in agents:

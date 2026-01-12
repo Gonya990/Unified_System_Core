@@ -72,7 +72,7 @@ python3 Scripts/Orchestration/agent_mail_client.py read --id 123
 | VioletCastle | claude-code | Kosta |
 | OrangeStone | antigravity-core | Igor (bot) |
 | PinkLake | llm-council | Igor (bot) |
-| FuchsiaCat | llm-council | Igor (bot) |
+| FuchsiaCat | opencode | Kosta (inactive) |
 
 ## Workflow Example
 
