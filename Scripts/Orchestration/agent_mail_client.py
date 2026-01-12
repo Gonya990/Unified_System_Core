@@ -16,9 +16,18 @@ try:
 
     from dotenv import load_dotenv
 
-    # Load .env from project root (2 levels up from this script)
-    env_path = Path(__file__).resolve().parent.parent.parent / ".env"
-    load_dotenv(env_path)
+    # Try different potential root locations for .env
+    current_file = Path(__file__).resolve()
+    # Scripts/Orchestration/ (3 levels up)
+    # Projects/AI_Core/src/ (4 levels up)
+    for depth in range(2, 6):
+        env_path = current_file.parents[depth] / ".env"
+        if env_path.exists():
+            load_dotenv(env_path)
+            break
+    else:
+        # Fallback to default search
+        load_dotenv()
 except ImportError:
     pass
 
