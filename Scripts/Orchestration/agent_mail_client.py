@@ -34,12 +34,19 @@ class AgentMailConfig:
     @classmethod
     def from_env(cls):
         """Load config from environment"""
+        project_key = (
+            os.getenv("AGENT_MAIL_PROJECT")
+            or os.getenv("AGENT_MAIL_PROJECT_KEY")
+            or os.getenv("PROJECT_KEY")
+            or "/home/gonya/Unified_System"
+        )
+        if project_key == "home-gonya-unified-system":
+            project_key = "/home/gonya/Unified_System"
+
         return cls(
             server=os.getenv("AGENT_MAIL_SERVER", "http://100.110.209.49:8765"),
             token="c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb",
-            project_key=os.getenv(
-                "AGENT_MAIL_PROJECT", "/Gonya990/Unified_System_Core"
-            ),
+            project_key=project_key,
             agent_name=os.getenv("AGENT_MAIL_NAME", "Antigravity"),
         )
 
