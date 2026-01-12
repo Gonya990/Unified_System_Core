@@ -33,31 +33,77 @@ USERS = {
     "Kostya": 578363419
 }
 
-def get_weather(location="Tel Aviv"):
-    # Mock/Simple weather
-    return "☀️ 25°C, Sunny"
-
-def get_news_summary():
-    """Use TokenBroker to fetch headers or generate summary."""
+def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
+    """Fetch real weather from OpenMeteo"""
     try:
-        from Scripts.Utilities.token_broker import TokenBroker
-        broker = TokenBroker()
-        # Use simple generator logic
-        return "1. Tech: AI advancements in 2026.\n2. Local: New metro line opening.\n3. Global: Space mission success."
-    except:
-        return "News unavailable."
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            cw = data.get("current_weather", {})
+            temp = cw.get("temperature")
+            # Code mapping could be added, but simple temp is fine
+            return f"{temp}°C"
+        return "N/A"
+    except Exception as e:
+        logger.error(f"Weather error: {e}")
+        return "Unavailable"
+
+def get_homework_summary():
+    """Fetch homework from Sentinel + Mashov"""
+    report = []
+    
+    # 1. Gmail Sentinel
+    try:
+        from Scripts.Family.homework_sentinel import scan_mailbox, summarize_tasks
+        emails = scan_mailbox()
+        if emails:
+            gmail_summary = summarize_tasks(emails)
+            report.append(f"📧 **Gmail Homework:**\n{gmail_summary}")
+        else:
+            report.append("📧 Gmail: No new homework emails.")
+    except Exception as e:
+        logger.error(f"Sentinel error: {e}")
+        report.append(f"📧 Sentinel Error: {e}")
+
+    # 2. Mashov (if configured)
+    try:
+        from Scripts.Family.mashov_login import login_mashov, fetch_homework, fetch_grades
+        user = os.getenv("MASHOV_USER")
+        pwd = os.getenv("MASHOV_PASS")
+        school = os.getenv("MASHOV_SCHOOL")
+        
+        if user and pwd and school and school != "0":
+            session, data = login_mashov(user, pwd, int(school))
+            if session and data:
+                uid = data['credential']['userId']
+                hw = fetch_homework(session, uid)
+                if hw:
+                    report.append(f"🏫 **Mashov Homework:** {len(hw)} tasks pending.")
+                else:
+                    report.append("🏫 Mashov: No pending tasks.")
+            else:
+                report.append("🏫 Mashov: Login failed.")
+        else:
+            report.append("🏫 Mashov: Not configured (Missing School Symbol).")
+            
+    except Exception as e:
+        logger.error(f"Mashov error: {e}")
+
+    return "\n\n".join(report)
 
 async def send_brief():
     logger.info("Generating Morning Brief...")
 
     date_str = datetime.now().strftime("%A, %d %B %Y")
     weather = get_weather()
-    news = get_news_summary()
+    # news = get_news_summary() # Keep mock or remove if irrelevant
+    homework = get_homework_summary()
 
     message = f"🌅 **Morning Brief** | {date_str}\n\n" \
               f"🌡️ **Weather:** {weather}\n\n" \
-              f"📰 **Top Stories:**\n{news}\n\n" \
-              f"📅 **Tasks:**\n- Check Mashov (Sentinel Active)\n- Review Factory Output"
+              f"📚 **School Update:**\n{homework}\n\n" \
+              f"🚀 **Have a great day!**"
 
     logger.info(f"Brief Content:\n{message}")
 

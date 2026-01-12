@@ -54,7 +54,7 @@
 |-----------------|-------|--------|---------------|
 | `nodriver_im...` | **Browser Control** | ✅ Done | nodriver_daemon.py, ndc |
 | `workflow_de...` | **Workflow Design** | ✅ Done | WORKFLOW_DESIGN.md |
-| `arthur_tabl...` | **Arthur Tablet** | 🔄 InPrg | ADB setup, Tailscale |
+| `arthur_tabl...` | **Arthur Tablet** | 🔄 InPrg | MorningBrief, Mashov, ADB |
 | `6afbab64-f0...` | **Codex Handoff** | ✅ Done | Artifact index, handoff |
 | `0866ee1f-59...` | **Unified Topology** | ✅ Done | MCP server, n8n guide |
 | `a1c2070a-d3...` | **Proxmox Recon** | 🔄 InPrg | System inventory |

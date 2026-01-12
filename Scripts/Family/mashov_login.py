@@ -92,16 +92,62 @@ def fetch_homework(session, user_id):
     except:
         return []
 
-if __name__ == "__main__":
-    # Test Credentials (ENV or Hardcoded for test)
-    user = os.getenv("MASHOV_USER", "PLACEHOLDER")
-    pwd = os.getenv("MASHOV_PASS", "PLACEHOLDER")
-    school = os.getenv("MASHOV_SCHOOL", "0")
+def get_all_schools():
+    """Fetch all schools from Mashov API"""
+    try:
+        res = requests.get(f"{MASHOV_URL}/schools")
+        if res.status_code == 200:
+            return res.json()
+        return []
+    except Exception as e:
+        logger.error(f"Failed to fetch schools: {e}")
+        return []
 
-    if user == "PLACEHOLDER":
-        print("❌ Please set MASHOV_USER, MASHOV_PASS, MASHOV_SCHOOL env vars or edit script.")
+def search_school(query):
+    """Search for a school by name"""
+    schools = get_all_schools()
+    return [s for s in schools if query in s['name']]
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Mashov Login & Test")
+    parser.add_argument("--user", help="Username", default=os.getenv("MASHOV_USER"))
+    parser.add_argument("--pwd", help="Password", default=os.getenv("MASHOV_PASS"))
+    parser.add_argument("--school", help="School Symbol", default=os.getenv("MASHOV_SCHOOL"))
+    parser.add_argument("--search", help="Search string for school name")
+    
+    args = parser.parse_args()
+
+    if args.search:
+        results = search_school(args.search)
+        print(f"🔍 Found {len(results)} schools matching '{args.search}':")
+        for s in results:
+            print(f"  🏫 {s['name']} (Symbol: {s['semel']}) - Years: {s.get('years')}")
+        sys.exit(0)
+
+    if not args.user or not args.pwd:
+        print("❌ Please provide user/pass via --user/--pwd or .env")
+        sys.exit(1)
+    
+    school_id = args.school
+    if not school_id or school_id == "0":
+        # Try to guess or ask? For now, fail.
+        print("❌ School Symbol required. Use --search to find it.")
+        sys.exit(1)
+
+    log, data = login_mashov(args.user, args.pwd, int(school_id))
+    if log:
+        print("✅ Mashov Login Successful!")
+        print(f"Student Data: {json.dumps(data, indent=2, ensure_ascii=False)}")
+        
+        # Try fetching grades
+        if 'credential' in data:
+            uid = data['credential'].get('userId')
+            if uid:
+                print("\n📊 Fetching Grades...")
+                grades = fetch_grades(log, uid)
+                print(f"Found {len(grades)} grades.")
+                if grades:
+                    print(grades[:5]) # Show first 5
     else:
-        log, data = login_mashov(user, pwd, school)
-        if log:
-            print("✅ Mashov Test Passed.")
-            print(data)
+        print("❌ Login Failed.")
