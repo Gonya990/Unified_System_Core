@@ -139,7 +139,7 @@ Each conversation folder may contain:
 - [x] Configure systemd service for Mail Processor
 - [x] Ensure agent registration (AmberOwl) on server
 - [x] Test Telegram alerts integration
-- [x] Consolidate diagnostic scripts to Scripts/Maintenance/Diagnostics
+- [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
 - [x] Clean up Workspace root directory
 ```
 
@@ -352,4 +352,5 @@ For the next session, ensure:
 
 ---
 
-*This document serves as a complete knowledge transfer for Antigravity agent sessions. Refresh by running the documentation generation workflow.*
+*This document serves as a complete knowledge transfer for Antigravity agent
+sessions. Refresh by running the documentation generation workflow.*
