@@ -1941,10 +1941,11 @@ async def post_init(application: Application) -> None:
     logger.info("DailyScheduler background task started via post_init.")
 
     # Start Web Dashboard
+    dashboard_port = int(config.get("DASHBOARD_PORT", 8096))
     if DashboardService:
         try:
             dashboard = DashboardService(
-                port=8096,
+                port=dashboard_port,
                 context={
                     "infra": infra_manager,
                     "usage": usage_tracker,
@@ -1955,7 +1956,7 @@ async def post_init(application: Application) -> None:
                 },
             )
             dashboard.start()
-            logger.info("🚀 Web Dashboard started on port 8096")
+            logger.info(f"🚀 Web Dashboard started on port {dashboard_port}")
         except Exception as e:
             logger.error(f"❌ Failed to start Web Dashboard: {e}")
     else:
@@ -4368,8 +4369,9 @@ def main():
             except Exception as e:
                 info["swarm_error"] = str(e)
         return info
-    start_health_server(port=8095, health_callback=get_health_info)
-    logger.info("[STARTUP] Health server started on port 8095")
+    health_port = int(config.get("HEALTH_PORT", 8095))
+    start_health_server(port=health_port, health_callback=get_health_info)
+    logger.info(f"[STARTUP] Health server started on port {health_port}")
 
     logger.info("[STARTUP] Starting polling...")
     print("Bot V2 (AI_Core) is running...")
