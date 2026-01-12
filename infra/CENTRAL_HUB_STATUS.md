@@ -2,16 +2,16 @@
 
 ## ✅ Deployment Complete
 
-**Date:** 2025-12-25  
-**Location:** igor-gaming-1 (100.88.65.71)  
+**Date:** 2025-01-12 (Updated)  
+**Location:** unified-home-core-cloud (100.110.209.49)  
 **Status:** Operational
 
 ## Configuration
 
 ### Hub Details
 
-- **URL:** `http://100.88.65.71:8765/mcp`
-- **Auth Token:** `antigravity_secret`
+- **URL:** `http://100.110.209.49:8765/mcp`
+- **Auth Token:** See `.env` file
 - **Database:** SQLite (`/opt/mcp-agent-mail/data/agent_mail.db`)
 - **Storage:** `/opt/mcp-agent-mail/data/mailbox`
 
@@ -115,7 +115,7 @@ Located at: `infra/setup_central_hub.sh`
 
 ## Next Steps
 
-1. ✅ Deploy hub on igor-gaming-1
+1. ✅ Deploy hub on unified-home-core-cloud
 2. ✅ Verify message delivery
 3. 🔄 Update mission_sync.sh for beads integration
 4. 🔄 Configure local agents to use centralized hub
@@ -126,19 +126,20 @@ Located at: `infra/setup_central_hub.sh`
 ### View Logs
 
 ```bash
-ssh igor-gaming-1 "docker logs acfs-hub-server-1"
+ssh gonya@100.110.209.49 "ps aux | grep mcp_agent_mail"
 ```
 
 ### Restart Hub
 
 ```bash
-ssh igor-gaming-1 "cd acfs-hub && docker compose restart server"
+ssh root@100.110.209.49 "systemctl restart mcp-agent-mail"
 ```
 
-### Database Migration
+### Service Location
 
 ```bash
-ssh igor-gaming-1 "docker exec acfs-hub-server-1 python -m mcp_agent_mail.cli migrate"
+# Running at: /opt/mcp-agent-mail
+# Started via: uv run python -m mcp_agent_mail.cli serve-http --host 0.0.0.0 --port 8765
 ```
 
 ## Security Notes
