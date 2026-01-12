@@ -1,9 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/usr/bin/python3: can't open file '/Users/macbook/Documents/Unified_System/Scripts/Orchestration/mail_processor.py': [Errno 1] Operation not permitted
-/Applications/Xcode.app/Contents/Developer/usr/bin/python3: can't open file '/Users/macbook/Documents/Unified_System/Scripts/Orchestration/mail_processor.py': [Errno 1] Operation not permitted
-/Applications/Xcode.app/Contents/Developer/usr/bin/python3: can't open file '/Users/macbook/Documents/Unified_System/Scripts/Orchestration/mail_processor.py': [Errno 1] Operation not permitted
-/Applications/Xcode.app/Contents/Developer/usr/bin/python3: can't open file '/Users/macbook/Documents/Unified_System/Scripts/Orchestration/mail_processor.py': [Errno 1] Operation not permitted
-/Applications/Xcode.app/Contents/Developer/usr/bin/python3: can't open file '/Users/macbook/Documents/Unified_System/Scripts/Orchestration/mail_processor.py': [Errno 1] Operation not permitted
-2026-01-12 13:46:38 - MailProcessor - INFO - 🚀 Mail Processor starting...
-2026-01-12 13:46:38 - MailProcessor - INFO -    Poll interval: 60s
-2026-01-12 13:46:38 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow
-2026-01-12 13:46:38 - MailProcessor - INFO -    Alert keywords: 17 configured
