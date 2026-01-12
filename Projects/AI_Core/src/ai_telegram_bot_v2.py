@@ -27,6 +27,16 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
+# Handle arguments before importing ConfigManager
+import argparse
+parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
+parser.add_argument("--env", help="Path to .env file", default=".env")
+args, unknown = parser.parse_known_args()
+
+if args.env:
+    os.environ["ENV_FILE"] = args.env
+    # Reload env if needed, but ConfigManager will pick it up on import
+
 # Configuration
 from config_manager import ConfigManager
 from health import start_health_server
@@ -427,7 +437,7 @@ USER_ALIASES = {
     "admin": 708531393,
 }
 
-ADMIN_ID = 708531393  # Primary admin for notifications
+ADMIN_ID = int(config.get("ADMIN_ID", "708531393")) # Primary admin for notifications
 
 
 def require_role(required_role: str):

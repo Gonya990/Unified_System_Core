@@ -9,10 +9,11 @@ import os
 from pathlib import Path
 from typing import Optional
 
-# Load .env file automatically
+# Load .env file automatically or from specified path
 from dotenv import load_dotenv
 
-load_dotenv()
+env_file = os.environ.get("ENV_FILE", ".env")
+load_dotenv(env_file)
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
