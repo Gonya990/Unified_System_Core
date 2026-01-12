@@ -44,6 +44,7 @@ const gemini_1 = require("./gemini");
 const ollama_1 = require("./ollama");
 const openrouter_1 = require("./openrouter");
 const nvidia_1 = require("./nvidia");
+const groq_1 = require("./groq");
 class ProviderManager {
     providers = new Map();
     currentProviderId;
@@ -61,6 +62,7 @@ class ProviderManager {
         this.providers.set('ollama', new ollama_1.OllamaProvider());
         this.providers.set('openrouter', new openrouter_1.OpenRouterProvider());
         this.providers.set('nvidia-rtx', new nvidia_1.NvidiaRTXProvider());
+        this.providers.set('groq', new groq_1.GroqProvider());
     }
     reloadConfiguration() {
         this.initializeProviders();
