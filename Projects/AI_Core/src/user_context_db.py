@@ -60,6 +60,16 @@ class UserContextDB:
                     FOREIGN KEY(user_id) REFERENCES users(user_id)
                 )
             """)
+            # Mashov homework cache
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS mashov_homework (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    homework_data TEXT,
+                    fetched_at TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(user_id)
+                )
+            """)
             conn.commit()
 
     def add_user(
@@ -247,3 +257,79 @@ class UserContextDB:
     def demote_to_member(self, user_id: int) -> bool:
         """Demote user to member role."""
         return self.set_role(user_id, "MEMBER")
+
+    # ========== Mashov Integration Methods ==========
+
+    def cache_homework(self, user_id: int, homework_data: list) -> bool:
+        """
+        Cache homework data for user.
+
+        Args:
+            user_id: User ID
+            homework_data: List of homework items to cache
+
+        Returns:
+            True if cached successfully
+        """
+        try:
+            import json
+            homework_json = json.dumps(homework_data, ensure_ascii=False)
+
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                # Delete old cache for this user
+                cursor.execute("DELETE FROM mashov_homework WHERE user_id = ?", (user_id,))
+                # Insert new cache
+                cursor.execute(
+                    """
+                    INSERT INTO mashov_homework (user_id, homework_data, fetched_at)
+                    VALUES (?, ?, ?)
+                """,
+                    (user_id, homework_json, datetime.now()),
+                )
+                conn.commit()
+                logger.debug(f"[MASHOV] Cached {len(homework_data)} homework items for user {user_id}")
+                return True
+        except Exception as e:
+            logger.error(f"[MASHOV] Failed to cache homework: {e}")
+            return False
+
+    def get_cached_homework(self, user_id: int, max_age_hours: int = 24) -> Optional[list]:
+        """
+        Get cached homework data if it's recent enough.
+
+        Args:
+            user_id: User ID
+            max_age_hours: Maximum age of cache in hours (default: 24)
+
+        Returns:
+            List of homework items or None if cache is too old/not found
+        """
+        try:
+            import json
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT homework_data, fetched_at FROM mashov_homework
+                    WHERE user_id = ?
+                    AND fetched_at > datetime('now', '-' || ? || ' hours')
+                    ORDER BY fetched_at DESC LIMIT 1
+                """,
+                    (user_id, max_age_hours),
+                )
+                row = cursor.fetchone()
+                if row:
+                    homework_json, fetched_at = row
+                    homework_data = json.loads(homework_json)
+                    logger.debug(
+                        f"[MASHOV] Retrieved cached homework for user {user_id} "
+                        f"(fetched: {fetched_at})"
+                    )
+                    return homework_data
+                else:
+                    logger.debug(f"[MASHOV] No valid cache for user {user_id}")
+                    return None
+        except Exception as e:
+            logger.error(f"[MASHOV] Failed to retrieve cached homework: {e}")
+            return None
