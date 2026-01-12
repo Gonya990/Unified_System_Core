@@ -10,7 +10,7 @@
 
 - [/] Install Tasker and automation apps <!-- id: 201 --> <!-- BLOCKED -->
 - [x] Implement Morning Brief with Real-time Data <!-- id: 205 -->
-- [ ] Integrate Ministry of Education Portal (Parents) <!-- id: 206 -->
+- [ ] Integrate Ministry of Education Portal (Parents) <!-- id: 206 --> <!-- STATUS: Script created, blocked -->
 - [ ] Implement Screen Time limits via API/ADB <!-- id: 202 -->
 - [ ] Configure Home Assistant integration (sensors) <!-- id: 203 -->
 - [ ] Deploy custom dashboard/launcher <!-- id: 204 -->
