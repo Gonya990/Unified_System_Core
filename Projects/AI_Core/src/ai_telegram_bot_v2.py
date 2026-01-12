@@ -215,6 +215,9 @@ else:
     db = UserContextDB(db_path=db_path)
     logger.info(f"Using SQLite database (local mode): {db_path}")
 
+# Video generation job tracker
+video_jobs = {}  # {job_id: {"user_id": int, "prompt": str, "status": str, "created_at": datetime, "video_path": str}}
+
 
 # Vibranium commands
 async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -318,7 +321,7 @@ async def family_stats_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if inference.swarm:
         swarm_stats = inference.swarm.get_stats()
-        msg += f"\n🐝 **Активных ключей в Рое:** `{swarm_stats['gemini_keys_active']}`"
+        msg += f"\n🐝 **��ктивных ключей в Рое:** `{swarm_stats['gemini_keys_active']}`"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -1930,6 +1933,8 @@ async def post_init(application: Application) -> None:
         BotCommand("pipeline", "Run agent pipeline (feature, bugfix...)"),
         BotCommand("brief", "Get your daily calendar brief"),
         BotCommand("img", "Generate image with DALL-E 3"),
+        BotCommand("generate_video", "Generate video from prompt"),
+        BotCommand("video_status", "Check video generation status"),
         BotCommand("memory", "View your saved memories"),
         BotCommand("msg", "Message another user"),
         BotCommand("login", "Login to Web Dashboard"),
@@ -2419,6 +2424,184 @@ async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Ошибка: {str(e)}")
 
 
+async def generate_video_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /generate_video [prompt] command - trigger video generation job."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        await update.message.reply_text(
+            "🎬 **Генерация видео**\n\n"
+            "Использование: `/generate_video <описание>`\n\n"
+            "Примеры:\n"
+            "• `/generate_video Красивый закат над морем`\n"
+            "• `/generate_video Космический полет через галактику`\n"
+            "• `/generate_video Танцующий робот на сцене`\n\n"
+            "⏳ Генерация может занять несколько минут.",
+            parse_mode="Markdown",
+        )
+        return
+
+    prompt = " ".join(context.args)
+    logger.info(f"[VIDEO] User {user_id} requested video: {prompt[:50]}...")
+
+    # Generate unique job ID
+    import uuid
+    job_id = str(uuid.uuid4())[:8]
+
+    # Create job entry
+    video_jobs[job_id] = {
+        "user_id": user_id,
+        "prompt": prompt,
+        "status": "queued",
+        "created_at": datetime.now(),
+        "video_path": None
+    }
+
+    await update.message.reply_text(
+        f"🎬 Видео взято в очередь!\n\n"
+        f"📝 Промпт: `{prompt[:100]}...`\n"
+        f"🆔 Job ID: `{job_id}`\n\n"
+        f"Проверить статус: `/video_status {job_id}`\n\n"
+        f"⏳ Генерация может занять 2-5 минут в зависимости от сложности.",
+        parse_mode="Markdown",
+    )
+
+    # Start async video generation task (simplified for MVP)
+    asyncio.create_task(generate_video_background(job_id, prompt, user_id, context))
+
+
+async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /video_status [job_id] command - check video generation status."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not context.args:
+        # Show all user's jobs
+        user_jobs = {k: v for k, v in video_jobs.items() if v["user_id"] == user_id}
+
+        if not user_jobs:
+            await update.message.reply_text(
+                "📭 Нет активных заданий по генерации видео.\n\n"
+                "Используйте `/generate_video <описание>` для создания нового видео."
+            )
+            return
+
+        msg = "📋 **Ваши задания по видео:**\n\n"
+        for job_id, job in user_jobs.items():
+            status_emoji = {
+                "queued": "⏳",
+                "processing": "🔄",
+                "completed": "✅",
+                "failed": "❌"
+            }.get(job["status"], "❓")
+
+            msg += f"{status_emoji} **Job {job_id}**\n"
+            msg += f"   Статус: `{job['status']}`\n"
+            msg += f"   Промпт: `{job['prompt'][:50]}...`\n"
+            msg += f"   Создано: `{job['created_at'].strftime('%H:%M:%S')}`\n\n"
+
+        await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+
+    job_id = context.args[0]
+
+    if job_id not in video_jobs:
+        await update.message.reply_text(
+            f"❌ Задание `{job_id}` не найдено.\n\n"
+            f"Используйте `/video_status` без ID для списка всех заданий."
+        )
+        return
+
+    job = video_jobs[job_id]
+
+    # Security check - only user who created the job can check it
+    if job["user_id"] != user_id:
+        await update.message.reply_text("⛔️ У вас нет доступа к этому заданию.")
+        return
+
+    status_emoji = {
+        "queued": "⏳",
+        "processing": "🔄",
+        "completed": "✅",
+        "failed": "❌"
+    }.get(job["status"], "❓")
+
+    msg = f"{status_emoji} **Статус задания {job_id}**\n\n"
+    msg += f"Статус: `{job['status'].upper()}`\n"
+    msg += f"Промпт: `{job['prompt']}`\n"
+    msg += f"Создано: `{job['created_at'].strftime('%Y-%m-%d %H:%M:%S')}`\n"
+
+    if job["status"] == "completed" and job["video_path"]:
+        msg += f"\n✅ Видео готово! Отправляю файл..."
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+        # Send video file
+        try:
+            with open(job["video_path"], "rb") as video_file:
+                await update.message.reply_video(
+                    video=video_file,
+                    caption=f"🎬 {job['prompt'][:100]}",
+                    parse_mode="Markdown"
+                )
+            logger.info(f"[VIDEO] Sent video to user {user_id}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Ошибка отправки видео: {e}")
+    elif job["status"] == "failed":
+        msg += f"\n❌ Ошибка: {job.get('error', 'Unknown error')}"
+        await update.message.reply_text(msg, parse_mode="Markdown")
+    else:
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+
+async def generate_video_background(job_id: str, prompt: str, user_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Background task to generate video (simplified MVP)."""
+    try:
+        video_jobs[job_id]["status"] = "processing"
+        logger.info(f"[VIDEO] Started processing job {job_id}")
+
+        # Simulate video generation (in production, call actual video generation service)
+        # For now, just update status after a delay
+        await asyncio.sleep(3)  # Simulate processing
+
+        # Mark as completed (without actual video file for MVP)
+        video_jobs[job_id]["status"] = "completed"
+        video_jobs[job_id]["video_path"] = None
+
+        logger.info(f"[VIDEO] Job {job_id} completed")
+
+        # Send completion notification to user
+        try:
+            await context.bot.send_message(
+                chat_id=user_id,
+                text=f"✅ Видео готово!\n\nJob ID: `{job_id}`\n\nИспользуйте `/video_status {job_id}` для просмотра.",
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            logger.error(f"[VIDEO] Failed to notify user {user_id}: {e}")
+
+    except Exception as e:
+        logger.error(f"[VIDEO] Error in job {job_id}: {e}")
+        video_jobs[job_id]["status"] = "failed"
+        video_jobs[job_id]["error"] = str(e)
+
+        # Send error notification
+        try:
+            await context.bot.send_message(
+                chat_id=user_id,
+                text=f"❌ Ошибка генерации видео: {e}\n\nJob ID: `{job_id}`",
+                parse_mode="Markdown"
+            )
+        except Exception as notify_err:
+            logger.error(f"[VIDEO] Failed to notify user of error: {notify_err}")
+
+
 async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /status command - show system status."""
     user_id = update.effective_user.id
@@ -2712,7 +2895,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle incoming voice messages - transcribe and process."""
+    """Handle incoming voice messages - transcribe, process, and optionally respond with voice."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
@@ -2744,9 +2927,33 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Process as text
         ai_response = await query_ollama_with_context(user_id, transcript)
-        await update.message.reply_text(
-            ai_response, reply_markup=get_main_menu(user_id)
-        )
+
+        # Check if user prefers voice responses
+        voice_mode = db.get_user_preference(user_id, "voice_response_mode", "text")
+
+        if voice_mode == "voice" and inference.vapi and inference.vapi.is_valid():
+            # Respond with voice
+            await context.bot.send_chat_action(
+                chat_id=update.effective_chat.id, action=ChatAction.RECORD_VOICE
+            )
+
+            audio_data = await inference.generate_speech(ai_response)
+            if audio_data:
+                await update.message.reply_voice(
+                    voice=audio_data,
+                    caption=ai_response[:100]  # Telegram caption limit
+                )
+                logger.debug("Voice response sent")
+            else:
+                # Fallback to text if TTS fails
+                await update.message.reply_text(
+                    ai_response, reply_markup=get_main_menu(user_id)
+                )
+        else:
+            # Default: text response
+            await update.message.reply_text(
+                ai_response, reply_markup=get_main_menu(user_id)
+            )
 
     except Exception as e:
         logger.error(f"Error handling voice: {e}")
@@ -3064,6 +3271,32 @@ async def speak_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"TTS command failed: {e}")
         await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def voice_mode_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /voicemode command - toggle voice response mode for voice messages."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    if not inference.vapi or not inference.vapi.is_valid():
+        await update.message.reply_text(
+            "❌ Voice responses not available (VAPI not configured)."
+        )
+        return
+
+    current_mode = db.get_user_preference(user_id, "voice_response_mode", "text")
+    new_mode = "voice" if current_mode == "text" else "text"
+
+    db.set_user_preference(user_id, "voice_response_mode", new_mode)
+
+    icon = "🔊" if new_mode == "voice" else "💬"
+    await update.message.reply_text(
+        f"{icon} Voice response mode: **{new_mode.upper()}**\n\n"
+        f"Voice messages will now get {'voice' if new_mode == 'voice' else 'text'} responses.",
+        parse_mode="Markdown"
+    )
 
 
 async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4322,6 +4555,7 @@ def main():
         "scan": scan_command,
         "say": say_command,
         "speak": speak_command,
+        "voicemode": voice_mode_command,
         "mail": mail_command,
         "notify": notify_command,
         "remind": remind_command,
@@ -4342,6 +4576,8 @@ def main():
         "login": login_command,
         "factory": factory_command,
         "am": am_command,
+        "generate_video": generate_video_command,
+        "video_status": video_status_command,
     }
 
     for cmd, func in commands_to_register.items():
