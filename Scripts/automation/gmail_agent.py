@@ -11,6 +11,9 @@ Automatically monitors and processes emails from gonya90.gg@gmail.com
 import base64
 import json
 import sys
+import os
+import requests
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -41,6 +44,10 @@ SCOPES = [
 # Script is in: Unified_System/Scripts/automation/gmail_agent.py
 # Base should be: Unified_System/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_ADMIN_CHAT_ID")
 CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -145,6 +152,11 @@ CATEGORIES = {
             "@moin.gov.il",
         ],
     },
+    "family": {
+        "keywords": ["family", "invite", "приглашение", "семейная группа", "gorode"],
+        "icon": "🏠",
+        "senders": ["families-noreply@google.com"],
+    },
     # Payments IL
     "payment": {
         "keywords": ["bit", "paybox", "pepper", "העברה", "קיבלת", "שילמת", "תשלום"],
@@ -162,7 +174,12 @@ CATEGORIES = {
             "merge",
         ],
         "icon": "🐙",
-        "senders": ["@github.com", "@gitlab"],
+        "senders": ["@github.com", "@gitlab", "gitguardian"],
+    },
+    "security": {
+        "keywords": ["security alert", "incident detected", "breach", "vulnerability", "утечка", "секрет", "обнаружен"],
+        "icon": "👮",
+        "senders": ["gitguardian", "@auth", "security"],
     },
     "linkedin": {
         "keywords": ["linkedin", "connection", "invitation", "network", "job alert"],
@@ -249,6 +266,62 @@ def categorize_email(subject, body, sender):
                 return category
 
     return "info"
+
+
+def send_telegram_alert(category, subject, sender, body_preview):
+    """
+    Send a notification to Telegram based on category priority
+    """
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("⚠️ Telegram credentials not found, skipping alert")
+        return
+
+    # Define icons and alerts
+    priority_map = {
+        "urgent": "🚨 URGENT",
+        "work": "💼 WORK",
+        "family": "🏠 FAMILY",
+        "security": "👮 SECURITY", # New category for gitguardian etc
+        "github": "🐙 GIT",
+        "payment": "💰 MONEY"
+    }
+
+    # Only alert for specific categories
+    if category not in priority_map:
+        return
+
+    header = priority_map[category]
+    
+    import html
+    
+    # Construct message
+    safe_sender = html.escape(sender)
+    safe_subject = html.escape(subject)
+    safe_preview = html.escape(body_preview[:100])
+
+    message = (
+        f"{header}\n\n"
+        f"<b>From:</b> {safe_sender}\n"
+        f"<b>Subject:</b> {safe_subject}\n"
+        f"<i>{safe_preview}...</i>"
+    )
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        if response.status_code == 200:
+            print(f"✈️ Telegram alert sent for: {subject[:30]}...")
+        else:
+            print(f"⚠️ Failed to send Telegram alert: {response.text}")
+    except Exception as e:
+        print(f"⚠️ Error sending Telegram alert: {e}")
 
 
 import argparse
@@ -345,6 +418,7 @@ def get_recent_emails(service, hours=24, max_results=50, query=None):
                     ).decode("utf-8")
 
                 # Categorize
+                body_preview = body[:200] if body else ""
                 category = categorize_email(subject, body[:500], sender)
 
                 emails.append(
@@ -354,9 +428,13 @@ def get_recent_emails(service, hours=24, max_results=50, query=None):
                         "sender": sender,
                         "date": date,
                         "category": category,
-                        "body_preview": body[:200] if body else "",
+                        "body_preview": body_preview,
                     }
                 )
+                
+                # Send Alert immediately for fresh emails
+                send_telegram_alert(category, subject, sender, body_preview)
+
             except Exception as e:
                 print(f"⚠️ Error processing message {msg['id']}: {e}")
                 continue
