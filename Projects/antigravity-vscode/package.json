@@ -1,0 +1,205 @@
+{
+  "name": "antigravity",
+  "displayName": "Antigravity AI",
+  "description": "Multi-provider AI chat sidebar for VS Code. OpenAI, Claude, Gemini, Mistral, OpenRouter, Ollama and more.",
+  "version": "0.1.0",
+  "publisher": "unified-system",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Chat",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "ai",
+    "chat",
+    "gpt",
+    "claude",
+    "gemini",
+    "openai",
+    "copilot",
+    "assistant"
+  ],
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "antigravity-sidebar",
+          "title": "Antigravity AI",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "antigravity-sidebar": [
+        {
+          "type": "webview",
+          "id": "antigravity.chatView",
+          "name": "Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "antigravity.openChat",
+        "title": "Antigravity: Open Chat"
+      },
+      {
+        "command": "antigravity.newConversation",
+        "title": "Antigravity: New Conversation"
+      },
+      {
+        "command": "antigravity.switchProvider",
+        "title": "Antigravity: Switch AI Provider"
+      },
+      {
+        "command": "antigravity.insertCode",
+        "title": "Antigravity: Insert Code at Cursor"
+      },
+      {
+        "command": "antigravity.explainSelection",
+        "title": "Antigravity: Explain Selection"
+      },
+      {
+        "command": "antigravity.refactorSelection",
+        "title": "Antigravity: Refactor Selection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "antigravity.explainSelection",
+          "when": "editorHasSelection",
+          "group": "antigravity"
+        },
+        {
+          "command": "antigravity.refactorSelection",
+          "when": "editorHasSelection",
+          "group": "antigravity"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Antigravity AI",
+      "properties": {
+        "antigravity.defaultProvider": {
+          "type": "string",
+          "default": "openai",
+          "enum": [
+            "openai",
+            "anthropic",
+            "gemini",
+            "mistral",
+            "openrouter",
+            "ollama",
+            "nvidia-rtx",
+            "council"
+          ],
+          "description": "Default AI provider"
+        },
+        "antigravity.providers.openai.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API Key"
+        },
+        "antigravity.providers.openai.model": {
+          "type": "string",
+          "default": "gpt-4o",
+          "description": "OpenAI model to use"
+        },
+        "antigravity.providers.anthropic.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API Key"
+        },
+        "antigravity.providers.anthropic.model": {
+          "type": "string",
+          "default": "claude-sonnet-4-20250514",
+          "description": "Anthropic model to use"
+        },
+        "antigravity.providers.gemini.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Google Gemini API Key"
+        },
+        "antigravity.providers.gemini.model": {
+          "type": "string",
+          "default": "gemini-2.0-flash",
+          "description": "Gemini model to use"
+        },
+        "antigravity.providers.mistral.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Mistral API Key"
+        },
+        "antigravity.providers.openrouter.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenRouter API Key (access 100+ models)"
+        },
+        "antigravity.providers.ollama.endpoint": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Ollama local server endpoint"
+        },
+        "antigravity.providers.ollama.model": {
+          "type": "string",
+          "default": "llama3.2",
+          "description": "Ollama model to use"
+        },
+        "antigravity.providers.nvidia.endpoint": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "NVIDIA NIM local endpoint (or https://integrate.api.nvidia.com for cloud)"
+        },
+        "antigravity.providers.nvidia.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "NVIDIA API Key (for cloud API at build.nvidia.com)"
+        },
+        "antigravity.providers.nvidia.model": {
+          "type": "string",
+          "default": "meta/llama-3.1-8b-instruct",
+          "description": "NVIDIA NIM model to use"
+        },
+        "antigravity.systemPrompt": {
+          "type": "string",
+          "default": "You are a helpful coding assistant. Be concise and provide working code examples.",
+          "description": "System prompt for AI conversations"
+        },
+        "antigravity.streamResponses": {
+          "type": "boolean",
+          "default": true,
+          "description": "Stream responses in real-time"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "@anthropic-ai/sdk": "^0.20.0",
+    "@google/generative-ai": "^0.21.0"
+  }
+}
