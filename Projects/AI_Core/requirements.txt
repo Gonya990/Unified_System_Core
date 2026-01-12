@@ -25,3 +25,4 @@ google-cloud-firestore>=2.16.0
 qrcode[pil]>=7.4.2
 pytz
 aiohttp-socks
+vapi-python>=0.1.0

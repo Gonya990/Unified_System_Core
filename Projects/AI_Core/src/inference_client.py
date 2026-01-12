@@ -25,6 +25,16 @@ logger = logging.getLogger(__name__)
 _gemini_client = None
 _gemini_client_key = None
 
+# Lazy import for VAPI
+VAPI_AVAILABLE = False
+try:
+    from .vapi_client import VAPIClient
+
+    VAPI_AVAILABLE = True
+except ImportError:
+    VAPI_AVAILABLE = False
+    logger.debug("VAPIClient not available")
+
 
 def _get_gemini_client(api_key: str):
     """Lazy load and configure Gemini client using new SDK."""
@@ -57,6 +67,21 @@ class InferenceClient:
         # Load resources for swarm
         resources_path = Path(__file__).parent.parent / "config" / "resources.yaml"
         self.swarm = SwarmManager(resources_path) if SwarmManager else None
+
+        # Initialize VAPI client for voice features
+        self.vapi = None
+        if VAPI_AVAILABLE:
+            vapi_key = config.get("VAPI_API_KEY")
+            if vapi_key:
+                try:
+                    self.vapi = VAPIClient(vapi_key)
+                    if self.vapi and self.vapi.is_valid():
+                        logger.info("VAPI voice client initialized")
+                    else:
+                        self.vapi = None
+                except Exception as e:
+                    logger.warning(f"Failed to initialize VAPI client: {e}")
+                    self.vapi = None
 
     async def chat(self, messages: list, system_prompt: Optional[str] = None, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"):
         """Routed chat request with branch awareness."""
@@ -239,14 +264,27 @@ class InferenceClient:
         return "Vision is currently only supported via Gemini provider."
 
     async def transcribe_audio(self, audio_path: str):
-        """Transcribe audio to text."""
-        # For now, use Gemini if available as it's multimodal
+        """
+        Transcribe audio to text.
+        Tries VAPI first (dedicated STT), falls back to Gemini (multimodal).
+        """
+        # Try VAPI first (dedicated speech-to-text)
+        if self.vapi and self.vapi.is_valid():
+            try:
+                transcript = await self.vapi.transcribe_audio(audio_path)
+                if transcript:
+                    logger.debug("VAPI transcription successful")
+                    return transcript
+            except Exception as e:
+                logger.debug(f"VAPI transcription failed, falling back to Gemini: {e}")
+
+        # Fallback to Gemini (multimodal)
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
         if provider == "gemini":
-             # Similar to vision, Gemini 1.5/2.0 handles audio
-             return await self.analyze_image(audio_path, "Transcribe this audio exactly.")
+            # Similar to vision, Gemini 1.5/2.0 handles audio
+            return await self.analyze_image(audio_path, "Transcribe this audio exactly.")
 
-        return "Audio transcription is currently only supported via Gemini provider."
+        return "Audio transcription not available (configure VAPI or Gemini provider)."
 
     async def health_check(self) -> bool:
         """Check if the inference service is reachable."""
@@ -259,3 +297,26 @@ class InferenceClient:
             except Exception:
                 return False
         return True # Assume others are OK if configured
+
+    async def generate_speech(self, text: str, voice_id: Optional[str] = None) -> Optional[bytes]:
+        """
+        Generate speech from text using VAPI TTS.
+
+        Args:
+            text: Text to synthesize
+            voice_id: Voice ID override (default from VAPI config)
+
+        Returns:
+            Audio bytes (OGG format for Telegram) or None on failure
+        """
+        if not self.vapi or not self.vapi.is_valid():
+            logger.warning("VAPI not configured for TTS")
+            return None
+
+        try:
+            voice = voice_id or self.config.get("VAPI_VOICE_ID", "rachel")
+            audio_data = await self.vapi.generate_speech(text, voice)
+            return audio_data
+        except Exception as e:
+            logger.error(f"TTS generation failed: {e}")
+            return None
