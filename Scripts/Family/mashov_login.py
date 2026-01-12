@@ -115,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument("--pwd", help="Password", default=os.getenv("MASHOV_PASS"))
     parser.add_argument("--school", help="School Symbol", default=os.getenv("MASHOV_SCHOOL"))
     parser.add_argument("--search", help="Search string for school name")
-    
+
     args = parser.parse_args()
 
     if args.search:
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     if not args.user or not args.pwd:
         print("❌ Please provide user/pass via --user/--pwd or .env")
         sys.exit(1)
-    
+
     school_id = args.school
     if not school_id or school_id == "0":
         # Try to guess or ask? For now, fail.
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     if log:
         print("✅ Mashov Login Successful!")
         print(f"Student Data: {json.dumps(data, indent=2, ensure_ascii=False)}")
-        
+
         # Try fetching grades
         if 'credential' in data:
             uid = data['credential'].get('userId')

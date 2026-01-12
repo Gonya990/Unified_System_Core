@@ -136,11 +136,11 @@ def main():
         if not args.files or not args.reason:
             print("❌ --files and --reason required")
             exit(1)
-        
+
         try:
             result = client.reserve_files(paths=args.files, reason=args.reason)
-            # The result structure depends on the tool output, assuming standard success/fail 
-            # or a list of reserved paths. 
+            # The result structure depends on the tool output, assuming standard success/fail
+            # or a list of reserved paths.
             # Example response: {"reserved": ["file1"], "conflicts": []}
             print(f"✅ Reservation request sent for {len(args.files)} files")
             print(f"Response: {json.dumps(result, indent=2)}")
@@ -153,7 +153,7 @@ def main():
         if not args.id:
             print("❌ --id <message_id> required")
             exit(1)
-        
+
         try:
             client.acknowledge(message_id=args.id, note=args.note)
             print(f"✅ Message #{args.id} acknowledged")
