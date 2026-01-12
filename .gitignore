@@ -67,3 +67,9 @@ broll/
 *_token.json
 email_database.json
 hooks/hooks_server.err
+
+# Session and cookie data from browser extraction
+browser_sessions.json
+webtop_session.json
+.beads/
+.claude/
