@@ -10,6 +10,7 @@ import { GeminiProvider } from './gemini';
 import { OllamaProvider } from './ollama';
 import { OpenRouterProvider } from './openrouter';
 import { NvidiaRTXProvider } from './nvidia';
+import { GroqProvider } from './groq';
 
 export interface ProviderInfo {
     name: string;
@@ -39,6 +40,7 @@ export class ProviderManager {
         this.providers.set('ollama', new OllamaProvider());
         this.providers.set('openrouter', new OpenRouterProvider());
         this.providers.set('nvidia-rtx', new NvidiaRTXProvider());
+        this.providers.set('groq', new GroqProvider());
     }
 
     reloadConfiguration() {
