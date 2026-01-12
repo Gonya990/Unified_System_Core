@@ -1,8 +1,8 @@
 # Как дать доступ другому агенту к MCP Agent Mail / How to Give Another Agent Access to MCP Agent Mail
 
-**English:** This guide explains how to grant another AI agent access to the MCP Agent Mail communication system running on `igor-gaming-1`.
+**English:** This guide explains how to grant another AI agent access to the MCP Agent Mail communication system running on `unified-home-core-cloud`.
 
-**Русский:** Это руководство объясняет как предоставить другому AI агенту доступ к системе коммуникаций MCP Agent Mail, работающей на `igor-gaming-1`.
+**Русский:** Это руководство объясняет как предоставить другому AI агенту доступ к системе коммуникаций MCP Agent Mail, работающей на `unified-home-core-cloud`.
 
 ---
 
@@ -10,13 +10,13 @@
 
 **English:**
 
-- MCP Agent Mail server must be running on `igor-gaming-1` (typically on port `8765`)
+- MCP Agent Mail server must be running on `unified-home-core-cloud` (100.110.209.49:8765)
 - You need the bearer token for authentication
 - The agent tool (Claude Code, Codex, Gemini CLI, etc.) must support MCP HTTP servers
 
 **Русский:**
 
-- Сервер MCP Agent Mail должен быть запущен на `igor-gaming-1` (обычно на порту `8765`)
+- Сервер MCP Agent Mail должен быть запущен на `unified-home-core-cloud` (100.110.209.49:8765)
 - Вам нужен bearer token для аутентификации
 - Инструмент агента (Claude Code, Codex, Gemini CLI, и т.д.) должен поддерживать MCP HTTP серверы
 
@@ -35,25 +35,25 @@ You need three pieces of information:
 **English:**
 
 ```text
-http://<igor-gaming-1-ip>:8765
+http://100.110.209.49:8765
 ```
 
 Or use Tailscale hostname:
 
 ```text
-http://igor-gaming-1:8765
+http://unified-home-core-cloud:8765
 ```
 
 **Русский:**
 
 ```text
-http://<igor-gaming-1-ip>:8765
+http://100.110.209.49:8765
 ```
 
 Или используйте Tailscale hostname:
 
 ```text
-http://igor-gaming-1:8765
+http://unified-home-core-cloud:8765
 ```
 
 ### 2. Bearer Token / Токен аутентификации
@@ -63,10 +63,9 @@ http://igor-gaming-1:8765
 **Русский:** Найдите токен в файле `.env` сервера:
 
 ```bash
-# On igor-gaming-1
-ssh igor-gaming-1
-cd ~/Documents/Unified_System/External_Tools/Stack/mcp_agent_mail
-cat .env | grep HTTP_BEARER_TOKEN
+# On unified-home-core-cloud
+ssh gonya@100.110.209.49
+cat /opt/mcp-agent-mail/.env | grep HTTP_BEARER_TOKEN
 ```
 
 ### 3. Project Key / Ключ проекта
@@ -111,7 +110,7 @@ home-gonya-unified-system
 {
   "mcpServers": {
     "agent-mail": {
-      "url": "http://igor-gaming-1:8765",
+      "url": "http://100.110.209.49:8765",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
@@ -129,7 +128,7 @@ home-gonya-unified-system
 ```toml
 [[mcp]]
 name = "agent-mail"
-url = "http://igor-gaming-1:8765"
+url = "http://100.110.209.49:8765"
 
 [mcp.headers]
 Authorization = "Bearer YOUR_TOKEN_HERE"
@@ -145,7 +144,7 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 {
   "mcpServers": {
     "agent-mail": {
-      "url": "http://igor-gaming-1:8765",
+      "url": "http://100.110.209.49:8765",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
@@ -408,12 +407,12 @@ agent_mail_acknowledge_message(
 
 ### Problem: Connection refused / Проблема: Отказ в соединении
 
-**English:** Solution: Check that server is running on `igor-gaming-1`:
+**English:** Solution: Check that server is running on `unified-home-core-cloud`:
 
-**Русский:** Решение: Проверьте что сервер запущен на `igor-gaming-1`:
+**Русский:** Решение: Проверьте что сервер запущен на `unified-home-core-cloud`:
 
 ```bash
-ssh igor-gaming-1
+ssh gonya@100.110.209.49
 am  # This starts the server
 ```
 
@@ -431,7 +430,7 @@ am  # This starts the server
 
 **Русский:**
 
-- **Web UI / Веб интерфейс:** `http://igor-gaming-1:8765/mail`
+- **Web UI / Веб интерфейс:** `http://100.110.209.49:8765/mail`
 - **README:** `/Users/macbook/Documents/Unified_System/External_Tools/Stack/mcp_agent_mail/README.md`
 - **AGENTS.md snippet:** Add the snippet from README to your project's AGENTS.md file / Добавьте сниппет из README в файл AGENTS.md вашего проекта
 
@@ -443,7 +442,7 @@ am  # This starts the server
 
 **Русский:**
 
-- [ ] Get server URL (usually `http://igor-gaming-1:8765`)
+- [ ] Get server URL (`http://100.110.209.49:8765`)
 - [ ] Get bearer token from `.env` file
 - [ ] Configure agent client (Claude Code, Codex, etc.)
 - [ ] Register agent with `agent_mail_register_agent` tool
