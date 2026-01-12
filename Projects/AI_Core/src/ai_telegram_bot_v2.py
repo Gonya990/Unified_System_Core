@@ -1933,8 +1933,11 @@ async def post_init(application: Application) -> None:
         BotCommand("msg", "Message another user"),
         BotCommand("login", "Login to Web Dashboard"),
     ]
-    await application.bot.set_my_commands(commands)
-    logger.info("Bot commands registered.")
+    try:
+        await application.bot.set_my_commands(commands)
+        logger.info("Bot commands registered.")
+    except Exception as e:
+        logger.warning(f"Could not register bot commands (likely flood control): {e}")
 
     scheduler = DailyScheduler(application, db, inference=inference)
     asyncio.create_task(scheduler.start())
