@@ -29,6 +29,7 @@ if current_dir not in sys.path:
 
 # Handle arguments before importing ConfigManager
 import argparse
+
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
 parser.add_argument("--env", help="Path to .env file", default=".env")
 args, unknown = parser.parse_known_args()
