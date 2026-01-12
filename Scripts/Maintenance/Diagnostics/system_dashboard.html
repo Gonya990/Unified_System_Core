@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antigravity System Status</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #050505;
@@ -46,8 +49,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .header {
@@ -60,6 +70,7 @@
             font-weight: 800;
             background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
             margin-bottom: 10px;
@@ -243,6 +254,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="glow"></div>
     <div class="glow-2"></div>
@@ -336,7 +348,7 @@
                 <div class="progress-steps">
                     <div class="progress-line"></div>
                     <div class="progress-line-active"></div>
-                    
+
                     <div class="step">
                         <div class="step-circle">✓</div>
                         <div class="step-label">Identify</div>
@@ -369,4 +381,5 @@
         </footer>
     </div>
 </body>
+
 </html>
