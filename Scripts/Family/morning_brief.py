@@ -52,7 +52,7 @@ def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
 def get_homework_summary():
     """Fetch homework from Sentinel + Mashov"""
     report = []
-    
+
     # 1. Gmail Sentinel
     try:
         from Scripts.Family.homework_sentinel import scan_mailbox, summarize_tasks
@@ -68,11 +68,11 @@ def get_homework_summary():
 
     # 2. Mashov (if configured)
     try:
-        from Scripts.Family.mashov_login import login_mashov, fetch_homework, fetch_grades
+        from Scripts.Family.mashov_login import fetch_homework, login_mashov
         user = os.getenv("MASHOV_USER")
         pwd = os.getenv("MASHOV_PASS")
         school = os.getenv("MASHOV_SCHOOL")
-        
+
         if user and pwd and school and school != "0":
             session, data = login_mashov(user, pwd, int(school))
             if session and data:
@@ -87,8 +87,8 @@ def get_homework_summary():
         else:
             # report.append("🏫 Mashov: Не настроен (нет символа школы).")
             pass # Silent if not configured
-            
-    except Exception as e:
+
+    except Exception:
         # logger.error(f"Mashov error: {e}")
         pass # Silent error
 
@@ -99,12 +99,12 @@ async def send_brief():
 
     # Date in Russian manually to avoid locale issues on minimal envs
     now = datetime.now()
-    months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 
+    months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
               'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
     weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
-    
+
     date_str = f"{weekdays[now.weekday()]}, {now.day} {months[now.month-1]} {now.year}"
-    
+
     weather = get_weather()
     # news = get_news_summary() # Keep mock or remove if irrelevant
     homework = get_homework_summary()
