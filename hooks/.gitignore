@@ -1,0 +1,2 @@
+# Ignore local hook error logs
+hooks_server.err
