@@ -114,7 +114,7 @@ async def main():
                 }
                 jobs.append(job)
                 print(f"   {i+1}. {job['title'][:40]} @ {job['company'][:20]} {'[Easy Apply]' if job['easy_apply'] else ''}")
-            except:
+            except Exception:
                 continue
 
         results["jobs_found"] = jobs

@@ -256,6 +256,6 @@ class InferenceClient:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f"{self.endpoint}/api/tags", timeout=5) as resp:
                         return resp.status == 200
-            except:
+            except Exception:
                 return False
         return True # Assume others are OK if configured

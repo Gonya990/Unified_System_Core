@@ -112,7 +112,7 @@ async def read_root(request: Request, user: dict = Depends(get_current_user)):
             kosta_status = "Working ⚡"
         else:
             kosta_status = "Resting 💤"
-    except:
+    except Exception:
         kosta_status = "Busy ⚙️"
 
     return templates.TemplateResponse("index.html", {
@@ -175,7 +175,7 @@ async def get_system_stats():
         try:
             r = requests.get("http://localhost:8765", timeout=0.2)
             if r.status_code < 500: kosta_ok = True
-        except:
+        except Exception:
             r = requests.get("http://100.110.209.49:8765", timeout=0.5)
             if r.status_code < 500: kosta_ok = True
     except: pass

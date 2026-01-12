@@ -48,7 +48,7 @@ async def check_approvals_job(context: ContextTypes.DEFAULT_TYPE):
         task_id = task['id']
         try:
             payload = json.loads(task['task_payload'])
-        except:
+        except Exception:
             payload = {'summary': task['task_payload']}
 
         text = f"🛡️ **Request for Approval**\n\n" \

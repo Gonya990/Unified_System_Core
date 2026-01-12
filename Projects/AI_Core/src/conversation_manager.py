@@ -7,7 +7,6 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +24,14 @@ class ConversationManager:
         """Get file path for user's conversation history."""
         return self.storage / f"{user_id}.json"
 
-    def get_history(self, user_id: int, limit: int = 10) -> List[Dict]:
+    def get_history(self, user_id: int, limit: int = 10) -> list[dict]:
         """
         Get conversation history for a user.
-        
+
         Args:
             user_id: Telegram user ID
             limit: Maximum number of recent messages to return
-        
+
         Returns:
             List of message dictionaries with role, content, timestamp
         """
@@ -54,7 +53,7 @@ class ConversationManager:
     def add_message(self, user_id: int, role: str, content: str) -> None:
         """
         Add a message to user's conversation history.
-        
+
         Args:
             user_id: Telegram user ID
             role: Message role ('user' or 'assistant')
@@ -83,7 +82,7 @@ class ConversationManager:
         except Exception as e:
             logger.error(f"Failed to save history for user {user_id}: {e}")
 
-    def get_full_history(self, user_id: int) -> List[Dict]:
+    def get_full_history(self, user_id: int) -> list[dict]:
         """Get all conversation history for a user."""
         file_path = self._get_file_path(user_id)
 
@@ -100,7 +99,7 @@ class ConversationManager:
     def clear_history(self, user_id: int) -> bool:
         """
         Clear conversation history for a user.
-        
+
         Returns:
             True if history was cleared, False if no history existed
         """
@@ -117,10 +116,10 @@ class ConversationManager:
             logger.error(f"Failed to clear history for user {user_id}: {e}")
             return False
 
-    def get_context_messages(self, user_id: int, limit: int = 5) -> List[Dict]:
+    def get_context_messages(self, user_id: int, limit: int = 5) -> list[dict]:
         """
         Get recent messages formatted for AI context.
-        
+
         Returns messages in format: [{"role": "user|assistant", "content": "..."}]
         """
         history = self.get_history(user_id, limit=limit)
@@ -131,7 +130,7 @@ class ConversationManager:
             for msg in history
         ]
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """Get statistics about conversation storage."""
         files = list(self.storage.glob("*.json"))
         total_users = len(files)

@@ -26,7 +26,7 @@ class BudgetMonitor:
             messages = client.search_emails(query, max_results=3)
 
             for msg in messages:
-                snippet = msg.get('snippet', '')
+                msg.get('snippet', '')
                 subject = msg.get('subject', '')
 
                 # Check for high percentages

@@ -1,6 +1,6 @@
 import os
-import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 from instagrapi import Client
 
@@ -18,10 +18,10 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
     Supports Login via Username/Password or SessionID (bypasses 2FA).
     """
     cl = Client()
-    
+
     # Use provided session_id or fallback to env
     active_session_id = session_id or INSTAGRAM_SESSION_ID
-    
+
     # 1. Try Session ID (Most robust for 2FA/Facebook login)
     if active_session_id and active_session_id != "your_session_id":
         try:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # Test path
     test_video = "/Users/macbook/Documents/Unified_System/outputs/ai_council_ru_impact.mp4"
     test_caption = "Будущее 2026: Эволюция Разума. #AI #Future #Technology #ImpactVision"
-    
+
     if Path(test_video).exists():
         upload_reel(test_video, test_caption)
     else:

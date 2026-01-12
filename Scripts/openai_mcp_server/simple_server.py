@@ -22,7 +22,7 @@ class MCPHandler(BaseHTTPRequestHandler):
 
         try:
             request = json.loads(body.decode('utf-8'))
-        except:
+        except Exception:
             request = {}
 
         method = request.get('method', 'unknown')

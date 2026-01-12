@@ -1,7 +1,7 @@
 import logging
 import sqlite3
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ class UserContextDB:
             )
             conn.commit()
 
-    def get_memories(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_memories(self, user_id: int, limit: int = 10) -> list[dict[str, Any]]:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
@@ -126,7 +126,7 @@ class UserContextDB:
             )
             conn.commit()
 
-    def get_inactive_users(self, hours: int = 72) -> List[Dict[str, Any]]:
+    def get_inactive_users(self, hours: int = 72) -> list[dict[str, Any]]:
         """Find users who haven't interacted for more than N hours."""
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
@@ -137,7 +137,7 @@ class UserContextDB:
             )
             return [dict(row) for row in cursor.fetchall()]
 
-    def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_user(self, user_id: int) -> Optional[dict[str, Any]]:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
@@ -232,7 +232,7 @@ class UserContextDB:
         """Check if user is an admin."""
         return self.get_role(user_id) == "ADMIN"
 
-    def list_admins(self) -> List[Dict[str, Any]]:
+    def list_admins(self) -> list[dict[str, Any]]:
         """Get all admin users."""
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row

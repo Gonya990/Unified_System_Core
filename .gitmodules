@@ -4,6 +4,3 @@
 [submodule "infra/cliproxyapi/src"]
 	path = infra/cliproxyapi/src
 	url = https://github.com/router-for-me/CLIProxyAPI
-[submodule "Projects/global1sim"]
-	path = Projects/global1sim
-	url = https://github.com/KostaGorod/global1sim.git

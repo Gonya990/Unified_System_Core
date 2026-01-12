@@ -41,7 +41,6 @@ class InfrastructureManager:
         """Get summary of all nodes."""
         summary = "🏗 **Infrastructure Summary**\n\n"
         for node in self.data.get("nodes", []):
-            status = "⚪️" # Unknown
             # We could add ping check here later
             summary += f"🔹 `{node['id']}` ({node['name']})\n"
         return summary

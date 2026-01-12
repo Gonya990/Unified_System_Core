@@ -2,7 +2,7 @@ import logging
 import random
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import yaml
 
@@ -32,8 +32,8 @@ class SwarmManager:
 
     def __init__(self, resources_path: str = "config/resources.yaml"):
         self.resources_path = Path(resources_path)
-        self.gemini_pool: List[dict] = []
-        self.openai_pool: List[dict] = []
+        self.gemini_pool: list[dict] = []
+        self.openai_pool: list[dict] = []
         self._current_gemini_idx = 0
         self._token_broker: Optional[TokenBroker] = None
 

@@ -4,7 +4,7 @@ Integrates with Google Calendar API using OAuth 2.0 credentials.
 """
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Optional
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class CalendarClient:
     """Client for Google Calendar API per user."""
 
-    def __init__(self, credentials_json: str = None, credentials_dict: Dict = None):
+    def __init__(self, credentials_json: str = None, credentials_dict: dict = None):
         """
         Initialize with user credentials.
         :param credentials_json: JSON string of credentials
@@ -44,7 +44,7 @@ class CalendarClient:
     def is_valid(self) -> bool:
         return self.service is not None
 
-    def get_upcoming_events(self, days: int = 7) -> List[Dict]:
+    def get_upcoming_events(self, days: int = 7) -> list[dict]:
         """Get upcoming events for next N days."""
         if not self.service:
             return []
@@ -67,7 +67,7 @@ class CalendarClient:
             logger.error(f"Failed to fetch upcoming events: {e}")
             return []
 
-    def format_event(self, event: Dict) -> str:
+    def format_event(self, event: dict) -> str:
         """Format event for display."""
         start = event['start'].get('dateTime', event['start'].get('date'))
         summary = event.get('summary', 'No Title')
@@ -79,12 +79,12 @@ class CalendarClient:
                 time_str = dt.strftime('%H:%M')
             else:  # All-day event
                 time_str = "All Day"
-        except:
+        except Exception:
             time_str = "?"
 
         return f"{time_str} - {summary}"
 
-    def create_event(self, summary: str, start_time: datetime, duration_minutes: int = 60, description: str = "") -> Optional[Dict]:
+    def create_event(self, summary: str, start_time: datetime, duration_minutes: int = 60, description: str = "") -> Optional[dict]:
         """
         Create a new calendar event.
         """

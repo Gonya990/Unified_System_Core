@@ -54,8 +54,8 @@ class AliceSkill:
 
             req = data.get("request", {})
             command = req.get("command", "")
-            original_utterance = req.get("original_utterance", "")
-            user_id = data.get("session", {}).get("user", {}).get("user_id", "anonymous")
+            req.get("original_utterance", "")
+            data.get("session", {}).get("user", {}).get("user_id", "anonymous")
 
             # Handle "ping" (used by Yandex to check availability)
             if command == "ping":

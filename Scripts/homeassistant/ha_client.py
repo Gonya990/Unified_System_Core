@@ -7,7 +7,7 @@ Provides full programmatic control over HA integrations, entities, and services.
 import json
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import requests
 
@@ -44,29 +44,29 @@ class HomeAssistantClient:
         """GET request"""
         return self._request('GET', endpoint).json()
 
-    def post(self, endpoint: str, data: Optional[Dict] = None) -> Any:
+    def post(self, endpoint: str, data: Optional[dict] = None) -> Any:
         """POST request"""
         return self._request('POST', endpoint, json=data).json()
 
     # ========== General API ==========
 
-    def get_config(self) -> Dict:
+    def get_config(self) -> dict:
         """Get HA configuration"""
         return self.get('config')
 
-    def get_states(self) -> List[Dict]:
+    def get_states(self) -> list[dict]:
         """Get all entity states"""
         return self.get('states')
 
-    def get_entity_state(self, entity_id: str) -> Dict:
+    def get_entity_state(self, entity_id: str) -> dict:
         """Get specific entity state"""
         return self.get(f'states/{entity_id}')
 
-    def get_services(self) -> List[Dict]:
+    def get_services(self) -> list[dict]:
         """Get all available services"""
         return self.get('services')
 
-    def call_service(self, domain: str, service: str, entity_id: Optional[str] = None, **kwargs) -> List[Dict]:
+    def call_service(self, domain: str, service: str, entity_id: Optional[str] = None, **kwargs) -> list[dict]:
         """Call a service"""
         data = kwargs
         if entity_id:
@@ -75,17 +75,17 @@ class HomeAssistantClient:
 
     # ========== Integrations ==========
 
-    def get_integrations(self) -> List[Dict]:
+    def get_integrations(self) -> list[dict]:
         """Get all integration entries"""
         # Note: This endpoint may not be available in all HA versions
         # Alternative: parse .storage/core.config_entries directly
         try:
             return self.get('config_entries/entry')
-        except:
+        except Exception:
             # Fallback: try to get from states
             return []
 
-    def get_homekit_integration(self) -> Optional[Dict]:
+    def get_homekit_integration(self) -> Optional[dict]:
         """Get HomeKit Bridge integration details"""
         integrations = self.get_integrations()
         for integration in integrations:
@@ -93,13 +93,13 @@ class HomeAssistantClient:
                 return integration
         return None
 
-    def reload_integration(self, entry_id: str) -> Dict:
+    def reload_integration(self, entry_id: str) -> dict:
         """Reload a config entry"""
         return self.post(f'config/config_entries/{entry_id}/reload')
 
     # ========== HomeKit Specific ==========
 
-    def get_homekit_status(self) -> Dict:
+    def get_homekit_status(self) -> dict:
         """Get HomeKit Bridge status and pairing info"""
         hk = self.get_homekit_integration()
         if not hk:
@@ -115,7 +115,7 @@ class HomeAssistantClient:
             "data": hk.get('data', {})
         }
 
-    def restart_homekit(self) -> Dict:
+    def restart_homekit(self) -> dict:
         """Restart HomeKit Bridge"""
         hk = self.get_homekit_integration()
         if not hk:
@@ -125,33 +125,33 @@ class HomeAssistantClient:
 
     # ========== Lights ==========
 
-    def turn_on_light(self, entity_id: str, **kwargs) -> List[Dict]:
+    def turn_on_light(self, entity_id: str, **kwargs) -> list[dict]:
         """Turn on a light with optional parameters"""
         return self.call_service('light', 'turn_on', entity_id, **kwargs)
 
-    def turn_off_light(self, entity_id: str) -> List[Dict]:
+    def turn_off_light(self, entity_id: str) -> list[dict]:
         """Turn off a light"""
         return self.call_service('light', 'turn_off', entity_id)
 
     # ========== Switches ==========
 
-    def turn_on_switch(self, entity_id: str) -> List[Dict]:
+    def turn_on_switch(self, entity_id: str) -> list[dict]:
         """Turn on a switch"""
         return self.call_service('switch', 'turn_on', entity_id)
 
-    def turn_off_switch(self, entity_id: str) -> List[Dict]:
+    def turn_off_switch(self, entity_id: str) -> list[dict]:
         """Turn off a switch"""
         return self.call_service('switch', 'turn_off', entity_id)
 
     # ========== Climate ==========
 
-    def set_temperature(self, entity_id: str, temperature: float) -> List[Dict]:
+    def set_temperature(self, entity_id: str, temperature: float) -> list[dict]:
         """Set climate temperature"""
         return self.call_service('climate', 'set_temperature', entity_id, temperature=temperature)
 
     # ========== Diagnostics ==========
 
-    def check_health(self) -> Dict:
+    def check_health(self) -> dict:
         """Check HA health and connectivity"""
         try:
             config = self.get_config()

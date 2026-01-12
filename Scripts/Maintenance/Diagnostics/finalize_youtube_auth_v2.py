@@ -46,7 +46,7 @@ def exchange_code(code):
         # Initialize dependencies only for exchange
         db_path = "/home/gonya/Unified_System/Projects/AI_Core/user_context.db"
         db = UserContextDB(db_path=db_path)
-        config = ConfigManager()
+        ConfigManager()
         # Mock auth manager for IdentityOrchestrator init if needed, or just use identity to save
         # Actually we need flow to exchange code
         flow = Flow.from_client_secrets_file(

@@ -152,7 +152,7 @@ async def process_profile(profile, llm):
             logger.error(f"Analysis failed for {email['id']}: {e}")
 
 async def main():
-    config = await load_config() # Keep config loading just for structure
+    await load_config() # Keep config loading just for structure
     llm = get_llm()
     if not llm:
         return

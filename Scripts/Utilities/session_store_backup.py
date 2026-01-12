@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import yaml
 from token_broker import TokenBroker
@@ -23,7 +23,7 @@ class SessionStore:
             self.store_path = store_path
 
         self.broker = TokenBroker()
-        self.sessions: Dict[str, Any] = {}
+        self.sessions: dict[str, Any] = {}
         self.load_sessions()
 
     def load_sessions(self):

@@ -4,9 +4,8 @@ Viral Content Research & Script Generator
 Uses web research and AI to create engaging scripts
 """
 
-import os
-from pathlib import Path
 import json
+from pathlib import Path
 
 # Trending Topics Research (Jan 2026)
 TRENDS_2026 = {
@@ -59,16 +58,16 @@ SCRIPT_TEMPLATES = {
 def generate_script(topic: str, template_type: str = "secret_reveal", lang: str = "ru") -> dict:
     """
     Generate viral script for given topic
-    
+
     Args:
         topic: Main topic/niche
         template_type: controversy, secret_reveal, transformation, listicle
         lang: ru or en
-    
+
     Returns:
         Script dict with sections
     """
-    
+
     # Example: AI tools script
     if "ai" in topic.lower() or "ии" in topic.lower():
         script = {
@@ -81,7 +80,7 @@ def generate_script(topic: str, template_type: str = "secret_reveal", lang: str 
                     "visual": "dramatic_face_closeup"
                 },
                 {
-                    "name": "tool_1", 
+                    "name": "tool_1",
                     "text": "Первый — это ChatGPT o3. Он пишет код лучше, чем 80% программистов. Серьезно.",
                     "visual": "screen_recording_chatgpt"
                 },
@@ -114,20 +113,22 @@ def generate_script(topic: str, template_type: str = "secret_reveal", lang: str 
             "hashtags": [],
             "cta": ""
         }
-    
+
     return script
 
-def find_untranslated_viral_content(source_lang: str = "en", target_langs: list = ["ru", "he", "ar"]) -> list:
+def find_untranslated_viral_content(source_lang: str = "en", target_langs: list = None) -> list:
     """
     Find viral videos without translations to target languages
-    
+
     Strategy:
     1. Search trending videos in source language
     2. Check if translations exist for each target language
     3. Return list of opportunities
     """
-    
+
     # This would use YouTube/TikTok API in production
+    if target_langs is None:
+        target_langs = ["ru", "he", "ar"]
     opportunities = [
         {
             "platform": "TikTok",
@@ -154,23 +155,23 @@ def find_untranslated_viral_content(source_lang: str = "en", target_langs: list 
             "opportunity_score": 8.2
         }
     ]
-    
+
     return opportunities
 
 if __name__ == "__main__":
     # Check for daily topic from daily_researcher.py
     daily_topic_path = Path(__file__).parent / "current_daily_topic.json"
-    
+
     if daily_topic_path.exists():
         print(f"Loading daily topic from {daily_topic_path}...")
         try:
-            with open(daily_topic_path, 'r', encoding='utf-8') as f:
+            with open(daily_topic_path, encoding='utf-8') as f:
                 data = json.load(f)
                 topic_data = data.get('topic', {})
                 topic_title = topic_data.get('title', "AI Tools 2026")
                 topic_angle = topic_data.get('angle', "secret_reveal")
                 script = generate_script(topic_title, "secret_reveal", "ru")
-                # Inject the angle/reason into the script context if possible, 
+                # Inject the angle/reason into the script context if possible,
                 # but for now we just use the title to generate the script.
                 print(f"✅ Uses Council Selected Topic: {topic_title}")
                 print(f"📐 Angle: {topic_angle}")
@@ -180,24 +181,24 @@ if __name__ == "__main__":
     else:
         print("⚠️ No daily topic found. Using default.")
         script = generate_script("AI инструменты 2026", "secret_reveal", "ru")
-    
+
     print("=" * 50)
     print(f"📹 SCRIPT: {script['title']}")
     print("=" * 50)
     print(f"\n🎯 HOOK: {script['hook']}\n")
-    
-    for i, section in enumerate(script['sections'], 1):
+
+    for _i, section in enumerate(script['sections'], 1):
         print(f"[{section['name']}] {section['text']}")
         print(f"  Visual: {section['visual']}\n")
-    
+
     print(f"⏱ Duration: {script['duration_seconds']}s")
     print(f"📌 CTA: {script['cta']}")
     print(f"#️⃣ {' '.join(script['hashtags'])}")
-    
+
     print("\n" + "=" * 50)
     print("🔍 TRANSLATION OPPORTUNITIES:")
     print("=" * 50)
-    
+
     for opp in find_untranslated_viral_content():
         print(f"\n{opp['platform']} | {opp['creator']}")
         print(f"  {opp['video']} ({opp['views']} views)")

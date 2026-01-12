@@ -52,7 +52,7 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO token_usage 
+                    INSERT INTO token_usage
                     (user_id, username, provider, model, prompt_tokens, completion_tokens, total_tokens)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, (
@@ -77,7 +77,7 @@ class UsageTracker:
 
                 # Total tokens
                 cursor.execute("""
-                    SELECT 
+                    SELECT
                         SUM(total_tokens) as total,
                         SUM(prompt_tokens) as prompt,
                         SUM(completion_tokens) as completion,
@@ -123,7 +123,7 @@ class UsageTracker:
                 cursor = conn.cursor()
 
                 cursor.execute("""
-                    SELECT 
+                    SELECT
                         user_id,
                         username,
                         SUM(total_tokens) as total,
@@ -156,7 +156,7 @@ class UsageTracker:
                 cursor = conn.cursor()
 
                 cursor.execute("""
-                    SELECT 
+                    SELECT
                         provider,
                         SUM(total_tokens) as total,
                         COUNT(*) as requests
@@ -186,7 +186,7 @@ class UsageTracker:
                 cursor = conn.cursor()
 
                 cursor.execute("""
-                    SELECT 
+                    SELECT
                         date(timestamp) as date,
                         SUM(total_tokens) as tokens
                     FROM token_usage
@@ -212,8 +212,8 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT SUM(total_tokens) 
-                    FROM token_usage 
+                    SELECT SUM(total_tokens)
+                    FROM token_usage
                     WHERE user_id = ? AND date(timestamp) = date('now')
                 """, (user_id,))
                 res = cursor.fetchone()

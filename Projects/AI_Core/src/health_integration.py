@@ -6,7 +6,6 @@ Intended to be used with iOS Shortcuts or Android Automation.
 import logging
 import sqlite3
 from datetime import datetime
-from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ class HealthIntegration:
             logger.error(f"Failed to record metric: {e}")
             return False
 
-    def get_today_stats(self, user_id: int) -> Dict[str, float]:
+    def get_today_stats(self, user_id: int) -> dict[str, float]:
         """Get aggregate stats for today."""
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
@@ -91,13 +90,13 @@ class HealthIntegration:
         conn.close()
         return stats
 
-    def get_weekly_stats(self, user_id: int) -> Dict[str, float]:
+    def get_weekly_stats(self, user_id: int) -> dict[str, float]:
         """Get average stats for the last 7 days."""
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
 
         stats = {}
-        week_start = datetime.now().strftime("%Y-%m-%d 00:00:00") # Simplified, actually needs -7 days logic, handled below
+        datetime.now().strftime("%Y-%m-%d 00:00:00") # Simplified, actually needs -7 days logic, handled below
 
         # Avg Steps
         c.execute("SELECT AVG(daily_steps) FROM (SELECT SUM(value) as daily_steps FROM metrics WHERE user_id=? AND metric_type='steps' AND timestamp >= date('now', '-7 days') GROUP BY date(timestamp))", (user_id,))

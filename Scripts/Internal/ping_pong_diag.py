@@ -41,7 +41,7 @@ async def main():
 
     while True:
         # 1. Check Bot
-        bot_alive = await check_bot_health()
+        await check_bot_health()
 
         # 2. Ping Kostya (FuchsiaCat)
         kostya_status = await ping_mcp_agent("FuchsiaCat", "Heartbeat check")

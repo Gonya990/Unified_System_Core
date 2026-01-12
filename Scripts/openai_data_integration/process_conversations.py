@@ -10,7 +10,6 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 
 # Colors for terminal output
@@ -26,7 +25,7 @@ def print_bilingual(english: str, russian: str, color: str = Colors.NC):
     print(f"{color}English: {english}{Colors.NC}")
     print(f"{color}Russian: {russian}{Colors.NC}")
 
-def load_config() -> Dict:
+def load_config() -> dict:
     """Load configuration file"""
     script_dir = Path(__file__).parent
     config_path = script_dir / "config.json"
@@ -34,7 +33,7 @@ def load_config() -> Dict:
     with open(config_path) as f:
         return json.load(f)
 
-def parse_conversation(conv: Dict) -> Dict:
+def parse_conversation(conv: dict) -> dict:
     """Parse a single conversation into structured format"""
     messages = []
 
@@ -81,7 +80,7 @@ def parse_conversation(conv: Dict) -> Dict:
     mapping = conv.get('mapping', {})
 
     # Build conversation tree
-    for node_id, node in mapping.items():
+    for _node_id, node in mapping.items():
         message = node.get('message')
         if not message:
             continue
@@ -108,7 +107,7 @@ def parse_conversation(conv: Dict) -> Dict:
         'id': conv.get('id', 'unknown')
     }
 
-def conversation_to_markdown(conv_data: Dict, include_timestamps: bool = True) -> str:
+def conversation_to_markdown(conv_data: dict, include_timestamps: bool = True) -> str:
     """Convert conversation data to markdown format"""
     md = []
 
@@ -136,7 +135,7 @@ def conversation_to_markdown(conv_data: Dict, include_timestamps: bool = True) -
 
     return '\n'.join(md)
 
-def create_index(conversations: List[Dict], output_dir: Path) -> str:
+def create_index(conversations: list[dict], output_dir: Path) -> str:
     """Create an index file for all conversations"""
     md = ["# OpenAI ChatGPT Conversations Index\n"]
     md.append("# Индекс разговоров OpenAI ChatGPT\n\n")

@@ -5,7 +5,7 @@ import os
 import re
 import sys
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import aiohttp
 
@@ -509,7 +509,6 @@ def get_gmail_client(user_id: int) -> Optional[GmailClient]:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    chat_id = update.effective_chat.id
 
     logger.info(f"[CMD] /start from {user.id} (@{user.username})")
 
@@ -1706,7 +1705,7 @@ async def show_memory_context(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
 
-async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
+async def parse_event_details(text: str) -> Optional[dict[str, Any]]:
     prompt = (
         "Extract event details from this text for a calendar: '" + text + "'. "
         "Current local time: " + datetime.now().isoformat() + ". "
@@ -2044,7 +2043,6 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @require_role("ADMIN")
 async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
 
     if not context.args:
         await update.message.reply_text("Usage: `/approve USER_ID`")
@@ -2305,7 +2303,7 @@ async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(
         chat_id=update.effective_chat.id, action=ChatAction.TYPING
     )
-    status_msg = await update.message.reply_text(
+    await update.message.reply_text(
         f"🔄 Запускаю пайплайн `{pipeline_type}`\n\n"
         f"Этапы: {stage_names}\n\n"
         f"⏱ Это может занять 2-5 минут...",
@@ -2977,7 +2975,7 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
 
     try:
-        process = await asyncio.create_subprocess_exec(
+        await asyncio.create_subprocess_exec(
             venv_python,
             script_path,
             stdout=asyncio.subprocess.PIPE,
@@ -3430,7 +3428,6 @@ async def digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @require_role("ADMIN")
 async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
 
     await context.bot.send_chat_action(
         chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_DOCUMENT
@@ -3478,7 +3475,6 @@ async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @require_role("ADMIN")
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
 
     await update.message.reply_text(
         "🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)..."

@@ -48,7 +48,7 @@ def get_mashov_session(user_id, password):
         wait = WebDriverWait(driver, 10)
 
         # Try finding the Edu button
-        edu_btn = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "mat-mdc-button-touch-target"))) # Generic?
+        wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "mat-mdc-button-touch-target"))) # Generic?
         # Better: find by href or specific class for Edu login
         # Usually 'az.mashov.info' link or similar.
         # Let's search by partial text logic if possible or specific mashov selector

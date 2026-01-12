@@ -17,7 +17,7 @@ import sys
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Optional
 
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -47,7 +47,7 @@ class ProcessorConfig:
     poll_interval_seconds: int = 60
 
     # High Priority Alert Keywords (case-insensitive)
-    alert_keywords: List[str] = field(
+    alert_keywords: list[str] = field(
         default_factory=lambda: [
             "urgent",
             "critical",
@@ -82,7 +82,7 @@ class ProcessorConfig:
     )
 
     # Council Agents - their messages get special processing
-    council_agents: List[str] = field(
+    council_agents: list[str] = field(
         default_factory=lambda: [
             "FuchsiaCat",
             "VioletCastle",
@@ -124,7 +124,7 @@ class MailProcessor:
     def __init__(self, config: Optional[ProcessorConfig] = None):
         self.config = config or ProcessorConfig()
         self.client = AgentMailClient()
-        self.processed_ids: Set[int] = set()
+        self.processed_ids: set[int] = set()
         self.logger = self._setup_logging()
         self._load_state()
 
@@ -180,7 +180,7 @@ class MailProcessor:
         except Exception as e:
             self.logger.error(f"Could not save state: {e}")
 
-    def _detect_priority(self, message: Dict[str, Any]) -> str:
+    def _detect_priority(self, message: dict[str, Any]) -> str:
         """Detect message priority based on keywords and sender"""
         subject = (message.get("subject") or "").lower()
         body = (message.get("body_md") or message.get("body") or "").lower()
@@ -206,7 +206,7 @@ class MailProcessor:
 
         return "normal"
 
-    def _send_telegram_alert(self, message: Dict[str, Any], priority: str):
+    def _send_telegram_alert(self, message: dict[str, Any], priority: str):
         """Send high-priority alert to Admin Telegram"""
         if not self.config.telegram_bot_token or not self.config.telegram_chat_id:
             self.logger.warning("Telegram not configured, skipping alert")
@@ -250,7 +250,7 @@ class MailProcessor:
         except Exception as e:
             self.logger.error(f"Failed to send Telegram alert: {e}")
 
-    def _process_council_message(self, message: Dict[str, Any]):
+    def _process_council_message(self, message: dict[str, Any]):
         """Special processing for Council agent messages"""
         sender = message.get("from", "Unknown")
         subject = message.get("subject", "")
@@ -290,7 +290,7 @@ class MailProcessor:
             else:
                 self.logger.warning("Cannot auto-acknowledge message without int id")
 
-    def process_message(self, message: Dict[str, Any]) -> bool:
+    def process_message(self, message: dict[str, Any]) -> bool:
         """Process a single message. Returns True if processed successfully."""
         message_id = message.get("id")
         if not isinstance(message_id, int):

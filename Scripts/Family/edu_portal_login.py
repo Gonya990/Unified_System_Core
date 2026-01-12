@@ -49,7 +49,6 @@ def login_edu_portal(username, password):
 
         # Check if we are on the Edu Login page
         # Usually looking for specific inputs
-        page_source = driver.page_source
 
         if "Hizdaot" in driver.current_url or "edu.gov.il" in driver.current_url:
             logger.info("Found Unified Login Page.")
@@ -67,7 +66,7 @@ def login_edu_portal(username, password):
                         user_input = driver.find_element(By.ID, selector)
                         logger.info(f"Found user input with ID: {selector}")
                         break
-                    except:
+                    except Exception:
                         continue
 
                 if not user_input:
@@ -89,7 +88,7 @@ def login_edu_portal(username, password):
                         pwd_tab = driver.find_element(By.XPATH, "//*[contains(text(), 'סיסמה')]")
                         pwd_tab.click()
                         time.sleep(2)
-                    except:
+                    except Exception:
                         pass # Maybe already on password tab
 
                     pwd_input = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
