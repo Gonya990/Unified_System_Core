@@ -9,19 +9,6 @@ from typing import Any, Optional
 
 import aiohttp
 
-# Setup logging first
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename="bot_journal.log",
-    filemode="a",
-)
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-logging.getLogger("").addHandler(console)
-
-logger = logging.getLogger(__name__)
-
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
@@ -29,6 +16,7 @@ if current_dir not in sys.path:
 
 # Handle arguments before importing ConfigManager
 import argparse
+from dotenv import load_dotenv
 
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
 parser.add_argument("--env", help="Path to .env file", default=".env")
@@ -36,7 +24,25 @@ args, unknown = parser.parse_known_args()
 
 if args.env:
     os.environ["ENV_FILE"] = args.env
-    # Reload env if needed, but ConfigManager will pick it up on import
+    load_dotenv(args.env)
+
+# Get BOT_INSTANCE for per-instance logging
+bot_instance = os.getenv("BOT_INSTANCE", "default")
+log_filename = f"bot_{bot_instance}.log"
+
+# Setup logging with instance-specific filename
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    filename=log_filename,
+    filemode="a",
+)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger("").addHandler(console)
+
+logger = logging.getLogger(__name__)
+logger.info(f"Bot instance: {bot_instance}, logging to {log_filename}")
 
 # Configuration
 from config_manager import ConfigManager
@@ -83,7 +89,6 @@ except ImportError:
 
     _USE_FIRESTORE = False
 
-from agent_mail_client import AgentMailClient
 from agent_orchestrator import PIPELINES, AgentOrchestrator
 from calendar_client import CalendarClient
 from conversation_manager import ConversationManager
