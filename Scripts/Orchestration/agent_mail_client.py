@@ -208,12 +208,6 @@ class AgentMailClient:
             return None
 
     def list_agents(self, include_inactive: bool = False) -> List[Dict[str, Any]]:
-        """List agents in the project using native list_agents tool.
-
-        Returns list of agent dicts with: name, program, model, task_description, last_active_ts
-        Falls back to whois-based discovery if native tool unavailable.
-        """
-        # Try native list_agents tool first
         try:
             result = self._call_tool(
                 "list_agents",
@@ -223,55 +217,13 @@ class AgentMailClient:
                 },
             )
             agents_data = result.get("structuredContent", {}).get("agents", [])
-            # Filter out self
             return [a for a in agents_data if a.get("name") != self.config.agent_name]
         except Exception:
-            pass
-
-        # Fallback: whois-based discovery
-        known_agents = [
-            "VioletCastle",
-            "OrangeStone",
-            "PinkLake",
-            "FuchsiaCat",
-            "WhiteMill",
-            "IvoryOtter",
-            "CalmSnow",
-            "CobaltRidge",
-            "BoldCliff",
-        ]
-
-        registered = []
-        for agent in known_agents:
-            if agent == self.config.agent_name:
-                continue
-            info = self.whois(agent)
-            if info and info.get("id"):
-                registered.append(info)
-
-        return registered
+            return []
 
     def broadcast(self, subject: str, body_md: str, importance: str = "normal"):
-        """Broadcast message to all registered agents in project"""
         agents_data = self.list_agents()
-        agent_names: List[str] = []
-        for a in agents_data:
-            name = a.get("name") if isinstance(a, dict) else str(a)
-            if name:
-                agent_names.append(name)
-
-        if not agent_names:
-            fallback = [
-                "VioletCastle",
-                "OrangeStone",
-                "PinkLake",
-                "FuchsiaCat",
-                "WhiteMill",
-                "IvoryOtter",
-                "CalmSnow",
-                "CobaltRidge",
-            ]
-            agent_names = [a for a in fallback if a != self.config.agent_name]
+        agent_names: List[str] = [str(a["name"]) for a in agents_data if a.get("name")]
 
         if not agent_names:
             raise Exception("No agents found to broadcast to")
