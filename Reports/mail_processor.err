@@ -1,0 +1,19 @@
+2026-01-12 16:33:24 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-12 16:33:24 - MailProcessor - INFO - ✅ Registered as agent: PinkLake (ID: 3)
+2026-01-12 16:33:24 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-12 16:33:24 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-12 16:33:24 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #13 from VioletCastle: [Coordination] Stop comms breakage: make Agent Mail client a stable SDK
+2026-01-12 16:33:24 - MailProcessor - INFO - 📋 Council message from VioletCastle: [Coordination] Stop comms breakage: make Agent Mail client a stable SDK
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #9 from CalmSnow: Unified Bot Online (Vibranium Core)
+2026-01-12 16:33:24 - MailProcessor - INFO - 📋 Council message from CalmSnow: Unified Bot Online (Vibranium Core)
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #8 from CalmSnow: Unified Bot Online
+2026-01-12 16:33:24 - MailProcessor - INFO - 📋 Council message from CalmSnow: Unified Bot Online
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #7 from CalmSnow: Unified Bot Online (Vibranium Core)
+2026-01-12 16:33:24 - MailProcessor - INFO - 📋 Council message from CalmSnow: Unified Bot Online (Vibranium Core)
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #6 from CalmSnow: Unified Bot Online
+2026-01-12 16:33:24 - MailProcessor - INFO - 📋 Council message from CalmSnow: Unified Bot Online
+2026-01-12 16:33:24 - MailProcessor - INFO - Processing message #5 from PinkLake: Swarm Ping
+2026-01-12 16:33:25 - MailProcessor - INFO - Sent Telegram alert for message #5
+2026-01-12 16:33:25 - MailProcessor - INFO - 📋 Council message from PinkLake: Swarm Ping
+2026-01-12 16:33:25 - MailProcessor - INFO - Processed 6 new messages

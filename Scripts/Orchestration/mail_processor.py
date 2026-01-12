@@ -66,6 +66,18 @@ class ProcessorConfig:
             "priority",
             "warning",
             "incident",
+            "auth",
+            "unauthorized",
+            "permission",
+            "token",
+            "secret",
+            "key",
+            "database",
+            "db",
+            "production",
+            "deploy",
+            "exception",
+            "traceback",
         ]
     )
 
@@ -79,6 +91,9 @@ class ProcessorConfig:
             "WhiteMill",
             "IvoryOtter",
             "CalmSnow",
+            "BlueLake",
+            "GreenCastle",
+            "RedStone",
         ]
     )
 
