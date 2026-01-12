@@ -6,6 +6,7 @@ Unified interface for inter-agent communication via Agent Mail server.
 
 import os
 import sys
+import json
 
 # Add SDK to path
 sdk_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../External_Tools/Stack/agent_mail_sdk/src"))

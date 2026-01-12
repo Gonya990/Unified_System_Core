@@ -258,7 +258,10 @@ class MailProcessor:
 
         self.logger.info(f"📋 Council message from {sender}: {subject}")
 
-        # Log the full message for council agents
+        # CIRCUIT BREAKER: Avoid infinite ack loops
+        if "Auto-Acknowledged by MailProcessor" in body or "Auto-Acknowledged" in body:
+            self.logger.info(f"Skipping auto-response to auto-ack from {sender}")
+            return
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "from": sender,
