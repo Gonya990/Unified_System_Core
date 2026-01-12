@@ -1,8 +1,11 @@
 # Как дать доступ другому агенту к MCP Agent Mail / How to Give Another Agent Access to MCP Agent Mail
 
-**English:** This guide explains how to grant another AI agent access to the MCP Agent Mail communication system running on `unified-home-core-cloud`.
+**English:** This guide explains how to grant another AI agent access to MCP Agent Mail communication system running on `unified-home-core-cloud`.
 
 **Русский:** Это руководство объясняет как предоставить другому AI агенту доступ к системе коммуникаций MCP Agent Mail, работающей на `unified-home-core-cloud`.
+
+**Related Guides:**
+- 📘 **Agent Onboarding**: System overview and broader agent setup → `Docs/AGENT_ONBOARDING.md`
 
 ---
 

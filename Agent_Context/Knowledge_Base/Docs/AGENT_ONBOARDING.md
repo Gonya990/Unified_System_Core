@@ -1,7 +1,10 @@
 # Agent Onboarding: Unified System Multi-Agent Network
 
-> **Purpose:** Copy this document into your system prompt to join the Unified System.
+> **Purpose:** Copy this document into your system prompt to join Unified System.
 > **Last Updated:** 2025-12-25
+
+**Related Guides:**
+- 🔗 **MCP Agent Mail Setup**: Detailed communication system setup → `../HOW_TO_GIVE_ANOTHER_AGENT_ACCESS_TO_MCP_AGENT_MAIL.md`
 
 ---
 
