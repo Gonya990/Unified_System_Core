@@ -193,11 +193,67 @@ class AgentMailClient:
             },
         )
 
+    def whois(self, agent_name: str) -> Optional[Dict[str, Any]]:
+        """Look up agent info by name"""
+        try:
+            result = self._call_tool(
+                "whois",
+                {
+                    "project_key": self.config.project_key,
+                    "agent_name": agent_name,
+                },
+            )
+            return result.get("structuredContent", {})
+        except:
+            return None
+
+    def list_agents(self) -> List[str]:
+        """List known agents (checks which are registered via whois)"""
+        # Known agents in the system
+        known_agents = [
+            # Kosta's agents
+            "VioletCastle",
+            # Igor's bot agents
+            "OrangeStone",
+            "PinkLake",
+            "FuchsiaCat",
+            # Other known agents
+            "WhiteMill",
+            "IvoryOtter",
+            "CalmSnow",
+            "CobaltRidge",
+            "BoldCliff",
+        ]
+
+        registered = []
+        for agent in known_agents:
+            if agent == self.config.agent_name:
+                continue
+            info = self.whois(agent)
+            if info and info.get("id"):
+                registered.append(agent)
+
+        return registered
+
     def broadcast(self, subject: str, body_md: str, importance: str = "normal"):
-        """Broadcast message to all agents in project"""
-        # Send to known active agents
-        agents = ["VioletCastle", "WhiteMill", "IvoryOtter", "CalmSnow"]
-        agents = [a for a in agents if a != self.config.agent_name]
+        """Broadcast message to all registered agents in project"""
+        agents = self.list_agents()
+
+        if not agents:
+            known_agents = [
+                "VioletCastle",
+                "OrangeStone",
+                "PinkLake",
+                "FuchsiaCat",
+                "WhiteMill",
+                "IvoryOtter",
+                "CalmSnow",
+                "CobaltRidge",
+            ]
+            agents = [a for a in known_agents if a != self.config.agent_name]
+
+        if not agents:
+            raise Exception("No agents found to broadcast to")
 
         return self.send_message(
             to=agents, subject=subject, body_md=body_md, importance=importance
@@ -210,7 +266,8 @@ def main():
 
     parser = argparse.ArgumentParser(description="Agent Mail MCP Client")
     parser.add_argument(
-        "action", choices=["health", "register", "inbox", "send", "broadcast", "read"]
+        "action",
+        choices=["health", "register", "inbox", "send", "broadcast", "read", "agents"],
     )
     parser.add_argument("--to", nargs="+", help="Recipients (for send)")
     parser.add_argument("--subject", help="Message subject")
@@ -289,6 +346,17 @@ def main():
             subject=args.subject, body_md=args.body, importance=args.importance
         )
         print(f"✅ Broadcast sent to {result['count']} agents")
+
+    elif args.action == "agents":
+        agents = client.list_agents()
+        if not agents:
+            print("📭 No registered agents found")
+        else:
+            print(f"👥 {len(agents)} registered agents:\n")
+            for agent in agents:
+                info = client.whois(agent)
+                status = info.get("task_description", "Unknown") if info else "Unknown"
+                print(f"  • {agent}: {status}")
 
 
 if __name__ == "__main__":
