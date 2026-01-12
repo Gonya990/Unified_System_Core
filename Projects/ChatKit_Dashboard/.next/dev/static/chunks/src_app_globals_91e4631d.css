@@ -57,6 +57,7 @@ body {
   background: linear-gradient(135deg, var(--accent), #a855f7);
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
+  background-clip: text;
   font-size: 1.25rem;
   font-weight: 700;
 }
