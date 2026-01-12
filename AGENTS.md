@@ -32,3 +32,19 @@ adapt their output based on the current user's preferences.
 
 **Note**: The old `Windows_AI_Core` directory has been migrated to
 `Projects/AI_Core`.
+
+## OpenAI ChatGPT Conversations Knowledge Base
+
+**Location:** `Agent_Context/Knowledge_Base/OpenAI_Conversations/`
+
+**Description:**
+- **English:** Historical ChatGPT conversations imported from OpenAI export
+- **Russian:** Исторические разговоры ChatGPT, импортированные из экспорта OpenAI
+
+**Last Updated:** 2026-01-12 21:13:14
+
+**Contents:** 50 conversation files
+
+**Purpose:** Reference material for continuity, context, and learning from past interactions.
+
+---
