@@ -4,9 +4,9 @@ Agent Mail MCP Client (AI Core)
 Unified interface for inter-agent communication via Agent Mail server.
 """
 
-import sys
-import os
 import json
+import os
+import sys
 
 # Add SDK to path
 # Path: Projects/AI_Core/src -> ../../../External_Tools/Stack/agent_mail_sdk/src
