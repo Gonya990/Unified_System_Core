@@ -1,14 +1,15 @@
-import subprocess
 import json
+import subprocess
 import sys
+
 
 def run_apple_script(script):
     """Run an AppleScript command."""
     try:
         result = subprocess.run(
-            ['osascript', '-e', script], 
-            capture_output=True, 
-            text=True, 
+            ['osascript', '-e', script],
+            capture_output=True,
+            text=True,
             check=True
         )
         return result.stdout.strip()
@@ -35,7 +36,7 @@ def trigger_shortcut(shortcut_name, input_data=None):
     cmd = ['shortcuts', 'run', shortcut_name]
     if input_data:
         cmd.extend(['-i', input_data])
-    
+
     try:
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.stdout.strip() if result.returncode == 0 else f"Error: {result.stderr}"
@@ -46,17 +47,17 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(json.dumps({"error": "No command provided"}))
         sys.exit(1)
-        
+
     command = sys.argv[1]
-    
+
     if command == "list_shortcuts":
         res = subprocess.run(['shortcuts', 'list'], capture_output=True, text=True)
         print(json.dumps({"shortcuts": res.stdout.splitlines()}))
-        
+
     elif command == "summarize":
         text = sys.argv[2] if len(sys.argv) > 2 else "No text provided"
         print(json.dumps({"summary": summarize_text(text)}))
-        
+
     elif command == "run_shortcut":
         name = sys.argv[2]
         data = sys.argv[3] if len(sys.argv) > 3 else None
