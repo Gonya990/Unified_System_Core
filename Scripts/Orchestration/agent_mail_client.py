@@ -227,7 +227,11 @@ class AgentMailClient:
                 },
             )
             agents_data = result.get("structuredContent", {}).get("agents", [])
-            return [a for a in agents_data if a.get("name") != self.config.agent_name]
+            # Mark self instead of excluding
+            for a in agents_data:
+                if a.get("name") == self.config.agent_name:
+                    a["is_self"] = True
+            return agents_data
         except Exception:
             return []
 
@@ -238,9 +242,7 @@ class AgentMailClient:
         if not agent_names:
             raise Exception("No agents found to broadcast to")
 
-        return self.send_message(
-            to=agent_names, subject=subject, body_md=body_md, importance=importance
-        )
+        return self.send_message(to=agent_names, subject=subject, body_md=body_md, importance=importance)
 
 
 def main():
@@ -255,9 +257,7 @@ def main():
     parser.add_argument("--to", nargs="+", help="Recipients (for send)")
     parser.add_argument("--subject", help="Message subject")
     parser.add_argument("--body", help="Message body (markdown)")
-    parser.add_argument(
-        "--importance", choices=["low", "normal", "high"], default="normal"
-    )
+    parser.add_argument("--importance", choices=["low", "normal", "high"], default="normal")
     parser.add_argument("--limit", type=int, default=20, help="Inbox limit")
     parser.add_argument("--id", type=int, help="Message ID for read")
 
@@ -325,9 +325,7 @@ def main():
             print("❌ --subject and --body required")
             exit(1)
 
-        result = client.broadcast(
-            subject=args.subject, body_md=args.body, importance=args.importance
-        )
+        result = client.broadcast(subject=args.subject, body_md=args.body, importance=args.importance)
         print(f"✅ Broadcast sent to {result['count']} agents")
 
     elif args.action == "agents":
@@ -339,7 +337,8 @@ def main():
             for agent in agents:
                 name = agent.get("name", "Unknown")
                 status = agent.get("task_description", "Unknown")
-                print(f"  • {name}: {status}")
+                marker = " (you)" if agent.get("is_self") else ""
+                print(f"  • {name}{marker}: {status}")
 
 
 if __name__ == "__main__":
