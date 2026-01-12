@@ -32,7 +32,7 @@ integrating real-time weather, Gmail homework scanning, and Mashov connectivity.
 
 ## Next Steps
 
-1. User to identify School Symbol using:
-   `python3 Scripts/Family/mashov_login.py --search "Name"`.
+1. **Edu Portal**: Investigate `parents.education.gov.il` for automated
+    grade/homework retrieval (replacing Mashov).
 2. Update `.env` with `MASHOV_SCHOOL`.
 3. Once tablet is online, proceed with Tasker setup.

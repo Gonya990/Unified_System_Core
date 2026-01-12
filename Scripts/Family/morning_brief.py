@@ -59,12 +59,12 @@ def get_homework_summary():
         emails = scan_mailbox()
         if emails:
             gmail_summary = summarize_tasks(emails)
-            report.append(f"📧 **Gmail Homework:**\n{gmail_summary}")
+            report.append(f"📧 **Д/З из почты:**\n{gmail_summary}")
         else:
-            report.append("📧 Gmail: No new homework emails.")
+            report.append("📧 Gmail: Нет новых писем с домашкой.")
     except Exception as e:
         logger.error(f"Sentinel error: {e}")
-        report.append(f"📧 Sentinel Error: {e}")
+        report.append(f"📧 Ошибка Sentinel: {e}")
 
     # 2. Mashov (if configured)
     try:
@@ -79,31 +79,40 @@ def get_homework_summary():
                 uid = data['credential']['userId']
                 hw = fetch_homework(session, uid)
                 if hw:
-                    report.append(f"🏫 **Mashov Homework:** {len(hw)} tasks pending.")
+                    report.append(f"🏫 **Mashov:** {len(hw)} заданий в ожидании.")
                 else:
-                    report.append("🏫 Mashov: No pending tasks.")
+                    report.append("🏫 Mashov: Нет активных заданий.")
             else:
-                report.append("🏫 Mashov: Login failed.")
+                report.append("🏫 Mashov: Ошибка входа.")
         else:
-            report.append("🏫 Mashov: Not configured (Missing School Symbol).")
+            # report.append("🏫 Mashov: Не настроен (нет символа школы).")
+            pass # Silent if not configured
             
     except Exception as e:
-        logger.error(f"Mashov error: {e}")
+        # logger.error(f"Mashov error: {e}")
+        pass # Silent error
 
     return "\n\n".join(report)
 
 async def send_brief():
     logger.info("Generating Morning Brief...")
 
-    date_str = datetime.now().strftime("%A, %d %B %Y")
+    # Date in Russian manually to avoid locale issues on minimal envs
+    now = datetime.now()
+    months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 
+              'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
+    weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+    
+    date_str = f"{weekdays[now.weekday()]}, {now.day} {months[now.month-1]} {now.year}"
+    
     weather = get_weather()
     # news = get_news_summary() # Keep mock or remove if irrelevant
     homework = get_homework_summary()
 
-    message = f"🌅 **Morning Brief** | {date_str}\n\n" \
-              f"🌡️ **Weather:** {weather}\n\n" \
-              f"📚 **School Update:**\n{homework}\n\n" \
-              f"🚀 **Have a great day!**"
+    message = f"🌅 **Утренняя Сводка** | {date_str}\n\n" \
+              f"🌡️ **Погода:** {weather}\n\n" \
+              f"📚 **Школа и Задачи:**\n{homework}\n\n" \
+              f"🚀 **Хорошего дня!**"
 
     logger.info(f"Brief Content:\n{message}")
 
