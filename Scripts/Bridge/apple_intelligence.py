@@ -34,7 +34,7 @@ def summarize_text(text):
 def trigger_shortcut(shortcut_name, input_data=None):
     """Trigger a macOS Shortcut."""
     cmd = ['shortcuts', 'run', shortcut_name]
-    
+
     try:
         print(f"DEBUG: Running command: {cmd}")
         print(f"DEBUG: Input data length: {len(input_data) if input_data else 0}")
