@@ -10,13 +10,14 @@ Automatically monitors and processes emails from gonya90.gg@gmail.com
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
 import base64
 import json
-import sys
 import os
-import requests
-from dotenv import load_dotenv
+import sys
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from pathlib import Path
+
+import requests
+from dotenv import load_dotenv
 
 # Gmail API imports
 try:
@@ -291,9 +292,9 @@ def send_telegram_alert(category, subject, sender, body_preview):
         return
 
     header = priority_map[category]
-    
+
     import html
-    
+
     # Construct message
     safe_sender = html.escape(sender)
     safe_subject = html.escape(subject)
@@ -431,7 +432,7 @@ def get_recent_emails(service, hours=24, max_results=50, query=None):
                         "body_preview": body_preview,
                     }
                 )
-                
+
                 # Send Alert immediately for fresh emails
                 send_telegram_alert(category, subject, sender, body_preview)
 
