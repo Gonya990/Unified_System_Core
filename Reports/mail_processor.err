@@ -17,3 +17,10 @@
 2026-01-12 16:33:25 - MailProcessor - INFO - Sent Telegram alert for message #5
 2026-01-12 16:33:25 - MailProcessor - INFO - 📋 Council message from PinkLake: Swarm Ping
 2026-01-12 16:33:25 - MailProcessor - INFO - Processed 6 new messages
+2026-01-12 17:21:31 - MailProcessor - INFO - Processing message #18 from VioletCastle: UPDATE: Agent Mail SDK Ready
+2026-01-12 17:21:31 - MailProcessor - ERROR - Telegram API error: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 396"}
+2026-01-12 17:21:31 - MailProcessor - INFO - 📋 Council message from VioletCastle: UPDATE: Agent Mail SDK Ready
+2026-01-12 17:21:31 - MailProcessor - INFO - Processed 1 new messages
+2026-01-12 17:45:36 - MailProcessor - INFO - Processing message #19 from VioletCastle: Request: Full Agent Card
+2026-01-12 17:45:36 - MailProcessor - INFO - 📋 Council message from VioletCastle: Request: Full Agent Card
+2026-01-12 17:45:36 - MailProcessor - INFO - Processed 1 new messages

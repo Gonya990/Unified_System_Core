@@ -267,3 +267,15 @@ class AgentMailClient:
         # If we need to just check, we might need a different tool.
         # Let's stick to reserve_files for now as per US-l54.
         pass
+
+    def acknowledge(self, message_id: int, note: str = "Acknowledged"):
+        """Acknowledge a message requiring ACK"""
+        self._call_tool(
+            "acknowledge_message",
+            {
+                "project_key": self.config.project_key,
+                "agent_name": self.config.agent_name,
+                "message_id": message_id,
+                "note": note,
+            },
+        )

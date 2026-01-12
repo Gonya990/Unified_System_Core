@@ -7,6 +7,7 @@ Unified interface for inter-agent communication via Agent Mail server.
 import json
 import os
 import sys
+from datetime import datetime
 
 # Add SDK to path
 # Path: Projects/AI_Core/src -> ../../../External_Tools/Stack/agent_mail_sdk/src
@@ -28,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description="Agent Mail MCP Client (AI Core)")
     parser.add_argument(
         "action",
-        choices=["health", "register", "inbox", "send", "broadcast", "read", "agents", "reserve"],
+        choices=["health", "register", "inbox", "send", "broadcast", "read", "agents", "reserve", "ack"],
     )
     parser.add_argument("--to", nargs="+", help="Recipients (for send)")
     parser.add_argument("--subject", help="Message subject")
@@ -38,6 +39,19 @@ def main():
     parser.add_argument("--id", type=int, help="Message ID for read")
     parser.add_argument("--files", nargs="+", help="Files to reserve")
     parser.add_argument("--reason", help="Reason for reservation")
+    parser.add_argument("--note", help="Note for acknowledgement", default="Acknowledged via CLI")
+
+    def format_ts(ts_str):
+        """Format timestamp to local time"""
+        if not ts_str:
+            return "N/A"
+        try:
+            # Handle standard ISO format
+            dt = datetime.fromisoformat(ts_str)
+            # Convert to local time
+            return dt.astimezone().strftime("%Y-%m-%d %H:%M:%S %Z")
+        except Exception:
+            return ts_str
 
     args = parser.parse_args()
 
@@ -64,7 +78,7 @@ def main():
             for msg in messages:
                 status = "📖" if msg.get("read") else "✉️"
                 print(f"{status} [{msg['id']}] From: {msg['from']} | {msg['subject']}")
-                print(f"   {msg['created_ts']}")
+                print(f"   {format_ts(msg['created_ts'])}")
                 print()
 
     elif args.action == "send":
@@ -91,7 +105,7 @@ def main():
             print(f"📧 Message #{target['id']}")
             print(f"From: {target['from']}")
             print(f"Subject: {target['subject']}")
-            print(f"Time: {target['created_ts']}")
+            print(f"Time: {format_ts(target['created_ts'])}")
             print("-" * 40)
             print(target.get("body_md") or target.get("body"))
             client.mark_read(target["id"])
@@ -134,6 +148,18 @@ def main():
             print(f"❌ Reservation failed: {e}")
             exit(1)
 
+
+    elif args.action == "ack":
+        if not args.id:
+            print("❌ --id <message_id> required")
+            exit(1)
+        
+        try:
+            client.acknowledge(message_id=args.id, note=args.note)
+            print(f"✅ Message #{args.id} acknowledged")
+        except Exception as e:
+            print(f"❌ Acknowledgement failed: {e}")
+            exit(1)
 
 
 
