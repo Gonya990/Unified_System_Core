@@ -63,6 +63,7 @@
 | `8c34a8bc-20df-...` | **Chrome Remote Debugging** | ✅ Complete | Docker CDP setup |
 | `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan |
 | `2026-01-12_m_dep` | **Mail Processor Deployment** | ✅ Complete | task.md, walkthrough.md |
+| `2026-01-12_sync` | **Maintenance & Sync Cycle** | 🔄 In Progress | task.md, walkthrough.md |
 
 ### Brain Artifact Types
 
@@ -141,6 +142,16 @@ Each conversation folder may contain:
 - [x] Test Telegram alerts integration
 - [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
 - [x] Clean up Workspace root directory
+
+### From `2026-01-12_maintenance_sync` (Maintenance & Sync) - IN PROGRESS 🔄
+
+```markdown
+- [ ] Execute /update-progress workflow
+- [ ] Execute /autosave workflow
+- [ ] Execute /sync-mail workflow
+- [ ] Execute /sync workflow
+```
+
 ```
 
 ### General Outstanding Items
