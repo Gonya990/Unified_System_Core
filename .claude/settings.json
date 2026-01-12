@@ -8,7 +8,8 @@
       "Bash(tree:*)",
       "Bash(tee:*)",
       "Bash(ffprobe:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(bd update:*)"
     ]
   },
   "hooks": {
@@ -34,7 +35,6 @@
         ]
       }
     ],
-
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
