@@ -49,21 +49,24 @@
 
 ### Active Conversation Artifacts
 
+<!-- markdownlint-disable MD013 -->
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
-| `nodriver_implementation` | **Browser Control Daemon** | ✅ Implemented | nodriver_daemon.py, ndc CLI, UV setup |
-| `workflow_design_c651` | **Multi-Agent Workflow Design** | ✅ Complete | WORKFLOW_DESIGN_DECISIONS.md, discuss-design workflow |
-| `arthur_tablet_setup` | **Arthur Tablet Setup** | 🔄 In Progress | ADB setup, Family Link, Tailscale |
-| `6afbab64-f024-...` | **Codex Context Handoff (Mac)** | ✅ Complete | Artifact index, session handoff, task + walkthrough |
-| `0866ee1f-5969-...` | **Unified Topology Setup** | ✅ Complete | MCP server, n8n guide, walkthrough |
-| `a1c2070a-d35e-...` | **Proxmox Network Reconnaissance** | 🔄 In Progress | System inventory, deep clean briefing |
-| `b64b29bb-d3b8-...` | **Hybrid Cortex Activation** | ✅ Complete | RAG/Function calling implementation plan |
-| `bc334b70-7153-...` | **Grant Mac Service Access** | ✅ Complete | Host configuration guide |
-| `b32255f1-fc4d-...` | **Docker GPU Access Check** | ✅ Complete | Workflow verification |
-| `8c34a8bc-20df-...` | **Chrome Remote Debugging** | ✅ Complete | Docker CDP setup |
-| `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan |
-| `2026-01-12_m_dep` | **Mail Processor Deployment** | ✅ Complete | task.md, walkthrough.md |
-| `2026-01-12_sync` | **Maintenance & Sync Cycle** | 🔄 In Progress | task.md, walkthrough.md |
+| `nodriver_im...` | **Browser Control** | ✅ Done | nodriver_daemon.py, ndc |
+| `workflow_de...` | **Workflow Design** | ✅ Done | WORKFLOW_DESIGN.md |
+| `arthur_tabl...` | **Arthur Tablet** | 🔄 InPrg | ADB setup, Tailscale |
+| `6afbab64-f0...` | **Codex Handoff** | ✅ Done | Artifact index, handoff |
+| `0866ee1f-59...` | **Unified Topology** | ✅ Done | MCP server, n8n guide |
+| `a1c2070a-d3...` | **Proxmox Recon** | 🔄 InPrg | System inventory |
+| `b64b29bb-d3...` | **Hybrid Cortex** | ✅ Done | RAG implementation |
+| `bc334b70-71...` | **Mac Access** | ✅ Done | Host config guide |
+| `b32255f1-fc...` | **Docker GPU** | ✅ Done | Workflow verification |
+| `8c34a8bc-20...` | **Chrome Debug** | ✅ Done | Docker CDP setup |
+| `30813860-99...` | **File Org** | ✅ Done | Migration plan |
+| `2026-01-12_...` | **Mail Proctor** | ✅ Done | task.md, walkthrough |
+| `2026-01-12_...` | **Sync Cycle** | ✅ Done | task.md, walkthrough |
+| `2026-01-12_...` | **Comm CLI** | ✅ Done | task.md, walkthrough |
+<!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
 
@@ -143,15 +146,25 @@ Each conversation folder may contain:
 - [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics` <!-- id: 202 -->
 - [x] Clean up Workspace root directory
 
-### From `2026-01-12_maintenance_sync` (Maintenance & Sync) - IN PROGRESS 🔄
+```
+
+### From `2026-01-12_sync` (Maintenance & Sync) - COMPLETE ✅
 
 ```markdown
 - [ ] Execute /update-progress workflow
 - [ ] Execute /autosave workflow
 - [ ] Execute /sync-mail workflow
 - [ ] Execute /sync workflow
+
+
 ```
 
+### From `2026-01-12_comm_cli_upgrade` (Comm CLI Upgrade) - COMPLETE ✅
+
+```markdown
+- [x] Implement File Reservation in SDK (US-l54)
+- [x] Implement File Reservation in CLI
+- [x] Verify Broadcast functionality
 ```
 
 ### General Outstanding Items
