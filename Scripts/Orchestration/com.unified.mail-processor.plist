@@ -25,6 +25,12 @@
         <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
         <key>PYTHONUNBUFFERED</key>
         <string>1</string>
+        <key>AGENT_MAIL_NAME</key>
+        <string>PinkLake</string>
+        <key>AGENT_MAIL_PROJECT</key>
+        <string>/home/gonya/Unified_System</string>
+        <key>AGENT_MAIL_SERVER</key>
+        <string>http://100.110.209.49:8765</string>
     </dict>
 </dict>
 </plist>
