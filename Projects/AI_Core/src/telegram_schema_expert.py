@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class TelegramSchemaExpert:
     def _load_schema(self):
         try:
             if self.schema_path.exists():
-                with open(self.schema_path, "r") as f:
+                with open(self.schema_path) as f:
                     self.data = json.load(f)
                 logger.info(f"Loaded Telegram schema from {self.schema_path}")
             else:
@@ -26,12 +26,12 @@ class TelegramSchemaExpert:
     def lookup(self, query: str) -> str:
         """Find information about a constructor, method, or type."""
         query = query.strip().lower()
-        
+
         # Search in constructors
         for c in self.data.get("constructors", []):
             if c["predicate"].lower() == query or str(c["id"]) == query:
                 return self._format_obj(c, "Constructor")
-        
+
         # Search in methods
         for m in self.data.get("methods", []):
             if m["method"].lower() == query or str(m["id"]) == query:
@@ -51,7 +51,7 @@ class TelegramSchemaExpert:
         name = obj.get("predicate") or obj.get("method")
         params = obj.get("params", [])
         param_str = "\n".join([f"  - `{p['name']}`: `{p['type']}`" for p in params])
-        
+
         res = f"📘 **{label}: {name}**\n"
         res += f"ID: `{obj['id']}`\n"
         res += f"Type: `{obj['type']}`\n"
@@ -59,7 +59,7 @@ class TelegramSchemaExpert:
             res += f"Parameters:\n{param_str}\n"
         else:
             res += "Parameters: None\n"
-        
+
         return res
 
     def get_stats(self) -> str:

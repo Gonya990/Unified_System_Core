@@ -2,14 +2,14 @@
 Agent Orchestrator - Manages specialized AI agents for code tasks.
 Integrates with .claude/agents/ definitions and InferenceClient.
 """
-import os
-import re
-import yaml
 import asyncio
 import logging
-from pathlib import Path
+import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+import yaml
 
 logger = logging.getLogger(__name__)
 

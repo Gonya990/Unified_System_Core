@@ -1,6 +1,8 @@
-import os
 import logging
+import os
+
 from google.cloud import logging as cloud_logging
+
 
 def setup_cloud_logging(service_name="ai-telegram-bot"):
     """
@@ -23,7 +25,7 @@ def setup_cloud_logging(service_name="ai-telegram-bot"):
         # Python logging module. By default this captures all logs
         # at INFO level and higher
         client.setup_logging()
-        
+
         logging.info(f"☁️ Cloud Logging enabled for {service_name}")
         return True
 

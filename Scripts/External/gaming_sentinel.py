@@ -1,8 +1,8 @@
-import os
-import time
-import requests
-import psutil
 import logging
+import time
+
+import psutil
+import requests
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def is_gaming_active():
     Adjust process names based on setup (Sunshine, Moonlight, Steam, etc.)
     """
     active_processes = ["Sunshine.exe", "Moonlight.exe", "Steam.exe"]
-    
+
     for proc in psutil.process_iter(['name']):
         if proc.info['name'] in active_processes:
             # You could add further checks here, like network connection count for Sunshine
@@ -35,7 +35,7 @@ def get_idle_time():
                 ("cbSize", ctypes.c_uint),
                 ("dwTime", ctypes.c_uint),
             ]
-        
+
         lii = LASTINPUTINFO()
         lii.cbSize = ctypes.sizeof(LASTINPUTINFO)
         ctypes.windll.user32.GetLastInputInfo(ctypes.byref(lii))
@@ -47,16 +47,16 @@ def get_idle_time():
 def main():
     logger.info("Sentinel started. Monitoring for idle gaming session...")
     idle_start = None
-    
+
     while True:
         gaming = is_gaming_active()
         idle_time = get_idle_time()
-        
+
         if not gaming or idle_time > (IDLE_THRESHOLD_MINS * 60):
             if idle_start is None:
                 idle_start = time.time()
                 logger.info(f"System detected as idle. Starting reclaim timer ({IDLE_THRESHOLD_MINS}m)...")
-            
+
             elapsed = (time.time() - idle_start) / 60
             if elapsed >= IDLE_THRESHOLD_MINS:
                 logger.warning("IDLE THRESHOLD REACHED. Sending reclaim request to Core.")
@@ -70,7 +70,7 @@ def main():
             if idle_start is not None:
                 logger.info("Activity detected. Resetting idle timer.")
             idle_start = None
-            
+
         time.sleep(CHECK_INTERVAL_SECS)
 
 if __name__ == "__main__":

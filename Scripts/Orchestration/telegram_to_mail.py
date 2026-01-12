@@ -4,11 +4,10 @@ Telegram Channel Monitoring → Agent Mail Integration
 Monitors Telegram channel for new posts and broadcasts to agents via Agent Mail.
 """
 
-import os
 import json
-import time
+from datetime import datetime
 from pathlib import Path
-from datetime import datetime, timedelta
+
 from agent_mail_client import AgentMailClient
 
 # Paths

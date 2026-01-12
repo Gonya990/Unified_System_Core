@@ -15,7 +15,6 @@ import os
 import shutil
 import sys
 import time
-from pathlib import Path
 
 # Add parent directory to path for token_broker import
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,7 +33,7 @@ def detect_vault_kdf(vault_path: str) -> str:
         return "none"
 
     try:
-        with open(vault_path, "r") as f:
+        with open(vault_path) as f:
             data = yaml.safe_load(f) or {}
 
         if "encrypted_data" not in data:
@@ -60,7 +59,7 @@ def migrate_vault(
     Returns:
         True if migration succeeded, False otherwise
     """
-    from token_broker import TokenBroker, HAS_ARGON2, HAS_CRYPTO
+    from token_broker import HAS_ARGON2, HAS_CRYPTO, TokenBroker
 
     if not HAS_CRYPTO:
         logger.error("cryptography library not available. Cannot migrate.")

@@ -3,9 +3,10 @@ Yandex Alice Skill Handler for AI Telegram Bot.
 Handles incoming webhook requests from Yandex Dialogs.
 """
 import logging
-import json
+from collections.abc import Awaitable
+from typing import Callable
+
 from aiohttp import web
-from typing import Dict, Any, Callable, Awaitable
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ class AliceSkill:
         self.app.router.add_post("/alice", self._handle_webhook)
         self.runner = None
         self.site = None
-        
+
         # Callback to handle intent execution (hooked to main bot logic)
         self.command_handler: Callable[[str, int], Awaitable[str]] = None
 
@@ -42,7 +43,7 @@ class AliceSkill:
         try:
             data = await request.json()
             logger.info(f"Alice request: {data}")
-            
+
             response = {
                 "version": data["version"],
                 "session": data["session"],
@@ -70,7 +71,7 @@ class AliceSkill:
                 try:
                     # Pass a pseudo-user-ID for Alice users (hashed or prefixed)
                     # For now using a fixed ID or similar logic
-                    
+
                     # Execute command
                     result_text = await self.command_handler(command, 0) # 0 = system/alice user
                     response["response"]["text"] = result_text[:1024] # Alice limit
@@ -81,7 +82,7 @@ class AliceSkill:
                 response["response"]["text"] = "Обработчик команд не настроен."
 
             return web.json_response(response)
-            
+
         except Exception as e:
             logger.error(f"Alice webhook error: {e}")
             return web.Response(status=500)

@@ -24,7 +24,6 @@ SECURITY:
 
 import json
 import os
-import sys
 
 # Configuration
 SECRETS_DIR = "secrets"
@@ -43,9 +42,9 @@ def get_input(prompt):
 def main():
     print("=== 🛡️  Secure Identity Setup (Local Context) 🛡️  ===")
     print("This utility creates a local map of human identities for the AI System.")
-    
+
     ensure_secrets_dir()
-    
+
     structure = {
         "manager": {},
         "members": [],
@@ -54,23 +53,23 @@ def main():
             "security_policy": "LOCAL_ONLY"
         }
     }
-    
+
     print("\n--- 👑 Manager (You) ---")
     structure["manager"]["name"] = get_input("Enter your full real name: ")
     structure["manager"]["role"] = "admin"
     structure["manager"]["system_id"] = "root_admin"
-    
+
     print("\n--- 👥 Members (Family/Team) ---")
     while True:
         choice = get_input("Add a member? (y/n): ").lower()
         if choice != 'y':
             break
-            
+
         print("adding member...")
         name = get_input("  Name: ")
         role = get_input("  Role (parent/member/child/ally): ")
         sys_id = get_input("  System ID (e.g., agent_arthur, trusted_ally_bob): ")
-        
+
         member = {
             "name": name,
             "role": role,
@@ -82,7 +81,7 @@ def main():
     # Save
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(structure, f, indent=2, ensure_ascii=False)
-        
+
     print(f"\n🎉 Success! Identity Map saved to: {OUTPUT_FILE}")
     print("Your Agent now has local awareness of these identities without API calls.")
     print("DO NOT COMMIT THIS FILE.")

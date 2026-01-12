@@ -4,10 +4,10 @@ Uses Google Cloud Firestore (free tier: 50K reads, 20K writes/day, 1GB storage).
 
 Falls back to SQLite if Firestore is not configured.
 """
-import os
 import logging
+import os
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

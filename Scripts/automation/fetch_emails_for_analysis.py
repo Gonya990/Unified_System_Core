@@ -3,14 +3,11 @@
 Fetch Last 200 Emails for Analysis
 """
 
-import os
-import sys
-import json
-
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
 import base64
+import json
+import sys
 from pathlib import Path
-from typing import List, Dict
 
 # Gmail API imports
 try:

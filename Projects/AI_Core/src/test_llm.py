@@ -3,8 +3,8 @@ Test LLM inference on RTX 3080
 Simple example using Hugging Face Transformers
 """
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 print("=" * 70)
 print("  LLM Inference Test on RTX 3080")
@@ -49,10 +49,10 @@ print("=" * 70)
 for i, prompt in enumerate(prompts, 1):
     print(f"\n[{i}] Prompt: {prompt}")
     print("-" * 70)
-    
+
     # Tokenize
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-    
+
     # Generate
     with torch.no_grad():
         outputs = model.generate(
@@ -62,7 +62,7 @@ for i, prompt in enumerate(prompts, 1):
             do_sample=True,
             top_p=0.9
         )
-    
+
     # Decode
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     print(f"Response:\n{response}")

@@ -1,7 +1,6 @@
 
 import json
 import os
-import sys
 
 # Define path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -30,7 +29,7 @@ def main():
     current_data = {"gemini": [], "openai": [], "claude": [], "other": []}
     if os.path.exists(KEYS_FILE):
          try:
-            with open(KEYS_FILE, 'r') as f:
+            with open(KEYS_FILE) as f:
                 current_data = json.load(f)
             print(f"✅ Found existing keys file with {sum(len(v) for v in current_data.values())} keys.")
          except:
@@ -43,23 +42,23 @@ def main():
         print("3. Claude (Anthropic)")
         print("4. Other")
         print("5. Save & Exit")
-        
+
         choice = get_input("\nSelect Provider (1-5)")
-        
+
         if choice == '5':
             break
-            
+
         provider_map = {'1': 'gemini', '2': 'openai', '3': 'claude', '4': 'other'}
         provider = provider_map.get(choice)
-        
+
         if not provider:
             print("Invalid choice.")
             continue
-            
+
         print(f"\nAdding key for {provider.upper()}...")
         alias = get_input("  Key Alias (e.g., 'Igor_Primary', 'Child_Account')", "My_Key")
         key_value = get_input("  API Key Value (sk-...)")
-        
+
         if not key_value:
             print("❌ Skipped empty key.")
             continue
@@ -71,7 +70,7 @@ def main():
             "tier": get_input("  Tier (free/paid/high-throughput)", "free"),
             "owner": get_input("  Owner Name (for billing)", "Igor")
         }
-        
+
         # Check duplicates
         # Simple list append for now, can be sophisticated later
         current_data[provider].append(new_entry)
@@ -81,7 +80,7 @@ def main():
     print(f"\n💾 Saving to {KEYS_FILE}...")
     with open(KEYS_FILE, 'w') as f:
         json.dump(current_data, f, indent=2)
-    
+
     print("Done! The TokenBroker can now use these keys.")
 
 if __name__ == "__main__":

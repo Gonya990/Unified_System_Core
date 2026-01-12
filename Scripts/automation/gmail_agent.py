@@ -7,16 +7,13 @@ Automatically monitors and processes emails from gonya90.gg@gmail.com
 Автоматически мониторит и обрабатывает письма с gonya90.gg@gmail.com
 """
 
-import os
-import sys
-import json
-
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
 import base64
+import json
+import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from pathlib import Path
 
 # Gmail API imports
 try:
@@ -207,7 +204,7 @@ def get_gmail_service():
         else:
             if not CREDENTIALS_PATH.exists():
                 print("❌ Gmail credentials not found!")
-                print(f"Please download OAuth2 credentials from Google Cloud Console")
+                print("Please download OAuth2 credentials from Google Cloud Console")
                 print(f"And save to: {CREDENTIALS_PATH}")
                 print("\nSteps:")
                 print("1. Go to: https://console.cloud.google.com/apis/credentials")
@@ -255,7 +252,6 @@ def categorize_email(subject, body, sender):
 
 
 import argparse
-from email.mime.text import MIMEText
 
 
 def send_email(service, to, subject, body):
@@ -381,7 +377,7 @@ def save_email_database(emails):
 
     # Load existing
     if EMAIL_DB_PATH.exists():
-        with open(EMAIL_DB_PATH, "r") as f:
+        with open(EMAIL_DB_PATH) as f:
             db = json.load(f)
     else:
         db = {"emails": [], "last_check": None}

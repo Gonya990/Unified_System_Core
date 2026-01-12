@@ -1,12 +1,11 @@
 
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-import html
-import re
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 # Paths
 OUTPUT_PDF = "/Users/macbook/Desktop/Resumes_Igor/Прямые_Контакты_Работодателей_Расширенный.pdf"
@@ -44,7 +43,7 @@ JOBS = [
         "vacancy": "Deployment Manager / Site Supervisor",
         "contact_type": "LinkedIn / Corporate",
         "location": "North (Binyamina/Caesarea)",
-        "contact": "https://www.fivesgroup.com/careers", 
+        "contact": "https://www.fivesgroup.com/careers",
         "note": "Логистическая автоматизация. Искать через карьеру или LinkedIn рекрутеров."
     },
     {
@@ -89,7 +88,7 @@ JOBS = [
         "contact": "cv@nisha.co.il", # General CV inbox
         "note": "Крупное агентство. У них много клиентов на Севере (промзоны Хайфа/Йокнеам)."
     },
-    
+
     # --- JOB BOARDS (Actionable Links) ---
     {
         "company": "AllJobs (North Operations)",
@@ -126,7 +125,7 @@ def create_pdf():
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
-    
+
     # Custom Styles
     style_title = ParagraphStyle(name='Title', parent=styles['Heading1'], fontName=font_name, fontSize=18, spaceAfter=20, textColor=colors.darkblue)
     style_h2 = ParagraphStyle(name='H2', parent=styles['Heading2'], fontName=font_name, fontSize=14, spaceBefore=10, textColor=colors.black)
@@ -142,15 +141,15 @@ def create_pdf():
 
     # Iterate categories (Implicitly by order in JOBS list for now, or grouped)
     # Let's just list them nicely
-    
+
     for job in JOBS:
         # Title: Company - Vacancy
         header_text = f"<b>{job['company']}</b> - {job['vacancy']}"
         story.append(Paragraph(header_text, style_h2))
-        
+
         # Details
         story.append(Paragraph(f"📍 <b>Локация:</b> {job['location']}", style_normal))
-        
+
         # Contact Link
         contact = job['contact']
         if "@" in contact and "http" not in contact:
@@ -164,7 +163,7 @@ def create_pdf():
 
         # Note
         story.append(Paragraph(f"💡 <i>{job['note']}</i>", style_normal))
-        
+
         story.append(Spacer(1, 12))
         story.append(Paragraph("<hr/>", style_normal))
 

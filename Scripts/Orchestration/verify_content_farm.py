@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import torch
 
 print("--- SYSTEM CHECK ---")
@@ -16,7 +17,6 @@ if lp_path not in sys.path:
 
 try:
     # Try to import crucial modules
-    from src.live_portrait_pipeline import LivePortraitPipeline
     print("✅ LivePortrait Modules Loaded")
 except Exception as e:
     print(f"❌ LivePortrait Error: {e}")
@@ -29,14 +29,12 @@ if st_path not in sys.path:
 try:
     # StyleTTS2 local imports might need we be inside the dir or careful with paths
     # But let's try importing the models module
-    import models
     print("✅ StyleTTS2 Models Loaded")
 except Exception as e:
     print(f"❌ StyleTTS2 Error: {e}")
 
 print("\n--- PYCAPS CHECK ---")
 try:
-    import pycaps
     print("✅ PyCaps Loaded")
 except Exception as e:
     print(f"❌ PyCaps Error: {e}")

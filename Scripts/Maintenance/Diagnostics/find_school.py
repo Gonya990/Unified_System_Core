@@ -1,6 +1,8 @@
 
-import requests
 import json
+
+import requests
+
 
 def find_school(query):
     url = "https://web.mashov.info/api/schools"
@@ -8,7 +10,7 @@ def find_school(query):
         res = requests.get(url)
         schools = res.json()
         print(f"Total schools: {len(schools)}")
-        
+
         matches = []
         for s in schools:
             # Search in all string values
@@ -18,7 +20,7 @@ def find_school(query):
                      found_key = True
             if found_key:
                 matches.append(s)
-        
+
         return matches
     except Exception as e:
         print(e)
@@ -30,7 +32,7 @@ if __name__ == "__main__":
     found = find_school(q)
     for f in found:
         print(f"Symbol: {f['semel']}, Name: {f['name']}")
-    
+
     # Also Check Psagot specifically to see structure
     print("--- Psagot Structure ---")
     for s in find_school("פסגות"):

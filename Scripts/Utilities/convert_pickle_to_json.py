@@ -1,11 +1,9 @@
 
-import pickle
-import json
 import os
-from google.oauth2.credentials import Credentials
+import pickle
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Scripts/Utilities -> Scripts -> Root? No.
-# Script is in Scripts/Utilities. 
+# Script is in Scripts/Utilities.
 # Pickle is in Scripts/automation/.credentials
 
 CREDS_DIR = os.path.join(os.path.dirname(BASE_DIR), "automation", ".credentials")
@@ -21,17 +19,17 @@ def convert():
     try:
         with open(PICKLE_PATH, 'rb') as token:
             creds = pickle.load(token)
-            
+
         print("✅ Pickle loaded.")
-        
+
         # Convert to JSON
         json_creds = creds.to_json()
-        
+
         with open(JSON_PATH, 'w') as f:
             f.write(json_creds)
-            
+
         print(f"✅ Converted and saved to {JSON_PATH}")
-        
+
     except Exception as e:
         print(f"❌ Conversion failed: {e}")
 

@@ -1,11 +1,12 @@
 
-import time
-import requests
 import json
 import logging
 import os
 import sqlite3
+import time
 from datetime import datetime
+
+import requests
 
 # Configuration
 MCP_URL = 'http://localhost:8765/mcp'
@@ -74,8 +75,8 @@ def request_telegram_approval(sender, subject, body):
         logging.error(f"Failed to request Telegram approval: {e}")
 
 def main():
-    logging.info(f"🦊 FoxWatch 3.0 (Telegram Hybrid) initiated.")
-    
+    logging.info("🦊 FoxWatch 3.0 (Telegram Hybrid) initiated.")
+
     while True:
         try:
             # 1. Check Inbox for new messages
@@ -86,7 +87,7 @@ def main():
                     "agent_name": MY_AGENT
                 }
             })
-            
+
             if "error" in resp:
                 logging.error(f"MCP Connection error: {resp['error']}")
                 time.sleep(60)
@@ -98,22 +99,22 @@ def main():
                 messages = json.loads(content_str)
             except:
                 messages = []
-            
+
             for msg in messages:
                 sender = msg.get('from', '')
                 is_read = msg.get('read', False)
                 msg_id = msg.get('id')
-                
+
                 if sender in TARGET_AGENTS and not is_read:
                     logging.info(f"🚨 New incoming mail from {sender} (ID: {msg_id})")
-                    
+
                     # Fetch full message details to get body
                     # Using resources if tool is missing
                     # Actually, let's just use the subject/metadata for now or try to get body
-                    
+
                     # Request Telegram Approval instead of auto-replying everything
                     request_telegram_approval(sender, msg.get('subject'), "Full body processing...")
-                    
+
                     # Mark as read immediately to stop polling it
                     call_mcp("tools/call", {
                         "name": "mark_message_read",
@@ -126,10 +127,10 @@ def main():
 
             # 2. Check for APPROVED tasks to execute
             # (In the future, we can add logic here to trigger syncs or replies)
-            
+
         except Exception as e:
             logging.error(f"Loop error: {e}")
-            
+
         time.sleep(45) # Check every 45 seconds
 
 if __name__ == "__main__":

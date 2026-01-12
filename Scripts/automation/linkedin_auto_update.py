@@ -25,45 +25,45 @@ async def main():
     print("🔗 LINKEDIN AUTO-UPDATER")
     print("="*60)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    
+
     try:
         from playwright.async_api import async_playwright
     except ImportError:
         print("❌ Playwright не установлен!")
         sys.exit(1)
-    
+
     async with async_playwright() as p:
         # Launch visible browser
         browser = await p.chromium.launch(
             headless=False,
             slow_mo=500  # Slow down for visibility
         )
-        
+
         context = await browser.new_context(
             viewport={'width': 1400, 'height': 900}
         )
-        
+
         page = await context.new_page()
-        
+
         # Step 1: Go to LinkedIn
         print("\n📍 Шаг 1: Открываю LinkedIn...")
         await page.goto("https://www.linkedin.com/feed/", timeout=30000)
         await asyncio.sleep(2)
-        
+
         # Check if logged in
         if "/login" in page.url or "/authwall" in page.url:
             print("\n🔐 Требуется вход в LinkedIn!")
             print("   Войдите в браузере и нажмите Enter...")
             await page.goto("https://www.linkedin.com/login")
             input("\n>>> Нажмите Enter после входа: ")
-        
+
         print("✅ Вход выполнен!")
-        
+
         # Step 2: Go to profile edit
         print("\n📍 Шаг 2: Открываю редактирование профиля...")
         await page.goto(f"{PROFILE_URL}/edit/intro/", timeout=30000)
         await asyncio.sleep(3)
-        
+
         # Step 3: Update headline
         print("\n📍 Шаг 3: Обновляю Headline...")
         try:
@@ -80,7 +80,7 @@ async def main():
         except Exception as e:
             print(f"   ⚠️ Не удалось найти поле Headline: {e}")
             print("   Попробуйте обновить вручную")
-        
+
         # Step 4: Save
         print("\n📍 Шаг 4: Сохраняю изменения...")
         try:
@@ -94,12 +94,12 @@ async def main():
                 print("   ✅ Сохранено!")
         except:
             print("   ⚠️ Кнопка сохранения не найдена")
-        
+
         # Step 5: Update About section
         print("\n📍 Шаг 5: Обновляю раздел 'О себе'...")
         await page.goto(f"{PROFILE_URL}/edit/about/", timeout=30000)
         await asyncio.sleep(2)
-        
+
         try:
             about_textarea = await page.wait_for_selector(
                 'textarea, [contenteditable="true"]',
@@ -110,7 +110,7 @@ async def main():
                 await page.keyboard.press("Control+A")
                 await page.keyboard.type(NEW_ABOUT)
                 print("   ✅ About section обновлен!")
-                
+
                 # Save
                 save_btn = await page.query_selector('button[type="submit"], button:has-text("Save")')
                 if save_btn:
@@ -118,12 +118,12 @@ async def main():
                     await asyncio.sleep(2)
         except Exception as e:
             print(f"   ⚠️ Ошибка при обновлении About: {e}")
-        
+
         # Step 6: Verify
         print("\n📍 Шаг 6: Проверяю результат...")
         await page.goto(PROFILE_URL, timeout=30000)
         await asyncio.sleep(2)
-        
+
         # Get current headline
         try:
             headline_el = await page.query_selector('div.text-body-medium')
@@ -132,13 +132,13 @@ async def main():
                 print(f"   Текущий headline: {current[:50]}...")
         except:
             pass
-        
+
         print("\n" + "="*60)
         print("✅ ГОТОВО!")
         print("="*60)
         print("\nПроверьте профиль в браузере.")
         print("Нажмите Enter для закрытия...")
-        
+
         input()
         await browser.close()
 

@@ -4,8 +4,8 @@ Provides /health endpoint for container orchestration.
 """
 import json
 import logging
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 class HealthHandler(BaseHTTPRequestHandler):
     """HTTP handler for health checks."""
-    
+
     # Class-level callback for dynamic health status
     health_callback: Optional[Callable[[], dict]] = None
-    
+
     def log_message(self, format, *args):
         """Suppress default logging."""
         pass
-    
+
     def do_GET(self):
         """Handle GET requests."""
         if self.path == "/health":
@@ -29,7 +29,7 @@ class HealthHandler(BaseHTTPRequestHandler):
             self._handle_ready()
         else:
             self.send_error(404)
-    
+
     def _handle_health(self):
         """Return health status."""
         status = {"status": "healthy"}
@@ -39,12 +39,12 @@ class HealthHandler(BaseHTTPRequestHandler):
                 status.update(callback())
             except Exception as e:
                 status["error"] = str(e)
-        
+
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps(status).encode())
-    
+
     def _handle_ready(self):
         """Return readiness status."""
         self.send_response(200)
@@ -70,7 +70,7 @@ def start_health_server(port: int = 8080, health_callback: Optional[Callable[[],
         The HTTPServer instance
     """
     HealthHandler.health_callback = health_callback
-    
+
     try:
         server = ReuseAddrHTTPServer(("0.0.0.0", port), HealthHandler)
     except OSError as e:
@@ -83,9 +83,9 @@ def start_health_server(port: int = 8080, health_callback: Optional[Callable[[],
             server = ReuseAddrHTTPServer(("0.0.0.0", port), HealthHandler)
         else:
             raise
-    
+
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
-    
+
     logger.info(f"Health server started on port {port}")
     return server

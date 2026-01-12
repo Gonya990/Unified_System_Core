@@ -1,10 +1,7 @@
 
 import asyncio
-import json
 import logging
 import random
-import sys
-from datetime import datetime
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,7 +18,7 @@ async def ping_mcp_agent(agent_name="FuchsiaCat", info="Handshake check"):
     logger.info(f"🏓 PING -> {agent_name}: {info}")
     # In reality, this would be an HTTP POST to localhost:8765/mcp
     # We will simulate a successful handshake for the purpose of this diagnosis script
-    await asyncio.sleep(0.5) 
+    await asyncio.sleep(0.5)
     success = random.choice([True, True, False]) # 66% chance of success for simulation
     if success:
         logger.info(f"✅ PONG <- {agent_name}: online and ready.")
@@ -41,23 +38,23 @@ async def check_bot_health(bot_container="ai_core-ai-bot-local-1"):
 
 async def main():
     logger.info("🚀 Initiating Vibranium Ping-Pong Protocol (Continuous Mode)...")
-    
+
     while True:
         # 1. Check Bot
         bot_alive = await check_bot_health()
-        
+
         # 2. Ping Kostya (FuchsiaCat)
         kostya_status = await ping_mcp_agent("FuchsiaCat", "Heartbeat check")
-        
+
         # 3. Ping Council (PinkLake)
         council_status = await ping_mcp_agent("PinkLake", "Council quorum check")
-        
+
         # 4. Report
         if kostya_status and council_status:
             logger.info("🌟 SYSTEM GREEN. All agents synced.")
         else:
             logger.warning("⚠️ SYSTEM AMBER. Some agents are silent.")
-            
+
         await asyncio.sleep(30) # Check every 30 seconds
 
 if __name__ == "__main__":

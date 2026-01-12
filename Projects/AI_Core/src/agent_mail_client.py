@@ -4,12 +4,12 @@ Agent Mail MCP Client
 Unified interface for inter-agent communication via Agent Mail server.
 """
 
-import os
 import json
-import requests
-from typing import List, Optional, Dict, Any
+import os
 from dataclasses import dataclass
-from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import requests
 
 try:
     from dotenv import load_dotenv

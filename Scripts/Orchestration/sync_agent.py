@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import sys
 import json
-import requests
-import os
+import sys
 from datetime import datetime
+
+import requests
 
 # CONFIGURATION
 URL = "http://localhost:8765/mcp"
@@ -61,16 +61,16 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: ./sync_agent.py \"Your current status/action\"")
         sys.exit(1)
-        
+
     status = sys.argv[1]
-    
+
     # 1. Push
     push_res = push_status(status)
     if "error" in push_res:
         print(f"❌ Push failed: {push_res['error']}")
     else:
         print("✅ Status pushed successfully!")
-        
+
     # 2. Fetch
     updates = fetch_updates()
     print("\n--- UPDATES FROM KOSTYA ---")

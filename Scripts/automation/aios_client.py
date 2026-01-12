@@ -1,11 +1,11 @@
+
 import requests
-import json
-import os
+
 
 class AIOSClient:
     def __init__(self, host="100.110.209.49", port=8000):
         self.base_url = f"http://{host}:{port}"
-    
+
     def get_status(self):
         try:
             response = requests.get(f"{self.base_url}/status")
@@ -42,10 +42,10 @@ class AIOSClient:
 if __name__ == "__main__":
     client = AIOSClient()
     print("AIOS Status:", client.get_status())
-    
+
     # Example selection
     # print(client.select_llms([{"name": "gemini-2.0-flash-exp", "provider": "gemini"}]))
-    
+
     # Example query
     # print(client.query("test_agent", "llm", {
     #     "messages": [{"role": "user", "content": "Hello AIOS!"}],

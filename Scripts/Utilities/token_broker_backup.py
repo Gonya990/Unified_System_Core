@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import time
-from itertools import cycle
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -156,7 +155,7 @@ class TokenBroker:
             return
 
         try:
-            with open(self.vault_path, "r") as f:
+            with open(self.vault_path) as f:
                 data = yaml.safe_load(f) or {}
 
             if not data or "encrypted_data" not in data:
@@ -217,7 +216,7 @@ class TokenBroker:
 
         if os.path.exists(legacy_path):
             try:
-                with open(legacy_path, "r") as f:
+                with open(legacy_path) as f:
                     self.key_store = json.load(f)
                 logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
                 self.save_vault()
@@ -349,19 +348,19 @@ class TokenBroker:
         policy = {}
         if os.path.exists(rbac_path):
              try:
-                 with open(rbac_path, 'r') as f:
+                 with open(rbac_path) as f:
                      policy = yaml.safe_load(f) or {}
              except:
                  pass
-        
+
         agent_role = policy.get("agents", {}).get(agent_name, "worker")
-        
+
         if agent_role == "admin":
             return True
-        
+
         if tier == "pro" or tier == "tier1":
             return agent_role in ["admin", "pro_agent"]
-            
+
         return True # Default access for free/standard
 
 

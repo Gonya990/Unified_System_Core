@@ -1,9 +1,10 @@
 import logging
 import random
-import yaml
 import sys
 from pathlib import Path
 from typing import List, Optional
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class SwarmManager:
             return
 
         try:
-            with open(self.resources_path, "r") as f:
+            with open(self.resources_path) as f:
                 data = yaml.safe_load(f)
                 if not data:
                     return
@@ -117,7 +118,7 @@ class SwarmManager:
         # Load existing data to avoid overwriting other pools
         data = {"gemini_pool": [], "openai_pool": []}
         if self.resources_path.exists():
-            with open(self.resources_path, "r") as f:
+            with open(self.resources_path) as f:
                 data = yaml.safe_load(f) or data
 
         data.setdefault("gemini_pool", []).append(new_key)

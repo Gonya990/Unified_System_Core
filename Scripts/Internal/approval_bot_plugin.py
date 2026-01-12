@@ -1,8 +1,9 @@
-import logging
 import json
+import logging
 import sqlite3
 from datetime import datetime
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ async def check_approvals_job(context: ContextTypes.DEFAULT_TYPE):
             payload = json.loads(task['task_payload'])
         except:
             payload = {'summary': task['task_payload']}
-        
+
         text = f"🛡️ **Request for Approval**\n\n" \
                f"👤 **Agent:** `{task['requester_agent']}`\n" \
                f"📌 **Type:** `{task['task_type']}`\n" \
@@ -60,7 +61,7 @@ async def check_approvals_job(context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("❌ Reject", callback_data=f"apprv_no_{task_id}")
         ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
+
         try:
             await context.bot.send_message(
                 chat_id=admin_id,

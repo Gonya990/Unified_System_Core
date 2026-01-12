@@ -6,7 +6,6 @@ LinkedIn Profile Manager - Автоматизация работы с LinkedIn �
 
 import asyncio
 import json
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -70,7 +69,7 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
     ],
     "skills": [
         "Project Coordination",
-        "Team Management", 
+        "Team Management",
         "Field Supervision",
         "Quality Control",
         "Logistics",
@@ -100,21 +99,21 @@ async def check_login_status(page):
     try:
         await page.goto("https://www.linkedin.com/feed/", timeout=15000)
         await page.wait_for_load_state("networkidle", timeout=10000)
-        
+
         # Check if we're on the feed (logged in) or login page
         if "/login" in page.url or "/authwall" in page.url:
             return False
-        
+
         # Look for profile menu
         profile_menu = await page.query_selector('[data-control-name="nav.settings_signout"]')
         if profile_menu:
             return True
-            
+
         # Alternative check - look for messaging icon
         messaging = await page.query_selector('[data-test-icon="nav-messages-icon"]')
         if messaging:
             return True
-            
+
         return "feed" in page.url
     except Exception as e:
         print(f"Login check error: {e}")
@@ -129,12 +128,12 @@ async def manual_login(page):
     print("\nОткрываю страницу входа в LinkedIn...")
     print("Пожалуйста, войдите вручную в браузере.")
     print("\n⚠️  После входа нажмите Enter в терминале для продолжения...")
-    
+
     await page.goto("https://www.linkedin.com/login")
-    
+
     # Wait for user to login manually
     input("\nНажмите Enter после успешного входа в LinkedIn...")
-    
+
     # Verify login
     if await check_login_status(page):
         print("✅ Вход выполнен успешно!")
@@ -147,41 +146,41 @@ async def manual_login(page):
 async def get_profile_info(page):
     """Получить текущую информацию профиля"""
     print("\n📊 Получение информации профиля...")
-    
+
     await page.goto(LINKEDIN_PROFILE_URL, timeout=30000)
     await page.wait_for_load_state("networkidle", timeout=15000)
-    
+
     profile_info = {}
-    
+
     try:
         # Get name
         name_el = await page.query_selector('h1.text-heading-xlarge')
         if name_el:
             profile_info['name'] = await name_el.inner_text()
-        
+
         # Get headline
         headline_el = await page.query_selector('div.text-body-medium')
         if headline_el:
             profile_info['headline'] = await headline_el.inner_text()
-        
+
         # Get location
         location_el = await page.query_selector('span.text-body-small.inline')
         if location_el:
             profile_info['location'] = await location_el.inner_text()
-        
+
         # Get connections count
         connections_el = await page.query_selector('[href*="/connections/"]')
         if connections_el:
             profile_info['connections'] = await connections_el.inner_text()
-        
+
         # Get about section
         about_section = await page.query_selector('#about ~ div.display-flex span[aria-hidden="true"]')
         if about_section:
             profile_info['about'] = await about_section.inner_text()
-            
+
     except Exception as e:
         print(f"Ошибка при получении данных: {e}")
-    
+
     return profile_info
 
 
@@ -190,21 +189,21 @@ async def compare_profiles(current, target):
     print("\n" + "="*60)
     print("📋 СРАВНЕНИЕ ПРОФИЛЕЙ")
     print("="*60)
-    
+
     differences = []
-    
+
     if current.get('name') != target.get('name'):
         differences.append(('name', current.get('name'), target.get('name')))
-    
+
     if current.get('headline') != target.get('headline'):
         differences.append(('headline', current.get('headline'), target.get('headline')))
-    
+
     # About section comparison (partial match)
     current_about = current.get('about', '')
     target_about = target.get('about', '')
     if target_about and target_about[:50] not in current_about:
         differences.append(('about', current_about[:100] + '...', target_about[:100] + '...'))
-    
+
     if differences:
         print("\n⚠️  Найдены различия:\n")
         for field, current_val, target_val in differences:
@@ -214,7 +213,7 @@ async def compare_profiles(current, target):
             print()
     else:
         print("\n✅ Профиль соответствует целевым данным!")
-    
+
     return differences
 
 
@@ -225,31 +224,31 @@ async def main():
     print("="*60)
     print(f"\n📅 Дата: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print(f"🔗 Профиль: {LINKEDIN_PROFILE_URL}")
-    
+
     try:
         from playwright.async_api import async_playwright
     except ImportError:
         print("\n❌ Playwright не установлен!")
         print("   Установите: pip install playwright && playwright install chromium")
         sys.exit(1)
-    
+
     async with async_playwright() as p:
         # Launch browser (visible for manual login)
         browser = await p.chromium.launch(
             headless=False,
             args=['--start-maximized']
         )
-        
+
         context = await browser.new_context(
             viewport={'width': 1280, 'height': 800},
             user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         )
-        
+
         page = await context.new_page()
-        
+
         # Check login status
         logged_in = await check_login_status(page)
-        
+
         if not logged_in:
             success = await manual_login(page)
             if not success:
@@ -257,17 +256,17 @@ async def main():
                 return
         else:
             print("✅ Уже залогинены в LinkedIn")
-        
+
         # Get current profile info
         current_profile = await get_profile_info(page)
-        
+
         print("\n📊 Текущий профиль:")
         for key, value in current_profile.items():
             print(f"   {key}: {value[:50] if len(str(value)) > 50 else value}...")
-        
+
         # Compare with target
         differences = await compare_profiles(current_profile, PROFILE_DATA)
-        
+
         # Save profile data
         export_data = {
             "fetched_at": datetime.now().isoformat(),
@@ -280,12 +279,12 @@ async def main():
             },
             "differences_found": len(differences)
         }
-        
+
         with open(PROFILE_DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
-        
+
         print(f"\n💾 Данные сохранены в: {PROFILE_DATA_FILE}")
-        
+
         # Ask about next steps
         if differences:
             print("\n" + "="*60)
@@ -294,15 +293,15 @@ async def main():
             print("1. Обновить профиль вручную (откроется редактирование)")
             print("2. Экспортировать целевые данные в текстовый файл")
             print("3. Завершить")
-            
+
             choice = input("\nВыберите действие (1/2/3): ").strip()
-            
+
             if choice == "1":
                 await page.goto(f"{LINKEDIN_PROFILE_URL}/edit/intro/")
                 print("\n🔧 Открыта страница редактирования профиля")
                 print("   Внесите изменения и сохраните в браузере")
                 input("\nНажмите Enter после завершения редактирования...")
-                
+
             elif choice == "2":
                 export_file = Path(__file__).parent / "linkedin_update_text.txt"
                 with open(export_file, 'w', encoding='utf-8') as f:
@@ -316,9 +315,9 @@ async def main():
                     for skill in PROFILE_DATA['skills']:
                         f.write(f"  • {skill}\n")
                 print(f"\n💾 Данные экспортированы в: {export_file}")
-        
+
         print("\n✅ Готово!")
-        
+
         # Keep browser open for review
         input("\nНажмите Enter для закрытия браузера...")
         await browser.close()

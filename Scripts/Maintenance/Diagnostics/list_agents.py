@@ -1,6 +1,5 @@
-import os
 import requests
-import json
+
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -25,12 +24,12 @@ def list_agents():
         },
         'id': 1
     }
-    
+
     headers = {
         'Authorization': f'Bearer {TOKEN}',
         'Content-Type': 'application/json'
     }
-    
+
     print(f"Sending request to {url}...")
     try:
         res = requests.post(url, json=payload, headers=headers)

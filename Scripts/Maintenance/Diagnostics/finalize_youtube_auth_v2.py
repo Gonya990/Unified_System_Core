@@ -1,17 +1,16 @@
-import sys
-import os
 import json
+import sys
 from pathlib import Path
 
 # Add AI_Core/src to path
 sys.path.append("/home/gonya/Unified_System/Projects/AI_Core/src")
 
 try:
-    from google_auth_oauthlib.flow import Flow
-    from google.oauth2.credentials import Credentials
-    from user_context_db import UserContextDB
     from config_manager import ConfigManager
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import Flow
     from identity_orchestrator import IdentityOrchestrator
+    from user_context_db import UserContextDB
 except ImportError as e:
     print(f"❌ Import error: {e}")
     sys.exit(1)
@@ -55,17 +54,17 @@ def exchange_code(code):
             scopes=SCOPES,
             redirect_uri=REDIRECT_URI
         )
-        
+
         print(f"🔄 Exchanging code: {code[:10]}...")
         flow.fetch_token(code=code)
         creds = flow.credentials
-        
+
         print("✅ Code exchanged successfully!")
-        
+
         # Save to DB via IdentityOrchestrator (need to init properly)
         # We'll just manually mimic the save since import might be complex with deps
         creds_json = creds.to_json()
-        
+
         # 1. Update Content Factory Token (Immediate Fix)
         target_path = Path("/home/gonya/Unified_System/Projects/Content_Factory/src/uploaders/.credentials/youtube_token.json")
         target_path.parent.mkdir(parents=True, exist_ok=True)
@@ -88,7 +87,7 @@ def exchange_code(code):
             print("🚀 YOUTUBE UPLOAD SCOPE ACQUIRED!")
         else:
             print(f"⚠️ Missing YouTube scope. Got: {scopes_got}")
-            
+
     except Exception as e:
         print(f"❌ Error exchanging code: {e}")
         import traceback
@@ -102,7 +101,7 @@ if __name__ == "__main__":
             code = sys.argv[1]
             if not code.startswith("4/"):
                 # sometimes users paste just the end, but usually it starts with 4/
-                pass 
+                pass
             exchange_code(code)
     else:
         print("Usage: python3 finalize.py [url|<code>]")

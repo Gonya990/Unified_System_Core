@@ -1,12 +1,11 @@
 
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-import html
-import re
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 # Paths
 OUTPUT_PDF = "/Users/macbook/Desktop/Resumes_Igor/Прямые_Контакты_Работодателей_Расширенный_Финальный.pdf"
@@ -20,7 +19,7 @@ JOBS = [
         "vacancy": "Deployment Manager / Site Supervisor",
         "contact_type": "LinkedIn Recruiter / Careers",
         "location": "North (Binyamina/Caesarea/Haifa)",
-        "contact": "https://www.fivesgroup.com/careers", 
+        "contact": "https://www.fivesgroup.com/careers",
         "note": "Автоматизация складов. Ищите рекрутеров Fives в LinkedIn, пишите напрямую."
     },
     {
@@ -60,7 +59,7 @@ JOBS = [
         "vacancy": "Manager of Operations",
         "contact_type": "Direct Apply",
         "location": "North (Kibbutz Gonen)",
-        "contact": "https://www.jpro.org/jobs/manager-of-operations-at-galilee-culinary-institute-2/", 
+        "contact": "https://www.jpro.org/jobs/manager-of-operations-at-galilee-culinary-institute-2/",
         "note": "Полное управление объектом в Кибуц Гонен. Логистика, закупки, обслуживание."
     },
 
@@ -71,7 +70,7 @@ JOBS = [
         "vacancy": "Construction / Infrastructure Project Managers",
         "contact_type": "Direct Recruiter Email",
         "location": "Nationwide",
-        "contact": "info@projectpro.co.il", 
+        "contact": "info@projectpro.co.il",
         "note": "Лидеры в инфраструктуре. Отправлять резюме с пометкой 'Experienced Site Manager'."
     },
     {
@@ -87,10 +86,10 @@ JOBS = [
         "vacancy": "Construction Management",
         "contact_type": "Recruiter Email",
         "location": "North (Akko)",
-        "contact": "info@cohengroup.li", 
+        "contact": "info@cohengroup.li",
         "note": "Базируются в Акко. Стройка и управление персоналом."
     },
-    
+
     # --- JOB BOARDS (Pre-filtered Links) ---
     {
         "company": "AllJobs (North Operations)",
@@ -127,7 +126,7 @@ def create_pdf():
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=18)
     styles = getSampleStyleSheet()
-    
+
     # Custom Styles
     style_title = ParagraphStyle(name='Title', parent=styles['Heading1'], fontName=font_name, fontSize=18, spaceAfter=20, textColor=colors.darkblue)
     style_h2 = ParagraphStyle(name='H2', parent=styles['Heading2'], fontName=font_name, fontSize=14, spaceBefore=10, textColor=colors.black)
@@ -149,10 +148,10 @@ def create_pdf():
         # Title: Company - Vacancy
         header_text = f"<b>{job['company']}</b> - {job['vacancy']}"
         story.append(Paragraph(header_text, style_h2))
-        
+
         # Details
         story.append(Paragraph(f"📍 <b>Локация:</b> {job['location']}", style_normal))
-        
+
         # Contact Link
         contact = job['contact']
         if "@" in contact and "http" not in contact:
@@ -165,7 +164,7 @@ def create_pdf():
 
         # Note
         story.append(Paragraph(f"💡 <i>{job['note']}</i>", style_normal))
-        
+
         story.append(Spacer(1, 12))
         story.append(Paragraph("<hr/>", style_normal))
 

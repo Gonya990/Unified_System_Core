@@ -4,12 +4,13 @@ Scheduled token rotation for TokenBroker.
 Runs as a standalone service or integrates with APScheduler.
 """
 
+import logging
 import os
 import sys
 import time
-import logging
-import schedule
 from pathlib import Path
+
+import schedule
 
 sys.path.insert(0, str(Path(__file__).parent))
 from token_broker import TokenBroker
@@ -49,7 +50,7 @@ def health_job():
 
 def run_scheduler():
     """Run the rotation scheduler as a standalone service."""
-    logger.info(f"Starting TokenBroker rotation scheduler")
+    logger.info("Starting TokenBroker rotation scheduler")
     logger.info(f"  Rotation interval: {ROTATION_INTERVAL_HOURS}h")
     logger.info(f"  Reload interval: {RELOAD_INTERVAL_HOURS}h")
 

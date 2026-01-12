@@ -17,7 +17,7 @@ echo -e "${GREEN}💎 VIBRANIUM SYNC STARTED${NC}"
 echo "=========================================="
 
 # 1. Local Auto-Commit
-echo -e "\n${YELLOW}[1/4] Saving local progress...${NC}"
+echo -e "\n${YELLOW}[1/5] Saving local progress...${NC}"
 cd "$UNIFIED_SYSTEM"
 if [[ -n $(git status -s) ]]; then
     git add .
@@ -27,20 +27,33 @@ else
     echo -e "${GREEN}✓ Nothing to save locally.${NC}"
 fi
 
-# 2. Main Sync (Git & Tasks)
-echo -e "\n${YELLOW}[2/4] Running Main Sync (Git & Tasks)...${NC}"
+# 2. Linting & Quality Check
+echo -e "\n${YELLOW}[2/5] Running Quality Check (Ruff)...${NC}"
+RUFF_BIN="$HOME/Library/Python/3.9/bin/ruff"
+if [ -f "$RUFF_BIN" ]; then
+    if "$RUFF_BIN" check Scripts/ Projects/AI_Core/src/ --fix; then
+        echo -e "${GREEN}✓ Code quality check passed (and auto-fixed).${NC}"
+    else
+        echo -e "${YELLOW}! Linting found issues that require manual attention.${NC}"
+    fi
+else
+    echo -e "${YELLOW}! Ruff not found. Skipping quality check.${NC}"
+fi
+
+# 3. Main Sync (Git & Tasks)
+echo -e "\n${YELLOW}[3/5] Running Main Sync (Git & Tasks)...${NC}"
 bash "$SCRIPT_DIR/sync.sh" all
 
-# 3. Remote Update
-echo -e "\n${YELLOW}[3/4] Updating Remote Server...${NC}"
+# 4. Remote Update
+echo -e "\n${YELLOW}[4/5] Updating Remote Server...${NC}"
 if bash "$SCRIPT_DIR/deploy/remote-update.sh" --force; then
     echo -e "${GREEN}✓ Remote server updated.${NC}"
 else
     echo -e "${RED}✗ Remote update failed. Check Tailscale!${NC}"
 fi
 
-# 4. Final Status
-echo -e "\n${YELLOW}[4/4] Verifying Final State...${NC}"
+# 5. Final Status
+echo -e "\n${YELLOW}[5/5] Verifying Final State...${NC}"
 git status
 echo ""
 echo -e "${GREEN}========================================${NC}"

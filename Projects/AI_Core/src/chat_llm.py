@@ -3,33 +3,35 @@
 Используйте этот скрипт для общения с моделью в консоли
 """
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
-import torch
 import sys
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 def main():
     print("=" * 60)
     print("🤖 ЗАГРУЗКА МОДЕЛИ...")
     print("=" * 60)
-    
+
     # Выбор модели (можно легко заменить на другую)
     model_name = "microsoft/phi-2"
     # Альтернативы для русского языка:
     # model_name = "facebook/opt-1.3b"
     # model_name = "bigscience/bloomz-560m"
-    
+
     print(f"\nМодель: {model_name}")
     print("Загрузка токенизатора...")
-    
+
     tokenizer = AutoTokenizer.from_pretrained(
-        model_name, 
+        model_name,
         trust_remote_code=True
     )
-    
+
     # Устанавливаем pad_token если его нет
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    
+
     print("Загрузка модели на GPU...")
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -37,16 +39,16 @@ def main():
         device_map="cuda",           # Автоматически на GPU
         trust_remote_code=True
     )
-    
+
     model.eval()  # Режим inference
-    
+
     # Информация о GPU
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
         gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
         print(f"\n✅ GPU: {gpu_name}")
         print(f"✅ Память GPU: {gpu_memory:.1f} GB")
-    
+
     print("\n" + "=" * 60)
     print("✅ МОДЕЛЬ ГОТОВА К РАБОТЕ!")
     print("=" * 60)
@@ -56,28 +58,28 @@ def main():
     print("  - /clear - очистить историю")
     print("  - /help - справка")
     print("=" * 60)
-    
+
     # История диалога (опционально)
     conversation_history = []
-    
+
     while True:
         try:
             # Получаем ввод пользователя
             user_input = input("\n👤 Вы: ").strip()
-            
+
             if not user_input:
                 continue
-            
+
             # Обработка команд
             if user_input.lower() in ['/exit', '/quit', '/выход']:
                 print("\n👋 До свидания!")
                 break
-            
+
             if user_input.lower() in ['/clear', '/очистить']:
                 conversation_history = []
                 print("🗑️  История очищена")
                 continue
-            
+
             if user_input.lower() in ['/help', '/помощь']:
                 print("\n📖 СПРАВКА:")
                 print("  - Пишите вопросы на русском или английском")
@@ -85,7 +87,7 @@ def main():
                 print("  - /exit - выход из программы")
                 print("  - /clear - очистить историю диалога")
                 continue
-            
+
             # Формируем промпт с учетом истории
             if conversation_history:
                 # Берем последние 3 обмена для контекста
@@ -94,7 +96,7 @@ def main():
                 prompt = f"{context}\nВопрос: {user_input}\nОтвет:"
             else:
                 prompt = f"Вопрос: {user_input}\nОтвет:"
-            
+
             # Токенизация
             inputs = tokenizer(
                 prompt,
@@ -103,9 +105,9 @@ def main():
                 truncation=True,
                 max_length=512
             ).to("cuda")
-            
+
             print("\n🤖 Модель: ", end="", flush=True)
-            
+
             # Генерация ответа
             with torch.no_grad():
                 outputs = model.generate(
@@ -119,26 +121,26 @@ def main():
                     eos_token_id=tokenizer.eos_token_id,
                     repetition_penalty=1.2        # Штраф за повторы
                 )
-            
+
             # Декодируем ответ
             generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
+
             # Извлекаем только новый ответ (убираем промпт)
             if "Ответ:" in generated_text:
                 response = generated_text.split("Ответ:")[-1].strip()
             else:
                 response = generated_text[len(prompt):].strip()
-            
+
             # Очистка ответа от лишних символов
             response = response.split("\n")[0] if "\n" in response else response
             response = response.strip()
-            
+
             print(response)
-            
+
             # Сохраняем в историю
             conversation_history.append(f"Вопрос: {user_input}")
             conversation_history.append(f"Ответ: {response}")
-            
+
         except KeyboardInterrupt:
             print("\n\n👋 Прервано пользователем. До свидания!")
             break

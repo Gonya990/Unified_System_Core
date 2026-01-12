@@ -1,13 +1,13 @@
+import asyncio
+import json
 import logging
 import os
 import re
 import sys
-import asyncio
-import aiohttp
-import json
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, Optional
+
+import aiohttp
 
 # Setup logging first
 logging.basicConfig(
@@ -44,23 +44,23 @@ except Exception as e:
     logger.error(f"Unexpected error importing DashboardService: {e}")
     DashboardService = None
 
+from inference_client import InferenceClient
 from telegram import (
-    Update,
+    BotCommand,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
-    BotCommand,
-)
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    MessageHandler,
-    CallbackQueryHandler,
-    filters,
-    ContextTypes,
+    Update,
 )
 from telegram.constants import ChatAction
-from inference_client import InferenceClient
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 # Try Firestore first, fallback to SQLite
 try:
@@ -72,16 +72,14 @@ except ImportError:
 
     _USE_FIRESTORE = False
 
-from google_auth import GoogleAuthManager
-from calendar_client import CalendarClient
-from daily_scheduler import DailyScheduler
-from conversation_manager import ConversationManager
-from telegram_schema_expert import TelegramSchemaExpert
-from conversation_manager import ConversationManager
-from telegram_schema_expert import TelegramSchemaExpert
-from agent_orchestrator import AgentOrchestrator, PIPELINES
 from agent_mail_client import AgentMailClient
+from agent_orchestrator import PIPELINES, AgentOrchestrator
+from calendar_client import CalendarClient
+from conversation_manager import ConversationManager
+from daily_scheduler import DailyScheduler
+from google_auth import GoogleAuthManager
 from identity_orchestrator import IdentityOrchestrator
+from telegram_schema_expert import TelegramSchemaExpert
 
 # Optional imports with fallbacks
 try:
@@ -168,18 +166,18 @@ try:
     # If running from Projects/AI_Core/src, we need to go up 3 levels to root, then Scripts/Orchestration
     # or use absolute path if we can rely on standard structure.
     # Current dir is .../Projects/AI_Core/src
-    
+
     # Try finding the root Unified_System directory
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-    if os.path.basename(root_path) != "Unified_System": 
+    if os.path.basename(root_path) != "Unified_System":
          # Fallback or try relatively if we are just in src
          root_path = os.path.abspath(os.path.join(current_dir, "../../../"))
-    
+
     agent_mail_path = os.path.join(root_path, 'Scripts', 'Orchestration')
-    
+
     if agent_mail_path not in sys.path:
         sys.path.append(agent_mail_path)
-        
+
     from agent_mail_client import AgentMailClient
     agent_mail = AgentMailClient()
     logger.info("AgentMailClient initialized")
@@ -536,7 +534,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [
                     [
                         InlineKeyboardButton(
-                            f"✅ Одобрить", callback_data=f"approve_user:{user.id}"
+                            "✅ Одобрить", callback_data=f"approve_user:{user.id}"
                         ),
                         InlineKeyboardButton(
                             "❌ Отклонить", callback_data=f"deny_user:{user.id}"
@@ -660,7 +658,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     [
                         [
                             InlineKeyboardButton(
-                                "✅ Да, добавить", callback_data=f"force_confirm_event"
+                                "✅ Да, добавить", callback_data="force_confirm_event"
                             )
                         ],
                         [
@@ -1618,7 +1616,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
         else:
             ai_response = ai_response.replace(
-                f"[[HA:{action}:{entity_name}]]", f"❌ _(HA недоступен)_"
+                f"[[HA:{action}:{entity_name}]]", "❌ _(HA недоступен)_"
             )
 
     # 3. DIRECT MESSAGING (Telegram)
@@ -2095,8 +2093,9 @@ async def setrole_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @require_role("ADMIN")
 async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    import psutil
     import time
+
+    import psutil
 
     await context.bot.send_chat_action(
         chat_id=update.effective_chat.id, action=ChatAction.TYPING
@@ -2419,8 +2418,9 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     msg = await update.message.reply_text("🔍 Проверяю системы...")
 
-    import psutil
     import time
+
+    import psutil
 
     try:
         cpu_usage = psutil.cpu_percent()
@@ -2444,7 +2444,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 ha_res = await ha_controller.get_status()
                 if ha_res and ha_res.get("status") == "ok":
-                    ha_status = f"✅ Online"
+                    ha_status = "✅ Online"
                 else:
                     ha_status = "❌ Error"
             except Exception as e:
@@ -3069,7 +3069,7 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not agent_mail:
              await update.message.reply_text("❌ MCP Mail Client not available.")
              return
-             
+
         await update.message.reply_text("🔄 Checking Agent Mail...")
         try:
             loop = asyncio.get_running_loop()
@@ -3802,7 +3802,7 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for m in messages:
                 status = "✉️" if not m.get("read") else "📖"
                 msg += f"{status} `#{m['id']}` From: **{m['from']}**\n   _{m['subject']}_\n\n"
-            
+
             msg += "Используйте `/am read <id>` для подробностей."
             await update.message.reply_text(msg, parse_mode="Markdown")
         except Exception as e:
@@ -3812,14 +3812,14 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(context.args) < 2:
             await update.message.reply_text("Usage: /am read <id>")
             return
-        
+
         try:
             msg_id = int(context.args[1])
             # fetch_inbox doesn't give full bodies in some versions, but we'll try
             # For simplicity, we search in the batch (since Fetch Inbox includes bodies in this MCP)
             messages = client.fetch_inbox(limit=20)
             target = next((m for m in messages if m["id"] == msg_id), None)
-            
+
             if target:
                 resp = (
                     f"📧 **Message #{msg_id}**\n"
@@ -3842,7 +3842,7 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(parts) < 3:
             await update.message.reply_text("❌ Format: `/am send Agent | Subject | Body`")
             return
-        
+
         try:
             client.send_message(to=[parts[0]], subject=parts[1], body_md=parts[2])
             await update.message.reply_text(f"✅ Отправлено агенту {parts[0]}")
@@ -3854,7 +3854,7 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not body:
             await update.message.reply_text("Usage: /am broadcast <message>")
             return
-        
+
         try:
             client.broadcast(subject="Broadcast from Bot", body_md=body)
             await update.message.reply_text("✅ Рассылка завершена.")
@@ -4366,7 +4366,7 @@ def main():
     logger.info("[STARTUP] Health server started on port 8095")
 
     logger.info("[STARTUP] Starting polling...")
-    print(f"Bot V2 (AI_Core) is running...")
+    print("Bot V2 (AI_Core) is running...")
     application.run_polling(drop_pending_updates=True)
 
 

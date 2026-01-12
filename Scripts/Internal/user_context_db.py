@@ -1,8 +1,7 @@
-import sqlite3
-import json
 import logging
+import sqlite3
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

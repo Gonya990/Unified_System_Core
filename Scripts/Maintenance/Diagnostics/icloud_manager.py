@@ -1,6 +1,6 @@
-import sys
-import time
 import os
+import sys
+
 from pyicloud import PyiCloudService
 
 # Folder to store session data
@@ -11,20 +11,20 @@ def authenticate(username, password):
     print(f"🍏 Attempting login for {username}...")
     try:
         api = PyiCloudService(username, password, cookie_directory=SESSION_DIR)
-        
+
         if api.requires_2fa:
             print(f"⚠️ Two-factor authentication required for {username}")
-            
+
             # Request code via SMS if not auto-sent to devices
             # devices = api.trusted_devices
             # print(f"Trusted devices: {devices}")
-            
+
             # This triggers the code to be sent
             # code = input("Enter the code you received: ")
-            print("2FA_REQUIRED") 
+            print("2FA_REQUIRED")
             # We exit here so the orchestrator knows to ask user for code
             return None
-            
+
         if api.requires_2sa:
             print("⚠️ Two-step authentication required")
             print("2SA_REQUIRED")
@@ -43,7 +43,7 @@ def validate_2fa(username, password, code):
     try:
         api = PyiCloudService(username, password, cookie_directory=SESSION_DIR)
         result = api.validate_2fa_code(code)
-        
+
         if result:
             print("✅ 2FA Code Verified!")
             if not api.is_trusted_session:
@@ -53,7 +53,7 @@ def validate_2fa(username, password, code):
         else:
             print("❌ Invalid 2FA Code")
             return False
-            
+
     except Exception as e:
         print(f"❌ 2FA Validation Error: {e}")
         return False

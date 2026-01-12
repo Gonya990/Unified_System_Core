@@ -1,11 +1,9 @@
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from datetime import datetime
+
 from telegram.ext import Application
 from user_context_db import UserContextDB
-from calendar_client import CalendarClient
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +37,11 @@ class DailyScheduler:
         for user in inactive_users:
             try:
                 user_id = user['user_id']
-                
+
                 # Get some context for a better nudge
                 memories = self.db.get_memories(user_id, limit=3)
                 mem_text = "\n".join([f"- {m['fact_full']}" for m in memories])
-                
+
                 if self.inference and mem_text:
                     prompt = (
                         f"The user {user['full_name']} hasn't interacted for 3 days. "
@@ -73,14 +71,14 @@ class DailyScheduler:
     async def schedule_daily_briefs(self):
         """Send daily brief at 7:00 AM local time."""
         now = datetime.now()
-        # For simplicity, we assume server time is local or adjust. 
+        # For simplicity, we assume server time is local or adjust.
         # Ideally, use user's timezone.
         if now.hour == 7 and now.minute == 0:
             logger.info("Seven AM! Sending daily briefs.")
             users = self.db.list_users() # Assuming this exists or we fetch from config
             for user in users:
                 await self.send_daily_brief(user['user_id'])
-    
+
     async def send_daily_brief(self, user_id):
         # Implementation to be connected to /brief logic
         pass
