@@ -2,7 +2,8 @@
 
 > **Status:** In Progress (80% Complete)
 > **Last Updated:** 2026-01-11
-> **Goal:** Deploy Proactive Family Assistant, integrate Content Farm 2.0, and enable MCP Mail Intelligence.
+> **Goal:** Deploy Proactive Family Assistant, integrate Content Farm 2.0,
+> and enable MCP Mail Intelligence.
 
 ---
 
@@ -10,14 +11,14 @@
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| TokenBroker Integration | ✅ Complete | `daily_researcher.py` uses TokenBroker |
-| Bot Command `/factory` | ✅ Complete | Telegram bot can trigger video pipeline |
+| TokenBroker Integration | ✅ Complete | `daily_researcher.py` uses Broker |
+| Bot Command `/factory` | ✅ Complete | Telegram bot can trigger video pipe |
 | Homework Sentinel | ✅ Complete | `Scripts/Family/homework_sentinel.py` |
 | Morning Brief | ✅ Complete | `Scripts/Family/morning_brief.py` |
 | MCP Mail Client | ✅ Complete | `Scripts/Orchestration/agent_mail_client.py` |
-| Mail Processor Service | ✅ Complete | `Scripts/Orchestration/mail_processor.py` |
+| Mail Processor Service | ✅ Complete | `Scripts/.../mail_processor.py` |
 | Telegram Alert Integration | ✅ Complete | Configured in `.env` and tested |
-| Systemd Service Deployment | ✅ Complete | Deployed as `launchd` service on Mac |
+| Systemd Service Deployment | ✅ Complete | Deployed as `launchd` service |
 
 ---
 
@@ -27,10 +28,12 @@
 
 **Status:** ✅ Implemented
 
-**Objective:** Scan Artur's Gmail for keywords ("Homework", "School", "Classroom") and generate a daily summary.
+**Objective:** Scan Artur's Gmail for keywords ("Homework", "School",
+"Classroom") and generate a daily summary.
 **Mechanism:**
 
-1. **Auth:** Use `IdentityOrchestrator` to load Artur's Gmail Token (needs to be added to `secrets/`).
+1. **Auth:** Use `IdentityOrchestrator` to load Artur's Gmail Token
+   (needs to be added to `secrets/`).
 2. **Scan:** Fetch unread emails from last 24h.
 3. **Process:** Extract deadlines and tasks using a cheap LLM (Gemini Flash).
 4. **Notify:** Send report to Telegram Bot -> Artur (or Parent).
@@ -82,13 +85,16 @@ key = TokenBroker().get_key("openai", owner="Artur")
 
 **Status:** ✅ Implemented (2026-01-11)
 
-**Objective:** Background service that monitors MCP Mail inbox and auto-processes messages.
+**Objective:** Background service that monitors MCP Mail inbox and
+auto-processes messages.
 
 **Features:**
 
 - ⏰ **Polling:** Configurable interval (default 60s)
-- 🚨 **Alert Detection:** Scans for high-priority keywords (urgent, critical, emergency, etc.)
-- 📋 **Council Processing:** Special handling for FuchsiaCat, VioletCastle, PinkLake, etc.
+- 🚨 **Alert Detection:** Scans for high-priority keywords (urgent, critical,
+  emergency, etc.)
+- 📋 **Council Processing:** Special handling for FuchsiaCat, VioletCastle,
+  PinkLake, etc.
 - 💬 **Telegram Alerts:** Sends high-priority messages to Admin Telegram
 - ✅ **Auto-Acknowledgement:** Auto-replies to messages requiring acknowledgement
 - 💾 **State Persistence:** Tracks processed message IDs
@@ -142,7 +148,8 @@ AGENT_MAIL_NAME=Antigravity
 
 ### Step 3: Integration Testing ✅
 
-- [x] Send test message via `agent_mail_client.py send` (Verified processing of Swarm Ping)
+- [x] Send test message via `agent_mail_client.py send`
+  (Verified processing of Swarm Ping)
 - [x] Verify Telegram alert received
 - [x] Check council message log
 
@@ -161,7 +168,7 @@ AGENT_MAIL_NAME=Antigravity
 
 ## Architecture Diagram
 
-```
+```mermaid
 ┌─────────────────────────────────────────────────────────────┐
 │                    Unified System                           │
 ├─────────────────────────────────────────────────────────────┤
