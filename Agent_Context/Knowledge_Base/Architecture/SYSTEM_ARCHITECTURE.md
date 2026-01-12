@@ -1,3 +1,25 @@
+# Unified System Architecture
+
+## Quick Overview (English)
+
+**Network Topology:**
+- **Mesh Network**: Tailscale (100.x.x.x) connects all nodes (Mac, Windows, Proxmox)
+- **Local Network**: Proxmox VMs are bridged (192.168.190.x)
+
+**Synchronization Strategy:**
+- **Git + GitHub** as primary mechanism for file synchronization and version control
+- Source of truth: remote repository acts as central valid state
+- Version control: can rollback any breaking changes
+- Automation: Windows and Linux nodes can automatically `git pull` latest logic
+- Security: Access controlled via SSH keys
+
+**Node Roles:**
+- **MacBook**: Commander / Coding Terminal
+- **Windows AI Core**: Heavy Inference (GPU), Telegram Bot Host
+- **Proxmox**: 24/7 Services (Home Assistant, Docker)
+
+---
+
 # Полный Отчет по Системе "Unified System"
 
 ## 1. Общая Концепция

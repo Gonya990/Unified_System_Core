@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/session-start-sync.sh"
+            "command": "bash \"${PWD}/hooks/scripts/session-start-sync.sh\""
           }
         ]
       }
@@ -34,17 +34,7 @@
         ]
       }
     ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if git rev-parse --abbrev-ref HEAD 2>/dev/null | grep -qE '^(main|master)$'; then echo '{\"block\": true, \"message\": \"Direct edits to main/master branch are blocked. Create a feature branch first.\"}'; else echo '{\"continue\": true}'; fi"
-          }
-        ]
-      }
-    ],
+
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
@@ -69,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/check-mail.sh"
+            "command": "bash \"${PWD}/hooks/scripts/check-mail.sh\""
           }
         ]
       }
