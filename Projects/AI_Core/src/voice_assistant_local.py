@@ -10,14 +10,16 @@
 иначе процесс не сможет получить доступ к локальному микрофону.
 """
 
+import argparse
 import os
 import sys
-import argparse
 import tempfile
 from pathlib import Path
+
+import torch
+
 # Отложенный импорт для библиотек, которые нужны только в интерактивном режиме
 from faster_whisper import WhisperModel
-import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Настройки — можете менять
@@ -34,7 +36,7 @@ def record_audio(filename: str, duration: float):
         try:
             import sounddevice as sd
             import soundfile as sf
-        except ImportError as ie:
+        except ImportError:
             print("Для записи аудио в интерактивном режиме нужны пакеты 'sounddevice' и 'soundfile'.")
             print("Установите их в окружение: python -m pip install sounddevice soundfile")
             raise

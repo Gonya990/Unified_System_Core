@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import time
-from itertools import cycle
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -22,7 +21,7 @@ except ImportError:
 
 # Argon2id support (preferred over PBKDF2 for new vaults)
 try:
-    from argon2.low_level import hash_secret_raw, Type
+    from argon2.low_level import Type, hash_secret_raw
 
     HAS_ARGON2 = True
 except ImportError:
@@ -188,7 +187,7 @@ class TokenBroker:
             return
 
         try:
-            with open(self.vault_path, "r") as f:
+            with open(self.vault_path) as f:
                 data = yaml.safe_load(f) or {}
 
             if not data or "encrypted_data" not in data:
@@ -257,7 +256,7 @@ class TokenBroker:
 
         if os.path.exists(legacy_path):
             try:
-                with open(legacy_path, "r") as f:
+                with open(legacy_path) as f:
                     self.key_store = json.load(f)
                 logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
                 self.save_vault()
@@ -387,12 +386,12 @@ class TokenBroker:
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         canonical_path = os.path.join(root_dir, "config", "rbac_policy.yaml")
         runtime_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
-        
+
         policy = {}
         for path in [canonical_path, runtime_path]:
             if os.path.exists(path):
                 try:
-                    with open(path, 'r') as f:
+                    with open(path) as f:
                         data = yaml.safe_load(f) or {}
                         if "agents" in data:
                             policy.setdefault("agents", {}).update(data["agents"])
@@ -402,16 +401,16 @@ class TokenBroker:
                             policy["default_role"] = data["default_role"]
                 except Exception as e:
                     logger.warning(f"Failed to load RBAC from {path}: {e}")
-        
+
         default_role = policy.get("default_role", "worker")
         agent_role = policy.get("agents", {}).get(agent_name, default_role)
-        
+
         if agent_role == "admin":
             return True
-        
+
         if tier and tier in ["pro", "tier1", "high"]:
             return agent_role in ["admin", "pro_agent"]
-            
+
         return True # Default access for lower tiers
 
 

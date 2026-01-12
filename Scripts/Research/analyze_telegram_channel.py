@@ -20,8 +20,8 @@ from datetime import datetime
 
 try:
     from telethon import TelegramClient
-    from telethon.tl.functions.messages import GetHistoryRequest
     from telethon.errors import FloodWaitError
+    from telethon.tl.functions.messages import GetHistoryRequest
 except ImportError:
     print("❌ Error: telethon not installed")
     print("   Run: pip install telethon")
@@ -104,7 +104,7 @@ async def analyze_channel():
         print(f"👥 Subscribers: {channel.participants_count if hasattr(channel, 'participants_count') else 'N/A'}")
 
         # Fetch messages
-        print(f"\n📥 Fetching messages...")
+        print("\n📥 Fetching messages...")
         messages = await fetch_channel_messages(client, channel, START_MESSAGE_ID)
 
         print(f"✅ Fetched {len(messages)} messages")
@@ -143,7 +143,7 @@ async def analyze_channel():
                 media_types[m['media']] = media_types.get(m['media'], 0) + 1
 
         if media_types:
-            print(f"\n   Media distribution:")
+            print("\n   Media distribution:")
             for media, count in media_types.items():
                 print(f"      {media}: {count}")
 

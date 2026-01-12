@@ -2,12 +2,11 @@
 import json
 import re
 from pathlib import Path
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -55,6 +54,7 @@ WEB_RESULTS = [
 
 import html
 
+
 def clean_text(text):
     if not text: return ""
     # Remove excessive whitespace
@@ -80,7 +80,7 @@ def extract_url(text):
 def create_pdf(jobs):
     doc = SimpleDocTemplate(str(OUTPUT_PDF), pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
-    
+
     # Custom Styles
     styles.add(ParagraphStyle(name='JobTitle', parent=styles['Heading2'], fontSize=12, spaceAfter=6, textColor=colors.darkblue))
     styles.add(ParagraphStyle(name='JobMeta', parent=styles['Normal'], fontSize=10, textColor=colors.gray))
@@ -117,11 +117,11 @@ def create_pdf(jobs):
     for job in jobs:
         title = clean_text(job.get('subject', 'Job Opportunity'))
         sender = clean_text(job.get('sender', 'Unknown'))
-        
+
         # Use content for snippet but careful with length and escaping
         content_raw = job.get('content', '')
         snippet = clean_snippet(content_raw)[:300] + "..."
-        
+
         # Try to find a link or email in the RAW content before escaping
         email_contact = extract_email(content_raw)
         link_contact = extract_url(content_raw)
@@ -129,7 +129,7 @@ def create_pdf(jobs):
         story.append(Paragraph(f"<b>{title}</b>", styles['JobTitle']))
         story.append(Paragraph(f"From: {sender} | Date: {job.get('date', '')}", styles['JobMeta']))
         story.append(Paragraph(snippet, styles['JobDesc']))
-        
+
         if email_contact:
             # Re-escape specifically for the display link if needed, but simple strings are safer
             story.append(Paragraph(f"<b>Contact Email:</b> <a href='mailto:{email_contact}'>{email_contact}</a>", styles['Link']))
@@ -137,7 +137,7 @@ def create_pdf(jobs):
             # Escape the link for display but keep href valid
             safe_link = html.escape(link_contact)
             story.append(Paragraph(f"<b>Apply Link:</b> <a href='{safe_link}'>{safe_link}</a>", styles['Link']))
-            
+
         story.append(Spacer(1, 12))
 
     doc.build(story)
@@ -149,35 +149,35 @@ def main():
         create_pdf([])
         return
 
-    with open(INPUT_FILE, 'r', encoding='utf-8') as f:
+    with open(INPUT_FILE, encoding='utf-8') as f:
         emails = json.load(f)
 
     # Filter emails
     relevant_jobs = []
     seen_ids = set()
-    
+
     keywords = ["operations", "manager", "site", "supervisor", "project", "logistics", "warehouse", "מנהל", "תפעול"]
-    
+
     for email in emails:
         if email['id'] in seen_ids: continue
         seen_ids.add(email['id'])
-        
+
         content = (email['subject'] + " " + email['content']).lower()
-        
+
         # Must have at least one keyword
         if any(k in content for k in keywords):
             # Prioritize if email address found in body (rare for automated alerts, but good for direct comms)
             score = 0
             if "@" in email['content']: score += 2
             if "north" in content or "haifa" in content or "צפון" in content or "חיפה" in content: score += 1
-            
+
             # Simple struct
             email['score'] = score
             relevant_jobs.append(email)
 
     # Sort
     relevant_jobs.sort(key=lambda x: x.get('score', 0), reverse=True)
-    
+
     # Take top 15 unique
     unique_jobs = []
     seen_subjects = set()

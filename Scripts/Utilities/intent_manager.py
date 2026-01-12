@@ -5,17 +5,17 @@ Handles the 'Lease' mechanism for decentralized agents.
 Architecture: Git-native stigmergy.
 """
 
-import yaml
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
+
+import yaml
 
 LEDGER_PATH = Path(__file__).resolve().parent.parent.parent / "INTENT_LEDGER.yaml"
 
 def load_ledger():
     if not LEDGER_PATH.exists():
         return {"intents": [], "constraints": []}
-    with open(LEDGER_PATH, 'r') as f:
+    with open(LEDGER_PATH) as f:
         return yaml.safe_load(f) or {"intents": [], "constraints": []}
 
 def save_ledger(data):
@@ -25,14 +25,14 @@ def save_ledger(data):
 def claim_intent(intent_id, agent_id, human_owner, ttl_minutes=60):
     ledger = load_ledger()
     now = datetime.now()
-    
+
     for intent in ledger["intents"]:
         if intent["id"] == intent_id:
             # Check if lease expired
             expires = datetime.fromisoformat(intent["lease_ttl"])
             if intent["status"] == "claimed" and expires > now and intent["owner"] != agent_id:
                 return False, f"Intent {intent_id} is already claimed by {intent['owner']}"
-            
+
             # Claim or Renew
             intent["status"] = "claimed"
             intent["owner"] = agent_id
@@ -42,10 +42,10 @@ def claim_intent(intent_id, agent_id, human_owner, ttl_minutes=60):
                 intent["renewal_count"] = intent.get("renewal_count", 0) + 1
             else:
                 intent["renewal_count"] = 0
-                
+
             save_ledger(ledger)
             return True, f"Intent {intent_id} claimed by {agent_id}"
-            
+
     return False, f"Intent {intent_id} not found"
 
 if __name__ == "__main__":

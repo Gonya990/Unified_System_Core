@@ -1,9 +1,8 @@
 
-import os
-import sys
 import datetime
+import os
 import subprocess
-import platform
+import sys
 
 # Configuration
 PROJECT_ROOT = "/Users/macbook/Documents/Unified_System"
@@ -13,10 +12,10 @@ REPORT_PATH = os.path.join(PROJECT_ROOT, "Reports/system_audit_report.html")
 def run_command(command, cwd):
     try:
         result = subprocess.run(
-            command, 
-            cwd=cwd, 
-            shell=True, 
-            stdout=subprocess.PIPE, 
+            command,
+            cwd=cwd,
+            shell=True,
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
@@ -26,7 +25,7 @@ def run_command(command, cwd):
 
 def generate_report():
     print(f"Starting System Audit at {datetime.datetime.now()}...")
-    
+
     # 1. Project Structure Check
     structure_checks = [
         ("AI Core Source", os.path.join(AI_CORE_PATH, "src"), True),
@@ -34,7 +33,7 @@ def generate_report():
         ("Dashboard Templates", os.path.join(AI_CORE_PATH, "src/templates/index.html"), True),
         ("Tests Directory", os.path.join(AI_CORE_PATH, "tests"), True),
     ]
-    
+
     structure_results = []
     for name, path, required in structure_checks:
         exists = os.path.exists(path)
@@ -45,11 +44,11 @@ def generate_report():
     print("Running Unit Tests...")
     venv_python = os.path.join(AI_CORE_PATH, "venv_mac/bin/python3")
     tests_passed, tests_output = run_command(f"{venv_python} -m pytest tests", AI_CORE_PATH)
-    
+
     # 3. Validation of Dashboard (Static)
     dashboard_status = "✅ Operational"
     try:
-        with open(os.path.join(AI_CORE_PATH, "src/templates/index.html"), 'r') as f:
+        with open(os.path.join(AI_CORE_PATH, "src/templates/index.html")) as f:
             content = f.read()
             if "searchNotes" not in content:
                 dashboard_status = "⚠️ Warning: Search feature missing in template"
@@ -62,7 +61,7 @@ def generate_report():
     try:
         env_path = os.path.join(AI_CORE_PATH, ".env")
         if os.path.exists(env_path):
-            with open(env_path, 'r') as f:
+            with open(env_path) as f:
                 env_content = f.read()
                 if "NOTION_API_KEY" in env_content and "NOTION_DATABASE_ID" in env_content:
                     notion_status = "✅ Configured"
@@ -78,7 +77,7 @@ def generate_report():
 
     # 4. Generate HTML (Premium Design)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
     # Calculate stats
     total_checks = len(structure_results) + 3 + len(func_results) # +3 for dashboard, notion, search + func tests
     passed_checks = sum(1 for r in structure_results if "Found" in r['status']) + \
@@ -86,9 +85,9 @@ def generate_report():
                    (1 if "Configured" in notion_status else 0) + \
                    1 + \
                    sum(1 for r in func_results if "Passed" in r['status'])
-    
+
     success_rate = int((passed_checks / total_checks) * 100)
-    
+
     # Generate Functionality Rows
     func_rows = ""
     for res in func_results:
@@ -364,12 +363,12 @@ def generate_report():
 </body>
 </html>
     """
-    
+
     with open(REPORT_PATH, "w") as f:
         f.write(html)
-        
+
     print(f"Report generated at {REPORT_PATH}")
-    
+
     # Open on Mac
     subprocess.run(f"open {REPORT_PATH}", shell=True)
 
@@ -377,7 +376,7 @@ def run_functionality_tests():
     """Run smoke tests (import & init) for key modules."""
     print("Running Functionality Smoke Tests...")
     results = []
-    
+
     # helper to test module init
     def test_init(name, module_path, class_name):
         status = "✅ Passed"
@@ -385,7 +384,7 @@ def run_functionality_tests():
         try:
             # Mock env for safety
             with patch.dict(os.environ, {
-                "TELEGRAM_BOT_TOKEN": "test_token", 
+                "TELEGRAM_BOT_TOKEN": "test_token",
                 "OPENAI_API_KEY": "test_key",
                 "GEMINI_API_KEY": "test_key",
                 "NOTION_API_KEY": "test",
@@ -397,19 +396,18 @@ def run_functionality_tests():
                 sys.modules["module"] = module
                 spec.loader.exec_module(module)
                 cls = getattr(module, class_name)
-                
+
                 # Mock dependencies if strictly needed, but let's try raw init first for smoke test
                 _ = cls()
-                
+
         except Exception as e:
             status = "❌ Failed"
             error = str(e)
-            
+
         return {"name": name, "status": status, "error": error}
 
     import importlib.util
-    from unittest.mock import patch, MagicMock
-    import sys
+    from unittest.mock import patch
 
     # List of modules to test
     modules_to_test = [
@@ -424,7 +422,7 @@ def run_functionality_tests():
 
     for name, path, cls in modules_to_test:
         results.append(test_init(name, path, cls))
-        
+
     return results
 
 if __name__ == "__main__":

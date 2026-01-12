@@ -1,6 +1,7 @@
-import os
-import requests
 import json
+
+import requests
+
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -28,12 +29,12 @@ def register():
         },
         'id': 1
     }
-    
+
     headers = {
         'Authorization': f'Bearer {TOKEN}',
         'Content-Type': 'application/json'
     }
-    
+
     print(f"Sending request to {url}...")
     try:
         res = requests.post(url, json=payload, headers=headers)

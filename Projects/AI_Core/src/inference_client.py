@@ -2,12 +2,11 @@
 Unified Inference Client for AI Telegram Bot.
 Supports Ollama, OpenAI-compatible, Gemini, and custom endpoints.
 """
-import json
 import logging
-from typing import Optional
-import aiohttp
 from pathlib import Path
-import random
+from typing import Optional
+
+import aiohttp
 
 try:
     from .config_manager import ConfigManager
@@ -33,7 +32,7 @@ def _get_gemini_client(api_key: str):
     try:
         from google import genai
         # from google.genai.types import GenerateContentConfig
-        
+
         if not _gemini_client or _gemini_client_key != api_key:
             _gemini_client = genai.Client(api_key=api_key)
             _gemini_client_key = api_key
@@ -47,14 +46,14 @@ def _get_gemini_client(api_key: str):
 
 class InferenceClient:
     """Unified client for multiple AI inference providers."""
-    
+
     def __init__(self, config: ConfigManager):
         self.config = config
         self.provider = config.get("INFERENCE_PROVIDER", "ollama")
         self.model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
         self.endpoint = config.get("OLLAMA_BASE_URL", config.get("INFERENCE_BASE_URL", "http://localhost:11434"))
         self.api_key = config.get("INFERENCE_API_KEY", "")
-        
+
         # Load resources for swarm
         resources_path = Path(__file__).parent.parent / "config" / "resources.yaml"
         self.swarm = SwarmManager(resources_path) if SwarmManager else None
@@ -62,7 +61,7 @@ class InferenceClient:
     async def chat(self, messages: list, system_prompt: Optional[str] = None, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"):
         """Routed chat request with branch awareness."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
-        
+
         if provider == "gemini":
             return await self._chat_gemini(messages, system_prompt, branch_id, project_context)
         elif provider == "openai":
@@ -75,13 +74,13 @@ class InferenceClient:
     async def _chat_gemini(self, messages: list, system_prompt: Optional[str] = None, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"):
         """Gemini SDK integration with Swarm support and branch isolation."""
         api_key = self.api_key
-        
+
         # Priority: Swarm Key -> Config Key
         if self.swarm:
             swarm_key = self.swarm.get_gemini_key(branch_id=branch_id, project_context=project_context)
             if swarm_key:
                 api_key = swarm_key
-                
+
         client = _get_gemini_client(api_key)
         if not client:
             return "Error: Gemini client not configured.", {}
@@ -92,7 +91,7 @@ class InferenceClient:
             if system_prompt:
                 # The new genai SDK handles system prompt in config
                 pass
-                
+
             for m in messages:
                 contents.append({
                     "role": "user" if m["role"] == "user" else "model",
@@ -101,11 +100,11 @@ class InferenceClient:
 
             # Call Gemini
             model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
-            
+
             # Use asyncio loop for blocking SDK call
             import asyncio
             loop = asyncio.get_event_loop()
-            
+
             def call_sdk():
                 from google.genai.types import GenerateContentConfig
                 return client.models.generate_content(
@@ -115,33 +114,33 @@ class InferenceClient:
                         system_instruction=system_prompt if system_prompt else None
                     )
                 )
-                
+
             response = await loop.run_in_executor(None, call_sdk)
-            
+
             # Parse usage
             usage = {
                 "prompt_tokens": response.usage_metadata.prompt_token_count if response.usage_metadata else 0,
                 "completion_tokens": response.usage_metadata.candidates_token_count if response.usage_metadata else 0,
                 "total_tokens": response.usage_metadata.total_token_count if response.usage_metadata else 0
             }
-            
+
             return response.text, usage
 
         except Exception as e:
             logger.error(f"Gemini Chat Error: {e}")
-            
+
             # If 429, mark key as failed in swarm
             if "429" in str(e) and self.swarm:
                 self.swarm.mark_key_failed("gemini", api_key)
                 # Failover to next key could be implemented here with recursion
-                
+
             return f"Error: {e}", {}
 
     async def _chat_ollama(self, messages: list, system_prompt: Optional[str] = None):
         """Ollama API request."""
         endpoint = self.config.get("OLLAMA_BASE_URL", self.endpoint)
         model = self.config.get("OLLAMA_MODEL", self.model)
-        
+
         url = f"{endpoint}/api/chat"
         payload = {
             "model": model,
@@ -167,7 +166,7 @@ class InferenceClient:
         """OpenAI API request."""
         # Simplified OpenAI request
         return "OpenAI integration stub", {}
-        
+
     async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""
         return "OpenRouter integration stub", {}
@@ -175,7 +174,7 @@ class InferenceClient:
     async def list_models(self):
         """List available models for the current provider."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
-        
+
         if provider == "ollama":
             url = f"{self.endpoint}/api/tags"
             try:
@@ -187,7 +186,7 @@ class InferenceClient:
             except Exception as e:
                 logger.error(f"Failed to list Ollama models: {e}")
             return ["llama3.2", "mistral", "gemma"] # Fallbacks
-            
+
         elif provider == "gemini":
             # Return standard Gemini models
             return [
@@ -195,31 +194,32 @@ class InferenceClient:
                 "gemini-1.5-flash",
                 "gemini-1.5-pro"
             ]
-        
+
         return [self.model]
 
     async def analyze_image(self, image_path: str, prompt: str):
         """Analyze image using vision-capable models."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
-        
+
         if provider == "gemini":
             api_key = self.api_key
             if self.swarm:
                 swarm_key = self.swarm.get_gemini_key(branch_id="HOME_HQ", project_context="PERSONAL")
                 if swarm_key:
                     api_key = swarm_key
-            
+
             client = _get_gemini_client(api_key)
             if not client:
                 return "Error: Gemini vision not configured."
 
             try:
                 import asyncio
+
                 from google.genai.types import Part
-                
+
                 with open(image_path, "rb") as f:
                     image_data = f.read()
-                
+
                 def call_sdk():
                     return client.models.generate_content(
                         model=self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
@@ -228,14 +228,14 @@ class InferenceClient:
                             prompt
                         ]
                     )
-                
+
                 loop = asyncio.get_event_loop()
                 response = await loop.run_in_executor(None, call_sdk)
                 return response.text
             except Exception as e:
                 logger.error(f"Gemini Vision Error: {e}")
                 return f"Error analyzing image: {e}"
-        
+
         return "Vision is currently only supported via Gemini provider."
 
     async def transcribe_audio(self, audio_path: str):
@@ -245,7 +245,7 @@ class InferenceClient:
         if provider == "gemini":
              # Similar to vision, Gemini 1.5/2.0 handles audio
              return await self.analyze_image(audio_path, "Transcribe this audio exactly.")
-             
+
         return "Audio transcription is currently only supported via Gemini provider."
 
     async def health_check(self) -> bool:

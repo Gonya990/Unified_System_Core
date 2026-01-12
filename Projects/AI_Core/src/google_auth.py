@@ -1,10 +1,11 @@
-import os
 import logging
+import os
 import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-from google_auth_oauthlib.flow import Flow
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs, urlparse
+
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
 
 logger = logging.getLogger(__name__)
 
@@ -118,14 +119,14 @@ class GoogleAuthManager:
 
             flow.fetch_token(code=code)
             creds = flow.credentials
-            
+
             # Save to persistent file
             if user_id:
                 token_path = os.path.join(SECRETS_DIR, f"token_{user_id}.json")
                 with open(token_path, 'w') as token_file:
                     token_file.write(creds.to_json())
                 logger.info(f"Saved persistent token to {token_path}")
-            
+
             logger.info(f"Successfully exchanged code for user {user_id}")
             return creds
         except Exception as e:

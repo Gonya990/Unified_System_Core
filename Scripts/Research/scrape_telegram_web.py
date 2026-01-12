@@ -6,8 +6,8 @@ Uses the public Telegram web interface.
 """
 
 import json
-import sys
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -212,7 +212,7 @@ def main():
     print(f"   Avg views per post: {analysis['avg_views']:.0f}")
 
     if analysis['media_distribution']:
-        print(f"\n   Media distribution:")
+        print("\n   Media distribution:")
         for media, count in analysis['media_distribution'].items():
             print(f"      {media}: {count}")
 

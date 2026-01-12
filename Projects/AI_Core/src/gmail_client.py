@@ -5,9 +5,9 @@ Uses unified OAuth credentials from Firestore (same as Calendar).
 """
 import base64
 import logging
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from typing import List, Dict, Optional
+from email.mime.text import MIMEText
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

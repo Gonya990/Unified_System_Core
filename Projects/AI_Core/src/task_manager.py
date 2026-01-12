@@ -2,9 +2,9 @@
 Simple Task Manager for AI Telegram Bot.
 Stores tasks in SQLite database.
 """
-import sqlite3
 import logging
-from typing import List, Dict, Optional
+import sqlite3
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ class TaskManager:
     def __init__(self, db_path: str = "tasks.db"):
         self.db_path = db_path
         self._init_db()
-    
+
     def _init_db(self):
         """Initialize SQLite database and tables."""
         try:

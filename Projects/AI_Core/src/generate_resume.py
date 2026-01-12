@@ -1,12 +1,13 @@
 
+
 from docx import Document
-from docx.shared import Pt, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-import os
+from docx.shared import Pt
+
 
 def create_resume():
     document = Document()
-    
+
     # --- HEADER ---
     name = document.add_paragraph()
     name.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -20,13 +21,13 @@ def create_resume():
     run = title.add_run("מנהל תפעול | מנהל פרויקטים טכני | אינטגרטור")
     run.font.size = Pt(14)
     run.font.name = "Arial"
-    
+
     # Contacts
     contacts = document.add_paragraph()
     contacts.alignment = WD_ALIGN_PARAGRAPH.CENTER
     contacts.add_run("Email: gonya90.gg@gmail.com | Mobile: 053-XXX-XXXX | קרית ביאליק\n")
     contacts.add_run("LinkedIn: linkedin.com/in/igor-goncharenko | Telegram: @igoreha9")
-    
+
     document.add_paragraph() # Spacer
 
     # --- Helper function for Sections ---
@@ -54,7 +55,7 @@ def create_resume():
     p.paragraph_format.space_before = Pt(6)
     r = p.add_run("2023 – היום | Schindler Group | מפקח טכני / מנהל עבודה (Supervisor - Major Projects)")
     r.bold = True
-    
+
     items = [
         "ניהול ופיקוח כולל על פרויקטי הקמת מעליות במגדלי יוקרה (High-rise), משלב התכנון ועד המסירה.",
         "ניהול אופרטיבי של אתר העבודה: תיאום מול קבלנים, הנדסה, בטיחות ולוחות זמנים (Gantt).",
@@ -71,7 +72,7 @@ def create_resume():
     p.paragraph_format.space_before = Pt(12)
     r = p.add_run("2019 – 2023 | URICOMS (עבור Partner) | ראש צוות תשתיות וסיבים (Team Leader)")
     r.bold = True
-    
+
     items = [
         "ניהול והובלת צוותי טכנאים בפריסת תשתיות סיבים אופטיים (FTTH) ותקשורת.",
         "אחריות על עמידה ביעדי ביצוע (KPIs / SLA), איכות התקנה ושביעות רצון לקוחות.",
@@ -87,7 +88,7 @@ def create_resume():
     p.paragraph_format.space_before = Pt(12)
     r = p.add_run("2020 – 2022 | וירה והרכבות בע״מ | טכנאי מעליות ודרגנועים")
     r.bold = True
-    
+
     items = [
         "ביצוע התקנות מכאניות וחשמליות (Heavy Duty), קריאת שרטוטים הנדסיים.",
         "עבודה בצוותים, הקפדה על דיוק ואיכות ביצוע ברמה גבוהה."

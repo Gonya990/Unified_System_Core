@@ -3,12 +3,10 @@
 Fetch Job Emails from Last 4 Months (Optimized)
 """
 
-import os
-import sys
-import json
-
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
 import base64
+import json
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 

@@ -1,17 +1,15 @@
-import logging
 import json
-import os
-from typing import Optional, Dict, Any, List
-from google.oauth2.credentials import Credentials
+import logging
+from typing import Any, Dict, List, Optional
 
 try:
-    from google_auth import GoogleAuthManager
-    from calendar_client import CalendarClient
-    from gmail_client import GmailClient
-    
     # Import TokenBroker from Utilities
     import sys
     from pathlib import Path
+
+    from calendar_client import CalendarClient
+    from gmail_client import GmailClient
+    from google_auth import GoogleAuthManager
     ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
     UTILS_DIR = ROOT_DIR / "Scripts" / "Utilities"
     if str(UTILS_DIR) not in sys.path:
@@ -36,7 +34,7 @@ class IdentityOrchestrator:
         self.db = db
         self.config = config_manager
         self.auth_manager = auth_manager
-        
+
         # Unified TokenBroker for encryption/decryption
         if TokenBroker:
             self.token_broker = TokenBroker()

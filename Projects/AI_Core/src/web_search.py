@@ -2,10 +2,9 @@
 Web Search Module for AI Telegram Bot.
 Uses SerpApi (Google) if configured, else DuckDuckGo Search fallback.
 """
-import logging
 import asyncio
+import logging
 import os
-from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +13,7 @@ class WebSearch:
         self.available = False
         self.ddgs = None
         self.serp_api_key = os.getenv("SERPAPI_KEY")
-        
+
         try:
             from duckduckgo_search import DDGS
             self.ddgs = DDGS()
@@ -47,9 +46,9 @@ class WebSearch:
                 }
                 search = GoogleSearch(params)
                 results = search.get_dict()
-                
+
                 formatted_results = []
-                
+
                 # Knowledge Graph
                 if "knowledge_graph" in results:
                     kg = results["knowledge_graph"]
@@ -65,31 +64,31 @@ class WebSearch:
                         link = item.get("link")
                         snippet = item.get("snippet", "")
                         formatted_results.append(f"• [{title}]({link})\n  {snippet}")
-                
+
                 if formatted_results:
                     return "\n\n".join(formatted_results)
-                    
+
             except Exception as e:
                 logger.error(f"SerpApi failed: {e}. Falling back to DuckDuckGo.")
 
         # 2. Fallback to DuckDuckGo
         if not self.available or not self.ddgs:
             return "❌ Search module unavailable."
-            
+
         try:
             results = list(self.ddgs.text(query, max_results=max_results))
             if not results:
                 return f"🔍 По запросу '{query}' ничего не найдено."
-            
+
             formatted_results = []
             for i, r in enumerate(results, 1):
                 title = r.get('title', 'No Title')
                 link = r.get('href', '#')
                 body = r.get('body', '')
                 formatted_results.append(f"{i}. [{title}]({link})\n_{body}_")
-            
+
             return "\n\n".join(formatted_results)
-            
+
         except Exception as e:
             logger.error(f"DDG Search failed: {e}")
             return f"❌ Ошибка поиска: {e}"

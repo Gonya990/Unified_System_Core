@@ -1,6 +1,6 @@
-import subprocess
 import logging
 import os
+import subprocess
 import time
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ProxmoxManager:
     """Orchestrates Proxmox VMs via direct SSH and qm commands."""
-    
+
     def __init__(self):
         self.pve_host = os.environ.get("PVE_HOST", "100.78.145.67")
         self.pve_user = os.environ.get("PVE_USER", "root")
@@ -32,7 +32,7 @@ class ProxmoxManager:
     def stop_vm(self, vmid, timeout=60):
         logger.info(f"Gracefully stopping VM {vmid}...")
         self._run_ssh_cmd(f"qm shutdown {vmid}")
-        
+
         start_time = time.time()
         while time.time() - start_time < timeout:
             status = self.get_vm_status(vmid)
@@ -40,7 +40,7 @@ class ProxmoxManager:
                 logger.info(f"VM {vmid} stopped.")
                 return True
             time.sleep(3)
-        
+
         logger.warning(f"VM {vmid} did not stop gracefully. Forcing stop...")
         self._run_ssh_cmd(f"qm stop {vmid}")
         return True

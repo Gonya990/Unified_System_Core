@@ -10,22 +10,22 @@ Features:
 - Logs all processing activity for debugging
 """
 
+import json
+import logging
 import os
 import sys
-import json
 import time
-import logging
-import hashlib
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set
 
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from dotenv import load_dotenv
     from pathlib import Path
+
+    from dotenv import load_dotenv
 
     env_path = Path(__file__).resolve().parent.parent.parent / ".env"
     load_dotenv(env_path)
@@ -144,7 +144,7 @@ class MailProcessor:
         """Load persisted state (processed message IDs)"""
         try:
             if os.path.exists(self.config.processed_ids_file):
-                with open(self.config.processed_ids_file, "r") as f:
+                with open(self.config.processed_ids_file) as f:
                     state = json.load(f)
                     self.processed_ids = set(state.get("processed_ids", []))
                 self.logger.info(
@@ -353,7 +353,7 @@ class MailProcessor:
     def run(self):
         """Run the processor loop"""
         self.logger.info("🚀 Mail Processor starting...")
-        
+
         # Ensure agent is registered
         try:
             self.client.ensure_project()

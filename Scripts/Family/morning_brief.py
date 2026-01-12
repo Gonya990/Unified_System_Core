@@ -1,12 +1,12 @@
 
+import asyncio
+import logging
 import os
 import sys
-import logging
-import asyncio
-import json
-import requests
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import requests
 from dotenv import load_dotenv
 
 # Setup Paths
@@ -18,7 +18,7 @@ load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
 LOG_DIR = ROOT_DIR / "logs/family"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
-    level=logging.INFO, 
+    level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(LOG_DIR / "morning_brief.log"),
@@ -49,21 +49,21 @@ def get_news_summary():
 
 async def send_brief():
     logger.info("Generating Morning Brief...")
-    
+
     date_str = datetime.now().strftime("%A, %d %B %Y")
     weather = get_weather()
     news = get_news_summary()
-    
+
     message = f"🌅 **Morning Brief** | {date_str}\n\n" \
               f"🌡️ **Weather:** {weather}\n\n" \
               f"📰 **Top Stories:**\n{news}\n\n" \
               f"📅 **Tasks:**\n- Check Mashov (Sentinel Active)\n- Review Factory Output"
-              
+
     logger.info(f"Brief Content:\n{message}")
-    
+
     # Send via Bot API
     token = os.getenv("TELEGRAM_BOT_TOKEN") or "8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk"
-    
+
     if token:
         for name, chat_id in USERS.items():
             if chat_id:

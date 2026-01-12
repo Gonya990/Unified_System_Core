@@ -1,12 +1,11 @@
 
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-import html
-import re
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 # Paths
 OUTPUT_PDF = "/Users/macbook/Desktop/Resumes_Igor/Прямые_Контакты_Работодателей.pdf"
@@ -32,7 +31,7 @@ JOBS = [
         "company": "Utron",
         "vacancy": "Site Manager",
         "contact_type": "Contact info / HR",
-        "contact": "https://www.utron.com/contact-us/", 
+        "contact": "https://www.utron.com/contact-us/",
         "note": "Прямого email нет, но можно найти HR 'Keren Bar-Lev' в LinkedIn или писать в форму. "
     },
     {
@@ -76,7 +75,7 @@ def create_pdf():
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
-    
+
     # Custom Styles
     style_h1 = ParagraphStyle(name='H1', parent=styles['Heading1'], fontName=font_name, fontSize=16, spaceAfter=20, textColor=colors.darkblue)
     style_normal = ParagraphStyle(name='Normal', parent=styles['Normal'], fontName=font_name, fontSize=11, leading=14)
@@ -93,17 +92,17 @@ def create_pdf():
     for job in JOBS:
         # Check validity
         contact = job['contact']
-        
+
         # Company & Vacancy
         story.append(Paragraph(f"<b>Компания:</b> {job['company']}", style_bold))
         story.append(Paragraph(f"<b>Вакансия:</b> {job['vacancy']}", style_normal))
-        
+
         # Contact
         if "@" in contact:
             story.append(Paragraph(f"<b>Email:</b> <a href='mailto:{contact}'>{contact}</a>", style_link))
         else:
             story.append(Paragraph(f"<b>Сайт/Ссылка:</b> <a href='{contact}'>{contact}</a>", style_link))
-            
+
         # Note
         story.append(Paragraph(f"<i>Примечание:</i> {job['note']}", style_normal))
         story.append(Spacer(1, 14))

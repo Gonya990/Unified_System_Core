@@ -13,7 +13,7 @@ KEYWORDS = [
     "תפעול", "פרויקטים", "מנהל", "מחסן", "לוגיסטיקה", "טכני", "אחזקה", "בינוי", "תשתיות", "שטח", "מפקח"
 ]
 
-# Negative Keywords (Higher Education strict requirements usually mentioned in snippets might be hard to detect, 
+# Negative Keywords (Higher Education strict requirements usually mentioned in snippets might be hard to detect,
 # but we can look for "Degree required" if confident. For now, rely on positive matching).
 # However, user said "so I don't need higher education".
 # We will prioritize roles that look like "Operations", "Site Manager", "Technical" over "R&D Manager" or "Software Engineer".
@@ -30,7 +30,7 @@ def extract_url(text):
     return None
 
 def analyze_emails():
-    with open(INPUT_FILE, 'r', encoding='utf-8') as f:
+    with open(INPUT_FILE, encoding='utf-8') as f:
         emails = json.load(f)
 
     job_emails = []
@@ -39,29 +39,29 @@ def analyze_emails():
         sender = email.get('sender', '').lower()
         subject = email.get('subject', '').lower()
         snippet = email.get('content_preview', '')
-        
+
         # 1. Identify Job Emails
         is_job_email = False
         if any(s in sender for s in ['linkedin', 'alljobs', 'taasuka', 'job', 'career', 'drushim', 'glassdoor']):
             is_job_email = True
         elif any(k in subject for k in ['vacancy', 'job', 'hiring', 'opportunity', 'משרה', 'דרוש', 'גיוס']):
             is_job_email = True
-            
+
         if not is_job_email:
             continue
 
         # 2. Score Relevance based on Resume Keywords
         score = 0
         combined_text = (subject + " " + snippet).lower()
-        
+
         for kw in KEYWORDS:
             if kw.lower() in combined_text:
                 score += 1
-        
+
         # Boost for location "North" or "Haifa" or "Krayot"
         if any(loc in combined_text for loc in ['haifa', 'north', 'krayot', 'akko', 'nahariya', 'carmiel', 'חיפה', 'צפון', 'קריות', 'עכו', 'נהריה', 'כרמיאל']):
             score += 2
-            
+
         # 3. Filter Low Relevance
         if score > 0:
             link = extract_url(snippet)
@@ -77,7 +77,7 @@ def analyze_emails():
 
     # Sort by score descending
     job_emails.sort(key=lambda x: x['score'], reverse=True)
-    
+
     # Print candidates
     print(f"Found {len(job_emails)} potentially relevant job emails.")
     print("-" * 60)

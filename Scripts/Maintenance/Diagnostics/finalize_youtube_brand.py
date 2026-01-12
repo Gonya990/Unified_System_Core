@@ -1,7 +1,8 @@
-import sys
-import os
 import json
+import os
+import sys
 from pathlib import Path
+
 from google_auth_oauthlib.flow import Flow
 
 # Configuration
@@ -26,27 +27,27 @@ def generate_url():
         redirect_uri=REDIRECT_URI
     )
     auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true')
-    
+
     print(f"\n🔗 НОВАЯ ССЫЛКА АВТОРИЗАЦИИ (Только YouTube):\n{auth_url}\n")
     print("👉 Нажмите на ссылку, выберите ВАШ НОВЫЙ БРЕНД-АККАУНТ (Unified System) и скопируйте код.")
 
 def exchange_code(code):
     try:
         print(f"🔄 Exchanging code: {code[:10]}...")
-        
+
         flow = Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE,
             scopes=SCOPES,
             redirect_uri=REDIRECT_URI
         )
-        
+
         flow.fetch_token(code=code)
         creds = flow.credentials
-        
+
         print("✅ Code exchanged successfully!")
-        
+
         creds_json = creds.to_json()
-        
+
         # Save to Content Factory path
         target_path = Path("/home/gonya/Unified_System/Projects/Content_Factory/src/uploaders/.credentials/youtube_token.json")
         target_path.parent.mkdir(parents=True, exist_ok=True)
@@ -55,11 +56,11 @@ def exchange_code(code):
             backup_path = target_path.with_suffix('.bak')
             target_path.rename(backup_path)
             print(f"📦 Backed up old token to {backup_path}")
-            
+
         with open(target_path, "w") as f:
             f.write(creds_json)
         print(f"✅ YouTube BRAND token updated at {target_path}")
-        
+
         # Verify
         creds_dict = json.loads(creds_json)
         # Access token usually doesn't show scopes directly in to_json sometimes, but let's check

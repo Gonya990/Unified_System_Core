@@ -4,11 +4,10 @@ GCP Custom Metrics Collector for igor-gaming-1
 Collects CPU, RAM, GPU metrics and pushes to Google Cloud Monitoring
 """
 
-import os
-import time
-import subprocess
 import logging
-from datetime import datetime
+import os
+import subprocess
+import time
 
 # Setup logging
 logging.basicConfig(
@@ -18,9 +17,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
+    import psutil
     from google.cloud import monitoring_v3
     from google.protobuf import timestamp_pb2
-    import psutil
 except ImportError as e:
     logger.error(f"Missing dependency: {e}")
     logger.info("Install with: pip install google-cloud-monitoring psutil")
@@ -83,7 +82,7 @@ def create_time_series(client, project_name: str, metric_type: str, value: float
     now = time.time()
     seconds = int(now)
     nanos = int((now - seconds) * 10**9)
-    
+
     # Use dict-style initialization compatible with proto-plus
     series = {
         "metric": {
@@ -115,16 +114,16 @@ def push_metrics(metrics: dict):
     """Push metrics to GCP Monitoring"""
     client = monitoring_v3.MetricServiceClient()
     project_name = f"projects/{PROJECT_ID}"
-    
+
     time_series_list = []
     labels = {"instance": INSTANCE_ID}
-    
+
     for metric_name, value in metrics.items():
         if value is not None:
             metric_type = f"{METRIC_PREFIX}/{metric_name}"
             series = create_time_series(client, project_name, metric_type, float(value), labels)
             time_series_list.append(series)
-    
+
     if time_series_list:
         try:
             client.create_time_series(
@@ -140,25 +139,25 @@ def main():
     """Main collection loop"""
     logger.info(f"Starting GCP metrics collector for {INSTANCE_ID}")
     logger.info(f"Project: {PROJECT_ID}, Interval: {COLLECTION_INTERVAL}s")
-    
+
     while True:
         try:
             # Collect all metrics
             metrics = {}
             metrics.update(get_system_metrics())
             metrics.update(get_gpu_metrics())
-            
+
             logger.info(f"Collected metrics: CPU={metrics.get('cpu_percent', 'N/A')}%, "
                        f"RAM={metrics.get('memory_percent', 'N/A')}%, "
                        f"GPU={metrics.get('gpu_utilization', 'N/A')}%, "
                        f"GPU Temp={metrics.get('gpu_temperature', 'N/A')}°C")
-            
+
             # Push to GCP
             push_metrics(metrics)
-            
+
         except Exception as e:
             logger.error(f"Error in collection loop: {e}")
-        
+
         time.sleep(COLLECTION_INTERVAL)
 
 

@@ -7,18 +7,17 @@ Scans Gmail for vacancy-related emails from the last 30 days and sends the resum
 Сканирует Gmail на наличие писем о вакансиях за последние 30 дней и отправляет резюме.
 """
 
-import os
-import sys
-
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
 import base64
 import mimetypes
+import os
+import sys
 from datetime import datetime, timedelta
-from pathlib import Path
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
 
 # Gmail API imports
 try:

@@ -2,9 +2,8 @@
 Usage Tracker for AI Telegram Bot.
 Tracks token usage per user, provider, and model using SQLite.
 """
-import sqlite3
 import logging
-from pathlib import Path
+import sqlite3
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -13,7 +12,7 @@ class UsageTracker:
     def __init__(self, db_path: str = "usage.db"):
         self.db_path = db_path
         self._init_db()
-    
+
     def _init_db(self):
         """Initialize SQLite database and tables."""
         try:
@@ -75,7 +74,7 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 # Total tokens
                 cursor.execute("""
                     SELECT 
@@ -86,11 +85,11 @@ class UsageTracker:
                     FROM token_usage
                     WHERE user_id = ? AND timestamp >= date('now', ?)
                 """, (user_id, f'-{days} days'))
-                
+
                 row = cursor.fetchone()
                 if not row or row['total'] is None:
                     return None
-                
+
                 stats = {
                     "total_tokens": row['total'],
                     "prompt_tokens": row['prompt'],
@@ -98,7 +97,7 @@ class UsageTracker:
                     "requests": row['requests'],
                     "by_model": {}
                 }
-                
+
                 # Breakdown by model
                 cursor.execute("""
                     SELECT model, SUM(total_tokens) as tokens
@@ -107,10 +106,10 @@ class UsageTracker:
                     GROUP BY model
                     ORDER BY tokens DESC
                 """, (user_id, f'-{days} days'))
-                
+
                 for r in cursor.fetchall():
                     stats["by_model"][r['model']] = r['tokens']
-                    
+
                 return stats
         except Exception as e:
             logger.error(f"Failed to get stats: {e}")
@@ -122,7 +121,7 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                     SELECT 
                         user_id,
@@ -134,7 +133,7 @@ class UsageTracker:
                     GROUP BY user_id
                     ORDER BY total DESC
                 """, (f'-{days} days',))
-                
+
                 users = []
                 for row in cursor.fetchall():
                     users.append({
@@ -143,7 +142,7 @@ class UsageTracker:
                         "total_tokens": row['total'],
                         "requests": row['requests']
                     })
-                
+
                 return {"users": users}
         except Exception as e:
             logger.error(f"Failed to get all users stats: {e}")
@@ -155,7 +154,7 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                     SELECT 
                         provider,
@@ -166,14 +165,14 @@ class UsageTracker:
                     GROUP BY provider
                     ORDER BY total DESC
                 """, (f'-{days} days',))
-                
+
                 providers = {}
                 for row in cursor.fetchall():
                     providers[row['provider']] = {
                         "tokens": row['total'],
                         "requests": row['requests']
                     }
-                
+
                 return providers
         except Exception as e:
             logger.error(f"Failed to get provider breakdown: {e}")
@@ -185,7 +184,7 @@ class UsageTracker:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                     SELECT 
                         date(timestamp) as date,
@@ -195,13 +194,13 @@ class UsageTracker:
                     GROUP BY date(timestamp)
                     ORDER BY date ASC
                 """, (f'-{days} days',))
-                
+
                 dates = []
                 tokens = []
                 for row in cursor.fetchall():
                     dates.append(row['date'])
                     tokens.append(row['tokens'])
-                    
+
                 return {"dates": dates, "tokens": tokens}
         except Exception as e:
             logger.error(f"Failed to get daily usage: {e}")
@@ -231,15 +230,15 @@ class UsageTracker:
             "MEMBER": 100000,
             "GUEST": 10000
         }
-        
+
         limit = TIER_LIMITS.get(role.upper(), 10000) # Default to guest limit
         if limit == float('inf'):
             return True, "Unlimited"
-            
+
         current_usage = self.get_user_daily_total(user_id)
         if current_usage >= limit:
             return False, f"Quota exceeded: {current_usage:,}/{limit:,} tokens used today."
-            
+
         return True, f"{current_usage:,}/{limit:,}"
 
     def create_session(self, user_id: int, expiry_hours: int = 24) -> str:
@@ -248,7 +247,7 @@ class UsageTracker:
         from datetime import timedelta
         token = str(uuid.uuid4())
         expiry = datetime.now() + timedelta(hours=expiry_hours)
-        
+
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()

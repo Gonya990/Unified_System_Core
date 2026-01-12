@@ -1,22 +1,23 @@
+import asyncio
+import json
 import logging
 import os
 import sys
-import asyncio
-import aiohttp
-import json
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, Optional
+
+import aiohttp
 
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, BotCommand
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from telegram.constants import ChatAction
 from config_manager import ConfigManager
 from inference_client import InferenceClient
+from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Update
+from telegram.constants import ChatAction
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters
 
 # Try Firestore first, fallback to SQLite
 try:
@@ -26,12 +27,12 @@ except ImportError:
     from user_context_db import UserContextDB
     _USE_FIRESTORE = False
 
-from google_auth import GoogleAuthManager
+from agent_orchestrator import PIPELINES, AgentOrchestrator
 from calendar_client import CalendarClient
-from daily_scheduler import DailyScheduler
 from conversation_manager import ConversationManager
+from daily_scheduler import DailyScheduler
+from google_auth import GoogleAuthManager
 from telegram_schema_expert import TelegramSchemaExpert
-from agent_orchestrator import AgentOrchestrator, PIPELINES
 
 # Optional imports with fallbacks
 try:
@@ -274,7 +275,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 keyboard = InlineKeyboardMarkup([
                     [
-                        InlineKeyboardButton(f"✅ Одобрить", callback_data=f"approve_user:{user.id}"),
+                        InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user:{user.id}"),
                         InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_user:{user.id}")
                     ]
                 ])
@@ -318,7 +319,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer() # Acknowledge
-    
+
     data = query.data
     user_id = update.effective_user.id
     db.update_last_interaction(user_id)
@@ -339,28 +340,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         else:
             await query.edit_message_text("❌ Error: `client_secret.json` is missing on the server. Please contact Admin.")
-    
+
     elif data == "help_onboarding":
         await show_advanced_help(query, context, edit=True)
-    
+
     elif data.startswith("confirm_event_"):
         pending = context.user_data.get('pending_event')
         if not pending:
             await query.edit_message_text("❌ Событие не найдено или сессия истекла.")
             return
-        
+
         client = get_calendar_client(user_id)
         if not client:
             await query.edit_message_text("❌ Календарь не подключен. Используйте /start.")
             return
-        
+
         # Parse time
         try:
             start_time = datetime.fromisoformat(pending['time'].replace('Z', '+00:00'))
         except (ValueError, TypeError) as e:
             logger.warning(f"Failed to parse event time '{pending.get('time')}': {e}, using default")
-            start_time = datetime.now() + timedelta(hours=1) 
-            
+            start_time = datetime.now() + timedelta(hours=1)
+
         # Conflict detection
         existing_events = client.get_upcoming_events(days=1)
         conflict = None
@@ -371,10 +372,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if pending['time'] in e_start_str:
                     conflict = e['summary']
                     break
-        
+
         if conflict:
-            await query.edit_message_text(f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\nВсё равно добавить?", parse_mode='Markdown', 
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✅ Да, добавить", callback_data=f"force_confirm_event")], [InlineKeyboardButton("❌ Отмена", callback_data="cancel_event")]]))
+            await query.edit_message_text(f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\nВсё равно добавить?", parse_mode='Markdown',
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✅ Да, добавить", callback_data="force_confirm_event")], [InlineKeyboardButton("❌ Отмена", callback_data="cancel_event")]]))
             return
 
         await process_event_creation(query, user_id, client, pending, start_time, context)
@@ -388,26 +389,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "cancel_event":
         context.user_data.pop('pending_event', None)
         await query.edit_message_text("❌ Создание события отменено.")
-    
+
     elif data == "edit_context":
         await query.edit_message_text("Feature coming soon! For now, try adding the event again with more details.")
-    
+
     elif data == "clear_memory":
         db.clear_memories(user_id)
         conv_manager.clear_history(user_id)
         await query.edit_message_text("🗑 Memory and conversation history cleared.")
-    
+
     elif data == "show_help":
         await show_advanced_help(query, context, edit=True)
-    
+
     elif data == "daily_brief_cb":
         # Simulate '📅 Daily Brief' command
         await show_daily_brief(update, context)
-    
+
     elif data == "show_memories_cb":
         # Simulate '🧠 Memory/Context' command
         await show_memory_context(update, context)
-        
+
     elif data == "settings_cb":
         current_provider = config.get("INFERENCE_PROVIDER", "ollama")
         current_model = config.get("MODEL_NAME", "unknown")
@@ -520,7 +521,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "admin_keys":
         if user_id not in ALLOWED_IDS: return
-        
+
         status = config.get_status()
         resp = (
             "🔑 **Key Management**\n\n"
@@ -646,13 +647,13 @@ async def process_event_creation(query, user_id, client, pending, start_time, co
         start_time=start_time,
         description=pending.get('context', '')
     )
-    
+
     if success:
         db.add_event_context(user_id, pending['summary'], pending.get('context', ''), start_time)
         await query.edit_message_text(f"✅ Запланировано: **{pending['summary']}**\nВремя: {pending['time']}", parse_mode='Markdown')
     else:
         await query.edit_message_text("❌ Не удалось создать событие в Google Calendar.")
-    
+
     context.user_data.pop('pending_event', None)
 
 async def show_advanced_help(update_or_query, context, edit=False):
@@ -671,7 +672,7 @@ async def show_advanced_help(update_or_query, context, edit=False):
         [InlineKeyboardButton("⚙️ Настройки", callback_data="settings_cb")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
+
     if edit:
         await update_or_query.edit_message_text(text, parse_mode='Markdown', reply_markup=reply_markup)
     else:
@@ -709,7 +710,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
-    
+
     # Handle OAuth code - can start with "4/" or be a full URL
     auth_code = None
     if user_text.strip().startswith("4/"):
@@ -768,7 +769,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 3. AI Intent Parsing & Response
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-    
+
     # Save to history
     conv_manager.add_message(user_id, "user", user_text)
 
@@ -786,7 +787,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Exclude messaging keywords from event detection to prevent hijacking
     MSG_START_KEYWORDS = ["tell", "say", "send", "скажи", "передай", "отправь", "сообщи", "напиши"]
-    
+
     # Check for "Add Event" intent
     if any(k in lower_text for k in EVENT_KEYWORDS) and not any(m in lower_text for m in MSG_START_KEYWORDS):
         event_details = await parse_event_details(user_text)
@@ -794,14 +795,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             summary = event_details['summary']
             time_str = event_details.get('time', 'Unknown')
             context_desc = event_details.get('context', 'No context provided')
-            
+
             keyboard = [
                 [InlineKeyboardButton("✅ Confirm", callback_data=f"confirm_event_{summary[:20]}")],
                 [InlineKeyboardButton("✏️ Edit Context", callback_data="edit_context")],
                 [InlineKeyboardButton("❌ Cancel", callback_data="cancel_event")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            
+
             await update.message.reply_text(
                 f"📅 **Found Event:**\n"
                 f"📝 Title: {summary}\n"
@@ -814,7 +815,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Store event details
             context.user_data['pending_event'] = event_details
             return
-    
+
     # Multilingual brief/schedule keywords
     BRIEF_KEYWORDS = [
         "schedule", "brief", "plan", "today", "agenda",  # English
@@ -824,7 +825,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if any(k in lower_text for k in BRIEF_KEYWORDS):
         await show_daily_brief(update, context)
         return
-    
+
     # 4. Image Generation Intent
     IMAGE_KEYWORDS = [
         "создай картинку", "нарисуй", "сгенерируй изображение", "картинка", "draw", "generate image", "imagine"
@@ -838,7 +839,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 import re
                 img_prompt = re.sub(re.escape(kw), "", img_prompt, flags=re.IGNORECASE).strip()
                 break
-        
+
         if img_prompt:
             # Delegate to img_command logic (simulated)
             # We can just call img_command if we wrap it or copy logic
@@ -859,17 +860,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         gmail = get_gmail_client(user_id)
         if gmail and gmail.is_valid():
             await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-            
+
             # Detect vacancy-related queries
             VACANCY_KEYWORDS = ["вакансий", "вакансии", "вакансия", "vacancy", "vacancies", "job", "работа", "работу", "предложения", "резюме"]
             is_vacancy_query = any(v in lower_text for v in VACANCY_KEYWORDS)
-            
+
             # Extract count if mentioned (e.g., "30 писем")
             import re
             count_match = re.search(r'(\d+)', lower_text)
             requested_count = int(count_match.group(1)) if count_match else 10
             max_count = min(requested_count, 50)  # Cap at 50 for context window safety
-            
+
             is_analysis_requested = any(a in lower_text for a in ["анализ", "проанализируй", "analyze", "summarize", "обзор", "проверь"])
 
             if is_vacancy_query:
@@ -886,19 +887,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if len(email['subject']) > 60:
                             subj += "..."
                         msg += f"{i}. **{sender}**\n   {subj}\n\n"
-                    
+
                     msg += "_Анализирую содержимое для подбора лучших..._"
                     await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
-                    
+
                     # Store emails in context specifically for AI to analyze
                     email_context = "EMAILS_SNAPSHOT (Top 20 most recent):\n"
                     # Limit to top 20 and truncate content to fit context window
-                    for email in emails[:20]: 
+                    for email in emails[:20]:
                          snippet = (email.get('snippet', '') or '')[:300].replace('\n', ' ')
                          email_context += f"- ID: {email['id']}\n  From: {email['from']}\n  Subject: {email['subject']}\n  Summary: {snippet}\n\n"
-                    
+
                     conv_manager.add_message(user_id, "user", f"[SYSTEM DATA]\n{email_context}")
-                    
+
                     # Trigger analysis
                     analysis_prompt = (
                         "Проанализируй эти письма (выше) и выбери 5-7 самых подходящих вакансий для меня. "
@@ -907,7 +908,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "1. **Название/Тема** (Отправитель)\n"
                         "   Почему подходит: ...\n"
                     )
-                    
+
                     try:
                         ai_response = await query_ollama_with_context(user_id, analysis_prompt)
                         if ai_response and ai_response.strip():
@@ -928,15 +929,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if not emails:
                     await update.message.reply_text("📭 Входящих писем не найдено.", reply_markup=get_main_menu(user_id))
                     return
-                
+
                 await update.message.reply_text(f"🔍 Загрузил последние {len(emails)} писем. Анализирую на предмет критических уведомлений и предупреждений...", reply_markup=get_main_menu(user_id))
-                
+
                 email_context = "ПОСЛЕДНИЕ ПИСЬМА (ДЛЯ АНАЛИЗА):\n"
                 for i, email in enumerate(emails, 1):
                     sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
                     snippet = (email.get('snippet', '') or '')[:200].replace('\n', ' ')
                     email_context += f"{i}. От: {sender} | Тема: {email['subject']} | Суть: {snippet}\n"
-                
+
                 full_analysis_prompt = (
                     f"Проанализируй следующий список из {len(emails)} писем.\n"
                     f"Контекст запроса пользователя: '{user_text}'\n"
@@ -947,7 +948,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "4. Отвечай кратко и по делу на языке пользователя.\n\n"
                     f"{email_context}"
                 )
-                
+
                 try:
                     ai_response = await query_ollama_with_context(user_id, full_analysis_prompt)
                     if ai_response and ai_response.strip():
@@ -959,7 +960,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     logger.error(f"Deep analysis failed: {e}")
                     await update.message.reply_text("❌ Ошибка при глубоком анализе почты.", reply_markup=get_main_menu(user_id))
                 return
-            
+
             # Check if user wants to search
             if any(w in lower_text for w in ["найди", "поиск", "search", "find", "ищи"]):
                 # Extract search query (words after search keyword)
@@ -977,7 +978,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             else:
                                 await update.message.reply_text(f"📭 По запросу '{query}' ничего не найдено.", reply_markup=get_main_menu(user_id))
                             return
-            
+
             # Default: show email summary
             summary = gmail.get_email_summary()
             await update.message.reply_text(summary, parse_mode='Markdown', reply_markup=get_main_menu(user_id))
@@ -991,14 +992,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Regular AI query with context
     ai_response = await query_ollama_with_context(user_id, user_text)
-    
+
     # Validate response is not empty
     if not ai_response or not ai_response.strip():
         ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз или смените провайдер через /settings."
-    
+
     # --- PROCESSS AI COMMANDS ([[TAG:args]]) ---
     import re
-    
+
     # 1. ALICE TTS
     alice_matches = re.findall(r'\[\[ALICE:(.*?)\]\]', ai_response)
     for text_to_say in alice_matches:
@@ -1018,13 +1019,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await ha_controller.turn_off_light(entity_name)
                 ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"🌑 _(Выключаю: {entity_name})_")
         else:
-             ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"❌ _(HA недоступен)_")
+             ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", "❌ _(HA недоступен)_")
 
     # 3. DIRECT MESSAGING (Telegram)
     msg_matches = re.findall(r'\[\[RUN:MSG:(.*?):(.*?)\]\]', ai_response)
     for target_name, msg_text in msg_matches:
         target_id = None
-        
+
         # Resolve target
         target_clean = target_name.strip().lower().lstrip('@')
         if target_clean.isdigit():
@@ -1035,14 +1036,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Fallback scan DB for username
             try:
                 # get_inactive_users(hours=0) should return all users if DB isn't empty
-                all_users = db.get_inactive_users(hours=0) 
+                all_users = db.get_inactive_users(hours=0)
                 for u in all_users:
                     if u.get('username', '').lower() == target_clean:
                         target_id = u['user_id']
                         break
             except Exception as db_err:
                 logger.error(f"[MSG] DB resolution error: {db_err}")
-        
+
         if target_id:
             try:
                 # Get sender info
@@ -1063,7 +1064,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode='Markdown')
-    
+
     # Trigger async digestion if history is long
     history = conv_manager.get_history(user_id)
     if len(history) >= 10 and len(history) % 10 == 0:
@@ -1072,14 +1073,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def show_memory_context(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     memories = db.get_memories(user_id)
-    
+
     if not memories:
         await update.effective_message.reply_text("🧠 I haven't learned any key facts about you yet. Let's talk more!")
     else:
         resp = "🧠 **My Long-term Memory:**\n\n"
         for m in memories:
             resp += f"• {m['fact_short']}\n"
-        
+
         keyboard = [[InlineKeyboardButton("🗑 Clear Memory", callback_data="clear_memory")]]
         await update.effective_message.reply_text(resp, parse_mode='Markdown', reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -1089,7 +1090,7 @@ async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
         "Current local time: " + datetime.now().isoformat() + ". "
         "Return ONLY a JSON object with keys: summary, time (ISO format), context (reason for event)."
     )
-    
+
     response = await query_ollama(prompt, system="You are a data extractor. Return JSON only.")
     try:
         start = response.find('{')
@@ -1103,11 +1104,11 @@ async def parse_event_details(text: str) -> Optional[Dict[str, Any]]:
 async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     client = get_calendar_client(user_id)
-    
+
     if not client:
         await update.effective_message.reply_text("❌ Календарь не подключен. Используйте /start.")
         return
-    
+
     events = client.get_upcoming_events(days=1)
     if not events:
         await update.effective_message.reply_text("🗓 Совсем нет планов на сегодня! Можно заняться новыми делами.")
@@ -1120,26 +1121,26 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
             title = e.get('summary', 'Untitled')
             time_formatted = client.format_event(e)
             ctx = contexts.get(title)
-            
+
             resp += f"• {time_formatted}"
             if ctx:
                 resp += f"\n  💡 *Context:* {ctx}"
             resp += "\n"
-            
+
         await update.effective_message.reply_text(resp, parse_mode='Markdown')
 
 async def digest_chat_memory(user_id: int):
     """Summarize recent history into long-term facts."""
     history = conv_manager.get_history(user_id, limit=20)
     history_text = "\n".join([f"{m['role']}: {m['content']}" for m in history])
-    
+
     prompt = (
         "Analyze the following chat history and extract any NEW key facts "
         "or preferences about the user (e.g., job, interests, business details, names). "
         "Return results as a JSON array of objects with 'fact_short' and 'fact_full' keys. "
         "If no new facts found, return empty array [].\n\nHistory:\n" + history_text
     )
-    
+
     response = await query_ollama(prompt, system="You are a knowledge extractor. Return JSON array ONLY.")
     try:
         start = response.find('[')
@@ -1168,22 +1169,22 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         "You are Gonya, a powerful multilingual personal AI assistant. "
         "You fluently understand and respond in English, Russian (русский), and Hebrew (עברית). "
         "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you.\n\n"
-        
+
         "=== YOUR CAPABILITIES ===\n"
         "You have REAL access to the user's data and can perform actions:\n\n"
-        
+
         "📧 EMAIL (Gmail):\n"
         "- Read emails: /mail or /mail list [count]\n"
         "- Search: /mail search <query>\n"
         "- Send: /mail send email | subject | body\n"
         "- Archive/Delete: /mail archive/trash <id>\n"
         "When user asks about emails, tell them to use /mail commands or offer to explain how.\n\n"
-        
+
         "📅 CALENDAR (Google):\n"
         "- View events: /calendar or /brief\n"
         "- Create events: user can say 'добавь встречу на 15:00 название'\n"
         "- You can parse natural language requests for calendar events.\n\n"
-        
+
         "🏠 HOME ASSISTANT & ALICE:\n"
         "- Control smart home: You can output COMMANDS to control devices.\n"
         "  Format: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
@@ -1199,20 +1200,20 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         "2. ALWAYS wrap the relayed message in the [[RUN:MSG:...]] tag.\n"
         "3. Example of WRONG response: 'Игорь, нам нужно встретиться...'\n"
         "4. Example of CORRECT response: 'Хорошо, передаю Игорю. [[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
-        
+
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
         "- Image generation: /img <prompt>\n"
         "- AI agents: /agent <name> <task>\n"
         "- System status: /status\n"
         "- Memory/context: /memory\n\n"
-        
+
         "=== USER CONTEXT ===\n"
         + mem_text + "\n\n"
         "Known Aliases:\n"
         "- Kostya (Nibbler420): target='kostya'\n"
         "- Igor (Owner): target='igor'\n\n"
-        
+
         "=== INSTRUCTIONS ===\n"
         "1. Be proactive - if user asks to tell/send something to Kostya, use [[RUN:MSG:kostya:text]].\n"
         "2. Remember: timezone is Asia/Jerusalem (IST).\n"
@@ -1326,9 +1327,9 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     key_name = context.args[0].upper()
     key_value = context.args[1]
-    
+
     config.set(key_name, key_value)
-    
+
     try:
         await update.message.delete()
     except Exception as e:
@@ -1614,8 +1615,9 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     msg = await update.message.reply_text("🔍 Проверяю системы...")
 
-    import psutil
     import time
+
+    import psutil
 
     try:
         cpu_usage = psutil.cpu_percent()
@@ -1639,7 +1641,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 ha_res = await ha_controller.get_status()
                 if ha_res and ha_res.get("status") == "ok":
-                    ha_status = f"✅ Online"
+                    ha_status = "✅ Online"
                 else:
                     ha_status = "❌ Error"
             except Exception as e:
@@ -1899,9 +1901,9 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     document = update.message.document
     file_name = document.file_name
-    
+
     await update.message.reply_text(f"📂 Получил файл: `{file_name}`.", parse_mode="Markdown")
-    
+
     # Text-based files processing
     text_extensions = ('.txt', '.md', '.py', '.json', '.yaml', '.yml', '.csv', '.log', '.rtf')
     if file_name.lower().endswith(text_extensions):
@@ -1914,25 +1916,25 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             new_file = await document.get_file()
             file_content_byte = await new_file.download_as_bytearray()
             text_content = file_content_byte.decode('utf-8', errors='ignore')
-            
+
             # Basic RTF cleanup (remove {} and control words)
             if file_name.lower().endswith('.rtf'):
                 import re
                 text_content = re.sub(r'[{}\\]', '', text_content)  # Very basic cleanup
                 text_content = re.sub(r'\\[a-z]+\d*', ' ', text_content) # Remove control words like \par
-            
+
             # Save to context
             conv_manager.add_message(user_id, "user", f"[User uploaded file {file_name} content]:\n{text_content}")
-            
+
             await update.message.reply_text("✅ Текст файла сохранен в контексте диалога.")
-            
+
             # Trigger AI analysis immediately with specific prompt
             prompt = f"Я отправил файл {file_name}. Проанализируй его содержимое."
             ai_response = await query_ollama_with_context(user_id, prompt)
-            
+
             conv_manager.add_message(user_id, "assistant", ai_response)
             await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
-            
+
         except Exception as e:
             logger.error(f"Failed to read document {file_name}: {e}")
             await update.message.reply_text("❌ Не удалось прочитать текст файла.")
@@ -2152,13 +2154,13 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     gmail = get_gmail_client(user_id)
     cmd = context.args[0].lower() if context.args else None
-    
+
     if cmd == "agent" or (not gmail and agent_mail):
         # Check MCP Agent Mail
         if not agent_mail:
              await update.message.reply_text("❌ MCP Mail Client not available.")
              return
-             
+
         await update.message.reply_text("🔄 Checking Agent Mail...")
         try:
             loop = asyncio.get_running_loop()
@@ -2990,10 +2992,10 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
-    
+
     current_model = inference.model
     current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-    
+
     await update.message.reply_text(
         f"⚙️ **Настройки AI**\n\n"
         f"🤖 Модель: `{current_model}`\n"
@@ -3007,7 +3009,7 @@ async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /msg <user_id|username> <text> command."""
     sender_id = update.effective_user.id
     sender_name = update.effective_user.username or update.effective_user.full_name
-    
+
     if not db.is_approved(sender_id):
         return
 
@@ -3017,21 +3019,21 @@ async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = context.args[0]
     message = " ".join(context.args[1:])
-    
+
     target_id = None
-    
+
     # Try to resolve target
     if target.isdigit():
         target_id = int(target)
     else:
         # Simple scan of inactive users (all users in DB)
-        all_users = db.get_inactive_users(hours=0) 
+        all_users = db.get_inactive_users(hours=0)
         target_clean = target.lstrip('@')
         for u in all_users:
             if u.get('username') == target_clean:
                 target_id = u['user_id']
                 break
-    
+
     if target_id:
         try:
             await context.bot.send_message(
@@ -3109,7 +3111,7 @@ def main():
     logger.info("[STARTUP] All handlers registered")
 
     logger.info("[STARTUP] Starting polling...")
-    print(f'Bot V2 (AI_Core) is running...')
+    print('Bot V2 (AI_Core) is running...')
     application.run_polling(drop_pending_updates=True)
 
 if __name__ == '__main__':

@@ -3,10 +3,12 @@ Professional LLM Chat with instruction-following model
 Uses Mistral-7B or similar model optimized for following instructions
 """
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
 import sys
 import traceback
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 try:
     import transformers as _transformers
     TF_VER = _transformers.__version__
@@ -22,49 +24,49 @@ def main():
     print("=" * 70)
     print("🤖 LOADING ADVANCED INSTRUCTION-FOLLOWING MODEL...")
     print("=" * 70)
-    
+
     # Use a better model for Russian and instructions
     # Options (uncomment one):
-    
+
     # Option 1: Mistral 7B Instruct (best quality, needs 14GB VRAM)
     # model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-    
+
     # Option 2: Phi-3 Mini (good balance, 3.8B params, ~8GB VRAM)
     model_name = "microsoft/Phi-3-mini-4k-instruct"
-    
+
     # Option 3: Gemma 2B (smaller, 4GB VRAM)
     # model_name = "google/gemma-2b-it"
-    
+
     print(f"\nModel: {model_name}")
     print("Loading tokenizer...")
     print(f"transformers version: {TF_VER}; accelerate version: {ACC_VER}")
-    
+
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
         trust_remote_code=True
     )
-    
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    
+
     print("Loading model on GPU...")
     print("This may take 1-2 minutes for first download...")
-    
+
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.float16,
         device_map="cuda",
         trust_remote_code=True
     )
-    
+
     model.eval()
-    
+
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
         vram_allocated = torch.cuda.memory_allocated(0) / 1024**3
         print(f"\n✅ GPU: {gpu_name}")
         print(f"✅ VRAM used: {vram_allocated:.1f} GB")
-    
+
     print("\n" + "=" * 70)
     print("✅ MODEL READY FOR INSTRUCTIONS!")
     print("=" * 70)
@@ -77,7 +79,7 @@ def main():
     print("   - Calculate 15 * 23 + 47")
     print("\nCommands: /exit (quit), /clear (clear history), /help")
     print("=" * 70)
-    
+
     # Instruction / system prompt: задаёт поведение ассистента
     instruction_prefix = (
         "You are a helpful, precise and instruction-following assistant. "
@@ -86,23 +88,23 @@ def main():
     )
 
     conversation_history = []
-    
+
     while True:
         try:
             user_input = input("\n👤 You: ").strip()
-            
+
             if not user_input:
                 continue
-            
+
             if user_input.lower() in ['/exit', '/quit']:
                 print("\n👋 Goodbye!")
                 break
-            
+
             if user_input.lower() == '/clear':
                 conversation_history = []
                 print("🗑️  History cleared")
                 continue
-            
+
             if user_input.lower() == '/help':
                 print("\n📖 HELP:")
                 print("  This model follows instructions and answers questions")
@@ -113,7 +115,7 @@ def main():
                 print("  - Analyze text")
                 print("  - Do calculations")
                 continue
-            
+
             # Build conversation with proper instruction format
             # Префикс-инструкция идёт всегда впереди — задаёт роль ассистента
             if conversation_history:
@@ -124,7 +126,7 @@ def main():
                 )
             else:
                 full_prompt = f"{instruction_prefix}\n\nUser: {user_input}\nAssistant:"
-            
+
             # Tokenize
             inputs = tokenizer(
                 full_prompt,
@@ -132,7 +134,7 @@ def main():
                 max_length=1024,
                 truncation=True
             ).to("cuda")
-            
+
             print("\n🤖 Assistant: ", end="", flush=True)
 
             # Generate response with robust error handling for provider/library issues
@@ -173,33 +175,33 @@ def main():
                     # Give user hint and continue loop
                     print("Попробуйте перезапустить скрипт или использовать более простую модель (меньше параметров).\n")
                     continue
-            
+
             # Decode response
             full_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
+
             # Extract only the new answer
             if "Assistant:" in full_response:
                 response = full_response.split("Assistant:")[-1].strip()
             else:
                 response = full_response[len(full_prompt):].strip()
-            
+
             # Clean up response - take first complete sentence/paragraph
             if "\n\n" in response:
                 response = response.split("\n\n")[0]
             elif "\nUser:" in response:
                 response = response.split("\nUser:")[0]
-            
+
             response = response.strip()
-            
+
             if response:
                 print(response)
-                
+
                 # Save to history
                 conversation_history.append(f"User: {user_input}")
                 conversation_history.append(f"Assistant: {response}")
             else:
                 print("I apologize, I couldn't generate a proper response. Please try rephrasing.")
-            
+
         except KeyboardInterrupt:
             print("\n\n👋 Interrupted by user. Goodbye!")
             break

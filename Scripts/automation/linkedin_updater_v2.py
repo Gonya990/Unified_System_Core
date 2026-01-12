@@ -29,23 +29,23 @@ async def main():
     print("🔗 LINKEDIN PROFILE UPDATER v2")
     print("="*60)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    
+
     try:
         from playwright.async_api import async_playwright
     except ImportError:
         print("❌ Playwright не установлен!")
         sys.exit(1)
-    
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=False,
             slow_mo=300
         )
-        
+
         context = await browser.new_context(
             viewport={'width': 1400, 'height': 900}
         )
-        
+
         # Set LinkedIn session cookie
         print("\n🍪 Устанавливаю session cookie...")
         await context.add_cookies([{
@@ -56,30 +56,30 @@ async def main():
             'httpOnly': True,
             'secure': True
         }])
-        
+
         page = await context.new_page()
-        
+
         # Go to profile
         print("\n📍 Открываю профиль...")
         await page.goto(PROFILE_URL, timeout=30000)
         await asyncio.sleep(3)
-        
+
         # Check if logged in
         if "/login" in page.url or "/authwall" in page.url:
             print("❌ Cookie недействительный или истёк")
             print("   Нужен свежий li_at cookie")
             await browser.close()
             return
-        
+
         print("✅ Авторизация успешна!")
-        
+
         # Find and click edit button on intro section
         print("\n📍 Ищу кнопку редактирования...")
-        
+
         # LinkedIn uses pencil icon for edit
         edit_buttons = await page.query_selector_all('button[aria-label*="Edit"], button svg[data-icon="pencil"]')
         print(f"   Найдено кнопок редактирования: {len(edit_buttons)}")
-        
+
         # Try to find the intro edit button (usually first one)
         try:
             # Look for edit intro section specifically
@@ -100,13 +100,13 @@ async def main():
                     await asyncio.sleep(2)
             except:
                 print("   ⚠️ Не могу найти кнопку редактирования")
-        
+
         # Now try to find headline field in modal
         print("\n📍 Ищу поле Headline в модальном окне...")
-        
+
         # Wait for modal
         await asyncio.sleep(2)
-        
+
         # Try different selectors for headline
         headline_selectors = [
             'input[id*="headline"]',
@@ -115,7 +115,7 @@ async def main():
             'input[placeholder*="headline"]',
             'form input[type="text"]'
         ]
-        
+
         headline_found = False
         for selector in headline_selectors:
             try:
@@ -124,7 +124,7 @@ async def main():
                     # Found it!
                     current_value = await el.input_value()
                     print(f"   Текущий headline: {current_value[:50] if current_value else '(пусто)'}...")
-                    
+
                     # Clear and type new
                     await el.click()
                     await el.fill('')
@@ -134,16 +134,16 @@ async def main():
                     break
             except:
                 continue
-        
+
         if not headline_found:
             print("   ⚠️ Поле headline не найдено")
             print("   LinkedIn мог изменить структуру страницы")
-        
+
         # Take screenshot for debugging
         screenshot_path = "/Users/macbook/Documents/Unified_System/Scripts/automation/linkedin_screenshot.png"
         await page.screenshot(path=screenshot_path)
         print(f"\n📸 Скриншот сохранён: {screenshot_path}")
-        
+
         # Save if possible
         try:
             save_btn = await page.query_selector('button:has-text("Save"), button[type="submit"]')
@@ -153,7 +153,7 @@ async def main():
                 await asyncio.sleep(2)
         except:
             pass
-        
+
         print("\n" + "="*60)
         print("📋 РЕЗУЛЬТАТ")
         print("="*60)
@@ -163,7 +163,7 @@ async def main():
         print("   Если изменения не применились - обновите вручную")
         print("\n   Данные для обновления:")
         print(f"   Headline: {NEW_HEADLINE}")
-        
+
         input("\nНажмите Enter для закрытия браузера...")
         await browser.close()
 

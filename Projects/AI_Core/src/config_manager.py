@@ -3,9 +3,9 @@ Configuration Manager for AI Telegram Bot.
 Handles persistent storage with encryption for sensitive values.
 """
 
+import base64
 import json
 import os
-import base64
 from pathlib import Path
 from typing import Optional
 
@@ -95,7 +95,7 @@ class ConfigManager:
         # Override with persisted config if exists
         if self.CONFIG_FILE.exists():
             try:
-                with open(self.CONFIG_FILE, "r") as f:
+                with open(self.CONFIG_FILE) as f:
                     stored = json.load(f)
                     for key, value in stored.items():
                         # Skip empty values to preserve Environment Variables precedence if config is broken

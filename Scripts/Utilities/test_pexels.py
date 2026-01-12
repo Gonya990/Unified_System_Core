@@ -1,7 +1,8 @@
 
-import requests
-import sys
 import os
+import sys
+
+import requests
 
 # Put parent dir in path
 sys.path.append(os.getcwd())
@@ -15,16 +16,16 @@ def test_pexels():
     print("🔍 Testing Pexels Key via TokenBroker...")
     broker = TokenBroker()
     key = broker.get_key("pexels")
-    
+
     if not key:
         print("❌ No Pexels key found in broker.")
         return
 
     print(f"🔑 Using Key: {key[:5]}...{key[-3:]}")
-    
+
     headers = {"Authorization": key}
     url = "https://api.pexels.com/videos/search?query=nature&per_page=1"
-    
+
     try:
         response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:

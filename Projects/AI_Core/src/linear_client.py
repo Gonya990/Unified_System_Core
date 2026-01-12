@@ -2,16 +2,17 @@
 Linear API Client for Task Management
 Integrates with Linear.app for professional issue tracking.
 """
-import os
 import logging
+import os
+from typing import Dict, List, Optional
+
 import requests
-from typing import Optional, List, Dict
 
 logger = logging.getLogger(__name__)
 
 class LinearClient:
     """Client for Linear GraphQL API."""
-    
+
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("LINEAR_API_KEY")
         self.endpoint = "https://api.linear.app/graphql"
@@ -20,7 +21,7 @@ class LinearClient:
             "Content-Type": "application/json"
         }
         self.team_id = None  # Will be fetched on first use
-        
+
     def _query(self, query: str, variables: Optional[Dict] = None) -> Dict:
         """Execute GraphQL query."""
         try:
@@ -32,16 +33,16 @@ class LinearClient:
             )
             response.raise_for_status()
             data = response.json()
-            
+
             if "errors" in data:
                 logger.error(f"Linear API errors: {data['errors']}")
                 return None
-                
+
             return data.get("data")
         except Exception as e:
             logger.error(f"Linear API request failed: {e}")
             return None
-    
+
     def get_viewer(self) -> Optional[Dict]:
         """Get current user info."""
         query = """
@@ -55,7 +56,7 @@ class LinearClient:
         """
         result = self._query(query)
         return result.get("viewer") if result else None
-    
+
     def get_teams(self) -> List[Dict]:
         """Get all teams."""
         query = """
@@ -73,7 +74,7 @@ class LinearClient:
         if result and "teams" in result:
             return result["teams"]["nodes"]
         return []
-    
+
     def _ensure_team_id(self):
         """Ensure we have a team ID."""
         if not self.team_id:
@@ -81,7 +82,7 @@ class LinearClient:
             if teams:
                 self.team_id = teams[0]["id"]  # Use first team
                 logger.info(f"Using Linear team: {teams[0]['name']}")
-    
+
     def create_issue(self, title: str, description: str = "", priority: int = 0) -> Optional[Dict]:
         """
         Create a new issue.
@@ -92,11 +93,11 @@ class LinearClient:
             priority: Priority (0=None, 1=Urgent, 2=High, 3=Normal, 4=Low)
         """
         self._ensure_team_id()
-        
+
         if not self.team_id:
             logger.error("No team ID available")
             return None
-        
+
         query = """
         mutation IssueCreate($input: IssueCreateInput!) {
             issueCreate(input: $input) {
@@ -110,7 +111,7 @@ class LinearClient:
             }
         }
         """
-        
+
         variables = {
             "input": {
                 "teamId": self.team_id,
@@ -119,12 +120,12 @@ class LinearClient:
                 "priority": priority
             }
         }
-        
+
         result = self._query(query, variables)
         if result and result.get("issueCreate", {}).get("success"):
             return result["issueCreate"]["issue"]
         return None
-    
+
     def get_my_issues(self, limit: int = 10) -> List[Dict]:
         """Get issues assigned to current user."""
         query = """
@@ -145,12 +146,12 @@ class LinearClient:
             }
         }
         """ % limit
-        
+
         result = self._query(query)
         if result and "viewer" in result:
             return result["viewer"]["assignedIssues"]["nodes"]
         return []
-    
+
     def update_issue_state(self, issue_id: str, state_id: str) -> bool:
         """Update issue state (e.g., mark as done)."""
         query = """
@@ -160,7 +161,7 @@ class LinearClient:
             }
         }
         """
-        
+
         variables = {"id": issue_id, "stateId": state_id}
         result = self._query(query, variables)
         return result and result.get("issueUpdate", {}).get("success", False)
