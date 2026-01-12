@@ -38,15 +38,15 @@ The Unified System now features a **Centralized Communication Hub** running on `
 
 ### 1. Central Hub (igor-gaming-1)
 
-**Location:** `100.88.65.71:8765`  
+**Location:** `100.110.209.49:8765`  
 **Protocol:** MCP JSON-RPC over HTTP  
-**Authentication:** Bearer token (`antigravity_secret`)
+**Authentication:** Bearer token (`c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb`)
 
 #### Services
 
-- **MCP Agent Mail Server** - Message routing and delivery
-- **SQLite Database** - Message and agent data persistence  
-- **Docker Compose** - Container orchestration
+- **MCP Agent Mail Server** - Message routing and delivery (Systemd: `mcp-agent-mail.service`)
+- **SQLite Database** - Message and agent data persistence (`/opt/mcp-agent-mail/storage.sqlite3`)
+- **Git State** - Agent profiles persisted to Git worktrees
 
 ### 2. Local Scripts
 
@@ -116,8 +116,8 @@ Example agent names:
 ### Manual Registration
 
 ```bash
-curl -sS --http1.1 -X POST "http://100.88.65.71:8765/mcp" \
-  -H "Authorization: Bearer antigravity_secret" \
+curl -sS --http1.1 -X POST "http://100.110.209.49:8765/mcp" \
+  -H "Authorization: Bearer c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb" \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc":"2.0",
@@ -126,7 +126,7 @@ curl -sS --http1.1 -X POST "http://100.88.65.71:8765/mcp" \
     "params": {
       "name":"register_agent",
       "arguments": {
-        "project_key":"/main",
+        "project_key":"/home/gonya/Unified_System",
         "program":"my-agent",
         "model":"my-model-v1"
       }
@@ -202,9 +202,9 @@ OrangeLake → [TASK] Deploy Documentation → GreenPond
 
 ```bash
 # Hub connection
-HUB_URL="http://100.88.65.71:8765/mcp"
-AUTH_TOKEN="antigravity_secret"
-PROJECT_KEY="/main"
+HUB_URL="http://100.110.209.49:8765/mcp"
+AUTH_TOKEN="c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+PROJECT_KEY="/home/gonya/Unified_System"
 
 # Local cache
 AGENT_STATE_FILE="$HOME/.cache/agent_comm_state"
@@ -302,8 +302,8 @@ ssh igor-gaming-1 "docker exec acfs-hub-server-1 python -m mcp_agent_mail.cli li
 
 ```bash
 curl -v --http1.1 \
-  -H "Authorization: Bearer antigravity_secret" \
-  http://100.88.65.71:8765/health/liveness
+  -H "Authorization: Bearer c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb" \
+  http://100.110.209.49:8765/health/liveness
 ```
 
 ## Usage Examples
@@ -366,74 +366,42 @@ curl -v --http1.1 \
 
 ## Mail Processor (Systemd)
 
-The `Mail Processor` (`Scripts/Orchestration/mail_processor.py`) is the background service that polls the billboard inbox and performs automation (mark-read, auto-ack for `ack_required`, Telegram alerts for high-priority messages when configured).
+The `Mail Processor` (`Scripts/Orchestration/mail_processor.py`) is the background service that polls the agent's inbox and performs automation (mark-read, auto-ack for `ack_required`, Telegram alerts for high-priority messages).
 
-### Non-blocking preflight (no systemd changes)
+### Server Deployment
 
-Run a single poll cycle to validate `.env` rehydration and server connectivity:
+The Mail Processor is currently deployed as a Systemd service on `igor-gaming-1`.
 
-```bash
-devenv shell -- bash -c 'python3 Scripts/Orchestration/mail_processor.py --once'
-```
+**Unit Path:** `/etc/systemd/system/mail-processor.service`  
+**Identity:** `AmberOwl`  
+**Target:** Monitors high-priority alerts for the Unified System.
 
-Expected:
-- `Mail server not available` should not appear
-- If inbox is empty, it exits cleanly
-
-### User service (no sudo)
-
-Use this when you cannot (or do not want to) use `sudo`.
-
-1. Install the unit:
+**Status Commands:**
 
 ```bash
-mkdir -p ~/.config/systemd/user
-cp infra/mail-processor.user.service ~/.config/systemd/user/mail-processor.service
-# NixOS note: the unit uses /run/current-system/sw/bin/bash + /run/current-system/sw/bin/devenv
-systemctl --user daemon-reload
+systemctl status mail-processor.service
+tail -f /home/gonya/Unified_System/Reports/mail_processor.log
 ```
 
-2. Start/enable:
+### Local macOS Deployment (Launchd)
+
+For macOS machines (e.g. MacBook), a Launchd agent is provided.
+
+**Location:** `Scripts/Orchestration/com.unified.mail-processor.plist`
+
+**Commands:**
 
 ```bash
-systemctl --user enable --now mail-processor.service
+# Load service
+launchctl load ~/Library/LaunchAgents/com.unified.mail-processor.plist
+
+# Unload service
+launchctl unload ~/Library/LaunchAgents/com.unified.mail-processor.plist
 ```
 
-3. Verify:
+### Configuration
 
-```bash
-systemctl --user status mail-processor.service
-journalctl --user -u mail-processor.service -n 200 --no-pager
-```
-
-### System service (requires sudo)
-
-Use this when deploying centrally on a server.
-
-1. Install the unit:
-
-```bash
-sudo cp infra/mail-processor.service /etc/systemd/system/mail-processor.service
-# NixOS note: the unit uses /run/current-system/sw/bin/bash + /run/current-system/sw/bin/devenv
-sudo systemctl daemon-reload
-```
-
-2. Start/enable:
-
-```bash
-sudo systemctl enable --now mail-processor.service
-```
-
-3. Verify:
-
-```bash
-sudo systemctl status mail-processor.service
-sudo journalctl -u mail-processor.service -n 200 --no-pager
-```
-
-### Notes
-
-- The processor reads `.env` from the repo root; ensure `AGENT_MAIL_SERVER`, `AGENT_MAIL_PROJECT`, and `AGENT_MAIL_NAME` match the billboard.
+- The processor reads `.env` from the repo root; ensure `AGENT_MAIL_SERVER`, `AGENT_MAIL_PROJECT`, and `AGENT_MAIL_NAME` match the hub configuration.
 - Telegram alerts require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID`.
 
 ## Support & Maintenance
