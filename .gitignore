@@ -13,6 +13,12 @@ id_rsa*
 secrets.yaml
 bot_config.py
 setup_telegram.py
+tokens.txt
+
+# Debug / Temporary
+analyze_token.py
+search_schools.py
+debug_*.py
 
 # Python / UV / Builds
 __pycache__/
