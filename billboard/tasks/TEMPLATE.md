@@ -31,4 +31,5 @@ Briefly explain *what* needs to be done and *why*.
 ## 📡 REP Sensitivities (Planned)
 
 *What environmental variables does this task depend on?*
+
 - IF `API_VERSION` changes, THEN `Client` must update.
