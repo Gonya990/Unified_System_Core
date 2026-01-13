@@ -12,10 +12,10 @@ import schedule
 from dotenv import load_dotenv
 
 # Setup paths
-SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
+SRC_DIR = Path(__file__).parent.parent.resolve()  # Projects/Content_Factory/src
 FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
-PROJECTS_DIR = FACTORY_DIR.parent # /Projects
-ROOT_DIR = PROJECTS_DIR.parent # Unified_System (Root)
+PROJECTS_DIR = FACTORY_DIR.parent  # /Projects
+ROOT_DIR = PROJECTS_DIR.parent  # Unified_System (Root)
 
 # Add all source subdirectories to path
 for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
@@ -24,18 +24,19 @@ for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
 
-import asyncio
-import subprocess
+import asyncio  # noqa: E402
+import subprocess  # noqa: E402
 
-from account_manager import AccountManager
-from daily_researcher import generate_vision_assets, run_daily_research, translate_to_english, translate_to_hebrew
-from insta_uploader import upload_reel
-from orchestrator_v3_no_face import run_no_face_pipeline
-from uploaders.threads_browser import ThreadsBrowser
+from account_manager import AccountManager  # noqa: E402
+from daily_researcher import generate_vision_assets, run_daily_research, translate_to_english, translate_to_hebrew  # noqa: E402
+from insta_uploader import upload_reel  # noqa: E402
+from orchestrator_v3_no_face import run_no_face_pipeline  # noqa: E402
+from threads_browser import ThreadsBrowser  # noqa: E402
 
 # Long-form documentary producer
 try:
     from longform_producer import run_longform_production
+
     LONGFORM_ENABLED = True
     print("✅ Long-form Documentary Producer loaded")
 except ImportError:
@@ -49,10 +50,11 @@ POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 # --- MONETIZATION SAFETY LIMITS (OPTIMIZED - ToS SAFE) ---
 DAILY_VIDEOS_LIMIT = 3  # Optimized: 3 videos per day (quality + reach)
 MIN_INTERVAL_HOURS = 4  # 4-hour gap for better algorithm treatment
-INSTA_ACTION_DELAY = 90 # Seconds between Instagram operations (safer)
+INSTA_ACTION_DELAY = 90  # Seconds between Instagram operations (safer)
 # YouTube: 3/day safe | Instagram: 1-2/day safe | Threads: 3/day safe
 # NO TikTok - excluded by user preference
 # ----------------------------------------------------------
+
 
 def agent_sync(msg):
     """Синхронизация с агентом Кости (VioletCastle) через MCP"""
@@ -68,6 +70,7 @@ def agent_sync(msg):
     except Exception as e:
         print(f"⚠️ Sync Error: {e}")
 
+
 def load_history():
     if POSTED_HISTORY_FILE.exists():
         try:
@@ -77,9 +80,11 @@ def load_history():
             return []
     return []
 
+
 def save_history(history):
     with open(POSTED_HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=4)
+
 
 def is_already_posted(topic):
     history = load_history()
@@ -87,23 +92,20 @@ def is_already_posted(topic):
     posted_topics = [item.get("topic") for item in history[-30:]]
     return topic in posted_topics
 
+
 def mark_as_posted(topic, prefix, lang):
     history = load_history()
-    history.append({
-        "topic": topic,
-        "prefix": prefix,
-        "lang": lang,
-        "timestamp": datetime.now().isoformat()
-    })
+    history.append({"topic": topic, "prefix": prefix, "lang": lang, "timestamp": datetime.now().isoformat()})
     # Keep history manageable
     save_history(history[-200:])
+
 
 def get_static_fallback():
     """
     Emergency fallback if deep research fails.
     Improved with date-based variety.
     """
-    day_str = datetime.now().strftime('%Y-%m-%d')
+    day_str = datetime.now().strftime("%Y-%m-%d")
     topics = [
         ("AI Agents Revolution", "How autonomous agents are taking over digital tasks."),
         ("Quantum Supremacy", "The race for the first practical quantum computer."),
@@ -111,11 +113,12 @@ def get_static_fallback():
         ("Neural interface evolution", "Connecting human brains directly to the cloud."),
         ("Sustainable Fusion Energy", "Clean, infinite power is finally within reach."),
         ("Robotics in Everyday Life", "How machines are helping us in our homes."),
-        ("The Future of Medicine", "AI-driven diagnostics and personalized treatments.")
+        ("The Future of Medicine", "AI-driven diagnostics and personalized treatments."),
     ]
     # Filter out already posted topics if possible
     available_topics = [t for t in topics if not is_already_posted(t[0])]
-    if not available_topics: available_topics = topics
+    if not available_topics:
+        available_topics = topics
 
     topic, desc = random.choice(available_topics)
 
@@ -125,47 +128,56 @@ def get_static_fallback():
         "description": desc,
         "script_ru": f"Будущее наступило незаметно. Сегодня, {day_str}, мы видим... как технологии {topic.lower()} меняют правила игры. Мы больше не просто наблюдатели... мы творцы новой реальности. Это момент истины... для всего человечества.",
         "scenes": [
-            {"image": f"fallback_s{i}", "keyword": kw} for i, kw in enumerate([
-                "futuristic technology high tech", "digital connection networking",
-                "cyber city night lights", "abstract data visualization",
-                "innovation inspiration vision", "global communication earth"
-            ])
-        ]
+            {"image": f"fallback_s{i}", "keyword": kw}
+            for i, kw in enumerate(
+                [
+                    "futuristic technology high tech",
+                    "digital connection networking",
+                    "cyber city night lights",
+                    "abstract data visualization",
+                    "innovation inspiration vision",
+                    "global communication earth",
+                ]
+            )
+        ],
     }
+
 
 def generate_hebrew_content(russian_content):
     if not russian_content:
         russian_content = get_static_fallback()
     print("🇮🇱 Translating to Hebrew...")
-    he_script = translate_to_hebrew(russian_content.get('script_ru', ""))
+    he_script = translate_to_hebrew(russian_content.get("script_ru", ""))
     return {
-        "selected_topic": russian_content.get('selected_topic', "AI Future"),
+        "selected_topic": russian_content.get("selected_topic", "AI Future"),
         "script_he": he_script,
-        "scenes": (russian_content.get('scenes', []) * 2)[:16],
-        "description": f"מהדורת שבועית: {russian_content.get('selected_topic', '')} #AI #Israel"
+        "scenes": (russian_content.get("scenes", []) * 2)[:16],
+        "description": f"מהדורת שבועית: {russian_content.get('selected_topic', '')} #AI #Israel",
     }
+
 
 def generate_english_content(russian_content):
     if not russian_content:
         russian_content = get_static_fallback()
     print("🇬🇧 Translating to English...")
-    en_script = translate_to_english(russian_content.get('script_ru', ""))
+    en_script = translate_to_english(russian_content.get("script_ru", ""))
     return {
-        "selected_topic": russian_content.get('selected_topic', "AI Future"),
+        "selected_topic": russian_content.get("selected_topic", "AI Future"),
         "script_en": en_script,
-        "scenes": (russian_content.get('scenes', []) * 2)[:16],
-        "description": f"Weekly Edition: {russian_content.get('selected_topic', '')} #AI #Future #Tech"
+        "scenes": (russian_content.get("scenes", []) * 2)[:16],
+        "description": f"Weekly Edition: {russian_content.get('selected_topic', '')} #AI #Future #Tech",
     }
 
+
 def run_factory_production(mode="daily"):
-    day_str = datetime.now().strftime('%Y-%m-%d')
+    day_str = datetime.now().strftime("%Y-%m-%d")
 
     # Auto-detect mode based on day if not specified
     if mode == "auto":
         weekday = datetime.now().weekday()
-        if weekday == 6: # Sunday
+        if weekday == 6:  # Sunday
             mode = "hebrew"
-        elif weekday == 2: # Wednesday
+        elif weekday == 2:  # Wednesday
             mode = "english"
         else:
             mode = "daily"
@@ -184,12 +196,12 @@ def run_factory_production(mode="daily"):
             content_data = get_static_fallback()
 
         # Uniqueness check
-        topic = content_data.get('selected_topic', '')
+        topic = content_data.get("selected_topic", "")
         if is_already_posted(topic):
             agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
-            content_data = run_daily_research() # Retry once
-            if not content_data or is_already_posted(content_data.get('selected_topic', '')):
-                content_data = get_static_fallback() # Fallback ensures variety better now
+            content_data = run_daily_research()  # Retry once
+            if not content_data or is_already_posted(content_data.get("selected_topic", "")):
+                content_data = get_static_fallback()  # Fallback ensures variety better now
     except Exception as e:
         agent_sync(f"Ошибка исследования: {e}")
         content_data = get_static_fallback()
@@ -199,20 +211,20 @@ def run_factory_production(mode="daily"):
     # 2. SELECTION
     if mode == "hebrew":
         content_data = generate_hebrew_content(content_data)
-        script = content_data['script_he']
+        script = content_data["script_he"]
         lang = "he"
         prefix = "weekly_he"
     elif mode == "english":
         content_data = generate_english_content(content_data)
-        script = content_data['script_en']
+        script = content_data["script_en"]
         lang = "en"
         prefix = "weekly_en"
     elif mode == "cartoon":
-        script = content_data['script_ru']
+        script = content_data["script_ru"]
         lang = "ru"
         prefix = "cartoon_daily"
     else:
-        script = content_data['script_ru']
+        script = content_data["script_ru"]
         lang = "ru"
         prefix = "factory_daily"
 
@@ -222,10 +234,10 @@ def run_factory_production(mode="daily"):
     assets_dir.mkdir(parents=True, exist_ok=True)
 
     final_scenes = []
-    assets = generate_vision_assets(content_data.get('scenes', []), assets_dir, style=style)
+    assets = generate_vision_assets(content_data.get("scenes", []), assets_dir, style=style)
     for a in assets:
-        if a.get('resolved_path'):
-            final_scenes.append({"image": a['resolved_path'], "keyword": a['keyword']})
+        if a.get("resolved_path"):
+            final_scenes.append({"image": a["resolved_path"], "keyword": a["keyword"]})
 
     agent_sync(f"Ассеты готовы: {len(final_scenes)} сцен успешно скачано")
 
@@ -236,7 +248,9 @@ def run_factory_production(mode="daily"):
     # 4. PRODUCTION
     out_name = f"{prefix}_{day_str.replace('-', '')}"
     try:
-        video_path = run_no_face_pipeline(text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style)
+        video_path = run_no_face_pipeline(
+            text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style
+        )
 
         # 5. UPLOAD (Instagram + YouTube)
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
@@ -246,7 +260,7 @@ def run_factory_production(mode="daily"):
 
             for acc in insta_accounts:
                 agent_sync(f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})...")
-                caption = content_data.get('description', f"New AI vision: {content_data.get('selected_topic', '')}")
+                caption = content_data.get("description", f"New AI vision: {content_data.get('selected_topic', '')}")
 
                 try:
                     # Respect action delay
@@ -263,16 +277,23 @@ def run_factory_production(mode="daily"):
             yt_accounts = acc_manager.get_accounts("youtube")
             for acc in yt_accounts:
                 agent_sync(f"Загружаю {prefix} в YouTube ({acc.get('name') or 'Channel'})...")
-                title = content_data.get('selected_topic', f"New AI Video {day_str}")
+                title = content_data.get("selected_topic", f"New AI Video {day_str}")
                 desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
                 tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
 
                 try:
                     from youtube_uploader import upload_video
+
                     token_file = acc.get("token_file")
                     # If relative path, prefix with CREDENTIALS_DIR from uploader or use absolute
-                    yt_success = upload_video(video_path, title=title, description=desc_yt, tags=tags,
-                                            privacy_status="public", token_file=token_file)
+                    yt_success = upload_video(
+                        video_path,
+                        title=title,
+                        description=desc_yt,
+                        tags=tags,
+                        privacy_status="public",
+                        token_file=token_file,
+                    )
                     if yt_success:
                         agent_sync(f"🚀 YouTube ({acc.get('name')}): Успешно!")
                     else:
@@ -300,7 +321,7 @@ def run_factory_production(mode="daily"):
                 if threads_success:
                     agent_sync("🚀 Threads: Успешно опубликован!")
                 else:
-                     agent_sync("⚠️ Threads: Не удалось опубликовать (Check session)")
+                    agent_sync("⚠️ Threads: Не удалось опубликовать (Check session)")
 
                 asyncio.run(threads_bot.close())
 
@@ -309,12 +330,12 @@ def run_factory_production(mode="daily"):
                 print(f"Threads Error: {e}")
 
             if yt_success or insta_success or threads_success:
-                 mark_as_posted(content_data.get('selected_topic'), prefix, lang)
-
+                mark_as_posted(content_data.get("selected_topic"), prefix, lang)
 
     except Exception as e:
         print(f"❌ Factory Crash: {e}")
         agent_sync(f"Критическая ошибка фабрики: {e}")
+
 
 def start_scheduler():
     """Бесконечный цикл планировщика (OPTIMIZED - Время по Израилю UTC+2)"""
@@ -348,17 +369,18 @@ def start_scheduler():
         schedule.run_pending()
         time.sleep(60)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Content Farm Scheduler')
-    parser.add_argument('--hebrew', action='store_true', help='Force Hebrew weekly special')
-    parser.add_argument('--english', action='store_true', help='Force English weekly special')
-    parser.add_argument('--cartoon', action='store_true', help='Force Cartoon/Animation daily mode')
-    parser.add_argument('--auto', action='store_true', help='Detect mode based on day')
-    parser.add_argument('--scheduler', action='store_true', help='Run in infinity loop mode')
-    parser.add_argument('--longform', action='store_true', help='Force 30-min Documentary mode')
-    parser.add_argument('--longform-topic', type=str, help='Topic for documentary')
 
-    parser.add_argument('--auto-upload', action='store_true', help='Force enable auto upload')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Content Farm Scheduler")
+    parser.add_argument("--hebrew", action="store_true", help="Force Hebrew weekly special")
+    parser.add_argument("--english", action="store_true", help="Force English weekly special")
+    parser.add_argument("--cartoon", action="store_true", help="Force Cartoon/Animation daily mode")
+    parser.add_argument("--auto", action="store_true", help="Detect mode based on day")
+    parser.add_argument("--scheduler", action="store_true", help="Run in infinity loop mode")
+    parser.add_argument("--longform", action="store_true", help="Force 30-min Documentary mode")
+    parser.add_argument("--longform-topic", type=str, help="Topic for documentary")
+
+    parser.add_argument("--auto-upload", action="store_true", help="Force enable auto upload")
 
     args = parser.parse_args()
 
@@ -375,9 +397,13 @@ if __name__ == "__main__":
             print("❌ Long-form producer not available")
     else:
         mode = "daily"
-        if args.hebrew: mode = "hebrew"
-        elif args.english: mode = "english"
-        elif args.cartoon: mode = "cartoon"
-        elif args.auto: mode = "auto"
+        if args.hebrew:
+            mode = "hebrew"
+        elif args.english:
+            mode = "english"
+        elif args.cartoon:
+            mode = "cartoon"
+        elif args.auto:
+            mode = "auto"
 
         run_factory_production(mode=mode)
