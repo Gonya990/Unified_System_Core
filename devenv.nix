@@ -14,10 +14,11 @@ in
   env.LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ];
 
   # https://devenv.sh/packages/
-  # Include git, beads, and GCC's C++ runtime (libstdc++).
+  # Include git, beads, Bun (from nixpkgs-unstable), and GCC's C++ runtime (libstdc++).
   packages = [
     pkgs.git
     pkgs-unstable.beads
+    pkgs-unstable.bun
     pkgs.stdenv.cc.cc
   ];
 
