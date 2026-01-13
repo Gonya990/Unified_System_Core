@@ -10,18 +10,19 @@ import tempfile
 from pathlib import Path
 
 # Resolve absolute paths for tools to avoid B607
-FFMPEG_BIN = shutil.which("ffmpeg")
-FFPROBE_BIN = shutil.which("ffprobe")
+FFMPEG_BIN = shutil.which("ffmpeg") or "/opt/homebrew/bin/ffmpeg"
+FFPROBE_BIN = shutil.which("ffprobe") or "/opt/homebrew/bin/ffprobe"
 
 if not FFMPEG_BIN or not FFPROBE_BIN:
     raise FileNotFoundError("ffmpeg or ffprobe not found in PATH")
+
 
 def create_video_with_broll(
     avatar_video: Path,
     broll_clips: list[Path],
     output_path: Path,
     broll_interval: float = 5.0,  # Insert B-Roll every X seconds
-    broll_duration: float = 2.0   # Duration of each B-Roll clip
+    broll_duration: float = 2.0,  # Duration of each B-Roll clip
 ) -> bool:
     """
     Create video with B-Roll insertions
@@ -102,47 +103,84 @@ def create_video_with_broll(
         print(f"❌ Assembly failed: {e}")
         return False
 
+
 def get_video_duration(video_path: Path) -> float:
     """Get video duration in seconds"""
     try:
         # nosec B603: Using absolute path and list args
-        result = subprocess.run([
-            FFPROBE_BIN, "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
-            str(video_path)
-        ], capture_output=True, text=True, check=False)
+        result = subprocess.run(
+            [
+                FFPROBE_BIN,
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                str(video_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
         return float(result.stdout.strip())
     except Exception:
         return 0.0
+
 
 def trim_video(input_path: Path, output_path: Path, duration: float) -> bool:
     """Trim video to specified duration"""
     try:
         # nosec B603: Using absolute path and list args
-        subprocess.run([
-            FFMPEG_BIN, "-y", "-i", str(input_path),
-            "-t", str(duration),
-            "-c:v", "libx264", "-c:a", "aac",
-            str(output_path)
-        ], check=True, capture_output=True)
+        subprocess.run(
+            [
+                FFMPEG_BIN,
+                "-y",
+                "-i",
+                str(input_path),
+                "-t",
+                str(duration),
+                "-c:v",
+                "libx264",
+                "-c:a",
+                "aac",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
         return True
     except Exception:
         return False
+
 
 def extract_segment(input_path: Path, output_path: Path, start: float, end: float) -> bool:
     """Extract segment from video"""
     try:
         # nosec B603: Using absolute path and list args
-        subprocess.run([
-            FFMPEG_BIN, "-y", "-i", str(input_path),
-            "-ss", str(start), "-to", str(end),
-            "-c:v", "libx264", "-c:a", "aac",
-            str(output_path)
-        ], check=True, capture_output=True)
+        subprocess.run(
+            [
+                FFMPEG_BIN,
+                "-y",
+                "-i",
+                str(input_path),
+                "-ss",
+                str(start),
+                "-to",
+                str(end),
+                "-c:v",
+                "libx264",
+                "-c:a",
+                "aac",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
         return True
     except Exception:
         return False
+
 
 def concat_videos(videos: list[Path], output_path: Path) -> bool:
     """Concatenate videos using ffmpeg"""
@@ -154,18 +192,32 @@ def concat_videos(videos: list[Path], output_path: Path) -> bool:
                 f.write(f"file '{v}'\n")
 
         # nosec B603: Using absolute path and list args
-        subprocess.run([
-            FFMPEG_BIN, "-y", "-f", "concat", "-safe", "0",
-            "-i", str(concat_file),
-            "-c:v", "libx264", "-c:a", "aac",
-            str(output_path)
-        ], check=True, capture_output=True)
+        subprocess.run(
+            [
+                FFMPEG_BIN,
+                "-y",
+                "-f",
+                "concat",
+                "-safe",
+                "0",
+                "-i",
+                str(concat_file),
+                "-c:v",
+                "libx264",
+                "-c:a",
+                "aac",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
 
         concat_file.unlink()
         return True
     except Exception as e:
         print(f"Concat error: {e}")
         return False
+
 
 if __name__ == "__main__":
     ROOT_DIR = Path(__file__).parent.resolve()
