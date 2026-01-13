@@ -9,6 +9,7 @@
   **Action:** Ignore errors but do not deploy until fixed.
 - **Contact Form:** Spec sent to `VioletCastle`.
   **Rule:** Do not implement code until Spec is approved (Mail > 502).
+- **Submodule Repair:** `Projects/global1sim` redirected to `AzureBeacon`.
 - **Mail Loop:** Resolved.
   **Rule:** Never send auto-ack to subjects containing "Re:" and "Concilium".
 
@@ -23,7 +24,7 @@
 ## ⏳ Pending / Waiting
 
 - [ ] Reply from `VioletCastle` (Mail ID > 502)
-- [ ] Fix permissions for `global1sim` repo (Owner: Kostya)
+- [ ] Fix permissions for `global1sim` repo (Owner: AzureBeacon)
 
 ## 💡 Ideas / Backlog
 

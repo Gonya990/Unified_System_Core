@@ -41,7 +41,11 @@ logger = logging.getLogger("MorningBrief")
 # User Configuration with Phone Numbers
 USERS = {
     "Admin": {"telegram_id": 708531393, "phone": os.getenv("PHONE_ADMIN", ""), "name": "Igor"},
-    "Kostya": {"telegram_id": 578363419, "phone": os.getenv("PHONE_KOSTYA", ""), "name": "Kostya"},
+    "Azure": {
+        "telegram_id": 578363419,
+        "phone": os.getenv("PHONE_AZURE", os.getenv("PHONE_KOSTYA", "")),
+        "name": "Azure",
+    },
 }
 
 # Delivery Settings
