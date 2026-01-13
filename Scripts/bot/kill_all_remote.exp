@@ -12,7 +12,7 @@ expect {
 }
 
 # PVE
-spawn ssh -o StrictHostKeyChecking=no gonya@100.78.145.67 "sudo pkill -9 -f python"
+spawn ssh -o StrictHostKeyChecking=no gonya@100.74.137.122 "sudo pkill -9 -f python"
 expect {
     "password:" { send "$password\r"; exp_continue }
     eof

@@ -17,7 +17,7 @@ Manage Proxmox VMs, storage pools, and homelab infrastructure via SSH.
 | Node | IP (Tailscale) | Role |
 |------|----------------|------|
 | proxmox | 100.74.137.122 | Main Proxmox host |
-| proxmox-gpu | 100.78.145.67 | GPU-enabled Proxmox host |
+| proxmox-gpu | 100.74.137.122 | GPU-enabled Proxmox host |
 | unified-home-core-cloud | 100.110.209.49 | Main AI/automation VM (vmid 106) |
 | smart | 100.81.133.25 | Smart home services |
 
@@ -40,21 +40,21 @@ Manage Proxmox VMs, storage pools, and homelab infrastructure via SSH.
 
 ### Check VM Status
 ```bash
-ssh root@100.78.145.67 "qm status <VMID>"
-ssh root@100.78.145.67 "qm config <VMID>"
+ssh root@100.74.137.122 "qm status <VMID>"
+ssh root@100.74.137.122 "qm config <VMID>"
 ```
 
 ### Check Storage
 ```bash
-ssh root@100.78.145.67 "pvesm status"
-ssh root@100.78.145.67 "lvs <pool> --units g"
-ssh root@100.78.145.67 "df -h"
+ssh root@100.74.137.122 "pvesm status"
+ssh root@100.74.137.122 "lvs <pool> --units g"
+ssh root@100.74.137.122 "df -h"
 ```
 
 ### Check Inside VM
 ```bash
 # Via Proxmox host (needs VM's local IP)
-ssh root@100.78.145.67 "ssh user@<VM_LOCAL_IP> 'lsblk && df -h'"
+ssh root@100.74.137.122 "ssh user@<VM_LOCAL_IP> 'lsblk && df -h'"
 
 # Direct via Tailscale (if VM has Tailscale)
 ssh user@<VM_TAILSCALE_IP> "lsblk && df -h"

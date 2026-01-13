@@ -13,7 +13,7 @@ I have implemented Phase 1 (Family AI Swarm) and the foundation for Phase 2 (Har
 ### Current Implementation State
 
 1. **API Swarm**: `swarm_manager.py` is active in `AI_Core`. It rotates Gemini keys from `config/resources.yaml`.
-2. **Hardware Switching**: `proxmox_manager.py` is ready to be used by the Telegram Bot (`/play`, `/stop_play`). It uses direct SSH and `qm` commands on `100.78.145.67`.
+2. **Hardware Switching**: `proxmox_manager.py` is ready to be used by the Telegram Bot (`/play`, `/stop_play`). It uses direct SSH and `qm` commands on `100.74.137.122`.
 3. **Sentinels**: `gaming_sentinel.py` is prepared for deployment on the Windows VM to monitor idle time and notify for reclaim.
 
 ### Next for You

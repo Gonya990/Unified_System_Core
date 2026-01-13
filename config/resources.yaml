@@ -49,7 +49,7 @@ pools:
 hardware:
   pve_nodes:
     - name: "pve"
-      ip: "100.78.145.67"
+      ip: "100.74.137.122"
       vms:
         - id: 100
           name: "Igor_Gaming"

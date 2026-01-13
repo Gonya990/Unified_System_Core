@@ -26,7 +26,7 @@
 
 - **Device**: Server (Virtualization)
 - **FQDN**: `pve.myth-rudd.ts.net`
-- **Tailscale IP**: `100.78.145.67` (Active, IP Updated)
+- **Tailscale IP**: `100.74.137.122` (Active, IP Updated)
 - **Role**: Host for VMs and Containers.
 - **Components**:
   - **RAM**: ✅ **64GB Verified** (62Gi Total available).
