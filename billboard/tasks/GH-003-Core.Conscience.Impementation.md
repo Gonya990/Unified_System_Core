@@ -10,11 +10,14 @@ Lease-Until: 2026-01-20
 # Implement "System Conscience" (Governance Layer)
 
 **Objective:**
-Integrate a morality/rules engine that parses `NOTEBOOK.md` to enforce operational constraints on the Unified System controller.
+Integrate a morality/rules engine that parses `NOTEBOOK.md` to enforce
+operational constraints on the Unified System controller.
 
 ## 📝 Description
 
-The system needs a way to respect "soft rules" (like "don't deploy if broken" or "don't spam") dynamically without hardcoding them into every script. The `conscience.py` module acts as a middleware in `unified.py`.
+The system needs a way to respect "soft rules" (like "don't deploy if broken" or
+"don't spam") dynamically without hardcoding them into every script.
+The `conscience.py` module acts as a middleware in `unified.py`.
 
 ## ✅ Acceptance Criteria
 
@@ -30,5 +33,7 @@ The system needs a way to respect "soft rules" (like "don't deploy if broken" or
 
 ## 📡 REP Sensitivities
 
-* IF `NOTEBOOK.md` is missing, THEN Conscience warns but allows actions (fail-open).
-- IF `unified.py` structure changes, THEN Conscience integration must be preserved.
+- IF `NOTEBOOK.md` is missing, THEN Conscience warns but allows actions
+  (fail-open).
+- IF `unified.py` structure changes, THEN Conscience integration must be
+  preserved.
