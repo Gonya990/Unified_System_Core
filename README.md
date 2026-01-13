@@ -34,7 +34,7 @@ graph LR
 | **igor-gaming-1** | `igor-1...` | `100.78...` | Primary AI Workstation |
 | **igor-gaming** | `igor...` | `100.127...` | AI Core / GPU |
 | **MacBook-Air** | `mac...` | `100.93...` | Admin & Dev |
-| **pve** | `pve...` | `100.78.145.67` | Hypervisor |
+| **pve** | `pve...` | `100.74.137.122` | Hypervisor |
 | **iphone-15** | `iph...` | `100.86...` | Mobile |
 
 ---

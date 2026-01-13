@@ -10,7 +10,7 @@ class ProxmoxManager:
     """Orchestrates Proxmox VMs via direct SSH and qm commands."""
 
     def __init__(self):
-        self.pve_host = os.environ.get("PVE_HOST", "100.78.145.67")
+        self.pve_host = os.environ.get("PVE_HOST", "100.74.137.122")
         self.pve_user = os.environ.get("PVE_USER", "root")
 
     def _run_ssh_cmd(self, cmd):

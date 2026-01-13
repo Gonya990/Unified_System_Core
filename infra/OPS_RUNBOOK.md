@@ -5,7 +5,7 @@
 | Host | IP (Tailscale) | Role | Status Check |
 |------|----------------|------|--------------|
 | unified-home-core-cloud | 100.110.209.49 | MCP Mail Hub, Services | `ping 100.110.209.49` |
-| proxmox-gpu | 100.78.145.67 | VM Host, GPU Workloads | `ping 100.78.145.67` |
+| proxmox-gpu | 100.74.137.122 | VM Host, GPU Workloads | `ping 100.74.137.122` |
 
 ---
 
@@ -115,7 +115,7 @@ ssh gonya@100.110.209.49 "free -h && ps aux --sort=-%mem | head -10"
 ### Check Status (when reachable)
 
 ```bash
-ssh root@100.78.145.67 "hostname && uptime && pvesm status && qm list"
+ssh root@100.74.137.122 "hostname && uptime && pvesm status && qm list"
 ```
 
 ### Storage Health

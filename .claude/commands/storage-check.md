@@ -11,24 +11,24 @@ When user says `/storage-check`:
 
 ### 1. Proxmox Storage Status
 ```bash
-ssh root@100.78.145.67 "pvesm status"
+ssh root@100.74.137.122 "pvesm status"
 ```
 
 ### 2. LVM Volume Groups
 ```bash
-ssh root@100.78.145.67 "vgs --units g"
-ssh root@100.78.145.67 "lvs --units g"
+ssh root@100.74.137.122 "vgs --units g"
+ssh root@100.74.137.122 "lvs --units g"
 ```
 
 ### 3. Filesystem Usage
 ```bash
-ssh root@100.78.145.67 "df -h"
+ssh root@100.74.137.122 "df -h"
 ```
 
 ### 4. ZFS Pools (if any)
 ```bash
-ssh root@100.78.145.67 "zpool list 2>/dev/null || echo 'No ZFS pools'"
-ssh root@100.78.145.67 "zfs list 2>/dev/null || echo 'No ZFS datasets'"
+ssh root@100.74.137.122 "zpool list 2>/dev/null || echo 'No ZFS pools'"
+ssh root@100.74.137.122 "zfs list 2>/dev/null || echo 'No ZFS datasets'"
 ```
 
 ## Storage Reference

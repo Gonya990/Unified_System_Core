@@ -57,7 +57,7 @@ nodes:
 
   - id: proxmox-gpu
     name: Proxmox VE (GPU)
-    ip: 100.78.145.67
+    ip: 100.74.137.122
     type: server
     os: proxmox-ve
     services:
