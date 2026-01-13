@@ -1,15 +1,26 @@
 'use client';
 
 import { useState } from 'react';
+import { toast, Toaster } from 'sonner';
+import { createOrder, type PlanType } from '@/lib/api';
 import type { Destination } from '../data/destinations';
 
 interface LandingPageProps {
     destinations: Destination[];
 }
 
+const PLAN_LABELS: Record<PlanType, string> = {
+    explorer: 'Исследователь',
+    connector: 'Коннектор',
+    global_citizen: 'Гражданин Мира',
+};
+
 export default function LandingPage({ destinations }: LandingPageProps) {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
+    const [customerName, setCustomerName] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
+    const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
 
     const handleStartBridging = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -17,7 +28,7 @@ export default function LandingPage({ destinations }: LandingPageProps) {
         pricingSection?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const openPayment = (plan: string) => {
+    const openPayment = (plan: PlanType) => {
         setSelectedPlan(plan);
         setIsPaymentModalOpen(true);
     };
@@ -25,10 +36,54 @@ export default function LandingPage({ destinations }: LandingPageProps) {
     const closePayment = () => {
         setIsPaymentModalOpen(false);
         setSelectedPlan(null);
+        setCustomerName('');
+        setCustomerEmail('');
+        setIsSubmittingPayment(false);
+    };
+
+    const showError = (message: string) => {
+        if (typeof window !== 'undefined' && toast?.error) {
+            toast.error(message);
+        } else {
+            alert(message);
+        }
+    };
+
+    const handlePayment = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!selectedPlan) {
+            return;
+        }
+
+        if (!customerName.trim() || !customerEmail.trim()) {
+            showError('Введите имя и email для оплаты.');
+            return;
+        }
+
+        setIsSubmittingPayment(true);
+
+        try {
+            const response = await createOrder(selectedPlan, {
+                name: customerName.trim(),
+                email: customerEmail.trim(),
+            });
+
+            if (!response?.payment_url) {
+                throw new Error('Payment URL not returned.');
+            }
+
+            window.location.href = response.payment_url;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to create payment order.';
+            showError(message);
+            setIsSubmittingPayment(false);
+        }
     };
 
     return (
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-primary-foreground relative">
+            <Toaster position="top-right" richColors />
             {/* Search / Hero Section */}
             <section className="relative h-[600px] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
                 {/* Dynamic Sky Background */}
@@ -116,7 +171,7 @@ export default function LandingPage({ destinations }: LandingPageProps) {
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openPayment('Исследователь')}
+                                onClick={() => openPayment('explorer')}
                                 className="w-full py-4 rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all"
                             >
                                 Выбрать Исследователя
@@ -137,7 +192,7 @@ export default function LandingPage({ destinations }: LandingPageProps) {
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openPayment('Коннектор')}
+                                onClick={() => openPayment('connector')}
                                 className="w-full py-4 rounded-xl bg-white text-blue-600 font-bold hover:bg-gray-100 transition-all shadow-lg"
                             >
                                 Подключиться
@@ -157,7 +212,7 @@ export default function LandingPage({ destinations }: LandingPageProps) {
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openPayment('Гражданин Мира')}
+                                onClick={() => openPayment('global_citizen')}
                                 className="w-full py-4 rounded-xl border-2 border-gray-300 dark:border-gray-700 font-bold hover:border-primary hover:text-primary transition-all"
                             >
                                 Выбрать Global
@@ -183,36 +238,55 @@ export default function LandingPage({ destinations }: LandingPageProps) {
                     <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-3xl shadow-2xl p-8 relative animate-in zoom-in-95 duration-200">
                         <button
                             onClick={closePayment}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            disabled={isSubmittingPayment}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
 
-                        <h3 className="text-2xl font-bold mb-2">Подтвердить: {selectedPlan}</h3>
-                        <p className="text-gray-500 mb-8">Завершите безопасную оплату для начала.</p>
+                        <h3 className="text-2xl font-bold mb-2">
+                            Подтвердить: {selectedPlan ? PLAN_LABELS[selectedPlan] : ''}
+                        </h3>
+                        <p className="text-gray-500 mb-8">Введите имя и email, чтобы перейти к оплате.</p>
 
-                        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert('Симуляция оплаты успешна! Добро пожаловать, Костя :)'); closePayment(); }}>
+                        <form className="space-y-6" onSubmit={handlePayment}>
                             <div>
-                                <label className="block text-sm font-medium mb-2">Данные карты</label>
-                                <div className="relative">
-                                    <input type="text" placeholder="0000 0000 0000 0000" className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
-                                    <div className="absolute left-4 top-3.5 text-gray-400">💳</div>
-                                </div>
+                                <label className="block text-sm font-medium mb-2">Имя</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ваше имя"
+                                    value={customerName}
+                                    onChange={(event) => setCustomerName(event.target.value)}
+                                    disabled={isSubmittingPayment}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-70"
+                                />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Срок действия</label>
-                                    <input type="text" placeholder="MM/YY" className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">CVC</label>
-                                    <input type="text" placeholder="123" className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    value={customerEmail}
+                                    onChange={(event) => setCustomerEmail(event.target.value)}
+                                    disabled={isSubmittingPayment}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-70"
+                                />
                             </div>
 
-                            <button type="submit" className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/30">
-                                Оплатить безопасно
+                            <button
+                                type="submit"
+                                disabled={isSubmittingPayment}
+                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/30 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isSubmittingPayment ? (
+                                    <span className="inline-flex items-center justify-center gap-2">
+                                        <span className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                                        Перенаправляем...
+                                    </span>
+                                ) : (
+                                    'Перейти к оплате'
+                                )}
                             </button>
                         </form>
 
