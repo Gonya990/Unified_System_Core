@@ -70,9 +70,21 @@ bd close <id1> <id2> ...              # Close multiple at once
 bd dep add <issue> <depends-on>       # Add dependency
 bd blocked                            # Show blocked issues
 
-# Sync with remote
-bd sync                               # Run at session end
+# Sync with remote (CORRECT ORDER - avoids merge conflicts)
+bd sync --flush-only                  # 1. Export local DB → JSONL
+git add .beads/ && git commit -m "chore(beads): sync"  # 2. Commit before pull
+git pull --rebase                     # 3. Pull remote changes
+bd sync --import-only                 # 4. Import merged JSONL
+bd sync                               # 5. Final reconcile & push
+
+# If merge conflict in .beads/issues.jsonl:
+git checkout --theirs .beads/issues.jsonl  # Accept remote
+bd sync --import-only                       # Re-import
+bd sync                                     # Reconcile
 ```
+
+> ⚠️ **Key Rule:** Always commit `.beads/` changes BEFORE `git pull`. Conflicts
+> happen when you pull with uncommitted beads changes.
 
 ### Priority Levels
 
