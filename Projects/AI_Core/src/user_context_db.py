@@ -29,6 +29,19 @@ class UserContextDB:
                     created_at TIMESTAMP
                 )
             """)
+            # Migrate: Add missing columns if they don't exist
+            cursor.execute("PRAGMA table_info(users)")
+            columns = {row[1] for row in cursor.fetchall()}
+
+            if "branch_id" not in columns:
+                logger.info("Migrating: Adding branch_id column to users table")
+                cursor.execute("ALTER TABLE users ADD COLUMN branch_id TEXT DEFAULT 'HOME_HQ'")
+
+            if "role" not in columns:
+                logger.info("Migrating: Adding role column to users table")
+                cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MEMBER'")
+
+            conn.commit()
             # Events context table
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS event_contexts (
