@@ -10,6 +10,10 @@
 - **99_Archive_Original/**: Only for original structure snapshots
   (empty by default).
 
+## Communication Rules
+
+1. **Language**: Always communicate with the USER **ONLY in Russian** (@/СО МНОЙ ТОЛЬКО ПО РУССКИ***). This applies to all responses, summaries, and explanations. Technical terms can be left in English if necessary, but the primary language must be Russian.
+
 ## ROOT RULES (ROYAL DECREES)
 
 1. **The Royal 429 Protocol**: When using browser automation tools or headless
