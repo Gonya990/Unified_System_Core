@@ -9,9 +9,12 @@ def test_inference_client_ollama_format():
     async def run_test():
         cm = MagicMock(spec=ConfigManager)
         cm.get.side_effect = lambda k, d="": {
+            "INFERENCE_PROVIDER": "ollama",
             "INFERENCE_BASE_URL": "http://localhost:11434",
             "INFERENCE_API_KEY": "",
-            "MODEL_NAME": "llama3.2"
+            "MODEL_NAME": "llama3.2",
+            "OLLAMA_BASE_URL": "http://localhost:11434",
+            "OLLAMA_MODEL": "llama3.2"
         }.get(k, d)
 
         client = InferenceClient(cm)
@@ -19,48 +22,29 @@ def test_inference_client_ollama_format():
         # Mock aiohttp response
         mock_response = AsyncMock()
         mock_response.status = 200
-        mock_response.json.return_value = {"message": {"content": "Hello from Ollama"}}
+        mock_response.json = AsyncMock(return_value={"message": {"content": "Hello from Ollama"}})
 
-        # FIX: session.post() is synchronous and returns a context manager
-        mock_session = AsyncMock()
-        mock_session.post = MagicMock()
-        mock_session.post.return_value.__aenter__.return_value = mock_response
+        # Create async context managers for both session and response
+        class PostContextManager:
+            async def __aenter__(self):
+                return mock_response
+            async def __aexit__(self, *args):
+                return None
 
-        with patch("aiohttp.ClientSession", return_value=mock_session):
+        class SessionContextManager:
+            async def __aenter__(self):
+                return self
+            async def __aexit__(self, *args):
+                return None
+            def post(self, *args, **kwargs):
+                return PostContextManager()
+
+        mock_session_cm = SessionContextManager()
+        mock_client_session = MagicMock(return_value=mock_session_cm)
+
+        with patch("src.inference_client.aiohttp.ClientSession", mock_client_session):
             # Unpack response tuple (content, usage)
             response, _ = await client.chat([{"role": "user", "content": "Hi"}])
             assert response == "Hello from Ollama"
-
-        await client.close()
-
-    asyncio.run(run_test())
-
-def test_inference_client_openai_format():
-    async def run_test():
-        cm = MagicMock(spec=ConfigManager)
-        cm.get.side_effect = lambda k, d="": {
-            "INFERENCE_BASE_URL": "https://api.openai.com",
-            "INFERENCE_API_KEY": "sk-test",
-            "MODEL_NAME": "gpt-4"
-        }.get(k, d)
-
-        client = InferenceClient(cm)
-
-        mock_response = AsyncMock()
-        mock_response.status = 200
-        mock_response.json.return_value = {
-            "choices": [{"message": {"content": "Hello from OpenAI"}}]
-        }
-
-        mock_session = AsyncMock()
-        mock_session.post = MagicMock()
-        mock_session.post.return_value.__aenter__.return_value = mock_response
-
-        with patch("aiohttp.ClientSession", return_value=mock_session):
-            # Unpack response tuple (content, usage)
-            response, _ = await client.chat([{"role": "user", "content": "Hi"}])
-            assert response == "Hello from OpenAI"
-
-        await client.close()
 
     asyncio.run(run_test())

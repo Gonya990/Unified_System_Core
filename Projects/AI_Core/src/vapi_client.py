@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # Lazy import for VAPI SDK
 VAPI_AVAILABLE = False
 try:
-    from vapi import Vapi
+    from vapi_python import Vapi
 
     VAPI_AVAILABLE = True
 except ImportError:
