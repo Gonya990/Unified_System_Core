@@ -107,6 +107,12 @@ def main():
         elif cmd == "get-key":
             if len(sys.argv) > 2:
                 print(vizier.get_api_key(sys.argv[2]))
+        elif cmd == "add-key":
+            if len(sys.argv) > 4:
+                vizier.add_api_key(sys.argv[2], sys.argv[3], sys.argv[4])
+        elif cmd == "update-session":
+            if len(sys.argv) > 4:
+                vizier.update_social_session(sys.argv[2], sys.argv[3], sys.argv[4])
         elif cmd == "update-insta":
             if len(sys.argv) > 3:
                 vizier.update_social_session("instagram", sys.argv[2], sys.argv[3])
