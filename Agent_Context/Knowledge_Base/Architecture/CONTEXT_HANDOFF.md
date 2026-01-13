@@ -3,6 +3,9 @@
 > **Generated:** 2025-12-23  
 > **Purpose:** Complete system knowledge transfer for session continuity
 
+> **Redirect:** Kostya is currently operating as **AzureBeacon**. All tasks
+> assigned to Kostya should be handled by/directed to AzureBeacon.
+
 ---
 
 ## 🏠 WORKSPACE OVERVIEW

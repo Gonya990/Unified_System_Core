@@ -9,7 +9,7 @@ Lease-Until: YYYY-MM-DD # Optional
 Task-Id: GH-002
 Task-Semantic: Infrastructure.Git.Global1Sim
 Context: Infrastructure
-Owner: Kostya
+Owner: AzureBeacon
 Status: Blocked
 Lease-Until: 2026-01-20
 ---
