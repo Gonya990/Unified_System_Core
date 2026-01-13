@@ -379,3 +379,13 @@ For the next session, ensure:
 
 *This document serves as a complete knowledge transfer for Antigravity agent
 sessions. Refresh by running the documentation generation workflow.*
+
+### From `agent_mail_mashov_fix` (Mac Agent Mail & Mashov) - PARTIAL ✅
+
+```markdown
+- [x] Fix Agent Mail 403 Forbidden (RBAC remote config)
+- [x] Verify Mail Processor functionality
+- [x] Fix lint in mashov_client.py
+- [x] Update Mashov School Symbol (641001)
+- [/] Debug Mashov Login (MOE Portal flow blocked by headless detection/redirection)
+```
