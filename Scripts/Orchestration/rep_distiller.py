@@ -1,7 +1,7 @@
-import re
-import sys
 import json
+import re
 import subprocess
+import sys
 from datetime import datetime
 
 TRAILER_PATTERN = re.compile(r"^(?P<key>[a-zA-Z0-9-]+):\s*(?P<value>.+)$")

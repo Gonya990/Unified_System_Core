@@ -117,23 +117,27 @@ async function POST(request) {
     try {
         const { messages } = await request.json();
         const userMessage = messages[messages.length - 1].content;
-        // Use new Responses API with GPT-5.2
-        const response = await client.responses.create({
-            model: 'gpt-5.2',
-            input: userMessage,
-            instructions: `You are "Unified System AI" - a powerful assistant managing the Unified System infrastructure.
+        const response = await client.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+                {
+                    role: 'system',
+                    content: `You are "Unified System AI" - a powerful assistant managing the Unified System infrastructure.
 You have access to:
 - Content Factory (YouTube/Instagram/Threads automation)
-- AI Telegram Bot  
+- AI Telegram Bot
 - Family Assistant (Homework Sentinel)
 - Token Broker (API key management)
 - MCP Mail Agent (inter-agent communication)
 - ChatKit Dashboard (this interface)
 
 Be helpful, concise, and professional. Respond in the same language as the user. Use emojis sparingly for clarity.`
+                },
+                ...messages
+            ]
         });
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            message: response.output_text
+            message: response.choices[0].message.content
         });
     } catch (error) {
         console.error('Chat API Error:', error);
