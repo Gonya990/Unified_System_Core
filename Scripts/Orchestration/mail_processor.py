@@ -98,18 +98,12 @@ class ProcessorConfig:
     )
 
     # Admin Telegram Chat ID for alerts
-    telegram_chat_id: str = field(
-        default_factory=lambda: os.getenv("TELEGRAM_ADMIN_CHAT_ID", "")
-    )
-    telegram_bot_token: str = field(
-        default_factory=lambda: os.getenv("TELEGRAM_BOT_TOKEN", "")
-    )
+    telegram_chat_id: str = field(default_factory=lambda: os.getenv("TELEGRAM_ADMIN_CHAT_ID", ""))
+    telegram_bot_token: str = field(default_factory=lambda: os.getenv("TELEGRAM_BOT_TOKEN", ""))
 
     # Persistence
     processed_ids_file: str = field(
-        default_factory=lambda: os.path.join(
-            os.path.dirname(__file__), ".mail_processor_state.json"
-        )
+        default_factory=lambda: os.path.join(os.path.dirname(__file__), ".mail_processor_state.json")
     )
 
 
@@ -146,9 +140,7 @@ class MailProcessor:
         # File handler
         log_dir = os.path.join(os.path.dirname(__file__), "logs")
         os.makedirs(log_dir, exist_ok=True)
-        fh = logging.FileHandler(
-            os.path.join(log_dir, f"mail_processor_{datetime.now():%Y%m%d}.log")
-        )
+        fh = logging.FileHandler(os.path.join(log_dir, f"mail_processor_{datetime.now():%Y%m%d}.log"))
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(formatter)
         logger.addHandler(fh)
@@ -162,21 +154,43 @@ class MailProcessor:
                 with open(self.config.processed_ids_file) as f:
                     state = json.load(f)
                     self.processed_ids = set(state.get("processed_ids", []))
-                self.logger.info(
-                    f"Loaded {len(self.processed_ids)} processed message IDs"
-                )
+                self.logger.info(f"Loaded {len(self.processed_ids)} processed message IDs")
         except Exception as e:
             self.logger.warning(f"Could not load state: {e}")
 
     def _save_state(self):
-        """Persist state"""
+        """Persist state and heartbeat"""
         try:
             state = {
                 "processed_ids": list(self.processed_ids),
                 "last_updated": datetime.now().isoformat(),
+                "status": "running",
+                "pid": os.getpid(),
             }
             with open(self.config.processed_ids_file, "w") as f:
                 json.dump(state, f)
+
+            # Update a general status file for the Admin Panel
+            status_file = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "service_status.json"
+            )
+            try:
+                current_status = {}
+                if os.path.exists(status_file):
+                    with open(status_file) as f:
+                        current_status = json.load(f)
+
+                current_status["mail_processor"] = {
+                    "status": "🟢 Running",
+                    "last_poll": datetime.now().isoformat(),
+                    "processed_count": len(self.processed_ids),
+                }
+
+                with open(status_file, "w") as f:
+                    json.dump(current_status, f, indent=2)
+            except Exception as e:
+                self.logger.warning(f"Could not update service_status.json: {e}")
+
         except Exception as e:
             self.logger.error(f"Could not save state: {e}")
 
@@ -241,9 +255,7 @@ class MailProcessor:
             )
 
             if response.status_code == 200:
-                self.logger.info(
-                    f"Sent Telegram alert for message #{message.get('id')}"
-                )
+                self.logger.info(f"Sent Telegram alert for message #{message.get('id')}")
             else:
                 self.logger.error(f"Telegram API error: {response.text}")
 
@@ -271,9 +283,7 @@ class MailProcessor:
         }
 
         # Append to council log
-        council_log = os.path.join(
-            os.path.dirname(__file__), "logs", "council_messages.jsonl"
-        )
+        council_log = os.path.join(os.path.dirname(__file__), "logs", "council_messages.jsonl")
         os.makedirs(os.path.dirname(council_log), exist_ok=True)
         with open(council_log, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
@@ -307,9 +317,7 @@ class MailProcessor:
             sender = message.get("from", "Unknown")
             subject = message.get("subject", "No Subject")
 
-            self.logger.info(
-                f"Processing message #{message_id} from {sender}: {subject}"
-            )
+            self.logger.info(f"Processing message #{message_id} from {sender}: {subject}")
 
             # Detect priority
             priority = self._detect_priority(message)
@@ -326,9 +334,7 @@ class MailProcessor:
             try:
                 self.client.mark_read(message_id)
             except Exception as e:
-                self.logger.warning(
-                    f"Could not mark message #{message_id} as read: {e}"
-                )
+                self.logger.warning(f"Could not mark message #{message_id} as read: {e}")
 
             # Add to processed set
             self.processed_ids.add(message_id)
@@ -363,7 +369,8 @@ class MailProcessor:
 
             if new_count > 0:
                 self.logger.info(f"Processed {new_count} new messages")
-                self._save_state()
+
+            self._save_state()
 
         except Exception as e:
             self.logger.error(f"Error during poll: {e}")
@@ -382,9 +389,7 @@ class MailProcessor:
 
         self.logger.info(f"   Poll interval: {self.config.poll_interval_seconds}s")
         self.logger.info(f"   Council agents: {', '.join(self.config.council_agents)}")
-        self.logger.info(
-            f"   Alert keywords: {len(self.config.alert_keywords)} configured"
-        )
+        self.logger.info(f"   Alert keywords: {len(self.config.alert_keywords)} configured")
 
         try:
             while True:
@@ -415,12 +420,8 @@ def main():
         default=60,
         help="Poll interval in seconds (default: 60)",
     )
-    parser.add_argument(
-        "--once", action="store_true", help="Process once and exit (no loop)"
-    )
-    parser.add_argument(
-        "--test-alert", action="store_true", help="Send a test alert to Telegram"
-    )
+    parser.add_argument("--once", action="store_true", help="Process once and exit (no loop)")
+    parser.add_argument("--test-alert", action="store_true", help="Send a test alert to Telegram")
 
     args = parser.parse_args()
 
