@@ -14,9 +14,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from Scripts.Utilities.telegram_notifier import TelegramNotifier
-from External_Tools.nodriver import (
-    nodriver_daemon,
-)  # Optional if we want to reuse that logic, but shell curl might be easier for public pages if not blocked.
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
