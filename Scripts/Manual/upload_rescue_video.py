@@ -1,5 +1,4 @@
 import sys
-import os
 from pathlib import Path
 
 # Setup paths
@@ -9,8 +8,8 @@ SRC_DIR = FACTORY_DIR / "src"
 sys.path.append(str(SRC_DIR / "uploaders"))
 sys.path.append(str(SRC_DIR / "pipeline"))
 
-from youtube_uploader import upload_video
 from account_manager import AccountManager
+from youtube_uploader import upload_video
 
 
 def main():
