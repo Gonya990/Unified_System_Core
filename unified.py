@@ -28,6 +28,12 @@ VENV_PYTHON = ROOT_DIR / ".venv/bin/python"
 SCRIPTS_DIR = ROOT_DIR / "Scripts"
 PROJECTS_DIR = ROOT_DIR / "Projects"
 
+# Import Conscience
+sys.path.append(str(SCRIPTS_DIR))  # Ensure Scripts/ is in path
+from Core.conscience import Conscience  # noqa: E402
+
+conscience = Conscience(ROOT_DIR / "NOTEBOOK.md")
+
 # Define colors
 GREEN = "\033[92m"
 BLUE = "\033[94m"
@@ -141,6 +147,7 @@ def main_menu():
     print("4. 🌅 Family Assistant")
     print("5. 📈 Dashboard")
     print("6. 📊 Status")
+    print("7. ⚖️  Conscience")
     print("0. 🚪 Exit")
 
     choice = input(f"\n{YELLOW}Choose module: {RESET}")
@@ -150,17 +157,23 @@ def main_menu():
     elif choice == "2":
         run_mail()
     elif choice == "3":
-        run_sync()
+        if conscience.check_action("deploy status sync"):  # Example check
+            run_sync()
     elif choice == "4":
         run_brief()
     elif choice == "5":
         run_dashboard()
     elif choice == "6":
         run_status()
+    elif choice == "7":
+        conscience.state_rules()
     elif choice == "0":
         sys.exit(0)
     else:
         main_menu()
+
+
+# ================= MAIN =================
 
 
 if __name__ == "__main__":
@@ -185,6 +198,9 @@ if __name__ == "__main__":
         try:
             while True:
                 main_menu()
-                input(f"\n{BLUE}Press Enter to continue...{RESET}")
-        except KeyboardInterrupt:
+                try:
+                    input(f"\n{BLUE}Press Enter to continue...{RESET}")
+                except EOFError:
+                    break
+        except (KeyboardInterrupt, EOFError):
             print("\nGoodbye!")
