@@ -12,10 +12,19 @@ from pathlib import Path
 src_path = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
+# Check if vapi_python can be imported (it requires pyaudio which may not be available)
+try:
+    __import__('vapi_python')
+    VAPI_AVAILABLE = True
+except ImportError:
+    VAPI_AVAILABLE = False
+
 
 @pytest.fixture
 def mock_vapi_sdk():
     """Mock VAPI SDK to avoid actual dependencies."""
+    if not VAPI_AVAILABLE:
+        pytest.skip("vapi-python not available (requires pyaudio)")
     with patch("src.vapi_client.Vapi") as mock:
         yield mock
 
