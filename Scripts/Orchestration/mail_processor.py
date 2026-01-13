@@ -302,15 +302,62 @@ class MailProcessor:
             message_id = message.get("id")
             if isinstance(message_id, int):
                 try:
+                    # Translate auto-acknowledgment to Russian as requested
+                    ack_body = f"✅ **Автоматическое подтверждение (MailProcessor)**\n\nСообщение получено в {datetime.now():%Y-%m-%d %H:%M:%S Z}"
                     self.client.reply(
                         message_id=message_id,
-                        body_md=f"✅ **Auto-Acknowledged by MailProcessor**\n\nMessage received at {datetime.now():%Y-%m-%d %H:%M:%S Z}",
+                        body_md=ack_body,
                     )
                     self.logger.info(f"Auto-acknowledged message #{message_id}")
                 except Exception as e:
                     self.logger.error(f"Failed to auto-acknowledge: {e}")
             else:
                 self.logger.warning("Cannot auto-acknowledge message without int id")
+
+        # Parse for specific instructions/approvals
+        self._parse_council_instructions(message)
+
+    def _parse_council_instructions(self, message: dict[str, Any]):
+        """Parse council messages for specific commands or approvals"""
+        sender = message.get("from", "Unknown")
+        body = (message.get("body_md") or message.get("body") or "").lower()
+        subject = (message.get("subject") or "").lower()
+
+        # Keywords for approval/actions
+        approvals = ["approved", "одобрено", "подтверждаю", "confirm", "approve"]
+        rejections = ["rejected", "отклонено", "отмена", "deny", "reject"]
+
+        instruction_found = False
+        action = None
+
+        if any(kw in body or kw in subject for kw in approvals):
+            action = "APPROVED"
+            instruction_found = True
+        elif any(kw in body or kw in subject for kw in rejections):
+            action = "REJECTED"
+            instruction_found = True
+
+        if instruction_found:
+            instruction_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "from": sender,
+                "action": action,
+                "subject": message.get("subject"),
+                "message_id": message.get("id"),
+                "content": body[:500],
+            }
+
+            # Save to instructions log
+            instr_log = os.path.join(os.path.dirname(__file__), "logs", "council_instructions.jsonl")
+            with open(instr_log, "a") as f:
+                f.write(json.dumps(instruction_entry) + "\n")
+
+            self.logger.info(f"🎯 Council Instruction Detected: {action} from {sender}")
+
+            # If it's an approval for the pending Spec 502, we could potentially update NOTEBOOK.md
+            if "502" in body or "502" in subject:
+                self.logger.info("🚀 Approval for Spec 502 detected! Triggering notebook update...")
+                # Note: Actual notebook update logic can be added here or handled by another script watching this log
 
     def process_message(self, message: dict[str, Any]) -> bool:
         """Process a single message. Returns True if processed successfully."""

@@ -9,12 +9,35 @@ import subprocess  # nosec B404
 import tempfile
 from pathlib import Path
 
-# Resolve absolute paths for tools to avoid B607
-FFMPEG_BIN = shutil.which("ffmpeg") or "/opt/homebrew/bin/ffmpeg"
-FFPROBE_BIN = shutil.which("ffprobe") or "/opt/homebrew/bin/ffprobe"
+import os
+
+
+# Resolve absolute paths for tools to avoid binary not found errors
+def get_binary_path(name, fallbacks):
+    # 1. Check PATH
+    path = shutil.which(name)
+    if path:
+        return path
+    # 2. Check Fallbacks
+    for fb in fallbacks:
+        if os.path.exists(fb):
+            return fb
+    return None
+
+
+COMMON_FFMPEG_PATHS = ["/opt/homebrew/bin/ffmpeg", "/usr/local/bin/ffmpeg", "/usr/bin/ffmpeg", "/bin/ffmpeg"]
+
+COMMON_FFPROBE_PATHS = ["/opt/homebrew/bin/ffprobe", "/usr/local/bin/ffprobe", "/usr/bin/ffprobe", "/bin/ffprobe"]
+
+FFMPEG_BIN = get_binary_path("ffmpeg", COMMON_FFMPEG_PATHS)
+FFPROBE_BIN = get_binary_path("ffprobe", COMMON_FFPROBE_PATHS)
 
 if not FFMPEG_BIN or not FFPROBE_BIN:
-    raise FileNotFoundError("ffmpeg or ffprobe not found in PATH")
+    error_msg = (
+        f"ffmpeg or ffprobe not found. FFMPEG: {FFMPEG_BIN}, FFPROBE: {FFPROBE_BIN}. Checked PATH and common locations."
+    )
+    print(f"❌ {error_msg}")
+    raise FileNotFoundError(error_msg)
 
 
 def create_video_with_broll(
