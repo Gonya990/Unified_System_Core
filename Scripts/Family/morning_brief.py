@@ -1,4 +1,3 @@
-
 import asyncio
 import logging
 import os
@@ -14,9 +13,9 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 FAMILY_DIR = Path(__file__).resolve().parent
 sys.path.append(str(ROOT_DIR))
 
-# Load both AI_Core and Family environment configurations
+# Load both AI_Core and main environment configurations
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
-load_dotenv(FAMILY_DIR / ".env")
+load_dotenv(ROOT_DIR / ".env")
 
 # Import VAPIClient for voice delivery
 VAPI_AVAILABLE = False
@@ -34,33 +33,23 @@ LOG_DIR = ROOT_DIR / "logs/family"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_DIR / "morning_brief.log"),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(LOG_DIR / "morning_brief.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger("MorningBrief")
 
 # User Configuration with Phone Numbers
 USERS = {
-    "Admin": {
-        "telegram_id": 708531393,
-        "phone": os.getenv("PHONE_ADMIN", ""),
-        "name": "Igor"
-    },
-    "Kostya": {
-        "telegram_id": 578363419,
-        "phone": os.getenv("PHONE_KOSTYA", ""),
-        "name": "Kostya"
-    }
+    "Admin": {"telegram_id": 708531393, "phone": os.getenv("PHONE_ADMIN", ""), "name": "Igor"},
+    "Kostya": {"telegram_id": 578363419, "phone": os.getenv("PHONE_KOSTYA", ""), "name": "Kostya"},
 }
 
 # Delivery Settings
 ENABLE_VOICE = os.getenv("BRIEF_ENABLE_VOICE", "false").lower() == "true"
 ENABLE_TELEGRAM = os.getenv("BRIEF_ENABLE_TELEGRAM", "true").lower() == "true"
 
-def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
+
+def get_weather(lat=32.08, lon=34.78):  # Tel Aviv by default
     """Fetch real weather from OpenMeteo"""
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
@@ -76,6 +65,7 @@ def get_weather(lat=32.08, lon=34.78): # Tel Aviv by default
         logger.error(f"Weather error: {e}")
         return "Unavailable"
 
+
 async def get_homework_summary():
     """Fetch homework from Sentinel + Mashov"""
     report = []
@@ -83,6 +73,7 @@ async def get_homework_summary():
     # 1. Gmail Sentinel
     try:
         from Scripts.Family.homework_sentinel import scan_mailbox, summarize_tasks
+
         emails = scan_mailbox()
         if emails:
             gmail_summary = summarize_tasks(emails)
@@ -93,51 +84,56 @@ async def get_homework_summary():
         logger.error(f"Sentinel error: {e}")
         report.append(f"📧 Ошибка Sentinel: {e}")
 
-    # 2. Mashov (if configured)
+    # 2. Mashov/Webtop (School Data)
     try:
-        from Projects.AI_Core.src.mashov_client import MashovClient
+        # Check for WEBTOP_TOKEN first as it supersedes Mashov credentials
+        webtop_token = os.getenv("WEBTOP_TOKEN")
+        if webtop_token:
+            from Projects.AI_Core.src.webtop_client import WebtopClient
 
-        user = os.getenv("MASHOV_USER")
-        pwd = os.getenv("MASHOV_PASS")
-        school = os.getenv("MASHOV_SCHOOL")
+            webtop = WebtopClient(webtop_token)
+            if webtop.check_auth():
+                hw = webtop.fetch_homework() or []
+                grades = webtop.fetch_grades() or []
 
-        if user and pwd and school and school != "0":
-            # Initialize Mashov client
-            mashov = MashovClient(
-                username=user,
-                password=pwd,
-                school_id=int(school)
-            )
+                summary_lines = []
+                if hw:
+                    summary_lines.append(f"📚 {len(hw)} заданий в Webtop")
+                if grades:
+                    summary_lines.append(f"📊 {len(grades)} новых оценок")
 
-            if not mashov.is_valid():
-                logger.warning("[MASHOV] Invalid configuration in morning_brief")
-                report.append("🏫 Mashov: Ошибка конфигурации")
+                if not hw and not grades:
+                    summary_lines.append("✅ Нет новых заданий или оценок")
+
+                report.append(f"🏫 **Школа (Webtop):**\n" + "\n".join(summary_lines))
             else:
-                # Attempt login
-                login_ok = await mashov.login()
-                if login_ok:
+                report.append("🏫 Webtop: Ошибка авторизации (Token expired?)")
+
+        else:
+            # Fallback to legacy Mashov
+            from Projects.AI_Core.src.mashov_client import MashovClient
+
+            user = os.getenv("MASHOV_USER")
+            pwd = os.getenv("MASHOV_PASS")
+            school = os.getenv("MASHOV_SCHOOL")
+
+            if user and pwd and school and school != "0":
+                mashov = MashovClient(username=user, password=pwd, school_id=int(school))
+                if await mashov.login():
                     student_id = mashov.get_student_id()
                     if student_id:
                         hw = await mashov.fetch_homework(student_id)
-                        if hw:
-                            report.append(f"🏫 **Mashov:** {len(hw)} заданий в ожидании")
-                        else:
-                            report.append("🏫 Mashov: Нет активных заданий")
+                        report.append(f"🏫 **Mashov:** {len(hw) if hw else 0} заданий")
                     else:
-                        logger.warning("[MASHOV] Could not extract student ID in morning_brief")
-                        report.append("🏫 Mashov: Ошибка получения данных ученика")
+                        report.append("🏫 Mashov: Ошибка получения ID")
                 else:
-                    logger.warning("[MASHOV] Login failed in morning_brief")
-                    report.append("🏫 Mashov: Ошибка входа (проверьте учетные данные)")
-        else:
-            logger.debug("[MASHOV] Mashov not configured in morning_brief (silent)")
+                    report.append("🏫 Mashov: Ошибка входа")
+            else:
+                logger.debug("[SCHOOL] No school credentials configured")
 
-    except ImportError as e:
-        logger.error(f"[MASHOV] Import error in morning_brief: {e}")
-        report.append("🏫 Mashov: Ошибка импорта модуля")
     except Exception as e:
-        logger.error(f"[MASHOV] Error in morning_brief: {e}")
-        report.append("🏫 Mashov: Ошибка подключения")
+        logger.error(f"[SCHOOL] Integration error: {e}")
+        report.append(f"🏫 Школа: Ошибка {str(e)}")
 
     return "\n\n".join(report)
 
@@ -150,7 +146,14 @@ async def send_voice_brief(vapi_client: "VAPIClient", phone: str, name: str, mes
 
     try:
         # Convert text brief to natural speech format (remove Markdown)
-        speech_message = message.replace("**", "").replace("*", "").replace("🌅", "").replace("🌡️", "").replace("📚", "").replace("🚀", "")
+        speech_message = (
+            message.replace("**", "")
+            .replace("*", "")
+            .replace("🌅", "")
+            .replace("🌡️", "")
+            .replace("📚", "")
+            .replace("🚀", "")
+        )
 
         # Create system prompt for voice assistant
         system_prompt = (
@@ -158,10 +161,7 @@ async def send_voice_brief(vapi_client: "VAPIClient", phone: str, name: str, mes
             f"Read the following information clearly in Russian to {name}: {speech_message}"
         )
 
-        call_info = await vapi_client.create_phone_call(
-            phone_number=phone,
-            system_message=system_prompt
-        )
+        call_info = await vapi_client.create_phone_call(phone_number=phone, system_message=system_prompt)
 
         if call_info:
             call_id = call_info.get("id", "unknown")
@@ -181,20 +181,34 @@ async def send_brief():
 
     # Date in Russian manually to avoid locale issues on minimal envs
     now = datetime.now()
-    months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
-              'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
-    weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+    months = [
+        "Января",
+        "Февраля",
+        "Марта",
+        "Апреля",
+        "Мая",
+        "Июня",
+        "Июля",
+        "Августа",
+        "Сентября",
+        "Октября",
+        "Ноября",
+        "Декабря",
+    ]
+    weekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
 
-    date_str = f"{weekdays[now.weekday()]}, {now.day} {months[now.month-1]} {now.year}"
+    date_str = f"{weekdays[now.weekday()]}, {now.day} {months[now.month - 1]} {now.year}"
 
     weather = get_weather()
     # news = get_news_summary() # Keep mock or remove if irrelevant
     homework = await get_homework_summary()
 
-    message = f"🌅 **Утренняя Сводка** | {date_str}\n\n" \
-              f"🌡️ **Погода:** {weather}\n\n" \
-              f"📚 **Школа и Задачи:**\n{homework}\n\n" \
-              f"🚀 **Хорошего дня!**"
+    message = (
+        f"🌅 **Утренняя Сводка** | {date_str}\n\n"
+        f"🌡️ **Погода:** {weather}\n\n"
+        f"📚 **Школа и Задачи:**\n{homework}\n\n"
+        f"🚀 **Хорошего дня!**"
+    )
 
     logger.info(f"Brief Content:\n{message}")
 
@@ -249,6 +263,7 @@ async def send_brief():
                     logger.info(f"Voice brief sent to {name}")
             else:
                 logger.info(f"No phone number for {name}, skipping voice delivery")
+
 
 if __name__ == "__main__":
     asyncio.run(send_brief())

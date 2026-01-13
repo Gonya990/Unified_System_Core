@@ -10,8 +10,8 @@
 ## Phase 2: Mashov Integration & Debugging <!-- id: 200 -->
 
 - [x] Authenticate with Mashov using cookie session <!-- id: 201 -->
-- [/] Resolve School ID ambiguity (Psagot Carmiel) <!-- id: 202 --> <!-- CURRENT FOCUS -->
-- [ ] Resume homework and grade extraction <!-- id: 203 -->
+- [x] Resolve School ID ambiguity (Psagot Carmiel 244285) <!-- id: 202 -->
+- [/] Resume homework and grade extraction (via Webtop) <!-- id: 203 --> <!-- CURRENT FOCUS -->
 
 ## Phase 3: System Maintenance <!-- id: 300 -->
 
