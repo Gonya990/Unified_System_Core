@@ -17,6 +17,7 @@ in
   # Include git, beads, Bun (from nixpkgs-unstable), and GCC's C++ runtime (libstdc++).
   packages = [
     pkgs.git
+    pkgs.ast-grep
     pkgs-unstable.beads
     pkgs-unstable.bun
     pkgs.stdenv.cc.cc
