@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import json
 import os
 import random
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -24,12 +26,23 @@ for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
 
-import asyncio  # noqa: E402
-import subprocess  # noqa: E402
 
 from account_manager import AccountManager  # noqa: E402
-from daily_researcher import generate_vision_assets, run_daily_research, translate_to_english, translate_to_hebrew  # noqa: E402
-from insta_uploader import upload_reel  # noqa: E402
+from daily_researcher import (  # noqa: E402
+    generate_vision_assets,
+    run_daily_research,
+    translate_to_english,
+    translate_to_hebrew,
+)
+
+try:
+    from insta_uploader import upload_reel  # noqa: E402
+
+    INSTA_ENABLED = True
+except ImportError:
+    INSTA_ENABLED = False
+    print("⚠️ Instagram uploader not available")
+
 from orchestrator_v3_no_face import run_no_face_pipeline  # noqa: E402
 from threads_browser import ThreadsBrowser  # noqa: E402
 
@@ -169,7 +182,7 @@ def generate_english_content(russian_content):
     }
 
 
-def run_factory_production(mode="daily"):
+def run_factory_production(mode="daily", manual_topic=None, manual_outline=None, style_override=None):
     day_str = datetime.now().strftime("%Y-%m-%d")
 
     # Auto-detect mode based on day if not specified
@@ -183,21 +196,30 @@ def run_factory_production(mode="daily"):
             mode = "daily"
 
     print(f"🏭 RUN: {day_str} | MODE: {mode.upper()}")
+    if manual_topic:
+        print(f"💡 Using Manual Topic: {manual_topic}")
 
     # PHASE 1. RESEARCH
     agent_sync(f"🔍 Запускаю исследование (Mode: {mode})...")
 
-    style = "cartoon" if mode == "cartoon" else "impact"
+    # Determine style (override > mode-based > default)
+    if style_override:
+        style = style_override
+    else:
+        style = "cartoon" if mode == "cartoon" else "impact"
+
+    print(f"🎨 Visual Style: {style.upper()}")
 
     try:
-        content_data = run_daily_research(style=style)
+        content_data = run_daily_research(style=style, manual_topic=manual_topic, manual_outline=manual_outline)
+
         if not content_data:
             agent_sync("Исследование не дало результатов, использую Fallback")
             content_data = get_static_fallback()
 
-        # Uniqueness check
+        # Uniqueness check (skip if manual topic is provided)
         topic = content_data.get("selected_topic", "")
-        if is_already_posted(topic):
+        if not manual_topic and is_already_posted(topic):
             agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
             content_data = run_daily_research()  # Retry once
             if not content_data or is_already_posted(content_data.get("selected_topic", "")):
@@ -258,20 +280,25 @@ def run_factory_production(mode="daily"):
             acc_manager = AccountManager()
             insta_accounts = acc_manager.get_accounts("instagram")
 
-            for acc in insta_accounts:
-                agent_sync(f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})...")
-                caption = content_data.get("description", f"New AI vision: {content_data.get('selected_topic', '')}")
+            # Define caption common for all platforms
+            caption = content_data.get("description", f"New AI vision: {content_data.get('selected_topic', '')}")
 
-                try:
-                    # Respect action delay
-                    time.sleep(INSTA_ACTION_DELAY)
-                    insta_success = upload_reel(str(video_path), caption, session_id=acc.get("session_id"))
-                    if insta_success:
-                        agent_sync(f"🚀 Instagram ({acc.get('username')}): Успешно!")
-                    else:
-                        agent_sync(f"❌ Instagram ({acc.get('username')}): Ошибка")
-                except Exception as e:
-                    agent_sync(f"❌ Instagram Exception: {e}")
+            if INSTA_ENABLED:
+                for acc in insta_accounts:
+                    agent_sync(f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})...")
+
+                    try:
+                        # Respect action delay
+                        time.sleep(INSTA_ACTION_DELAY)
+                        insta_success = upload_reel(str(video_path), caption, session_id=acc.get("session_id"))
+                        if insta_success:
+                            agent_sync(f"🚀 Instagram ({acc.get('username')}): Успешно!")
+                        else:
+                            agent_sync(f"❌ Instagram ({acc.get('username')}): Ошибка")
+                    except Exception as e:
+                        agent_sync(f"❌ Instagram Exception: {e}")
+            else:
+                agent_sync("⚠️ Пропуск Instagram (модуль отключен)")
 
             # 5.2 YouTube (Multi-channel)
             yt_accounts = acc_manager.get_accounts("youtube")
@@ -381,6 +408,13 @@ if __name__ == "__main__":
     parser.add_argument("--longform-topic", type=str, help="Topic for documentary")
 
     parser.add_argument("--auto-upload", action="store_true", help="Force enable auto upload")
+    parser.add_argument(
+        "--style", type=str, choices=["impact", "cartoon", "sketch", "painting"], help="Force visual style"
+    )
+    parser.add_argument("--inspiration-topic", type=str, help="Manually provided topic from YouTube Inspiration Tab")
+    parser.add_argument(
+        "--inspiration-outline", type=str, help="Manually provided outline from YouTube Inspiration Tab"
+    )
 
     args = parser.parse_args()
 
@@ -406,4 +440,9 @@ if __name__ == "__main__":
         elif args.auto:
             mode = "auto"
 
-        run_factory_production(mode=mode)
+        run_factory_production(
+            mode=mode,
+            manual_topic=args.inspiration_topic,
+            manual_outline=args.inspiration_outline,
+            style_override=args.style,
+        )
