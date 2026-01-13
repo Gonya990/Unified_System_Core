@@ -5,12 +5,16 @@
 
 ## Summary
 
-Successfully updated the YouTube API token for the new brand account and proceeded with Mashov authentication debugging. Synchronized system status and tasks.
+Successfully updated the YouTube API token for the new brand account and
+proceeded with Mashov authentication debugging. Synchronized system status and
+tasks.
 
 ## Changes Made
 
-1. **Projects/AI_Core/src/google_auth.py**: Updated to handle new YouTube token flow.
-2. **Scripts/Maintenance/Diagnostics/finalize_youtube_brand.py**: Created script to finalize the token exchange and verification.
+1. **Projects/AI_Core/src/google_auth.py**: Updated to handle new YouTube token
+   flow.
+2. **Scripts/Maintenance/Diagnostics/finalize_youtube_brand.py**: Created script
+   to finalize the token exchange and verification.
 3. **Mashov/Webtop Integration**:
     - Discovered that Psagot Carmiel uses Webtop (SmartSchool) instead of Mashov.
     - Confirmed School ID: 244285.
