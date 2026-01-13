@@ -271,9 +271,18 @@ class MailProcessor:
         self.logger.info(f"📋 Council message from {sender}: {subject}")
 
         # CIRCUIT BREAKER: Avoid infinite ack loops
+        # 1. Ignore if body contains auto-ack signature
         if "Auto-Acknowledged by MailProcessor" in body or "Auto-Acknowledged" in body:
             self.logger.info(f"Skipping auto-response to auto-ack from {sender}")
             return
+
+        # 2. Ignore replies to our own threads if no new content (dumb heuristic)
+        if subject.startswith("Re:") and "Concilium" in subject:
+            # Check if this is just a ping-pong.
+            # For now, let's just Log it but NOT reply to avoid the storm.
+            self.logger.warning(f"⚠️ POTENTIAL LOOP DETECTED from {sender}. Skipping Auto-Ack.")
+            return
+
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "from": sender,
