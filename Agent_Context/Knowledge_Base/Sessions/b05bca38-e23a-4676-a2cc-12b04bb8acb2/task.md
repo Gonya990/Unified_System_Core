@@ -18,5 +18,5 @@
 
 - [x] Sync Agent Mail inbox <!-- id: 301 -->
 - [x] Sync Task Board (Beads) <!-- id: 302 -->
-- [ ] Perform Vibranium Full Sync <!-- id: 303 -->
-- [ ] Autosave and push changes <!-- id: 304 -->
+- [x] Perform Vibranium Full Sync <!-- id: 303 -->
+- [x] Autosave and push changes <!-- id: 304 -->
