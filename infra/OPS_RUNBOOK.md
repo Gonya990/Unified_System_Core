@@ -121,21 +121,21 @@ ssh root@100.74.137.122 "hostname && uptime && pvesm status && qm list"
 ### Storage Health
 
 ```bash
-ssh root@100.78.145.67 "pvesm status && df -h && lvs --units g"
+ssh root@100.74.137.122 "pvesm status && df -h && lvs --units g"
 ```
 
 ### VM Management
 
 ```bash
 # List VMs
-ssh root@100.78.145.67 "qm list"
+ssh root@100.74.137.122 "qm list"
 
 # Start/Stop VM
-ssh root@100.78.145.67 "qm start 106"
-ssh root@100.78.145.67 "qm stop 106"
+ssh root@100.74.137.122 "qm start 106"
+ssh root@100.74.137.122 "qm stop 106"
 
 # VM config
-ssh root@100.78.145.67 "qm config 106"
+ssh root@100.74.137.122 "qm config 106"
 ```
 
 ---
