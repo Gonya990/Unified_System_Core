@@ -85,3 +85,9 @@
 2026-01-13 14:11:54 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
 2026-01-13 14:11:54 - MailProcessor - INFO -    Alert keywords: 29 configured
 2026-01-13 14:18:00 - MailProcessor - WARNING - Mail server not available, skipping poll
+2026-01-13 18:37:30 - MailProcessor - INFO - Loaded 271 processed message IDs
+2026-01-13 18:37:30 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-13 18:37:36 - MailProcessor - INFO - ✅ Registered as agent: PinkLake (ID: 3)
+2026-01-13 18:37:36 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-13 18:37:36 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-13 18:37:36 - MailProcessor - INFO -    Alert keywords: 29 configured

@@ -23,11 +23,15 @@ ROOT_DIR = PROJECTS_DIR.parent  # Unified_System (Root)
 for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
     sys.path.append(str(SRC_DIR / d))
 
+# Add Utilities to path
+sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
+
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
 
 
 from account_manager import AccountManager  # noqa: E402
+from telegram_notifier import send_telegram_message  # noqa: E402
 from daily_researcher import (  # noqa: E402
     generate_vision_assets,
     run_daily_research,
@@ -70,18 +74,23 @@ INSTA_ACTION_DELAY = 90  # Seconds between Instagram operations (safer)
 
 
 def agent_sync(msg):
-    """Синхронизация с агентом Кости (VioletCastle) через MCP"""
+    """Синхронизация с агентом Кости (VioletCastle) через MCP и уведомление в Telegram"""
     try:
+        # Sync via MCP Agent Mail
         sync_script = ROOT_DIR / "Scripts/Orchestration/sync_agent.py"
         env = os.environ.copy()
-        # Ensure AGENT_MAIL_TOKEN is passed if not in env
         if "AGENT_MAIL_TOKEN" not in env:
             env["AGENT_MAIL_TOKEN"] = "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
 
         subprocess.run(["python3", str(sync_script), msg], capture_output=True, text=True, env=env)
         print(f"🔄 Agent Sync: {msg[:50]}...")
+
+        # Also notify via Telegram
+        telegram_msg = f"🏭 **Factory Status:** {msg}"
+        send_telegram_message(telegram_msg)
+
     except Exception as e:
-        print(f"⚠️ Sync Error: {e}")
+        print(f"⚠️ Sync/Notification Error: {e}")
 
 
 def load_history():
