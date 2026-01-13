@@ -1,16 +1,16 @@
+
 from agno.agent import Agent
-from agno.models.openai import OpenAIChat
 from agno.models.google import Gemini
+from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGo
 from dotenv import load_dotenv
-import os
 
 # Load keys from .env
 load_dotenv()
 
 def test_agno_providers():
     print("🚀 Testing Agno Multi-Provider Abstraction\n")
-    
+
     # 1. OpenAI Agent
     print("--- 🤖 Provider: OpenAI ---")
     openai_agent = Agent(

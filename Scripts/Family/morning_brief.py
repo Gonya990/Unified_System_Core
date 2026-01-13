@@ -134,10 +134,10 @@ async def get_homework_summary():
 
     except ImportError as e:
         logger.error(f"[MASHOV] Import error in morning_brief: {e}")
-        report.append(f"🏫 Mashov: Ошибка импорта модуля")
+        report.append("🏫 Mashov: Ошибка импорта модуля")
     except Exception as e:
         logger.error(f"[MASHOV] Error in morning_brief: {e}")
-        report.append(f"🏫 Mashov: Ошибка подключения")
+        report.append("🏫 Mashov: Ошибка подключения")
 
     return "\n\n".join(report)
 

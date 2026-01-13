@@ -1,10 +1,10 @@
+import json
 import logging
 import os
 import sys
 from pathlib import Path
 
 import requests
-import json
 
 # Setup Paths
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
