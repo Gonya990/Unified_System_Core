@@ -49,6 +49,15 @@ We are moving from a set of scripts to a robust **Engineering System** where:
 - [ ] **Backfill:** Create Billboard tasks for active work (e.g., "Fix
     YouTube Uploads").
 
+### Phase 4: Knowledge & Grounding (Vertex AI) 📚
+
+- [ ] **Vertex AI Search:** Index documentation and project logs for static
+    grounding.
+- [ ] **Unified Function Calling:** Standardize system APIs (MCP, HomeAssistant)
+    into Vertex Function schemas.
+- [ ] **Grounding Gate:** Implement a check where agent actions are verified
+    against the Knowledge Base.
+
 ---
 
 ## 📐 Architecture Specs
@@ -71,7 +80,8 @@ We are moving from a set of scripts to a robust **Engineering System** where:
 
     ```text
     Task-Id: GH-101
-    REP-Sensitivity: IF YouTube API quota limit drops THEN switch to daily-only uploads BECAUSE quota is shared.
+    REP-Sensitivity: IF YouTube API quota limit drops THEN switch to daily-only
+    uploads BECAUSE quota is shared.
     REP-Variables: quota, api_policy
     ```
 
