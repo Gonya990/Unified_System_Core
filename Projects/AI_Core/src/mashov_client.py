@@ -8,8 +8,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Any, Optional
 
 import requests
 
@@ -154,7 +153,7 @@ class MashovClient:
             logger.error(f"[MASHOV] Login sync error: {e}")
             return False
 
-    async def fetch_homework(self, user_id: str) -> Optional[List[Dict[str, Any]]]:
+    async def fetch_homework(self, user_id: str) -> Optional[list[dict[str, Any]]]:
         """
         Fetch pending homework assignments.
 
@@ -183,7 +182,7 @@ class MashovClient:
             logger.error(f"[MASHOV] Homework fetch error: {e}")
             return None
 
-    def _fetch_homework_sync(self, user_id: str) -> Optional[List[Dict]]:
+    def _fetch_homework_sync(self, user_id: str) -> Optional[list[dict]]:
         """Synchronous homework fetch."""
         try:
             if not self.session:
@@ -208,7 +207,7 @@ class MashovClient:
             logger.error(f"[MASHOV] Homework sync error: {e}")
             return None
 
-    async def fetch_grades(self, user_id: str) -> Optional[List[Dict[str, Any]]]:
+    async def fetch_grades(self, user_id: str) -> Optional[list[dict[str, Any]]]:
         """
         Fetch student grades.
 
@@ -237,7 +236,7 @@ class MashovClient:
             logger.error(f"[MASHOV] Grades fetch error: {e}")
             return None
 
-    def _fetch_grades_sync(self, user_id: str) -> Optional[List[Dict]]:
+    def _fetch_grades_sync(self, user_id: str) -> Optional[list[dict]]:
         """Synchronous grades fetch."""
         try:
             if not self.session:
@@ -302,7 +301,7 @@ class MashovClient:
             logger.info(f"[MASHOV] Invalidated cache for {username}")
 
     @staticmethod
-    async def find_school(query: str) -> List[Dict[str, Any]]:
+    async def find_school(query: str) -> list[dict[str, Any]]:
         """
         Search for schools by name.
 
@@ -323,7 +322,7 @@ class MashovClient:
             return []
 
     @staticmethod
-    def _find_school_sync(query: str) -> List[Dict]:
+    def _find_school_sync(query: str) -> list[dict]:
         """Synchronous school search."""
         try:
             response = requests.get(
