@@ -173,6 +173,7 @@ Each conversation folder may contain:
 
 ```markdown
 - [x] Fetch Agent Mail inbox and sync Beads (US-l54)
+- [x] Mashov/Webtop Integrated (Auth + Client)
 - [/] Execute /update-progress workflow <!-- CURRENT FOCUS -->
 - [ ] Execute /sync (Vibranium Full Sync)
 - [ ] Execute /autosave workflow
