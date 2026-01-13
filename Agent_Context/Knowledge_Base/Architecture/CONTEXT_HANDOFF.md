@@ -67,6 +67,7 @@
 | `2026-01-12_...` | **Sync Cycle** | ✅ Done | task.md, walkthrough |
 | `2026-01-12_...` | **Comm CLI** | ✅ Done | task.md, walkthrough |
 | `b05bca38-e2...` | **System Sync & Youtube** | ✅ Done | task.md, walkthrough |
+| `75f5a657-2d...` | **Clockwork Governance** | 🔄 InPrg | task.md, walkthrough, conscience.py |
 <!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
@@ -398,5 +399,16 @@ sessions. Refresh by running the documentation generation workflow.*
 - [x] Verify Mail Processor functionality
 - [x] Fix lint in mashov_client.py
 - [x] Update Mashov School Symbol (641001)
-- [/] Debug Mashov Login (MOE Portal flow blocked by headless detection/redirection)
+- [ ] Debug Mashov Login (MOE Portal flow blocked by headless detection/redirection)
+```
+
+### From `75f5a657` (Clockwork Governance) - IN PROGRESS 🔄
+
+```markdown
+- [x] Fix MailProcessor Auto-Ack Loop (Mail ID > 502)
+- [x] Implement Conscience module (`conscience.py`)
+- [x] Integrate Conscience into `unified.py`
+- [x] Create Billboard tasks GH-002, GH-003, GH-004
+- [/] Wait for VioletCastle feedback on Contact Form
+- [ ] Implement Vertex AI Search grounding (POC)
 ```
