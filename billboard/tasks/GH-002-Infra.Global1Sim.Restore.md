@@ -14,8 +14,7 @@ Status: Blocked
 Lease-Until: 2026-01-20
 ---
 
-Restore Global1Sim Submodule Access
-====================================
+# Restore Global1Sim Submodule Access
 
 **Objective:**
 Fix the `Repository not found` error for `Projects/global1sim` which is causing
