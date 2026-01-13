@@ -1,9 +1,9 @@
 import asyncio
 import os
-import sys
 from pathlib import Path
-from playwright.async_api import async_playwright
+
 from dotenv import load_dotenv
+from playwright.async_api import async_playwright
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(ROOT_DIR / ".env")
@@ -11,7 +11,7 @@ load_dotenv(ROOT_DIR / ".env")
 async def login_edu_portal():
     user = os.getenv("MASHOV_USER")
     pwd = os.getenv("MASHOV_PASS")
-    
+
     if not user or not pwd:
         print("❌ Credentials missing in .env")
         return
@@ -23,19 +23,19 @@ async def login_edu_portal():
             user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
         page = await context.new_page()
-        
+
         # Direct link to Edu Login
         url = "https://web.mashov.info/api/login/mni/students"
         print(f"🔗 Navigating to {url}...")
         await page.goto(url)
-        
+
         await page.wait_for_timeout(5000)
-        
+
         print(f"📍 URL: {page.url}")
-        
+
         if "idp.edu.gov.il" in page.url or "Hizdaot" in page.url:
             print("🔑 Login page detected. Entering credentials...")
-            
+
             # Switch to password tab
             try:
                 # Text usually contains "סיסמה"
@@ -63,19 +63,19 @@ async def login_edu_portal():
                     await page.screenshot(path="login_error.png")
                     await browser.close()
                     return
-            
+
             print("⌛ Waiting for redirect...")
             await page.wait_for_timeout(15000)
             print(f"✅ Current URL: {page.url}")
             await page.screenshot(path="edu_portal_result.png")
-            
+
             # If we are back at Mashov or Parents portal, it worked
             if "mashov" in page.url or "education" in page.url:
                 print("🎉 SUCCESS: Logged in!")
                 # Grab cookies for requests
                 cookies = await context.cookies()
                 print(f"🍪 Captured {len(cookies)} cookies")
-            
+
         else:
             print(f"ℹ️ Redirected elsewhere: {page.url}")
             await page.screenshot(path="edu_portal_other.png")

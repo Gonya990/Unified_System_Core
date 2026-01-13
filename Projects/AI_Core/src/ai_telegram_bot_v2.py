@@ -16,6 +16,7 @@ if current_dir not in sys.path:
 
 # Handle arguments before importing ConfigManager
 import argparse
+
 from dotenv import load_dotenv
 
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
@@ -2546,7 +2547,7 @@ async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYP
     msg += f"Создано: `{job['created_at'].strftime('%Y-%m-%d %H:%M:%S')}`\n"
 
     if job["status"] == "completed" and job["video_path"]:
-        msg += f"\n✅ Видео готово! Отправляю файл..."
+        msg += "\n✅ Видео готово! Отправляю файл..."
         await update.message.reply_text(msg, parse_mode="Markdown")
 
         # Send video file

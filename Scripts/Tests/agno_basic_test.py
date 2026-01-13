@@ -1,15 +1,14 @@
+
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
-from agno.tools.duckduckgo import DuckDuckGo
 from dotenv import load_dotenv
-import os
 
 # Load keys from .env
 load_dotenv()
 
 def test_agno_basic():
     print("🚀 Testing Agno with OpenAI\n")
-    
+
     # OpenAI Agent
     print("--- 🤖 Provider: OpenAI ---")
     agent = Agent(

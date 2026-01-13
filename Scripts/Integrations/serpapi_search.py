@@ -5,10 +5,9 @@ Provides Google/Bing search results for AI agents
 https://serpapi.com
 """
 
-import os
-import json
 import logging
-from typing import Optional
+import os
+
 import requests
 
 logging.basicConfig(level=logging.INFO)
@@ -24,14 +23,14 @@ class SerpAPIClient:
         
     Requires SERPAPI_KEY environment variable.
     """
-    
+
     BASE_URL = "https://serpapi.com/search"
-    
+
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("SERPAPI_KEY")
         if not self.api_key:
             logger.warning("SERPAPI_KEY not set. Get one at https://serpapi.com/dashboard")
-    
+
     def search(
         self,
         query: str,
@@ -57,7 +56,7 @@ class SerpAPIClient:
         """
         if not self.api_key:
             return {"error": "SERPAPI_KEY not configured"}
-        
+
         params = {
             "api_key": self.api_key,
             "engine": engine,
@@ -65,20 +64,20 @@ class SerpAPIClient:
             "num": num_results,
             "hl": language
         }
-        
+
         if location:
             params["location"] = location
         if country:
             params["gl"] = country
-        
+
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
             data = response.json()
-            
+
             if "error" in data:
                 logger.error(f"SerpAPI error: {data['error']}")
                 return {"error": data["error"]}
-            
+
             # Extract key information
             result = {
                 "query": query,
@@ -87,7 +86,7 @@ class SerpAPIClient:
                 "answer_box": data.get("answer_box"),
                 "total_results": data.get("search_information", {}).get("total_results")
             }
-            
+
             # Parse organic results
             for item in data.get("organic_results", [])[:num_results]:
                 result["organic_results"].append({
@@ -96,13 +95,13 @@ class SerpAPIClient:
                     "snippet": item.get("snippet"),
                     "position": item.get("position")
                 })
-            
+
             return result
-            
+
         except requests.RequestException as e:
             logger.error(f"Request failed: {e}")
             return {"error": str(e)}
-    
+
     def search_images(self, query: str, num_results: int = 10) -> list:
         """Search for images"""
         params = {
@@ -111,11 +110,11 @@ class SerpAPIClient:
             "q": query,
             "num": num_results
         }
-        
+
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
             data = response.json()
-            
+
             return [
                 {
                     "title": img.get("title"),
@@ -127,7 +126,7 @@ class SerpAPIClient:
             ]
         except Exception as e:
             return [{"error": str(e)}]
-    
+
     def search_news(self, query: str, num_results: int = 10) -> list:
         """Search for news articles"""
         params = {
@@ -136,11 +135,11 @@ class SerpAPIClient:
             "q": query,
             "num": num_results
         }
-        
+
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
             data = response.json()
-            
+
             return [
                 {
                     "title": news.get("title"),
@@ -162,12 +161,12 @@ def search_for_ai(query: str, num_results: int = 5) -> str:
     """
     client = SerpAPIClient()
     results = client.search(query, num_results=num_results)
-    
+
     if "error" in results:
         return f"Search failed: {results['error']}"
-    
+
     output = [f"## Web Search Results for: {query}\n"]
-    
+
     # Add answer box if present
     if results.get("answer_box"):
         ab = results["answer_box"]
@@ -175,24 +174,24 @@ def search_for_ai(query: str, num_results: int = 5) -> str:
             output.append(f"**Quick Answer:** {ab['answer']}\n")
         elif ab.get("snippet"):
             output.append(f"**Featured Snippet:** {ab['snippet']}\n")
-    
+
     # Add organic results
     for i, item in enumerate(results.get("organic_results", []), 1):
         output.append(f"\n### {i}. {item['title']}")
         output.append(f"**URL:** {item['link']}")
         if item.get("snippet"):
             output.append(f"{item['snippet']}")
-    
+
     return "\n".join(output)
 
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) < 2:
         print("Usage: python serpapi_search.py <query>")
         print("Example: python serpapi_search.py 'AI trends 2024'")
         sys.exit(1)
-    
+
     query = " ".join(sys.argv[1:])
     print(search_for_ai(query))

@@ -6,7 +6,7 @@ Integrates with VAPI.ai platform for real-time voice conversations.
 import asyncio
 import logging
 import os
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 

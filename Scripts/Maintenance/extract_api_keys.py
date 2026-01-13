@@ -3,9 +3,11 @@
 Extract API keys from open browser tabs
 """
 import json
+import re
+
 import requests
 import websocket
-import re
+
 
 def get_tabs():
     resp = requests.get("http://localhost:9222/json")
@@ -31,14 +33,14 @@ def run_js(ws_url, expression):
 def main():
     tabs = get_tabs()
     keys = {}
-    
+
     # Find SerpAPI dashboard
     for tab in tabs:
         url = tab.get("url", "")
         ws_url = tab.get("webSocketDebuggerUrl")
         if not ws_url:
             continue
-        
+
         # SerpAPI
         if "serpapi.com/dashboard" in url:
             print("🔍 Checking SerpAPI...")
@@ -50,7 +52,7 @@ def main():
                 if match:
                     keys["SERPAPI_KEY"] = match.group(1)
                     print(f"   ✅ Found key: {match.group(1)[:20]}...")
-        
+
         # OpenRouter
         if "openrouter.ai/settings/keys" in url:
             print("🔍 Checking OpenRouter...")
@@ -60,7 +62,7 @@ def main():
                 if match:
                     keys["OPENROUTER_KEY"] = match.group(1)
                     print(f"   ✅ Found key: {match.group(1)[:30]}...")
-        
+
         # NVIDIA
         if "build.nvidia.com" in url:
             print("🔍 Checking NVIDIA...")
@@ -71,15 +73,15 @@ def main():
                 for k, v in storage.items():
                     if 'nvapi' in str(v).lower() or 'key' in k.lower():
                         print(f"   Found localStorage key: {k}")
-    
+
     print("\n" + "="*60)
     print("🔑 EXTRACTED API KEYS")
     print("="*60)
-    
+
     if keys:
         for name, key in keys.items():
             print(f"\nexport {name}=\"{key}\"")
-        
+
         # Append to .env
         with open(".env", "a") as f:
             f.write("\n# Auto-extracted API keys\n")

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import json
+import logging
+
 import requests
 import websocket
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("WebtopStealer")
@@ -23,7 +24,7 @@ def main():
     ws_url = tab.get('webSocketDebuggerUrl')
     try:
         ws = websocket.create_connection(ws_url)
-        
+
         # JS to extract homework from Webtop internal state
         # Usually Webtop uses Vue/React, we can try to find the data in the DOM or API response
         js_code = """
@@ -46,26 +47,26 @@ def main():
             });
         })()
         """
-        
+
         ws.send(json.dumps({
             "id": 1,
             "method": "Runtime.evaluate",
             "params": {"expression": js_code, "returnByValue": True}
         }))
-        
+
         res = json.loads(ws.recv())
         ws.close()
-        
+
         if "result" in res and "result" in res["result"] and "value" in res["result"]["result"]:
             data = json.loads(res["result"]["result"]["value"])
             print(json.dumps(data, indent=2, ensure_ascii=False))
-            
+
             with open("webtop_session.json", "w") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             print("\n✅ Saved session to webtop_session.json")
         else:
             print("❌ Failed to extract data")
-            
+
     except Exception as e:
         print(f"❌ Error: {e}")
 
