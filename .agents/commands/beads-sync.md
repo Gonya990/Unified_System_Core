@@ -60,6 +60,30 @@ bd sync                                     # Reconcile
 4. `bd close <id> --reason "..."` — Complete task
 5. **`bd sync`** — Run at session end (ALWAYS)
 
+## Blocker Protocol
+
+> ⚠️ **NEVER skip verification silently.** If infra/env blocks task completion, create a bead.
+
+When a task cannot be fully completed due to blockers:
+
+```bash
+# 1. Create a bead for the blocker
+bd create --title "[INFRA] <description of blocker>" --type bug --priority 2
+
+# 2. Add context
+bd update <new-id> --description "## Problem\n<what failed>\n\n## Impact\n<what was skipped>"
+
+# 3. Do NOT close the original task without verification evidence
+```
+
+**Examples of blockers that need beads:**
+- Test environment broken (missing deps, build failures)
+- External service unavailable
+- Missing credentials/access
+- Hardware/network issues
+
+**Rule:** If you can't prove it works, don't close it. Create a blocker bead instead.
+
 ## bd vs TodoWrite
 
 | bd (persistent) | TodoWrite (ephemeral) |
