@@ -1,7 +1,8 @@
 import logging
 import os
+from typing import Any, Optional
+
 import requests
-from typing import Any, Optional, List, Dict
 
 logger = logging.getLogger(__name__)
 

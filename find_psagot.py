@@ -1,5 +1,6 @@
-import requests
 import json
+
+import requests
 
 url = "https://web.mashov.info/api/schools"
 headers = {

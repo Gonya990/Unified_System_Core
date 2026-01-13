@@ -105,7 +105,7 @@ async def get_homework_summary():
                 if not hw and not grades:
                     summary_lines.append("✅ Нет новых заданий или оценок")
 
-                report.append(f"🏫 **Школа (Webtop):**\n" + "\n".join(summary_lines))
+                report.append("🏫 **Школа (Webtop):**\n" + "\n".join(summary_lines))
             else:
                 report.append("🏫 Webtop: Ошибка авторизации (Token expired?)")
 
