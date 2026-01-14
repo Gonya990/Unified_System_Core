@@ -29,6 +29,24 @@ sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 load_dotenv(ROOT_DIR / ".env")
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
+
+# Notification Helper
+def send_telegram_notification(message):
+    """Sends a status update to the Admin via Telegram Bot API"""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("ADMIN_ID", "708531393")  # Default to Admin
+    if not token or not chat_id:
+        print("⚠️ Telegram Notification Skipped: No Token/ID found.")
+        return
+
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
+        requests.post(url, json=payload, timeout=5)
+    except Exception as e:
+        print(f"⚠️ Failed to send Telegram notification: {e}")
+
+
 # Import TokenBroker
 try:
     from token_broker import TokenBroker
@@ -583,6 +601,7 @@ def translate_to_english(text):
 def main():
     """Execute Full Daily Viral Content Pipeline"""
     print("🚀 DAILY RESEARCHER PIPELINE INITIATED")
+    send_telegram_notification("🚀 **Factory Started:** Daily Researcher Pipeline Initiated.")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # 1. Research & Scripting
@@ -600,6 +619,7 @@ def main():
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"📜 Script Data saved to: {json_path}")
+    send_telegram_notification(f"📝 **Script Generated:**\n_{data.get('selected_topic', 'Unknown Topic')}_")
 
     # 2. Image Generation (Visualization)
     print("🎨 Generating Visual Assets...")
@@ -617,6 +637,8 @@ def main():
 
     if len(resolved_scenes) < len(scenes):
         print(f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated.")
+
+    send_telegram_notification(f"🎨 **Visuals Ready:** {len(resolved_scenes)}/{len(scenes)} scenes generated.")
 
     # 3. Handover to Orchestrator (Audio + Video Assembly)
     print("🤝 Handing over to Orchestrator v3 (No-Face)...")
@@ -641,8 +663,10 @@ def main():
             )
             if final_video_ru:
                 print(f"🎉 SUCCESS! Video Ready: {final_video_ru}")
+                send_telegram_notification(f"🎉 **Video Rendered Successfully!**\nPath: `{final_video_ru}`")
             else:
                 print("❌ RU Video Assembly failed.")
+                send_telegram_notification("❌ **Error:** Video assembly failed.")
 
     except ImportError as e:
         print(f"❌ Failed to import orchestrator: {e}")
