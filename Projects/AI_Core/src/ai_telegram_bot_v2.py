@@ -403,6 +403,42 @@ async def login_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /factory command - Manual Trigger for Content Pipeline."""
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        await update.message.reply_text("⛔️ Admin only.")
+        return
+
+    # Path to daily_researcher.py
+    # We assume the bot is running from Projects/AI_Core/src or root
+    # Adjust path relative to current_dir
+    researcher_path = os.path.abspath(
+        os.path.join(current_dir, "../../Content_Factory/src/researcher/daily_researcher.py")
+    )
+
+    if not os.path.exists(researcher_path):
+        await update.message.reply_text(f"❌ Script not found: `{researcher_path}`", parse_mode="Markdown")
+        return
+
+    await update.message.reply_text(
+        "🏭 **Starting Factory...**\nExecuting: `daily_researcher.py`", parse_mode="Markdown"
+    )
+
+    # Run in subprocess to avoid blocking event loop
+    try:
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, researcher_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+
+        # We don't wait for it to finish here, as it sends its own notifications.
+        # But we could log the start.
+        logger.info(f"Started daily_researcher.py (PID: {process.pid})")
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ Failed to start process: {e}")
+
+
 auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 identity = IdentityOrchestrator(db, config, auth_manager)
 conv_manager = ConversationManager()
@@ -422,12 +458,6 @@ logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
-    "костя": 578363419,
-    "kostya": 578363419,
-    "kosta": 578363419,
-    "коста": 578363419,
-    "nibbler": 578363419,
-    "nibbler420": 578363419,
     "toxicfi7h": 578363419,
     "igor": 708531393,
     "игорь": 708531393,
@@ -440,7 +470,7 @@ USER_ALIASES = {
     "admin": 708531393,
 }
 
-ADMIN_ID = int(config.get("ADMIN_ID", "708531393"))  # Primary admin for notifications
+ADMIN_ID = int(config.get("ADMIN_ID", "578363419"))  # Primary admin for notifications
 
 
 def require_role(required_role: str):
@@ -4231,42 +4261,6 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
             )
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
-
-
-async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /factory command to trigger Content Farm."""
-    user_id = update.effective_user.id
-    if not db.is_approved(user_id):
-        return
-
-    topic = " ".join(context.args) if context.args else None
-
-    await update.message.reply_text(
-        "🏭 **Content Factory 2.0**\n"
-        f"Preparing to launch pipeline...\n"
-        f"Topic: `{topic or 'Auto-Trend'}`\n"
-        "⏳ _Connecting to TokenBroker & Server..._",
-        parse_mode="Markdown",
-    )
-
-    script_path = "/app/Scripts/Orchestration/daily_researcher.py"
-    if not os.path.exists(script_path):
-        script_path = "/Users/macbook/Documents/Unified_System/Scripts/Orchestration/daily_researcher.py"
-
-    cmd = ["python3", script_path]
-    if topic:
-        cmd.extend(["--topic", topic])
-
-    try:
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            cwd=os.path.dirname(script_path),
-        )
-        await update.message.reply_text(f"🚀 Pipeline Started! PID: `{process.pid}`")
-    except Exception as e:
-        await update.message.reply_text(f"❌ Failed to start factory: {e}")
 
 
 async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

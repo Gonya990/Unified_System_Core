@@ -134,9 +134,10 @@ export default function ContactSection() {
                 <select
                   name="feedback_type"
                   required
+                  defaultValue=""
                   className="h-12 w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 px-4 text-sm text-white focus:border-cyan-400/60 focus:outline-none"
                 >
-                  <option value="" disabled selected>Select category</option>
+                  <option value="" disabled>Select category</option>
                   <option value="Support">Support</option>
                   <option value="Sales">Sales</option>
                   <option value="Media">Media</option>
@@ -173,8 +174,8 @@ export default function ContactSection() {
                 role="status"
                 aria-live="polite"
                 className={`rounded-2xl border px-4 py-3 text-sm font-medium ${status.type === "success"
-                    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
-                    : "border-rose-400/30 bg-rose-500/10 text-rose-200"
+                  ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
+                  : "border-rose-400/30 bg-rose-500/10 text-rose-200"
                   }`}
               >
                 {status.message}
