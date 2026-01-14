@@ -9,39 +9,39 @@ import sys
 import time
 import traceback
 from datetime import datetime, timedelta
+from typing import Any, Optional
+
+import aiohttp
+import psutil
+from dotenv import load_dotenv
 
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-from typing import Any, Optional
-
-import aiohttp
-import psutil
-
 try:
-    from src.agent_orchestrator import PIPELINES, AgentOrchestrator
+    from src.agent_orchestrator import PIPELINES, AgentOrchestrator  # noqa: E402
 except ImportError:
-    from agent_orchestrator import PIPELINES, AgentOrchestrator
-from calendar_client import CalendarClient
-from config_manager import ConfigManager
-from conversation_manager import ConversationManager
-from daily_scheduler import DailyScheduler
-from dotenv import load_dotenv
-from google_auth import GoogleAuthManager
-from health import start_health_server
-from identity_orchestrator import IdentityOrchestrator
-from inference_client import InferenceClient
-from telegram import (
+    from agent_orchestrator import PIPELINES, AgentOrchestrator  # noqa: E402
+
+from calendar_client import CalendarClient  # noqa: E402
+from config_manager import ConfigManager  # noqa: E402
+from conversation_manager import ConversationManager  # noqa: E402
+from daily_scheduler import DailyScheduler  # noqa: E402
+from google_auth import GoogleAuthManager  # noqa: E402
+from health import start_health_server  # noqa: E402
+from identity_orchestrator import IdentityOrchestrator  # noqa: E402
+from inference_client import InferenceClient  # noqa: E402
+from telegram import (  # noqa: E402
     BotCommand,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
     Update,
 )
-from telegram.constants import ChatAction
-from telegram.ext import (
+from telegram.constants import ChatAction  # noqa: E402
+from telegram.ext import (  # noqa: E402
     Application,
     CallbackQueryHandler,
     CommandHandler,
@@ -49,12 +49,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from telegram_schema_expert import TelegramSchemaExpert
-
-# Ensure we can import sibling modules irrespective of execution context
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
+from telegram_schema_expert import TelegramSchemaExpert  # noqa: E402
 
 # Handle arguments before importing ConfigManager
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
@@ -2243,22 +2238,18 @@ async def generate_video_command(update: Update, context: ContextTypes.DEFAULT_T
             "Использование: `/generate_video <описание>`\n\n"
             "Примеры:\n"
             "• `/generate_video Красивый закат над морем`\n"
-            "• `/generate_video Космический полет через галактику`\n"
-            "• `/generate_video Танцующий робот на сцене`\n\n"
+            "• `/generate_video Космический полет через галактику`\n\n"
             "⏳ Генерация может занять несколько минут.",
             parse_mode="Markdown",
         )
         return
 
     prompt = " ".join(context.args)
-    logger.info(f"[VIDEO] User {user_id} requested video: {prompt[:50]}...")
-
-    # Generate unique job ID
     import uuid
 
     job_id = str(uuid.uuid4())[:8]
 
-    # Create job entry
+    # Create job entry (simulation for now)
     video_jobs[job_id] = {
         "user_id": user_id,
         "prompt": prompt,
@@ -2268,16 +2259,124 @@ async def generate_video_command(update: Update, context: ContextTypes.DEFAULT_T
     }
 
     await update.message.reply_text(
-        f"🎬 Видео взято в очередь!\n\n"
-        f"📝 Промпт: `{prompt[:100]}...`\n"
-        f"🆔 Job ID: `{job_id}`\n\n"
-        f"Проверить статус: `/video_status {job_id}`\n\n"
-        f"⏳ Генерация может занять 2-5 минут в зависимости от сложности.",
+        f"🎬 Видео взято в очередь!\n🆔 Job ID: `{job_id}`\n⏳ Генерация может занять 2-5 минут.",
         parse_mode="Markdown",
     )
 
-    # Start async video generation task (simplified for MVP)
     asyncio.create_task(generate_video_background(job_id, prompt, user_id, context))
+
+
+async def generate_video_background(job_id: str, prompt: str, user_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Background task to generate video (simulation)."""
+    try:
+        video_jobs[job_id]["status"] = "completed"
+        await asyncio.sleep(5)
+        await context.bot.send_message(chat_id=user_id, text=f"✅ Видео (Simulation) готово! Job: {job_id}")
+    except Exception as e:
+        logger.error(f"Video background error: {e}")
+
+
+async def generate_news_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /generate_news [character] [text] command."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+
+    db.update_last_interaction(user_id)
+
+    if not context.args:
+        await update.message.reply_text(
+            "🎥 **Генерация Новостей (Avatar Hosts)**\n\n"
+            "Использование: `/generate_news [character] [text]`\n\n"
+            "**Доступные персонажи:**\n"
+            "• `unit_x` (RU)\n"
+            "• `spark` (EN)\n"
+            "• `holo_cat` (HE)\n\n"
+            "Пример:\n"
+            "`/generate_news spark Future is here!`\n\n"
+            "⏳ Рендеринг на CPU займет 10-15 минут для короткого видео.",
+            parse_mode="Markdown",
+        )
+        return
+
+    char = context.args[0].lower()
+    text = " ".join(context.args[1:]) if len(context.args) > 1 else None
+
+    import uuid
+
+    job_id = f"news_{str(uuid.uuid4())[:6]}"
+
+    await update.message.reply_text(
+        f"🎬 **Производство Запущено!**\n"
+        f"👤 Персонаж: `{char}`\n"
+        f"🆔 Job ID: `{job_id}`\n\n"
+        f"Я сообщу вам, когда видео будет готово. 🤖",
+        parse_mode="Markdown",
+    )
+
+    asyncio.create_task(run_news_production_background(job_id, char, text, user_id, context))
+
+
+async def run_news_production_background(job_id, char, text, user_id, context):
+    try:
+        script_path = (
+            "/Users/macbook/Documents/Unified_System/Projects/Content_Factory/scripts/generate_news_broadcast.py"
+        )
+        venv_python = (
+            "/Users/macbook/Documents/Unified_System/Projects/Content_Factory/src/live_portrait/.venv/bin/python3"
+        )
+
+        cmd = [venv_python, script_path, "--character", char]
+        if text:
+            cmd.extend(["--text", text])
+
+        # Use absolute path for output to find it later
+        output_name = f"{job_id}.mp4"
+        cmd.extend(["--output", output_name])
+
+        # Run process
+        logger.info(f"[NEWS] Starting production {job_id}...")
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=os.path.dirname(script_path),
+            env=os.environ.copy(),  # Pipeline needs PYTHONPATH etc
+        )
+
+        stdout, stderr = await process.communicate()
+
+        if process.returncode == 0:
+            logger.info(f"[NEWS] Production {job_id} success")
+            # The file should be in Projects/Content_Factory/outputs/production/
+            video_file = (
+                f"/Users/macbook/Documents/Unified_System/Projects/Content_Factory/outputs/production/{output_name}"
+            )
+
+            if os.path.exists(video_file):
+                await context.bot.send_video(
+                    chat_id=user_id,
+                    video=open(video_file, "rb"),
+                    caption=f"🎥 **Ваш выпуск новостей готов!**\n\nJob: `{job_id}`\nХост: `{char}`",
+                    parse_mode="Markdown",
+                )
+            else:
+                await context.bot.send_message(
+                    chat_id=user_id, text=f"❌ Видео сгенерировано, но файл не найден: {output_name}"
+                )
+        else:
+            error_msg = stderr.decode()
+            logger.error(f"[NEWS] Production {job_id} failed: {error_msg}")
+            await context.bot.send_message(
+                chat_id=user_id,
+                text=f"❌ Ошибка при производстве новости ({job_id}):\n\n<code>{error_msg[-500:]}</code>",
+                parse_mode="HTML",
+            )
+
+    except Exception as e:
+        logger.error(f"[NEWS] Fatal error in background task {job_id}: {e}")
+        await context.bot.send_message(chat_id=user_id, text=f"⚠️ Критическая ошибка бота ({job_id}): {e}")
 
 
 async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2352,46 +2451,6 @@ async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text(msg, parse_mode="Markdown")
     else:
         await update.message.reply_text(msg, parse_mode="Markdown")
-
-
-async def generate_video_background(job_id: str, prompt: str, user_id: int, context: ContextTypes.DEFAULT_TYPE):
-    """Background task to generate video (simplified MVP)."""
-    try:
-        video_jobs[job_id]["status"] = "processing"
-        logger.info(f"[VIDEO] Started processing job {job_id}")
-
-        # Simulate video generation (in production, call actual video generation service)
-        # For now, just update status after a delay
-        await asyncio.sleep(3)  # Simulate processing
-
-        # Mark as completed (without actual video file for MVP)
-        video_jobs[job_id]["status"] = "completed"
-        video_jobs[job_id]["video_path"] = None
-
-        logger.info(f"[VIDEO] Job {job_id} completed")
-
-        # Send completion notification to user
-        try:
-            await context.bot.send_message(
-                chat_id=user_id,
-                text=f"✅ Видео готово!\n\nJob ID: `{job_id}`\n\nИспользуйте `/video_status {job_id}` для просмотра.",
-                parse_mode="Markdown",
-            )
-        except Exception as e:
-            logger.error(f"[VIDEO] Failed to notify user {user_id}: {e}")
-
-    except Exception as e:
-        logger.error(f"[VIDEO] Error in job {job_id}: {e}")
-        video_jobs[job_id]["status"] = "failed"
-        video_jobs[job_id]["error"] = str(e)
-
-        # Send error notification
-        try:
-            await context.bot.send_message(
-                chat_id=user_id, text=f"❌ Ошибка генерации видео: {e}\n\nJob ID: `{job_id}`", parse_mode="Markdown"
-            )
-        except Exception as notify_err:
-            logger.error(f"[VIDEO] Failed to notify user of error: {notify_err}")
 
 
 # Mashov Homework Integration Commands
@@ -4370,6 +4429,7 @@ def main():
         "factory": factory_command,
         "am": am_command,
         "generate_video": generate_video_command,
+        "generate_news": generate_news_command,
         "video_status": video_status_command,
         "mashov_homework": mashov_homework_command,
         "mashov_find_school": mashov_find_school_command,
