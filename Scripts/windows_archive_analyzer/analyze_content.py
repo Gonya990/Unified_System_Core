@@ -1,9 +1,8 @@
 import json
 import os
 import subprocess
-import glob
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
 def find_latest_report():
@@ -88,7 +87,7 @@ def main():
         return
 
     print(f"Loading report: {report_path}")
-    with open(report_path, "r", encoding="utf-8") as f:
+    with open(report_path, encoding="utf-8") as f:
         data = json.load(f)
 
     archives = data.get("Archives", [])
