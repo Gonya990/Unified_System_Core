@@ -9,17 +9,22 @@ Token-aware: Uses TokenBroker for API management
 
 import json
 import logging
+import re
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("LongFormProducer")
 
@@ -34,14 +39,23 @@ sys.path.append(str(SRC_DIR / "researcher"))
 sys.path.append(str(SRC_DIR / "pipeline"))
 sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 sys.path.append(str(ROOT_DIR / "LLM_Council"))
+sys.path.append(str(ROOT_DIR / "Scripts/Reporting"))
 
-from dotenv import load_dotenv
+try:
+    from telegram_reporter import (
+        report_phase_complete,
+        report_production_error,
+        report_production_start,
+    )
+except ImportError:
+    report_production_start = report_phase_complete = report_production_error = lambda *args, **kwargs: None
 
-load_dotenv(ROOT_DIR / ".env")
+# load_dotenv(ROOT_DIR / ".env") # Handled at top
 
 # Import TokenBroker
 try:
     from token_broker import TokenBroker
+
     BROKER = TokenBroker()
     print("✅ TokenBroker ready for Long-Form production")
 except ImportError:
@@ -54,27 +68,31 @@ except ImportError:
 
 LONGFORM_CONFIG = {
     "target_duration_minutes": 28,  # Target 28 min (leaves buffer)
-    "segments": 6,                   # 6 segments x ~5 min each
-    "words_per_minute": 130,         # Narration speed
+    "segments": 6,  # 6 segments x ~5 min each
+    "words_per_minute": 130,  # Narration speed
     "style": "documentary",
     "lang": "ru",
-    "output_prefix": "documentary_weekly"
+    "output_prefix": "documentary_weekly",
 }
 
 # Each segment is ~5 minutes = ~650 words
-WORDS_PER_SEGMENT = LONGFORM_CONFIG["target_duration_minutes"] * LONGFORM_CONFIG["words_per_minute"] // LONGFORM_CONFIG["segments"]
+WORDS_PER_SEGMENT = (
+    LONGFORM_CONFIG["target_duration_minutes"] * LONGFORM_CONFIG["words_per_minute"] // LONGFORM_CONFIG["segments"]
+)
 
 # =============================================================================
 #                           TOKEN TRACKING
 # =============================================================================
 
+
 class TokenTracker:
     """Track token usage across the pipeline"""
+
     def __init__(self):
         self.usage = {
             "openai": {"input": 0, "output": 0},
             "gemini": {"input": 0, "output": 0},
-            "total_cost_estimate": 0.0
+            "total_cost_estimate": 0.0,
         }
 
     def log(self, provider: str, input_tokens: int, output_tokens: int):
@@ -85,24 +103,28 @@ class TokenTracker:
         # Rough cost estimate (OpenAI GPT-4o pricing)
         if provider == "openai":
             self.usage["total_cost_estimate"] += (input_tokens * 2.5 + output_tokens * 10) / 1_000_000
-        print(f"📊 Token Usage [{provider}]: +{input_tokens} in, +{output_tokens} out | Total est: ${self.usage['total_cost_estimate']:.4f}")
+        print(
+            f"📊 Token Usage [{provider}]: +{input_tokens} in, +{output_tokens} out | Total est: ${self.usage['total_cost_estimate']:.4f}"
+        )
 
     def report(self):
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("📊 LONG-FORM PRODUCTION TOKEN REPORT")
-        print("="*50)
+        print("=" * 50)
         for provider, usage in self.usage.items():
             if isinstance(usage, dict):
                 print(f"  {provider}: {usage['input']} input, {usage['output']} output")
         print(f"  💰 Estimated Cost: ${self.usage['total_cost_estimate']:.4f}")
-        print("="*50 + "\n")
+        print("=" * 50 + "\n")
         return self.usage
+
 
 TRACKER = TokenTracker()
 
 # =============================================================================
 #                           DEEP RESEARCH (PLAN & EXECUTE)
 # =============================================================================
+
 
 def get_documentary_structure(topic: str) -> Optional[dict]:
     """Phase 1: Get structured plan with segment outlines"""
@@ -140,22 +162,37 @@ def get_documentary_structure(topic: str) -> Optional[dict]:
         """
 
         import asyncio
-        session = asyncio.run(council.deliberate(plan_query, verbose=False))
+
+        # Enable verbose logging to troubleshoot
+        session = asyncio.run(council.deliberate(plan_query, verbose=True))
         consensus = session.stage3_consensus
 
+        # Robust JSON extraction
         if "```json" in consensus:
             consensus = consensus.split("```json")[1].split("```")[0].strip()
+        elif "```" in consensus:
+            consensus = consensus.split("```")[1].split("```")[0].strip()
+
+        # Try to find { ... } if looks like text
+        if not consensus.startswith("{"):
+            start = consensus.find("{")
+            end = consensus.rfind("}")
+            if start != -1 and end != -1:
+                consensus = consensus[start : end + 1]
 
         data = json.loads(consensus)
         TRACKER.log("openai", len(plan_query) // 4, len(consensus) // 4)
 
-        try: asyncio.run(council.close())
-        except: pass
+        try:
+            asyncio.run(council.close())
+        except Exception:
+            pass
 
         return data
     except Exception as e:
         print(f"❌ Planning failed: {e}")
         return None
+
 
 def generate_segment_script(topic: str, segment_info: dict, context_summary: str = "") -> Optional[dict]:
     """Phase 2: Generate full-length script for a single segment using LLMCouncil"""
@@ -164,6 +201,7 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
 
     try:
         from council.council import LLMCouncil
+
         if BROKER:
             council = LLMCouncil.from_token_broker(BROKER)
         else:
@@ -173,7 +211,7 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
         Write a FULL DOCUMENTARY SCRIPT for one segment of a documentary about: {topic}
 
         SEGMENT: {seg_name}
-        FOCUS POINTS: {segment_info.get('focus_points')}
+        FOCUS POINTS: {segment_info.get("focus_points")}
         CONTEXT: {context_summary}
 
         REQUIREMENTS:
@@ -193,24 +231,52 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
         """
 
         import asyncio
+
         session = asyncio.run(council.deliberate(prompt, verbose=False))
         content = session.stage3_consensus
 
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
 
-        seg_data = json.loads(content)
+        # Try to find { ... } if it's buried in text
+        if "{" in content and "}" in content:
+            start = content.find("{")
+            end = content.rfind("}")
+            content = content[start : end + 1]
+
+        # Clean up some common LLM JSON errors (like trailing commas)
+        content = re.sub(r",\s*([\]}])", r"\1", content)
+
+        try:
+            seg_data = json.loads(content)
+        except json.JSONDecodeError as je:
+            print(f"❌ JSON Decode Error at pos {je.pos}: {je.msg}")
+            print(f"Snippet near error: {content[max(0, je.pos - 100) : je.pos + 100]}")
+            # Final attempt: JSON fixes (double-quote keys if they are single-quoted)
+            try:
+                # This is a bit risky but can save scripts
+                import ast
+
+                seg_data = ast.literal_eval(content)
+            except Exception:
+                return None
+
         # Approximate tokens
         TRACKER.log("openai", len(prompt) // 4, len(content) // 4)
 
-        try: asyncio.run(council.close())
-        except: pass
+        try:
+            asyncio.run(council.close())
+        except Exception:
+            pass
 
         return seg_data
 
     except Exception as e:
         print(f"⚠️ Segment generation failed: {e}")
         return None
+
 
 def deep_research_with_council(topic: str) -> dict:
     """Refactored: Plan with Council, Execute with individual calls"""
@@ -222,7 +288,7 @@ def deep_research_with_council(topic: str) -> dict:
         "title": structure.get("title"),
         "description": structure.get("description"),
         "youtube_tags": structure.get("youtube_tags"),
-        "segments": []
+        "segments": [],
     }
 
     cumulative_script = ""
@@ -232,17 +298,15 @@ def deep_research_with_council(topic: str) -> dict:
             segment_data = {
                 "name": seg_info.get("name"),
                 "script": seg_script_data.get("script", ""),
-                "scenes": seg_script_data.get("scenes", [])
+                "scenes": seg_script_data.get("scenes", []),
             }
             full_data["segments"].append(segment_data)
             cumulative_script += " " + segment_data["script"]
         else:
-            print(f"❌ Failed to generate script for segment {i+1}")
-            full_data["segments"].append({
-                "name": seg_info.get("name"),
-                "script": f"...Продолжаем наше исследование {topic}...",
-                "scenes": []
-            })
+            print(f"❌ Failed to generate script for segment {i + 1}")
+            full_data["segments"].append(
+                {"name": seg_info.get("name"), "script": f"...Продолжаем наше исследование {topic}...", "scenes": []}
+            )
 
     # Calculate chapters based on word count estimate (~130 wpm)
     chapters = ["0:00 Начало"]
@@ -251,23 +315,25 @@ def deep_research_with_council(topic: str) -> dict:
         words = len(seg.get("script", "").split())
         current_seconds += (words / 130) * 60
         m, s = divmod(int(current_seconds), 60)
-        chapters.append(f"{m}:{s:02d} {full_data['segments'][i+1]['name']}")
+        chapters.append(f"{m}:{s:02d} {full_data['segments'][i + 1]['name']}")
 
     full_data["youtube_chapters"] = chapters
     full_data["total_word_count"] = len(cumulative_script.split())
 
     return full_data
 
+
 def fallback_research(topic: str) -> dict:
     """Legacy/Simple single-model research"""
     print(f"🌠 Fallback Research (Gemini Flash) for '{topic}'")
     # Kept for compatibility but usually deep_research_with_council handles things now
-    return None # We prefer the new multi-step process
+    return None  # We prefer the new multi-step process
 
 
 # =============================================================================
 #                           LONG-FORM ASSEMBLY
 # =============================================================================
+
 
 def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     """
@@ -284,15 +350,14 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         generate_audio,
         semantic_search_broll,
     )
-    from pexels_broll import semantic_search_broll
 
-    timestamp = datetime.now().strftime('%Y%m%d')
+    timestamp = datetime.now().strftime("%Y%m%d")
     segments = data.get("segments", [])
 
     segment_videos = []
 
     for i, segment in enumerate(segments):
-        print(f"\n📹 Processing Segment {i+1}/{len(segments)}: {segment.get('name', 'Unknown')}")
+        print(f"\n📹 Processing Segment {i + 1}/{len(segments)}: {segment.get('name', 'Unknown')}")
 
         # Rate limiting / token awareness
         time.sleep(3)  # Strategic pause between segments
@@ -301,7 +366,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         scenes = segment.get("scenes", [])
 
         if not script:
-            print(f"⚠️ Empty script for segment {i+1}, skipping")
+            print(f"⚠️ Empty script for segment {i + 1}, skipping")
             continue
 
         segment_name = f"longform_seg_{i}_{timestamp}"
@@ -309,7 +374,8 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         # 1. Generate audio for this segment
         audio_path = output_dir / f"{segment_name}_audio.wav"
         if not generate_audio(script, audio_path, lang="ru"):
-            print(f"❌ Audio failed for segment {i+1}")
+            print(f"❌ Audio failed for segment {i + 1}")
+            report_production_error(f"Audio generation failed for segment {i + 1}: {segment.get('name')}")
             continue
 
         # 2. Fetch visual assets
@@ -318,29 +384,24 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
 
         # Convert scenes to proper format
         scene_list = []
-        for j, scene in enumerate(scenes):
+        for scene in scenes:
             kw = scene.get("keyword", "technology future")
-            scene_list.append({
-                "image": f"seg{i}_scene{j}",
-                "keyword": kw
-            })
+            scene_list.append({"image": f"seg{i}_scene{len(scene_list)}", "keyword": kw})
 
         # Alternating styles: Every second segment uses AI Generation (cartoon style)
         current_style = "cartoon" if i % 2 == 1 else "impact"
-        print(f"🎨 Using Style: {current_style} for Segment {i+1}")
+        print(f"🎨 Using Style: {current_style} for Segment {i + 1}")
 
         resolved_scenes = generate_vision_assets(scene_list, assets_dir, style=current_style)
 
         if not resolved_scenes:
             # Use B-roll as backup
-            print(f"⚠️ Using B-roll for segment {i+1}")
+            print(f"⚠️ Using B-roll for segment {i + 1}")
             clips = semantic_search_broll(script[:100], BROLL_DIR, num_clips=5)
-            for j, clip in enumerate(clips):
-                resolved_scenes.append({
-                    "image": str(clip),
-                    "resolved_path": str(clip),
-                    "keyword": "documentary footage"
-                })
+            for _, clip in enumerate(clips):
+                resolved_scenes.append(
+                    {"image": str(clip), "resolved_path": str(clip), "keyword": "documentary footage"}
+                )
 
         # 3. Assemble segment video
         raw_video = output_dir / f"{segment_name}_raw.mp4"
@@ -351,11 +412,16 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         if add_subtitles(raw_video, final_segment, lang="ru", style="impact"):
             segment_videos.append(final_segment)
             # Delete raw video if final succeeded
-            if raw_video.exists(): raw_video.unlink()
+            if raw_video.exists():
+                raw_video.unlink()
         else:
             segment_videos.append(raw_video)
 
-        print(f"✅ Segment {i+1} complete: {segment_videos[-1]}")
+        print(f"✅ Segment {i + 1} complete: {segment_videos[-1]}")
+        report_phase_complete(
+            f"Segment {i + 1}/{len(segments)} Rendered",
+            f"**{segment.get('name')}** is complete.\nStyle: {current_style}",
+        )
 
         # Local Preview: Copy first segment to Desktop immediately
         if i == 0:
@@ -383,12 +449,14 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     final_output = output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_final.mp4"
 
     import subprocess
+
     try:
-        subprocess.run([
-            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-            "-i", str(concat_file),
-            "-c", "copy", str(final_output)
-        ], check=True, capture_output=True, cwd=str(output_dir))
+        subprocess.run(
+            ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file), "-c", "copy", str(final_output)],
+            check=True,
+            capture_output=True,
+            cwd=str(output_dir),
+        )
     except subprocess.CalledProcessError as e:
         print(f"❌ FFMPEG Concat Failed: {e.stderr.decode()}")
         return None
@@ -413,20 +481,22 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
 
     return final_output
 
+
 # =============================================================================
 #                           MAIN PIPELINE
 # =============================================================================
+
 
 def run_longform_production(topic: str = None) -> Optional[Path]:
     """
     Full long-form documentary production pipeline.
     Call from scheduler or manually.
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎬 LONG-FORM DOCUMENTARY PRODUCTION")
-    print("="*60)
+    print("=" * 60)
 
-    timestamp = datetime.now().strftime('%Y-%m-%d')
+    timestamp = datetime.now().strftime("%Y-%m-%d")
 
     # Auto-generate topic if not provided
     if not topic:
@@ -436,12 +506,14 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
             "Космическая гонка 2026: Марс, Луна и дальше",
             "Биотехнологии: Как мы победим болезни",
             "Энергетическая революция: Термоядерный синтез",
-            "Автономные системы: Роботы среди нас"
+            "Автономные системы: Роботы среди нас",
         ]
         import random
+
         topic = random.choice(topics)
 
     print(f"📌 Topic: {topic}")
+    report_production_start(topic)
 
     # 1. Deep Research
     data = deep_research_with_council(topic)
@@ -450,7 +522,10 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
 
     if not data:
         print("❌ Research failed, aborting production")
+        report_production_error(f"Research failed for topic: {topic}")
         return None
+
+    report_phase_complete("Research & Planning", f"Documentary structure created: {data.get('title')}")
 
     # 2. Setup output directory
     output_dir = ROOT_DIR / "outputs" / f"documentary_{timestamp}"
@@ -468,6 +543,7 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
 
     if final_video:
         print(f"\n🎉 SUCCESS: Documentary ready at {final_video}")
+        report_phase_complete("Production Complete", f"Final video ready: {final_video.name}")
 
         # Local Desktop Transfer (Vibranium Auto-Ship)
         desktop_path = Path.home() / "Desktop" / final_video.name
@@ -480,6 +556,7 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
             pass
 
     return final_video
+
 
 # =============================================================================
 #                           CLI

@@ -79,3 +79,8 @@ browser_sessions.json
 webtop_session.json
 .beads/
 .claude/
+contexts/*.pdf
+contexts/*.mp4
+contexts/*.m4a
+contexts/*.crdownload
+contexts/*.png
