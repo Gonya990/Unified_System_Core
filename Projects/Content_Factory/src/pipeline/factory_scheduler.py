@@ -60,6 +60,15 @@ except ImportError:
     LONGFORM_ENABLED = False
     print("⚠️ Long-form producer not available")
 
+# Infrastructure
+try:
+    from brev_controller import BrevController
+
+    BREV_ENABLED = True
+except ImportError:
+    BREV_ENABLED = False
+    print("⚠️ Brev Controller not found in path")
+
 # Configuration
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
@@ -278,10 +287,21 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
 
     # 4. PRODUCTION
     out_name = f"{prefix}_{day_str.replace('-', '')}"
+    out_name = f"{prefix}_{day_str.replace('-', '')}"
     try:
+        # GPU ORCHESTRATION: "Cloud as Muscles"
+        if BREV_ENABLED:
+            brev = BrevController()
+            agent_sync("🚀 Waking up GPU Muscle (Brev)...")
+            brev.start_instance()
+
         video_path = run_no_face_pipeline(
             text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style
         )
+
+        if BREV_ENABLED:
+            agent_sync("💤 Resting GPU Muscle (Stopping instance)...")
+            brev.stop_instance()
 
         # 5. UPLOAD (Instagram + YouTube)
         if REELS_AUTO_UPLOAD and video_path and video_path.exists():
