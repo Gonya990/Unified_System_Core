@@ -71,22 +71,19 @@ class Wav2LipController:
 
         try:
             # Run inside the Wav2Lip directory to handle relative imports inside inference.py
-            result = subprocess.run(cmd, cwd=str(self.wav2lip_root), check=True, capture_output=True, text=True)
+            # Do NOT use capture_output=True for long-running processes with TQDM as it can hang the pipe
+            subprocess.run(cmd, cwd=str(self.wav2lip_root), check=True)
 
             if output_path.exists():
                 logger.info(f"Lip-Sync successfully generated: {output_path}")
                 return str(output_path)
             else:
                 logger.error("Wav2Lip finished but output file was not found.")
-                logger.error(f"Stdout: {result.stdout}")
-                logger.error(f"Stderr: {result.stderr}")
                 return None
 
         except subprocess.CalledProcessError as e:
             logger.error(f"Wav2Lip failed with exit code {e.returncode}")
-            logger.error(f"Stdout: {e.stdout}")
-            logger.error(f"Stderr: {e.stderr}")
-            raise RuntimeError(f"Lip-Sync inference failed: {e.stderr}") from e
+            raise RuntimeError("Lip-Sync inference failed. Check terminal output for details.") from e
 
 
 # Simple CLI test
