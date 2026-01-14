@@ -128,16 +128,34 @@ export default function ContactSection() {
               </label>
             </div>
 
-            <label className="space-y-2 text-sm font-medium text-slate-200">
-              Subject
-              <input
-                name="subject"
-                type="text"
-                required
-                placeholder="How can we help?"
-                className="h-12 w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none"
-              />
-            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2 text-sm font-medium text-slate-200">
+                Feedback Type
+                <select
+                  name="feedback_type"
+                  required
+                  className="h-12 w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 px-4 text-sm text-white focus:border-cyan-400/60 focus:outline-none"
+                >
+                  <option value="" disabled selected>Select category</option>
+                  <option value="Support">Support</option>
+                  <option value="Sales">Sales</option>
+                  <option value="Media">Media</option>
+                  <option value="Enterprise">Enterprise</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+
+              <label className="space-y-2 text-sm font-medium text-slate-200">
+                Subject
+                <input
+                  name="subject"
+                  type="text"
+                  required
+                  placeholder="How can we help?"
+                  className="h-12 w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none"
+                />
+              </label>
+            </div>
 
             <label className="space-y-2 text-sm font-medium text-slate-200">
               Message
@@ -154,11 +172,10 @@ export default function ContactSection() {
               <div
                 role="status"
                 aria-live="polite"
-                className={`rounded-2xl border px-4 py-3 text-sm font-medium ${
-                  status.type === "success"
+                className={`rounded-2xl border px-4 py-3 text-sm font-medium ${status.type === "success"
                     ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
                     : "border-rose-400/30 bg-rose-500/10 text-rose-200"
-                }`}
+                  }`}
               >
                 {status.message}
               </div>
