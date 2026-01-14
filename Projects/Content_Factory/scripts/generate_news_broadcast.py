@@ -34,87 +34,98 @@ def generate_broadcast():
     ref_wav = Path("secure_vault/biometrics/unit_x/ref.wav").resolve()
 
     # 2. Generate Audio (XTTS)
-    logger.info("🎙️ Stage 1: Generating Audio with XTTS v2...")
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
-    try:
-        model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
-        tts = TTS(model_name).to(device)
-        tts.tts_to_file(text=text, speaker_wav=str(ref_wav), language="ru", file_path=str(audio_path))
-        logger.info(f"✅ Audio generated: {audio_path}")
-    except Exception as e:
-        logger.error(f"❌ Audio generation failed: {e}")
-        return
+    if not audio_path.exists():
+        logger.info("🎙️ Stage 1: Generating Audio with XTTS v2...")
+        device = "mps" if torch.backends.mps.is_available() else "cpu"
+        try:
+            model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
+            tts = TTS(model_name).to(device)
+            tts.tts_to_file(text=text, speaker_wav=str(ref_wav), language="ru", file_path=str(audio_path))
+            logger.info(f"✅ Audio generated: {audio_path}")
+        except Exception as e:
+            logger.error(f"❌ Audio generation failed: {e}")
+            return
+    else:
+        logger.info(f"⏭️ Skipping Stage 1: Audio already exists at {audio_path}")
 
     # 3. Generate Motion (LivePortrait)
-    logger.info("🎬 Stage 2: Generating Head Motion (LivePortrait)...")
-    lp_controller = LivePortraitController()
-    lp_video = lp_controller.animate(str(avatar_path), output_filename="unit_x_motion.mp4")
+    lp_video_path = output_dir / "unit_x_motion.mp4"
+    if not lp_video_path.exists():
+        logger.info("🎬 Stage 2: Generating Head Motion (LivePortrait)...")
+        lp_controller = LivePortraitController()
+        lp_video = lp_controller.animate(str(avatar_path), output_filename="unit_x_motion.mp4")
+    else:
+        logger.info(f"⏭️ Skipping Stage 2: Motion already exists at {lp_video_path}")
+        lp_video = str(lp_video_path)
 
     if not lp_video:
         logger.error("LivePortrait failed.")
         return
 
     # 3.5 Loop Motion to match Audio (FFmpeg)
-    logger.info("♻️ Stage 2.5: Looping Motion to match Audio duration...")
     looped_motion = output_dir / "unit_x_motion_looped.mp4"
-
-    # Get durations
-    try:
-        audio_dur = float(
-            subprocess.check_output(
-                [
-                    "ffprobe",
-                    "-v",
-                    "error",
-                    "-show_entries",
-                    "format=duration",
-                    "-of",
-                    "default=noprint_wrappers=1:nokey=1",
-                    str(audio_path),
-                ]
-            ).strip()
-        )
-        video_dur = float(
-            subprocess.check_output(
-                [
-                    "ffprobe",
-                    "-v",
-                    "error",
-                    "-show_entries",
-                    "format=duration",
-                    "-of",
-                    "default=noprint_wrappers=1:nokey=1",
-                    str(lp_video),
-                ]
-            ).strip()
-        )
-
-        loops = int(audio_dur / video_dur) + 1
-        logger.info(f"Looping video {loops} times (Audio: {audio_dur}s, Video: {video_dur}s)")
-
-        # FFmpeg stream loop
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-stream_loop",
-                str(loops - 1),
-                "-i",
-                str(lp_video),
-                "-t",
-                str(audio_dur),
-                "-c",
-                "copy",
-                str(looped_motion),
-            ],
-            check=True,
-            capture_output=True,
-        )
-
+    if looped_motion.exists():
+        logger.info(f"⏭️ Skipping Stage 2.5: Looped motion already exists at {looped_motion}")
         motion_for_sync = str(looped_motion)
-    except Exception as e:
-        logger.error(f"Looping failed: {e}. Falling back to original video.")
-        motion_for_sync = str(lp_video)
+    else:
+        logger.info("♻️ Stage 2.5: Looping Motion to match Audio duration...")
+        # Get durations
+        try:
+            audio_dur = float(
+                subprocess.check_output(
+                    [
+                        "ffprobe",
+                        "-v",
+                        "error",
+                        "-show_entries",
+                        "format=duration",
+                        "-of",
+                        "default=noprint_wrappers=1:nokey=1",
+                        str(audio_path),
+                    ]
+                ).strip()
+            )
+            video_dur = float(
+                subprocess.check_output(
+                    [
+                        "ffprobe",
+                        "-v",
+                        "error",
+                        "-show_entries",
+                        "format=duration",
+                        "-of",
+                        "default=noprint_wrappers=1:nokey=1",
+                        str(lp_video),
+                    ]
+                ).strip()
+            )
+
+            loops = int(audio_dur / video_dur) + 1
+            logger.info(f"Looping video {loops} times (Audio: {audio_dur}s, Video: {video_dur}s)")
+
+            # FFmpeg stream loop
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-stream_loop",
+                    str(loops - 1),
+                    "-i",
+                    str(lp_video),
+                    "-t",
+                    str(audio_dur),
+                    "-c",
+                    "copy",
+                    str(looped_motion),
+                ],
+                check=True,
+                capture_output=True,
+            )
+
+            motion_for_sync = str(looped_motion)
+        except Exception as e:
+            logger.error(f"Looping failed: {e}. Falling back to original video.")
+            motion_for_sync = str(lp_video)
 
     # 4. Generate Lip-Sync (Wav2Lip)
     logger.info("👄 Stage 3: Applying Lip-Sync (Wav2Lip)...")
