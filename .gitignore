@@ -77,7 +77,7 @@ hooks/hooks_server.err
 # Session and cookie data from browser extraction
 browser_sessions.json
 webtop_session.json
-.beads/
+
 .claude/
 contexts/*.pdf
 contexts/*.mp4
