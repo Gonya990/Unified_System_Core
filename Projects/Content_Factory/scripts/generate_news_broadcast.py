@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import sys
 from pathlib import Path
 
@@ -53,12 +54,74 @@ def generate_broadcast():
         logger.error("LivePortrait failed.")
         return
 
+    # 3.5 Loop Motion to match Audio (FFmpeg)
+    logger.info("♻️ Stage 2.5: Looping Motion to match Audio duration...")
+    looped_motion = output_dir / "unit_x_motion_looped.mp4"
+
+    # Get durations
+    try:
+        audio_dur = float(
+            subprocess.check_output(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-show_entries",
+                    "format=duration",
+                    "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    str(audio_path),
+                ]
+            ).strip()
+        )
+        video_dur = float(
+            subprocess.check_output(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-show_entries",
+                    "format=duration",
+                    "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    str(lp_video),
+                ]
+            ).strip()
+        )
+
+        loops = int(audio_dur / video_dur) + 1
+        logger.info(f"Looping video {loops} times (Audio: {audio_dur}s, Video: {video_dur}s)")
+
+        # FFmpeg stream loop
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-stream_loop",
+                str(loops - 1),
+                "-i",
+                str(lp_video),
+                "-t",
+                str(audio_dur),
+                "-c",
+                "copy",
+                str(looped_motion),
+            ],
+            check=True,
+            capture_output=True,
+        )
+
+        motion_for_sync = str(looped_motion)
+    except Exception as e:
+        logger.error(f"Looping failed: {e}. Falling back to original video.")
+        motion_for_sync = str(lp_video)
+
     # 4. Generate Lip-Sync (Wav2Lip)
     logger.info("👄 Stage 3: Applying Lip-Sync (Wav2Lip)...")
     w2l_controller = Wav2LipController()
-    # We apply Wav2Lip ON TOP of the LivePortrait video
+    # We apply Wav2Lip ON TOP of the looped LivePortrait video
     final_video = w2l_controller.animate(
-        face_path=str(lp_video), audio_path=str(audio_path), output_filename="final_news_broadcast.mp4"
+        face_path=motion_for_sync, audio_path=str(audio_path), output_filename="final_news_broadcast.mp4"
     )
 
     if final_video:
