@@ -82,7 +82,7 @@ def report_recent_production():
         data_file = doc_dir / "documentary_data.json"
         if data_file.exists():
             try:
-                with open(data_file, "r") as f:
+                with open(data_file) as f:
                     data = json.load(f)
                     title = html.escape(data.get("title", "Untitled Documentary"))
                     doc_msg = (
