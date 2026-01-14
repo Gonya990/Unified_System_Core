@@ -436,14 +436,13 @@ sessions. Refresh by running the documentation generation workflow.*
 - [x] Reference Audio placeholders assigned for Unit-X/Spark/Holo-Cat
 ```
 
-```
-
+```markdown
 ### Session: bf1f24ee-8eae-4925-ba3b-1c69f206b090 (Launch Production)
 - **Status**: Expressive head motion integrated. Stage 3 (Wav2Lip) rendering on CPU (~2h).
 - **Bot**: Integrated `/generate_news [character] [text]` command into `ai_telegram_bot_v2.py`.
 - **Character AI**: `character_profiles.json` created (Unit-X, Spark, Holo-Cat).
 - **CI Fix**: Dockerfile patched; all nodes sync'd via Vibranium.
-- **Artifacts**: [system_participation_registry.md](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/system_participation_registry.md), [walkthrough.md](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/walkthrough.md), [character_profiles.json](file:///Users/macbook/Documents/Unified_System/Projects/Content_Factory/config/character_profiles.json)
+- **Artifacts**: [registry](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/system_participation_registry.md), [walkthrough](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/walkthrough.md), [profiles](file:///Users/macbook/Documents/Unified_System/Projects/Content_Factory/config/character_profiles.json)
 
 ### Session: d8781fed-c6e9-42a4-b9a0-f743467e4389 (System Sync & Maintenance)
 - **Status**: Status checked, connectivity verified.
