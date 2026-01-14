@@ -15,9 +15,10 @@ class Wav2LipController:
             # Default: Projects/Content_Factory/src/lip_sync
             self.base_dir = Path(__file__).parent.resolve()
 
+        self.root_dir = Path(__file__).parent.parent.parent.parent.parent.resolve()
         self.wav2lip_root = self.base_dir / "Wav2Lip"
         self.checkpoints_dir = self.wav2lip_root / "checkpoints"
-        self.output_dir = Path("Projects/Content_Factory/outputs/lip_sync")
+        self.output_dir = self.root_dir / "Projects/Content_Factory/outputs/lip_sync"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Prefer GAN model for better visual quality

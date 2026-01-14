@@ -15,7 +15,9 @@ from Projects.Content_Factory.src.lip_sync.wav2lip_controller import Wav2LipCont
 # For now, we will use a shell command or existing testing script logic for XTTS
 
 # Add project root to sys.path
-sys.path.append(str(Path(__file__).parent.parent.parent.parent))
+ROOT_DIR = Path(__file__).parent.parent.parent.parent.resolve()
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,11 +36,15 @@ def generate_broadcast():
         or "Приветствую! Это Unit-X с эксклюзивным выпуском новостей. Сегодня мы успешно запустили систему LivePortrait для создания гиперреалистичного контента. Будущее уже наступило."
     )
     character_id = args.character
-    output_dir = Path("Projects/Content_Factory/outputs/production").resolve()
+    output_dir = ROOT_DIR / "Projects/Content_Factory/outputs/production"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Load character config
-    config_path = Path("Projects/Content_Factory/config/character_profiles.json").resolve()
+    config_path = ROOT_DIR / "Projects/Content_Factory/config/character_profiles.json"
+    if not config_path.exists():
+        logger.error(f"Config not found at {config_path}")
+        return
+
     with open(config_path) as f:
         profiles = json.load(f)
 
@@ -47,8 +53,8 @@ def generate_broadcast():
         return
 
     char = profiles[character_id]
-    avatar_path = Path(char["avatar_path"]).resolve()
-    ref_wav = Path(char["voice_ref_path"]).resolve()
+    avatar_path = ROOT_DIR / char["avatar_path"]
+    ref_wav = ROOT_DIR / char["voice_ref_path"]
     audio_path = output_dir / f"{character_id}_news_audio.wav"
 
     # 2. Generate Audio (XTTS)
