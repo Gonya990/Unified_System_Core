@@ -5,10 +5,20 @@ param(
     [switch]$Verbose
 )
 
+# Determine script root robustly
+$ScriptRoot = $PSScriptRoot
+if ([string]::IsNullOrEmpty($ScriptRoot)) {
+    $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
+if ([string]::IsNullOrEmpty($ScriptRoot)) {
+    $ScriptRoot = Get-Location
+}
+
 # Load configuration
-$ConfigPath = Join-Path $PSScriptRoot $ConfigFile
+$ConfigPath = Join-Path $ScriptRoot $ConfigFile
 if (-not (Test-Path $ConfigPath)) {
     Write-Error "Config file not found at: $ConfigPath"
+    Write-Error "Current Location: $(Get-Location)"
     exit 1
 }
 $config = Get-Content $ConfigPath | ConvertFrom-Json
