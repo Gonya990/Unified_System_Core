@@ -71,7 +71,7 @@
 | `2026-01-12_...` | **Comm CLI** | ✅ Done | task.md, walkthrough |
 | `b05bca38-e2...` | **System Sync & Youtube** | ✅ Done | task.md, walkthrough |
 | `75f5a657-2d...` | **Clockwork Governance** | 🔄 InPrg | task.md, walkthrough, conscience.py |
-| `b70aa625-09...` | **Launch Prep & AI Resilience** | ✅ Done | task.md, market_research, telegram_reporter |
+| `b70aa625-09...` | **Launch Prep & AI Resilience** | ✅ Done | task.md, market_research, telegram_reporter, brev_audit |
 <!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types

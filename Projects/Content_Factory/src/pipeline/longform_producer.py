@@ -174,14 +174,35 @@ def get_documentary_structure(topic: str) -> Optional[dict]:
             consensus = consensus.split("```")[1].split("```")[0].strip()
 
         # Try to find { ... } if looks like text
-        if not consensus.startswith("{"):
+        if "{" in consensus:
             start = consensus.find("{")
-            end = consensus.rfind("}")
-            if start != -1 and end != -1:
+            # Stack-based matching
+            brace_count = 0
+            found_end = -1
+            for i in range(start, len(consensus)):
+                if consensus[i] == "{":
+                    brace_count += 1
+                elif consensus[i] == "}":
+                    brace_count -= 1
+                    if brace_count == 0:
+                        found_end = i
+                        break
+            if found_end != -1:
+                consensus = consensus[start : found_end + 1]
+            else:
+                end = consensus.rfind("}")
                 consensus = consensus[start : end + 1]
 
+        # Clean up common JSON errors
+        def escape_control_chars(match):
+            s = match.group(1)
+            s = s.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
+            return f'": "{s}"'
+
+        consensus = re.sub(r'":\s*"([^"]*)"', escape_control_chars, consensus, flags=re.DOTALL)
+
         data = json.loads(consensus)
-        TRACKER.log("openai", len(plan_query) // 4, len(consensus) // 4)
+        TRACKER.log("nvidia", len(plan_query) // 4, len(consensus) // 4)
 
         try:
             asyncio.run(council.close())
@@ -241,13 +262,37 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
             content = content.split("```")[1].split("```")[0].strip()
 
         # Try to find { ... } if it's buried in text
-        if "{" in content and "}" in content:
+        if "{" in content:
             start = content.find("{")
-            end = content.rfind("}")
-            content = content[start : end + 1]
+            # Stack-based matching for the first complete JSON object
+            brace_count = 0
+            found_end = -1
+            for i in range(start, len(content)):
+                if content[i] == "{":
+                    brace_count += 1
+                elif content[i] == "}":
+                    brace_count -= 1
+                    if brace_count == 0:
+                        found_end = i
+                        break
+            if found_end != -1:
+                content = content[start : found_end + 1]
+            else:
+                # Fallback to rfind if stack matching fails
+                end = content.rfind("}")
+                content = content[start : end + 1]
 
         # Clean up some common LLM JSON errors (like trailing commas)
-        content = re.sub(r",\s*([\]}])", r"\1", content)
+        content = re.sub(r",\s*([\\]}])", r"\1", content)
+
+        # Robustly escape unescaped control characters inside JSON strings
+        def escape_control_chars(match):
+            s = match.group(1)
+            # Escape newlines, carriage returns, and tabs
+            s = s.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
+            return f'": "{s}"'
+
+        content = re.sub(r'":\s*"([^"]*)"', escape_control_chars, content, flags=re.DOTALL)
 
         try:
             seg_data = json.loads(content)
@@ -264,7 +309,7 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
                 return None
 
         # Approximate tokens
-        TRACKER.log("openai", len(prompt) // 4, len(content) // 4)
+        TRACKER.log("nvidia", len(prompt) // 4, len(content) // 4)
 
         try:
             asyncio.run(council.close())

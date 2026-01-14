@@ -27,6 +27,8 @@ preparing market research for the upcoming Kickstarter campaign.
 
 - **Market Research**: Generated deep competitive analysis for the AI
   Documentary Factory.
+- **NVIDIA Brev Audit**: Identified free A100 GPU compute tier and $100
+  credits for infrastructure optimization.
 - **Kickstarter**: Drafted campaign text and market validation survey questions.
 - **Telegram Reporting**: Created `telegram_reporter.py` and integrated it
   into the production engine for real-time status updates.
