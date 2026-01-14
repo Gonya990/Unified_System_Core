@@ -9,11 +9,21 @@ import sys
 import time
 import traceback
 from datetime import datetime, timedelta
+
+# Ensure we can import sibling modules irrespective of execution context
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from typing import Any, Optional
 
 import aiohttp
 import psutil
-from agent_orchestrator import PIPELINES, AgentOrchestrator
+
+try:
+    from src.agent_orchestrator import PIPELINES, AgentOrchestrator
+except ImportError:
+    from agent_orchestrator import PIPELINES, AgentOrchestrator
 from calendar_client import CalendarClient
 from config_manager import ConfigManager
 from conversation_manager import ConversationManager
