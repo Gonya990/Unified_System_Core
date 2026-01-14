@@ -438,15 +438,20 @@ sessions. Refresh by running the documentation generation workflow.*
 
 ```markdown
 ### Session: bf1f24ee-8eae-4925-ba3b-1c69f206b090 (Launch Production)
-- **Status**: Expressive head motion integrated. Stage 3 (Wav2Lip) rendering on CPU (~2h).
-- **Bot**: Integrated `/generate_news [character] [text]` command into `ai_telegram_bot_v2.py`.
-- **Character AI**: `character_profiles.json` created (Unit-X, Spark, Holo-Cat).
+- **Status**: Expressive head motion integrated.
+  Stage 3 (Wav2Lip) rendering on CPU (~2h).
+- **Bot**: Integrated `/generate_news [character] [text]` into bot.
+- **Character AI**: `character_profiles.json` created.
 - **CI Fix**: Dockerfile patched; all nodes sync'd via Vibranium.
-- **Artifacts**: [registry](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/system_participation_registry.md), [walkthrough](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/walkthrough.md), [profiles](file:///Users/macbook/Documents/Unified_System/Projects/Content_Factory/config/character_profiles.json)
+- **Artifacts**: [registry](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/system_participation_registry.md),
+  [walkthrough](file:///Users/macbook/.gemini/antigravity/brain/bf1f24ee-8eae-4925-ba3b-1c69f206b090/walkthrough.md),
+  [profiles](file:///Users/macbook/Documents/Unified_System/Projects/Content_Factory/config/character_profiles.json)
 
 ### Session: d8781fed-c6e9-42a4-b9a0-f743467e4389 (System Sync & Maintenance)
 - **Status**: Status checked, connectivity verified.
-- **Linting**: Fixed module-level import warnings in `ai_telegram_bot_v2.py` and `broadcast_generator.py` using `# noqa: E402`.
-- **News Generation**: Refactored `generate_news_broadcast.py`, `LivePortraitController`, and `Wav2LipController` to use absolute paths based on the project root. This ensures robust operation when called from the Telegram bot.
+- **Linting**: Fixed import warnings in `ai_telegram_bot_v2.py`
+  and `broadcast_generator.py` using `# noqa: E402`.
+- **News Generation**: Refactored `generate_news_broadcast.py` and
+  controllers to use absolute paths based on the project root.
 - **Sync**: Staged and committed WIP changes. Performing periodic maintenance fixes.
 - **Artifacts**: [task.md](file:///Users/macbook/.gemini/antigravity/brain/d8781fed-c6e9-42a4-b9a0-f743467e4389/task.md)
