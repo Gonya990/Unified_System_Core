@@ -1,7 +1,5 @@
-import os
 import json
-import shutil
-from pathlib import Path
+import os
 
 # Configuration
 TARGET_FOLDERS = [
@@ -23,7 +21,7 @@ TARGET_FOLDERS = [
 
 def load_hardware_report():
     try:
-        with open("hardware_report.json", "r", encoding="utf-8") as f:
+        with open("hardware_report.json", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         print("Hardware report not found. Running blind.")
