@@ -22,7 +22,7 @@ def send_telegram_report(message: str, silent: bool = False):
     payload = {
         "chat_id": CHAT_ID,
         "text": message,
-        "parse_mode": "Markdown",
+        "parse_mode": "HTML",
         "disable_notification": silent,
     }
 
@@ -36,24 +36,24 @@ def send_telegram_report(message: str, silent: bool = False):
 
 
 def report_production_start(topic: str):
-    msg = f"🚀 *ADF Production Started*\n\n📌 *Topic:* {topic}\n🛠 *Phase:* Planning & Research\n🤖 *Model:* NVIDIA NIM (Chairman)"
+    msg = f"🚀 <b>ADF Production Started</b>\n\n📌 <b>Topic:</b> {topic}\n🛠 <b>Phase:</b> Planning & Research\n🤖 <b>Model:</b> NVIDIA NIM (Chairman)"
     return send_telegram_report(msg)
 
 
 def report_phase_complete(phase: str, details: str = ""):
-    msg = f"✅ *Phase Complete: {phase}*\n\n{details}"
+    msg = f"✅ <b>Phase Complete: {phase}</b>\n\n{details}"
     return send_telegram_report(msg)
 
 
 def report_production_error(error: str):
-    msg = f"⚠️ *ADF Production Alert*\n\n❌ *Error:* {error}"
+    msg = f"⚠️ <b>ADF Production Alert</b>\n\n❌ <b>Error:</b> {error}"
     return send_telegram_report(msg)
 
 
 if __name__ == "__main__":
     # Test
     print("🧪 Testing Telegram Reporter...")
-    success = send_telegram_report("🤖 *ADF Launch System:* Online & Synchronized")
+    success = send_telegram_report("🤖 <b>ADF Launch System:</b> Online & Synchronized")
     if success:
         print("✅ Test message sent!")
     else:
