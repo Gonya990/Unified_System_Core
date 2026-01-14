@@ -1,0 +1,38 @@
+{
+    "unit_x": {
+        "display_name": "Unit-X",
+        "role": "Chief Tech Analyst",
+        "description": "Retro-futuristic TV-head host specializing in detailed technical breakdowns and geopolitics.",
+        "avatar_path": "Projects/Content_Factory/assets/avatars/unit_x.png",
+        "voice_ref_path": "secure_vault/biometrics/unit_x/ref.wav",
+        "primary_language": "ru",
+        "tone_preset": "analytical_anchor",
+        "social_handles": {
+            "telegram": "@UnitX_News"
+        }
+    },
+    "spark": {
+        "display_name": "Spark",
+        "role": "Global Innovation Scout",
+        "description": "High-agility mini-drone reporting live from the edge of innovation.",
+        "avatar_path": "Projects/Content_Factory/assets/avatars/spark.png",
+        "voice_ref_path": "secure_vault/biometrics/spark/ref.wav",
+        "primary_language": "en",
+        "tone_preset": "energetic_digital",
+        "social_handles": {
+            "threads": "@Spark_ADF"
+        }
+    },
+    "holo_cat": {
+        "display_name": "Holo-Cat",
+        "role": "Strategic Observer",
+        "description": "A holographic feline entity observing complex system dynamics with sophisticated detachment.",
+        "avatar_path": "Projects/Content_Factory/assets/avatars/holo_cat.png",
+        "voice_ref_path": "secure_vault/biometrics/holo_cat/ref.wav",
+        "primary_language": "he",
+        "tone_preset": "calm_mystical",
+        "social_handles": {
+            "instagram": "@HoloCat_ADF"
+        }
+    }
+}
