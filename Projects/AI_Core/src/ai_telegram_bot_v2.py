@@ -1,13 +1,45 @@
+import argparse
 import asyncio
 import json
 import logging
 import os
 import re
+import sqlite3
 import sys
+import time
+import traceback
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
 import aiohttp
+import psutil
+from agent_orchestrator import PIPELINES, AgentOrchestrator
+from calendar_client import CalendarClient
+from config_manager import ConfigManager
+from conversation_manager import ConversationManager
+from daily_scheduler import DailyScheduler
+from dotenv import load_dotenv
+from google_auth import GoogleAuthManager
+from health import start_health_server
+from identity_orchestrator import IdentityOrchestrator
+from inference_client import InferenceClient
+from telegram import (
+    BotCommand,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    Update,
+)
+from telegram.constants import ChatAction
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+from telegram_schema_expert import TelegramSchemaExpert
 
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,10 +47,6 @@ if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
 # Handle arguments before importing ConfigManager
-import argparse
-
-from dotenv import load_dotenv
-
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
 parser.add_argument("--env", help="Path to .env file", default=".env")
 args, unknown = parser.parse_known_args()
@@ -46,9 +74,6 @@ logger = logging.getLogger(__name__)
 logger.info(f"Bot instance: {bot_instance}, logging to {log_filename}")
 
 # Configuration
-from config_manager import ConfigManager
-from health import start_health_server
-
 config = ConfigManager()
 
 try:
@@ -62,24 +87,6 @@ except Exception as e:
     logger.error(f"Unexpected error importing DashboardService: {e}")
     DashboardService = None
 
-from inference_client import InferenceClient
-from telegram import (
-    BotCommand,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    ReplyKeyboardMarkup,
-    Update,
-)
-from telegram.constants import ChatAction
-from telegram.ext import (
-    Application,
-    CallbackQueryHandler,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters,
-)
-
 # Try Firestore first, fallback to SQLite
 try:
     from firestore_db import FirestoreDB
@@ -89,14 +96,6 @@ except ImportError:
     from user_context_db import UserContextDB
 
     _USE_FIRESTORE = False
-
-from agent_orchestrator import PIPELINES, AgentOrchestrator
-from calendar_client import CalendarClient
-from conversation_manager import ConversationManager
-from daily_scheduler import DailyScheduler
-from google_auth import GoogleAuthManager
-from identity_orchestrator import IdentityOrchestrator
-from telegram_schema_expert import TelegramSchemaExpert
 
 # Optional imports with fallbacks
 try:
@@ -762,7 +761,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         # Service status check
-        import psutil
 
         try:
             # Check if AI inference is reachable
@@ -1025,7 +1023,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif "code=" in user_text:
         # Extract code from URL like http://localhost:8085/oauth2callback?code=4/0ABC...
         # Also handles long URLs with other parameters
-        import re
 
         match = re.search(r"code=([^&\s]+)", user_text)
         if match:
@@ -1044,8 +1041,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     {"google_creds": credentials.to_json(), "is_google_connected": True}
                 )
             else:
-                import sqlite3
-
                 with sqlite3.connect("user_context.db") as conn:
                     cursor = conn.cursor()
                     cursor.execute(
@@ -1207,9 +1202,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         img_prompt = user_text
         for kw in IMAGE_KEYWORDS:
             if kw in lower_text:
-                # Use regex to replace case-insensitively
-                import re
-
                 img_prompt = re.sub(re.escape(kw), "", img_prompt, flags=re.IGNORECASE).strip()
                 break
 
@@ -1263,9 +1255,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "резюме",
             ]
             is_vacancy_query = any(v in lower_text for v in VACANCY_KEYWORDS)
-
-            # Extract count if mentioned (e.g., "30 писем")
-            import re
 
             count_match = re.search(r"(\d+)", lower_text)
             requested_count = int(count_match.group(1)) if count_match else 10
@@ -1475,10 +1464,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Validate response is not empty
     if not ai_response or not ai_response.strip():
-        ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз или смените провайдер через /settings."
+        ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз."
 
     # --- PROCESSS AI COMMANDS ([[TAG:args]]) ---
-    import re
 
     # 1. ALICE TTS
     alice_matches = re.findall(r"\[\[ALICE:(.*?)\]\]", ai_response)
@@ -1947,10 +1935,6 @@ async def setrole_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @require_role("ADMIN")
 async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    import time
-
-    import psutil
-
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     msg = await update.message.reply_text("📊 Loading dashboard...")
 
@@ -1966,8 +1950,8 @@ async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         inf_ok = await inference.health_check() if inference else False
 
         tb_info = "N/A"
-        if swarm_manager:
-            stats = swarm_manager.get_stats()
+        if inference and inference.swarm:
+            stats = inference.swarm.get_stats()
             tb = stats.get("token_broker", {})
             tb_info = f"{tb.get('active_keys', 0)}/{tb.get('total_keys', 0)} active, {tb.get('failed_keys', 0)} failed"
 
@@ -2612,10 +2596,6 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     msg = await update.message.reply_text("🔍 Проверяю системы...")
 
-    import time
-
-    import psutil
-
     try:
         cpu_usage = psutil.cpu_percent()
         mem = psutil.virtual_memory()
@@ -2646,9 +2626,9 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ha_status = "❌ Unreachable"
 
         swarm_section = ""
-        if swarm_manager:
+        if inference and inference.swarm:
             try:
-                swarm_stats = swarm_manager.get_stats()
+                swarm_stats = inference.swarm.get_stats()
                 tb_health = swarm_stats.get("token_broker", {})
                 active = tb_health.get("active_keys", 0)
                 total = tb_health.get("total_keys", 0)
@@ -2960,8 +2940,6 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Basic RTF cleanup (remove {} and control words)
             if file_name.lower().endswith(".rtf"):
-                import re
-
                 text_content = re.sub(r"[{}\\]", "", text_content)  # Very basic cleanup
                 text_content = re.sub(r"\\[a-z]+\d*", " ", text_content)  # Remove control words like \par
 
@@ -3467,8 +3445,6 @@ async def remind_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d"
         )
         return
-
-    import re
 
     time_str = context.args[0].lower()
     text = " ".join(context.args[1:])
@@ -4174,8 +4150,6 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
     logger.error(f"[ERROR] Exception while handling an update: {context.error}")
-    import traceback
-
     tb_str = "".join(traceback.format_exception(None, context.error, context.error.__traceback__))
     logger.error(f"[ERROR] Traceback:\n{tb_str}")
 
@@ -4224,25 +4198,6 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"🚀 Pipeline Started! PID: `{process.pid}`")
     except Exception as e:
         await update.message.reply_text(f"❌ Failed to start factory: {e}")
-
-
-async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /settings command."""
-    user_id = update.effective_user.id
-    if not db.is_approved(user_id):
-        return
-
-    current_model = inference.model
-    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-
-    await update.message.reply_text(
-        f"⚙️ **Настройки AI**\n\n"
-        f"🤖 Модель: `{current_model}`\n"
-        f"🔌 Провайдер: `{current_provider.upper()}`\n\n"
-        f"Используйте меню ниже для изменения:",
-        parse_mode="Markdown",
-        reply_markup=get_settings_menu(),
-    )
 
 
 async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4304,10 +4259,7 @@ def main():
                 creds = auth_manager.load_credentials(uid)
                 if creds and creds.valid:
                     logger.info(f"[STARTUP] Restored Google Session for user {uid}")
-                    # Update internal DB state if possible
                     try:
-                        import sqlite3
-
                         with sqlite3.connect("user_context.db") as conn:
                             cursor = conn.cursor()
                             # Check if user exists first to avoid error
@@ -4348,7 +4300,6 @@ def main():
         """Safely add a command handler, logging failures instead of crashing."""
         try:
             # Command names must be alphanumeric/underscores for Telegram
-            import re
 
             if not re.match(r"^[a-z0-9_]+$", cmd_name.lower()):
                 logger.warning(f"⚠️ [VIBRANIUM] Skipping invalid command name: '{cmd_name}'")
