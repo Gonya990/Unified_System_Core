@@ -1,6 +1,4 @@
-# Windows Archive Scanner | Сканер архивов Windows
-# English: Scans multiple drives for ZIP archives and catalogs them
-# Russian: Сканирует несколько дисков на наличие ZIP архивов и каталогизирует их
+# Windows Archive Scanner
 
 param(
     [string]$ConfigFile = "config.json",
@@ -11,7 +9,7 @@ param(
 $config = Get-Content $ConfigFile | ConvertFrom-Json
 
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║   Windows Archive Scanner | Сканер архивов Windows           ║" -ForegroundColor Cyan
+Write-Host "║   Windows Archive Scanner                                    ║" -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
@@ -24,12 +22,10 @@ $totalCount = 0
 foreach ($drive in $config.scan_settings.drives) {
     if (-not (Test-Path $drive)) {
         Write-Host "⚠ Drive $drive not found, skipping..." -ForegroundColor Yellow
-        Write-Host "⚠ Диск $drive не найден, пропускаем..." -ForegroundColor Yellow
         continue
     }
     
     Write-Host "🔍 Scanning drive: $drive" -ForegroundColor Green
-    Write-Host "🔍 Сканирование диска: $drive" -ForegroundColor Green
     
     # Find all ZIP files
     $searchPath = Join-Path $drive "*"
@@ -70,11 +66,11 @@ foreach ($drive in $config.scan_settings.drives) {
 # Generate summary
 Write-Host ""
 Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host " Scan Summary | Сводка сканирования" -ForegroundColor Cyan
+Write-Host " Scan Summary" -ForegroundColor Cyan
 Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Total Archives | Всего архивов: $totalCount" -ForegroundColor Green
-Write-Host "Total Size | Общий размер: $([math]::Round($totalSize / 1GB, 2)) GB" -ForegroundColor Green
+Write-Host "Total Archives: $totalCount" -ForegroundColor Green
+Write-Host "Total Size: $([math]::Round($totalSize / 1GB, 2)) GB" -ForegroundColor Green
 Write-Host ""
 
 # Save results
@@ -93,13 +89,12 @@ $scanReport = [PSCustomObject]@{
 $scanReport | ConvertTo-Json -Depth 10 | Out-File $outputFile -Encoding UTF8
 
 Write-Host "✓ Scan results saved to: $outputFile" -ForegroundColor Green
-Write-Host "✓ Результаты сканирования сохранены в: $outputFile" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next step | Следующий шаг: python analyze_content.py $outputFile" -ForegroundColor Yellow
+Write-Host "Next step: python analyze_content.py $outputFile" -ForegroundColor Yellow
 Write-Host ""
 
 # Display top 10 largest archives
-Write-Host "Top 10 Largest Archives | 10 самых больших архивов:" -ForegroundColor Cyan
+Write-Host "Top 10 Largest Archives:" -ForegroundColor Cyan
 $results | Sort-Object -Property SizeGB -Descending | Select-Object -First 10 | 
     Format-Table Name, SizeGB, AgeDays, Drive -AutoSize
 
