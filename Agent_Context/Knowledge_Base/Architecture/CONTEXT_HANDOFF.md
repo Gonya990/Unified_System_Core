@@ -1,7 +1,11 @@
 # 🌌 ANTIGRAVITY CONTEXT HANDOFF
 >
-> **Generated:** 2025-12-23  
-> **Purpose:** Complete system knowledge transfer for session continuity
+> [!IMPORTANT]
+> **SOVEREIGN FILE:** Данный файл является основным журналом оркестрации.
+> Он должен находиться только на **Mac** станции. Права на редактирование
+> строго ограничены **Gonya990** и связанными авторизованными ID.
+>
+> **Purpose:** Полная передача знаний о системе для непрерывности сессий.
 >
 > **Redirect:** Kostya is currently operating as **AzureBeacon**. All tasks
 > assigned to Kostya should be handled by/directed to AzureBeacon.
