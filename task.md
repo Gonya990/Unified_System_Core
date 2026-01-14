@@ -16,9 +16,16 @@
 - [x] **Contact Form Update** <!-- id: 1 -->
   - [x] Verify `feedback_type` field
   - [x] Fix React console warnings
-- [ ] **Infrastructure & Security** <!-- id: 2 -->
-  - [ ] `global1sim` Submodule Integration (⛔️ **LOCKED**: Requires Biometric Auth/Access Keys)
-  - [ ] Security Scan for new modules
+- [x] **Windows Archive Cleanup** <!-- id: 3 -->
+  - [x] Fix Linting & Encoding (English)
+  - [x] Fix Path Resolution (`$PSScriptRoot`)
+  - [x] Fix Config Regex Patterns
+  - [x] Deploy & Verify Execution (Partial Success)
+
+## Infrastructure & Security
+
+- [ ] `global1sim` Submodule Integration (⛔️ **LOCKED**: Requires Biometric Auth/Access Keys)
+- [ ] Security Scan for new modules
 
 ## Backlog
 
