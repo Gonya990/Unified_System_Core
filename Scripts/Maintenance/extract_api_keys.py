@@ -2,6 +2,7 @@
 """
 Extract API keys from open browser tabs
 """
+
 import json
 import re
 
@@ -11,24 +12,24 @@ import websocket
 
 def get_tabs():
     resp = requests.get("http://localhost:9222/json")
-    return [t for t in resp.json() if t.get('type') == 'page']
+    return [t for t in resp.json() if t.get("type") == "page"]
+
 
 def run_js(ws_url, expression):
     try:
         ws = websocket.create_connection(ws_url, timeout=10)
-        ws.send(json.dumps({
-            "id": 1,
-            "method": "Runtime.evaluate",
-            "params": {
-                "expression": expression,
-                "returnByValue": True
-            }
-        }))
+        ws.send(
+            json.dumps(
+                {"id": 1, "method": "Runtime.evaluate", "params": {"expression": expression, "returnByValue": True}}
+            )
+        )
         result = json.loads(ws.recv())
         ws.close()
         return result.get("result", {}).get("result", {}).get("value")
-    except:
+    except Exception as e:
+        print(f"WS error: {e}")
         return None
+
 
 def main():
     tabs = get_tabs()
@@ -48,7 +49,7 @@ def main():
             html = run_js(ws_url, "document.body.innerText")
             if html:
                 # Look for API key pattern
-                match = re.search(r'([a-f0-9]{64})', html)
+                match = re.search(r"([a-f0-9]{64})", html)
                 if match:
                     keys["SERPAPI_KEY"] = match.group(1)
                     print(f"   ✅ Found key: {match.group(1)[:20]}...")
@@ -58,7 +59,7 @@ def main():
             print("🔍 Checking OpenRouter...")
             html = run_js(ws_url, "document.body.innerText")
             if html:
-                match = re.search(r'(sk-or-v1-[a-f0-9]{64})', html)
+                match = re.search(r"(sk-or-v1-[a-f0-9]{64})", html)
                 if match:
                     keys["OPENROUTER_KEY"] = match.group(1)
                     print(f"   ✅ Found key: {match.group(1)[:30]}...")
@@ -71,16 +72,16 @@ def main():
             if data:
                 storage = json.loads(data)
                 for k, v in storage.items():
-                    if 'nvapi' in str(v).lower() or 'key' in k.lower():
+                    if "nvapi" in str(v).lower() or "key" in k.lower():
                         print(f"   Found localStorage key: {k}")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔑 EXTRACTED API KEYS")
-    print("="*60)
+    print("=" * 60)
 
     if keys:
         for name, key in keys.items():
-            print(f"\nexport {name}=\"{key}\"")
+            print(f'\nexport {name}="{key}"')
 
         # Append to .env
         with open(".env", "a") as f:
@@ -93,6 +94,7 @@ def main():
         print("Keys might be hidden. Check manually:")
         print("  - SerpAPI: https://serpapi.com/dashboard")
         print("  - OpenRouter: https://openrouter.ai/settings/keys")
+
 
 if __name__ == "__main__":
     main()

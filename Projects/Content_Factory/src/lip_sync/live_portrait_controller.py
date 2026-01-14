@@ -13,10 +13,12 @@ class LivePortraitController:
         if base_dir:
             self.base_dir = Path(base_dir)
         else:
-            # Default: Projects/Content_Factory/src/live_portrait
-            self.base_dir = Path("Projects/Content_Factory/src/live_portrait").resolve()
+            # Determine root from file location: Projects/Content_Factory/src/lip_sync/live_portrait_controller.py
+            # 1. lip_sync, 2. src, 3. Content_Factory, 4. Projects, 5. Unified_System
+            self.root_dir = Path(__file__).parent.parent.parent.parent.parent.resolve()
+            self.base_dir = self.root_dir / "Projects/Content_Factory/src/live_portrait"
 
-        self.output_dir = Path("Projects/Content_Factory/outputs/live_portrait")
+        self.output_dir = self.root_dir / "Projects/Content_Factory/outputs/live_portrait"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Default driving video (from the repo examples)

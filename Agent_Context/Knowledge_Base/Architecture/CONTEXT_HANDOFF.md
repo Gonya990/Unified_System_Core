@@ -447,5 +447,6 @@ sessions. Refresh by running the documentation generation workflow.*
 ### Session: d8781fed-c6e9-42a4-b9a0-f743467e4389 (System Sync & Maintenance)
 - **Status**: Status checked, connectivity verified.
 - **Linting**: Fixed module-level import warnings in `ai_telegram_bot_v2.py` and `broadcast_generator.py` using `# noqa: E402`.
-- **Sync**: Staged and committed WIP changes. Preparing for Vibranium Full Sync.
+- **News Generation**: Refactored `generate_news_broadcast.py`, `LivePortraitController`, and `Wav2LipController` to use absolute paths based on the project root. This ensures robust operation when called from the Telegram bot.
+- **Sync**: Staged and committed WIP changes. Performing periodic maintenance fixes.
 - **Artifacts**: [task.md](file:///Users/macbook/.gemini/antigravity/brain/d8781fed-c6e9-42a4-b9a0-f743467e4389/task.md)
