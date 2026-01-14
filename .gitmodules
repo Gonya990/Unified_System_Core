@@ -8,7 +8,7 @@
 
 [submodule "Projects/global1sim"]
 	path = Projects/global1sim
-	url = https://github.com/KostaGorod/global1sim.git
+	url = git@github.com:KostaGorod/global1sim.git
 	ignore = all
 	update = none
 
