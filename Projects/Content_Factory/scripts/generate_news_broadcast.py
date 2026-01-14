@@ -10,6 +10,7 @@ from TTS.api import TTS
 
 from Projects.Content_Factory.src.lip_sync.live_portrait_controller import LivePortraitController
 from Projects.Content_Factory.src.lip_sync.wav2lip_controller import Wav2LipController
+
 # Note: XTTS client might be in Projects/AI_Core or similar
 # For now, we will use a shell command or existing testing script logic for XTTS
 

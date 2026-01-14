@@ -1,5 +1,6 @@
-from Projects.Content_Factory.src.lip_sync.live_portrait_controller import LivePortraitController
 import logging
+
+from Projects.Content_Factory.src.lip_sync.live_portrait_controller import LivePortraitController
 
 logging.basicConfig(level=logging.INFO)
 

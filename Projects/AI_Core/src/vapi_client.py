@@ -6,7 +6,7 @@ Integrates with VAPI.ai platform for real-time voice conversations.
 import asyncio
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class VAPIClient:
             # This is a placeholder for the actual SDK call
             # Implementation depends on VAPI SDK version and available methods
 
-            with open(audio_path, "rb") as audio_file:
+            with open(audio_path, "rb"):
                 # Example using VAPI's transcription API
                 # Note: Actual implementation depends on VAPI SDK methods
                 logger.debug(f"Transcribing audio from {audio_path}")
@@ -183,7 +183,7 @@ class VAPIClient:
         phone_number: str,
         system_message: str,
         assistant_id: Optional[str] = None,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Initiate outbound phone call using VAPI.
 
@@ -229,7 +229,7 @@ class VAPIClient:
 
     def _create_call_sync(
         self, phone_number: str, system_message: str, assistant_id: Optional[str]
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Synchronous wrapper for VAPI phone call creation.
         Called from async context via run_in_executor.
@@ -269,7 +269,7 @@ class VAPIClient:
             logger.error(f"Call creation error: {e}")
             return None
 
-    def get_call_status(self, call_id: str) -> Optional[Dict[str, Any]]:
+    def get_call_status(self, call_id: str) -> Optional[dict[str, Any]]:
         """
         Get status of a phone call.
 
@@ -297,7 +297,7 @@ class VAPIClient:
         model: Optional[str] = None,
         voice_provider: Optional[str] = None,
         voice_id: Optional[str] = None,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Create a new voice assistant in VAPI.
 
@@ -338,24 +338,12 @@ class VAPIClient:
         model: Optional[str],
         voice_provider: Optional[str],
         voice_id: Optional[str],
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Synchronous wrapper for assistant creation."""
         try:
             logger.debug(f"Creating assistant: {name}")
 
             # Build assistant config
-            assistant_config = {
-                "name": name,
-                "model": {
-                    "provider": "openai",
-                    "model": model or "gpt-4o",
-                    "messages": [{"role": "system", "content": system_prompt}],
-                },
-                "voice": {
-                    "provider": voice_provider or "11labs",
-                    "voiceId": voice_id or "rachel",
-                },
-            }
 
             # Would create: response = self.client.assistants.create(**assistant_config)
             logger.debug("Assistant config prepared")

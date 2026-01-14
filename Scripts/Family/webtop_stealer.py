@@ -31,11 +31,11 @@ def main():
         (function() {
             // Try to find homework items in the DOM
             const items = Array.from(document.querySelectorAll('.homework-item, [class*="homework"]')).map(el => el.innerText);
-            
+
             // Also grab the auth tokens from localStorage
             const auth = localStorage.getItem('token') || localStorage.getItem('access_token');
             const user = localStorage.getItem('user');
-            
+
             return JSON.stringify({
                 url: window.location.href,
                 homework_dom: items,

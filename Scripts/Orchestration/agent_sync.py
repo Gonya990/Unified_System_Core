@@ -22,7 +22,7 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 # Optional .env loading (no hard dependency in committed code)
 try:
@@ -55,10 +55,10 @@ class SyncResult:
     """Result of a sync operation"""
     success: bool
     component: str
-    data: Dict[str, Any] = field(default_factory=dict)
+    data: dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             'success': self.success,
             'component': self.component,
@@ -72,14 +72,14 @@ class SyncReport:
     """Aggregated sync report"""
     timestamp: str
     agent_name: str
-    results: List[SyncResult] = field(default_factory=list)
+    results: list[SyncResult] = field(default_factory=list)
 
     @property
     def all_success(self) -> bool:
         return all(r.success for r in self.results)
 
     @property
-    def urgent_messages(self) -> List[Dict]:
+    def urgent_messages(self) -> list[dict]:
         for r in self.results:
             if r.component == 'inbox' and r.success:
                 return [m for m in r.data.get('messages', [])
@@ -87,13 +87,13 @@ class SyncReport:
         return []
 
     @property
-    def ready_tasks(self) -> List[Dict]:
+    def ready_tasks(self) -> list[dict]:
         for r in self.results:
             if r.component == 'beads' and r.success:
                 return r.data.get('ready', [])
         return []
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             'timestamp': self.timestamp,
             'agent_name': self.agent_name,
@@ -375,7 +375,7 @@ Examples:
   agent_sync.py                 Full sync (health + register + inbox + beads)
   agent_sync.py --quick         Quick sync (inbox + beads only)
   agent_sync.py inbox           Inbox only
-  agent_sync.py beads           Beads only  
+  agent_sync.py beads           Beads only
   agent_sync.py status          Current status
   agent_sync.py --json          Output as JSON
         """
