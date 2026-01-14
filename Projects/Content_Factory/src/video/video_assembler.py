@@ -4,12 +4,11 @@ Video Assembler
 Combines Avatar video with B-Roll clips for dynamic content
 """
 
+import os
 import shutil
 import subprocess  # nosec B404
 import tempfile
 from pathlib import Path
-
-import os
 
 
 # Resolve absolute paths for tools to avoid binary not found errors

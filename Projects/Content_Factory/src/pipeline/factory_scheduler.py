@@ -31,13 +31,13 @@ load_dotenv(ROOT_DIR / ".env")
 
 
 from account_manager import AccountManager  # noqa: E402
-from telegram_notifier import send_telegram_message  # noqa: E402
 from daily_researcher import (  # noqa: E402
     generate_vision_assets,
     run_daily_research,
     translate_to_english,
     translate_to_hebrew,
 )
+from telegram_notifier import send_telegram_message  # noqa: E402
 
 try:
     from insta_uploader import upload_reel  # noqa: E402

@@ -1,24 +1,22 @@
-import os
 import base64
-import re
-from pathlib import Path
-from googleapiclient.discovery import build
+
 from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 TOKEN_PATH = "Scripts/automation/.credentials/gmail_token.json"
 
 def main():
     creds = Credentials.from_authorized_user_file(TOKEN_PATH)
     service = build("gmail", "v1", credentials=creds)
-    
+
     query = "subject:\"Gonya990/Unified_System_Core - 1 internal incident detected\""
     results = service.users().messages().list(userId="me", q=query, maxResults=1).execute()
     messages = results.get("messages", [])
-    
+
     if messages:
         mid = messages[0]["id"]
         data = service.users().messages().get(userId="me", id=mid, format="full").execute()
-        
+
         def get_text(p):
             if "body" in p and "data" in p["body"]:
                 return base64.urlsafe_b64decode(p["body"]["data"]).decode("utf-8", errors="ignore")

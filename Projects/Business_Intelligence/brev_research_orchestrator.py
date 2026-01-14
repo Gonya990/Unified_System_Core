@@ -23,13 +23,13 @@ async def council_brev_audit():
 
     query = """
     Perform an in-depth research on NVIDIA Brev (brev.dev).
-    
+
     FOCUS:
     1. Identify exact 'Zero-Cost' (Free Tier) services available right now.
     2. Are there complementary GPU credits for new developers?
     3. How can we use Brev to host NVIDIA NIM for free or at minimum cost?
     4. Compare Brev with regular NVIDIA NIM API usage.
-    
+
     Deliver a structured report in Markdown.
     """
 

@@ -1,10 +1,10 @@
-import os
-import json
-import time
 import hashlib
-import requests
 import logging
-from typing import Dict, Any, Optional
+import os
+import time
+from typing import Any, Optional
+
+import requests
 from dotenv import load_dotenv
 
 # Load Environment
@@ -40,7 +40,7 @@ class MetaCAPIService:
             return None
         return hashlib.sha256(data.strip().lower().encode("utf-8")).hexdigest()
 
-    def send_event(self, event_name: str, user_data: Dict[str, Any], custom_data: Optional[Dict] = None):
+    def send_event(self, event_name: str, user_data: dict[str, Any], custom_data: Optional[dict] = None):
         """
         Sends a filtered server-side event to Meta.
 
