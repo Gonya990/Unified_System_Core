@@ -1,10 +1,25 @@
 [submodule "External_Tools/Stack/mcp_agent_mail"]
 	path = External_Tools/Stack/mcp_agent_mail
 	url = https://github.com/Dicklesworthstone/mcp_agent_mail.git
+
 [submodule "infra/cliproxyapi/src"]
 	path = infra/cliproxyapi/src
 	url = https://github.com/router-for-me/CLIProxyAPI
+
 [submodule "Projects/global1sim"]
 	path = Projects/global1sim
 	url = https://github.com/KostaGorod/global1sim.git
 	ignore = all
+	update = none
+
+[submodule "Projects/Content_Factory/src/lip_sync/Wav2Lip"]
+	path = Projects/Content_Factory/src/lip_sync/Wav2Lip
+	url = https://github.com/Rudrabha/Wav2Lip.git
+	ignore = all
+	update = none
+
+[submodule "Projects/Content_Factory/src/live_portrait"]
+	path = Projects/Content_Factory/src/live_portrait
+	url = https://github.com/KwaiVGI/LivePortrait.git
+	ignore = all
+	update = none
