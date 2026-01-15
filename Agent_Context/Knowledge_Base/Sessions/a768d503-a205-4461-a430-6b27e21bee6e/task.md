@@ -18,10 +18,11 @@
   - [x] **Copilot CLI**: Updated and verified `gh copilot`.
   - [x] **GitHub MCP**: Configured `github-mcp-server`.
   - [x] **Auth**: Checked `gh` CLI auth (Logged in as Gonya990).
-- [/] **System Orchestration & Sync** <!-- id: 13 -->
+- [/] **System Orchestration & Sync** <!-- id: 13 --> <!-- CURRENT FOCUS -->
   - [x] **Status**: Tailscale/Ping nodes (Done).
   - [x] **Vibranium Sync**: Pushed local changes to main.
-  - [/] **Documentation**: Update `CONTEXT_HANDOFF.md`.
+  - [x] **Documentation**: Update `CONTEXT_HANDOFF.md`.
+  - [/] **Workflows**: Executing /status, /sync-mail, /update-progress, /sync.
 - [ ] **Family Assistant (Webtop Integration)** <!-- id: 9 -->
   - [/] **API Fix**: Logic for `webtop_client.py` is hitting HTML.
 
