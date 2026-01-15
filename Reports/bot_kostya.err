@@ -3250,3 +3250,1132 @@ Traceback (most recent call last):
     raise exception
 telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 409 Conflict"
+[ERROR] Exception while handling an update: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[ERROR] Traceback:
+Traceback (most recent call last):
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/macbook/Documents/Unified_System/.venv/lib/python3.14/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+HTTP Request: POST https://api.telegram.org/bot8518131338:AAGp4GpyNR0S-Dq3bwzD0rPkZN0sEcBLaB0/getUpdates "HTTP/1.1 200 OK"
+Application is stopping. This might take a moment.
+Scheduler has been shut down
+Application.stop() complete
+Task was destroyed but it is pending!
+task: <Task pending name='Task-5' coro=<DailyScheduler.start() running at /Users/macbook/Documents/Unified_System/Projects/AI_Core/src/daily_scheduler.py:26> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10f9eda80>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10f9ef790>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10f9ee7a0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fb95b70>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fb97970>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fb97c40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fb96a70>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbb5f30>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbb6d40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbb74c0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbb7e20>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbb7c40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbe5f30>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbe66b0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbe74c0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbe7e20>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc25120>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fbe7c40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc266b0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc274c0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc50310>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc27e20>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc518a0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc526b0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc534c0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc53c40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc53f10>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc858a0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc866b0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc86e30>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc87c40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fc87f10>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbd8a0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbe020>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbee30>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbfc40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbff10>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fcbf5b0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<sys>:0: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x10fce6020>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
