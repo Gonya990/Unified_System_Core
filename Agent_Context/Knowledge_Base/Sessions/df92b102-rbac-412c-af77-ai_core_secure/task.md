@@ -27,7 +27,8 @@
 ### Фаза 3: Оркестрация <!-- id: 103 -->
 
 - [x] Обновить документацию по безопасности (`AGENTS_LEARNING_SCHEME.md` created) <!-- id: 103a -->
-- [x] Синхронизация изменений (Fixed `InvalidToken` bug, Service Active) <!-- id: 103b -->
+- [x] Синхронизация изменений <!-- id: 103b -->
+      (Fixed `InvalidToken` bug, Service Active)
       > **Note**: `telegram.error.Conflict` detected. Rogue instance on
       > `unified-home-core` (100.110.209.49) is fighting for the token.
       > **Action**: Reboot `unified-home-core` or fix Tailscale ACLs to
