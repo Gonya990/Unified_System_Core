@@ -196,9 +196,7 @@ Each conversation folder may contain:
 - [x] Sync Mail & Check Coordination (/sync-mail)
 - [/] Update Progress & Documentation (/update-progress)
 - [ ] Run Full Vibranium Sync (/sync)
-```
 
-```
 
 ### General Outstanding Items
 
