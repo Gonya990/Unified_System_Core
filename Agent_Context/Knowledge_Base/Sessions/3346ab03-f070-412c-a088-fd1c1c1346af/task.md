@@ -8,4 +8,8 @@
 - [x] Run Full Vibranium Sync (/sync) <!-- id: 104 -->
 - [ ] OpenAI Export Integration (/openai-export) <!-- id: 105 -->
   <!-- BLOCKED: No email/file received from OpenAI -->
-  <!-- CURRENT FOCUS -->
+
+## Phase 2: Infrastructure Repair (MCP) <!-- id: 200 -->
+
+- [x] Check WSL Status on `igor-gaming` <!-- id: 201 -->
+- [x] Configure Auto-start for WSL on Windows Boot <!-- id: 202 -->
