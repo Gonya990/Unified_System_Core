@@ -482,6 +482,8 @@ sessions. Refresh by running the documentation generation workflow.*
 - **Blocked**: `/openai-export` workflow paused (no email/file from OpenAI).
 - **Integration**: **Codex/GitHub Connected** ✅. Direct repo access enabled.
 - **Network**: **OFFICE** (Core ✅). `igor-gaming-1` (MCP) is **ONLINE** ✅.
+  > ⚠️ **Isolation Warning**: Bot (`igor-gaming-1`) cannot reach Kostya's Network (`pve.myth-rudd`) because it is a Tagged Device.
+  > **Fix**: Re-auth `igor-gaming-1` as User or setup Subnet Router.
 - **Next**: Monitor export email. Verify `WSL_AutoStart` task on next logon.
 
 ### Session: df92b102-rbac-412c-af77-ai_core_secure (AI Core RBAC)
