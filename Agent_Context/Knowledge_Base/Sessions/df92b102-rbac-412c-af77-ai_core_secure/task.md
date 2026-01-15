@@ -31,6 +31,8 @@
 
 - [x] Синхронизация изменений <!-- id: 103b -->
       (Fixed `InvalidToken` bug, Service Active)
-      > **Status**: Conflict resolved. Rogue instance on `unified-home-core`
-      > (100.110.209.49) was successfully rebooted via Proxmox PVE API (VM 106).
-      > Service on `igor-gaming-1` is now stable.
+      > **Status**: **Success!** Conflict resolved by stopping `unified-home-core`
+      > (VM 106). Bot on `igor-gaming-1` is now stable and processing
+      > updates (`HTTP 200`).
+      > **Warning**: VM 106 is currently STOPPED. You must disable `ai-bot` inside
+      > VM 106 via Proxmox Console before starting it again.
