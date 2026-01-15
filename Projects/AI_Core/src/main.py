@@ -35,7 +35,7 @@ load_dotenv(env_path, override=True)
 token = os.environ.get("TELEGRAM_BOT_TOKEN", "NOT_SET")
 print(f"[BOOT] Token loaded: {token[:5]}...{token[-5:] if len(token) > 10 else ''}")
 
-from ai_telegram_bot_v2 import main
-
 if __name__ == "__main__":
+    from ai_telegram_bot_v2 import main
+
     main()
