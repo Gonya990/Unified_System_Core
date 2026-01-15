@@ -394,8 +394,10 @@ class RBACManager:
                                 project=ProjectScope(row["project"]),
                                 resource=row["resource"],
                                 permissions={Permission(p) for p in json.loads(row["permissions"])},
-                                granted_by=row.get("granted_by"),
-                                granted_at=datetime.fromisoformat(row["granted_at"]) if row.get("granted_at") else None,
+                                granted_by=row["granted_by"] if "granted_by" in row.keys() else None,
+                                granted_at=datetime.fromisoformat(row["granted_at"])
+                                if "granted_at" in row.keys() and row["granted_at"]
+                                else None,
                             )
                         )
                     return entries
