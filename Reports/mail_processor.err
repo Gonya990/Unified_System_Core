@@ -91,3 +91,77 @@
 2026-01-13 18:37:36 - MailProcessor - INFO -    Poll interval: 60s
 2026-01-13 18:37:36 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
 2026-01-13 18:37:36 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-15 02:03:41 - MailProcessor - INFO - Loaded 296 processed message IDs
+2026-01-15 02:03:41 - MailProcessor - INFO - 🚀 Mail Processor starting...
+2026-01-15 02:03:42 - MailProcessor - INFO - ✅ Registered as agent: PinkLake (ID: 3)
+2026-01-15 02:03:42 - MailProcessor - INFO -    Poll interval: 60s
+2026-01-15 02:03:42 - MailProcessor - INFO -    Council agents: FuchsiaCat, VioletCastle, PinkLake, Kostya, WhiteMill, IvoryOtter, CalmSnow, BlueLake, GreenCastle, RedStone
+2026-01-15 02:03:42 - MailProcessor - INFO -    Alert keywords: 29 configured
+2026-01-15 02:04:44 - MailProcessor - INFO - Processing message #531 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:04:44 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:04:44 - MailProcessor - INFO - Processing message #530 from PinkLake: Unified Bot Online
+2026-01-15 02:04:44 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:04:45 - MailProcessor - INFO - Processing message #529 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:04:45 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:04:45 - MailProcessor - INFO - Processing message #528 from PinkLake: Unified Bot Online
+2026-01-15 02:04:45 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:04:45 - MailProcessor - INFO - Processed 4 new messages
+2026-01-15 02:05:46 - MailProcessor - INFO - Processing message #532 from PinkLake: Unified Bot Online
+2026-01-15 02:05:46 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:05:47 - MailProcessor - INFO - Processed 1 new messages
+2026-01-15 02:06:47 - MailProcessor - INFO - Processing message #535 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:06:47 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:06:48 - MailProcessor - INFO - Processing message #534 from PinkLake: Unified Bot Online
+2026-01-15 02:06:48 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:06:48 - MailProcessor - INFO - Processing message #533 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:06:48 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:06:49 - MailProcessor - INFO - Processed 3 new messages
+2026-01-15 02:20:59 - MailProcessor - INFO - Processing message #536 from PinkLake: Unified Bot Online
+2026-01-15 02:20:59 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:20:59 - MailProcessor - INFO - Processed 1 new messages
+2026-01-15 02:22:00 - MailProcessor - INFO - Processing message #540 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:22:00 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:22:00 - MailProcessor - INFO - Processing message #539 from PinkLake: Unified Bot Online
+2026-01-15 02:22:00 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:22:00 - MailProcessor - INFO - Processing message #538 from FrostyMeadow: Unified Bot Online (Vibranium Core)
+2026-01-15 02:22:00 - MailProcessor - INFO - Processing message #537 from FrostyMeadow: Unified Bot Online
+2026-01-15 02:22:00 - MailProcessor - INFO - Processed 4 new messages
+2026-01-15 02:26:02 - MailProcessor - INFO - Processing message #542 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:26:02 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:26:02 - MailProcessor - INFO - Processing message #541 from PinkLake: Unified Bot Online
+2026-01-15 02:26:02 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:26:02 - MailProcessor - INFO - Processed 2 new messages
+2026-01-15 02:27:02 - MailProcessor - INFO - Processing message #546 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:27:02 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:27:02 - MailProcessor - INFO - Processing message #545 from PinkLake: Unified Bot Online
+2026-01-15 02:27:02 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:27:03 - MailProcessor - INFO - Processing message #544 from OrangeStone: Unified Bot Online (Vibranium Core)
+2026-01-15 02:27:03 - MailProcessor - INFO - Processing message #543 from OrangeStone: Unified Bot Online
+2026-01-15 02:27:03 - MailProcessor - INFO - Processed 4 new messages
+2026-01-15 02:28:03 - MailProcessor - INFO - Processing message #548 from OrangeStone: Unified Bot Online (Vibranium Core)
+2026-01-15 02:28:03 - MailProcessor - INFO - Processing message #547 from OrangeStone: Unified Bot Online
+2026-01-15 02:28:03 - MailProcessor - INFO - Processed 2 new messages
+2026-01-15 02:29:04 - MailProcessor - INFO - Processing message #551 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:29:04 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:29:06 - MailProcessor - INFO - Processing message #550 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:29:06 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:29:06 - MailProcessor - INFO - Processing message #549 from PinkLake: Unified Bot Online
+2026-01-15 02:29:06 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:29:06 - MailProcessor - INFO - Processed 3 new messages
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #561 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #560 from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #559 from PinkLake: Unified Bot Online
+2026-01-15 02:30:07 - MailProcessor - INFO - 📋 Council message from PinkLake: Unified Bot Online
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #558 from FrostyMeadow: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #557 from OrangeStone: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:07 - MailProcessor - INFO - Processing message #556 from FrostyMeadow: Unified Bot Online
+2026-01-15 02:30:08 - MailProcessor - INFO - Processing message #555 from OrangeStone: Unified Bot Online
+2026-01-15 02:30:08 - MailProcessor - INFO - Processing message #554 from OrangeStone: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:08 - MailProcessor - INFO - Processing message #553 from FrostyMeadow: Unified Bot Online (Vibranium Core)
+2026-01-15 02:30:08 - MailProcessor - INFO - Processing message #552 from OrangeStone: Unified Bot Online
+2026-01-15 02:30:08 - MailProcessor - INFO - Processed 10 new messages
+2026-01-15 02:44:13 - MailProcessor - INFO - Processing message #562 from CrimsonTower: URGENT: Context Handoff Request - Core-AI & secure_vault Clarification
+2026-01-15 02:44:13 - MailProcessor - ERROR - Telegram API error: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 666"}
+2026-01-15 02:44:13 - MailProcessor - INFO - Processed 1 new messages
