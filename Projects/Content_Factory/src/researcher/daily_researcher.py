@@ -30,6 +30,38 @@ load_dotenv(ROOT_DIR / ".env")
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 
+# Retry configuration
+MAX_RETRIES = 5
+BASE_DELAY = 1.0
+RETRYABLE_CODES = (429, 500, 502, 503, 504)
+
+
+def _calculate_backoff(attempt: int, base_delay: float = BASE_DELAY, max_delay: float = 60.0) -> float:
+    """Calculate delay with exponential backoff and jitter."""
+    delay = min(base_delay * (2**attempt), max_delay)
+    return delay * (0.5 + random.random())
+
+
+def _is_retryable_error(exception) -> bool:
+    """Check if an exception is retryable."""
+    if hasattr(exception, "status_code"):
+        return exception.status_code in RETRYABLE_CODES
+    msg = str(exception)
+    for code in RETRYABLE_CODES:
+        if str(code) in msg:
+            return True
+    return False
+
+
+def _sanitize_prompt(prompt: str, max_length: int = 4000) -> str:
+    """Sanitize prompt for API calls to prevent 400 errors."""
+    # Remove control characters
+    prompt = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", "", prompt)
+    if len(prompt) > max_length:
+        prompt = prompt[:max_length] + "..."
+    return prompt.strip()
+
+
 # Notification Helper
 def send_telegram_notification(message):
     """Sends a status update to the Admin via Telegram Bot API"""
@@ -429,26 +461,39 @@ def generate_sdxl_images(scenes, output_dir: Path, style="impact"):
 
 
 def generate_dalle_assets(scenes, output_dir: Path, style="impact"):
-    """DALL-E 3 Image generation (PAID FALLBACK)"""
-    time.sleep(1.2)  # Vibranium Pause
+    """DALL-E 3 Image generation (PAID FALLBACK) with Retry Logic"""
     print(f"💰 Trying DALL-E 3 for {len(scenes)} scenes (PAID, Style: {style})...")
     resolved = []
     client = get_client()
     prefix = get_style_prompt_prefix(style)
+
     for s in scenes:
-        time.sleep(2.0)  # User requested tactical pause
-        try:
-            prompt = f"{prefix}, VERTICAL 9:16, {s['keyword']}"
-            res = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1792", n=1)
-            img_data = requests.get(res.data[0].url).content
-            path = output_dir / f"{s['image']}.jpg"
-            with open(path, "wb") as f:
-                f.write(img_data)
-            s["resolved_path"] = str(path)
-            resolved.append(s)
-            print(f"   ✅ DALL-E: {s['image']}")
-        except Exception as e:
-            print(f"   ⚠️ DALL-E failed: {e}")
+        last_error = None
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                prompt = _sanitize_prompt(f"{prefix}, VERTICAL 9:16, {s['keyword']}")
+                res = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1792", n=1)
+                img_data = requests.get(res.data[0].url, timeout=30).content
+                path = output_dir / f"{s['image']}.jpg"
+                with open(path, "wb") as f:
+                    f.write(img_data)
+                s["resolved_path"] = str(path)
+                resolved.append(s)
+                print(f"   ✅ DALL-E: {s['image']}")
+                break  # Success, move to next scene
+
+            except Exception as e:
+                last_error = e
+                if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                    delay = _calculate_backoff(attempt)
+                    print(
+                        f"   ⚠️ [Retry] DALL-E attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s..."
+                    )
+                    time.sleep(delay)
+                else:
+                    print(f"   ⚠️ DALL-E failed for {s['image']}: {e}")
+                    break
+
     return resolved
 
 
@@ -483,32 +528,58 @@ def generate_banana_assets(scenes, output_dir: Path, style="impact"):
 
 
 def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
-    """Pexels search with style-augmented keywords"""
+    """Pexels search with style-augmented keywords and Retry Logic"""
     print(f"🎬 Trying Pexels ({style}) for {len(scenes)} scenes...")
     resolved = []
-    for s in scenes:
-        time.sleep(1.0)  # Tactical pause
-        try:
-            kw = s["keyword"]
-            if style == "cartoon":
-                kw = f"cartoon illustration animation {kw}"
-            elif style == "sketch":
-                kw = f"sketch drawing {kw}"
-            elif style == "painting":
-                kw = f"painting art {kw}"
 
-            url = f"https://api.pexels.com/v1/search?query={kw}&per_page=1&orientation=portrait"
-            res = requests.get(url, headers={"Authorization": PEXELS_API_KEY}).json()
-            if res.get("photos"):
-                img_data = requests.get(res["photos"][0]["src"]["large2x"]).content
-                path = output_dir / f"{s['image']}.jpg"
-                with open(path, "wb") as f:
-                    f.write(img_data)
-                s["resolved_path"] = str(path)
-                resolved.append(s)
-                print(f"   ✅ Pexels: {s['image']}")
-        except Exception as e:
-            print(f"   ⚠️ Pexels failed: {e}")
+    for s in scenes:
+        last_error = None
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                kw = s["keyword"]
+                if style == "cartoon":
+                    kw = f"cartoon illustration animation {kw}"
+                elif style == "sketch":
+                    kw = f"sketch drawing {kw}"
+                elif style == "painting":
+                    kw = f"painting art {kw}"
+
+                url = f"https://api.pexels.com/v1/search?query={kw}&per_page=1&orientation=portrait"
+                res = requests.get(url, headers={"Authorization": PEXELS_API_KEY}, timeout=15)
+
+                if res.status_code in RETRYABLE_CODES and attempt < MAX_RETRIES:
+                    delay = _calculate_backoff(attempt)
+                    print(
+                        f"   ⚠️ [Retry] Pexels attempt {attempt + 1}/{MAX_RETRIES + 1} got {res.status_code}. Retrying in {delay:.2f}s..."
+                    )
+                    time.sleep(delay)
+                    continue
+
+                res.raise_for_status()
+                data = res.json()
+
+                if data.get("photos"):
+                    img_data = requests.get(data["photos"][0]["src"]["large2x"], timeout=30).content
+                    path = output_dir / f"{s['image']}.jpg"
+                    with open(path, "wb") as f:
+                        f.write(img_data)
+                    s["resolved_path"] = str(path)
+                    resolved.append(s)
+                    print(f"   ✅ Pexels: {s['image']}")
+                break  # Success or no photos found, move to next scene
+
+            except Exception as e:
+                last_error = e
+                if attempt < MAX_RETRIES and ("timeout" in str(e).lower() or "connection" in str(e).lower()):
+                    delay = _calculate_backoff(attempt)
+                    print(
+                        f"   ⚠️ [Retry] Pexels attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s..."
+                    )
+                    time.sleep(delay)
+                else:
+                    print(f"   ⚠️ Pexels failed for {s['image']}: {e}")
+                    break
+
     return resolved
 
 
