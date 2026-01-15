@@ -2354,3 +2354,126 @@ https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/READM
 
   import google.generativeai as genai
 INFO:TelegramNotifier:Telegram message sent successfully
+INFO:TelegramNotifier:Telegram message sent successfully
+INFO:TokenBroker:TokenBroker: Provided key 'Main_GPT_Account' for openai
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /responses in 0.415900 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /responses in 0.795475 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.478648 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.984651 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+INFO:TokenBroker:TokenBroker: Provided key 'Main_Gemini_Flash' for gemini
+INFO:TelegramNotifier:Telegram message sent successfully
+INFO:TelegramNotifier:Telegram message sent successfully
+INFO:TokenBroker:TokenBroker: Provided key 'Main_GPT_Account' for openai
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/images/generations "HTTP/1.1 400 Bad Request"
+INFO:TelegramNotifier:Telegram message sent successfully
+INFO:TokenBroker:TokenBroker: Provided key 'Main_GPT_Account' for openai
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/speech "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /audio/speech in 0.384577 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/speech "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /audio/speech in 0.823332 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/speech "HTTP/1.1 429 Too Many Requests"
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:TokenBroker:TokenBroker: Provided key 'User_Provided_Pexels' for pexels
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /audio/transcriptions in 0.454253 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 429 Too Many Requests"
+INFO:openai._base_client:Retrying request to /audio/transcriptions in 0.801908 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 429 Too Many Requests"
+INFO:TokenBroker:TokenBroker: Provided key 'Main_Gemini_Flash' for gemini
+INFO:TelegramNotifier:Telegram message sent successfully
+ERROR:TelegramNotifier:Failed to send Telegram message: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 49"}
+INFO:googleapiclient.discovery_cache:file_cache is only supported with oauth2client<4.0.0
+INFO:TelegramNotifier:Telegram message sent successfully
+ERROR:TelegramNotifier:Failed to send Telegram message: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 49"}
+INFO:TelegramNotifier:Telegram message sent successfully
