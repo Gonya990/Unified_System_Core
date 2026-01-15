@@ -85,8 +85,35 @@ VOICES = {
 }
 
 
+# Retry configuration
+MAX_RETRIES = 5
+BASE_DELAY = 1.0
+RETRYABLE_CODES = (429, 500, 502, 503, 504)
+
+
+def _calculate_backoff(attempt: int, base_delay: float = BASE_DELAY, max_delay: float = 60.0) -> float:
+    """Calculate delay with exponential backoff and jitter."""
+    import random
+
+    delay = min(base_delay * (2**attempt), max_delay)
+    return delay * (0.5 + random.random())
+
+
+def _is_retryable_error(exception) -> bool:
+    """Check if an exception is retryable based on status code."""
+    # Check for status_code attribute (OpenAI SDK)
+    if hasattr(exception, "status_code"):
+        return exception.status_code in RETRYABLE_CODES
+    # Check exception message
+    msg = str(exception)
+    for code in RETRYABLE_CODES:
+        if str(code) in msg:
+            return True
+    return False
+
+
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
-    """Generate audio using OpenAI TTS with Studio Post-Processing"""
+    """Generate audio using OpenAI TTS with Studio Post-Processing and Retry Logic"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
 
     api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
@@ -98,45 +125,58 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     masked_key = f"{api_key[:8]}...{api_key[-4:]}"
     print(f"🔑 Using API Key: {masked_key}")
 
-    try:
-        from openai import OpenAI
+    from openai import OpenAI
 
-        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        org_id = os.getenv("OPENAI_ORG_ID")
+    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    org_id = os.getenv("OPENAI_ORG_ID")
+    client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-        client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
+    last_error = None
 
-        response = client.audio.speech.create(model="tts-1-hd", voice=voice, input=text)
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            response = client.audio.speech.create(model="tts-1-hd", voice=voice, input=text)
 
-        mp3_path = output_path.with_suffix(".mp3")
-        response.stream_to_file(str(mp3_path))
+            mp3_path = output_path.with_suffix(".mp3")
+            response.stream_to_file(str(mp3_path))
 
-        # STUDIO POST-PROCESSING
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                str(mp3_path),
-                "-af",
-                "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
-                "-ar",
-                "44100",
-                "-ac",
-                "2",
-                "-b:a",
-                "192k",
-                str(output_path),
-            ],
-            check=True,
-            capture_output=True,
-        )
+            # STUDIO POST-PROCESSING
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    str(mp3_path),
+                    "-af",
+                    "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
+                    "-ar",
+                    "44100",
+                    "-ac",
+                    "2",
+                    "-b:a",
+                    "192k",
+                    str(output_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
 
-        print(f"✅ Studio Audio Mastered: {output_path}")
-        return True
-    except Exception as e:
-        print(f"❌ OpenAI TTS failed: {e}")
-        return False
+            print(f"✅ Studio Audio Mastered: {output_path}")
+            return True
+
+        except Exception as e:
+            last_error = e
+            if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                delay = _calculate_backoff(attempt)
+                print(f"⚠️ [Retry] TTS attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s...")
+                time.sleep(delay)
+                continue
+            else:
+                print(f"❌ OpenAI TTS failed: {e}")
+                return False
+
+    print(f"❌ OpenAI TTS failed after {MAX_RETRIES + 1} attempts: {last_error}")
+    return False
 
 
 def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
@@ -229,41 +269,59 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
 
 
 def transcribe_audio_whisper(audio_path: Path) -> list[dict]:
-    """Get word-level timestamps using OpenAI Whisper API with Gemini Fallback"""
-    # Rate limit protection
-    time.sleep(1.5)
-
+    """Get word-level timestamps using OpenAI Whisper API with Retry and Gemini Fallback"""
     print("🧠 Transcribing audio for word-level subtitles...")
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
 
-    # 1. Main Strategy: OpenAI Whisper
+    # 1. Main Strategy: OpenAI Whisper with Retry
     if api_key:
         temp_mp3 = audio_path.with_suffix(".mp3")
+
         try:
             subprocess.run(
                 ["ffmpeg", "-y", "-i", str(audio_path), "-b:a", "128k", str(temp_mp3)], check=True, capture_output=True
             )
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️ FFmpeg conversion failed: {e}")
+            return transcribe_audio_gemini(audio_path)
 
-            from openai import OpenAI
+        from openai import OpenAI
 
-            base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-            org_id = os.getenv("OPENAI_ORG_ID")
-            client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
+        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        org_id = os.getenv("OPENAI_ORG_ID")
+        client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-            with open(temp_mp3, "rb") as f:
-                transcript = client.audio.transcriptions.create(
-                    model="whisper-1", file=f, response_format="verbose_json", timestamp_granularities=["word"]
-                )
+        last_error = None
 
-            if temp_mp3.exists():
-                temp_mp3.unlink()
-            words = transcript.words if hasattr(transcript, "words") else []
-            if words:
-                return words
-        except Exception as e:
-            print(f"⚠️ OpenAI Whisper failed: {e}")
-            if temp_mp3.exists():
-                temp_mp3.unlink()
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                with open(temp_mp3, "rb") as f:
+                    transcript = client.audio.transcriptions.create(
+                        model="whisper-1", file=f, response_format="verbose_json", timestamp_granularities=["word"]
+                    )
+
+                if temp_mp3.exists():
+                    temp_mp3.unlink()
+                words = transcript.words if hasattr(transcript, "words") else []
+                if words:
+                    return words
+                break  # No words but no error, fall through to Gemini
+
+            except Exception as e:
+                last_error = e
+                if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                    delay = _calculate_backoff(attempt)
+                    print(
+                        f"⚠️ [Retry] Whisper attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s..."
+                    )
+                    time.sleep(delay)
+                    continue
+                else:
+                    print(f"⚠️ OpenAI Whisper failed: {e}")
+                    break
+
+        if temp_mp3.exists():
+            temp_mp3.unlink()
 
     # 2. Strategy 2: Gemini Fallback
     return transcribe_audio_gemini(audio_path)
