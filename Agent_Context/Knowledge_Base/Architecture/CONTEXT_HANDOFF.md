@@ -479,7 +479,7 @@ sessions. Refresh by running the documentation generation workflow.*
 ### Session: 3346ab03-f070-412c-a088-fd1c1c1346af (Maintenance & Sync)
 - **Status**: COMPLETE ✅ - Workflows `/status`, `/sync-mail`,
   `/update-progress`, `/sync` executed successfully.
-- **Blocked**: `/openai-export` workflow paused (no email/file from OpenAI).
+- **Integrated**: /openai-export integrated into GitHub automation for code verification.
 - **Integration**: **Codex/GitHub Connected** ✅. Direct repo access enabled.
 - **Network**: **OFFICE** (Core ✅). `igor-gaming-1` (MCP) is **ONLINE** ✅.
   > ⚠️ **Isolation Warning**: Bot (`igor-gaming-1`) cannot reach Kostya's Network

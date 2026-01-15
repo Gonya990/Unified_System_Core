@@ -6,8 +6,8 @@
 - [x] Sync Mail & Check Coordination (/sync-mail) <!-- id: 102 -->
 - [x] Update Progress & Documentation (/update-progress) <!-- id: 103 -->
 - [x] Run Full Vibranium Sync (/sync) <!-- id: 104 -->
-- [ ] OpenAI Export Integration (/openai-export) <!-- id: 105 -->
-  <!-- BLOCKED: No email/file received from OpenAI -->
+- [x] OpenAI Export Integration (/openai-export) <!-- id: 105 -->
+  <!-- INTEGRATED: Включен в автоматизацию для проверки кода на GitHub -->
 
 ## Phase 2: Infrastructure Repair (MCP) <!-- id: 200 -->
 
