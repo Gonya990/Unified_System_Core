@@ -7,16 +7,16 @@ Unified System - Network-wide RBAC Configuration
 
 import json
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add RBAC module to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "Projects/AI_Core/src"))
 
 from rbac import (
-    RBACManager,
-    ProjectScope,
     Permission,
+    ProjectScope,
+    RBACManager,
     Role,
 )
 from user_context_db import UserContextDB
@@ -183,7 +183,7 @@ def setup_network_rbac(rbac: RBACManager):
 
     logger.info("")
     logger.info("=" * 60)
-    logger.info(f"✅ Configuration complete")
+    logger.info("✅ Configuration complete")
     logger.info(f"   Configured: {configured} devices")
     logger.info(f"   Skipped: {skipped} devices")
     logger.info("=" * 60)

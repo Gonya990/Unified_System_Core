@@ -226,9 +226,9 @@ def main():
 
             print(f"{BOLD}Следующие шаги:{RESET}")
             print(f"  1. Проверьте файл: {output_file}")
-            print(f"  2. Обновите TAILSCALE_NETWORK_MAP.md")
-            print(f"  3. Запустите: python Scripts/Orchestration/setup_network_rbac.py")
-            print(f"  4. Проверьте права: /my_permissions в Telegram боте")
+            print("  2. Обновите TAILSCALE_NETWORK_MAP.md")
+            print("  3. Запустите: python Scripts/Orchestration/setup_network_rbac.py")
+            print("  4. Проверьте права: /my_permissions в Telegram боте")
         else:
             print(f"\n{YELLOW}⏭️  Регистрация отменена{RESET}")
 

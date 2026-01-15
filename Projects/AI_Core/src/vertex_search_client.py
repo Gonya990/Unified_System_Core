@@ -1,7 +1,8 @@
 import os
 from typing import List, Optional
-from google.cloud import discoveryengine_v1beta as discoveryengine
+
 from dotenv import load_dotenv
+from google.cloud import discoveryengine_v1beta as discoveryengine
 
 load_dotenv()
 
