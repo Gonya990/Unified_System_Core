@@ -481,5 +481,5 @@ sessions. Refresh by running the documentation generation workflow.*
   `/update-progress`, `/sync` executed successfully.
 - **Blocked**: `/openai-export` workflow paused (no email/file from OpenAI).
 - **Integration**: **Codex/GitHub Connected** ✅. Direct repo access enabled.
-- **Network**: **OFFICE** (Core ✅). **WARNING**: `igor-gaming-1` (MCP) is 🔴 OFFLINE.
-- **Next**: Check `igor-gaming-1` power/net. Monitor export email. Resume RBAC.
+- **Network**: **OFFICE** (Core ✅). `igor-gaming-1` (MCP) is **ONLINE** ✅.
+- **Next**: Monitor export email. Verify `WSL_AutoStart` task on next logon.
