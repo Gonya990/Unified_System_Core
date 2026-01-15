@@ -483,3 +483,9 @@ sessions. Refresh by running the documentation generation workflow.*
 - **Integration**: **Codex/GitHub Connected** ✅. Direct repo access enabled.
 - **Network**: **OFFICE** (Core ✅). `igor-gaming-1` (MCP) is **ONLINE** ✅.
 - **Next**: Monitor export email. Verify `WSL_AutoStart` task on next logon.
+
+### Session: df92b102-rbac-412c-af77-ai_core_secure (AI Core RBAC)
+- **Status**: COMPLETE ✅ - RBAC validated, `init_rbac.py` passed.
+- **Docs**: Created `Projects/AI_Core/AGENTS_LEARNING_SCHEME.md` for Kostya.
+- **Deployment**: Started deployment to `igor-gaming-1` via SSH.
+- **Access**: Owner (708531393) & Family (578363419) roles configured.
