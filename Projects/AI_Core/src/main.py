@@ -4,8 +4,9 @@ Entry point for the AI Telegram Bot (Unified System).
 Redirects to the latest version of the bot implementation.
 """
 
-import sys
 import os
+import sys
+
 from dotenv import load_dotenv
 
 # Ensure we can import modules from src
