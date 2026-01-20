@@ -85,3 +85,5 @@ contexts/*.m4a
 contexts/*.crdownload
 contexts/*.png
 /Knowledge_Base/
+gcloud init/
+secure_vault/
