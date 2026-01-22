@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # 🧠 OpenCode (Ollama) - Local AI Brain
+  ollama:
+    image: ollama/ollama:latest
+    container_name: unified-core-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    restart: always
+    networks:
+      - unified-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # 💻 Open WebUI - Chat Interface (ChatGPT clone)
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: unified-core-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      - webui_storage:/app/backend/data
+    restart: always
+    depends_on:
+      - ollama
+    networks:
+      - unified-net
+
+  # 🛡 Watchtower - Auto Updater
+  watchtower:
+    image: containrrr/watchtower
+    container_name: unified-core-updater
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup
+    restart: always
+    networks:
+      - unified-net
+
+volumes:
+  ollama_storage:
+  webui_storage:
+
+networks:
+  unified-net:
+    driver: bridge
