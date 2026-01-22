@@ -13,14 +13,15 @@
   - [x] **Transfer**: `OneDrive_1` (Done), `OneDrive_3` (Done), `File 3` (Done).
   - [x] **Analysis**: ~2900 files extracted to `contexts/temp_extract`.
   - [x] **De-duplication**: Deleted 1 duplicate from Google Drive (`503725.pdf`).
+- [x] **Unified Core Network Merger** <!-- id: 12 -->
+  - [x] Switch Windows Host & WSL to `unified-system-core.org.github` <!-- id: 12a -->
+  - [x] Configure Mac & Smarts to same network <!-- id: 12b -->
+  - [x] Verify Direct P2P connection for Smarts gaming <!-- id: 12c -->
+- [x] **GitLens Launchpad Configuration** <!-- id: 13 -->
+- [ ] **Content Factory API Keys Renewal** <!-- id: 14 -->
+  - [ ] Update Gemini API Key (Expired)
+  - [ ] Update OpenAI API Key (Unauthorized)
 - [ ] **Family Assistant (Webtop Integration)** <!-- id: 9 -->
-  - [x] **Pivot**: Confirmed School uses Webtop/SmartSchool. Found existing Token.
-  - [/] **API Fix**: Logic for `webtop_client.py` is hitting HTML. Need to RE the JSON API.
-  - [ ] **Data Fetch**: Get Grades/Homework via correct API (POST payload?).
-  - [ ] **Integration**: Connect to `morning_brief.py`.
-- [ ] **MCP Mail Intelligence** <!-- id: 10 -->
-  - [ ] **Server Setup**: Locate/Create MCP Mail Server.
-  - [ ] **Intelligence**: Add AI summarization/sorting to mail.
 
 ## Infrastructure & Security
 

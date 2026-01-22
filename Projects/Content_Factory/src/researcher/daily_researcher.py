@@ -327,10 +327,11 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
     # Strategy 3: Ollama (Rock Solid Local Fallback)
     if not data:
         try:
-            print("🦙 Attempting Research via Ollama (llama3)...")
+            print("🦙 Attempting Research via Ollama (Remote/Local Fallback)...")
+            ollama_base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
             response = requests.post(
-                "http://localhost:11434/api/generate",
-                json={"model": "llama3", "prompt": f"{prompt}\nReturn ONLY JSON.", "stream": False, "format": "json"},
+                f"{ollama_base}/api/generate",
+                json={"model": os.getenv("OLLAMA_MODEL", "llama3.2"), "prompt": f"{prompt}\nReturn ONLY JSON.", "stream": False, "format": "json"},
                 timeout=60,
             )
             data = response.json().get("response")

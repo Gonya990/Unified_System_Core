@@ -1,0 +1,15 @@
+{
+    "gitlens.launchpad.enabled": true,
+    "gitlens.launchpad.indicator.enabled": true,
+    "gitlens.launchpad.indicator.label": "item",
+    "gitlens.launchpad.indicator.useIcons": true,
+    "gitlens.launchpad.views.pullRequests.enabled": true,
+    "gitlens.launchpad.views.issues.enabled": true,
+    "python.defaultInterpreterPath": "./Projects/AI_Core/.venv/bin/python",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.DS_Store": true,
+        "**/.venv": true
+    }
+}
