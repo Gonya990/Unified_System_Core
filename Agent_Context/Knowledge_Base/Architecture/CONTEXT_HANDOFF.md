@@ -95,7 +95,7 @@ Each conversation folder may contain:
 
 ## 📋 ACTIVE TODOS & TASKS
 
-### Session: 18e8d41d-fe79-4d4a-b935-37099b0ba2c9 (System Synchronization) - IN PROGRESS 🔄
+### Session: 18e8d41d... (Syst Sync) - IN PROGRESS 🔄
 
 - [ ] Run /status workflow
 - [ ] Run /sync-mail workflow

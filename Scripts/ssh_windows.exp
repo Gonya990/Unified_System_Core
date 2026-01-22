@@ -1,10 +1,10 @@
 #!/usr/bin/expect -f
 set timeout 20
 set cmd [lindex $argv 0]
-spawn ssh -o ConnectTimeout=10 gonya@100.126.23.67 $cmd
+spawn ssh -o ConnectTimeout=10 -o PubkeyAuthentication=no gonya@100.126.23.67 $cmd
 expect {
     "password:" {
-        send "12345678\r"
+        send "GarYk6550\r"
         exp_continue
     }
     eof

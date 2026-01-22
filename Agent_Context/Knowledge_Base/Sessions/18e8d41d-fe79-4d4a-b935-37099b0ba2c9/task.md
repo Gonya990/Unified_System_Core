@@ -1,4 +1,4 @@
-# Task: System Synchronization and Status Check (Sequential Plan)
+ Task: System Synchronization and Status Check (Sequential Plan)
 
 ## Phase 1: A - Network & Server Status (Wake on LAN) <!-- id: 100 -->
 
@@ -23,6 +23,8 @@
 
 - [x] Establish SSH Alias for igor-windows <!-- id: 401 -->
 - [x] Connect Google Cloud Project (Vertex AI) <!-- id: 402 -->
+- [x] Enable Billing & APIs (Linked: `01981C-43E011-FC0292`) <!-- id: 402b -->
 - [x] Define AI Providers Configuration <!-- id: 403 -->
-- [/] Deploy OpenCode/Ollama on Windows (Pending SSH Lockout) <!-- id: 404 -->
+- [x] Install Git LFS on Mac (Completed manually) <!-- id: 403b -->
+- [/] Deploy OpenCode/Ollama on Windows (WSL Bypass Active - Pulling Images...) <!-- id: 404 -->
 - [ ] Launch Docker Containers (Unified Core) <!-- id: 405 -->
