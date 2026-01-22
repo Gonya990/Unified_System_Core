@@ -1,0 +1,4 @@
+User provided auth/invite key for gonya90.gg@gmail.com
+NodeKey: 52cd9b20fe7826da32c97f6dfd15e023822a985360e6621b49790e2f163fc26e
+NodeKey: 1213d2cef29f48b57453e1aab8bfb6ebb5bba4b8fe6b2375dea23e1c24eaec3d
+TLPub: f19504defe6ea08df6cd1e659f6e18dc332ea7a6f1cc3402fe6c5fd3a84f17f1
