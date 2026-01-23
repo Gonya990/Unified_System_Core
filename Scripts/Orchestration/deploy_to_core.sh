@@ -8,7 +8,7 @@
 
 set -e
 
-CORE_IP="100.110.209.49"
+CORE_IP="100.115.17.68"
 CORE_USER="gonya"
 CORE_PATH="/home/gonya/Unified_System"
 LOCAL_PATH="/Users/macbook/Documents/Unified_System"

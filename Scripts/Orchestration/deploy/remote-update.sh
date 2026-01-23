@@ -9,7 +9,11 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-REMOTE_HOST="${REMOTE_HOST:-gonya@100.110.209.49}"
+# Default to the primary Linux node (igor-gaming-1)
+REMOTE_HOST="${REMOTE_HOST:-gonya@100.115.17.68}"
+
+# Ensure Tailscale is in PATH (macOS fix)
+export PATH=$PATH:/Applications/Tailscale.app/Contents/MacOS
 REMOTE_PATH="${REMOTE_PATH:-/home/gonya/Unified_System}"
 
 echo -e "${GREEN}Remote Update${NC}"

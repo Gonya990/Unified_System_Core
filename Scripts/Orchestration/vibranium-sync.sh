@@ -16,6 +16,9 @@ UNIFIED_SYSTEM="$(cd "$SCRIPT_DIR/../.." && pwd)"
 echo -e "${GREEN}💎 VIBRANIUM SYNC STARTED${NC}"
 echo "=========================================="
 
+# Ensure Tailscale is in PATH for macOS
+export PATH=$PATH:/Applications/Tailscale.app/Contents/MacOS
+
 # 1. Local Auto-Commit
 echo -e "\n${YELLOW}[1/5] Saving local progress...${NC}"
 cd "$UNIFIED_SYSTEM"
