@@ -3,7 +3,8 @@
 # Система автосохранения изменений
 
 SDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-UNIFIED_SYSTEM="/Users/macbook/Documents/Unified_System"
+# Resolve project root dynamically
+UNIFIED_SYSTEM="$(cd "$SDIR/../.." && pwd)"
 
 cd "$UNIFIED_SYSTEM"
 
