@@ -3,11 +3,16 @@ import openai
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-load_dotenv("../.env")
+load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
 def test_openai():
     print("Testing OpenAI...")
-    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    key = os.getenv("OPENAI_API_KEY")
+    if not key:
+        print("❌ OpenAI API key not found in environment!")
+        return
+    print(f"Using key: {key[:8]}...{key[-4:]}")
+    client = openai.OpenAI(api_key=key)
     try:
         res = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -20,9 +25,16 @@ def test_openai():
 
 def test_gemini():
     print("\nTesting Gemini...")
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    key = os.getenv("GEMINI_API_KEY")
+    if not key:
+        print("❌ Gemini API key not found in environment!")
+        return
+    print(f"Using key: {key[:8]}...{key[-4:]}")
+    genai.configure(api_key=key)
+    model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    print(f"Using model: {model_name}")
     try:
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        model = genai.GenerativeModel(model_name)
         res = model.generate_content("ping")
         print(f"✅ Gemini works: {res.text}")
     except Exception as e:

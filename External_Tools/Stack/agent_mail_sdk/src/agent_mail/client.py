@@ -121,17 +121,29 @@ class AgentMailClient:
             },
         )
 
+        res_data = {}
         if "structuredContent" in result:
-            return result["structuredContent"]
+            res_data = result["structuredContent"]
         elif "content" in result:
             content = result["content"]
             if isinstance(content, list) and content:
                 text = content[0].get("text", "{}")
                 try:
-                    return json.loads(text)
+                    res_data = json.loads(text)
                 except:
-                    return {"raw": text}
-        return result
+                    res_data = {"raw": text}
+        else:
+            res_data = result
+
+        # CRITICAL: Update config with the name actually assigned by the server
+        assigned_name = res_data.get("name")
+        if assigned_name and assigned_name != self.config.agent_name:
+            print(f"ℹ️ Agent Mail: Server assigned name '{assigned_name}' (requested '{self.config.agent_name}')")
+            self.config.agent_name = assigned_name
+            # Also update environment for other components
+            os.environ["AGENT_MAIL_NAME"] = assigned_name
+
+        return res_data
 
     def send_message(
         self,

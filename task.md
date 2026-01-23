@@ -18,9 +18,20 @@
   - [x] Configure Mac & Smarts to same network <!-- id: 12b -->
   - [x] Verify Direct P2P connection for Smarts gaming <!-- id: 12c -->
 - [x] **GitLens Launchpad Configuration** <!-- id: 13 -->
-- [ ] **Content Factory API Keys Renewal** <!-- id: 14 -->
-  - [ ] Update Gemini API Key (Expired)
-  - [ ] Update OpenAI API Key (Unauthorized)
+- [x] **Content Factory API Keys Renewal** <!-- id: 14 -->
+  - [x] Update Gemini API Key (Success: Google MY)
+  - [x] Update OpenAI API Key (Success: Gonya990)
+- [ ] **Tailscale Server Unification & Best Practices (KB 1245)** <!-- id: 17 -->
+  - [x] SSH Access established to Windows & Smart <!-- id: 17a -->
+  - [ ] Terminate Key Expiry for all tagged servers (Admin Console required) <!-- id: 17b -->
+  - [x] Offload Ollama to WSL/GPU-node <!-- id: 17c -->
+- [ ] **GPU-node-1 Resurrection (MAXIMUM)** <!-- id: 15 -->
+  - [ ] Configure SSH Access (Need Credentials)
+  - [ ] Install Ollama + Llama 3.1 70B (AI Brain)
+  - [ ] Setup Remote Video Rendering (Offload from Mac)
+- [ ] **Smart Gaming Unification** <!-- id: 16 -->
+  - [ ] Verify Sunshine is running on Windows
+  - [ ] Configure Moonlight on Smart (IP: 100.118.179.47)
 - [ ] **Family Assistant (Webtop Integration)** <!-- id: 9 -->
 
 ## Infrastructure & Security
