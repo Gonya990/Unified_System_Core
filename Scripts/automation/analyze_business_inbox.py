@@ -84,41 +84,35 @@ def analyze_and_draft_responses(emails: List[Dict]):
         print(f"[{i+1}/{len(emails)}] Processing: {email['subject'][:40]}...")
         
         prompt = f"""
-        You are a strategic business development consultant. Analyze this email.
+        You are a strategic business development AI. 
         
         SENDER: {email['sender']}
         SUBJECT: {email['subject']}
         BODY_SNIPPET: {email['body'][:4000]}
         
         Task:
-        Identify if this email contains a **LEAD** (a company or person we can pitch to).
+        1. Identify if this is a **LEAD** (job alert, direct email, inquiry).
+        2. **CLASSIFY** the response type:
+           - "AUTO_SEND": Standard pitch, job application follow-up, cold outreach to a job alert. Safe to send automatically if we have an address.
+           - "MANUAL_REVIEW": Complex negotiation, sensitive topic, high-stakes investor reply. User must see it first.
+           - "IGNORE": Not a business lead.
         
-        Treat the following as RELEVANT LEADS:
-        1. **Direct Business Emails**: Investors, partners, clients.
-        2. **High-Level Job Alerts**: Roles like "Director", "Executive", "Manager", "Supervisor", "Operations". 
-           -> STRATEGY: Instead of applying as an employee, pitch a B2B consulting arrangement or "Fractional Executive" service.
-        3. **Application Acknowledgements**: "Thanks for applying to Google/Cust2Mate".
-           -> STRATEGY: Follow up with a "Value-Add Proposal" (Startup Plan) to stand out.
-           
-        Ignore:
-        - Social media notifications (Instagram, Reddit).
-        - purely automated system alerts (GitHub incidents, security codes).
-        - Span/Promotions.
+        3. **EXTRACT RECIPIENT**:
+           - Look for a real email address in the body (e.g., "send CV to hr@company.com").
+           - If the SENDER is a "noreply" or "notifications" address, you MUST find an email in the body. If none, output null.
+           - If the SENDER is a real person/recruiting alias, use that.
         
-        If RELEVANT, output JSON:
+        Output JSON:
         {{
             "is_relevant": true,
-            "company_name": "Name of company found",
-            "reason": "e.g. High-level role at Cust2Mate",
-            "reply_draft": "Professional email pitching a B2B/Consulting arrangement instead of just a job application. Focus on delivering immediate ROI.",
-            "strategy": {{
-                "plan": "Brief startup/rollout plan for this specific role/company",
-                "roi": "Estimated ROI keypoints (e.g. 'Reduce operational costs by 20% via AI automation')",
-                "action": "Find decision maker on LinkedIn and send this pitch"
-            }}
+            "action_type": "AUTO_SEND" or "MANUAL_REVIEW",
+            "recipient_email": "extracted_email@domain.com" or null,
+            "subject": "Strategic Proposal: ... (optimized subject line)",
+            "reply_body": "Full professional email body...",
+            "reason": "Why this action?"
         }}
         
-        If NOT relevant, output: {{"is_relevant": false}}
+        If NOT relevant: {{"is_relevant": false}}
         """
 
         try:
@@ -137,6 +131,12 @@ def analyze_and_draft_responses(emails: List[Dict]):
                 })
         except Exception as e:
             print(f"⚠️ Analysis error: {e}")
+
+    # Save structured data for the auto-responder script
+    ACTIONS_FILE = BASE_DIR / "Reports" / "email_actions.json"
+    with open(ACTIONS_FILE, "w") as f:
+        json.dump(analyzed_data, f, indent=2)
+    print(f"💾 Structured actions saved to {ACTIONS_FILE}")
 
     return analyzed_data
 

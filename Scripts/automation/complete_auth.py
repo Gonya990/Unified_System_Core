@@ -10,7 +10,10 @@ CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDENTIALS_PATH = CREDS_DIR / "gmail_credentials.json"
 TOKEN_PATH = CREDS_DIR / "gmail_token.json"
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.compose"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.compose"
+]
 
 def main():
     parser = argparse.ArgumentParser()
