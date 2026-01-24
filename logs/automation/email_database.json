@@ -399,7 +399,31 @@
       "date": "Fri, 23 Jan 2026 12:00:42 -0600",
       "category": "info",
       "body_preview": "Dear [Recipient's Name],\n\nI hope this message finds you well. I am reaching out to explore the potential for a strategic consulting partnership with IAI, particularly to support the enhancement of you"
+    },
+    {
+      "id": "19bf09eedbe1fad8",
+      "subject": "Ваш Аккаунт Apple использовался для входа в iCloud через браузер",
+      "sender": "Apple <noreply@email.apple.com>",
+      "date": "Sat, 24 Jan 2026 15:28:20 +0000 (GMT)",
+      "category": "info",
+      "body_preview": "Здравствуйте, Igor Goncharenko!\r\n\r\n\r\n\r\n    \r\n        \r\n            \r\n                Ваш Аккаунт Apple goncharenko_i@icloud.com использовался для входа в iCloud в браузере.\r\n            \r\n        \r\n  "
+    },
+    {
+      "id": "19bf0783e63e59bd",
+      "subject": "“Супервайзер”: IAI - Israel Aerospace Industries - מנהל/ת תפעולי באתרי החברה and more",
+      "sender": "LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>",
+      "date": "Sat, 24 Jan 2026 14:46:08 +0000 (UTC)",
+      "category": "linkedin",
+      "body_preview": "Your job alert for Супервайзер in Israel\r\nNew jobs match your preferences.\r\n            \r\nמנהל/ת תפעולי באתרי החברה\r\nIAI - Israel Aerospace Industries\r\nLod\r\n\r\nThis company is actively hiring\r\nView job"
+    },
+    {
+      "id": "19bf02a7e5965c67",
+      "subject": "Igor, plan fun get togethers with Google",
+      "sender": "\"Google Tips & Updates\" <googlecommunityteam-noreply@google.com>",
+      "date": "Sat, 24 Jan 2026 05:21:15 -0800",
+      "category": "grant",
+      "body_preview": "Igor, Google can help you plan the fun stuff\r\n\r\nPlanning a trip away with friends? A birthday party or dinner with friends  \r\nor colleagues? Google makes it easy to translate on the go, find  \r\nrestau"
     }
   ],
-  "last_check": "2026-01-24T15:23:53.061832"
+  "last_check": "2026-01-24T18:14:04.431458"
 }

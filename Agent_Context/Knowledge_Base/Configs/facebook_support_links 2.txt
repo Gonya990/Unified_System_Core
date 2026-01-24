@@ -1,0 +1,10 @@
+# Facebook Support Cases (2026-01-22)
+# User is facing issues with Meta Verified payment.
+
+https://m.facebook.com/help/734864594628372/?helpref=uf_share
+https://m.facebook.com/help/2069709739860518/?helpref=uf_share
+https://m.facebook.com/help/1026219344754266/?helpref=uf_share
+# Facebook Dev & Support Links (2026-01-22)
+https://developers.facebook.com/docs/development/register#app-settings
+https://www.facebook.com/business-support-home/100001001089589/247345449530589
+https://developers.facebook.com/docs/app-events/getting-started-app-events-ios#get-device-consent

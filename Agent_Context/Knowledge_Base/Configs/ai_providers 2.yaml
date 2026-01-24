@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: AIProviderConfig
+metadata:
+  name: unified-system-core-ai
+spec:
+  providers:
+    - name: antigravity-gemini
+      type: cloud
+      provider: google
+      status: active
+      role: orchestrator
+      
+    - name: vertex-ai-orchestrator
+      type: cloud
+      provider: google
+      project_id: my-home-435112
+      status: active
+      capabilities: [ "vision", "text", "code" ]
+      
+    - name: github-copilot
+      type: editor-plugin
+      provider: github
+      status: active
+      role: code-completion
+      
+    - name: apple-intelligence
+      type: system
+      provider: apple
+      status: active
+      role: system-integration
+      
+    - name: opencode-local
+      type: local
+      provider: ollama
+      status: pending_setup
+      host: igor-windows
+      port: 11434
+      notes: "Pending installation on Windows node due to Mac resource constraints"
