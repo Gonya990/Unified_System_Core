@@ -216,29 +216,45 @@ def get_gmail_service():
         creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
 
     # Refresh or create new credentials
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            if not CREDENTIALS_PATH.exists():
-                print("❌ Gmail credentials not found!")
-                print("Please download OAuth2 credentials from Google Cloud Console")
-                print(f"And save to: {CREDENTIALS_PATH}")
-                print("\nSteps:")
-                print("1. Go to: https://console.cloud.google.com/apis/credentials")
-                print("2. Create OAuth 2.0 Client ID (Desktop app)")
-                print("3. Download JSON")
-                print(f"4. Save as: {CREDENTIALS_PATH}")
-                sys.exit(1)
+    try:
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    print(f"⚠️ Token refresh failed: {e}")
+                    print("♻️ Deleting invalid token and re-authenticating...")
+                    if TOKEN_PATH.exists():
+                        TOKEN_PATH.unlink()
+                    creds = None
+            
+            if not creds:
+                if not CREDENTIALS_PATH.exists():
+                    print("❌ Gmail credentials not found!")
+                    print("Please download OAuth2 credentials from Google Cloud Console")
+                    print(f"And save to: {CREDENTIALS_PATH}")
+                    print("\nSteps:")
+                    print("1. Go to: https://console.cloud.google.com/apis/credentials")
+                    print("2. Create OAuth 2.0 Client ID (Desktop app)")
+                    print("3. Download JSON")
+                    print(f"4. Save as: {CREDENTIALS_PATH}")
+                    sys.exit(1)
 
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
-            creds = flow.run_local_server(port=0)
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    str(CREDENTIALS_PATH), SCOPES
+                )
+                creds = flow.run_local_server(port=0)
 
-        # Save credentials as JSON (secure format)
-        with open(TOKEN_PATH, "w") as token:
-            token.write(creds.to_json())
+            # Save credentials as JSON (secure format)
+            with open(TOKEN_PATH, "w") as token:
+                token.write(creds.to_json())
+
+    except Exception as e:
+        print(f"❌ Authentication error: {e}")
+        # Force cleanup if totally broken
+        if TOKEN_PATH.exists():
+             TOKEN_PATH.unlink()
+        sys.exit(1)
 
     return build("gmail", "v1", credentials=creds)
 
