@@ -59,6 +59,7 @@
 <!-- markdownlint-disable MD013 -->
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
+| `30e80d5c-1c...` | **System Sync** | 🔄 InPrg | task.md |
 | `nodriver_im...` | **Browser Control** | ✅ Done | nodriver_daemon.py, ndc |
 | `workflow_de...` | **Workflow Design** | ✅ Done | WORKFLOW_DESIGN.md |
 | `arthur_tabl...` | **Arthur Tablet** | 🔄 InPrg | MorningBrief, Mashov, ADB |
@@ -95,6 +96,13 @@ Each conversation folder may contain:
 ---
 
 ## 📋 ACTIVE TODOS & TASKS
+
+### Session: 30e80d5c-1c72... (System Sync) - IN PROGRESS 🔄
+
+- [x] Run /sync-mail workflow
+- [x] Run /status workflow
+- [/] Run /update-progress workflow
+- [ ] Run /sync (Vibranium) workflow
 
 ### Session: f79ac8d7-7e5f... (Syst Sync) - COMPLETE ✅
 

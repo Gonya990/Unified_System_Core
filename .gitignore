@@ -2,3 +2,5 @@
 .env.igor
 Projects/ChatKit_Dashboard/.env*
 .env.bak
+tmp/
+.DS_Store
