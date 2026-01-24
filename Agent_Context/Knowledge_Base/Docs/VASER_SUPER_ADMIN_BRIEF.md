@@ -87,7 +87,7 @@
   remove_device, reboot_device, configure_device.
 - **Home Assistant:** ha.service_call, ha.get_state, ha.set_state,
   ha.execute_script.
-- **Local:** /local/run, /local/read, /local/write.
+- **Local:** /local/run, /local/read, /local/write, /local/reminder.
 - **Cloud:** Google Calendar, iCloud, Gmail/Outlook, Google Drive,
   Yandex Disk, Dropbox.
 - **Management:** create_task, complete_task, remind_user, generate_report.
@@ -100,6 +100,26 @@ Action `generate_presentation(content_json)`
 - Генерация титульных слайдов, схем, диаграмм и архитектуры.
 - Слайды продукта, дорожной карты, бизнес-плана и видения развития.
 - Выходные форматы: `pptx` или `pdf`.
+
+## Проверка всех систем на работоспособность (регламент)
+
+### Цели проверки
+- Подтвердить доступность ключевых узлов и интеграций.
+- Выявить деградации сети, Home Assistant, локальных инструментов и облаков.
+- Зафиксировать результаты в отчёте и журнале аудита.
+
+### Минимальный чек-лист
+1. **VASER Hub**: доступность API и валидность токена.
+2. **Сеть**: scan_network (требует подтверждения), затем get_device_info по критичным узлам.
+3. **Устройства**: health-check/uptime через run_command (SSH/WinRM/API).
+4. **Home Assistant**: ha.get_state для ключевых сущностей + ha.service_call для тестового ping.
+5. **Локальный шлюз**: /local/run (echo/health), /local/read (проверка доступности), /local/write (тест без записи в боевые пути).
+6. **Облака**: list-операции в календарях/почте/дисках для проверки токенов.
+7. **Отчётность**: generate_report + collect_logs/analyze_logs по итогам.
+
+### Требуемые подтверждения
+- Сканирование сети.
+- Команды, которые меняют конфигурацию или перезапускают узлы.
 
 ## Дальнейшие шаги
 
