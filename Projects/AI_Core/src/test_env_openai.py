@@ -2,7 +2,10 @@ import os
 import requests
 
 def test_openai():
-    api_key = "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"
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("❌ OPENAI_API_KEY not set in environment")
+        return
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
