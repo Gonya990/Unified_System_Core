@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     libffi-dev \
     libavahi-compat-libdnssd-dev \
+    portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Compile bytecode for faster startup, install to system since we are in a container
