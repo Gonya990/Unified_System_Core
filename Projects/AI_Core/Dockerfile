@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
     libffi-dev \
+    libavahi-compat-libdnssd-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Compile bytecode for faster startup, install to system since we are in a container

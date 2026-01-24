@@ -1,0 +1,63 @@
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter and Data
+.ipynb_checkpoints
+*.ipynb
+
+# Environment
+.env
+.env.local
+.env.*
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and Data
+logs/
+*.log
+data/
+db/
+*.sqlite
+*.db
+
+# Large Files & Media
+*.mp4
+*.m4a
+*.mov
+*.zip
+*.tar.gz
+*.iso
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
