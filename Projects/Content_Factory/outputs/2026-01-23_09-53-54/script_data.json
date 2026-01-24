@@ -1,0 +1,33 @@
+{
+  "selected_topic": "5 Технологий, Которые Изменят Всё",
+  "description": "Погрузитесь в будущее с этими невероятными технологиями. #Технологии #Будущее #Единство",
+  "script_ru": "Вы не поверите, какие технологии уже здесь и как они изменят наш мир... Возможно, вы игнорируете их прямо сейчас, но этот шаг может изменить всё... Вот 5 технологий, которые изменят всё вокруг.\n\nНомер 1... Искусственный интеллект, который сам обучается. Представьте себе машину, которая учится быстрее, чем человек... Visual: AI neural network visualization\n\nНомер 2... Летающие автомобили в Китае уже скоро станут реальностью. Это не просто фантастика... Visual: futuristic flying car over city\n\nНомер 3... Повторное использование ракетных ускорителей, как у Blue Origin, делает космос ближе, чем когда-либо... Visual: rocket launch and landing\n\nНомер 4... Глобальная цифровая сеть, соединяющая умы по всему миру. Безграничные возможности для сотрудничества. Visual: digital global network connections\n\nНомер 5... Возобновляемая энергия, которая питает города будущего. Энергия солнца в каждом доме. Visual: solar panels and green cities\n\nМы стоим на пороге новой эры. Эти технологии объединяют нас, преодолевая границы. Давайте строить будущее вместе...",
+  "pinned_comment": "Какую технологию вы ждёте больше всего?",
+  "scenes": [
+    {
+      "image": "scene_1",
+      "keyword": "AI neural network visualization",
+      "resolved_path": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/scene_1.jpg"
+    },
+    {
+      "image": "scene_2",
+      "keyword": "futuristic flying car over city",
+      "resolved_path": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/scene_2.jpg"
+    },
+    {
+      "image": "scene_3",
+      "keyword": "rocket launch and landing",
+      "resolved_path": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/scene_3.jpg"
+    },
+    {
+      "image": "scene_4",
+      "keyword": "digital global network connections",
+      "resolved_path": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/scene_4.jpg"
+    },
+    {
+      "image": "scene_5",
+      "keyword": "solar panels and green cities",
+      "resolved_path": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/scene_5.jpg"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.venv/lib/python3.9/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.venv/lib/python3.9/site-packages/google/auth/__init__.py:54: FutureWarning: 
+    You are using a Python version 3.9 past its end of life. Google will update
+    google-auth with critical bug fixes on a best-effort basis, but not
+    with any other fixes or features. Please upgrade your Python version,
+    and then update google-auth.
+    
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.venv/lib/python3.9/site-packages/google/oauth2/__init__.py:40: FutureWarning: 
+    You are using a Python version 3.9 past its end of life. Google will update
+    google-auth with critical bug fixes on a best-effort basis, but not
+    with any other fixes or features. Please upgrade your Python version,
+    and then update google-auth.
+    
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/src/pipeline/orchestrator_v3_no_face.py:17: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+✅ TokenBroker imported successfully
+🚀 DAILY RESEARCHER PIPELINE INITIATED
+🧠 Starting MEGAFORMA RESEARCH (Style: IMPACT)
+📡 Researching MEGAFORMA topic: flying cars commercial launch
+✅ Found 3 news items.
+🔍 Browsing: Blue Origin makes impressive strides with reuse—next launch will refly booster - Ars Technica...
+🔍 Browsing: Media: China set to begin flying car passenger service by year-end - caliber.az...
+🤖 Attempting Research via OpenAI Responses API (GPT-4o)...
+📜 Script Data saved to: /Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/outputs/2026-01-23_09-53-54/script_data.json
+🎨 Generating Visual Assets...
+🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Free → Paid Failover (Style: impact)
+   Priority: Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels
+⚠️ Gemini Image Generation not available (experimental API)
+⚡ Checking Flux.1 Schnell server (Style: impact)...
+❌ Flux server not running (install in progress)
+🎨 Checking SDXL server (Style: impact)...
+❌ SDXL server not running (install in progress)
+⚠️ 5 images need PAID generation...
+💰 Trying DALL-E 3 for 5 scenes (PAID, Style: impact)...
+   ✅ DALL-E: scene_1
+   ✅ DALL-E: scene_2
+   ✅ DALL-E: scene_3
+   ✅ DALL-E: scene_4
+   ✅ DALL-E: scene_5
+🤝 Handing over to Orchestrator v3 (No-Face)...
+📡 API Status: OpenAI=sk-proj-... Pexels=...
+❌ ffmpeg or ffprobe not found. FFMPEG: None, FFPROBE: None. Checked PATH and common locations.
+❌ Orchestration failed: ffmpeg or ffprobe not found. FFMPEG: None, FFPROBE: None. Checked PATH and common locations.

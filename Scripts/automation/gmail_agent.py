@@ -201,6 +201,32 @@ CATEGORIES = {
         "icon": "⚪",
         "senders": [],
     },
+    # Grants & Funding (NEW)
+    "grant": {
+        "keywords": [
+            "grant",
+            "funding",
+            "innovation authority",
+            "r&d",
+            "incubator",
+            "startup fund",
+            "investment",
+            "грант",
+            "финансирование",
+            "инвестор",
+            "מענק",
+            "רשות החדשנות",
+            "קרן",
+            "השקעה"
+        ],
+        "icon": "🦄",
+        "senders": [
+            "innovationisrael.org.il",
+            "sifted.eu",
+            "techcrunch.com",
+            "google.com"
+        ],
+    },
 }
 
 
