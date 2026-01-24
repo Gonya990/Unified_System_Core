@@ -2,7 +2,10 @@ import os
 import requests
 
 def test_gemini():
-    api_key = "AIzaSyAPXO54KZnH13Qspn10WFgI4DvJ3Dzs2TA"
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("❌ GEMINI_API_KEY not set in environment")
+        return
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": "say hi"}]}]}
