@@ -11,5 +11,8 @@
         "**/__pycache__": true,
         "**/.DS_Store": true,
         "**/.venv": true
-    }
+    },
+    "gitlab.duo.enabled": true,
+    "gitlab.aiAssistedCodeSuggestions.enabled": true,
+    "gitlab.debug": true
 }

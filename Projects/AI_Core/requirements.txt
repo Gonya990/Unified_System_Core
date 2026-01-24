@@ -26,3 +26,4 @@ qrcode[pil]>=7.4.2
 pytz
 aiohttp-socks
 vapi-python>=0.1.0
+openai>=1.0.0
