@@ -17,7 +17,7 @@ dev = [
     "pytest-asyncio>=0.21",
 ]
 gpu = [
-    "torch",
+    "torch>=2.8.0",
     "transformers",
     "accelerate",
 ]
@@ -30,10 +30,15 @@ dev-dependencies = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",
 ]
+environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
 
 [[tool.uv.index]]
 name = "pytorch"
-url = "https://download.pytorch.org/whl/cu118"
+url = "https://download.pytorch.org/whl/cu126"
 explicit = true
 
 [tool.uv.sources]

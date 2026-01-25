@@ -3,4 +3,4 @@ sounddevice
 soundfile
 pyttsx3
 transformers
-torch
+torch>=2.8.0

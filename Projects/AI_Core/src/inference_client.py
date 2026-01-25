@@ -93,6 +93,8 @@ class InferenceClient:
             return await self._chat_openai(messages, system_prompt)
         elif provider == "openrouter":
             return await self._chat_openrouter(messages, system_prompt)
+        elif provider == "github":
+            return await self._chat_github(messages, system_prompt)
         else:
             return await self._chat_ollama(messages, system_prompt)
 
@@ -187,14 +189,88 @@ class InferenceClient:
         except Exception as e:
             return f"Ollama Connection Error: {e}", {}
 
+    async def _chat_openai_compatible(
+        self,
+        messages: list,
+        system_prompt: Optional[str],
+        base_url: str,
+        api_key: str,
+        model: str,
+    ):
+        """Generic handler for OpenAI-compatible APIs (OpenAI, OpenRouter, GitHub Models)."""
+        if not api_key:
+            return "Error: API Request Failed - Missing API Key", {}
+
+        url = f"{base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+
+        # OpenRouter specific headers
+        if "openrouter" in base_url:
+            headers["HTTP-Referer"] = "https://github.com/Unified-System-Core"
+            headers["X-Title"] = "Unified System Core"
+
+        payload = {
+            "model": model,
+            "messages": messages,
+            "stream": False,
+        }
+
+        if system_prompt:
+            payload["messages"].insert(0, {"role": "system", "content": system_prompt})
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        content = (
+                            data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        )
+                        usage = data.get("usage", {})
+                        if not usage:
+                            # Try fallback if usage not standard
+                            usage = {
+                                "total_tokens": 0
+                            }
+                        return content, usage
+                    else:
+                        error_text = await resp.text()
+                        return f"Error: API Request Failed ({resp.status}) - {error_text}", {}
+        except Exception as e:
+            return f"Error: Connection Failed - {str(e)}", {}
+
     async def _chat_openai(self, messages: list, system_prompt: Optional[str] = None):
         """OpenAI API request."""
-        # Simplified OpenAI request
-        return "OpenAI integration stub", {}
+        return await self._chat_openai_compatible(
+            messages,
+            system_prompt,
+            base_url=self.config.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            api_key=self.config.get("OPENAI_API_KEY"),
+            model=self.config.get("OPENAI_MODEL", "gpt-4o-mini"),
+        )
 
     async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""
-        return "OpenRouter integration stub", {}
+        return await self._chat_openai_compatible(
+            messages,
+            system_prompt,
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.config.get("OPENROUTER_API_KEY"),
+            model=self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"),
+        )
+
+    async def _chat_github(self, messages: list, system_prompt: Optional[str] = None):
+        """GitHub Models API request (via Azure AI Inference)."""
+        return await self._chat_openai_compatible(
+            messages,
+            system_prompt,
+            base_url=self.config.get("GITHUB_BASE_URL", "https://models.inference.ai.azure.com"),
+            api_key=self.config.get("GITHUB_TOKEN"),
+            model=self.config.get("GITHUB_MODEL", "gpt-4o"),
+        )
 
     async def list_models(self):
         """List available models for the current provider."""
@@ -219,6 +295,12 @@ class InferenceClient:
                 "gemini-1.5-flash",
                 "gemini-1.5-pro"
             ]
+        elif provider == "github":
+            return ["gpt-4o", "gpt-4o-mini", "Phi-3.5-mini-instruct", "Llama-3.2-90B-Vision-Instruct"]
+        elif provider == "openrouter":
+            return ["anthropic/claude-3.5-sonnet", "google/gemini-pro"]
+        elif provider == "openai":
+            return ["gpt-4o", "gpt-4o-mini"]
 
         return [self.model]
 

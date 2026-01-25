@@ -30,6 +30,7 @@ class ConfigManager:
         "GEMINI_API_KEY",
         "OPENAI_API_KEY",
         "OPENROUTER_API_KEY",
+        "GITHUB_TOKEN",
         "VAPI_API_KEY",
     }
 
@@ -82,6 +83,12 @@ class ConfigManager:
             ),
             "OPENROUTER_MODEL": os.environ.get(
                 "OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"
+            ),
+            # GitHub Models settings
+            "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", ""),
+            "GITHUB_MODEL": os.environ.get("GITHUB_MODEL", "gpt-4o"),
+            "GITHUB_BASE_URL": os.environ.get(
+                "GITHUB_BASE_URL", "https://models.inference.ai.azure.com"
             ),
             # Legacy settings (backwards compatibility)
             "INFERENCE_BASE_URL": os.environ.get(

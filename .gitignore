@@ -1,6 +1,42 @@
-.env
-.env.igor
-Projects/ChatKit_Dashboard/.env*
-.env.bak
-tmp/
+# Environment files
+.env*
+!.env.example
+
+# Credentials and tokens
+*.json
+*.pickle
+.credentials/
+secrets/
+token_*.json
+gcp-service-account.json
+client_secret.json
+gmail_credentials.json
+
+# Logs and databases
+*.log
+*.db
+*.sst
+
+# Archives and large media
+*.zip
+*.tar.gz
+*.tgz
+*.m4a
+*.mp4
+*.pdf
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.wav
+*.mp3
+
+# System files
 .DS_Store
+tmp/
+node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+.agent/
+.gemini/

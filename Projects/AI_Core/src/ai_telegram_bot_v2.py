@@ -1054,7 +1054,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Handle OAuth code - can start with "4/" or be a full URL (often Sent from mobile)
     auth_code = None
     if user_text.strip().startswith("4/"):
-        auth_code = user_text.strip()
+        auth_code = re.split(r"[&\s]", user_text.strip())[0]
     elif "code=" in user_text:
         # Extract code from URL like http://localhost:8085/oauth2callback?code=4/0ABC...
         # Also handles long URLs with other parameters
@@ -1067,6 +1067,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 auth_code = auth_code.replace("%2F", "/")
 
     if auth_code:
+        logger.info(f"[OAUTH] Extracted auth code: {auth_code}")
         await update.message.reply_text("🔄 Verifying code...")
         credentials = auth_manager.exchange_code(auth_code, user_id=user_id)
         if credentials:
