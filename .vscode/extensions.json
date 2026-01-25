@@ -1,5 +1,15 @@
 {
     "recommendations": [
-        "GitHub.vscode-pull-request-github"
+        "ms-python.python",
+        "ms-python.vscode-pylint",
+        "ms-azuretools.vscode-docker",
+        "humao.rest-client",
+        "tailscale.vscode-tailscale",
+        "vivaxy.vscode-conventional-commits",
+        "esbenp.prettier-vscode",
+        "yzhang.markdown-all-in-one",
+        "usernamehw.errorlens",
+        "tamasfe.even-better-toml",
+        "github.vscode-pull-request-github"
     ]
 }

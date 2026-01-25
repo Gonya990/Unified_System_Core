@@ -52,3 +52,12 @@ projects:
     owner: "Gonya"
     keywords: ["opencode-server", "service"]
     description: "OpenCode server configuration and scripts."
+
+  - id: PRJ-007
+    name: "Digital Assistant MVP"
+    aliases: ["assistant", "mvp", "control-center"]
+    status: active
+    path: "01_Projects/PRJ-007_Digital_Assistant_MVP"
+    owner: "Gonya"
+    keywords: ["make.com", "whatsapp", "crypto", "leads", "automation"]
+    description: "Business automation hub for Israel market. Connects Meta, AI, and Crypto."

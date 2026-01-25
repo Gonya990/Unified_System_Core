@@ -2,25 +2,40 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Beads: Refresh / Sync",
+            "label": "🚀 Start Bridge Server",
             "type": "shell",
-            "command": "bd sync && bd list",
-            "problemMatcher": [],
+            "command": "python3 /Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/bridge_server.py",
+            "group": "none",
             "presentation": {
                 "reveal": "always",
-                "panel": "shared"
-            },
+                "panel": "new",
+                "focus": true
+            }
+        },
+        {
+            "label": "🤖 Start Bot (Linux Kube)",
+            "type": "shell",
+            "command": "ssh -o StrictHostKeyChecking=no 100.115.17.68 'cd /home/gonya/Unified_System_Core/Projects/AI_Core/src && python3 ai_telegram_bot_v2.py'",
             "group": "none"
+        },
+        {
+            "label": "📊 Tail Logs (Bot)",
+            "type": "shell",
+            "command": "tail -f /Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/bot_igor.log",
+            "isBackground": true
+        },
+        {
+            "label": "📡 Connectivity Check",
+            "type": "shell",
+            "command": "ping -c 1 100.126.23.67 && ping -c 1 100.115.17.68",
+            "presentation": {
+                "reveal": "always"
+            }
         },
         {
             "label": "Beads: List Tasks",
             "type": "shell",
             "command": "bd list",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
             "group": "none"
         }
     ]

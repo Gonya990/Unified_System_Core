@@ -18,9 +18,32 @@
 
 ## Phase 4: Optimization & Tooling Restoration (2026-01-25) <!-- id: 400 -->
 
-- [ ] **Tailscale Fix**: Resolve `Trace/BPT trap: 5` on MacBook to restore remote connectivity. <!-- id: 401 -->
-- [ ] **Beads Recovery**: Find or reinstall `bd` CLI for task management sync. <!-- id: 402 -->
-- [ ] **Credentials Audit**: Retrieve and set `WEBTOP_TOKEN` in `.env`. <!-- id: 403 -->
-- [x] **Webtop Client Enhancement**: Add HTML output parsing/logging in `webtop_client.py` for debugging. <!-- id: 404 -->
-- [x] **Sync Resilience**: Update `agent_sync.py` to handle missing `bd` gracefully. <!-- id: 405 -->
-- [x] **System Status Update**: Generate and push a new `SYNC_STATUS_2026-01-25.md`. <!-- id: 406 -->
+- [ ] **Tailscale Fix**: Resolve `Trace/BPT trap: 5` on MacBook to restore
+  remote connectivity. <!-- id: 401 -->
+- [ ] **Beads Recovery**: Find or reinstall `bd` CLI for task management sync.
+  <!-- id: 402 -->
+- [ ] **Credentials Audit**: Retrieve and set `WEBTOP_TOKEN` in `.env`.
+  <!-- id: 403 -->
+- [x] **Webtop Client Enhancement**: Add HTML output parsing/logging in
+  `webtop_client.py` for debugging. <!-- id: 404 -->
+- [x] **Sync Resilience**: Update `agent_sync.py` to handle missing `bd`
+  gracefully. <!-- id: 405 -->
+- [x] **System Status Update**: Generate and push a new
+  `SYNC_STATUS_2026-01-25.md`. <!-- id: 406 -->
+
+## Phase 5: Digital Assistant MVP & Control Center (STRATEGIC) <!-- id: 500 -->
+
+- [ ] **Infrastructure**: Enable Tailscale SSH on all nodes for unified
+  management. <!-- id: 501 -->
+- [x] **Control Center**: Create FastAPI Bridge Server for Make.com.
+  <!-- id: 502 -->
+- [x] **Guide**: Provide `MAKE_COM_SETUP_GUIDE.md` for WhatsApp integration.
+  <!-- id: 507 -->
+- [ ] **Marketing**: Finalize "Assistant MVP" offer script for Israel market.
+  <!-- id: 503 -->
+- [x] **Vision**: Create and verify `vision_dashboard.html` for product
+  presentation. <!-- id: 504 -->
+- [ ] **Crypto**: Research NowPayments/BitPay API for USDT/BTC gateway.
+  <!-- id: 505 -->
+- [ ] **Leads**: Integrate Google Sheets CRM automation in Make.com.
+  <!-- id: 506 -->
