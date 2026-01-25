@@ -10,6 +10,7 @@
         "yzhang.markdown-all-in-one",
         "usernamehw.errorlens",
         "tamasfe.even-better-toml",
-        "github.vscode-pull-request-github"
+        "github.vscode-pull-request-github",
+        "github.vscode-github-actions"
     ]
 }

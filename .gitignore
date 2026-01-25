@@ -40,3 +40,4 @@ __pycache__/
 .pytest_cache/
 .agent/
 .gemini/
+tools/npm-cache/
