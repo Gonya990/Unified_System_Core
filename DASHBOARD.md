@@ -16,6 +16,7 @@ This dashboard provides quick access to all critical components.
 - **Bridge Server**: `Projects/AI_Core/src/bridge_server.py` (Port 8090)
 - **Telegram Bot v2**: `Projects/AI_Core/src/ai_telegram_bot_v2.py`
 - **Content Factory**: `Projects/Content_Factory/src/researcher/daily_researcher.py`
+- **Network Troubleshooting**: [System Networking Guide](docs/SYSTEM_NETWORKING.md) ⚠️
 
 ---
 

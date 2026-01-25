@@ -3,5 +3,13 @@
     // Disable table alignment rule as it's too strict
     "MD060": false,
     // Allow inline HTML for badges and special formatting
-    "MD033": false
+    "MD033": false,
+    // Disable line length check (MD013) - useful for long links and generated reports
+    "MD013": false,
+    // Allow duplicate headings (MD024) - useful for repeated sections in reports
+    "MD024": false,
+    // Allow multiple top-level headings (MD025) - useful for combined documents
+    "MD025": false,
+    // Allow heading levels to skip (MD001) - useful for generated content structure
+    "MD001": false
 }
