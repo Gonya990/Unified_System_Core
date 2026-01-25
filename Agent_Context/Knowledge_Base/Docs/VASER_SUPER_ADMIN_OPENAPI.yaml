@@ -1,0 +1,554 @@
+openapi: 3.0.3
+info:
+  title: VASER Super Admin Actions
+  version: 1.0.0
+  description: |
+    Unified OpenAPI manifest for the VASER Super Admin Custom GPT.
+    Provides secure access to network operations, Home Assistant, local gateway,
+    cloud integrations, task management, analytics, and presentation generation.
+servers:
+  - url: https://vaser-hub.local/api
+    description: VASER Control Hub (internal)
+  - url: https://vaser-hub.example.com/api
+    description: VASER Control Hub (external)
+security:
+  - VaserApiKey: []
+paths:
+  /network/scan:
+    post:
+      operationId: scan_network
+      summary: Scan local network for devices
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subnet:
+                  type: string
+                  example: 192.168.1.0/24
+                deep_scan:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: Network scan results
+  /network/device/{device_id}:
+    get:
+      operationId: get_device_info
+      summary: Get device info
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Device details
+    delete:
+      operationId: remove_device
+      summary: Remove device
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Removal confirmation
+  /network/device:
+    post:
+      operationId: add_device
+      summary: Add new device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, address, method]
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                method:
+                  type: string
+                  enum: [ssh, winrm, api, home_assistant]
+                credentials_ref:
+                  type: string
+      responses:
+        "200":
+          description: Device added
+  /network/device/{device_id}/reboot:
+    post:
+      operationId: reboot_device
+      summary: Reboot device
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reboot initiated
+  /network/device/{device_id}/configure:
+    post:
+      operationId: configure_device
+      summary: Configure device
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config:
+                  type: object
+      responses:
+        "200":
+          description: Configuration applied
+  /network/command:
+    post:
+      operationId: run_command
+      summary: Run a command on a device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, command]
+              properties:
+                device_id:
+                  type: string
+                command:
+                  type: string
+                run_as:
+                  type: string
+      responses:
+        "200":
+          description: Command output
+  /homeassistant/service_call:
+    post:
+      operationId: ha.service_call
+      summary: Call Home Assistant service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [domain, service]
+              properties:
+                domain:
+                  type: string
+                service:
+                  type: string
+                entity_id:
+                  type: string
+                data:
+                  type: object
+      responses:
+        "200":
+          description: Service call result
+  /homeassistant/state/{entity_id}:
+    get:
+      operationId: ha.get_state
+      summary: Get Home Assistant entity state
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entity state
+    put:
+      operationId: ha.set_state
+      summary: Set Home Assistant entity state
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  type: string
+                attributes:
+                  type: object
+      responses:
+        "200":
+          description: Entity updated
+  /homeassistant/script/{script_id}/execute:
+    post:
+      operationId: ha.execute_script
+      summary: Execute Home Assistant script
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Script execution result
+  /local/run:
+    post:
+      operationId: local.run
+      summary: Execute local command via gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                command:
+                  type: string
+      responses:
+        "200":
+          description: Command output
+  /local/read:
+    post:
+      operationId: local.read
+      summary: Read a local file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+      responses:
+        "200":
+          description: File contents
+  /local/write:
+    post:
+      operationId: local.write
+      summary: Write a local file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, content]
+              properties:
+                path:
+                  type: string
+                content:
+                  type: string
+      responses:
+        "200":
+          description: Write result
+  /clouds/google/calendar/create_event:
+    post:
+      operationId: google_calendar.create_event
+      summary: Create Google Calendar event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                calendar_id:
+                  type: string
+                summary:
+                  type: string
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Event created
+  /clouds/icloud/calendar/create_event:
+    post:
+      operationId: icloud_calendar.create_event
+      summary: Create iCloud calendar event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                calendar_id:
+                  type: string
+                summary:
+                  type: string
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Event created
+  /clouds/google/gmail/send:
+    post:
+      operationId: gmail.send_email
+      summary: Send Gmail message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to, subject, body]
+              properties:
+                to:
+                  type: string
+                subject:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Email sent
+  /clouds/outlook/send:
+    post:
+      operationId: outlook.send_email
+      summary: Send Outlook email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to, subject, body]
+              properties:
+                to:
+                  type: string
+                subject:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Email sent
+  /clouds/google/drive/upload:
+    post:
+      operationId: google_drive.upload_file
+      summary: Upload file to Google Drive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, content_base64]
+              properties:
+                name:
+                  type: string
+                content_base64:
+                  type: string
+                folder_id:
+                  type: string
+      responses:
+        "200":
+          description: Upload result
+  /clouds/yandex/disk/upload:
+    post:
+      operationId: yandex_disk.upload_file
+      summary: Upload file to Yandex Disk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, content_base64]
+              properties:
+                path:
+                  type: string
+                content_base64:
+                  type: string
+      responses:
+        "200":
+          description: Upload result
+  /clouds/dropbox/upload:
+    post:
+      operationId: dropbox.upload_file
+      summary: Upload file to Dropbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, content_base64]
+              properties:
+                path:
+                  type: string
+                content_base64:
+                  type: string
+      responses:
+        "200":
+          description: Upload result
+  /management/tasks:
+    post:
+      operationId: create_task
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                due_at:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Task created
+  /management/tasks/{task_id}/complete:
+    post:
+      operationId: complete_task
+      summary: Complete a task
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task completed
+  /management/reminders:
+    post:
+      operationId: remind_user
+      summary: Create a reminder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, remind_at]
+              properties:
+                message:
+                  type: string
+                remind_at:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Reminder scheduled
+  /management/reports:
+    post:
+      operationId: generate_report
+      summary: Generate a report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scope:
+                  type: string
+                period:
+                  type: string
+      responses:
+        "200":
+          description: Report generated
+  /analytics/logs/collect:
+    post:
+      operationId: collect_logs
+      summary: Collect system logs
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sources:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Logs collected
+  /analytics/logs/analyze:
+    post:
+      operationId: analyze_logs
+      summary: Analyze collected logs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeframe:
+                  type: string
+                focus:
+                  type: string
+      responses:
+        "200":
+          description: Analysis result
+  /analytics/project/summarize:
+    post:
+      operationId: summarize_project
+      summary: Summarize project status
+      responses:
+        "200":
+          description: Summary
+  /analytics/presentation/generate:
+    post:
+      operationId: generate_presentation
+      summary: Generate presentation deck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content_json]
+              properties:
+                content_json:
+                  type: object
+      responses:
+        "200":
+          description: Presentation generated
+components:
+  securitySchemes:
+    VaserApiKey:
+      type: apiKey
+      in: header
+      name: X-VASER-API-KEY
