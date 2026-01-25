@@ -16,6 +16,20 @@ on:
         description: "Image tag to build"
         required: false
         default: "latest"
+      target_branch:
+        description: "Branch to build from"
+        required: false
+        default: "main"
+      dry_run:
+        description: "Dry run mode (build only, no push)"
+        required: false
+        type: boolean
+        default: false
+
+# Prevent concurrent builds on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
@@ -23,20 +37,29 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
+      attestations: write
+      id-token: write
+
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tags: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch || github.ref }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Container Registry
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && !inputs.dry_run
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -51,35 +74,105 @@ jobs:
           tags: |
             type=sha,prefix=
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ github.event.inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./Projects/AI_Core
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Provenance/SBOM only when pushing (creates manifest lists incompatible with docker exporter)
+          provenance: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
+          sbom: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
+          outputs: ${{ (github.event_name == 'pull_request' || inputs.dry_run) && 'type=docker,dest=/tmp/image.tar' || '' }}
 
-  # Optional: Update Kubernetes manifests with new image tag
+      - name: Upload artifact
+        if: github.event_name == 'pull_request' || inputs.dry_run
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/image.tar
+          retention-days: 7
+
+      # Security scan for vulnerabilities
+      - name: Run Trivy vulnerability scanner
+        if: github.event_name == 'pull_request' || inputs.dry_run
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: /tmp/image.tar
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # Generate attestation for pushed images
+      - name: Generate attestation
+        if: github.event_name != 'pull_request' && !inputs.dry_run && steps.build.outputs.digest != ''
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      # Build summary with useful info
+      - name: Generate build summary
+        if: always()
+        run: |
+          echo "## 🐳 Docker Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Event** | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Dry Run** | \`${{ inputs.dry_run || false }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Push** | \`${{ github.event_name != 'pull_request' && !inputs.dry_run }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ -n "${{ steps.build.outputs.digest }}" ]]; then
+            echo "### Image Details" >> $GITHUB_STEP_SUMMARY
+            echo "- **Digest**: \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tags**:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ -f /tmp/image.tar ]]; then
+            SIZE=$(du -h /tmp/image.tar | cut -f1)
+            echo "### Artifact" >> $GITHUB_STEP_SUMMARY
+            echo "- **Image Size**: ${SIZE}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Update Kubernetes manifests with new image tag
   update-manifests:
     needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    continue-on-error: true
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && !inputs.dry_run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     permissions:
       contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update kustomization.yaml with new tag
         run: |
           cd Projects/AI_Core/k8s
-          sed -i "s/newTag: .*/newTag: ${GITHUB_SHA::7}/" kustomization.yaml
+          OLD_TAG=$(grep 'newTag:' kustomization.yaml | awk '{print $2}')
+          NEW_TAG="${GITHUB_SHA::7}"
+          sed -i "s/newTag: .*/newTag: ${NEW_TAG}/" kustomization.yaml
+          echo "Updated image tag: ${OLD_TAG} -> ${NEW_TAG}"
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -87,3 +180,13 @@ jobs:
           commit_message: "chore: update image tag to ${{ github.sha }}"
           file_pattern: "Projects/AI_Core/k8s/kustomization.yaml"
           branch: main
+
+      - name: Update manifest summary
+        if: always()
+        run: |
+          echo "## 📦 Manifest Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **New Tag** | \`${GITHUB_SHA::7}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image Digest** | \`${{ needs.build.outputs.image-digest }}\` |" >> $GITHUB_STEP_SUMMARY
