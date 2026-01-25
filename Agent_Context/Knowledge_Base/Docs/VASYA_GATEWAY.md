@@ -109,6 +109,12 @@ python /Users/macbook/Documents/Unified_System/Scripts/automation/test_vasya.py
 
 ---
 
+## 🧭 Super-Admin OpenAPI (VASER Router)
+
+- **OpenAPI YAML:** `docs/specs/super-admin-openapi.yaml`
+
+---
+
 ## 🔮 Возможные расширения
 
 | Интерфейс | Сложность | Описание |
