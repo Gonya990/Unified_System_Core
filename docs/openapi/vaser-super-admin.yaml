@@ -1,0 +1,15 @@
+openapi: 3.1.0
+info:
+  title: VASER Super-Admin Actions API
+  version: 0.1.0
+  description: |
+    OpenAPI manifest for VASER Super-Admin actions.
+    All state-changing operations must follow the VASER Action Approval & Safety Policy.
+
+x-policy: docs/security/vaser-action-approval-policy.md
+
+servers:
+  - url: https://vaser-hub.local
+    description: VASER Control Hub (local)
+
+paths: {}
