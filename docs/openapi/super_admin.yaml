@@ -1,0 +1,1515 @@
+openapi: 3.1.0
+info:
+  title: VASER Control Hub - Super Admin Actions
+  version: 1.0.0
+  description: |
+    Unified OpenAPI manifest for the Super-Admin GPT actions.
+
+    Role: "You are the main AI network administrator for the VASER platform."
+
+    This API centralizes network administration, Home Assistant operations,
+    local gateway execution, cloud integrations, management tasks, and analytics.
+    It follows the Vasya Gateway style: clear request/response schemas, explicit
+    security requirements, and a consistent error model.
+servers:
+  - url: https://vaser-hub.local
+    description: Primary VASER Control Hub (internal)
+  - url: https://api.vaser-hub.example.com
+    description: Public gateway (through secure tunnel)
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+  - oauth2Cloud: []
+tags:
+  - name: Network
+    description: LAN discovery and device lifecycle actions.
+  - name: Home Assistant
+    description: Home Assistant entity/service operations.
+  - name: Local Gateway
+    description: Local Python gateway for safe command and file operations.
+  - name: Clouds
+    description: Cloud productivity and storage services.
+  - name: Management
+    description: Tasking, reminders, reports.
+  - name: Analytics
+    description: Logs collection, analysis, summaries, and presentations.
+paths:
+  /network/scan:
+    post:
+      tags: [Network]
+      summary: scan_network
+      description: Scan the local network and return discovered devices.
+      operationId: scan_network
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NetworkScanRequest"
+      responses:
+        "200":
+          description: Scan results with device list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NetworkScanResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /network/device/info:
+    post:
+      tags: [Network]
+      summary: get_device_info
+      description: Retrieve detailed information about a device by ID or IP.
+      operationId: get_device_info
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceInfoRequest"
+      responses:
+        "200":
+          description: Device details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceInfoResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /network/device/command:
+    post:
+      tags: [Network]
+      summary: run_command
+      description: Run a command on a target device via SSH/WinRM/API.
+      operationId: run_command
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunCommandRequest"
+      responses:
+        "200":
+          description: Command execution result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunCommandResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /network/device:
+    post:
+      tags: [Network]
+      summary: add_device
+      description: Register a new device in VASER Hub.
+      operationId: add_device
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDeviceRequest"
+      responses:
+        "200":
+          description: Device registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceOperationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "500": { $ref: "#/components/responses/InternalError" }
+    delete:
+      tags: [Network]
+      summary: remove_device
+      description: Remove a device from VASER Hub.
+      operationId: remove_device
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveDeviceRequest"
+      responses:
+        "200":
+          description: Device removed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceOperationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /network/device/reboot:
+    post:
+      tags: [Network]
+      summary: reboot_device
+      description: Reboot a managed device (may require user confirmation).
+      operationId: reboot_device
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RebootDeviceRequest"
+      responses:
+        "200":
+          description: Reboot initiated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceOperationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /network/device/configure:
+    post:
+      tags: [Network]
+      summary: configure_device
+      description: Update device configuration (policy-controlled).
+      operationId: configure_device
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigureDeviceRequest"
+      responses:
+        "200":
+          description: Configuration applied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceOperationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /ha/service_call:
+    post:
+      tags: [Home Assistant]
+      summary: ha.service_call
+      description: Call a Home Assistant service.
+      operationId: ha_service_call
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HaServiceCallRequest"
+      responses:
+        "200":
+          description: Service call result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaServiceCallResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /ha/get_state:
+    post:
+      tags: [Home Assistant]
+      summary: ha.get_state
+      description: Get state of a Home Assistant entity.
+      operationId: ha_get_state
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HaGetStateRequest"
+      responses:
+        "200":
+          description: Entity state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaGetStateResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /ha/set_state:
+    post:
+      tags: [Home Assistant]
+      summary: ha.set_state
+      description: Set state of a Home Assistant entity.
+      operationId: ha_set_state
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HaSetStateRequest"
+      responses:
+        "200":
+          description: State updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaSetStateResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /ha/execute_script:
+    post:
+      tags: [Home Assistant]
+      summary: ha.execute_script
+      description: Execute a Home Assistant script.
+      operationId: ha_execute_script
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HaExecuteScriptRequest"
+      responses:
+        "200":
+          description: Script execution result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaExecuteScriptResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /local/run:
+    post:
+      tags: [Local Gateway]
+      summary: /local/run
+      description: Execute a local command using the Python gateway.
+      operationId: local_run
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocalRunRequest"
+      responses:
+        "200":
+          description: Command execution output.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocalRunResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /local/read:
+    post:
+      tags: [Local Gateway]
+      summary: /local/read
+      description: Read a file from the local gateway sandbox.
+      operationId: local_read
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocalReadRequest"
+      responses:
+        "200":
+          description: File contents.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocalReadResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /local/write:
+    post:
+      tags: [Local Gateway]
+      summary: /local/write
+      description: Write a file through the local gateway sandbox.
+      operationId: local_write
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocalWriteRequest"
+      responses:
+        "200":
+          description: Write confirmation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocalWriteResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/google/calendar:
+    post:
+      tags: [Clouds]
+      summary: Google Calendar
+      description: Create, update, or fetch calendar events.
+      operationId: cloud_google_calendar
+      security:
+        - oauth2Cloud: [calendar]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudCalendarRequest"
+      responses:
+        "200":
+          description: Calendar action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudCalendarResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/icloud:
+    post:
+      tags: [Clouds]
+      summary: iCloud
+      description: Access iCloud calendar, contacts, or files.
+      operationId: cloud_icloud
+      security:
+        - oauth2Cloud: [icloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudGenericRequest"
+      responses:
+        "200":
+          description: iCloud action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudGenericResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/mail:
+    post:
+      tags: [Clouds]
+      summary: Gmail/Outlook
+      description: Send, fetch, or manage email via Gmail or Outlook.
+      operationId: cloud_mail
+      security:
+        - oauth2Cloud: [mail]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudMailRequest"
+      responses:
+        "200":
+          description: Mail action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudMailResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/google/drive:
+    post:
+      tags: [Clouds]
+      summary: Google Drive
+      description: List, upload, or download files from Google Drive.
+      operationId: cloud_google_drive
+      security:
+        - oauth2Cloud: [drive]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudStorageRequest"
+      responses:
+        "200":
+          description: Google Drive action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudStorageResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/yandex/disk:
+    post:
+      tags: [Clouds]
+      summary: Yandex Disk
+      description: List, upload, or download files from Yandex Disk.
+      operationId: cloud_yandex_disk
+      security:
+        - oauth2Cloud: [disk]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudStorageRequest"
+      responses:
+        "200":
+          description: Yandex Disk action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudStorageResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /clouds/dropbox:
+    post:
+      tags: [Clouds]
+      summary: Dropbox
+      description: List, upload, or download files from Dropbox.
+      operationId: cloud_dropbox
+      security:
+        - oauth2Cloud: [dropbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudStorageRequest"
+      responses:
+        "200":
+          description: Dropbox action result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudStorageResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /management/task:
+    post:
+      tags: [Management]
+      summary: create_task
+      description: Create a new task for the user.
+      operationId: create_task
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskRequest"
+      responses:
+        "200":
+          description: Task created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+    patch:
+      tags: [Management]
+      summary: complete_task
+      description: Mark a task as completed.
+      operationId: complete_task
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteTaskRequest"
+      responses:
+        "200":
+          description: Task updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /management/remind:
+    post:
+      tags: [Management]
+      summary: remind_user
+      description: Schedule a reminder for the user.
+      operationId: remind_user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemindUserRequest"
+      responses:
+        "200":
+          description: Reminder scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReminderResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /management/report:
+    post:
+      tags: [Management]
+      summary: generate_report
+      description: Generate a management report.
+      operationId: generate_report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateReportRequest"
+      responses:
+        "200":
+          description: Report output.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateReportResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /analytics/collect_logs:
+    post:
+      tags: [Analytics]
+      summary: collect_logs
+      description: Collect logs and telemetry for analysis.
+      operationId: collect_logs
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectLogsRequest"
+      responses:
+        "200":
+          description: Logs collected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectLogsResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /analytics/analyze_logs:
+    post:
+      tags: [Analytics]
+      summary: analyze_logs
+      description: Analyze collected logs for issues and trends.
+      operationId: analyze_logs
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeLogsRequest"
+      responses:
+        "200":
+          description: Analysis report.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeLogsResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /analytics/summarize_project:
+    post:
+      tags: [Analytics]
+      summary: summarize_project
+      description: Summarize project status, risks, and next steps.
+      operationId: summarize_project
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SummarizeProjectRequest"
+      responses:
+        "200":
+          description: Project summary.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SummarizeProjectResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+  /analytics/generate_presentation:
+    post:
+      tags: [Analytics]
+      summary: generate_presentation
+      description: Generate presentation materials (pptx/pdf) from content JSON.
+      operationId: generate_presentation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GeneratePresentationRequest"
+      responses:
+        "200":
+          description: Presentation output.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratePresentationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token issued by VASER Hub.
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-VASER-API-Key
+      description: API key for trusted service accounts.
+    oauth2Cloud:
+      type: oauth2
+      description: OAuth2 tokens for cloud providers (Google, Apple, Microsoft, Yandex, Dropbox).
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.vaser-hub.example.com/oauth/authorize
+          tokenUrl: https://auth.vaser-hub.example.com/oauth/token
+          scopes:
+            calendar: Access calendar data
+            mail: Access mail data
+            drive: Access drive files
+            icloud: Access iCloud data
+            disk: Access Yandex Disk data
+            dropbox: Access Dropbox data
+  responses:
+    BadRequest:
+      description: Invalid input or malformed request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Authentication required or failed.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Not allowed by policy or missing permissions.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Resource conflict (already exists or state mismatch).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    NetworkScanRequest:
+      type: object
+      properties:
+        cidr:
+          type: string
+          description: CIDR range to scan.
+          example: 192.168.1.0/24
+        methods:
+          type: array
+          items:
+            type: string
+            enum: [arp, ping, mdns, snmp]
+          description: Scan methods to use.
+        include_offline:
+          type: boolean
+          description: Whether to include offline devices in the result.
+          default: false
+      required: [cidr]
+    NetworkScanResponse:
+      type: object
+      properties:
+        scan_id:
+          type: string
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeviceSummary"
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+      required: [scan_id, devices]
+    DeviceSummary:
+      type: object
+      properties:
+        device_id:
+          type: string
+        hostname:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        mac:
+          type: string
+        status:
+          type: string
+          enum: [online, offline, unknown]
+        vendor:
+          type: string
+      required: [device_id, ip, status]
+    DeviceInfoRequest:
+      type: object
+      properties:
+        device_id:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+      oneOf:
+        - required: [device_id]
+        - required: [ip]
+    DeviceInfoResponse:
+      type: object
+      properties:
+        device:
+          $ref: "#/components/schemas/DeviceDetails"
+      required: [device]
+    DeviceDetails:
+      type: object
+      properties:
+        device_id:
+          type: string
+        hostname:
+          type: string
+        ip:
+          type: string
+        mac:
+          type: string
+        os:
+          type: string
+        services:
+          type: array
+          items:
+            type: string
+        last_seen:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        credentials_ref:
+          type: string
+          description: Reference to credentials stored in VASER Hub.
+      required: [device_id, ip]
+    RunCommandRequest:
+      type: object
+      properties:
+        device_id:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        protocol:
+          type: string
+          enum: [ssh, winrm, api]
+        command:
+          type: string
+        confirm:
+          type: boolean
+          description: Whether user confirmation has been obtained for critical commands.
+          default: false
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 3600
+          default: 60
+      required: [protocol, command]
+    RunCommandResponse:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+      required: [execution_id]
+    AddDeviceRequest:
+      type: object
+      properties:
+        hostname:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        mac:
+          type: string
+        credentials_ref:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      required: [hostname, ip]
+    RemoveDeviceRequest:
+      type: object
+      properties:
+        device_id:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        confirm:
+          type: boolean
+          description: Required for critical deletions.
+          default: false
+      required: [confirm]
+    RebootDeviceRequest:
+      type: object
+      properties:
+        device_id:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        confirm:
+          type: boolean
+          description: Required for reboot of critical devices.
+          default: false
+      required: [confirm]
+    ConfigureDeviceRequest:
+      type: object
+      properties:
+        device_id:
+          type: string
+        config_patch:
+          type: object
+          description: Configuration patch to apply (policy validated).
+        confirm:
+          type: boolean
+          description: Required for critical changes.
+          default: false
+      required: [device_id, config_patch]
+    DeviceOperationResponse:
+      type: object
+      properties:
+        device_id:
+          type: string
+        status:
+          type: string
+          enum: [accepted, applied, rejected]
+        message:
+          type: string
+      required: [device_id, status]
+    HaServiceCallRequest:
+      type: object
+      properties:
+        domain:
+          type: string
+        service:
+          type: string
+        target:
+          type: object
+          description: Home Assistant target selector.
+        service_data:
+          type: object
+      required: [domain, service]
+    HaServiceCallResponse:
+      type: object
+      properties:
+        result:
+          type: object
+        message:
+          type: string
+      required: [result]
+    HaGetStateRequest:
+      type: object
+      properties:
+        entity_id:
+          type: string
+      required: [entity_id]
+    HaGetStateResponse:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        state:
+          type: string
+        attributes:
+          type: object
+        last_changed:
+          type: string
+          format: date-time
+      required: [entity_id, state]
+    HaSetStateRequest:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        state:
+          type: string
+        attributes:
+          type: object
+      required: [entity_id, state]
+    HaSetStateResponse:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        state:
+          type: string
+        attributes:
+          type: object
+      required: [entity_id, state]
+    HaExecuteScriptRequest:
+      type: object
+      properties:
+        script_id:
+          type: string
+        fields:
+          type: object
+      required: [script_id]
+    HaExecuteScriptResponse:
+      type: object
+      properties:
+        script_id:
+          type: string
+        result:
+          type: object
+      required: [script_id]
+    LocalRunRequest:
+      type: object
+      properties:
+        command:
+          type: string
+        cwd:
+          type: string
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 3600
+          default: 120
+        env:
+          type: object
+          additionalProperties:
+            type: string
+      required: [command]
+    LocalRunResponse:
+      type: object
+      properties:
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        duration_ms:
+          type: integer
+      required: [exit_code]
+    LocalReadRequest:
+      type: object
+      properties:
+        path:
+          type: string
+      required: [path]
+    LocalReadResponse:
+      type: object
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        encoding:
+          type: string
+          default: utf-8
+      required: [path, content]
+    LocalWriteRequest:
+      type: object
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        encoding:
+          type: string
+          default: utf-8
+        mode:
+          type: string
+          enum: [overwrite, append]
+          default: overwrite
+      required: [path, content]
+    LocalWriteResponse:
+      type: object
+      properties:
+        path:
+          type: string
+        bytes_written:
+          type: integer
+      required: [path, bytes_written]
+    CloudCalendarRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [create, update, delete, list]
+        calendar_id:
+          type: string
+        event:
+          $ref: "#/components/schemas/CalendarEvent"
+        query:
+          type: object
+      required: [action]
+    CloudCalendarResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarEvent"
+        message:
+          type: string
+      required: [status]
+    CloudGenericRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Provider-specific action.
+        payload:
+          type: object
+      required: [action]
+    CloudGenericResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+        message:
+          type: string
+      required: [status]
+    CloudMailRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          enum: [gmail, outlook]
+        action:
+          type: string
+          enum: [send, list, read, delete]
+        message:
+          $ref: "#/components/schemas/MailMessage"
+        query:
+          type: object
+      required: [provider, action]
+    CloudMailResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/MailMessage"
+        message:
+          type: string
+      required: [status]
+    CloudStorageRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [list, upload, download, delete]
+        path:
+          type: string
+        destination_path:
+          type: string
+        metadata:
+          type: object
+      required: [action]
+    CloudStorageResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/CloudFile"
+        message:
+          type: string
+      required: [status]
+    CreateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        due_at:
+          type: string
+          format: date-time
+        priority:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+      required: [title]
+    CompleteTaskRequest:
+      type: object
+      properties:
+        task_id:
+          type: string
+        completed_at:
+          type: string
+          format: date-time
+      required: [task_id]
+    TaskResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+          enum: [open, completed]
+        title:
+          type: string
+        description:
+          type: string
+        due_at:
+          type: string
+          format: date-time
+      required: [task_id, status, title]
+    RemindUserRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        remind_at:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          enum: [push, email, sms, voice]
+      required: [message, remind_at]
+    ReminderResponse:
+      type: object
+      properties:
+        reminder_id:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, sent]
+        message:
+          type: string
+      required: [reminder_id, status]
+    GenerateReportRequest:
+      type: object
+      properties:
+        report_type:
+          type: string
+          enum: [status, security, finance, project]
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        format:
+          type: string
+          enum: [pdf, markdown, html]
+          default: markdown
+      required: [report_type]
+    GenerateReportResponse:
+      type: object
+      properties:
+        report_id:
+          type: string
+        status:
+          type: string
+        output_url:
+          type: string
+        generated_at:
+          type: string
+          format: date-time
+      required: [report_id, status]
+    CollectLogsRequest:
+      type: object
+      properties:
+        sources:
+          type: array
+          items:
+            type: string
+            enum: [system, application, network, ha, cloud]
+        time_range:
+          $ref: "#/components/schemas/TimeRange"
+        include_sensitive:
+          type: boolean
+          default: false
+      required: [sources]
+    CollectLogsResponse:
+      type: object
+      properties:
+        collection_id:
+          type: string
+        status:
+          type: string
+        log_count:
+          type: integer
+      required: [collection_id, status]
+    AnalyzeLogsRequest:
+      type: object
+      properties:
+        collection_id:
+          type: string
+        focus:
+          type: array
+          items:
+            type: string
+            enum: [errors, performance, security, availability]
+      required: [collection_id]
+    AnalyzeLogsResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+        summary:
+          type: string
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+      required: [analysis_id, summary]
+    SummarizeProjectRequest:
+      type: object
+      properties:
+        project_id:
+          type: string
+        include_risks:
+          type: boolean
+          default: true
+        include_roadmap:
+          type: boolean
+          default: true
+      required: [project_id]
+    SummarizeProjectResponse:
+      type: object
+      properties:
+        project_id:
+          type: string
+        summary:
+          type: string
+        risks:
+          type: array
+          items:
+            type: string
+        roadmap:
+          type: array
+          items:
+            type: string
+      required: [project_id, summary]
+    GeneratePresentationRequest:
+      type: object
+      properties:
+        content_json:
+          type: object
+          description: Structured content (slides, charts, diagrams, roadmap, business plan).
+        output_format:
+          type: string
+          enum: [pptx, pdf]
+          default: pptx
+        theme:
+          type: string
+          default: vaser
+      required: [content_json]
+    GeneratePresentationResponse:
+      type: object
+      properties:
+        presentation_id:
+          type: string
+        status:
+          type: string
+        output_url:
+          type: string
+        generated_at:
+          type: string
+          format: date-time
+      required: [presentation_id, status]
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        location:
+          type: string
+        attendees:
+          type: array
+          items:
+            type: string
+      required: [title, start, end]
+    MailMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        from:
+          type: string
+        to:
+          type: array
+          items:
+            type: string
+        body:
+          type: string
+        received_at:
+          type: string
+          format: date-time
+      required: [subject]
+    CloudFile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        path:
+          type: string
+        size_bytes:
+          type: integer
+        modified_at:
+          type: string
+          format: date-time
+      required: [name, path]
+    TimeRange:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required: [start, end]
+    Finding:
+      type: object
+      properties:
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        title:
+          type: string
+        description:
+          type: string
+        recommendation:
+          type: string
+      required: [severity, title]
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+            trace_id:
+              type: string
+          required: [code, message]
+      required: [error]
