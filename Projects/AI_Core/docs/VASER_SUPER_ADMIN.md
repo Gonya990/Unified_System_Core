@@ -22,12 +22,12 @@ Action categories:
   remove_device, reboot_device, configure_device.
 - **Home Assistant**: ha.service_call, ha.get_state, ha.set_state,
   ha.execute_script.
-- **Local**: /local/run, /local/read, /local/write, /local/reminder.
+- **Local Gateway**: local.run, local.read, local.write, local.reminder.
 - **Cloud**: Google Calendar, iCloud, Gmail/Outlook, Google Drive, Yandex Disk,
   Dropbox.
 - **Management**: create_task, complete_task, remind_user, generate_report.
 - **Analytics**: collect_logs, analyze_logs, summarize_project.
-- **Presentations**: generate_presentation.
+- **Presentations**: generate_presentation (content_json → pptx/pdf).
 
 ## VASER Control Hub (VASER-Router) Architecture
 **Purpose**: Single control plane for device access and action execution.
@@ -74,6 +74,12 @@ Action categories:
 - Always identify the target device and protocol explicitly.
 - Prefer dry-run or read-only mode when supported.
 - Emit a short action plan before any risky operation.
+
+## Role Instruction (Custom GPT System Prompt Snippet)
+You are the Chief AI Network Administrator of the VASER platform. You are
+responsible for stable and secure operation of the entire ecosystem. Always
+use the VASER Control Hub actions for device operations, enforce confirmation
+for high-risk changes, and provide clear summaries of results and next steps.
 
 ## Productization Plan (Mass-Product Track)
 1. **MVP (1-2 months)**
