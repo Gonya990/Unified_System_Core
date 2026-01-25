@@ -14,6 +14,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from Scripts.Utilities.telegram_notifier import TelegramNotifier
+from External_Tools.nodriver import (
+    nodriver_daemon,
+)  # Optional if we want to reuse that logic, but shell curl might be easier for public pages if not blocked.
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -34,8 +37,9 @@ def check_for_updates():
     logger.info("🔍 Checking OpenAI features...")
 
     # We will try to read the last known state
+    last_state = ""
     if STATE_FILE.exists():
-        STATE_FILE.read_text().strip()
+        last_state = STATE_FILE.read_text().strip()
 
     # Construct command to fetch page via nodriver (most reliable way given 403s on curl)
     import subprocess

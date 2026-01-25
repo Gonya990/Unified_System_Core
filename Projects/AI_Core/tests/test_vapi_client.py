@@ -3,11 +3,10 @@ Unit tests for VAPI client integration.
 Tests VAPIClient initialization, configuration, and basic methods.
 """
 import os
+import pytest
+from unittest.mock import Mock, patch, AsyncMock
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch
-
-import pytest
 
 # Add src to path for imports
 src_path = Path(__file__).resolve().parent.parent / "src"
@@ -116,7 +115,7 @@ class TestVAPIClientAudio:
         """Test generate_speech respects voice_id parameter."""
         vapi_client_with_mock._synthesize_sync = Mock(return_value=b"audio_data")
 
-        await vapi_client_with_mock.generate_speech("Hello", voice_id="onyx")
+        result = await vapi_client_with_mock.generate_speech("Hello", voice_id="onyx")
         # Verify it would use the custom voice
         assert vapi_client_with_mock._synthesize_sync.called
 
@@ -186,7 +185,7 @@ class TestVAPIClientAssistant:
             return_value={"id": "asst_123"}
         )
 
-        await vapi_client_with_mock.create_assistant(
+        result = await vapi_client_with_mock.create_assistant(
             "Test Assistant", "Test system prompt"
         )
         # Would call with defaults for model, voice provider, voice_id

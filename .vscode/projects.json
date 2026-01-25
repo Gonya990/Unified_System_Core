@@ -1,0 +1,47 @@
+[
+    {
+        "name": "Unified System Core",
+        "rootPath": "/Users/igorgoncharenko/Documents/Unified_System_Core",
+        "paths": [],
+        "tags": [
+            "Main",
+            "System"
+        ]
+    },
+    {
+        "name": "AI Core (Docker)",
+        "rootPath": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core",
+        "paths": [],
+        "tags": [
+            "AI",
+            "Backend"
+        ]
+    },
+    {
+        "name": "Automation Scripts",
+        "rootPath": "/Users/igorgoncharenko/Documents/Unified_System_Core/Scripts/automation",
+        "paths": [],
+        "tags": [
+            "Scripts",
+            "Bots"
+        ]
+    },
+    {
+        "name": "Knowledge Base",
+        "rootPath": "/Users/igorgoncharenko/Documents/Unified_System_Core/Agent_Context/Knowledge_Base",
+        "paths": [],
+        "tags": [
+            "Docs",
+            "Obsidian"
+        ]
+    },
+    {
+        "name": "Antibridge Fix",
+        "rootPath": "/Users/igorgoncharenko/Documents/Unified_System_Core",
+        "paths": [],
+        "tags": [
+            "Git",
+            "Repair"
+        ]
+    }
+]

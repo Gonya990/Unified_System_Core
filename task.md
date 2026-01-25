@@ -1,39 +1,55 @@
-# Unified System Tasks
+# Задача проекта: Unified System (Recovery & Evolution)
 
-> [!CAUTION]
-> **STRICT SECURITY PROTOCOL ACTIVE**
+## 🚀 Реализованные функции (Сессия: 10.01.2026)
+
+### 🔴 System Recovery (Critical)
+
+- [x] **MCP Mail:** Агент `mcp-agent-mail` восстановлен после сбоя.
+  "Zombie" процессы убиты.
+- [x] **Communication:** Связь с `FuchsiaCat` (Kostya) и `VioletCastle`
+  восстановлена.
+- [x] **Bot Auth:** Реализовано персистентное хранение Google Tokens (`secrets/`).
+  Бот больше не теряет доступ к календарю при рестарте.
+
+### 🏭 Content Factory (Evolution)
+
+- [x] **Pipeline Integration:** Скрипт `daily_researcher.py` интегрирован
+  с `orchestrator_v3_no_face`.
+- [x] **Autonomous Loop:** Теперь один запуск создает Рисерч -> Картинки -> Видео.
+- [x] **Pause Logic:** Процесс остановлен до внедрения пула токенов
+  (экономия ресурсов).
+
+### 🏛️ Meta-Orchestration (New!)
+
+- [x] **Proposal:** Разработан документ `architecture/META_ORCHESTRATION.md`.
+- [x] **Notification:** Предложение отправлено Совету (Kostya/VioletCastle)
+  на утверждение.
+- [x] **Clarification:** Дан ответ на вопросы VioletCastle о планах.
+- [x] **Phase 1 Complete:** `TokenBroker` реализован и интегрирован.
+
+## 📋 Ближайшие шаги (Next Actions)
+
+### 🤖 Фаза 5: Продвинутая Автоматизация (Advanced Automation)
 >
-> - No external code/repo downloads without deep analysis + User Approval.
-> - No structural system changes ("Evolution Leaps") without **Biometric Approval** (iPhone/Mac).
-> - `global1sim` repo is RESTRICTED (Kostik's private secondary account). DO NOT TOUCH without explicit authorization.
+> *Статус: В РАБОТЕ (ПО ЗАПРОСУ)*
 
-## Current High Priority
+- [x] **Семейный Ассистент (Family Assistant):**
+  - [x] **Morning Brief:** Скрипт для утренних брифингов (Календарь + Погода + Задачи) для Артура (07:00).
+  - [x] **Homework Sentinel:** Сканирование почты Артура на предмет "Homework" / "School" и саммари дедлайнов.
+- [ ] **Интеграция Фабрики Контента 2.0:**
+  - [x] **Orchestrator Link:** Добавить команду `/factory` в бота для ручного запуска генерации видео.
+  - [ ] **Status Monitoring:** Уведомления в Telegram о статусе рендера (`daily_researcher` -> Bot).
+- [ ] **MCP Mail Intelligence:**
+  - [ ] **Council Feedback:** Авто-обработка ответов от Кости (FuchsiaCat/VioletCastle).
+  - [ ] **Alert System:** Уведомлять Админа только о важных письмах ("High Priority").
 
-- [x] **Knowledge Base Migration & De-duplication** <!-- id: 11 -->
-  - [x] **Transfer**: `OneDrive_1` (Done), `OneDrive_3` (Done), `File 3` (Done).
-  - [x] **Analysis**: ~2900 files extracted to `contexts/temp_extract`.
-  - [x] **De-duplication**: Deleted 1 duplicate from Google Drive (`503725.pdf`).
-- [ ] **Family Assistant (Webtop Integration)** <!-- id: 9 -->
-  - [x] **Pivot**: Confirmed School uses Webtop/SmartSchool. Found existing Token.
-  - [/] **API Fix**: Logic for `webtop_client.py` is hitting HTML. Need to RE the JSON API.
-  - [ ] **Data Fetch**: Get Grades/Homework via correct API (POST payload?).
-  - [ ] **Integration**: Connect to `morning_brief.py`.
-- [ ] **MCP Mail Intelligence** <!-- id: 10 -->
-  - [ ] **Server Setup**: Locate/Create MCP Mail Server.
-  - [ ] **Intelligence**: Add AI summarization/sorting to mail.
+### 🏗️ Интеграция Инфраструктуры (Meta-Orchestration)
 
-## Infrastructure & Security
+- [x] **TokenBroker Integration:** Обновить `daily_researcher.py` для использования семейных ключей через Брокера.
+- [ ] **Account Vizier:** Создать систему управления аккаунтами (Google/Insta) для агентов.
 
-- [x] **Security Scan for new modules** <!-- id: 8 -->
-  - [x] Audited `Scripts/windows_optimizer` & `archive_analyzer`.
-  - [x] Grep Check: No hardcoded secrets found.
-  - [x] Permissions: `wait_for_windows.sh` (+x), others (rw-).
-- [ ] `global1sim` Submodule Integration (⛔️ **LOCKED**: Requires Biometric Auth/Access Keys)
+## 🔮 Бэклог (Backlog)
 
-## Completed Tasks
-
-- [x] **Google Developer Benefits Research**
-- [x] **Windows System Optimization**
-- [x] **Content Factory Status Monitoring**
-- [x] **Google Cloud Verification**
-- [x] **Windows Archive Analyzer**
+- [ ] **Dashboard:** Починить UI для `/stats` (API готово, нужен фронт).
+- [ ] **Git Worktree:** Безопасные тесты веток.
+- [ ] **SmartThings:** Добить очистку API.

@@ -1,0 +1,4 @@
+Admin Invite 1: https://login.tailscale.com/admin/invite/MnxPYa4NMYZDfy7mb5gA11
+Admin Invite 2: https://login.tailscale.com/admin/invite/zRB2tnmpnvMDfy7mb5gA11
+Action Required: User needs to open these links in browser to link accounts.
+Termina AI cannot click these, but saves them for record.

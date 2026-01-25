@@ -7,13 +7,6 @@ WORKDIR /app
 
 # Install dependencies using uv
 COPY requirements.txt .
-# Install build tools for packages that require compilation (e.g. HAP-python)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    python3-dev \
-    libffi-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 # Compile bytecode for faster startup, install to system since we are in a container
 RUN uv pip install --system --no-cache -r requirements.txt
 

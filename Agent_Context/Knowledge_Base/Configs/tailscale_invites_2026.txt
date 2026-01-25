@@ -1,0 +1,7 @@
+# Tailscale Admin Invites (2026-01-21)
+# CAUTION: Use with extreme care. Verify identity before accepting.
+
+https://login.tailscale.com/admin/invite/XUp3k2aAt8cDfy7mb5gA11
+https://login.tailscale.com/admin/invite/QSLq5zBFHUDDfy7mb5gA11
+https://login.tailscale.com/admin/invite/nVqx9zJSr3TDfy7mb5gA11
+https://login.tailscale.com/admin/invite/kooDG5Z5bU5Dfy7mb5gA11

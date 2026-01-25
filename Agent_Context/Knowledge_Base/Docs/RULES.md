@@ -29,15 +29,6 @@
      longer before retrying.
    - *Verified Success Mechanism: 08 Jan 2026 - Map Verification Incident.*
 
-## Data Governance & Sovereignty
-
-1. **CONTEXT_HANDOFF.md**: Данный файл является критически важным и защищенным.
-   - **Локализация**: Файл должен находиться и редактироваться только на **Mac**.
-   - **Доступ**: Право на редактирование закреплено исключительно
-     за **Gonya990** (и связанными аккаунтами).
-   - **Синхронизация**: При синхронизации с другими узлами (например, Linux),
-     эти узлы должны относиться к файлу как "только для чтения".
-
 ## Project Assignment Logic
 
 1. **Home Assistant (PRJ-001)**:

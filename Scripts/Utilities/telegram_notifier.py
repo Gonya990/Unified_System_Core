@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import logging
 import os
-from pathlib import Path
-
 import requests
+import logging
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Setup logging

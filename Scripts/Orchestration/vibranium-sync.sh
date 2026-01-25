@@ -11,7 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-UNIFIED_SYSTEM="$(cd "$SCRIPT_DIR/../.." && pwd)"
+UNIFIED_SYSTEM="/Users/igorgoncharenko/Documents/Unified_System_Core"
 
 echo -e "${GREEN}💎 VIBRANIUM SYNC STARTED${NC}"
 echo "=========================================="

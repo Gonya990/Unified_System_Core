@@ -6,5 +6,6 @@
     "opencode-openai-codex-auth@latest",
     "@tarquinen/opencode-dcp@latest",
     "opencode-anthropic-auth@latest",
+    "@plannotator/opencode@latest"
   ]
 }

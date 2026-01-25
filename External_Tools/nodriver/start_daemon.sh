@@ -29,7 +29,5 @@ if ! curl -s http://localhost:9222/json/version &>/dev/null; then
 fi
 
 cd "$SCRIPT_DIR"
-echo "🚀 Starting nodriver daemon in background..."
-uv run python nodriver_daemon.py > /tmp/nodriver.log 2>&1 &
-echo "✓ Daemon started (PID $!)"
-sleep 2
+echo "🚀 Starting nodriver daemon..."
+uv run python nodriver_daemon.py
