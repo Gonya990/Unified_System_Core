@@ -74,6 +74,11 @@ graph LR
 git clone https://github.com/Gonya990/Unified_System_Core.git
 cd Unified_System_Core
 
+# Get help (NEW!)
+./help.sh                # Show help menu
+./help.sh check          # Run system diagnostics
+./help.sh start          # How to start AI bot
+
 # Check system status (from any node)
 tailscale status
 
