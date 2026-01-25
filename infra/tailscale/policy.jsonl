@@ -1,0 +1,40 @@
+// Tailscale ACL for Unified System Core
+{
+	"tagOwners": {
+		"tag:gaming":           ["autogroup:admin"],
+		"tag:ResourceNode":     ["autogroup:admin"],
+		"tag:session-recorder": ["autogroup:admin"],
+	},
+
+	"grants": [
+		{
+			"src": ["*"],
+			"dst": ["*"],
+			"ip":  ["*"],
+		},
+	],
+
+	"ssh": [
+		// Allow all users to SSH into their own devices in check mode. (Browser 2FA required)
+		{
+			"action": "check",
+			"src":    ["autogroup:member"],
+			"dst":    ["autogroup:self"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+		// Allow members to SSH into ResourceNodes.
+		// Root can enter directly (accept), non-root must check.
+		{
+			"action": "check",
+			"src":    ["autogroup:member"],
+			"dst":    ["tag:ResourceNode"],
+			"users":  ["autogroup:nonroot"],
+		},
+		{
+			"action": "accept",
+			"src":    ["autogroup:member"],
+			"dst":    ["tag:ResourceNode"],
+			"users":  ["root"],
+		},
+	],
+}

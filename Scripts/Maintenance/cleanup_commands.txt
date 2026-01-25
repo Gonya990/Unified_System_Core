@@ -1,0 +1,5 @@
+journalctl --vacuum-time=1d
+apt-get clean  
+docker system prune -af --volumes
+rm -rf /tmp/* /var/tmp/*
+df -h /

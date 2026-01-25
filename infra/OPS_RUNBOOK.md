@@ -2,10 +2,10 @@
 
 ## Infrastructure Overview
 
-| Host | IP (Tailscale) | Role | Status Check |
-|------|----------------|------|--------------|
-| unified-home-core-cloud | 100.110.209.49 | MCP Mail Hub, Services | `ping 100.110.209.49` |
-| proxmox-gpu | 100.74.137.122 | VM Host, GPU Workloads | `ping 100.74.137.122` |
+| Host                    | IP (Tailscale) | Role                       | Status Check              |
+|-------------------------|----------------|----------------------------|---------------------------|
+| unified-home-core-cloud | 100.110.209.49 | MCP Mail Hub, Services     | `ping 100.110.209.49`     |
+| proxmox-gpu             | 100.74.137.122 | VM Host, GPU Workloads     | `ping 100.74.137.122`     |
 
 ---
 
@@ -73,8 +73,8 @@ curl -s -o /dev/null -w "%{http_code}" http://100.110.209.49:8765/health
 
 ### Configuration
 
-| Item | Location |
-|------|----------|
+| Item         | Location                                      |
+|--------------|-----------------------------------------------|
 | Service file | `/etc/systemd/system/mcp-agent-mail.service` |
 | Application | `/opt/mcp-agent-mail` |
 | Environment | `/opt/mcp-agent-mail/.env` |
@@ -193,9 +193,57 @@ git checkout main
 
 ## Alerts & Thresholds
 
-| Metric | Warning | Critical | Action |
-|--------|---------|----------|--------|
+| Metric           | Warning | Critical | Action                                |
+|------------------|---------|----------|---------------------------------------|
 | Disk Usage | 80% | 90% | Run emergency cleanup |
 | Memory | 85% | 95% | Identify memory hog, restart services |
 | Service Down | - | Any | Restart service, check logs |
 | Host Unreachable | 5 min | 15 min | Check Tailscale, physical access |
+
+---
+
+## Tailscale ACL Management
+
+### GitOps Workflow
+
+ACL is managed via `infra/tailscale/policy.jsonl`. Changes are automatically applied on push to `main`.
+
+**To update ACL:**
+
+1. Edit `infra/tailscale/policy.jsonl` locally
+2. Commit and push to `main`
+3. GitHub Actions will validate and deploy
+4. Verify at [Tailscale ACL Console](https://login.tailscale.com/admin/acls)
+
+**Manual override (emergency):**
+
+If GitOps fails, you can still edit ACL via web UI. Re-sync by:
+
+```bash
+git pull origin main
+# Copy current web ACL to infra/tailscale/policy.jsonl
+git add infra/tailscale/policy.jsonl
+git commit -m "Sync ACL from web UI"
+git push
+```
+
+### Common ACL Changes
+
+**Add new ResourceNode:**
+
+1. Tag machine in web UI with `tag:ResourceNode`
+2. No ACL change needed (already covered by existing rules)
+
+**Add new user:**
+
+No ACL change needed - `autogroup:member` covers all org members automatically.
+
+### API Key Management
+
+**Location:** GitHub repo → Settings → Secrets → `TAILSCALE_API_KEY`
+
+**Rotation (every 90 days):**
+
+1. Generate new key at [Tailscale API Keys](https://login.tailscale.com/admin/settings/keys)
+2. Update GitHub secret
+3. Revoke old key
