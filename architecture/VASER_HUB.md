@@ -14,7 +14,7 @@
 |                      credential vault                        |
 |  - SSH keys                                                   |
 |  - API tokens                                                 |
-|  - endpoint registry                                          |
+|  - endpoint registry |
 +---------------------------+----------------------------------+
                             |
                             v
