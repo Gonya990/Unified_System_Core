@@ -326,6 +326,16 @@ paths:
               properties:
                 config_patch:
                   type: object
+                  description: >
+                    Partial device configuration to apply as a patch. This is a
+                    free-form JSON object whose keys and values depend on the
+                    specific device type and capabilities.
+                  additionalProperties: true
+                  example:
+                    hostname: "router-01"
+                    dns_servers:
+                      - "1.1.1.1"
+                      - "8.8.8.8"
                 apply_mode:
                   type: string
                   enum: [merge, replace]
