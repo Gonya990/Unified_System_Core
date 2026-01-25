@@ -125,7 +125,7 @@ flowchart TB
 - **Custom GPT Actions via OpenAPI** for:
   - Network (scan_network, get_device_info, run_command, add_device, remove_device, reboot_device, configure_device).
   - Home Assistant (ha.service_call, ha.get_state, ha.set_state, ha.execute_script).
-  - Local gateway (/local/run, /local/read, /local/write).
+  - Local gateway (/local/run, /local/read, /local/write, /local/reminder).
   - Cloud integrations (Calendar, Mail, Drives).
   - Management (create_task, complete_task, remind_user, generate_report).
   - Analytics (collect_logs, analyze_logs, summarize_project).
