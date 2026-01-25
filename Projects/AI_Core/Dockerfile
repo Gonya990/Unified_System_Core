@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 # Install UV for fast dependency management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
