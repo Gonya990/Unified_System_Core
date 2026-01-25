@@ -86,8 +86,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
+          # Provenance/SBOM only when pushing (creates manifest lists incompatible with docker exporter)
+          provenance: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
+          sbom: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
           outputs: ${{ (github.event_name == 'pull_request' || inputs.dry_run) && 'type=docker,dest=/tmp/image.tar' || '' }}
 
       - name: Upload artifact
