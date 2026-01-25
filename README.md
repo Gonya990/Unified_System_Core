@@ -142,4 +142,12 @@ All agents operating in this system follow the **English Translation Protocol**:
 
 ---
 
+## 🆘 Need Help?
+
+Having issues? Check out:
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+- **Health Check Tool**: `python3 Scripts/Utilities/system_health_check.py`
+
+---
+
 *Powered by Antigravity Agent* 🚀
