@@ -280,6 +280,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LocalWriteResponse'
+  /local/reminder:
+    post:
+      tags: [Local]
+      summary: Schedule a local reminder.
+      operationId: local.reminder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalReminderRequest'
+      responses:
+        '200':
+          description: Reminder scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalReminderResponse'
   /cloud/google/calendar:
     post:
       tags: [Cloud]
@@ -781,6 +799,24 @@ components:
           type: string
         bytes_written:
           type: integer
+    LocalReminderRequest:
+      type: object
+      required: [message, remind_at]
+      properties:
+        message:
+          type: string
+        remind_at:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+    LocalReminderResponse:
+      type: object
+      properties:
+        reminder_id:
+          type: string
+        status:
+          type: string
     CloudCalendarRequest:
       type: object
       required: [provider, action]
