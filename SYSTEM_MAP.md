@@ -24,6 +24,7 @@ Unified System workspace. **Always refer to this map for navigation.**
 - **Sync Logic**: `Scripts/Orchestration/full_sync.sh` links.
 - **Production Pipeline**: `Scripts/Production_Factory/` handles generation.
 - **Memory & Context**: Stored in `Agent_Context/` and `Agent_Workflows/`.
+- **Architecture (VASER-Hub)**: `docs/architecture/vaser-hub.md`.
 
 ## 🛠 Maintenance Rules
 
