@@ -148,6 +148,15 @@ class AgentSync:
         self.config = config or AgentMailConfig.from_env()
         self.mail_client = AgentMailClient(self.config)
         self.project_root = self._find_project_root()
+        self.bd_available = self._check_bd_availability()
+
+    def _check_bd_availability(self) -> bool:
+        """Check if bd CLI is installed and in path"""
+        try:
+            subprocess.run(['bd', '--version'], capture_output=True, check=False)
+            return True
+        except FileNotFoundError:
+            return False
 
     def _find_project_root(self) -> Path:
         """Find project root (contains .beads/)"""
@@ -222,6 +231,12 @@ class AgentSync:
 
     def sync_beads(self) -> SyncResult:
         """Sync beads task board"""
+        if not self.bd_available:
+            return SyncResult(
+                success=True,
+                component='beads',
+                data={'ready': [], 'in_progress': [], 'synced': False, 'note': 'Beads CLI (bd) not found'}
+            )
         try:
             # Sync with remote
             sync_result = self._run_bd('sync')

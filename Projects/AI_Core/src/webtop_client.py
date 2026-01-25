@@ -70,7 +70,11 @@ class WebtopClient:
                 try:
                     return res.json()
                 except ValueError:
-                    pass  # Not JSON
+                    logger.debug(f"Webtop response not JSON. HTML sample: {res.text[:500]}...")
+                    # Save full HTML for investigation
+                    with open("webtop_debug.html", "w") as f:
+                        f.write(res.text)
+                    logger.info("Saved Webtop HTML response to webtop_debug.html")
 
             # Try 2: Mobile API?
             # url = f"{self.BASE_URL}/api/mobile/GetStudentHomework"
@@ -78,7 +82,6 @@ class WebtopClient:
             # ...
 
             # If we reach here, we couldn't get JSON.
-            # We might just report "Check Webtop" for now until we can parse the HTML SPA state.
             return []
 
         except Exception as e:

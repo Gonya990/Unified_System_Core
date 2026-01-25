@@ -15,3 +15,12 @@
 - [x] Fix and restart Windows bot service <!-- id: 303 -->
 - [x] Add debugging for OAuth code extraction <!-- id: 304 -->
 - [x] Finalize multi-agent sync and push <!-- id: 305 -->
+
+## Phase 4: Optimization & Tooling Restoration (2026-01-25) <!-- id: 400 -->
+
+- [ ] **Tailscale Fix**: Resolve `Trace/BPT trap: 5` on MacBook to restore remote connectivity. <!-- id: 401 -->
+- [ ] **Beads Recovery**: Find or reinstall `bd` CLI for task management sync. <!-- id: 402 -->
+- [ ] **Credentials Audit**: Retrieve and set `WEBTOP_TOKEN` in `.env`. <!-- id: 403 -->
+- [x] **Webtop Client Enhancement**: Add HTML output parsing/logging in `webtop_client.py` for debugging. <!-- id: 404 -->
+- [x] **Sync Resilience**: Update `agent_sync.py` to handle missing `bd` gracefully. <!-- id: 405 -->
+- [x] **System Status Update**: Generate and push a new `SYNC_STATUS_2026-01-25.md`. <!-- id: 406 -->
