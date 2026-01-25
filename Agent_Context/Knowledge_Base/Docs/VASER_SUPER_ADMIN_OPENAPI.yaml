@@ -242,6 +242,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CommandResult"
+        "403":
+          description: Reboot forbidden for this device (unauthorized or protected device)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "forbidden"
+                  message:
+                    type: string
+                    example: "You are not allowed to reboot this device."
+                  details:
+                    type: object
+                    description: Additional context about the authorization or protection status
+        "404":
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "device_not_found"
+                  message:
+                    type: string
+                    example: "No device with the specified ID was found."
+                  details:
+                    type: object
+                    description: Additional lookup or inventory context
+        "409":
+          description: Device is already rebooting or in a conflicting state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "reboot_in_progress"
+                  message:
+                    type: string
+                    example: "A reboot operation is already in progress for this device."
+                  details:
+                    type: object
+                    description: Additional state information about the current reboot
+        "500":
+          description: Failed to initiate device reboot due to an internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "reboot_failed"
+                  message:
+                    type: string
+                    example: "The device reboot could not be started due to an internal error."
+                  details:
+                    type: object
+                    description: Optional low-level error details for troubleshooting
   /network/device/{device_id}/configure:
     post:
       summary: Configure a device
