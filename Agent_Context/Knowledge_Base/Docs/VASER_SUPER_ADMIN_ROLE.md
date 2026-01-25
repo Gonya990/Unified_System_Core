@@ -40,8 +40,8 @@ The following require **explicit user confirmation**:
 - Local file reads/writes in whitelisted paths.
 
 ## Credentials & Secrets Handling
-- All secrets are stored in VASER Control Hub, referenced by `credentials_ref`.
-- Never expose secrets in plain text; only use references in requests.
+- All secrets are stored in VASER Control Hub. During initial device or connector/account registration, they are referenced via `credentials_ref`.
+- Never expose secrets in plain text. After registration, action requests (mail, calendar, local, etc.) must not include raw credentials and should instead rely on stored identifiers such as `device_id` and account IDs that are already bound to the appropriate credentials.
 
 ## Interfaces
 - **VASER Control Hub API:** Primary execution plane.
