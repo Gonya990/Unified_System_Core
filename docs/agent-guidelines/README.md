@@ -40,6 +40,11 @@ This framework applies engineering principles from **Modern Software Engineering
 
 ## Guidelines Structure
 
+### Role Specifications
+
+- **[vaser-super-admin-role.md](./vaser-super-admin-role.md)** - VASER Super Admin role definition
+  - Topics: Mission, allowed actions, safety posture, escalation, observability, interaction style
+
 ### 1. [Velocity Principles](./velocity-principles.md)
 
 **Focus**: Individual agent speed and efficiency
