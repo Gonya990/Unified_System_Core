@@ -919,4 +919,4 @@ components:
 
 security:
   - bearerAuth: []
-    apiKeyAuth: []
+  - apiKeyAuth: []
