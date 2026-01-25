@@ -53,16 +53,16 @@
     },
     "exclusion_patterns": {
         "folders": [
-            ".*node_modules.*",
-            ".*\\.git.*",
-            ".*Windows.*",
-            ".*Program Files.*",
-            ".*System Volume Information.*"
+            "**/node_modules/**",
+            "**/.git/**",
+            "**/Windows/**",
+            "**/Program Files/**",
+            "**/System Volume Information/**"
         ],
         "files": [
-            "backup_important_.*",
-            "keep_.*",
-            ".*_donotdelete.*"
+            "backup_important_*",
+            "keep_*",
+            "*_donotdelete*"
         ]
     },
     "age_thresholds": {

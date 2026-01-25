@@ -27,9 +27,15 @@ from typing import Any, Optional
 # Optional .env loading (no hard dependency in committed code)
 try:
     import importlib
-
     dotenv = importlib.import_module("dotenv")
-    dotenv.load_dotenv()
+    # Try loading from standard locations first
+    if not dotenv.load_dotenv():
+        # Try finding it in Projects/AI_Core explicitly
+        script_dir = Path(__file__).resolve().parent
+        repo_root = script_dir.parent.parent
+        env_path = repo_root / "Projects/AI_Core/.env"
+        if env_path.exists():
+            dotenv.load_dotenv(env_path)
 except Exception:
     pass
 
@@ -142,6 +148,15 @@ class AgentSync:
         self.config = config or AgentMailConfig.from_env()
         self.mail_client = AgentMailClient(self.config)
         self.project_root = self._find_project_root()
+        self.bd_available = self._check_bd_availability()
+
+    def _check_bd_availability(self) -> bool:
+        """Check if bd CLI is installed and in path"""
+        try:
+            subprocess.run(['bd', '--version'], capture_output=True, check=False)
+            return True
+        except FileNotFoundError:
+            return False
 
     def _find_project_root(self) -> Path:
         """Find project root (contains .beads/)"""
@@ -154,12 +169,20 @@ class AgentSync:
     def _run_bd(self, *args) -> subprocess.CompletedProcess:
         """Run beads CLI command"""
         cmd = ['bd'] + list(args)
-        return subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            cwd=self.project_root
-        )
+        try:
+            return subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=self.project_root
+            )
+        except FileNotFoundError:
+            return subprocess.CompletedProcess(
+                args=cmd,
+                returncode=127,
+                stdout="",
+                stderr="Beads (bd) command not found. Please install it."
+            )
 
     def check_health(self) -> SyncResult:
         """Check Agent Mail server health"""
@@ -208,6 +231,12 @@ class AgentSync:
 
     def sync_beads(self) -> SyncResult:
         """Sync beads task board"""
+        if not self.bd_available:
+            return SyncResult(
+                success=True,
+                component='beads',
+                data={'ready': [], 'in_progress': [], 'synced': False, 'note': 'Beads CLI (bd) not found'}
+            )
         try:
             # Sync with remote
             sync_result = self._run_bd('sync')

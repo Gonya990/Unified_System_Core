@@ -11,13 +11,13 @@ patterns = [
 ]
 
 def scan_files():
-    for root, _dirs, files in os.walk('.'):
+    for root, dirs, files in os.walk('.'):
         if any(d in root for d in ['.git', 'venv', 'node_modules']): continue
         for file in files:
             if file.endswith(('.py', '.sh', '.json', '.txt', '.env')):
                 path = os.path.join(root, file)
                 try:
-                    with open(path, errors='ignore') as f:
+                    with open(path, 'r', errors='ignore') as f:
                         content = f.read()
                         for p in patterns:
                             matches = re.findall(p, content)

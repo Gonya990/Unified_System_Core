@@ -19,16 +19,6 @@ except ImportError:
     AESGCM = None
     PBKDF2HMAC = None
 
-# Argon2id support (preferred over PBKDF2 for new vaults)
-try:
-    from argon2.low_level import Type, hash_secret_raw
-
-    HAS_ARGON2 = True
-except ImportError:
-    HAS_ARGON2 = False
-    hash_secret_raw = None
-    Type = None
-
 logger = logging.getLogger("TokenBroker")
 
 
@@ -74,31 +64,9 @@ class TokenBroker:
         self.load_vault()
         self.initialized = True
 
-    def _derive_key(self, salt: bytes, kdf_type: str = "argon2id") -> Optional[bytes]:
-        """
-        Derive encryption key from master key using Argon2id (preferred) or PBKDF2 (fallback).
-
-        Argon2id parameters (OWASP recommended):
-        - memory_cost: 65536 KB (64 MB)
-        - time_cost: 3 iterations
-        - parallelism: 4 threads
-        """
+    def _derive_key(self, salt: bytes) -> Optional[bytes]:
         if not HAS_CRYPTO:
             return None
-
-        # Prefer Argon2id for new vaults (memory-hard, GPU/ASIC resistant)
-        if kdf_type == "argon2id" and HAS_ARGON2:
-            return hash_secret_raw(
-                secret=self.master_key,
-                salt=salt,
-                time_cost=3,
-                memory_cost=65536,  # 64 MB
-                parallelism=4,
-                hash_len=32,
-                type=Type.ID,
-            )
-
-        # PBKDF2 fallback for existing vaults or missing argon2-cffi
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -180,7 +148,7 @@ class TokenBroker:
         return None
 
     def load_vault(self):
-        """Loads and decrypts the token vault. Supports both Argon2id and PBKDF2 vaults."""
+        """Loads and decrypts the token vault."""
         if not os.path.exists(self.vault_path):
             logger.info("Token vault not found. Using legacy fallback.")
             self._try_legacy_import()
@@ -191,29 +159,25 @@ class TokenBroker:
                 data = yaml.safe_load(f) or {}
 
             if not data or "encrypted_data" not in data:
-                # Might be old format (unencrypted)
+                # Might be old format
                 self.key_store = data
                 return
 
             encrypted_data = bytes.fromhex(data["encrypted_data"])
             nonce = bytes.fromhex(data["nonce"])
             salt = bytes.fromhex(data["salt"])
-            kdf_type = data.get("kdf", "pbkdf2")  # Default to pbkdf2 for existing vaults
 
-            key = self._derive_key(salt, kdf_type=kdf_type)
+            key = self._derive_key(salt)
             if key and HAS_CRYPTO and AESGCM:
                 aesgcm = AESGCM(key)
                 decrypted = aesgcm.decrypt(nonce, encrypted_data, None)
                 self.key_store = yaml.safe_load(decrypted)
-                logger.info(f"Vault loaded and decrypted ({kdf_type}): {self.vault_path}")
+                logger.info(f"Vault loaded and decrypted: {self.vault_path}")
         except Exception as e:
             logger.error(f"TokenBroker: Failed to load vault: {e}")
 
-    def save_vault(self, tokens: dict[str, list[dict[str, Any]]] = None, force_kdf: str = None):
-        """
-        Encrypts and saves the current key_store to YAML.
-        Uses Argon2id for new vaults (if available), PBKDF2 as fallback.
-        """
+    def save_vault(self, tokens: dict[str, list[dict[str, Any]]] = None):
+        """Encrypts and saves the current key_store to YAML."""
         if tokens is not None:
             self.key_store = tokens
 
@@ -221,13 +185,10 @@ class TokenBroker:
             logger.error("Cryptography not available. Cannot save encrypted vault.")
             return
 
-        # Determine KDF type: prefer Argon2id for new vaults
-        kdf_type = force_kdf or ("argon2id" if HAS_ARGON2 else "pbkdf2")
-
         try:
             salt = os.urandom(16)
             nonce = os.urandom(12)
-            key = self._derive_key(salt, kdf_type=kdf_type)
+            key = self._derive_key(salt)
             aesgcm = AESGCM(key)
 
             raw_data = yaml.dump(self.key_store).encode()
@@ -237,7 +198,6 @@ class TokenBroker:
                 "encrypted_data": encrypted.hex(),
                 "nonce": nonce.hex(),
                 "salt": salt.hex(),
-                "kdf": kdf_type,
                 "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             }
 
@@ -347,8 +307,6 @@ class TokenBroker:
             "active_keys": active_keys,
             "blacklisted_keys": blacklisted,
             "encryption_enabled": HAS_CRYPTO,
-            "argon2_available": HAS_ARGON2,
-            "kdf_preferred": "argon2id" if HAS_ARGON2 else "pbkdf2",
             "last_rotation": self._last_rotation,
             "pools": pools,
             "timestamp": time.time(),
@@ -420,22 +378,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
     broker = TokenBroker()
-    if len(sys.argv) > 1:
-        cmd = sys.argv[1]
-        if cmd == "migrate":
-            print("🚀 Migrating to encrypted vault (legacy import)...")
-            broker._try_legacy_import()
-            print("✅ Done.")
-        elif cmd == "migrate-argon2":
-            if not HAS_ARGON2:
-                print("❌ Cannot migrate: argon2-cffi not installed.")
-                sys.exit(1)
-            print("🚀 Re-encrypting vault with Argon2id...")
-            broker.save_vault(force_kdf="argon2id")
-            print("✅ Done. Vault is now secured with Argon2id.")
-        elif cmd == "status":
-            import pprint
-            pprint.pprint(broker.health_check())
-        else:
-            print(f"Unknown command: {cmd}")
-            print("Available: migrate, migrate-argon2, status")
+    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
+        print("🚀 Migrating to encrypted vault...")
+        broker._try_legacy_import()
+        print("✅ Done.")

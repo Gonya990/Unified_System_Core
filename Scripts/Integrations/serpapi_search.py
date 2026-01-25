@@ -16,11 +16,11 @@ logger = logging.getLogger("SerpAPI")
 class SerpAPIClient:
     """
     Client for SerpAPI - Google Search Results API
-
+    
     Usage:
         client = SerpAPIClient()
         results = client.search("Python best practices 2024")
-
+        
     Requires SERPAPI_KEY environment variable.
     """
 
@@ -42,7 +42,7 @@ class SerpAPIClient:
     ) -> dict:
         """
         Search the web using SerpAPI
-
+        
         Args:
             query: Search query
             engine: Search engine (google, bing, yandex, etc)
@@ -50,7 +50,7 @@ class SerpAPIClient:
             location: Location for localized results
             language: Language code (en, ru, he, etc)
             country: Country code (us, il, ru, etc)
-
+            
         Returns:
             Dict with organic_results, knowledge_graph, etc
         """

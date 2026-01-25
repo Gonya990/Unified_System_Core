@@ -10,11 +10,10 @@ type ContactResponse = {
 export async function sendContactEmail(formData: FormData): Promise<ContactResponse> {
   const name = String(formData.get("name") ?? "").trim()
   const email = String(formData.get("email") ?? "").trim()
-  const feedbackType = String(formData.get("feedback_type") ?? "").trim()
   const subject = String(formData.get("subject") ?? "").trim()
   const message = String(formData.get("message") ?? "").trim()
 
-  if (!name || !email || !feedbackType || !subject || !message) {
+  if (!name || !email || !subject || !message) {
     return { success: false, message: "Please fill out all fields." }
   }
 
@@ -30,7 +29,6 @@ export async function sendContactEmail(formData: FormData): Promise<ContactRespo
     console.log("Contact form submission", {
       name,
       email,
-      feedbackType,
       subject,
       message,
       toAddress,
@@ -47,8 +45,8 @@ export async function sendContactEmail(formData: FormData): Promise<ContactRespo
       from: fromAddress,
       to: [toAddress],
       replyTo: email,
-      subject: `[${feedbackType}] Contact Form: ${subject}`,
-      text: `Name: ${name}\nEmail: ${email}\nCategory: ${feedbackType}\nSubject: ${subject}\n\n${message}`,
+      subject: `Contact Form: ${subject}`,
+      text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}`,
     })
 
     return { success: true, message: "Message sent successfully. We\"ll get back to you soon." }

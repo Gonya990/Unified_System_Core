@@ -7,8 +7,6 @@ Supports Russian and English voices
 
 import json
 import os
-import random
-import shutil
 import subprocess
 import sys
 import time
@@ -18,10 +16,10 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Setup paths
-SRC_DIR = Path(__file__).parent.parent.resolve()  # Projects/Content_Factory/src
+SRC_DIR = Path(__file__).parent.parent.resolve() # Projects/Content_Factory/src
 FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
-PROJECTS_DIR = FACTORY_DIR.parent  # /Projects
-ROOT_DIR = PROJECTS_DIR.parent  # Unified_System (Root)
+PROJECTS_DIR = FACTORY_DIR.parent # /Projects
+ROOT_DIR = PROJECTS_DIR.parent # Unified_System (Root)
 
 # Add all source subdirectories to path
 for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
@@ -30,17 +28,14 @@ for d in ["researcher", "pipeline", "assets", "video", "uploaders"]:
 # Add Scripts/Utilities to path for TokenBroker
 sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 
-
 def agent_mindfulness(task: str):
     """Reflecting user request: strategic pauses & token availability checks"""
     print(f"🕵️ Vibranium Agent checking {task} (Pausing for stability)...")
     time.sleep(2.5)
 
-
 # Load TokenBroker
 try:
     from token_broker import TokenBroker
-
     broker = TokenBroker()
 except ImportError:
     print("⚠️ TokenBroker not found. Falling back to environment variables.")
@@ -59,7 +54,7 @@ print(f"📡 API Status: OpenAI={openai_key[:8]}... Pexels={pexels_key[:8]}...")
 # Import internal tools
 try:
     from pexels_broll import semantic_search_broll
-    from video_assembler import get_video_duration
+    from video_assembler import create_video_with_broll, get_video_duration
 except ImportError:
     print("⚠️ Internal tools not found. Script might fail.")
 
@@ -71,49 +66,23 @@ OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 INPUT_DIR.mkdir(exist_ok=True, parents=True)
 BROLL_DIR.mkdir(exist_ok=True, parents=True)
 
+import random
+
 # Voice options (OpenAI TTS preferred, Edge-TTS fallback)
 VOICES = {
-    "en": "alloy",  # Neutral, clear (No accent/burring)
+    "en": "alloy",        # Neutral, clear (No accent/burring)
     "en_female": "shimmer",
-    "ru": "alloy",  # Neutral, professional
+    "ru": "alloy",        # Neutral, professional
     "ru_female": "shimmer",
-    "he": "alloy",  # Neutral (Best for Hebrew without heavy accent)
+    "he": "alloy",        # Neutral (Best for Hebrew without heavy accent)
     "he_female": "shimmer",
     "fallback_ru": "ru-RU-DmitryNeural",
     "fallback_en": "en-US-EmmaNeural",
-    "fallback_he": "he-IL-AvriNeural",  # Edge-TTS Hebrew
+    "fallback_he": "he-IL-AvriNeural" # Edge-TTS Hebrew
 }
 
-
-# Retry configuration
-MAX_RETRIES = 5
-BASE_DELAY = 1.0
-RETRYABLE_CODES = (429, 500, 502, 503, 504)
-
-
-def _calculate_backoff(attempt: int, base_delay: float = BASE_DELAY, max_delay: float = 60.0) -> float:
-    """Calculate delay with exponential backoff and jitter."""
-    import random
-
-    delay = min(base_delay * (2**attempt), max_delay)
-    return delay * (0.5 + random.random())
-
-
-def _is_retryable_error(exception) -> bool:
-    """Check if an exception is retryable based on status code."""
-    # Check for status_code attribute (OpenAI SDK)
-    if hasattr(exception, "status_code"):
-        return exception.status_code in RETRYABLE_CODES
-    # Check exception message
-    msg = str(exception)
-    for code in RETRYABLE_CODES:
-        if str(code) in msg:
-            return True
-    return False
-
-
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
-    """Generate audio using OpenAI TTS with Studio Post-Processing and Retry Logic"""
+    """Generate audio using OpenAI TTS with Studio Post-Processing"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
 
     api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
@@ -125,59 +94,34 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     masked_key = f"{api_key[:8]}...{api_key[-4:]}"
     print(f"🔑 Using API Key: {masked_key}")
 
-    from openai import OpenAI
+    try:
+        from openai import OpenAI
+        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        org_id = os.getenv("OPENAI_ORG_ID")
 
-    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    org_id = os.getenv("OPENAI_ORG_ID")
-    client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
+        client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-    last_error = None
+        response = client.audio.speech.create(
+            model="tts-1-hd",
+            voice=voice,
+            input=text
+        )
 
-    for attempt in range(MAX_RETRIES + 1):
-        try:
-            response = client.audio.speech.create(model="tts-1-hd", voice=voice, input=text)
+        mp3_path = output_path.with_suffix(".mp3")
+        response.stream_to_file(str(mp3_path))
 
-            mp3_path = output_path.with_suffix(".mp3")
-            response.stream_to_file(str(mp3_path))
+        # STUDIO POST-PROCESSING
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(mp3_path),
+            "-af", "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
+            "-ar", "44100", "-ac", "2", "-b:a", "192k", str(output_path)
+        ], check=True, capture_output=True)
 
-            # STUDIO POST-PROCESSING
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-i",
-                    str(mp3_path),
-                    "-af",
-                    "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm",
-                    "-ar",
-                    "44100",
-                    "-ac",
-                    "2",
-                    "-b:a",
-                    "192k",
-                    str(output_path),
-                ],
-                check=True,
-                capture_output=True,
-            )
-
-            print(f"✅ Studio Audio Mastered: {output_path}")
-            return True
-
-        except Exception as e:
-            last_error = e
-            if _is_retryable_error(e) and attempt < MAX_RETRIES:
-                delay = _calculate_backoff(attempt)
-                print(f"⚠️ [Retry] TTS attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s...")
-                time.sleep(delay)
-                continue
-            else:
-                print(f"❌ OpenAI TTS failed: {e}")
-                return False
-
-    print(f"❌ OpenAI TTS failed after {MAX_RETRIES + 1} attempts: {last_error}")
-    return False
-
+        print(f"✅ Studio Audio Mastered: {output_path}")
+        return True
+    except Exception as e:
+        print(f"❌ OpenAI TTS failed: {e}")
+        return False
 
 def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using Edge-TTS with rate control"""
@@ -185,36 +129,41 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice})...")
 
     mp3_path = output_path.with_suffix(".mp3")
+    edge_tts_cmd = "edge-tts"
 
     # Search paths for edge-tts binary
     search_paths = [
         FACTORY_DIR / "venv/bin/edge-tts",
         ROOT_DIR / "venv_content/bin/edge-tts",
-        ROOT_DIR.parent.parent / "venv/bin/edge-tts",
+        ROOT_DIR.parent.parent / "venv/bin/edge-tts"
     ]
 
-    # Advanced binary discovery
-    edge_tts_cmd = shutil.which("edge-tts")
-    cmd_base = [edge_tts_cmd] if edge_tts_cmd else ["python3", "-m", "edge_tts"]
+    for p in search_paths:
+        if p.exists():
+            edge_tts_cmd = str(p)
+            break
+    else:
+        # Fallback to which
+        import shutil
+        found = shutil.which("edge-tts")
+        if found: edge_tts_cmd = found
 
-    # Search paths for local venv installations if not in global PATH
-    if not edge_tts_cmd:
-        for p in search_paths:
-            if p.exists():
-                cmd_base = [str(p)]
-                break
-
-    # Construct full command
-    cmd = cmd_base + ["--text", text, "--write-media", str(mp3_path), "--voice", voice, "--rate=-10%"]
+    # FIX: Pass --rate as a single argument string or ensure it's correctly handled
+    cmd = [
+        edge_tts_cmd,
+        "--text", text,
+        "--write-media", str(mp3_path),
+        "--voice", voice,
+        "--rate=-10%"
+    ]
 
     try:
         subprocess.run(cmd, check=True, capture_output=True)
         # Convert to WAV
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", str(mp3_path), "-ar", "44100", "-ac", "2", str(output_path)],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(mp3_path),
+            "-ar", "44100", "-ac", "2", str(output_path)
+        ], check=True, capture_output=True)
         print(f"✅ Enhanced Fallback Audio: {output_path}")
         return True
     except subprocess.CalledProcessError as e:
@@ -223,7 +172,6 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     except Exception as e:
         print(f"❌ Edge-TTS general error: {e}")
         return False
-
 
 def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
     """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
@@ -241,10 +189,13 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
         with open(audio_path, "rb") as f:
             audio_data = f.read()
 
-        prompt = 'Transcribe this audio. Return ONLY a JSON list of words with start and end timestamps in seconds: [{"word": "text", "start": 0.0, "end": 0.5}, ...]. Do not include markdown formatting, just raw JSON.'
+        prompt = "Transcribe this audio. Return ONLY a JSON list of words with start and end timestamps in seconds: [{\"word\": \"text\", \"start\": 0.0, \"end\": 0.5}, ...]. Do not include markdown formatting, just raw JSON."
 
         # Structure payload correctly for Gemini
-        response = model.generate_content([prompt, {"mime_type": "audio/wav", "data": audio_data}])
+        response = model.generate_content([
+            prompt,
+            {"mime_type": "audio/wav", "data": audio_data}
+        ])
 
         text = response.text.strip()
         if "```json" in text:
@@ -267,87 +218,63 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
         print(f"❌ Gemini Transcription failed: {e}")
         return []
 
-
 def transcribe_audio_whisper(audio_path: Path) -> list[dict]:
-    """Get word-level timestamps using OpenAI Whisper API with Retry and Gemini Fallback"""
-    print("🧠 Transcribing audio for word-level subtitles...")
-    api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
+    """Get word-level timestamps using OpenAI Whisper API with Gemini Fallback"""
+    # Rate limit protection
+    time.sleep(1.5)
 
-    # 1. Main Strategy: OpenAI Whisper with Retry
+    print("🧠 Transcribing audio for word-level subtitles...")
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    # 1. Main Strategy: OpenAI Whisper
     if api_key:
         temp_mp3 = audio_path.with_suffix(".mp3")
-
         try:
-            subprocess.run(
-                ["ffmpeg", "-y", "-i", str(audio_path), "-b:a", "128k", str(temp_mp3)], check=True, capture_output=True
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"⚠️ FFmpeg conversion failed: {e}")
-            return transcribe_audio_gemini(audio_path)
+            subprocess.run([
+                "ffmpeg", "-y", "-i", str(audio_path),
+                "-b:a", "128k", str(temp_mp3)
+            ], check=True, capture_output=True)
 
-        from openai import OpenAI
+            from openai import OpenAI
+            base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+            org_id = os.getenv("OPENAI_ORG_ID")
+            client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        org_id = os.getenv("OPENAI_ORG_ID")
-        client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
+            with open(temp_mp3, "rb") as f:
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    response_format="verbose_json",
+                    timestamp_granularities=["word"]
+                )
 
-        last_error = None
-
-        for attempt in range(MAX_RETRIES + 1):
-            try:
-                with open(temp_mp3, "rb") as f:
-                    transcript = client.audio.transcriptions.create(
-                        model="whisper-1", file=f, response_format="verbose_json", timestamp_granularities=["word"]
-                    )
-
-                if temp_mp3.exists():
-                    temp_mp3.unlink()
-                words = transcript.words if hasattr(transcript, "words") else []
-                if words:
-                    return words
-                break  # No words but no error, fall through to Gemini
-
-            except Exception as e:
-                last_error = e
-                if _is_retryable_error(e) and attempt < MAX_RETRIES:
-                    delay = _calculate_backoff(attempt)
-                    print(
-                        f"⚠️ [Retry] Whisper attempt {attempt + 1}/{MAX_RETRIES + 1} failed: {e}. Retrying in {delay:.2f}s..."
-                    )
-                    time.sleep(delay)
-                    continue
-                else:
-                    print(f"⚠️ OpenAI Whisper failed: {e}")
-                    break
-
-        if temp_mp3.exists():
-            temp_mp3.unlink()
+            if temp_mp3.exists(): temp_mp3.unlink()
+            words = transcript.words if hasattr(transcript, 'words') else []
+            if words: return words
+        except Exception as e:
+            print(f"⚠️ OpenAI Whisper failed: {e}")
+            if temp_mp3.exists(): temp_mp3.unlink()
 
     # 2. Strategy 2: Gemini Fallback
     return transcribe_audio_gemini(audio_path)
 
-
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     """Main audio generation with premium support and fallback"""
-    time.sleep(1.0)  # Tactical pause
+    time.sleep(1.0) # Tactical pause
     voice = VOICES.get(lang, VOICES["en"])
 
     # Special case for Hebrew with Onyx (it works well for deep voice)
     if lang == "he":
-        voice = VOICES["en"]  # Use Onyx (multilingual model) for Hebrew
+        voice = VOICES["en"] # Use Onyx (multilingual model) for Hebrew
 
     # 1. Try OpenAI (Premium)
-    try:
-        if generate_audio_openai(text, output_path, voice):
-            return True
-    except Exception as e:
-        print(f"⚠️ OpenAI TTS Exception: {e}")
+    if generate_audio_openai(text, output_path, voice):
+        return True
 
     # 2. Fallback to Edge-TTS
-    print("⚠️ OpenAI Failed or Unreachable, falling back to Edge-TTS...")
+    print("⚠️ OpenAI Failed, falling back to Edge-TTS...")
     fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-EmmaNeural")
     return generate_audio_edge(text, output_path, fallback_voice)
-
 
 def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: str = "impact") -> bool:
     """Add dynamic word-by-word subtitles matching style"""
@@ -356,9 +283,7 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: 
 
     # 1. Extract audio and transcribe
     temp_audio = output_path.parent / f"temp_{output_path.stem}_sub.wav"
-    subprocess.run(
-        ["ffmpeg", "-y", "-i", str(video_path), "-vn", "-ac", "1", str(temp_audio)], check=True, capture_output=True
-    )
+    subprocess.run(["ffmpeg", "-y", "-i", str(video_path), "-vn", "-ac", "1", str(temp_audio)], check=True, capture_output=True)
 
     words = transcribe_audio_whisper(temp_audio)
     if not words:
@@ -369,49 +294,43 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: 
     # Motivaider: High contrast, centered, Gold/White
     filters = []
     font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf"
-    if not Path(font_path).exists():
-        font_path = "Arial"
+    if not Path(font_path).exists(): font_path = "Arial"
 
     for _i, w in enumerate(words):
         # Handle both dict and object (OpenAI SDK returns objects)
-        start = w.start if hasattr(w, "start") else w.get("start", 0)
-        end = w.end if hasattr(w, "end") else w.get("end", 0)
-        text = w.word if hasattr(w, "word") else w.get("word", "")
+        start = w.start if hasattr(w, 'start') else w.get('start', 0)
+        end = w.end if hasattr(w, 'end') else w.get('end', 0)
+        text = w.word if hasattr(w, 'word') else w.get('word', "")
 
-        text = text.upper().replace("'", "").replace(":", "").replace('"', "").replace("\\", "")
+        text = text.upper().replace("'", "").replace(":", "").replace("\"", "").replace("\\", "")
 
         if style == "impact":
             # Color: Golden Yellow (0xFFD700)
-            f = (
-                f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=80:"
-                f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
-                f"enable='between(t,{start},{end})'"
-            )
+            f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor=0xFFD700:fontsize=80:"
+                 f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
+                 f"enable='between(t,{start},{end})'")
         else:
             # Cartoon Style: Vibrant Pink/Cyan with white border, bigger and slightly higher
-            color = random.choice(["0xFF69B4", "0x00FFFF", "0xFFFF00"])  # Pink, Cyan, Yellow
-            f = (
-                f"drawtext=fontfile='{font_path}':text='{text}':fontcolor={color}:fontsize=100:"
-                f"x=(w-text_w)/2:y=h-(h*0.3):borderw=6:bordercolor=white:"
-                f"enable='between(t,{start},{end})'"
-            )
+            color = random.choice(["0xFF69B4", "0x00FFFF", "0xFFFF00"]) # Pink, Cyan, Yellow
+            f = (f"drawtext=fontfile='{font_path}':text='{text}':fontcolor={color}:fontsize=100:"
+                 f"x=(w-text_w)/2:y=h-(h*0.3):borderw=6:bordercolor=white:"
+                 f"enable='between(t,{start},{end})'")
         filters.append(f)
 
     filter_str = ",".join(filters)
 
     try:
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", str(video_path), "-vf", filter_str, "-c:a", "copy", str(output_path)],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(video_path),
+            "-vf", filter_str,
+            "-c:a", "copy", str(output_path)
+        ], check=True, capture_output=True)
         print(f"✨ Impact Vision Masterpiece Finalized: {output_path}")
         temp_audio.unlink()
         return True
     except Exception as e:
         print(f"❌ Subtitle burning failed: {e}")
         return False
-
 
 def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: Path):
     """
@@ -420,22 +339,10 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
     print("🎬 Assembling B-Roll only video...")
 
     # 1. Get total audio duration
-    audio_duration = float(
-        subprocess.run(
-            [
-                "ffprobe",
-                "-v",
-                "error",
-                "-show_entries",
-                "format=duration",
-                "-of",
-                "default=noprint_wrappers=1:nokey=1",
-                str(audio_path),
-            ],
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    )
+    audio_duration = float(subprocess.run([
+        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
+    ], capture_output=True, text=True).stdout.strip())
 
     print(f"⏱ Audio duration: {audio_duration}s")
 
@@ -453,25 +360,13 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
         target_duration = min(clip_duration, remaining)
 
         trimmed_path = output_path.parent / f"temp_{output_path.stem}_clip_{len(final_clips)}.mp4"
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                str(clip),
-                "-t",
-                str(target_duration),
-                "-vf",
-                "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920",  # Vertical format
-                "-c:v",
-                "libx264",
-                "-pix_fmt",
-                "yuv420p",
-                str(trimmed_path),
-            ],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(clip),
+            "-t", str(target_duration),
+            "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920", # Vertical format
+            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            str(trimmed_path)
+        ], check=True, capture_output=True)
 
         final_clips.append(trimmed_path)
         current_time += target_duration
@@ -484,48 +379,28 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
             f.write(f"file '{clip.name}'\n")
 
     video_no_audio = output_path.parent / f"temp_{output_path.stem}_no_audio.mp4"
-    subprocess.run(
-        ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), "-c", "copy", str(video_no_audio)],
-        check=True,
-        capture_output=True,
-        cwd=str(output_path.parent),
-    )
+    subprocess.run([
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+        "-i", str(concat_list),
+        "-c", "copy", str(video_no_audio)
+    ], check=True, capture_output=True, cwd=str(output_path.parent))
 
     # 4. Merge with audio
-    subprocess.run(
-        [
-            "ffmpeg",
-            "-y",
-            "-i",
-            str(video_no_audio),
-            "-i",
-            str(audio_path),
-            "-c:v",
-            "copy",
-            "-c:a",
-            "aac",
-            "-map",
-            "0:v:0",
-            "-map",
-            "1:a:0",
-            str(output_path),
-        ],
-        check=True,
-        capture_output=True,
-    )
+    subprocess.run([
+        "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
+        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
+        str(output_path)
+    ], check=True, capture_output=True)
 
     # Cleanup
-    for clip in final_clips:
-        clip.unlink()
+    for clip in final_clips: clip.unlink()
     video_no_audio.unlink()
     concat_list.unlink()
 
     print(f"✅ Video assembled: {output_path}")
 
-
 # FORCE CORRECT API KEY (bypassing potentially bad environment)
-# API Setup (loaded from .env)
-
+    # API Setup (loaded from .env)
 
 def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Path, style: str = "impact"):
     """
@@ -534,29 +409,17 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
     kind = "CINEMATIC MASTERPIECE" if style == "impact" else "CARTOON ADVENTURE"
     print(f"🎬 Producing {kind}...")
 
-    audio_duration = float(
-        subprocess.run(
-            [
-                "ffprobe",
-                "-v",
-                "error",
-                "-show_entries",
-                "format=duration",
-                "-of",
-                "default=noprint_wrappers=1:nokey=1",
-                str(audio_path),
-            ],
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    )
+    audio_duration = float(subprocess.run([
+        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
+    ], capture_output=True, text=True).stdout.strip())
 
     num_scenes = len(scenes)
     # Calculate duration per scene to exactly cover audio duration
     if num_scenes > 0:
         duration_per_scene = audio_duration / num_scenes
     else:
-        duration_per_scene = 5.0  # Fallback
+        duration_per_scene = 5.0 # Fallback
 
     print(f"⏱️ Exact Scene Duration: {duration_per_scene:.2f}s (Total: {audio_duration:.2f}s)")
 
@@ -569,7 +432,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
         agent_mindfulness(f"Assembling Scene {i}")
 
         # 🧪 Robust Image Path Resolution (Vibranium Standard)
-        img_path = scene.get("resolved_path") or scene.get("image")
+        img_path = scene.get('resolved_path') or scene.get('image')
         if img_path and not os.path.isabs(img_path):
             # Try with various extensions in INPUT_DIR
             potential_path = INPUT_DIR / img_path
@@ -580,7 +443,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
                         break
             img_path = str(potential_path)
 
-        keyword = scene.get("keyword", "abstract technology")
+        keyword = scene.get('keyword', 'abstract technology')
 
         # Timing: 80% B-Roll, 20% Image Flash
         broll_dur = duration_per_scene * 0.8
@@ -601,8 +464,7 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
                 remaining = broll_dur - accumulated_broll
                 this_clip_dur = min(get_video_duration(clip), remaining)
                 # If clip is extremely short (<1s), skip to avoid ffmpeg errors
-                if this_clip_dur < 0.5:
-                    break
+                if this_clip_dur < 0.5: break
 
                 seg_p = output_path.parent / f"{unique_prefix}_seg_{i}_b{clip_idx}.mp4"
                 if style == "impact":
@@ -610,27 +472,12 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
                 else:
                     vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=saturation=1.5"
 
-                subprocess.run(
-                    [
-                        "ffmpeg",
-                        "-y",
-                        "-i",
-                        str(clip),
-                        "-t",
-                        str(this_clip_dur),
-                        "-vf",
-                        vf,
-                        "-c:v",
-                        "libx264",
-                        "-pix_fmt",
-                        "yuv420p",
-                        "-r",
-                        "30",
-                        str(seg_p),
-                    ],
-                    check=True,
-                    capture_output=True,
-                )
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", str(clip),
+                    "-t", str(this_clip_dur),
+                    "-vf", vf,
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(seg_p)
+                ], check=True, capture_output=True)
                 segments.append(seg_p)
                 accumulated_broll += this_clip_dur
         else:
@@ -643,45 +490,25 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
         else:
             vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=pink"
 
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-loop",
-                "1",
-                "-i",
-                str(img_path),
-                "-t",
-                str(img_dur),
-                "-vf",
-                vf_img,
-                "-pix_fmt",
-                "yuv420p",
-                "-c:v",
-                "libx264",
-                "-r",
-                "30",
-                str(seg_p_img),
-            ],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
+            "-t", str(img_dur),
+            "-vf", vf_img,
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-r", "30", str(seg_p_img)
+        ], check=True, capture_output=True)
         segments.append(seg_p_img)
 
     # Concat visuals
     concat_file = output_path.parent / f"{unique_prefix}_concat.txt"
     with open(concat_file, "w") as f:
-        for seg in segments:
-            f.write(f"file '{seg.name}'\n")
+        for seg in segments: f.write(f"file '{seg.name}'\n")
 
     raw_visuals = output_path.parent / f"temp_{unique_prefix}_visuals.mp4"
     try:
-        subprocess.run(
-            ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file), "-c", "copy", str(raw_visuals)],
-            check=True,
-            capture_output=True,
-            cwd=str(output_path.parent),
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
+            "-c", "copy", str(raw_visuals)
+        ], check=True, capture_output=True, cwd=str(output_path.parent))
     except subprocess.CalledProcessError as e:
         print(f"❌ FFmpeg Concat Error: {e.stderr.decode()}")
         raise
@@ -692,64 +519,44 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
 
     if style == "impact":
         # Ultra-clean audio with minimal reverb for heavy documentaries
-        audio_filter = "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,aecho=0.8:0.3:20:0.1,loudnorm"
+        audio_filter = (
+            "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,"
+            "aecho=0.8:0.3:20:0.1,"
+            "loudnorm"
+        )
     else:
         audio_filter = "acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
 
     try:
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", str(audio_path), "-af", audio_filter, str(final_audio)],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(audio_path),
+            "-af", audio_filter,
+            str(final_audio)
+        ], check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ FFmpeg Audio Error: {e.stderr.decode()}")
         raise
 
     # 4. Final Final Merge
     try:
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                str(raw_visuals),
-                "-i",
-                str(final_audio),
-                "-c:v",
-                "copy",
-                "-c:a",
-                "aac",
-                "-map",
-                "0:v:0",
-                "-map",
-                "1:a:0",
-                "-shortest",
-                str(output_path),
-            ],
-            check=True,
-            capture_output=True,
-        )
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(raw_visuals), "-i", str(final_audio),
+            "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", "-shortest",
+            str(output_path)
+        ], check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ FFmpeg Merge Error: {e.stderr.decode()}")
         raise
 
     # Cleanup
     for seg in segments:
-        if seg.exists():
-            seg.unlink()
-    if raw_visuals.exists():
-        raw_visuals.unlink()
-    if final_audio.exists():
-        final_audio.unlink()
-    if concat_file.exists():
-        concat_file.unlink()
+        if seg.exists(): seg.unlink()
+    if raw_visuals.exists(): raw_visuals.unlink()
+    if final_audio.exists(): final_audio.unlink()
+    if concat_file.exists(): concat_file.unlink()
     return True
 
-
-def run_no_face_pipeline(
-    text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: list[dict] = None, style: str = "impact"
-):
+def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: list[dict] = None, style: str = "impact"):
     """Run pipeline without face usage"""
     print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang}, style={style})")
 
@@ -776,13 +583,11 @@ def run_no_face_pipeline(
     # 3. Subtitles
     if not add_subtitles(raw_video, final_video, lang, style=style):
         print("⚠️ Subtitles failed, using raw video.")
-        if final_video.exists():
-            final_video.unlink()
+        if final_video.exists(): final_video.unlink()
         raw_video.rename(final_video)
 
     print(f"\n✨ DONE: {final_video}")
     return final_video
-
 
 if __name__ == "__main__":
     # Council-Generated 15-Scene Script (Refined for Natural TTS & Pronunciation)
@@ -823,14 +628,17 @@ if __name__ == "__main__":
         {"image": "ai_scene_12_ethics_safety", "keyword": "cyber attack digital shield cinematic"},
         {"image": "ai_fact_1_robot", "keyword": "artificial intelligence robot thinking cinematic"},
         {"image": "ai_scene_14_global_net_earth", "keyword": "planet earth from space cinematic"},
-        {"image": "ai_scene_15_sunrise_digital", "keyword": "futuristic city sunrise cinematic"},
+        {"image": "ai_scene_15_sunrise_digital", "keyword": "futuristic city sunrise cinematic"}
     ]
 
     selected_scenes = []
     for scene in scene_data:
         matches = list(gen_dir.glob(f"{scene['image']}_*.png"))
         if matches:
-            selected_scenes.append({"image": sorted(matches)[-1], "keyword": scene["keyword"]})
+            selected_scenes.append({
+                "image": sorted(matches)[-1],
+                "keyword": scene['keyword']
+            })
         else:
             print(f"⚠️ Image {scene['image']} not found in {gen_dir}")
 

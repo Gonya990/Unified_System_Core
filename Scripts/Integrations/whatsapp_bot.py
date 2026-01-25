@@ -32,7 +32,7 @@ WHATSAPP_API_URL = f"https://graph.facebook.com/{WHATSAPP_API_VERSION}/{WHATSAPP
 class WhatsAppClient:
     """
     WhatsApp Cloud API Client
-
+    
     Usage:
         client = WhatsAppClient()
         client.send_text("972501234567", "Hello from Unified System!")
@@ -69,7 +69,7 @@ class WhatsAppClient:
     def send_text(self, to: str, message: str, preview_url: bool = False) -> dict:
         """
         Send a text message
-
+        
         Args:
             to: Recipient phone number (with country code, no +)
             message: Text message content
@@ -90,7 +90,7 @@ class WhatsAppClient:
     def send_template(self, to: str, template_name: str, language: str = "en_US", components: list = None) -> dict:
         """
         Send a template message (required for first contact)
-
+        
         Args:
             to: Recipient phone number
             template_name: Approved template name
@@ -146,7 +146,7 @@ class WhatsAppClient:
     def send_buttons(self, to: str, body: str, buttons: list, header: str = None, footer: str = None) -> dict:
         """
         Send interactive button message
-
+        
         Args:
             to: Recipient phone
             body: Message body
@@ -224,7 +224,7 @@ def handle_webhook():
             msg_id = message.get("id")
             from_number = message.get("from")
             msg_type = message.get("type")
-            message.get("timestamp")
+            timestamp = message.get("timestamp")
 
             logger.info(f"Received {msg_type} from {from_number}")
 
@@ -325,7 +325,7 @@ Environment variables required:
     WHATSAPP_TOKEN     - Meta access token
     WHATSAPP_PHONE_ID  - Your phone number ID
     WHATSAPP_VERIFY_TOKEN - Webhook verification token (optional)
-
+    
 Setup:
     1. Create app at https://developers.facebook.com
     2. Add WhatsApp product

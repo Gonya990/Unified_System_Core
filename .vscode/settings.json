@@ -1,0 +1,44 @@
+{
+    "gitlens.launchpad.enabled": true,
+    "gitlens.launchpad.indicator.enabled": true,
+    "python.defaultInterpreterPath": "./Projects/AI_Core/.venv/bin/python",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.DS_Store": true,
+        "**/.venv": true,
+        "**/.codex": true
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        ".env": ".env*, .envrc",
+        "pyproject.toml": "uv.lock, requirements*, .python-version, devenv*",
+        "bot_igor.log": "bot_*.log, *.log",
+        "task.md": "task_*.md, *.tasks",
+        "SYSTEM_MAP.md": "System_Architecture_Vibranium.md, setup_info.md"
+    },
+    "breadcrumbs.enabled": true,
+    "breadcrumbs.showFiles": true,
+    "breadcrumbs.showSymbols": true,
+    "editor.minimap.enabled": false,
+    "editor.stickyScroll.enabled": true,
+    "terminal.integrated.profiles.osx": {
+        "Unified Core": {
+            "path": "zsh",
+            "args": [
+                "-l"
+            ],
+            "icon": "pulse"
+        }
+    },
+    "terminal.integrated.defaultProfile.osx": "Unified Core",
+    "markdown.preview.breaks": true,
+    "markdown.preview.linkExternalVars": true,
+    "markdownlint.config": {
+        "MD001": false,
+        "MD013": false,
+        "MD024": false,
+        "MD025": false
+    }
+}

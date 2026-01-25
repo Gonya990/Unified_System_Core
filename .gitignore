@@ -68,6 +68,24 @@ outputs/
 inputs/
 broll/
 
+# Large Binaries and Media
+*.mp4
+*.m4a
+*.mov
+*.wav
+*.dmg
+*.pkg
+*.iso
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Tool Caches and Node
+tools/npm-cache/
+tools/node-*/
+node_modules/
+
 # Credentials and Tokens
 .credentials/
 *_token.json
@@ -77,11 +95,5 @@ hooks/hooks_server.err
 # Session and cookie data from browser extraction
 browser_sessions.json
 webtop_session.json
-
+.beads/
 .claude/
-contexts/*.pdf
-contexts/*.mp4
-contexts/*.m4a
-contexts/*.crdownload
-contexts/*.png
-/Knowledge_Base/

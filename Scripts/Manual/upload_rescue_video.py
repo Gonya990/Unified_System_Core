@@ -8,8 +8,8 @@ SRC_DIR = FACTORY_DIR / "src"
 sys.path.append(str(SRC_DIR / "uploaders"))
 sys.path.append(str(SRC_DIR / "pipeline"))
 
-from account_manager import AccountManager  # noqa: E402
-from youtube_uploader import upload_video  # noqa: E402
+from account_manager import AccountManager
+from youtube_uploader import upload_video
 
 
 def main():
