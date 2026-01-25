@@ -1,0 +1,922 @@
+openapi: 3.0.3
+info:
+  title: VASER Super Admin Actions
+  version: 0.1.0
+  description: >-
+    OpenAPI manifest for Custom GPT actions used by the VASER Super Admin role.
+    This spec defines network, Home Assistant, local gateway, cloud, management,
+    analytics, and presentation actions.
+servers:
+  - url: https://vaser-hub.local/api
+    description: VASER Control Hub API
+  - url: https://localhost:8080
+    description: Local development gateway
+paths:
+  /network/scan:
+    post:
+      operationId: scan_network
+      summary: Scan local network for devices.
+      tags: [Network]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetworkScanRequest'
+      responses:
+        '200':
+          description: Network scan results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkScanResponse'
+  /network/devices/{device_id}:
+    get:
+      operationId: get_device_info
+      summary: Get detailed info for a device.
+      tags: [Network]
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceInfo'
+    delete:
+      operationId: remove_device
+      summary: Remove a device from inventory.
+      tags: [Network]
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device removal status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /network/devices:
+    post:
+      operationId: add_device
+      summary: Add a device to inventory.
+      tags: [Network]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDeviceRequest'
+      responses:
+        '200':
+          description: Device added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceInfo'
+  /network/devices/{device_id}/command:
+    post:
+      operationId: run_command
+      summary: Run a command on a device via SSH/WinRM/API.
+      tags: [Network]
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          description: Command execution result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResult'
+  /network/devices/{device_id}/reboot:
+    post:
+      operationId: reboot_device
+      summary: Reboot a device.
+      tags: [Network]
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reboot action status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /network/devices/{device_id}/config:
+    put:
+      operationId: configure_device
+      summary: Configure a device.
+      tags: [Network]
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceConfigRequest'
+      responses:
+        '200':
+          description: Configuration status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /home-assistant/service-call:
+    post:
+      operationId: ha.service_call
+      summary: Call a Home Assistant service.
+      tags: [HomeAssistant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HAServiceCall'
+      responses:
+        '200':
+          description: Service call result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /home-assistant/state/get:
+    post:
+      operationId: ha.get_state
+      summary: Get a Home Assistant entity state.
+      tags: [HomeAssistant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HAStateRequest'
+      responses:
+        '200':
+          description: Entity state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HAStateResponse'
+  /home-assistant/state/set:
+    post:
+      operationId: ha.set_state
+      summary: Set a Home Assistant entity state.
+      tags: [HomeAssistant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HASetStateRequest'
+      responses:
+        '200':
+          description: State update status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /home-assistant/script/execute:
+    post:
+      operationId: ha.execute_script
+      summary: Execute a Home Assistant script.
+      tags: [HomeAssistant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HAScriptRequest'
+      responses:
+        '200':
+          description: Script execution status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /local/run:
+    post:
+      operationId: local.run
+      summary: Run a local command via the gateway.
+      tags: [Local]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalRunRequest'
+      responses:
+        '200':
+          description: Local execution result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResult'
+  /local/read:
+    post:
+      operationId: local.read
+      summary: Read a local file via the gateway.
+      tags: [Local]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalFileRequest'
+      responses:
+        '200':
+          description: File contents.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileReadResponse'
+  /local/write:
+    post:
+      operationId: local.write
+      summary: Write a local file via the gateway.
+      tags: [Local]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalWriteRequest'
+      responses:
+        '200':
+          description: Write status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /cloud/google-calendar/event:
+    post:
+      operationId: cloud.google_calendar.create_event
+      summary: Create a Google Calendar event.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarEventRequest'
+      responses:
+        '200':
+          description: Event created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarEventResponse'
+  /cloud/icloud/calendar/event:
+    post:
+      operationId: cloud.icloud.create_event
+      summary: Create an iCloud Calendar event.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarEventRequest'
+      responses:
+        '200':
+          description: Event created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarEventResponse'
+  /cloud/gmail/send:
+    post:
+      operationId: cloud.gmail.send_email
+      summary: Send an email with Gmail.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSendRequest'
+      responses:
+        '200':
+          description: Email send status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /cloud/outlook/send:
+    post:
+      operationId: cloud.outlook.send_email
+      summary: Send an email with Outlook.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSendRequest'
+      responses:
+        '200':
+          description: Email send status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /cloud/google-drive/file:
+    post:
+      operationId: cloud.google_drive.upload_file
+      summary: Upload a file to Google Drive.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudFileUploadRequest'
+      responses:
+        '200':
+          description: Upload status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudFileResponse'
+  /cloud/yandex-disk/file:
+    post:
+      operationId: cloud.yandex_disk.upload_file
+      summary: Upload a file to Yandex Disk.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudFileUploadRequest'
+      responses:
+        '200':
+          description: Upload status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudFileResponse'
+  /cloud/dropbox/file:
+    post:
+      operationId: cloud.dropbox.upload_file
+      summary: Upload a file to Dropbox.
+      tags: [Cloud]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudFileUploadRequest'
+      responses:
+        '200':
+          description: Upload status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudFileResponse'
+  /management/task:
+    post:
+      operationId: create_task
+      summary: Create a task.
+      tags: [Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateRequest'
+      responses:
+        '200':
+          description: Task created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+  /management/task/{task_id}/complete:
+    post:
+      operationId: complete_task
+      summary: Mark a task complete.
+      tags: [Management]
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task completion status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /management/reminder:
+    post:
+      operationId: remind_user
+      summary: Create a reminder for the user.
+      tags: [Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReminderRequest'
+      responses:
+        '200':
+          description: Reminder scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionStatus'
+  /management/report:
+    post:
+      operationId: generate_report
+      summary: Generate a management report.
+      tags: [Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+      responses:
+        '200':
+          description: Report generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+  /analytics/logs/collect:
+    post:
+      operationId: collect_logs
+      summary: Collect logs from VASER services.
+      tags: [Analytics]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogCollectRequest'
+      responses:
+        '200':
+          description: Logs collected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogCollectResponse'
+  /analytics/logs/analyze:
+    post:
+      operationId: analyze_logs
+      summary: Analyze logs for anomalies and incidents.
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogAnalyzeRequest'
+      responses:
+        '200':
+          description: Analysis results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogAnalyzeResponse'
+  /analytics/project/summary:
+    post:
+      operationId: summarize_project
+      summary: Summarize project status.
+      tags: [Analytics]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectSummaryRequest'
+      responses:
+        '200':
+          description: Project summary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSummaryResponse'
+  /analytics/presentation:
+    post:
+      operationId: generate_presentation
+      summary: Generate a presentation from JSON content.
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationRequest'
+      responses:
+        '200':
+          description: Presentation file metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationResponse'
+components:
+  schemas:
+    NetworkScanRequest:
+      type: object
+      properties:
+        cidr:
+          type: string
+          example: 192.168.1.0/24
+        methods:
+          type: array
+          items:
+            type: string
+            enum: [arp, icmp, mdns, snmp]
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          default: 60
+    NetworkScanResponse:
+      type: object
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceInfo'
+    DeviceInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ip:
+          type: string
+        mac:
+          type: string
+        vendor:
+          type: string
+        os:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        last_seen:
+          type: string
+          format: date-time
+    AddDeviceRequest:
+      type: object
+      required: [name, address, connection]
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+          description: IP, hostname, or API endpoint.
+        connection:
+          type: string
+          enum: [ssh, winrm, api]
+        credentials_ref:
+          type: string
+          description: Reference stored in VASER-Hub vault.
+    CommandRequest:
+      type: object
+      required: [command]
+      properties:
+        command:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+        timeout_seconds:
+          type: integer
+          default: 60
+    CommandResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, failed]
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+    DeviceConfigRequest:
+      type: object
+      properties:
+        config:
+          type: object
+          additionalProperties: true
+    ActionStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [accepted, running, completed, failed]
+        message:
+          type: string
+        task_id:
+          type: string
+    HAServiceCall:
+      type: object
+      required: [domain, service]
+      properties:
+        domain:
+          type: string
+        service:
+          type: string
+        service_data:
+          type: object
+          additionalProperties: true
+    HAStateRequest:
+      type: object
+      required: [entity_id]
+      properties:
+        entity_id:
+          type: string
+    HAStateResponse:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        state:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+    HASetStateRequest:
+      type: object
+      required: [entity_id, state]
+      properties:
+        entity_id:
+          type: string
+        state:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+    HAScriptRequest:
+      type: object
+      required: [script_id]
+      properties:
+        script_id:
+          type: string
+        fields:
+          type: object
+          additionalProperties: true
+    LocalRunRequest:
+      type: object
+      required: [command]
+      properties:
+        command:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+        timeout_seconds:
+          type: integer
+          default: 60
+    LocalFileRequest:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+    LocalWriteRequest:
+      type: object
+      required: [path, content]
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        overwrite:
+          type: boolean
+          default: false
+    FileReadResponse:
+      type: object
+      properties:
+        content:
+          type: string
+    CalendarEventRequest:
+      type: object
+      required: [title, start_time, end_time]
+      properties:
+        title:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        attendees:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        location:
+          type: string
+    CalendarEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+        status:
+          type: string
+    EmailSendRequest:
+      type: object
+      required: [to, subject, body]
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        body:
+          type: string
+        cc:
+          type: array
+          items:
+            type: string
+        bcc:
+          type: array
+          items:
+            type: string
+        attachments:
+          type: array
+          items:
+            type: string
+    CloudFileUploadRequest:
+      type: object
+      required: [filename, content_base64]
+      properties:
+        filename:
+          type: string
+        content_base64:
+          type: string
+        folder_path:
+          type: string
+    CloudFileResponse:
+      type: object
+      properties:
+        file_id:
+          type: string
+        url:
+          type: string
+    TaskCreateRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        due_at:
+          type: string
+          format: date-time
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+    TaskResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+    ReminderRequest:
+      type: object
+      required: [message, remind_at]
+      properties:
+        message:
+          type: string
+        remind_at:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          enum: [chat, email, push]
+    ReportRequest:
+      type: object
+      required: [scope]
+      properties:
+        scope:
+          type: string
+          enum: [daily, weekly, monthly, incident]
+        format:
+          type: string
+          enum: [markdown, pdf]
+    ReportResponse:
+      type: object
+      properties:
+        report_id:
+          type: string
+        url:
+          type: string
+    LogCollectRequest:
+      type: object
+      properties:
+        services:
+          type: array
+          items:
+            type: string
+        window_minutes:
+          type: integer
+          default: 60
+    LogCollectResponse:
+      type: object
+      properties:
+        log_bundle_id:
+          type: string
+        location:
+          type: string
+    LogAnalyzeRequest:
+      type: object
+      required: [log_bundle_id]
+      properties:
+        log_bundle_id:
+          type: string
+        focus:
+          type: string
+          enum: [errors, security, performance]
+    LogAnalyzeResponse:
+      type: object
+      properties:
+        findings:
+          type: array
+          items:
+            type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+    ProjectSummaryRequest:
+      type: object
+      properties:
+        period:
+          type: string
+          enum: [daily, weekly, monthly]
+    ProjectSummaryResponse:
+      type: object
+      properties:
+        summary:
+          type: string
+        risks:
+          type: array
+          items:
+            type: string
+        next_actions:
+          type: array
+          items:
+            type: string
+    PresentationRequest:
+      type: object
+      required: [content_json]
+      properties:
+        content_json:
+          type: object
+          additionalProperties: true
+        output_format:
+          type: string
+          enum: [pptx, pdf]
+          default: pptx
+    PresentationResponse:
+      type: object
+      properties:
+        file_id:
+          type: string
+        url:
+          type: string
