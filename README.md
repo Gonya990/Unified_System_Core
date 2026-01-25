@@ -12,6 +12,7 @@
 | **💻 AI Core (Main)** | [Projects/AI_Core/](Projects/AI_Core/) | Gonya Telegram Bot — personal AI assistant with smart home, calendar, tasks & multi-model chat |
 | **⚙️ Scripts** | [Scripts/](Scripts/) | Deployment, automation, expect scripts |
 | **🏗 Architecture** | [Architecture Docs](Agent_Context/Knowledge_Base/Architecture/) | System design and handoff guides |
+| **🛰️ VASER Hub** | [docs/architecture/VASER_HUB.md](docs/architecture/VASER_HUB.md) | VASER Hub architecture and security model |
 
 ---
 
