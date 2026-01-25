@@ -8,7 +8,8 @@ WORKDIR /app
 # Install dependencies using uv
 COPY requirements.txt .
 # Compile bytecode for faster startup, install to system since we are in a container
-RUN uv pip install --system --no-cache -r requirements.txt
+# Use --prerelease=allow in case any transitive deps need it
+RUN uv pip install --system --no-cache --prerelease=allow -r requirements.txt
 
 # Copy source code
 COPY src/ ./src/
