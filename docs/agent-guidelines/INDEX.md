@@ -55,6 +55,15 @@ Step-by-step guides for implementing specific patterns and workflows.
 
 ---
 
+## 🧭 Role Specifications
+
+Role definitions and operational constraints for specific agents.
+
+- **[vaser-super-admin-role.md](./vaser-super-admin-role.md)** - VASER Super Admin role definition
+  - Topics: Mission, allowed actions, safety posture, escalation, observability, interaction style
+
+---
+
 ## 📋 Templates
 
 Reusable templates for creating agents and running tests.
