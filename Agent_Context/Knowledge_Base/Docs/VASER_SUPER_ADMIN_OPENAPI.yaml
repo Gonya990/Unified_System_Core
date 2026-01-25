@@ -338,6 +338,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CommandResult"
+        "400":
+          description: Invalid configuration patch (malformed or unsupported structure)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "403":
+          description: Forbidden - device is protected or caller lacks permission to configure it
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "404":
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "422":
+          description: Configuration validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "500":
+          description: Internal error applying configuration to the device
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
 
   /ha/service_call:
     post:
