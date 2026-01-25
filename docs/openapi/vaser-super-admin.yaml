@@ -1,0 +1,401 @@
+openapi: 3.1.0
+info:
+  title: VASER Super Admin Actions
+  version: 1.0.0
+  description: Action manifest for VASER Super Admin automation.
+servers:
+  - url: https://vaser-router.local/api
+paths:
+  /network/scan:
+    post:
+      operationId: scan_network
+      summary: Scan approved network ranges.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Scan results.
+  /network/devices/{device_id}:
+    get:
+      operationId: get_device_info
+      summary: Retrieve device details.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Device info.
+    delete:
+      operationId: remove_device
+      summary: Remove a device.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Removal status.
+  /network/run-command:
+    post:
+      operationId: run_command
+      summary: Run a command on a target device.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Command result.
+  /network/devices:
+    post:
+      operationId: add_device
+      summary: Add a new device.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Add status.
+  /network/devices/{device_id}/reboot:
+    post:
+      operationId: reboot_device
+      summary: Reboot a device.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reboot status.
+  /network/devices/{device_id}/config:
+    patch:
+      operationId: configure_device
+      summary: Configure device settings.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Configuration status.
+  /home-assistant/service-call:
+    post:
+      operationId: ha.service_call
+      summary: Call a Home Assistant service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Service call result.
+  /home-assistant/states/{entity_id}:
+    get:
+      operationId: ha.get_state
+      summary: Get Home Assistant state.
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current state.
+    post:
+      operationId: ha.set_state
+      summary: Set Home Assistant state.
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: State update result.
+  /home-assistant/scripts/{script_id}/execute:
+    post:
+      operationId: ha.execute_script
+      summary: Execute a Home Assistant script.
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Script execution result.
+  /local/run:
+    post:
+      operationId: local.run
+      summary: Execute a local command.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Execution result.
+  /local/read:
+    get:
+      operationId: local.read
+      summary: Read a local resource.
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Read result.
+  /local/write:
+    post:
+      operationId: local.write
+      summary: Write to a local resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Write result.
+  /cloud/google-calendar/events:
+    post:
+      operationId: google_calendar.create_event
+      summary: Create a Google Calendar event.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Event creation result.
+  /cloud/icloud/sync:
+    post:
+      operationId: icloud.sync
+      summary: Sync with iCloud.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Sync result.
+  /cloud/gmail/send:
+    post:
+      operationId: gmail.send_email
+      summary: Send email via Gmail.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Email send result.
+  /cloud/outlook/send:
+    post:
+      operationId: outlook.send_email
+      summary: Send email via Outlook.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Email send result.
+  /cloud/google-drive/upload:
+    post:
+      operationId: google_drive.upload_file
+      summary: Upload a file to Google Drive.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Upload result.
+  /cloud/yandex-disk/upload:
+    post:
+      operationId: yandex_disk.upload_file
+      summary: Upload a file to Yandex Disk.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Upload result.
+  /cloud/dropbox/upload:
+    post:
+      operationId: dropbox.upload_file
+      summary: Upload a file to Dropbox.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Upload result.
+  /management/tasks:
+    post:
+      operationId: create_task
+      summary: Create a task.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Task creation result.
+  /management/tasks/{task_id}/complete:
+    post:
+      operationId: complete_task
+      summary: Complete a task.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task completion result.
+  /management/reminders:
+    post:
+      operationId: remind_user
+      summary: Create a reminder.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Reminder creation result.
+  /management/reports:
+    post:
+      operationId: generate_report
+      summary: Generate a report.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Report generation result.
+  /analytics/logs/collect:
+    post:
+      operationId: collect_logs
+      summary: Collect logs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Log collection result.
+  /analytics/logs/analyze:
+    post:
+      operationId: analyze_logs
+      summary: Analyze logs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Log analysis result.
+  /analytics/project/summarize:
+    post:
+      operationId: summarize_project
+      summary: Summarize project status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Summary result.
+  /analytics/presentation:
+    post:
+      operationId: generate_presentation
+      summary: Generate a presentation (pptx/pdf).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Presentation generation result.
