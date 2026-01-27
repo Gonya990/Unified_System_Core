@@ -95,5 +95,25 @@ hooks/hooks_server.err
 # Session and cookie data from browser extraction
 browser_sessions.json
 webtop_session.json
+<<<<<<< HEAD
 # .beads/ we need beads to sync
 # .claude/ we do want tools and commands, dont ignore
+=======
+.beads/
+.claude/
+tmp/
+tmp_backup/
+
+# Security
+secure_vault/
+
+# Temp Data
+tmp_audio_chunks/
+tmp_docs/
+tools/npm-global/
+unified.code-workspace
+*.vsix
+unnamed.png
+
+*.env.*
+>>>>>>> 6ef812bc (chore: cleanup large files and sync documentation)

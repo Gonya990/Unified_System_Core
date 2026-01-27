@@ -9,7 +9,7 @@
 
 ### **🔴 CORE Server (Primary Hub)**
 
-- **IP:** `100.110.209.49`
+- **IP:** `100.87.208.56`
 - **Hostname:** `unified-home-core-cloud`
 - **Роль:** Центральный сервер всей системы
 - **Назначение:**
@@ -132,7 +132,7 @@
 
 ### **Иерархия Ролей:**
 
-```
+```text
 OWNER > INFRASTRUCTURE_ADMIN > ADMIN > DEVELOPER > MEMBER > FAMILY > GUEST
 ```
 
@@ -140,16 +140,16 @@ OWNER > INFRASTRUCTURE_ADMIN > ADMIN > DEVELOPER > MEMBER > FAMILY > GUEST
 
 | IP | Устройство | Пользователь | Роль | Проекты | Особые права |
 |---|---|---|---|---|---|
-| **100.110.209.49** | CORE Server | System | SYSTEM | ALL | Все |
+| **100.87.208.56** | CORE Server | System | SYSTEM | ALL | Все |
 | **100.93.121.47** | MacBook Air | Igor | OWNER | ALL | Полный доступ |
-| **100.86.233.87** | iPhone | Igor | OWNER | Mobile Access | Полный доступ |
-| **100.127.194.111** | Windows PC | Igor | DEVELOPER | Agents (после VM) | Запуск агентов |
-| **100.114.27.103** | Tablet | Igor+Arthur | FAMILY | Family Assistant | Семейные проекты |
-| **100.97.100.92** | Laptop | Kostya | ADMIN | AI_Core, Personal | Административный |
-| **100.102.123.22** | Phone | Kostya | ADMIN | Mobile Access | Административный |
-| **100.78.145.67** | Hardware Control | Kostya | INFRASTRUCTURE_ADMIN | Infrastructure | **Только железо и ресурсы!** |
-| **100.74.137.122** | Tools Server | System | DEVELOPER | Automation, Tools | Инструменты |
-| **100.81.133.25** | Home Assistant | Family | FAMILY | Home Automation | Семья |
+| **100.86.233.87** | iPhone | Igor | OWNER | Mobile | Полный доступ |
+| **100.127.194.111** | Windows PC | Igor | DEVELOPER | AI | Запуск агентов |
+| **100.114.27.103** | Tablet | Igor+Arthur | FAMILY | Family | Семейные |
+| **100.97.100.92** | Laptop | Kostya | ADMIN | AI, Pers | Админ |
+| **100.102.123.22** | Phone | Kostya | ADMIN | Mobile | Админ |
+| **100.78.145.67** | HW Control | Kostya | INFRA_ADMIN | Infra | **Железо!** |
+| **100.74.137.122** | Tools Srv | System | DEVELOPER | Tools | Инструменты |
+| **100.81.133.25** | Home Assistant | Family | FAMILY | Home | Семья |
 | **100.100.134.4** | Unknown | ❓ | ❓ | ❓ | Требует уточнения |
 
 ---
