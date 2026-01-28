@@ -9,10 +9,11 @@ import { z } from "zod";
 // Constants & Types
 // ============================================================================
 
+
 const YAD2_API_BASE = "https://gw.yad2.co.il/feed-search-legacy/realestate/rent";
-const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
 interface Yad2Listing {
+  [key: string]: unknown; // Index signature for structuredContent compatibility
   id: string;
   token: string;
   title?: string;
@@ -64,6 +65,86 @@ interface Yad2FeedItem {
 // API Client
 // ============================================================================
 
+import { addExtra } from 'puppeteer-extra';
+import vanillaPuppeteer from 'puppeteer-core';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { execSync } from 'child_process';
+
+const puppeteer = addExtra(vanillaPuppeteer);
+puppeteer.use(StealthPlugin());
+
+// Mobile User Agent for better stealth
+const USER_AGENT = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36";
+
+import * as fs from 'fs';
+
+function logToFile(msg: string) {
+  fs.appendFileSync('yad2_internal.log', `${new Date().toISOString()} - ${msg}\n`);
+}
+
+let globalBrowser: ReturnType<typeof vanillaPuppeteer.launch> | null = null;
+let globalPage: any = null;
+
+async function getBrowser() {
+  if (globalBrowser) {
+    try {
+      const b = await globalBrowser;
+      if (b.isConnected()) return b;
+    } catch (e) {
+      logToFile("Browser disconnected, recreating...");
+    }
+  }
+
+  let chromePath = '';
+  try {
+    try {
+      chromePath = execSync('which chromium').toString().trim();
+    } catch {
+      chromePath = execSync('which google-chrome-stable').toString().trim();
+    }
+  } catch (e) {
+    logToFile("Could not find chromium or google-chrome-stable " + e);
+    throw new Error("Browser executable not found");
+  }
+
+  logToFile("Launching persistent browser session...");
+  globalBrowser = (puppeteer.launch({
+    headless: false,
+    executablePath: chromePath,
+    userDataDir: './yad2-session-data', // Persist cookies/localstorage
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-blink-features=AutomationControlled'
+    ]
+  }) as any);
+
+  return globalBrowser;
+}
+
+async function getPage() {
+  const browser = await getBrowser();
+  if (globalPage) {
+    try {
+      if (!globalPage.isClosed()) return globalPage;
+    } catch (e) {
+      logToFile("Global page check failed, recreating...");
+    }
+  }
+
+  globalPage = await (browser as any).newPage();
+  await globalPage.setUserAgent(USER_AGENT);
+  await globalPage.setViewport({ width: 375, height: 812, isMobile: true, hasTouch: true });
+
+  // Warm up home page once
+  logToFile("Warming up session on homepage...");
+  await globalPage.goto("https://www.yad2.co.il/", { waitUntil: 'networkidle2', timeout: 30000 });
+
+  return globalPage;
+}
+
+// Scrape Listings from Next Data
 async function searchYad2Rentals(params: {
   city?: string;
   priceMin?: number;
@@ -72,85 +153,153 @@ async function searchYad2Rentals(params: {
   roomsMax?: number;
   page?: number;
 }): Promise<{ listings: Yad2Listing[]; totalItems: number; totalPages: number; currentPage: number }> {
-  const queryParams: Record<string, string> = {
-    page: String(params.page || 1),
-  };
-
-  // City mapping (Yad2 uses city codes)
-  if (params.city) {
-    queryParams.city = params.city;
-  }
-  if (params.priceMin !== undefined) {
-    queryParams.price = `${params.priceMin}-${params.priceMax || ""}`;
-  } else if (params.priceMax !== undefined) {
-    queryParams.price = `-${params.priceMax}`;
-  }
-  if (params.roomsMin !== undefined || params.roomsMax !== undefined) {
-    queryParams.rooms = `${params.roomsMin || ""}-${params.roomsMax || ""}`;
-  }
+  logToFile("Starting Yad2 Search via Puppeteer...");
+  const page = await getPage();
 
   try {
-    const response = await axios.get<Yad2ApiResponse>(YAD2_API_BASE, {
-      params: queryParams,
-      headers: {
-        "User-Agent": USER_AGENT,
-        Accept: "application/json",
-        "Accept-Language": "he-IL,he;q=0.9,en;q=0.8",
-      },
-      timeout: 30000,
+    let basePath = "/realestate/rent";
+    if (params.city) {
+      // Remove spaces for the path or keep them? Yad2 usually replaces spaces with dashes or just uses encoded spaces.
+      // Let's try encoded city name in path.
+      basePath += `/${encodeURIComponent(params.city)}`;
+    }
+
+    const queryParts: string[] = [];
+    if (params.priceMin) queryParts.push(`price=${params.priceMin}-1000000`);
+    if (params.priceMax) queryParts.push(`price=${params.priceMin || 0}-${params.priceMax}`);
+    if (params.roomsMin || params.roomsMax) queryParts.push(`rooms=${params.roomsMin || 1}-${params.roomsMax || 12}`);
+    if (params.page && params.page > 1) queryParts.push(`page=${params.page}`);
+
+    const searchUrl = `https://www.yad2.co.il${basePath}${queryParts.length ? '?' + queryParts.join('&') : ''}`;
+    logToFile("Navigating to: " + searchUrl);
+
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+    if (await page.title() === "ShieldSquare Captcha") {
+      throw new Error("Blocked by ShieldSquare Captcha");
+    }
+
+    // 3. Extract Data
+    const data = await page.evaluate(() => {
+      const nextData = document.getElementById('__NEXT_DATA__');
+      return nextData ? JSON.parse(nextData.innerHTML) : null;
     });
 
-    const feed = response.data.feed;
-    const listings: Yad2Listing[] = feed.feed_items
-      .filter((item) => item.id && !item.merchant) // Filter out promoted/merchant items
-      .map((item) => ({
-        id: item.id,
-        token: item.token,
-        title: item.title_1 || item.title_2,
-        price: parsePrice(item.price),
-        city: item.city,
-        neighborhood: item.neighborhood,
-        street: item.street,
-        rooms: parseFloat(item.Rooms_text || "0"),
-        floor: parseFloor(item.floor_text),
-        squareMeters: parseInt(item.SquareMeter || "0", 10),
-        dateAdded: item.date_added || "",
-        images: (item.images || []).map((img) => img.src),
-        description: item.row_4,
-        contactName: item.contact_name,
-        url: `https://www.yad2.co.il/realestate/item/${item.token}`,
-      }));
+    if (!data) throw new Error("Failed to extract __NEXT_DATA__");
+
+    const props = data.props?.pageProps;
+
+    // Debugging logs
+    logToFile("PageProps Keys: " + Object.keys(props || {}).join(', '));
+    if (props?.initialState) logToFile("InitialState Keys: " + Object.keys(props.initialState).join(', '));
+
+    let feed = props?.feed ||
+      props?.initialState?.feed?.data ||
+      props?.initialState?.cat?.feed?.data ||
+      props?.search?.results;
+
+    if (!feed) {
+      // Try deeper search in typical places
+      try {
+        if (props?.initialState?.search) {
+          logToFile("Search State Keys: " + Object.keys(props.initialState.search).join(', '));
+        }
+      } catch (e) { }
+    }
+
+    let items: any[] = [];
+    let totalItems = 0;
+
+    if (feed) {
+      logToFile("Feed found. Keys: " + Object.keys(feed).join(', '));
+
+      // Handle the NEW structure (arrays)
+      if (Array.isArray(feed.private)) {
+        items = [...items, ...feed.private];
+      } else if (feed.private && feed.private.items) {
+        items = [...items, ...feed.private.items];
+      }
+
+      if (Array.isArray(feed.agency)) {
+        items = [...items, ...feed.agency];
+      } else if (feed.agency && feed.agency.items) {
+        items = [...items, ...feed.agency.items];
+      }
+
+      // Fallback for flat structure
+      if (items.length === 0) {
+        if (feed.feed_items) {
+          items = feed.feed_items;
+        } else if (Array.isArray(feed)) {
+          items = feed;
+        }
+      }
+
+      totalItems = feed.total_items || items.length;
+    } else {
+      logToFile("FEED OBJECT NOT FOUND IN EXPECTED LOCATIONS");
+    }
+
+    logToFile(`Found ${items.length} items`);
+
+    const listings: Yad2Listing[] = items.map((item: any) => {
+      // Map based on the NEW structure vs LEGACY structure
+      const res: Yad2Listing = {
+        id: String(item.id || item.orderId || item.token),
+        token: item.token || String(item.id),
+        title: item.title_1 || item.title_2 || item.search_text ||
+          (item.address ? `${item.additionalDetails?.property?.text || ''} ${item.address.street?.text || ''}` : "Listing"),
+        price: item.price ? Number(item.price) : parsePrice(item.price_text),
+        city: item.address?.city?.text || item.city || "",
+        neighborhood: item.address?.neighborhood?.text || item.neighborhood || "",
+        street: item.address?.street?.text || item.street || "",
+        rooms: parseFloat(String(item.additionalDetails?.roomsCount || item.Rooms_text || item.rooms || "0")),
+        floor: Number(item.address?.house?.floor ?? parseFloor(item.floor_text || item.floor)),
+        squareMeters: Number(item.additionalDetails?.squareMeter || item.SquareMeter || item.square_meters || "0"),
+        dateAdded: item.date_added || item.published_at || "",
+        images: item.metaData?.images || (item.images || []).map((img: any) => typeof img === 'string' ? img : img.src),
+        description: item.info_text || item.row_4 || item.text || "",
+        contactName: item.contact_name || item.contact?.name,
+        url: `https://www.yad2.co.il/realestate/item/${item.token || item.id}`,
+      };
+      return res;
+    });
 
     return {
       listings,
-      totalItems: feed.total_items,
-      totalPages: feed.total_pages,
-      currentPage: feed.current_page,
+      totalItems: totalItems,
+      totalPages: Math.ceil(totalItems / 40),
+      currentPage: params.page || 1
     };
+
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      throw new Error(
-        `Yad2 API error: ${axiosError.response?.status || "Network error"} - ${axiosError.message}`
-      );
-    }
+    logToFile("Puppeteer Search Error: " + error);
     throw error;
+  } finally {
+    // keeping tab open as per user request
+    // if (page) await page.close().catch(() => { });
   }
 }
 
 async function getYad2ListingDetails(token: string): Promise<Yad2Listing | null> {
-  const detailUrl = `https://gw.yad2.co.il/feed-search-legacy/item/${token}`;
-
+  // Simple implementation reusing search logic or just direct navigation
+  logToFile("Starting Yad2 Details Fetch via Puppeteer...");
+  const page = await getPage();
   try {
-    const response = await axios.get(detailUrl, {
-      headers: {
-        "User-Agent": USER_AGENT,
-        Accept: "application/json",
-      },
-      timeout: 15000,
+    const itemUrl = `https://www.yad2.co.il/realestate/item/${token}`;
+    logToFile("Navigating to item: " + itemUrl);
+    await page.goto(itemUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+    const data = await page.evaluate(() => {
+      const nextData = document.getElementById('__NEXT_DATA__');
+      return nextData ? JSON.parse(nextData.innerHTML) : null;
     });
 
-    const item = response.data;
+    if (!data) return null;
+
+    // Try to find listing data in props.pageProps.item or similar
+    const item = data.props?.pageProps?.item || data.props?.pageProps?.initialState?.item?.data;
+
     if (!item) return null;
 
     return {
@@ -161,21 +310,21 @@ async function getYad2ListingDetails(token: string): Promise<Yad2Listing | null>
       city: item.city,
       neighborhood: item.neighborhood,
       street: item.street,
-      rooms: parseFloat(item.Rooms_text || "0"),
+      rooms: parseFloat(item.Rooms_text || item.rooms || "0"),
       floor: parseFloor(item.floor_text),
-      squareMeters: parseInt(item.SquareMeter || "0", 10),
+      squareMeters: parseInt(item.SquareMeter || item.square_meters || "0", 10),
       dateAdded: item.date_added || "",
-      images: (item.images || []).map((img: { src: string }) => img.src),
-      description: item.info_text || item.row_4,
-      contactName: item.contact_name,
-      contactPhone: item.phone,
-      url: `https://www.yad2.co.il/realestate/item/${token}`,
+      images: (item.images || []).map((img: any) => typeof img === 'string' ? img : img.src),
+      description: item.info_text,
+      url: itemUrl
     };
+
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null;
-    }
-    throw error;
+    logToFile("Get Details Error: " + error);
+    return null;
+  } finally {
+    // keeping tab open as per user request
+    // if (page) await page.close().catch(() => { });
   }
 }
 
