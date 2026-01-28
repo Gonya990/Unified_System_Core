@@ -400,10 +400,24 @@ def start_scheduler():
 
     print("🚀 OPTIMIZED Scheduler running (3 videos/day + Weekly Documentary). Waiting...")
     print("📅 Daily: 09:00 RU | 14:00 EN | 20:00 Cartoon")
-    print("📅 Weekly: Sun 10:00 Hebrew | Sat 18:00 Documentary (30 min)")
+    # Priority: Brand > Context > News
+    modes = ["brand"] * 3 + ["context"] * 2 + ["auto"]
+    
     while True:
-        schedule.run_pending()
-        time.sleep(60)
+        mode = random.choice(modes)
+        print(f"🚀 Starting cycle: {mode}")
+        
+        try:
+            if mode == "brand":
+                run_brand_pipeline()
+            elif mode == "context":
+                run_context_pipeline()
+            else:
+                run_daily_cycle()
+        except Exception as e:
+            print(f"❌ Cycle failed: {e}")
+            
+        time.sleep(300) # 5 min pause
 
 
 if __name__ == "__main__":
