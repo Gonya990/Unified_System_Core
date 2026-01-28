@@ -494,19 +494,62 @@ def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
     return resolved
 
 
-def generate_vision_assets(scenes, output_dir: Path, style="impact"):
-    """💎 VIBRANIUM TRIPLE-THREAT: Free-First Failover Chain"""
-    # For styles that rely heavily on generation (sketch/painting/cartoon), avoid Pexels unless last resort
-    # For impact, we might want Pexels if user prefers stock footage, but let's stick to generation first for uniformity
+def check_local_context_files(scenes, output_dir: Path):
+    """Search for matching keywords in local Context/ folder"""
+    context_dir = ROOT_DIR / "Context"
+    if not context_dir.exists():
+        return []
+        
+    resolved = []
+    import shutil
+    
+    # Simple keyword matching from filenames
+    # Get all image/video files
+    candidates = list(context_dir.rglob("*.jpg")) + list(context_dir.rglob("*.png")) + list(context_dir.rglob("*.mp4"))
+    
+    print(f"📂 Checking {len(candidates)} local context files for matches...")
+    
+    for s in scenes:
+        kw = s['keyword'].lower().split()
+        best_match = None
+        
+        for cand in candidates:
+            # Check if any keyword matches filename
+            cand_name = cand.stem.lower()
+            if any(k in cand_name for k in kw):
+                best_match = cand
+                break
+        
+        if best_match:
+            # Copy to assets folder to ensure availability
+            dest = output_dir / best_match.name
+            shutil.copy2(best_match, dest)
+            s["resolved_path"] = str(dest)
+            resolved.append(s)
+            print(f"   ✅ Local Context Match: {s['image']} <- {best_match.name}")
+            
+    return resolved
 
-    print(f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Free → Paid Failover (Style: {style})")
-    print("   Priority: Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels")
+
+def generate_vision_assets(scenes, output_dir: Path, style="impact"):
+    """💎 VIBRANIUM TRIPLE-THREAT: Local Context → Free → Paid Failover"""
+    print(f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})")
+    print("   Priority: Context → Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels")
+
+    # LEVEL 0: LOCAL CONTEXT (Highest Priority - Brand Assets)
+    resolved = check_local_context_files(scenes, output_dir)
+    if len(resolved) == len(scenes):
+        print("✅ All assets found in Local Context")
+        return resolved
 
     # FREE TIER 1: Gemini 2.0 Flash Image (Best Quality, Free)
-    resolved = generate_gemini_images(scenes, output_dir, style=style)
-    if len(resolved) == len(scenes):
-        print("✅ All images generated via Gemini 2.0 (FREE)")
-        return resolved
+    missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+    if missing:
+        gemini_results = generate_gemini_images(missing, output_dir, style=style)
+        resolved.extend(gemini_results)
+        if len(resolved) == len(scenes):
+            print("✅ All images generated via Gemini 2.0 (FREE)")
+            return resolved
 
     # FREE TIER 2: Flux.1 Schnell (Fast, Local)
     missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
