@@ -27,6 +27,8 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+Projects/Content_Factory/venv/
+Projects/Content_Factory/outputs/
 
 # Windows
 Thumbs.db
