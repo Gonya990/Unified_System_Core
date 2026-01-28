@@ -3,7 +3,13 @@
 # Ensures environment, paths and tokens are correctly set
 
 # 1. Setup paths
-export ROOT_DIR="/home/gonya/Unified_System"
+# Detect OS and set root
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export ROOT_DIR="$HOME/Documents/Unified_System_Core"
+else
+    export ROOT_DIR="/home/gonya/Unified_System"
+fi
+
 export FACTORY_DIR="$ROOT_DIR/Projects/Content_Factory"
 export VENV_PATH="$FACTORY_DIR/venv"
 export PATH="$VENV_PATH/bin:/usr/local/bin:/usr/bin:/bin"

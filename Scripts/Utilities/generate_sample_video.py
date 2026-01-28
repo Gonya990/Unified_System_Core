@@ -57,7 +57,11 @@ async def generate_sample():
     if not hasattr(Image, 'ANTIALIAS'):
         Image.ANTIALIAS = Image.LANCZOS
 
-    from moviepy.editor import AudioFileClip, ColorClip, ImageClip, concatenate_videoclips
+    try:
+        from moviepy import AudioFileClip, ColorClip, ImageClip, concatenate_videoclips
+    except ImportError:
+        # Fallback for older versions
+        from moviepy.editor import AudioFileClip, ColorClip, ImageClip, concatenate_videoclips
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -99,11 +103,11 @@ async def generate_sample():
             duration = audio_clip.duration + 0.5
 
             if found_image:
-                video_clip = ImageClip(str(img_path)).set_duration(duration)
+                video_clip = ImageClip(str(img_path)).with_duration(duration)
             else:
                 # Fallback Color
                 color = (random.randint(0,50), random.randint(0,50), random.randint(50,150))
-                video_clip = ColorClip(size=(1280, 720), color=color).set_duration(duration)
+                video_clip = ColorClip(size=(1280, 720), color=color).with_duration(duration)
 
             # Subtitles (simple logic)
             # Try to add text, if fails return clean clip
@@ -116,8 +120,8 @@ async def generate_sample():
             except Exception:
                 pass
 
-            video_clip = video_clip.set_audio(audio_clip)
-            video_clip = video_clip.resize(width=1280) # Ensure size consistency
+            video_clip = video_clip.with_audio(audio_clip)
+            video_clip = video_clip.resized(width=1280) # Ensure size consistency
             clips.append(video_clip)
 
         print("🎞️ Concatenating final video...")
