@@ -95,8 +95,9 @@ hooks/hooks_server.err
 # Session and cookie data from browser extraction
 browser_sessions.json
 webtop_session.json
-# .beads/ we need beads to sync
-# .claude/ we do want tools and commands, dont ignore
+# .beads/ and .claude/ must be synced
+!.beads/
+!.claude/
 tmp/
 tmp_backup/
 
