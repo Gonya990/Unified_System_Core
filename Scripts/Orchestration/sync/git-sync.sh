@@ -14,7 +14,7 @@ echo "=========================================="
 
 # 1. Check current status
 echo -e "\n${YELLOW}[1/4] Checking local status...${NC}"
-if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+if ! git diff-index --quiet HEAD --ignore-submodules -- 2>/dev/null; then
     echo -e "${RED}Uncommitted changes detected:${NC}"
     git status --short
     echo ""
