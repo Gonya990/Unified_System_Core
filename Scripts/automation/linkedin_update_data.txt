@@ -1,0 +1,132 @@
+============================================================
+        LINKEDIN PROFILE UPDATE DATA
+        Данные для обновления профиля LinkedIn
+============================================================
+
+Профиль: https://www.linkedin.com/in/igor-goncha
+
+============================================================
+📛 ИМЯ / NAME
+============================================================
+Igor Goncharenko
+
+============================================================
+📌 ЗАГОЛОВОК / HEADLINE
+============================================================
+Supervisor | Project Coordinator | Systems Implementation
+
+============================================================
+📝 О СЕБЕ / ABOUT
+============================================================
+Experienced Supervisor with 7+ years in infrastructure, telecom, and high-rise construction projects. Currently leading elevator installation at BEYOND Tower – one of Israel's tallest buildings.
+
+My strengths: Coordinating complex operations, managing teams under pressure, and ensuring quality delivery on tight schedules.
+
+🔧 Key Skills: Project Coordination, Team Management, Field Supervision, Quality Control, Logistics, Safety Compliance
+
+📍 Based in Israel | Open to new opportunities
+
+============================================================
+💼 ТЕКУЩАЯ ПОЗИЦИЯ / CURRENT POSITION
+============================================================
+Title: Supervisor / PM Assistant
+Company: Schindler
+Location: Israel
+Start: August 2023 - Present
+
+Description:
+BEYOND Tower Project
+• Lead field operations for smart elevator installation
+• Coordinate 10+ subcontractors and technical teams
+• Client and management interface
+• Quality, safety, and manufacturer specs compliance
+
+============================================================
+📜 ОПЫТ РАБОТЫ / EXPERIENCE
+============================================================
+
+--- Position 1 ---
+Title: Supervisor / PM Assistant
+Company: Schindler
+Period: Aug 2023 - Present
+Description:
+BEYOND Tower Project
+• Lead field operations for smart elevator installation
+• Coordinate 10+ subcontractors and technical teams
+• Client and management interface
+• Quality, safety, and manufacturer specs compliance
+
+--- Position 2 ---
+Title: Team Lead – Fiber Optics
+Company: URICOMS (Partner Communications)
+Period: 2019 - 2023
+Description:
+• Led fiber optic network deployment (FTTx) across Central Israel
+• Managed regional teams, schedules, and quality targets
+• Complex troubleshooting at central offices and field sites
+
+--- Position 3 ---
+Title: Installation Technician
+Company: Vira & Assemblies Ltd
+Period: 2020 - 2022
+Description:
+• Elevator installation and testing
+• Work per test documentation and safety procedures
+
+============================================================
+🎯 НАВЫКИ / SKILLS
+============================================================
+• Project Coordination
+• Team Management
+• Field Supervision
+• Quality Control
+• Logistics
+• Safety Compliance
+• Fiber Optics
+• Elevator Systems
+• Technical Documentation
+• Subcontractor Management
+• Scheduling & Reporting
+
+============================================================
+🌍 ЯЗЫКИ / LANGUAGES
+============================================================
+• Hebrew - Professional working proficiency
+• Russian - Native
+• Ukrainian - Native
+• English - Elementary
+
+============================================================
+📜 СЕРТИФИКАТЫ / CERTIFICATIONS
+============================================================
+• Driver's License B
+• Forklift License (20T)
+• Height Work Certified
+
+============================================================
+⚔️ ВОЕННАЯ СЛУЖБА / MILITARY
+============================================================
+IDF - Air Force | 2013-2015 | Mission Driver | Sergeant
+
+============================================================
+📚 ОБРАЗОВАНИЕ / EDUCATION
+============================================================
+• Full High School Education – Ukraine
+• Professional Mechanics Training – 3 years, Ukraine
+
+============================================================
+🔗 КАК ОБНОВИТЬ ПРОФИЛЬ
+============================================================
+
+1. Откройте: https://www.linkedin.com/in/igor-goncharenko/edit/intro/
+2. Обновите Headline (заголовок) на указанный выше
+3. Обновите About (О себе) на текст выше
+4. Перейдите в Experience и проверьте/обновите позиции
+5. Добавьте Skills из списка выше
+6. Добавьте Languages
+7. Включите "Open to Work" если нужно
+
+============================================================
+        Generated: 2026-01-11 14:20
+        Source: RESUME_VARIANTS.md (Variant C)
+============================================================

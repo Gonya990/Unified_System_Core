@@ -14,7 +14,7 @@ catch wait
 send_user "\n[2/2] Starting bot in BACKGROUND...\n"
 # Using PowerShell Start-Process with -WindowStyle Hidden to detach from SSH session
 # Redirecting output to a file so we can debug if needed
-spawn ssh -o StrictHostKeyChecking=no $host "powershell -Command \"Start-Process uv -ArgumentList 'run python ai_telegram_bot.py' -WorkingDirectory 'Desktop/Windows_AI_Core/src' -WindowStyle Minimized\""
+spawn ssh -o StrictHostKeyChecking=no $host "powershell -Command \"Start-Process uv -ArgumentList 'run python ai_telegram_bot.py' -WorkingDirectory 'Desktop/Projects/AI_Core/src' -WindowStyle Minimized\""
 expect {
     "password:" { send "$password\r"; exp_continue }
     eof

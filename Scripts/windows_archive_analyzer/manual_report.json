@@ -1,0 +1,18 @@
+{
+    "Timestamp": "2026-01-14 22:45:00",
+    "TotalCount": 1,
+    "TotalSizeGB": 0.02,
+    "Archives": [
+        {
+            "Path": "C:\\Users\\gonya\\Saved Games\\Perfect World\\packages\\avresources1\\bin.7z",
+            "Name": "bin.7z",
+            "SizeGB": 0.02,
+            "SizeMB": 25.31,
+            "Created": "2025-12-28 21:58:00",
+            "Modified": "2025-12-28 21:58:00",
+            "AgeDays": 17,
+            "Drive": "C:",
+            "Extension": ".7z"
+        }
+    ]
+}

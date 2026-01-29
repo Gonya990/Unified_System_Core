@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Unified System - Admin Report | 2025-12-30 (Scan 2)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #0f172a;
+            --bg-tertiary: #1e293b;
+            --bg-card: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
+            --glow-green: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-card);
+            border-radius: 24px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            display: block;
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-online {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .code-snippet {
+            background: #000;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+    <div class="container">
+        <header class="hero">
+            <h1>🛡️ Unified System | Express Scan</h1>
+            <div class="status-badge">● System Stable</div>
+            <div style="color: var(--text-secondary); margin-top: 1rem;">December 30, 2025, 21:20</div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="value">67</span>
+                <span class="label">Parallel Connections</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">29ms</span>
+                <span class="label">Ping to Proxmox</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">33.3%</span>
+                <span class="label">Peak CPU (Renderer)</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">UP TO DATE</span>
+                <span class="label">Git Status</span>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-header">🖥️ Nodes & Availability</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>IP</th>
+                            <th>OS</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>macbook-air</td>
+                            <td>100.93.121.47</td>
+                            <td>macOS</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>igor-gaming-1</td>
+                            <td>100.78.144.50</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>pve-antigravity-1</td>
+                            <td>100.74.137.122</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>pve (main)</td>
+                            <td>100.78.145.67</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>smart</td>
+                            <td>100.81.133.25</td>
+                            <td>linux</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>igor-gaming (pc)</td>
+                            <td>100.127.194.111</td>
+                            <td>windows</td>
+                            <td><span class="badge badge-online">ONLINE</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">🛠️ Repository State</div>
+            <div class="section-content">
+                <div class="code-snippet">
+                    On branch main<br>
+                    Your branch is up to date with 'origin/main'.<br>
+                    Nothing to commit, working tree clean
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">🚀 Top Processes</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CPU %</th>
+                            <th>Command</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>33.3</td>
+                            <td>Antigravity Helper (Renderer)</td>
+                            <td>AI Agent Core</td>
+                        </tr>
+                        <tr>
+                            <td>21.5</td>
+                            <td>WindowServer</td>
+                            <td>OS System</td>
+                        </tr>
+                        <tr>
+                            <td>14.8</td>
+                            <td>language_server_macos_arm</td>
+                            <td>Development</td>
+                        </tr>
+                        <tr>
+                            <td>11.5</td>
+                            <td>Antigravity Helper (GPU)</td>
+                            <td>Hardware Accel</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

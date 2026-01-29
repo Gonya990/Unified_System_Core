@@ -2,18 +2,19 @@
 
 ## ✅ Deployment Complete
 
-**Date:** 2025-12-25  
-**Location:** igor-gaming-1 (100.88.65.71)  
+**Date:** 2026-01-12 (Updated)  
+**Location:** unified-home-core-cloud (100.110.209.49)  
 **Status:** Operational
 
 ## Configuration
 
 ### Hub Details
 
-- **URL:** `http://100.88.65.71:8765/mcp`
-- **Auth Token:** `antigravity_secret`
+- **URL:** `http://100.110.209.49:8765/mcp`
+- **Auth Token:** See `.env` file
 - **Database:** SQLite (`/opt/mcp-agent-mail/data/agent_mail.db`)
 - **Storage:** `/opt/mcp-agent-mail/data/mailbox`
+- **Git Repo:** `https://github.com/KostaGorod/mcp_agent_mail.git` (fork)
 
 ### Project
 
@@ -115,7 +116,7 @@ Located at: `infra/setup_central_hub.sh`
 
 ## Next Steps
 
-1. ✅ Deploy hub on igor-gaming-1
+1. ✅ Deploy hub on unified-home-core-cloud
 2. ✅ Verify message delivery
 3. 🔄 Update mission_sync.sh for beads integration
 4. 🔄 Configure local agents to use centralized hub
@@ -126,19 +127,63 @@ Located at: `infra/setup_central_hub.sh`
 ### View Logs
 
 ```bash
-ssh igor-gaming-1 "docker logs acfs-hub-server-1"
+ssh gonya@100.110.209.49 "sudo journalctl -u mcp-agent-mail -f"
 ```
 
 ### Restart Hub
 
 ```bash
-ssh igor-gaming-1 "cd acfs-hub && docker compose restart server"
+ssh gonya@100.110.209.49 "sudo systemctl restart mcp-agent-mail"
 ```
 
-### Database Migration
+### Service Location
 
 ```bash
-ssh igor-gaming-1 "docker exec acfs-hub-server-1 python -m mcp_agent_mail.cli migrate"
+# Running at: /opt/mcp-agent-mail
+# Started via: uv run python -m mcp_agent_mail.cli serve-http --host 0.0.0.0 --port 8765
+```
+
+## Deployment Runbook (Git-Based)
+
+### Update to Latest Version
+
+```bash
+ssh gonya@100.110.209.49 "cd /opt/mcp-agent-mail && sudo git pull origin main && sudo uv sync && sudo systemctl restart mcp-agent-mail"
+```
+
+### Full Redeploy
+
+```bash
+# Backup and clone fresh
+ssh gonya@100.110.209.49 "sudo mv /opt/mcp-agent-mail /opt/mcp-agent-mail.bak && \
+  sudo git clone https://github.com/KostaGorod/mcp_agent_mail.git /opt/mcp-agent-mail && \
+  sudo cp /opt/mcp-agent-mail.bak/.env /opt/mcp-agent-mail/.env && \
+  cd /opt/mcp-agent-mail && sudo uv sync && \
+  sudo systemctl restart mcp-agent-mail"
+```
+
+### Push Local Changes to Production
+
+```bash
+# From local machine (External_Tools/Stack/mcp_agent_mail)
+cd External_Tools/Stack/mcp_agent_mail
+git push fork main  # Push to KostaGorod/mcp_agent_mail
+
+# Then on server
+ssh gonya@100.110.209.49 "cd /opt/mcp-agent-mail && sudo git pull origin main && sudo uv sync && sudo systemctl restart mcp-agent-mail"
+```
+
+### Verify Deployment
+
+```bash
+# Check service status
+ssh gonya@100.110.209.49 "sudo systemctl status mcp-agent-mail --no-pager"
+
+# Check list_agents tool is present
+ssh gonya@100.110.209.49 "grep -l 'list_agents' /opt/mcp-agent-mail/src/mcp_agent_mail/app.py"
+
+# Test health endpoint
+curl -H "Authorization: Bearer <token>" http://100.110.209.49:8765/health
 ```
 
 ## Security Notes

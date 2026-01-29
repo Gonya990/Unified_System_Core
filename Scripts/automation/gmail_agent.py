@@ -7,15 +7,17 @@ Automatically monitors and processes emails from gonya90.gg@gmail.com
 Автоматически мониторит и обрабатывает письма с gonya90.gg@gmail.com
 """
 
+# SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
+import base64
+import json
 import os
 import sys
-import json
-import pickle
-import base64
 from datetime import datetime, timedelta
-from pathlib import Path
 from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from pathlib import Path
+
+import requests
+from dotenv import load_dotenv
 
 # Gmail API imports
 try:
@@ -26,14 +28,16 @@ try:
     from googleapiclient.errors import HttpError
 except ImportError:
     print("❌ Gmail API libraries not installed!")
-    print("Install with: pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib")
+    print(
+        "Install with: pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
+    )
     sys.exit(1)
 
 # Scopes for Gmail API
 SCOPES = [
-    'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.modify'
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/gmail.modify",
 ]
 
 # Paths
@@ -41,10 +45,14 @@ SCOPES = [
 # Script is in: Unified_System/Scripts/automation/gmail_agent.py
 # Base should be: Unified_System/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_ADMIN_CHAT_ID")
 CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDS_DIR.mkdir(parents=True, exist_ok=True)
 
-TOKEN_PATH = CREDS_DIR / "gmail_token.pickle"
+TOKEN_PATH = CREDS_DIR / "gmail_token.json"  # Migrated from pickle for security
 CREDENTIALS_PATH = CREDS_DIR / "gmail_credentials.json"
 EMAIL_DB_PATH = BASE_DIR / "logs" / "automation" / "email_database.json"
 
@@ -54,60 +62,145 @@ CATEGORIES = {
     "urgent": {
         "keywords": ["urgent", "asap", "important", "срочно", "важно", "דחוף", "מיידי"],
         "icon": "🔴",
-        "senders": []
+        "senders": [],
     },
     "work": {
-        "keywords": ["interview", "job", "position", "vacancy", "работа", "вакансия", "משרה", "schindler"],
+        "keywords": [
+            "interview",
+            "job",
+            "position",
+            "vacancy",
+            "работа",
+            "вакансия",
+            "משרה",
+            "schindler",
+        ],
         "icon": "💼",
-        "senders": ["@schindler"]
+        "senders": ["@schindler"],
     },
-    
     # Shopping
     "shopping": {
-        "keywords": ["order", "shipped", "delivered", "tracking", "заказ", "доставка", "משלוח", "הזמנה"],
+        "keywords": [
+            "order",
+            "shipped",
+            "delivered",
+            "tracking",
+            "заказ",
+            "доставка",
+            "משלוח",
+            "הזמנה",
+        ],
         "icon": "🛒",
-        "senders": ["@amazon", "@ebay", "@aliexpress", "@rozetka", "@shein", "@asos", "@zara", "@hm.com", "@ikea"]
+        "senders": [
+            "@amazon",
+            "@ebay",
+            "@aliexpress",
+            "@rozetka",
+            "@shein",
+            "@asos",
+            "@zara",
+            "@hm.com",
+            "@ikea",
+        ],
     },
-    
     # Banks IL
     "bank": {
-        "keywords": ["transaction", "העברה", "יתרה", "חיוב", "זיכוי", "כרטיס אשראי", "bank", "בנק", "פעולה"],
+        "keywords": [
+            "transaction",
+            "העברה",
+            "יתרה",
+            "חיוב",
+            "זיכוי",
+            "כרטיס אשראי",
+            "bank",
+            "בנק",
+            "פעולה",
+        ],
         "icon": "🏦",
-        "senders": ["@bankhapoalim", "@poalim", "@leumi", "@discountbank", "@mizrahi-tefahot", "@fibi", "@isracard", "@max.co.il", "@cal-online", "@visa", "@mastercard"]
+        "senders": [
+            "@bankhapoalim",
+            "@poalim",
+            "@leumi",
+            "@discountbank",
+            "@mizrahi-tefahot",
+            "@fibi",
+            "@isracard",
+            "@max.co.il",
+            "@cal-online",
+            "@visa",
+            "@mastercard",
+        ],
     },
-    
     # Government IL
     "gov": {
-        "keywords": ["gov.il", "ביטוח לאומי", "משרד הפנים", "מס הכנסה", "עירייה", "מינהל", "רשות", "משרד"],
+        "keywords": [
+            "gov.il",
+            "ביטוח לאומי",
+            "משרד הפנים",
+            "מס הכנסה",
+            "עירייה",
+            "מינהל",
+            "רשות",
+            "משרד",
+        ],
         "icon": "🏛️",
-        "senders": ["@gov.il", "@btl.gov.il", "@taxes.gov.il", "@justice.gov.il", "@health.gov.il", "@moin.gov.il"]
+        "senders": [
+            "@gov.il",
+            "@btl.gov.il",
+            "@taxes.gov.il",
+            "@justice.gov.il",
+            "@health.gov.il",
+            "@moin.gov.il",
+        ],
     },
-    
+    "family": {
+        "keywords": ["family", "invite", "приглашение", "семейная группа", "gorode"],
+        "icon": "🏠",
+        "senders": ["families-noreply@google.com"],
+    },
     # Payments IL
     "payment": {
         "keywords": ["bit", "paybox", "pepper", "העברה", "קיבלת", "שילמת", "תשלום"],
         "icon": "💳",
-        "senders": ["@bit.co.il", "@paybox", "@pepper.co.il", "@paypal", "@wise.com"]
+        "senders": ["@bit.co.il", "@paybox", "@pepper.co.il", "@paypal", "@wise.com"],
     },
-    
     # Tech/Dev
     "github": {
-        "keywords": ["github", "pull request", "commit", "repository", "issue", "merge"],
+        "keywords": [
+            "github",
+            "pull request",
+            "commit",
+            "repository",
+            "issue",
+            "merge",
+        ],
         "icon": "🐙",
-        "senders": ["@github.com", "@gitlab"]
+        "senders": ["@github.com", "@gitlab", "gitguardian"],
+    },
+    "security": {
+        "keywords": ["security alert", "incident detected", "breach", "vulnerability", "утечка", "секрет", "обнаружен"],
+        "icon": "👮",
+        "senders": ["gitguardian", "@auth", "security"],
     },
     "linkedin": {
         "keywords": ["linkedin", "connection", "invitation", "network", "job alert"],
         "icon": "💼",
-        "senders": ["@linkedin.com"]
+        "senders": ["@linkedin.com"],
     },
-    
     # Low priority
     "spam": {
-        "keywords": ["unsubscribe", "lottery", "winner", "prize", "click here", "спам", "הסר מרשימה"],
+        "keywords": [
+            "unsubscribe",
+            "lottery",
+            "winner",
+            "prize",
+            "click here",
+            "спам",
+            "הסר מרשימה",
+        ],
         "icon": "⚪",
-        "senders": []
-    }
+        "senders": [],
+    },
 }
 
 
@@ -117,12 +210,11 @@ def get_gmail_service():
     Аутентификация и возврат сервиса Gmail API
     """
     creds = None
-    
-    # Load existing token
+
+    # Load existing token (JSON format - migrated from pickle for security)
     if TOKEN_PATH.exists():
-        with open(TOKEN_PATH, 'rb') as token:
-            creds = pickle.load(token)
-    
+        creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
+
     # Refresh or create new credentials
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -130,7 +222,7 @@ def get_gmail_service():
         else:
             if not CREDENTIALS_PATH.exists():
                 print("❌ Gmail credentials not found!")
-                print(f"Please download OAuth2 credentials from Google Cloud Console")
+                print("Please download OAuth2 credentials from Google Cloud Console")
                 print(f"And save to: {CREDENTIALS_PATH}")
                 print("\nSteps:")
                 print("1. Go to: https://console.cloud.google.com/apis/credentials")
@@ -138,45 +230,103 @@ def get_gmail_service():
                 print("3. Download JSON")
                 print(f"4. Save as: {CREDENTIALS_PATH}")
                 sys.exit(1)
-            
-            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
+
+            flow = InstalledAppFlow.from_client_secrets_file(
+                str(CREDENTIALS_PATH), SCOPES
+            )
             creds = flow.run_local_server(port=0)
-        
-        # Save credentials
-        with open(TOKEN_PATH, 'wb') as token:
-            pickle.dump(creds, token)
-    
-    return build('gmail', 'v1', credentials=creds)
+
+        # Save credentials as JSON (secure format)
+        with open(TOKEN_PATH, "w") as token:
+            token.write(creds.to_json())
+
+    return build("gmail", "v1", credentials=creds)
 
 
 def categorize_email(subject, body, sender):
     """
     Categorize email based on sender and content
     Категоризация письма на основе отправителя и содержимого
-    
+
     Priority: sender patterns > keywords
     """
     sender_lower = sender.lower()
-    
+
     # Check sender patterns first (more reliable)
     for category, data in CATEGORIES.items():
         senders = data.get("senders", [])
         for sender_pattern in senders:
             if sender_pattern in sender_lower:
                 return category
-    
+
     # Then check keywords in content
     content = f"{subject} {body}".lower()
     for category, data in CATEGORIES.items():
         for keyword in data["keywords"]:
             if keyword in content:
                 return category
-    
+
     return "info"
 
 
+def send_telegram_alert(category, subject, sender, body_preview):
+    """
+    Send a notification to Telegram based on category priority
+    """
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("⚠️ Telegram credentials not found, skipping alert")
+        return
+
+    # Define icons and alerts
+    priority_map = {
+        "urgent": "🚨 URGENT",
+        "work": "💼 WORK",
+        "family": "🏠 FAMILY",
+        "security": "👮 SECURITY", # New category for gitguardian etc
+        "github": "🐙 GIT",
+        "payment": "💰 MONEY"
+    }
+
+    # Only alert for specific categories
+    if category not in priority_map:
+        return
+
+    header = priority_map[category]
+
+    import html
+
+    # Construct message
+    safe_sender = html.escape(sender)
+    safe_subject = html.escape(subject)
+    safe_preview = html.escape(body_preview[:100])
+
+    message = (
+        f"{header}\n\n"
+        f"<b>From:</b> {safe_sender}\n"
+        f"<b>Subject:</b> {safe_subject}\n"
+        f"<i>{safe_preview}...</i>"
+    )
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        if response.status_code == 200:
+            print(f"✈️ Telegram alert sent for: {subject[:30]}...")
+        else:
+            print(f"⚠️ Failed to send Telegram alert: {response.text}")
+    except Exception as e:
+        print(f"⚠️ Error sending Telegram alert: {e}")
+
+
 import argparse
-from email.mime.text import MIMEText
+
 
 def send_email(service, to, subject, body):
     """
@@ -185,26 +335,30 @@ def send_email(service, to, subject, body):
     """
     try:
         message = MIMEText(body)
-        message['to'] = to
-        message['from'] = 'me'
-        message['subject'] = subject
-        
-        raw = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
-        body = {'raw': raw}
-        
-        message = service.users().messages().send(userId='me', body=body).execute()
+        message["to"] = to
+        message["from"] = "me"
+        message["subject"] = subject
+
+        raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+        body = {"raw": raw}
+
+        message = service.users().messages().send(userId="me", body=body).execute()
         print(f"✅ Email sent to {to} (ID: {message['id']})")
         return message
     except HttpError as error:
         print(f"❌ Error sending email: {error}")
         return None
 
+
 def get_unread_emails(service, max_results=50):
     """
     Get all unread emails
     Получить все непрочитанные письма
     """
-    return get_recent_emails(service, hours=24 * 7, max_results=max_results, query='is:unread')
+    return get_recent_emails(
+        service, hours=24 * 7, max_results=max_results, query="is:unread"
+    )
+
 
 def get_recent_emails(service, hours=24, max_results=50, query=None):
     """
@@ -216,57 +370,78 @@ def get_recent_emails(service, hours=24, max_results=50, query=None):
             # Calculate timestamp
             since = datetime.now() - timedelta(hours=hours)
             query = f"after:{int(since.timestamp())}"
-        
-        results = service.users().messages().list(
-            userId='me',
-            q=query,
-            maxResults=max_results
-        ).execute()
-        
-        messages = results.get('messages', [])
-        
+
+        results = (
+            service.users()
+            .messages()
+            .list(userId="me", q=query, maxResults=max_results)
+            .execute()
+        )
+
+        messages = results.get("messages", [])
+
         emails = []
         for msg in messages:
             try:
-                email_data = service.users().messages().get(
-                    userId='me',
-                    id=msg['id'],
-                    format='full'
-                ).execute()
-                
-                headers = email_data['payload']['headers']
-                subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'No Subject')
-                sender = next((h['value'] for h in headers if h['name'] == 'From'), 'Unknown')
-                date = next((h['value'] for h in headers if h['name'] == 'Date'), '')
-                
+                email_data = (
+                    service.users()
+                    .messages()
+                    .get(userId="me", id=msg["id"], format="full")
+                    .execute()
+                )
+
+                headers = email_data["payload"]["headers"]
+                subject = next(
+                    (h["value"] for h in headers if h["name"] == "Subject"),
+                    "No Subject",
+                )
+                sender = next(
+                    (h["value"] for h in headers if h["name"] == "From"), "Unknown"
+                )
+                date = next((h["value"] for h in headers if h["name"] == "Date"), "")
+
                 # Get body
-                body = ''
-                if 'parts' in email_data['payload']:
-                    for part in email_data['payload']['parts']:
-                        if part['mimeType'] == 'text/plain':
-                            if 'data' in part['body']:
-                                body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8')
+                body = ""
+                if "parts" in email_data["payload"]:
+                    for part in email_data["payload"]["parts"]:
+                        if part["mimeType"] == "text/plain":
+                            if "data" in part["body"]:
+                                body = base64.urlsafe_b64decode(
+                                    part["body"]["data"]
+                                ).decode("utf-8")
                                 break
-                elif 'body' in email_data['payload'] and 'data' in email_data['payload']['body']:
-                    body = base64.urlsafe_b64decode(email_data['payload']['body']['data']).decode('utf-8')
-                
+                elif (
+                    "body" in email_data["payload"]
+                    and "data" in email_data["payload"]["body"]
+                ):
+                    body = base64.urlsafe_b64decode(
+                        email_data["payload"]["body"]["data"]
+                    ).decode("utf-8")
+
                 # Categorize
+                body_preview = body[:200] if body else ""
                 category = categorize_email(subject, body[:500], sender)
-                
-                emails.append({
-                    'id': msg['id'],
-                    'subject': subject,
-                    'sender': sender,
-                    'date': date,
-                    'category': category,
-                    'body_preview': body[:200] if body else ''
-                })
+
+                emails.append(
+                    {
+                        "id": msg["id"],
+                        "subject": subject,
+                        "sender": sender,
+                        "date": date,
+                        "category": category,
+                        "body_preview": body_preview,
+                    }
+                )
+
+                # Send Alert immediately for fresh emails
+                send_telegram_alert(category, subject, sender, body_preview)
+
             except Exception as e:
                 print(f"⚠️ Error processing message {msg['id']}: {e}")
                 continue
-        
+
         return emails
-    
+
     except HttpError as error:
         print(f"❌ Error fetching emails: {error}")
         return []
@@ -278,24 +453,24 @@ def save_email_database(emails):
     Сохранить письма в базу данных
     """
     EMAIL_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Load existing
     if EMAIL_DB_PATH.exists():
-        with open(EMAIL_DB_PATH, 'r') as f:
+        with open(EMAIL_DB_PATH) as f:
             db = json.load(f)
     else:
         db = {"emails": [], "last_check": None}
-    
+
     # Add new emails (avoid duplicates)
-    existing_ids = {e['id'] for e in db['emails']}
-    new_emails = [e for e in emails if e['id'] not in existing_ids]
-    
-    db['emails'].extend(new_emails)
-    db['last_check'] = datetime.now().isoformat()
-    
-    with open(EMAIL_DB_PATH, 'w') as f:
+    existing_ids = {e["id"] for e in db["emails"]}
+    new_emails = [e for e in emails if e["id"] not in existing_ids]
+
+    db["emails"].extend(new_emails)
+    db["last_check"] = datetime.now().isoformat()
+
+    with open(EMAIL_DB_PATH, "w") as f:
         json.dump(db, f, indent=2, ensure_ascii=False)
-    
+
     return len(new_emails)
 
 
@@ -309,25 +484,25 @@ def print_email_summary(emails):
     print("║   Агент автоматизации Gmail - Сводка писем                  ║")
     print("╚══════════════════════════════════════════════════════════════╝")
     print()
-    
+
     # Count by category
     stats = {}
     for email in emails:
-        cat = email['category']
+        cat = email["category"]
         stats[cat] = stats.get(cat, 0) + 1
-    
+
     print("📊 Email Statistics | Статистика писем:")
     print()
     for category, count in sorted(stats.items(), key=lambda x: x[1], reverse=True):
-        icon = CATEGORIES.get(category, {}).get('icon', '📧')
+        icon = CATEGORIES.get(category, {}).get("icon", "📧")
         print(f"  {icon} {category.title()}: {count}")
-    
+
     print()
     print(f"Total: {len(emails)} emails")
     print()
-    
+
     # Show urgent emails
-    urgent = [e for e in emails if e['category'] == 'urgent']
+    urgent = [e for e in emails if e["category"] == "urgent"]
     if urgent:
         print("🔴 URGENT EMAILS:")
         print()
@@ -336,9 +511,9 @@ def print_email_summary(emails):
             print(f"  Subject: {email['subject']}")
             print(f"  Date: {email['date']}")
             print()
-    
+
     # Show work-related
-    work = [e for e in emails if e['category'] == 'work']
+    work = [e for e in emails if e["category"] == "work"]
     if work:
         print("💼 WORK-RELATED:")
         print()
@@ -346,9 +521,9 @@ def print_email_summary(emails):
             print(f"  From: {email['sender']}")
             print(f"  Subject: {email['subject']}")
             print()
-    
+
     # Show shopping
-    shopping = [e for e in emails if e['category'] == 'shopping']
+    shopping = [e for e in emails if e["category"] == "shopping"]
     if shopping:
         print("🛒 SHOPPING / ORDERS:")
         print()
@@ -356,9 +531,9 @@ def print_email_summary(emails):
             print(f"  From: {email['sender']}")
             print(f"  Subject: {email['subject']}")
             print()
-    
+
     # Show bank notifications
-    bank = [e for e in emails if e['category'] == 'bank']
+    bank = [e for e in emails if e["category"] == "bank"]
     if bank:
         print("🏦 BANK NOTIFICATIONS:")
         print()
@@ -366,9 +541,9 @@ def print_email_summary(emails):
             print(f"  From: {email['sender']}")
             print(f"  Subject: {email['subject']}")
             print()
-    
+
     # Show government notifications
-    gov = [e for e in emails if e['category'] == 'gov']
+    gov = [e for e in emails if e["category"] == "gov"]
     if gov:
         print("🏛️ GOVERNMENT / GOV.IL:")
         print()
@@ -376,9 +551,9 @@ def print_email_summary(emails):
             print(f"  From: {email['sender']}")
             print(f"  Subject: {email['subject']}")
             print()
-    
+
     # Show payment notifications
-    payment = [e for e in emails if e['category'] == 'payment']
+    payment = [e for e in emails if e["category"] == "payment"]
     if payment:
         print("💳 PAYMENTS (Bit/PayBox/etc):")
         print()
@@ -387,31 +562,32 @@ def print_email_summary(emails):
             print(f"  Subject: {email['subject']}")
             print()
 
+
 def main():
     """Main execution"""
-    parser = argparse.ArgumentParser(description='Gmail Automation Agent')
-    parser.add_argument('--unread', action='store_true', help='Fetch all unread emails')
-    parser.add_argument('--send-to', help='Send email to address')
-    parser.add_argument('--subject', help='Subject for email sending')
-    parser.add_argument('--body', help='Body for email sending')
-    
+    parser = argparse.ArgumentParser(description="Gmail Automation Agent")
+    parser.add_argument("--unread", action="store_true", help="Fetch all unread emails")
+    parser.add_argument("--send-to", help="Send email to address")
+    parser.add_argument("--subject", help="Subject for email sending")
+    parser.add_argument("--body", help="Body for email sending")
+
     args = parser.parse_args()
 
     print("Starting Gmail Automation Agent...")
     print("Запуск агента автоматизации Gmail...")
     print()
-    
+
     # Get Gmail service
     print("🔐 Authenticating with Gmail...")
     service = get_gmail_service()
     print("✅ Authentication successful!")
     print()
-    
+
     if args.send_to:
         if not args.subject or not args.body:
-             print("❌ --subject and --body required for sending email")
-             sys.exit(1)
-        
+            print("❌ --subject and --body required for sending email")
+            sys.exit(1)
+
         print(f"📤 Sending email to {args.send_to}...")
         send_email(service, args.send_to, args.subject, args.body)
         print("✅ Done")
@@ -427,24 +603,26 @@ def main():
 
     print(f"✅ Found {len(emails)} emails")
     print()
-    
+
     if emails:
         # Save to database
         new_count = save_email_database(emails)
         print(f"💾 Saved {new_count} new emails to database")
         print()
-        
+
         # Print summary
         print_email_summary(emails)
-        
+
         # Save log
         log_file = BASE_DIR / "logs" / "automation" / "gmail_agent.log"
         log_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(log_file, 'a') as f:
-            f.write(f"{datetime.now().isoformat()} - Processed {len(emails)} emails ({new_count} new) [Mode: {'Unread' if args.unread else 'Recent'}]\n")
+        with open(log_file, "a") as f:
+            f.write(
+                f"{datetime.now().isoformat()} - Processed {len(emails)} emails ({new_count} new) [Mode: {'Unread' if args.unread else 'Recent'}]\n"
+            )
     else:
         print("ℹ️  No new emails found")
-    
+
     print()
     print("═══════════════════════════════════════════════════════════════")
     print("✅ Gmail Automation Agent completed successfully")

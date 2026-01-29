@@ -1,0 +1,170 @@
+import argparse
+import json
+import logging
+import subprocess
+import sys
+from pathlib import Path
+
+import torch
+from TTS.api import TTS
+
+from Projects.Content_Factory.src.lip_sync.live_portrait_controller import LivePortraitController
+from Projects.Content_Factory.src.lip_sync.wav2lip_controller import Wav2LipController
+
+# Note: XTTS client might be in Projects/AI_Core or similar
+# For now, we will use a shell command or existing testing script logic for XTTS
+
+# Add project root to sys.path
+ROOT_DIR = Path(__file__).parent.parent.parent.parent.resolve()
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def generate_broadcast():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--text", type=str, help="Text to speak")
+    parser.add_argument("--character", type=str, default="unit_x", help="Character ID")
+    parser.add_argument("--output", type=str, help="Output filename")
+    args = parser.parse_args()
+
+    # 1. Scripts/Topic
+    text = (
+        args.text
+        or "Приветствую! Это Unit-X с эксклюзивным выпуском новостей. Сегодня мы успешно запустили систему LivePortrait для создания гиперреалистичного контента. Будущее уже наступило."
+    )
+    character_id = args.character
+    output_dir = ROOT_DIR / "Projects/Content_Factory/outputs/production"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Load character config
+    config_path = ROOT_DIR / "Projects/Content_Factory/config/character_profiles.json"
+    if not config_path.exists():
+        logger.error(f"Config not found at {config_path}")
+        return
+
+    with open(config_path) as f:
+        profiles = json.load(f)
+
+    if character_id not in profiles:
+        logger.error(f"Character {character_id} not found.")
+        return
+
+    char = profiles[character_id]
+    avatar_path = ROOT_DIR / char["avatar_path"]
+    ref_wav = ROOT_DIR / char["voice_ref_path"]
+    audio_path = output_dir / f"{character_id}_news_audio.wav"
+
+    # 2. Generate Audio (XTTS)
+    if not audio_path.exists():
+        logger.info("🎙️ Stage 1: Generating Audio with XTTS v2...")
+        device = "mps" if torch.backends.mps.is_available() else "cpu"
+        try:
+            model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
+            tts = TTS(model_name).to(device)
+            tts.tts_to_file(text=text, speaker_wav=str(ref_wav), language="ru", file_path=str(audio_path))
+            logger.info(f"✅ Audio generated: {audio_path}")
+        except Exception as e:
+            logger.error(f"❌ Audio generation failed: {e}")
+            return
+    else:
+        logger.info(f"⏭️ Skipping Stage 1: Audio already exists at {audio_path}")
+
+    # 3. Generate Motion (LivePortrait)
+    lp_video_path = output_dir / "unit_x_motion.mp4"
+    if not lp_video_path.exists():
+        logger.info("🎬 Stage 2: Generating Head Motion (LivePortrait)...")
+        lp_controller = LivePortraitController()
+        lp_video = lp_controller.animate(str(avatar_path), output_filename="unit_x_motion.mp4")
+    else:
+        logger.info(f"⏭️ Skipping Stage 2: Motion already exists at {lp_video_path}")
+        lp_video = str(lp_video_path)
+
+    if not lp_video:
+        logger.error("LivePortrait failed.")
+        return
+
+    # 3.5 Loop Motion to match Audio (FFmpeg)
+    looped_motion = output_dir / "unit_x_motion_looped.mp4"
+    if looped_motion.exists():
+        logger.info(f"⏭️ Skipping Stage 2.5: Looped motion already exists at {looped_motion}")
+        motion_for_sync = str(looped_motion)
+    else:
+        logger.info("♻️ Stage 2.5: Looping Motion to match Audio duration...")
+        # Get durations
+        try:
+            audio_dur = float(
+                subprocess.check_output(
+                    [
+                        "ffprobe",
+                        "-v",
+                        "error",
+                        "-show_entries",
+                        "format=duration",
+                        "-of",
+                        "default=noprint_wrappers=1:nokey=1",
+                        str(audio_path),
+                    ]
+                ).strip()
+            )
+            video_dur = float(
+                subprocess.check_output(
+                    [
+                        "ffprobe",
+                        "-v",
+                        "error",
+                        "-show_entries",
+                        "format=duration",
+                        "-of",
+                        "default=noprint_wrappers=1:nokey=1",
+                        str(lp_video),
+                    ]
+                ).strip()
+            )
+
+            loops = int(audio_dur / video_dur) + 1
+            logger.info(f"Looping video {loops} times (Audio: {audio_dur}s, Video: {video_dur}s)")
+
+            # FFmpeg stream loop
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-stream_loop",
+                    str(loops - 1),
+                    "-i",
+                    str(lp_video),
+                    "-t",
+                    str(audio_dur),
+                    "-c",
+                    "copy",
+                    str(looped_motion),
+                ],
+                check=True,
+                capture_output=True,
+            )
+
+            motion_for_sync = str(looped_motion)
+        except Exception as e:
+            logger.error(f"Looping failed: {e}. Falling back to original video.")
+            motion_for_sync = str(lp_video)
+
+    # 4. Generate Lip-Sync (Wav2Lip)
+    logger.info("👄 Stage 3: Applying Lip-Sync (Wav2Lip)...")
+    w2l_controller = Wav2LipController()
+    # We apply Wav2Lip ON TOP of the looped LivePortrait video
+    final_video = w2l_controller.animate(
+        face_path=motion_for_sync,
+        audio_path=str(audio_path),
+        output_filename=args.output or f"final_{character_id}_broadcast.mp4",
+    )
+
+    if final_video:
+        logger.info(f"✅ Final Production Success: {final_video}")
+        return final_video
+
+
+if __name__ == "__main__":
+    generate_broadcast()

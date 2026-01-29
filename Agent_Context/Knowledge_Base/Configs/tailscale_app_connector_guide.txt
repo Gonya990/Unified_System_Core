@@ -1,0 +1,13 @@
+Tailscale App Connectors allow access to SaaS applications (GitHub, Salesforce, etc.) protected by Tailscale ACLs without exposing them to the public internet.
+
+Setup Strategy:
+1. Designate a Connector Node (High availability Linux server recommended, e.g., Ubuntu Docker host).
+2. Install Tailscale on Connector Node via proper package manager.
+3. Advertise the Connector capability:
+   `tailscale set --advertise-connector`
+4. Configure App Connector in Admin Console:
+   - Select the node.
+   - Define domains (e.g., *.github.com, *.google.com) to route through it.
+   - Tailscale will then route traffic to these domains via the Connector Node, applying ACLs.
+
+Documentation: https://tailscale.com/kb/1342/app-connectors-setup

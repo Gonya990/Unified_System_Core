@@ -1,0 +1,45 @@
+# Environment files
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Data (runtime config)
+data/
+bot_config.json
+
+# Docker
+.docker/
+
+# Credentials (sensitive)
+credentials/
+google_token.json
+client_secret.json
+*.credentials.json
+watchtower-config.json

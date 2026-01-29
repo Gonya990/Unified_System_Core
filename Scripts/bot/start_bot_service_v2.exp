@@ -15,7 +15,7 @@ expect {
 catch wait
 
 send_user "\nStarting bot in BACKGROUND...\n"
-spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Windows_AI_Core/src && start /B uv run python ai_telegram_bot.py"
+spawn ssh -o StrictHostKeyChecking=no $host "cd Desktop/Projects/AI_Core/src && start /B uv run python ai_telegram_bot_v2.py"
 expect {
     "password:" { send "$password\r"; exp_continue }
     eof

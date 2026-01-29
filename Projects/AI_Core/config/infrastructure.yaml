@@ -1,0 +1,164 @@
+# Unified System Infrastructure
+# Updated: 2025-12-29
+
+nodes:
+  - id: macbook-air
+    name: MacBook Air
+    fqdn: macbook-air.tail5e8a72.ts.net
+    ip: 100.93.121.47
+    type: control
+    os: macos
+    services:
+      - name: Antigravity Agent
+      - name: Git Workspace
+      - name: Nodriver Daemon
+
+  - id: igor-gaming-1
+    name: AI Server (WSL2)
+    fqdn: igor-gaming-1.tail5e8a72.ts.net
+    ip: 100.78.144.50
+    type: compute
+    os: ubuntu-wsl2
+    services:
+      - name: ai-bot
+        type: systemd
+      - name: ollama
+        port: 11434
+      - name: Claude (OpenRouter)
+        type: api
+      - name: home-assistant
+        type: docker
+        port: 8123
+      - name: n8n
+        port: 5678
+
+  - id: igor-gaming
+    name: Windows PC
+    fqdn: igor-gaming.tail5e8a72.ts.net
+    ip: 100.127.194.111
+    type: windows
+    os: windows11
+    services:
+      - name: Sunshine/Moonlight
+        port: 47989
+      - name: SSH (OpenSSH)
+        port: 22
+      - name: RDP
+        port: 3389
+
+  - id: proxmox
+    name: Proxmox VE (Control)
+    fqdn: pve-antigravity-1.tail5e8a72.ts.net
+    ip: 100.74.137.122
+    type: server
+    os: proxmox-ve
+    services:
+      - name: LXC Containers
+
+  - id: proxmox-gpu
+    name: Proxmox VE (GPU)
+    ip: 100.74.137.122
+    type: server
+    os: proxmox-ve
+    services:
+      - name: Titan RTX Passthrough
+    storage:
+      - name: nvme-thin
+        type: lvmthin
+        size: 957G
+        usage: fast VM disks (OS, databases)
+      - name: ent-ssd
+        type: lvm
+        size: 1.8T
+        usage: secondary VM storage
+      - name: Backup
+        type: dir
+        size: 3.6T
+        usage: VM backups
+    vms:
+      - vmid: 100
+        name: Gaming VM
+        purpose: Windows gaming with GPU passthrough
+        disks:
+          - scsi0: ent-ssd:500G
+      - vmid: 106
+        name: unified-home-core-cloud
+        purpose: Main AI workloads, Telegram bot, automation
+        cpu: 8 cores
+        ram: 25G
+        disks:
+          - scsi0: nvme-thin:100G (OS)
+          - scsi1: nvme-thin:300G (data, mounted /mnt/data)
+
+  - id: unified-home-core-cloud
+    name: Cloud Gateway (GCP)
+    fqdn: unified-home-core-cloud.tail5e8a72.ts.net
+    ip: 100.110.209.49
+    type: cloud
+    os: debian
+    services:
+      - name: Vasya Gateway
+        port: 8080
+      - name: AIOS MCP
+      - name: Docker
+
+  - id: external-ai-cloud
+    name: AI Providers Cloud
+    type: cloud
+    services:
+      - name: OpenRouter (Claude)
+      - name: Google Gemini
+      - name: SerpApi (Search)
+      - name: LLM Council 🏛️
+
+  - id: smart
+    name: Smart Home Hub
+    fqdn: smart.tail5e8a72.ts.net
+    ip: 100.81.133.25
+    type: iot
+    os: debian
+    services:
+      - name: Sensors
+      - name: Automation
+
+  - id: iphone
+    name: iPhone 15 Pro
+    fqdn: iphone-15-pro.tail5e8a72.ts.net
+    ip: 100.86.233.87
+    type: mobile
+    os: ios
+    services:
+      - name: Tailscale VPN
+      - name: Termius
+
+  - id: lenovo-tab
+    name: Lenovo Tab P11 (Artur)
+    fqdn: lenovo-tb-j606f.tail5e8a72.ts.net
+    ip: 100.114.27.103
+    type: mobile
+    os: android
+    services:
+      - name: Family Link
+      - name: ADB
+      - name: GPS Tracker
+
+networks:
+  - name: tailscale
+    cidr: 100.64.0.0/10
+    description: Mesh VPN connecting all nodes
+
+apps:
+  - name: Telegram Bot
+    location: igor-gaming-1
+    port: 8095
+  - name: Job Hunter
+    location: igor-gaming-1
+  - name: Vasya Gateway
+    location: unified-home-core-cloud
+    port: 8080
+  - name: Dashboard
+    location: igor-gaming-1
+    port: 8096
+  - name: Home Assistant
+    location: igor-gaming-1
+    port: 8123

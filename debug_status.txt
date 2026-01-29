@@ -1,0 +1,17 @@
+=== Tailscale Status ===
+
+=== Internet Check ===
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=118 time=38.088 ms
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=118 time=35.119 ms
+
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 35.119/36.603/38.088/1.485 ms
+
+=== Node/N8N Check ===
+Node version:
+v20.11.0
+N8N location:
+N8N version:
+./check_system.sh: line 21: n8n: command not found

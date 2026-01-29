@@ -18,10 +18,10 @@ flowchart TD
         E --> F[Vasya Gateway<br/>Docker :8080]
     end
     
-    subgraph LB["⚖️ Load Balancing"]
-        F --> G{Round Robin<br/>0→Ollama, 1→Gemini}
-        G -->|Запрос 1,3,5...| H[🦙 Ollama<br/>igor-gaming-1:11434<br/>qwen2:0.5b]
-        G -->|Запрос 2,4,6...| I[☁️ Gemini API<br/>gemini-2.0-flash-exp]
+     subgraph LB["⚖️ Load Balancing"]
+         F --> G{Round Robin<br/>0→Ollama, 1→Gemini}
+         G -->|Запрос 1,3,5...| H[🦙 Ollama<br/>unified-home-core:11434<br/>qwen2:0.5b]
+         G -->|Запрос 2,4,6...| I[☁️ Gemini API<br/>gemini-2.0-flash-exp]
     end
     
     H --> J[📤 JSON Response]
@@ -48,10 +48,10 @@ flowchart TD
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  igor-gaming-1 (Tailscale)                                     │
-│  Ollama Server @ 100.88.65.71:11434                            │
-│  Model: qwen2:0.5b                                              │
-└─────────────────────────────────────────────────────────────────┘
+ │  unified-home-core (Tailscale)                                    │
+ │  Ollama Server @ 100.110.209.49:11434                           │
+ │  Model: qwen2:0.5b                                              │
+ └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -106,6 +106,12 @@ python /Users/macbook/Documents/Unified_System/Scripts/automation/test_vasya.py
 | **Swagger UI** | `http://unified-home-core:8080/docs` | ✅ Активен |
 | **OpenAPI JSON** | `http://unified-home-core:8080/openapi.json` | ✅ Активен |
 | **MCP Tool** | `vasya_query()` через AIOS | ✅ Зарегистрирован |
+
+---
+
+## 🧭 Super-Admin OpenAPI (VASER Router)
+
+- **OpenAPI YAML:** `docs/specs/super-admin-openapi.yaml`
 
 ---
 

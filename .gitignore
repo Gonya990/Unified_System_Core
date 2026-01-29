@@ -2,8 +2,10 @@
 .DS_Store
 .Trash
 Sandbox/
+WARP.md
 
 # Secrets
+.env
 *.key
 *.pem
 *.odt
@@ -11,6 +13,12 @@ id_rsa*
 secrets.yaml
 bot_config.py
 setup_telegram.py
+tokens.txt
+
+# Debug / Temporary
+analyze_token.py
+search_schools.py
+debug_*.py
 
 # Python / UV / Builds
 __pycache__/
@@ -19,6 +27,8 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+Projects/Content_Factory/venv/
+Projects/Content_Factory/outputs/
 
 # Windows
 Thumbs.db
@@ -32,6 +42,11 @@ $RECYCLE.BIN/
 
 # Agent identity (local to each runtime)
 .agent-identity
+
+# Local agent runs
+.sisyphus/
+Scripts/Orchestration/logs/
+Scripts/Orchestration/.mail_processor_state.json
 secrets/
 Agent_Context/Personal_Profile/RESUME_VARIANTS.md
 logs/automation/resume_attachments/
@@ -46,4 +61,69 @@ snap/
 *.deb
 gcp-monitoring-venv/
 monitoring-venv/
-.env
+
+venv_mac/
+Projects/AI_Core/venv_mac/
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+# Local Venv and Assets
+venv_content/
+outputs/
+inputs/
+broll/
+
+# Large Binaries and Media
+*.mp4
+*.m4a
+*.mov
+*.wav
+*.dmg
+*.pkg
+*.iso
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Tool Caches and Node
+tools/npm-cache/
+tools/node-*/
+node_modules/
+
+# Credentials and Tokens
+.credentials/
+*_token.json
+email_database.json
+hooks/hooks_server.err
+
+# Session and cookie data from browser extraction
+browser_sessions.json
+webtop_session.json
+# .beads/ and .claude/ must be synced
+!.beads/
+!.claude/
+tmp/
+tmp_backup/
+
+# Security
+secure_vault/
+
+# Temp Data
+tmp_audio_chunks/
+tmp_docs/
+tools/npm-global/
+unified.code-workspace
+*.vsix
+unnamed.png
+
+*.env.*
+Projects/AI_Core/.venv.python39.bak/

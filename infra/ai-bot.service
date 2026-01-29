@@ -5,17 +5,17 @@ After=network.target
 [Service]
 # Run as user gonya
 User=gonya
-WorkingDirectory=/home/gonya/Documents/Unified_System/Windows_AI_Core
+WorkingDirectory=/home/gonya/Documents/Unified_System/Projects/AI_Core
 # ExecStart calls the python executable in the venv
 ExecStart=/home/gonya/Documents/Unified_System/venv/bin/python -m src.main
 # Restart on failure or manual kill
 Restart=always
 RestartSec=10
 # Environment variables
-EnvironmentFile=/home/gonya/Documents/Unified_System/Windows_AI_Core/.env
+EnvironmentFile=/home/gonya/Documents/Unified_System/Projects/AI_Core/.env
 # Output logging
-StandardOutput=append:/home/gonya/Documents/Unified_System/Windows_AI_Core/bot.log
-StandardError=append:/home/gonya/Documents/Unified_System/Windows_AI_Core/bot.log
+StandardOutput=append:/home/gonya/Documents/Unified_System/Projects/AI_Core/bot.log
+StandardError=append:/home/gonya/Documents/Unified_System/Projects/AI_Core/bot.log
 
 [Install]
 WantedBy=multi-user.target

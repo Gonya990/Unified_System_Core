@@ -1,0 +1,19 @@
+[submodule "External_Tools/Stack/mcp_agent_mail"]
+	path = External_Tools/Stack/mcp_agent_mail
+	url = https://github.com/Dicklesworthstone/mcp_agent_mail.git
+[submodule "infra/cliproxyapi/src"]
+	path = infra/cliproxyapi/src
+	url = https://github.com/router-for-me/CLIProxyAPI
+[submodule "Projects/global1sim"]
+	path = Projects/global1sim
+	url = https://github.com/KostaGorod/global1sim.git
+	ignore = all
+[submodule "Projects/AI_Core/antibridge"]
+	path = Projects/AI_Core/antibridge
+	url = https://github.com/Unified-system-Core/antibridge.git
+[submodule "Projects/AI_Core/gk-cli"]
+	path = Projects/AI_Core/gk-cli
+	url = https://github.com/gitkraken/gk-cli.git
+[submodule "tools/chrome-devtools-mcp"]
+	path = tools/chrome-devtools-mcp
+	url = https://github.com/ChromeDevTools/chrome-devtools-mcp.git

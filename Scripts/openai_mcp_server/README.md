@@ -1,8 +1,10 @@
 # OpenAI MCP Server | MCP Сервер OpenAI
 
-**English:** MCP server to connect Antigravity/Gemini with OpenAI's API for seamless ChatGPT integration.
+**English:** MCP server to connect Antigravity/Gemini with OpenAI's API
+for seamless ChatGPT integration.
 
-**Russian:** MCP сервер для подключения Antigravity/Gemini к API OpenAI для бесшовной интеграции с ChatGPT.
+**Russian:** MCP сервер для подключения Antigravity/Gemini к API OpenAI
+для бесшовной интеграции с ChatGPT.
 
 ## What This Does | Что это делает
 
@@ -152,7 +154,7 @@ Add to `/Users/macbook/Documents/Unified_System/External_Tools/Stack/mcp_agent_m
       "type": "http",
       "url": "http://127.0.0.1:8765/mcp/",
       "headers": {
-        "Authorization": "Bearer c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+        "Authorization": "Bearer YOUR_AGENT_HUB_TOKEN"
       }
     },
     "openai-gateway": {
@@ -255,6 +257,6 @@ OpenAI API has rate limits. Configure in `config.json`:
 ---
 
 **Status:** Ready for implementation | Готов к реализации  
-**Priority:** High (better than manual export) | Высокий (лучше чем ручной экспорт)  
+**Priority:** High (better than manual export)
 **Complexity:** Medium | Средний  
 **Time:** 1-2 hours setup | 1-2 часа на настройку

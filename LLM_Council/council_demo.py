@@ -9,17 +9,16 @@ Usage:
 """
 
 import asyncio
-import sys
 import logging
-from pathlib import Path
+import sys
 
 # Rich for beautiful console output
 try:
     from rich.console import Console
-    from rich.panel import Panel
-    from rich.table import Table
     from rich.markdown import Markdown
+    from rich.panel import Panel
     from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich.table import Table
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -64,33 +63,33 @@ def print_stage(stage_num: int, title: str):
 async def run_health_check():
     """Run health check on all providers."""
     print_header()
-    
+
     if RICH_AVAILABLE:
         console.print("[bold]Running health check...[/bold]\n")
     else:
         print("Running health check...\n")
-    
+
     try:
         council = LLMCouncil.from_env()
         results = await council.health_check()
-        
+
         if RICH_AVAILABLE:
             table = Table(title="Provider Health Status")
             table.add_column("Provider", style="cyan")
             table.add_column("Status", style="green")
-            
+
             for provider, healthy in results.items():
                 status = "✅ OK" if healthy else "❌ Failed"
                 table.add_row(provider, status)
-            
+
             console.print(table)
         else:
             for provider, healthy in results.items():
                 status = "✅ OK" if healthy else "❌ Failed"
                 print(f"  {provider}: {status}")
-        
+
         await council.close()
-        
+
     except ValueError as e:
         print(f"❌ Error: {e}")
         print("Make sure to copy .env.example to .env and add your API keys.")
@@ -99,15 +98,15 @@ async def run_health_check():
 async def run_query(query: str):
     """Run a single query through the council."""
     print_header()
-    
+
     if RICH_AVAILABLE:
         console.print(f"[bold]Query:[/bold] {query}\n")
     else:
         print(f"Query: {query}\n")
-    
+
     try:
         council = LLMCouncil.from_env()
-        
+
         # Run deliberation
         if RICH_AVAILABLE:
             with Progress(
@@ -121,10 +120,10 @@ async def run_query(query: str):
         else:
             print("Council deliberating...")
             session = await council.deliberate(query, verbose=True)
-        
+
         # Print Stage 1 results
         print_stage(1, "INDIVIDUAL RESPONSES")
-        
+
         if RICH_AVAILABLE:
             for resp in session.stage1_responses:
                 status = "[green]✓[/green]" if resp.success else "[red]✗[/red]"
@@ -140,17 +139,17 @@ async def run_query(query: str):
                 print(f"\n[{status}] {resp.provider_name} ({resp.model})")
                 print(f"    Time: {resp.latency_ms:.0f}ms | Tokens: {resp.tokens_used}")
                 print(f"    {resp.content[:200]}...")
-        
+
         # Print Stage 2 results
         if session.stage2_reviews:
             print_stage(2, "PEER REVIEW")
-            
+
             if RICH_AVAILABLE:
                 table = Table(title="Peer Review Scores")
                 table.add_column("Reviewer", style="cyan")
                 table.add_column("Reviewed", style="magenta")
                 table.add_column("Score", style="yellow")
-                
+
                 for review in session.stage2_reviews:
                     score_color = "green" if review.score >= 7 else "yellow" if review.score >= 5 else "red"
                     table.add_row(
@@ -158,15 +157,15 @@ async def run_query(query: str):
                         review.reviewee,
                         f"[{score_color}]{review.score}/10[/{score_color}]"
                     )
-                
+
                 console.print(table)
             else:
                 for review in session.stage2_reviews:
                     print(f"  {review.reviewer} → {review.reviewee}: {review.score}/10")
-        
+
         # Print Stage 3 result
         print_stage(3, "CHAIRMAN CONSENSUS")
-        
+
         if RICH_AVAILABLE:
             console.print(Panel(
                 Markdown(session.stage3_consensus),
@@ -177,9 +176,9 @@ async def run_query(query: str):
         else:
             print(f"\n👑 Final Answer (by {session.chairman_provider}):\n")
             print(session.stage3_consensus)
-        
+
         await council.close()
-        
+
     except ValueError as e:
         print(f"❌ Error: {e}")
         print("\nMake sure to:")
@@ -190,28 +189,28 @@ async def run_query(query: str):
 async def run_interactive():
     """Run interactive mode."""
     print_header()
-    
+
     if RICH_AVAILABLE:
         console.print("[bold]Interactive mode. Type 'quit' to exit.[/bold]\n")
     else:
         print("Interactive mode. Type 'quit' to exit.\n")
-    
+
     try:
         council = LLMCouncil.from_env()
-        
+
         while True:
             try:
                 query = input("\n🏛️ You: ").strip()
-                
+
                 if query.lower() in ('quit', 'exit', 'q'):
                     print("\nGoodbye! 👋")
                     break
-                
+
                 if not query:
                     continue
-                
+
                 session = await council.deliberate(query, verbose=False)
-                
+
                 if RICH_AVAILABLE:
                     console.print(Panel(
                         Markdown(session.stage3_consensus),
@@ -220,13 +219,13 @@ async def run_interactive():
                     ))
                 else:
                     print(f"\n👑 Council: {session.stage3_consensus}")
-                    
+
             except KeyboardInterrupt:
                 print("\n\nGoodbye! 👋")
                 break
-        
+
         await council.close()
-        
+
     except ValueError as e:
         print(f"❌ Error: {e}")
 
@@ -239,9 +238,9 @@ def main():
         print('  python council_demo.py --interactive')
         print('  python council_demo.py --health-check')
         sys.exit(1)
-    
+
     arg = sys.argv[1]
-    
+
     if arg == "--health-check":
         asyncio.run(run_health_check())
     elif arg == "--interactive":

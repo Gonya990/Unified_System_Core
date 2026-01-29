@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Swarm Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(20, 20, 20, 0.7);
+            --accent-primary: #00d2ff;
+            --accent-secondary: #3a7bd5;
+            --text-main: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --success: #00ff88;
+            --warning: #ffcc00;
+            --error: #ff4757;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --swarm-glow: rgba(0, 210, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent-primary), #fff, var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            margin-bottom: 5px;
+        }
+
+        .header .status-tag {
+            display: inline-block;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            padding: 5px 15px;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .card.span-4 {
+            grid-column: span 4;
+        }
+
+        .card.span-8 {
+            grid-column: span 8;
+        }
+
+        .card.span-12 {
+            grid-column: span 12;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        /* Swarm Display */
+        .swarm-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+        }
+
+        .node {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            border-color: var(--accent-primary);
+            background: rgba(0, 210, 255, 0.05);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .node .pid {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+
+        .node .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+        }
+
+        .node .state {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        /* Workflows */
+        .workflow-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .workflow-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+        }
+
+        .workflow-name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .workflow-status {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            background: rgba(0, 210, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* Stats List */
+        .stats-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-box {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Logs Section */
+        .terminal-preview {
+            background: #000;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #ccc;
+            border: 1px solid #333;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-line {
+            margin-bottom: 4px;
+        }
+
+        .log-time {
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .log-success {
+            color: var(--success);
+        }
+
+        .log-info {
+            color: var(--accent-primary);
+        }
+
+        /* Decors */
+        .glow-sphere {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--swarm-glow) 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-sphere-2 {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(58, 123, 213, 0.1) 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow-sphere"></div>
+    <div class="glow-sphere-2"></div>
+
+    <div class="container" id="app">
+        <header class="header">
+            <h1>ANTIGRAVITY SWARM ORCHESTRATOR</h1>
+            <div class="status-tag">SYSTEM STATUS: HARMONIZED • MULTI-AGENT SWARM ACTIVE</div>
+        </header>
+
+        <div class="grid">
+            <!-- Swarm Nodes -->
+            <div class="card span-12">
+                <h2>Active Swarm Terminals (12 Nodes Detected)</h2>
+                <div class="swarm-cluster">
+                    <div class="node">
+                        <div class="pid">PID: 42996</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 58971</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 68839</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 77128</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node" style="border-color: var(--warning);">
+                        <div class="pid">PID: 35525</div>
+                        <div class="name"><span class="state"
+                                style="background: var(--warning); box-shadow: 0 0 10px var(--warning);"></span>SSH
+                            Master</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 15398</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 80500</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 97507</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 20266</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 40278</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 39251</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                    <div class="node">
+                        <div class="pid">PID: 93206</div>
+                        <div class="name"><span class="state"></span>Codex Agent</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Engine -->
+            <div class="card span-4">
+                <h2>Operational Workflows</h2>
+                <div class="workflow-stack">
+                    <div class="workflow-item">
+                        <span class="workflow-name">/sync</span>
+                        <span class="workflow-status">READY</span>
+                    </div>
+                    <div class="workflow-item">
+                        <span class="workflow-name">/sync-mail</span>
+                        <span class="workflow-status">READY</span>
+                    </div>
+                    <div class="workflow-item">
+                        <span class="workflow-name">/commit-push</span>
+                        <span class="workflow-status">READY</span>
+                    </div>
+                    <div class="workflow-item">
+                        <span class="workflow-name">/autosave</span>
+                        <span class="workflow-status">READY</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Stats -->
+            <div class="card span-8">
+                <h2>Orchestator Telemetry</h2>
+                <div class="stats-list">
+                    <div class="stat-box">
+                        <div class="stat-label">System Entropy</div>
+                        <div class="stat-value" style="color: var(--success);">0.00% (STABLE)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Active Sync Pairs</div>
+                        <div class="stat-value">6 Channels</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Remote Node</div>
+                        <div class="stat-value">100.110.209.49</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Quality Buffer</div>
+                        <div class="stat-value">Ruff Engaged</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Logs -->
+            <div class="card span-12">
+                <h2>Distributed Logs (Aggregated)</h2>
+                <div class="terminal-preview">
+                    <div class="log-line"><span class="log-time">[15:12:01]</span> <span class="log-info">INFO:</span>
+                        Initializing Swarm Handshake for PID 93206...</div>
+                    <div class="log-line"><span class="log-time">[15:12:02]</span> <span
+                            class="log-success">SUCCESS:</span> Cluster state validated. 12 agents aligned.</div>
+                    <div class="log-line"><span class="log-time">[15:12:05]</span> <span class="log-info">INFO:</span>
+                        Running Ruff quality audit...</div>
+                    <div class="log-line"><span class="log-time">[15:12:07]</span> <span
+                            class="log-success">SUCCESS:</span> 0 errors found in current context.</div>
+                    <div class="log-line"><span class="log-time">[15:12:10]</span> <span class="log-info">INFO:</span>
+                        Awaiting mission parameters from Master Identity...</div>
+                    <div class="log-line"><span class="log-time">[15:12:54]</span> <span class="log-info">INFO:</span>
+                        UI Update: Swarm Visualization Layer Rendered.</div>
+                    <div class="log-line" style="color: #fff; background: rgba(0, 210, 255, 0.1);">>>> SWARM ONLINE |
+                        STANDING BY</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
