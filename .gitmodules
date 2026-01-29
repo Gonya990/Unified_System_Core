@@ -8,3 +8,12 @@
 	path = Projects/global1sim
 	url = https://github.com/KostaGorod/global1sim.git
 	ignore = all
+[submodule "Projects/AI_Core/antibridge"]
+	path = Projects/AI_Core/antibridge
+	url = https://github.com/Unified-system-Core/antibridge.git
+[submodule "Projects/AI_Core/gk-cli"]
+	path = Projects/AI_Core/gk-cli
+	url = https://github.com/gitkraken/gk-cli.git
+[submodule "tools/chrome-devtools-mcp"]
+	path = tools/chrome-devtools-mcp
+	url = https://github.com/ChromeDevTools/chrome-devtools-mcp.git
