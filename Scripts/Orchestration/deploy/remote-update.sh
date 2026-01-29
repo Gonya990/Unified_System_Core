@@ -11,7 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # 1. Define nodes (could be moved to a separate file later)
-NODES=("smart" "igor-gaming" "igor-windows" "gpu-node" "unified-home-core")
+NODES=("smart" "igor-gaming" "gpu-node-1" "unified-home-core-cloud")
 REMOTE_PATH_BASE="/home/gonya/Unified_System"
 
 echo -e "${GREEN}Multi-Node Remote Update${NC}"
@@ -28,7 +28,7 @@ for NODE in "${NODES[@]}"; do
 
     # 1. Check remote status
     echo -e "${YELLOW}[1/3] Checking remote status on $NODE...${NC}"
-    REMOTE_STATUS=$(tailscale ssh "$NODE" "cd $REMOTE_PATH_BASE && git status --porcelain" 2>/dev/null || echo "CONNECTION_FAILED")
+    REMOTE_STATUS=$(ssh "$NODE" "cd $REMOTE_PATH_BASE && git status --porcelain" 2>/dev/null || echo "CONNECTION_FAILED")
 
     if [ "$REMOTE_STATUS" = "CONNECTION_FAILED" ]; then
         echo -e "${RED}✗ Cannot connect to $NODE. Skipping.${NC}"
@@ -39,7 +39,7 @@ for NODE in "${NODES[@]}"; do
         echo -e "${RED}! $NODE has uncommitted changes.${NC}"
         if [ "${1:-}" = "--force" ]; then
             echo -e "${YELLOW}Discarding remote changes...${NC}"
-            tailscale ssh "$NODE" "cd $REMOTE_PATH_BASE && git checkout -- . && git clean -fd"
+            ssh "$NODE" "cd $REMOTE_PATH_BASE && git checkout -- . && git clean -fd"
         else
             echo "Skipping $NODE. Use --force to override."
             continue
@@ -48,11 +48,11 @@ for NODE in "${NODES[@]}"; do
 
     # 2. Pull on remote
     echo -e "${YELLOW}[2/3] Pulling on $NODE...${NC}"
-    tailscale ssh "$NODE" "cd $REMOTE_PATH_BASE && git pull origin main"
+    ssh "$NODE" "cd $REMOTE_PATH_BASE && git pull origin main"
 
     # 3. Update submodules
     echo -e "${YELLOW}[3/3] Updating submodules on $NODE...${NC}"
-    tailscale ssh "$NODE" "cd $REMOTE_PATH_BASE && git submodule update --init --recursive" || echo "Submodule update skipped."
+    ssh "$NODE" "cd $REMOTE_PATH_BASE && git submodule update --init --recursive" || echo "Submodule update skipped."
 
     echo -e "${GREEN}✓ $NODE update complete.${NC}"
 done
