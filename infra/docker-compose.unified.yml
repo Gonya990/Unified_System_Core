@@ -1,0 +1,409 @@
+# Unified System Core - Complete Docker Compose Stack
+#
+# Usage:
+#   Full stack:     docker compose -f docker-compose.unified.yml up -d
+#   Core only:      docker compose -f docker-compose.unified.yml --profile core up -d
+#   With GPU:       docker compose -f docker-compose.unified.yml --profile gpu up -d
+#   Development:    docker compose -f docker-compose.unified.yml --profile dev up -d
+#
+# Prerequisites:
+#   1. Copy .env.example to .env and fill in secrets
+#   2. Create external network: docker network create unified-net
+#   3. For GPU: Install NVIDIA Container Toolkit
+
+# Common configurations
+x-common-env: &common-env
+  TZ: ${TZ:-UTC}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+
+x-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ============================================
+  # CORE SERVICES
+  # ============================================
+
+  # AI Telegram Bot - Main conversational interface
+  ai-telegram-bot:
+    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:${AI_BOT_TAG:-latest}
+    container_name: ai-telegram-bot
+    profiles: ["core", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN is required}
+      ADMIN_ID: ${ADMIN_ID:?ADMIN_ID is required}
+      ALLOWED_USERS: ${ALLOWED_USERS:-}
+      INFERENCE_PROVIDER: ${INFERENCE_PROVIDER:-ollama}
+      INFERENCE_BASE_URL: ${INFERENCE_BASE_URL:-http://ollama:11434}
+      MODEL_NAME: ${MODEL_NAME:-llama3.2}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SQLITE_DB_PATH: /app/data/user_context.db
+      CONFIG_PATH: /app/config/bot_config.json
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ai_bot_data:/app/data
+      - ai_bot_config:/app/config
+      - ai_bot_logs:/app/logs
+    ports:
+      - "${AI_BOT_HEALTH_PORT:-8080}:8080"      # Health checks
+      - "${AI_BOT_BRIDGE_PORT:-8090}:8090"      # Bridge API
+      - "${AI_BOT_DASHBOARD_PORT:-8095}:8095"   # Dashboard
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    logging: *logging
+    networks:
+      - unified-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    depends_on:
+      ollama:
+        condition: service_healthy
+        required: false
+
+  # Agent Mail Server - Inter-agent communication
+  agent-mail-server:
+    build:
+      context: ../Deployment/igor-gaming-1/mcp_agent_mail
+      dockerfile: Dockerfile
+    image: unified-system/agent-mail-server:${AGENT_MAIL_TAG:-latest}
+    container_name: agent-mail-server
+    profiles: ["core", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      DATABASE_URL: postgres+asyncpg://agent:${POSTGRES_PASSWORD:-agent_pass}@agent-mail-db:5432/agent_mail
+      STORAGE_ROOT: /data/mailbox
+      HTTP_HOST: "0.0.0.0"
+      HTTP_PORT: "8765"
+      HTTP_BEARER_TOKEN: ${AGENT_MAIL_TOKEN:?AGENT_MAIL_TOKEN is required}
+    volumes:
+      - agent_mail_data:/data/mailbox
+    ports:
+      - "${AGENT_MAIL_PORT:-8765}:8765"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+    logging: *logging
+    networks:
+      - unified-net
+    depends_on:
+      agent-mail-db:
+        condition: service_healthy
+
+  # Agent Mail PostgreSQL Database
+  agent-mail-db:
+    image: postgres:16-alpine
+    container_name: agent-mail-db
+    profiles: ["core", "full"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agent_mail
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agent_pass}
+    volumes:
+      - agent_mail_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD-SHELL", "pg_isready -U agent -d agent_mail"]
+    logging: *logging
+    networks:
+      - unified-net
+
+  # Mail Processor - Background polling service
+  mail-processor:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.mail-processor
+    image: unified-system/mail-processor:${MAIL_PROCESSOR_TAG:-latest}
+    container_name: mail-processor
+    profiles: ["core", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      AGENT_MAIL_SERVER: ${AGENT_MAIL_SERVER:-http://agent-mail-server:8765}
+      AGENT_MAIL_NAME: ${AGENT_MAIL_NAME:-VioletCastle}
+      AGENT_MAIL_TOKEN: ${AGENT_MAIL_TOKEN:?AGENT_MAIL_TOKEN is required}
+      POLL_INTERVAL: ${POLL_INTERVAL:-60}
+      ADMIN_TELEGRAM_ID: ${ADMIN_ID:-}
+    logging: *logging
+    networks:
+      - unified-net
+    depends_on:
+      agent-mail-server:
+        condition: service_healthy
+
+  # ============================================
+  # MCP SERVERS
+  # ============================================
+
+  # OpenAI MCP Gateway
+  openai-mcp-gateway:
+    build:
+      context: ../Scripts/openai_mcp_server
+      dockerfile: Dockerfile
+    image: unified-system/openai-mcp-gateway:${OPENAI_MCP_TAG:-latest}
+    container_name: openai-mcp-gateway
+    profiles: ["mcp", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required for OpenAI MCP}
+      MCP_PORT: "8766"
+    ports:
+      - "${OPENAI_MCP_PORT:-8766}:8766"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8766/health"]
+    logging: *logging
+    networks:
+      - unified-net
+
+  # CLIProxyAPI
+  cliproxyapi:
+    build:
+      context: ./cliproxyapi/src
+      dockerfile: Dockerfile
+    image: unified-system/cliproxyapi:${CLIPROXY_TAG:-latest}
+    container_name: cliproxyapi
+    profiles: ["tools", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+    volumes:
+      - ./cliproxyapi/config.yaml:/CLIProxyAPI/config.yaml:ro
+      - cliproxy_auth:/root/.cli-proxy-api
+    ports:
+      - "${CLIPROXY_PORT:-8317}:8317"
+    logging: *logging
+    networks:
+      - unified-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Antigravity MCP Server (Docker/GPU control)
+  antigravity-mcp:
+    build:
+      context: ../Agent_Context/Knowledge_Base/mcp-server
+      dockerfile: Dockerfile
+    image: unified-system/antigravity-mcp:${ANTIGRAVITY_MCP_TAG:-latest}
+    container_name: antigravity-mcp
+    profiles: ["mcp", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      PORT: "3005"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "${ANTIGRAVITY_MCP_PORT:-3005}:3005"
+    logging: *logging
+    networks:
+      - unified-net
+
+  # ============================================
+  # WEB APPLICATIONS
+  # ============================================
+
+  # ChatKit Dashboard
+  chatkit-dashboard:
+    build:
+      context: ../Projects/ChatKit_Dashboard
+      dockerfile: Dockerfile
+    image: unified-system/chatkit-dashboard:${CHATKIT_TAG:-latest}
+    container_name: chatkit-dashboard
+    profiles: ["web", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      NODE_ENV: production
+      PORT: "3001"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "${CHATKIT_PORT:-3001}:3001"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+    logging: *logging
+    networks:
+      - unified-net
+
+  # Connect Landing Page
+  connect-landing:
+    build:
+      context: ../Projects/connect-landing-page
+      dockerfile: Dockerfile
+    image: unified-system/connect-landing:${LANDING_TAG:-latest}
+    container_name: connect-landing
+    profiles: ["web", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      NODE_ENV: production
+      PORT: "3000"
+    ports:
+      - "${LANDING_PORT:-3002}:3000"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+    logging: *logging
+    networks:
+      - unified-net
+
+  # ============================================
+  # INFERENCE STACK (GPU optional)
+  # ============================================
+
+  # Ollama - Local LLM inference
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    profiles: ["inference", "gpu", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      OLLAMA_HOST: "0.0.0.0"
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+    logging: *logging
+    networks:
+      - unified-net
+    # Uncomment for GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Open WebUI - Chat interface
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    profiles: ["inference", "full"]
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      OLLAMA_BASE_URL: http://ollama:11434
+      WEBUI_AUTH: "false"
+    volumes:
+      - open_webui_data:/app/backend/data
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+    logging: *logging
+    networks:
+      - unified-net
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  # ============================================
+  # INFRASTRUCTURE SERVICES
+  # ============================================
+
+  # Watchtower - Auto-update containers
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    profiles: ["infra", "full"]
+    restart: always
+    environment:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_POLL_INTERVAL: "${WATCHTOWER_INTERVAL:-300}"
+      WATCHTOWER_INCLUDE_RESTARTING: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging: *logging
+    networks:
+      - unified-net
+
+  # Traefik - Reverse proxy (optional)
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    profiles: ["proxy"]
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    logging: *logging
+    networks:
+      - unified-net
+
+# ============================================
+# VOLUMES
+# ============================================
+
+volumes:
+  # AI Bot
+  ai_bot_data:
+    name: unified_ai_bot_data
+  ai_bot_config:
+    name: unified_ai_bot_config
+  ai_bot_logs:
+    name: unified_ai_bot_logs
+
+  # Agent Mail
+  agent_mail_data:
+    name: unified_agent_mail_data
+  agent_mail_pgdata:
+    name: unified_agent_mail_pgdata
+
+  # MCP Services
+  cliproxy_auth:
+    name: unified_cliproxy_auth
+
+  # Inference
+  ollama_models:
+    name: unified_ollama_models
+  open_webui_data:
+    name: unified_open_webui_data
+
+  # Infrastructure
+  traefik_certs:
+    name: unified_traefik_certs
+
+# ============================================
+# NETWORKS
+# ============================================
+
+networks:
+  unified-net:
+    name: unified-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

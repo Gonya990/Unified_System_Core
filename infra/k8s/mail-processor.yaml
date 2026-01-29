@@ -1,0 +1,74 @@
+# Mail Processor - Kubernetes Deployment
+# Background service that polls Agent Mail inbox
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mail-processor-config
+  namespace: unified-system
+data:
+  AGENT_MAIL_SERVER: "http://agent-mail-server:8765"
+  AGENT_MAIL_NAME: "VioletCastle"
+  POLL_INTERVAL: "60"
+  LOG_LEVEL: "INFO"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-processor-secrets
+  namespace: unified-system
+type: Opaque
+stringData:
+  # CHANGE IN PRODUCTION - must match agent-mail-server token
+  AGENT_MAIL_TOKEN: "change_me_bearer_token"
+  # Optional: For Telegram alerts
+  ADMIN_TELEGRAM_ID: ""
+  TELEGRAM_BOT_TOKEN: ""
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail-processor
+  namespace: unified-system
+  labels:
+    app: mail-processor
+    app.kubernetes.io/name: mail-processor
+    app.kubernetes.io/component: worker
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Only one instance should poll
+  selector:
+    matchLabels:
+      app: mail-processor
+  template:
+    metadata:
+      labels:
+        app: mail-processor
+    spec:
+      containers:
+        - name: processor
+          image: ghcr.io/gonya990/unified_system_core/mail-processor:latest
+          envFrom:
+            - configMapRef:
+                name: mail-processor-config
+            - secretRef:
+                name: mail-processor-secrets
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          # No HTTP endpoint, use process-based probe
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import sys; sys.exit(0)"
+            initialDelaySeconds: 30
+            periodSeconds: 60

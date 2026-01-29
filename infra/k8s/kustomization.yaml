@@ -1,0 +1,30 @@
+# Unified System Core - Kustomize Configuration
+# Deploy all services with: kubectl apply -k .
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: unified-system
+
+resources:
+  - namespace.yaml
+  - agent-mail-server.yaml
+  - mail-processor.yaml
+  - openai-mcp-gateway.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: unified-system
+  app.kubernetes.io/managed-by: kustomize
+
+# Image tags - update these for deployments
+images:
+  - name: ghcr.io/gonya990/unified_system_core/agent-mail-server
+    newTag: latest
+  - name: ghcr.io/gonya990/unified_system_core/mail-processor
+    newTag: latest
+  - name: ghcr.io/gonya990/unified_system_core/openai-mcp-gateway
+    newTag: latest
+
+# Common annotations
+commonAnnotations:
+  deployment.kubernetes.io/revision: "1"
