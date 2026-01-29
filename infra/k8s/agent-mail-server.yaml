@@ -1,0 +1,226 @@
+# Agent Mail Server - Kubernetes Deployment
+# Inter-agent communication service with PostgreSQL backend
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-mail-config
+  namespace: unified-system
+data:
+  HTTP_HOST: "0.0.0.0"
+  HTTP_PORT: "8765"
+  STORAGE_ROOT: "/data/mailbox"
+  LOG_LEVEL: "INFO"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: agent-mail-secrets
+  namespace: unified-system
+type: Opaque
+stringData:
+  # CHANGE THESE IN PRODUCTION
+  POSTGRES_PASSWORD: "agent_pass_change_me"
+  HTTP_BEARER_TOKEN: "change_me_bearer_token"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agent-mail-pvc
+  namespace: unified-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agent-mail-db-pvc
+  namespace: unified-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-mail-db
+  namespace: unified-system
+  labels:
+    app: agent-mail-db
+    app.kubernetes.io/name: agent-mail-db
+    app.kubernetes.io/component: database
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: agent-mail-db
+  template:
+    metadata:
+      labels:
+        app: agent-mail-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "agent_mail"
+            - name: POSTGRES_USER
+              value: "agent"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: agent-mail-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - agent
+                - -d
+                - agent_mail
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - agent
+                - -d
+                - agent_mail
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: agent-mail-db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-mail-db
+  namespace: unified-system
+spec:
+  type: ClusterIP
+  selector:
+    app: agent-mail-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-mail-server
+  namespace: unified-system
+  labels:
+    app: agent-mail-server
+    app.kubernetes.io/name: agent-mail-server
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: agent-mail-server
+  template:
+    metadata:
+      labels:
+        app: agent-mail-server
+    spec:
+      containers:
+        - name: server
+          image: ghcr.io/gonya990/unified_system_core/agent-mail-server:latest
+          ports:
+            - name: http
+              containerPort: 8765
+          envFrom:
+            - configMapRef:
+                name: agent-mail-config
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: agent-mail-secrets
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgres+asyncpg://agent:$(POSTGRES_PASSWORD)@agent-mail-db:5432/agent_mail"
+            - name: HTTP_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-mail-secrets
+                  key: HTTP_BEARER_TOKEN
+          volumeMounts:
+            - name: mailbox-data
+              mountPath: /data/mailbox
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: mailbox-data
+          persistentVolumeClaim:
+            claimName: agent-mail-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-mail-server
+  namespace: unified-system
+spec:
+  type: ClusterIP
+  selector:
+    app: agent-mail-server
+  ports:
+    - name: http
+      port: 8765
+      targetPort: http

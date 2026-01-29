@@ -1,0 +1,24 @@
+# Unified System Core - Kubernetes Namespaces
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unified-system
+  labels:
+    app.kubernetes.io/part-of: unified-system
+    app.kubernetes.io/managed-by: kustomize
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unified-system-mcp
+  labels:
+    app.kubernetes.io/part-of: unified-system
+    app.kubernetes.io/component: mcp-servers
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unified-system-web
+  labels:
+    app.kubernetes.io/part-of: unified-system
+    app.kubernetes.io/component: web-apps
