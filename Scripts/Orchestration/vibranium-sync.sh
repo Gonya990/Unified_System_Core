@@ -11,7 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-UNIFIED_SYSTEM="/Users/igorgoncharenko/Documents/Unified_System_Core"
+UNIFIED_SYSTEM="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 echo -e "${GREEN}💎 VIBRANIUM SYNC STARTED${NC}"
 echo "=========================================="
@@ -29,15 +29,25 @@ fi
 
 # 2. Linting & Quality Check
 echo -e "\n${YELLOW}[2/5] Running Quality Check (Ruff)...${NC}"
-RUFF_BIN="$HOME/Library/Python/3.9/bin/ruff"
-if [ -f "$RUFF_BIN" ]; then
+if command -v ruff &> /dev/null; then
+    RUFF_BIN="$(command -v ruff)"
     if "$RUFF_BIN" check Scripts/ Projects/AI_Core/src/ --fix; then
         echo -e "${GREEN}✓ Code quality check passed (and auto-fixed).${NC}"
     else
         echo -e "${YELLOW}! Linting found issues that require manual attention.${NC}"
     fi
 else
-    echo -e "${YELLOW}! Ruff not found. Skipping quality check.${NC}"
+    # Fallback to check specific path if command not found, or just skip
+    RUFF_BIN="$HOME/Library/Python/3.9/bin/ruff"
+    if [ -f "$RUFF_BIN" ]; then
+         if "$RUFF_BIN" check Scripts/ Projects/AI_Core/src/ --fix; then
+            echo -e "${GREEN}✓ Code quality check passed (and auto-fixed).${NC}"
+        else
+            echo -e "${YELLOW}! Linting found issues that require manual attention.${NC}"
+        fi
+    else
+        echo -e "${YELLOW}! Ruff not found. Skipping quality check.${NC}"
+    fi
 fi
 
 # 3. Main Sync (Git & Tasks)
