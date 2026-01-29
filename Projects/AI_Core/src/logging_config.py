@@ -12,13 +12,18 @@ import sys
 from datetime import datetime, timezone
 from typing import Optional
 
-# Try to import unified observability module
+# Try to import unified observability module (installed package or path-based)
 try:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-    from infra.observability import setup_observability, get_logger, LogContext
+    from unified_observability import setup_observability, get_logger, LogContext
     UNIFIED_OBSERVABILITY_AVAILABLE = True
 except ImportError:
-    UNIFIED_OBSERVABILITY_AVAILABLE = False
+    try:
+        # Fallback for local development without installed package
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+        from infra.observability import setup_observability, get_logger, LogContext
+        UNIFIED_OBSERVABILITY_AVAILABLE = True
+    except ImportError:
+        UNIFIED_OBSERVABILITY_AVAILABLE = False
 
 
 class JSONFormatter(logging.Formatter):

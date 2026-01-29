@@ -34,14 +34,18 @@ try:
 except ImportError:
     pass
 
-# Try to import unified observability
+# Try to import unified observability (installed package or path-based)
 try:
-    from infra.observability import setup_observability, get_logger, LogContext
+    from unified_observability import setup_observability, get_logger, LogContext
     OBSERVABILITY_AVAILABLE = True
 except ImportError:
-    OBSERVABILITY_AVAILABLE = False
-    get_logger = None
-    LogContext = None
+    try:
+        from infra.observability import setup_observability, get_logger, LogContext
+        OBSERVABILITY_AVAILABLE = True
+    except ImportError:
+        OBSERVABILITY_AVAILABLE = False
+        get_logger = None
+        LogContext = None
 
 from agent_mail_client import AgentMailClient
 

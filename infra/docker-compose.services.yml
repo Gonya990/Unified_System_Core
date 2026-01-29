@@ -1,16 +1,18 @@
 # Unified System Services - Docker Compose
 # All application services with integrated observability
 #
-# Usage:
+# Usage (from project root):
 #   # Start observability stack first
-#   cd infra/observability && docker compose up -d
+#   docker compose -f infra/observability/docker-compose.yml up -d
 #
-#   # Then start services
-#   docker compose -f docker-compose.services.yml up -d
+#   # Then start services (must run from project root for build context)
+#   docker compose -f infra/docker-compose.services.yml up -d
 #
 # Or start everything together:
 #   docker compose -f infra/observability/docker-compose.yml \
 #                  -f infra/docker-compose.services.yml up -d
+#
+# NOTE: Build context is the project root (..) to include infra/observability package
 
 x-common-environment: &common-environment
   PYTHONUNBUFFERED: "1"
@@ -84,8 +86,8 @@ services:
   # ============================================================================
   bridge-server:
     build:
-      context: ../Projects/AI_Core
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: infra/Dockerfile.ai-telegram-bot
     image: bridge-server:local
     container_name: bridge-server
     restart: always

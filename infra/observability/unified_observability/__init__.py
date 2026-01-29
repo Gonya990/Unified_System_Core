@@ -1,18 +1,8 @@
 """
 Unified Observability Module - OpenTelemetry-based logging, tracing, and metrics.
 
-This module provides a consistent observability interface for all services in the
-Unified System Core, enabling:
-- Structured JSON logging with correlation IDs
-- Distributed tracing with OpenTelemetry
-- Metrics collection and export
-- Easy integration with existing Python services
-
-For containerized services, install as a package:
-    pip install /path/to/infra/observability  # or add to requirements.txt
-
-For local development with path imports:
-    from infra.observability import setup_observability, get_logger
+Install in your service:
+    pip install unified-observability  # or add to requirements.txt
 
 Usage:
     from unified_observability import setup_observability, get_logger
@@ -25,23 +15,23 @@ Usage:
     logger.info("Service started", extra={"user_id": 123})
 """
 
-# Re-export from the installable package for backward compatibility
-from .unified_observability import (
-    # Logger
+from .logger import (
     setup_observability,
     get_logger,
     StructuredLogger,
     LogContext,
     set_correlation_id,
     get_correlation_id,
-    # Tracing
+)
+from .tracing import (
     get_tracer,
     trace_function,
     trace_async_function,
     inject_context,
     extract_context,
     SpanContext,
-    # Metrics
+)
+from .metrics import (
     get_meter,
     create_counter,
     create_histogram,
@@ -73,7 +63,7 @@ __all__ = [
     "create_gauge",
     "timed_operation",
     "timed",
-    ServiceMetrics,
+    "ServiceMetrics",
 ]
 
 __version__ = "1.0.0"

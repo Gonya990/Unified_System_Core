@@ -18,13 +18,17 @@ except ImportError:
     from inference_client import InferenceClient
     from agent_orchestrator import AgentOrchestrator
 
-# Try to import unified observability
+# Try to import unified observability (installed package or path-based)
 try:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-    from infra.observability import setup_observability, get_logger
+    from unified_observability import setup_observability, get_logger
     OBSERVABILITY_AVAILABLE = True
 except ImportError:
-    OBSERVABILITY_AVAILABLE = False
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+        from infra.observability import setup_observability, get_logger
+        OBSERVABILITY_AVAILABLE = True
+    except ImportError:
+        OBSERVABILITY_AVAILABLE = False
 
 # Setup logging with OpenTelemetry support
 if OBSERVABILITY_AVAILABLE:
