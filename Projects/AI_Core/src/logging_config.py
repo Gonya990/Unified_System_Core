@@ -1,12 +1,24 @@
 """
 Logging Configuration for AI Telegram Bot.
-Provides structured JSON logging for container environments.
+Provides structured JSON logging with OpenTelemetry integration for observability.
+
+This module wraps the unified observability library and provides backward-compatible
+logging setup for the AI Telegram Bot service.
 """
 import json
 import logging
 import os
 import sys
 from datetime import datetime, timezone
+from typing import Optional
+
+# Try to import unified observability module
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+    from infra.observability import setup_observability, get_logger, LogContext
+    UNIFIED_OBSERVABILITY_AVAILABLE = True
+except ImportError:
+    UNIFIED_OBSERVABILITY_AVAILABLE = False
 
 
 class JSONFormatter(logging.Formatter):
@@ -18,6 +30,7 @@ class JSONFormatter(logging.Formatter):
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
+            "service": os.environ.get("OTEL_SERVICE_NAME", "ai-telegram-bot"),
         }
 
         # Add extra fields
@@ -26,6 +39,14 @@ class JSONFormatter(logging.Formatter):
         if hasattr(record, "chat_id"):
             log_entry["chat_id"] = record.chat_id
 
+        # Add trace context if available
+        if hasattr(record, "trace_id"):
+            log_entry["trace_id"] = record.trace_id
+        if hasattr(record, "span_id"):
+            log_entry["span_id"] = record.span_id
+        if hasattr(record, "correlation_id"):
+            log_entry["correlation_id"] = record.correlation_id
+
         # Add exception info if present
         if record.exc_info:
             log_entry["exception"] = self.formatException(record.exc_info)
@@ -33,11 +54,34 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(log_entry)
 
 
-def setup_logging() -> None:
-    """Configure logging based on environment."""
+def setup_logging(
+    service_name: Optional[str] = None,
+    service_version: str = "1.0.0",
+) -> None:
+    """
+    Configure logging based on environment with OpenTelemetry support.
+
+    Args:
+        service_name: Service name for telemetry (default: from env or 'ai-telegram-bot')
+        service_version: Service version for telemetry
+    """
+    service_name = service_name or os.environ.get("OTEL_SERVICE_NAME", "ai-telegram-bot")
     log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
 
-    # Create handler
+    # Use unified observability if available
+    if UNIFIED_OBSERVABILITY_AVAILABLE:
+        setup_observability(
+            service_name=service_name,
+            service_version=service_version,
+            log_level=log_level,
+        )
+        logging.getLogger("logging_config").info(
+            "Using unified observability module",
+            extra={"otel_enabled": True}
+        )
+        return
+
+    # Fallback to local logging configuration
     handler = logging.StreamHandler(sys.stdout)
 
     # Use JSON format in production, readable format in debug
@@ -59,3 +103,5 @@ def setup_logging() -> None:
     # Reduce noise from libraries
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("telegram").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)

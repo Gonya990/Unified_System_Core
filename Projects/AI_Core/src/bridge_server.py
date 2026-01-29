@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Header, Request
@@ -12,18 +13,32 @@ try:
     from inference_client import InferenceClient
     from agent_orchestrator import AgentOrchestrator
 except ImportError:
-    import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from config_manager import ConfigManager
     from inference_client import InferenceClient
     from agent_orchestrator import AgentOrchestrator
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger("BridgeServer")
+# Try to import unified observability
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+    from infra.observability import setup_observability, get_logger
+    OBSERVABILITY_AVAILABLE = True
+except ImportError:
+    OBSERVABILITY_AVAILABLE = False
+
+# Setup logging with OpenTelemetry support
+if OBSERVABILITY_AVAILABLE:
+    setup_observability(
+        service_name="bridge-server",
+        service_version="1.0.0",
+    )
+    logger = get_logger("BridgeServer")
+else:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    logger = logging.getLogger("BridgeServer")
 
 app = FastAPI(title="Unified Core Bridge", version="1.0.0")
 config = ConfigManager()

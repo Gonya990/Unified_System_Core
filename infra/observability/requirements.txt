@@ -1,0 +1,26 @@
+# OpenTelemetry Observability Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core OpenTelemetry
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+
+# OTLP Exporters (for sending to collector)
+opentelemetry-exporter-otlp-proto-grpc>=1.22.0
+opentelemetry-exporter-otlp-proto-http>=1.22.0
+
+# Logging integration
+opentelemetry-instrumentation-logging>=0.43b0
+
+# Auto-instrumentation for common libraries
+opentelemetry-instrumentation-requests>=0.43b0
+opentelemetry-instrumentation-aiohttp-client>=0.43b0
+opentelemetry-instrumentation-httpx>=0.43b0
+opentelemetry-instrumentation-fastapi>=0.43b0
+opentelemetry-instrumentation-flask>=0.43b0
+
+# Prometheus metrics exporter (optional, for direct scraping)
+opentelemetry-exporter-prometheus>=0.43b0
+
+# Google Cloud integration (optional)
+# google-cloud-logging>=3.0.0

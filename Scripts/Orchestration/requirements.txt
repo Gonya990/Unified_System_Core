@@ -1,0 +1,12 @@
+# Orchestration Scripts Dependencies
+
+# Core dependencies
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# OpenTelemetry observability
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp-proto-grpc>=1.22.0
+opentelemetry-instrumentation-requests>=0.43b0
+opentelemetry-instrumentation-logging>=0.43b0

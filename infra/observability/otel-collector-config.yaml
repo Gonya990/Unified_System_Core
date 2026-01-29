@@ -1,0 +1,117 @@
+# OpenTelemetry Collector Configuration
+# Receives telemetry from all Unified System services and routes to backends
+
+receivers:
+  # OTLP receiver for traces, metrics, and logs
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Prometheus receiver to scrape metrics from services
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 15s
+          static_configs:
+            - targets: ['localhost:8888']
+
+processors:
+  # Batch processor for better performance
+  batch:
+    timeout: 5s
+    send_batch_size: 1000
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # Resource processor to add common attributes
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: ${ENVIRONMENT:-development}
+        action: upsert
+      - key: service.namespace
+        value: unified-system
+        action: upsert
+
+  # Filter out noisy logs
+  filter/logs:
+    logs:
+      exclude:
+        match_type: regexp
+        bodies:
+          - ".*health.*check.*"
+          - ".*GET /health.*"
+          - ".*GET /ready.*"
+
+exporters:
+  # Loki exporter for logs
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+    labels:
+      attributes:
+        service.name: "service_name"
+        service.namespace: "service_namespace"
+        level: "level"
+      resource:
+        deployment.environment: "environment"
+
+  # Tempo exporter for traces
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  # Prometheus exporter for metrics
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: unified_system
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Debug exporter (for troubleshooting)
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+service:
+  # Extensions for health check
+  extensions:
+    - health_check
+
+  pipelines:
+    # Traces pipeline
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [otlp/tempo]
+
+    # Metrics pipeline
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch, resource]
+      exporters: [prometheus]
+
+    # Logs pipeline
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/logs, batch, resource]
+      exporters: [loki]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: 0.0.0.0:8888
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133

@@ -1,0 +1,80 @@
+# Prometheus Configuration for Unified System
+# Scrapes metrics from all services and the OTEL collector
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'unified-system'
+    environment: 'production'
+
+# Alerting configuration (optional)
+alerting:
+  alertmanagers: []
+
+# Rule files for alerting (optional)
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # OpenTelemetry Collector metrics
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'otel-collector'
+
+  # Unified System Services (discovered via Docker labels or static config)
+  # These targets will be available when services expose /metrics endpoints
+
+  # AI Telegram Bot
+  - job_name: 'ai-telegram-bot'
+    static_configs:
+      - targets: ['ai-telegram-bot:8095']
+        labels:
+          service: 'ai-telegram-bot'
+
+  # Bridge Server
+  - job_name: 'bridge-server'
+    static_configs:
+      - targets: ['bridge-server:8090']
+        labels:
+          service: 'bridge-server'
+
+  # Mail Processor
+  - job_name: 'mail-processor'
+    static_configs:
+      - targets: ['mail-processor:8080']
+        labels:
+          service: 'mail-processor'
+
+  # Content Factory
+  - job_name: 'content-factory'
+    static_configs:
+      - targets: ['content-factory:8080']
+        labels:
+          service: 'content-factory'
+
+  # Loki metrics
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+
+  # Tempo metrics
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']
+
+  # Grafana metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+
+# Remote write to external systems (optional)
+remote_write: []

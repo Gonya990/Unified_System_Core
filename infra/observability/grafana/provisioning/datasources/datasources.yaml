@@ -1,0 +1,66 @@
+# Grafana Data Sources Configuration
+# Auto-provisions data sources for the observability stack
+
+apiVersion: 1
+
+datasources:
+  # Loki - Log Aggregation
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    isDefault: true
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: '"trace_id":"([^"]+)"'
+          name: TraceID
+          url: '$${__value.raw}'
+
+  # Prometheus - Metrics
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    editable: false
+    jsonData:
+      timeInterval: 15s
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: tempo
+
+  # Tempo - Distributed Tracing
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    uid: tempo
+    editable: false
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: loki
+        tags: ['service.name', 'service.namespace']
+        mappedTags: [{ key: 'service.name', value: 'service_name' }]
+        mapTagNamesEnabled: true
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: true
+        filterBySpanID: false
+      tracesToMetrics:
+        datasourceUid: prometheus
+        tags: [{ key: 'service.name', value: 'service' }]
+        queries:
+          - name: 'Request rate'
+            query: 'sum(rate(unified_system_requests_total{$$__tags}[5m]))'
+          - name: 'Error rate'
+            query: 'sum(rate(unified_system_errors_total{$$__tags}[5m]))'
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: loki

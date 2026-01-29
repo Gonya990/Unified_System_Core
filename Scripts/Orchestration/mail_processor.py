@@ -8,6 +8,7 @@ Features:
 - Detects high-priority keywords and sends alerts to Admin Telegram
 - Special handling for Council agents (FuchsiaCat, VioletCastle, PinkLake)
 - Logs all processing activity for debugging
+- OpenTelemetry integration for observability
 """
 
 import json
@@ -21,6 +22,7 @@ from typing import Any, Optional
 
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 try:
     from pathlib import Path
@@ -31,6 +33,15 @@ try:
     load_dotenv(env_path)
 except ImportError:
     pass
+
+# Try to import unified observability
+try:
+    from infra.observability import setup_observability, get_logger, LogContext
+    OBSERVABILITY_AVAILABLE = True
+except ImportError:
+    OBSERVABILITY_AVAILABLE = False
+    get_logger = None
+    LogContext = None
 
 from agent_mail_client import AgentMailClient
 
@@ -123,7 +134,16 @@ class MailProcessor:
         self._load_state()
 
     def _setup_logging(self) -> logging.Logger:
-        """Configure logging"""
+        """Configure logging with OpenTelemetry support"""
+        # Use unified observability if available
+        if OBSERVABILITY_AVAILABLE:
+            setup_observability(
+                service_name="mail-processor",
+                service_version="1.0.0",
+            )
+            return get_logger("MailProcessor")
+
+        # Fallback to standard logging
         logger = logging.getLogger("MailProcessor")
         logger.setLevel(logging.INFO)
 

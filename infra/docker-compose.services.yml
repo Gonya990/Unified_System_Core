@@ -1,0 +1,265 @@
+# Unified System Services - Docker Compose
+# All application services with integrated observability
+#
+# Usage:
+#   # Start observability stack first
+#   cd infra/observability && docker compose up -d
+#
+#   # Then start services
+#   docker compose -f docker-compose.services.yml up -d
+#
+# Or start everything together:
+#   docker compose -f infra/observability/docker-compose.yml \
+#                  -f infra/docker-compose.services.yml up -d
+
+x-common-environment: &common-environment
+  PYTHONUNBUFFERED: "1"
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+  # OpenTelemetry configuration
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+  OTEL_SERVICE_NAMESPACE: "unified-system"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production"
+
+x-common-logging: &common-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+    labels: "service,environment"
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 10s
+
+services:
+  # ============================================================================
+  # AI Telegram Bot
+  # Main Telegram bot service with multiple instances
+  # ============================================================================
+  ai-telegram-bot:
+    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:latest
+    container_name: ai-telegram-bot
+    restart: always
+    env_file:
+      - ../Projects/AI_Core/.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "ai-telegram-bot"
+      GOOGLE_APPLICATION_CREDENTIALS: /app/gcp-service-account.json
+      GCP_PROJECT_ID: ${GCP_PROJECT_ID:-my-home-435112}
+    volumes:
+      - ../Projects/AI_Core/bot.log:/app/bot.log
+      - ../Projects/AI_Core/user_context.db:/app/user_context.db
+      - ../Projects/AI_Core/conversations:/app/conversations
+      - ../Projects/AI_Core/config:/app/config
+      - ../Projects/AI_Core/data:/app/data
+      - ../config/users.yaml:/app/config/users.yaml:ro
+      - ../config/resources.yaml:/app/config/resources.yaml:ro
+      - ../Projects/AI_Core/secrets:/app/secrets:ro
+      - ../secrets:/app/unified_secrets:ro
+      - ../Projects/AI_Core/gcp-service-account.json:/app/gcp-service-account.json:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=ai-telegram-bot"
+      - "environment=production"
+      - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8095/health"]
+    ports:
+      - "8095:8095"  # Health/metrics
+      - "8096:8096"  # Dashboard
+
+  # ============================================================================
+  # Bridge Server
+  # REST API gateway for external integrations
+  # ============================================================================
+  bridge-server:
+    build:
+      context: ../Projects/AI_Core
+      dockerfile: Dockerfile
+    image: bridge-server:local
+    container_name: bridge-server
+    restart: always
+    command: ["python", "-m", "src.bridge_server"]
+    env_file:
+      - ../Projects/AI_Core/.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "bridge-server"
+      BRIDGE_PORT: "8090"
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=bridge-server"
+      - "environment=production"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8090/health"]
+    ports:
+      - "8090:8090"
+
+  # ============================================================================
+  # Mail Processor
+  # Background service for Agent Mail processing
+  # ============================================================================
+  mail-processor:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.mail-processor
+    image: mail-processor:local
+    container_name: mail-processor
+    restart: always
+    env_file:
+      - ../.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "mail-processor"
+      POLL_INTERVAL: "60"
+    volumes:
+      - ../Scripts/Orchestration/logs:/app/logs
+      - ../.env:/app/.env:ro
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=mail-processor"
+      - "environment=production"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/logs') else 1)"]
+
+  # ============================================================================
+  # Content Factory
+  # Video and content production pipeline
+  # ============================================================================
+  content-factory:
+    build:
+      context: ../Projects/Content_Factory
+      dockerfile: Dockerfile
+    image: content-factory:local
+    container_name: content-factory
+    restart: always
+    env_file:
+      - ../Projects/Content_Factory/.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "content-factory"
+    volumes:
+      - ../Projects/Content_Factory/output:/app/output
+      - ../Projects/Content_Factory/data:/app/data
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=content-factory"
+      - "environment=production"
+    profiles:
+      - factory  # Only start when explicitly requested
+
+  # ============================================================================
+  # WhatsApp Bot
+  # Meta WhatsApp Cloud API integration
+  # ============================================================================
+  whatsapp-bot:
+    build:
+      context: ../Scripts/Integrations
+      dockerfile: Dockerfile.whatsapp
+    image: whatsapp-bot:local
+    container_name: whatsapp-bot
+    restart: always
+    env_file:
+      - ../.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "whatsapp-bot"
+      FLASK_PORT: "5000"
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=whatsapp-bot"
+      - "environment=production"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    ports:
+      - "5000:5000"
+    profiles:
+      - whatsapp  # Only start when explicitly requested
+
+  # ============================================================================
+  # MCP OpenAI Server
+  # FastMCP server for OpenAI ChatGPT integration
+  # ============================================================================
+  mcp-server:
+    build:
+      context: ../Scripts/openai_mcp_server
+      dockerfile: Dockerfile
+    image: mcp-server:local
+    container_name: mcp-server
+    restart: always
+    env_file:
+      - ../.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "mcp-server"
+      MCP_PORT: "8766"
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=mcp-server"
+      - "environment=production"
+    ports:
+      - "8766:8766"
+    profiles:
+      - mcp  # Only start when explicitly requested
+
+  # ============================================================================
+  # Meta CAPI Service
+  # Meta Pixel conversion tracking
+  # ============================================================================
+  meta-capi:
+    build:
+      context: ../Projects/Business_Intelligence
+      dockerfile: Dockerfile
+    image: meta-capi:local
+    container_name: meta-capi
+    restart: always
+    env_file:
+      - ../Projects/Business_Intelligence/.env
+    environment:
+      <<: *common-environment
+      OTEL_SERVICE_NAME: "meta-capi"
+    networks:
+      - unified-services
+      - observability
+    logging: *common-logging
+    labels:
+      - "service=meta-capi"
+      - "environment=production"
+    profiles:
+      - marketing  # Only start when explicitly requested
+
+networks:
+  unified-services:
+    name: unified-services
+    driver: bridge
+  observability:
+    external: true
+    name: observability
