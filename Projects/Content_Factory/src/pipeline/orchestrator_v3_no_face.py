@@ -43,8 +43,7 @@ except ImportError:
 
 # Load API keys from potential locations
 load_dotenv(ROOT_DIR / ".env", override=True)
-load_dotenv(ROOT_DIR.parent.parent / "Projects/AI_Core/.env", override=True)
-load_dotenv(ROOT_DIR / "LLM_Council" / ".env", override=True)
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 # Masked key debug
 openai_key = os.getenv("OPENAI_API_KEY", "")

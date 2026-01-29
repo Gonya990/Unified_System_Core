@@ -64,12 +64,11 @@ except ImportError:
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 
-# --- MONETIZATION SAFETY LIMITS (OPTIMIZED - ToS SAFE) ---
-DAILY_VIDEOS_LIMIT = 3  # Optimized: 3 videos per day (quality + reach)
-MIN_INTERVAL_HOURS = 4  # 4-hour gap for better algorithm treatment
-INSTA_ACTION_DELAY = 90  # Seconds between Instagram operations (safer)
-# YouTube: 3/day safe | Instagram: 1-2/day safe | Threads: 3/day safe
-# NO TikTok - excluded by user preference
+# --- MONETIZATION SAFETY LIMITS (STRICT COMPLIANCE) ---
+DAILY_VIDEOS_LIMIT = 3  # Maximum 3 videos per day to avoid "Spam" flags
+MIN_INTERVAL_HOURS = 4  # Minimum gap between any two posts
+INSTA_ACTION_DELAY = 120 # Delayed actions for human-like behavior
+AI_LABEL_MANDATORY = True # Always label as AI for Meta compliance
 # ----------------------------------------------------------
 
 
@@ -374,50 +373,47 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
 
 
 def start_scheduler():
-    """Бесконечный цикл планировщика (OPTIMIZED - Время по Израилю UTC+2)"""
-    agent_sync("⏰ Планировщик фабрики запущен (OPTIMIZED MODE - 3 видео/день)")
+    """Stable Scheduler Loop with Meta Compliance."""
+    agent_sync("⏰ Планировщик фабрики запущен (STRICT COMPLIANCE - 3 видео/день)")
 
-    # === ОПТИМИЗИРОВАННОЕ РАСПИСАНИЕ (3 видео/день) ===
+    # 1. Morning Production (09:00 ISR -> 07:00 UTC)
+    def morning_task():
+        # Add random jitter up to 45 minutes
+        delay = random.randint(0, 2700)
+        print(f"⌛ Random Jitter: Waiting {delay}s before Morning Run...")
+        time.sleep(delay)
+        run_factory_production(mode="daily")
 
-    # Утро 09:00 по Израилю -> 07:00 UTC - Daily Russian (пик активности)
-    schedule.every().day.at("07:00").do(run_factory_production, mode="daily")
+    # 2. Lunch Production (14:00 ISR -> 12:00 UTC)
+    def lunch_task():
+        delay = random.randint(0, 3600)
+        print(f"⌛ Random Jitter: Waiting {delay}s before Lunch Run...")
+        time.sleep(delay)
+        run_factory_production(mode="english")
 
-    # День 14:00 по Израилю -> 12:00 UTC - Daily English (обеденный контент)
-    schedule.every().day.at("12:00").do(run_factory_production, mode="english")
+    # 3. Evening Production (20:00 ISR -> 18:00 UTC)
+    def evening_task():
+        delay = random.randint(0, 1800)
+        print(f"⌛ Random Jitter: Waiting {delay}s before Evening Run...")
+        time.sleep(delay)
+        run_factory_production(mode="cartoon")
 
-    # Вечер 20:00 по Израилю -> 18:00 UTC - Cartoon/Creative (вечерний прайм-тайм)
-    schedule.every().day.at("18:00").do(run_factory_production, mode="cartoon")
+    # Schedule tasks
+    schedule.every().day.at("07:00").do(morning_task)
+    schedule.every().day.at("12:00").do(lunch_task)
+    schedule.every().day.at("18:00").do(evening_task)
 
-    # === ЕЖЕНЕДЕЛЬНЫЕ СПЕЦИАЛЬНЫЕ ВЫПУСКИ ===
-
-    # По воскресеньям в 10:00 по Израилю -> 08:00 UTC - Hebrew Special
+    # Weekly Special
     schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
-
-    # По субботам в 18:00 по Израилю -> 16:00 UTC - 30-MIN DOCUMENTARY
+    
     if LONGFORM_ENABLED:
         schedule.every().saturday.at("16:00").do(run_longform_production)
-        print("🎬 Long-form Documentary: Saturday 18:00 Israel Time")
 
-    print("🚀 OPTIMIZED Scheduler running (3 videos/day + Weekly Documentary). Waiting...")
-    print("📅 Daily: 09:00 RU | 14:00 EN | 20:00 Cartoon")
-    # Priority: Brand > Context > News
-    modes = ["brand"] * 3 + ["context"] * 2 + ["auto"]
+    print("🚀 COMPLIANT Scheduler running. Waiting for pending tasks...")
     
     while True:
-        mode = random.choice(modes)
-        print(f"🚀 Starting cycle: {mode}")
-        
-        try:
-            if mode == "brand":
-                run_brand_pipeline()
-            elif mode == "context":
-                run_context_pipeline()
-            else:
-                run_daily_cycle()
-        except Exception as e:
-            print(f"❌ Cycle failed: {e}")
-            
-        time.sleep(300) # 5 min pause
+        schedule.run_pending()
+        time.sleep(60) # Check every minute
 
 
 if __name__ == "__main__":

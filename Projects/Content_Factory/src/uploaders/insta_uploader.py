@@ -55,13 +55,26 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
             print(f"❌ Login failed: {e}")
             return False
 
+    # Compliance: Add "Made with AI" disclosure to caption
+    ai_tag = "✨ Made with AI / Сгенерировано ИИ\n\n"
+    final_caption = ai_tag + caption
+
     # Upload the Reel
     print(f"🚀 Uploading Reel: {video_path}...")
     try:
-        media = cl.clip_upload(
-            video_path,
-            caption=caption
-        )
+        # We attempt to use is_ai_generated if the library version supports it
+        # Otherwise, the text disclosure in the caption is the secondary safety net.
+        params = {
+            "video_path": video_path,
+            "caption": final_caption[:2000]
+        }
+        
+        # Check if version supports is_ai_generated (Safe call)
+        try:
+            media = cl.clip_upload(**params, is_ai_generated=True)
+        except TypeError:
+            media = cl.clip_upload(**params)
+            
         print(f"✨ Successfully uploaded Reel! Media ID: {media.id}")
         return True
     except Exception as e:
