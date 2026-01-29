@@ -2,9 +2,9 @@
 # agent_comm.sh
 # Local wrapper to interact with the Centralized Agent Mail Hub on igor-gaming-1
 
-HUB_URL="http://100.110.209.49:8765/mcp"
+HUB_URL="http://100.87.208.56:8765/mcp"
 AUTH_TOKEN="${AGENT_HUB_TOKEN:-c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb}"
-PROJECT_KEY="/Gonya990/Unified_System_Core" # Logical project name
+PROJECT_KEY="/home/gonya/Unified_System" # Logical project name
 AGENT_STATE_FILE="$HOME/.cache/agent_comm_state"
 
 call_mcp_tool() {
