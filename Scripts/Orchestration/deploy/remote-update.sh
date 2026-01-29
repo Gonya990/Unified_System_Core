@@ -20,9 +20,10 @@ echo "=========================================="
 for NODE in "${NODES[@]}"; do
     echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
     
-    # Check connectivity
-    if ! tailscale status | grep -q "$NODE"; then
-        echo -e "${RED}✗ $NODE is not reachable via Tailscale. Skipping.${NC}"
+    # Check connectivity (detects network reachability even if auth fails)
+    # We use { || true; } to ignore ssh exit code (255 due to auth fail) because pipefail is set
+    if ! { ssh -v -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit 2>&1 || true; } | grep -q "Connection established"; then
+        echo -e "${RED}✗ $NODE is not reachable. Skipping.${NC}"
         continue
     fi
 
