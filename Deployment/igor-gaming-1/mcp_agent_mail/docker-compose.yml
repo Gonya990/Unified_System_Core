@@ -1,4 +1,4 @@
-version: '3.8'
+# MCP Agent Mail Server - Docker Compose
 services:
   db:
     image: postgres:16-alpine
