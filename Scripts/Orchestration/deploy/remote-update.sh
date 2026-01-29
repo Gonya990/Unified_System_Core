@@ -1,61 +1,92 @@
 #!/bin/bash
 # Remote Update - Pull latest code on remote server
-# Does NOT reset or destroy anything
+# Usage: ./remote-update.sh [--force]
 
 set -euo pipefail
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-# 1. Define nodes (could be moved to a separate file later)
-NODES=("smart" "igor-gaming" "gpu-node-1" "unified-home-core-cloud")
-REMOTE_PATH_BASE="/home/gonya/Unified_System"
+# Define Node Configurations
+# Format: "Host:RemotePath"
+NODES=(
+    "unified-home-core-cloud:/home/gonya/Unified_System"
+    "gpu-node-1:/home/gonya990/Unified_System_Core"
+    "igor-gaming:Unified_System_Core"
+)
 
-echo -e "${GREEN}Multi-Node Remote Update${NC}"
+REPO_URL="git@github.com:Gonya990/Unified_System_Core.git"
+
+echo -e "${GREEN}💎 Multi-Node Remote Update${NC}"
 echo "=========================================="
 
-for NODE in "${NODES[@]}"; do
+for CONFIG in "${NODES[@]}"; do
+    NODE="${CONFIG%%:*}"
+    REMOTE_PATH="${CONFIG#*:}"
+    
     echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
     
-    # Check connectivity (detects network reachability even if auth fails)
-    # We use { || true; } to ignore ssh exit code (255 due to auth fail) because pipefail is set
-    if ! { ssh -v -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit 2>&1 || true; } | grep -q "Connection established"; then
-        echo -e "${RED}✗ $NODE is not reachable. Skipping.${NC}"
-        continue
-    fi
-
-    # 1. Check remote status
-    echo -e "${YELLOW}[1/3] Checking remote status on $NODE...${NC}"
-    REMOTE_STATUS=$(ssh "$NODE" "cd $REMOTE_PATH_BASE && git status --porcelain" 2>/dev/null || echo "CONNECTION_FAILED")
-
-    if [ "$REMOTE_STATUS" = "CONNECTION_FAILED" ]; then
+    # 1. Connectivity Check
+    if ssh -q -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit; then
+        echo -e "${GREEN}✓ Connected to $NODE${NC}"
+    else
         echo -e "${RED}✗ Cannot connect to $NODE. Skipping.${NC}"
         continue
     fi
 
-    if [ -n "$REMOTE_STATUS" ]; then
-        echo -e "${RED}! $NODE has uncommitted changes.${NC}"
-        if [ "${1:-}" = "--force" ]; then
-            echo -e "${YELLOW}Discarding remote changes...${NC}"
-            ssh "$NODE" "cd $REMOTE_PATH_BASE && git checkout -- . && git clean -fd"
+    # 2. Check/Setup Remote Directory
+    echo -e "${YELLOW}[1/3] Checking remote filesystem...${NC}"
+    
+    # Use 'cd && echo OK' which works on both Linux (bash) and Windows (cmd)
+    if ssh "$NODE" "cd $REMOTE_PATH && echo OK" | grep -q "OK"; then
+        # 3. Check Git Status
+        REMOTE_STATUS=$(ssh "$NODE" "cd $REMOTE_PATH && git status --porcelain" 2>/dev/null || echo "GIT_ERROR")
+        
+        if [ "$REMOTE_STATUS" = "GIT_ERROR" ]; then
+             echo -e "${RED}! Git error on $NODE (Not a repo or git missing).${NC}"
+             continue
+        fi
+
+        if [ -n "$REMOTE_STATUS" ]; then
+            echo -e "${RED}! $NODE has uncommitted changes.${NC}"
+            if [ "${1:-}" = "--force" ]; then
+                echo -e "${YELLOW}Discarding remote changes...${NC}"
+                ssh "$NODE" "cd $REMOTE_PATH && git checkout -- . && git clean -fd"
+            else
+                echo -e "${RED}Skipping $NODE (Dirty). Use --force to override.${NC}"
+                continue
+            fi
+        fi
+        
+        # 4. Pull Updates (using Agent Forwarding)
+        echo -e "${YELLOW}[2/3] Pulling updates...${NC}"
+        if ssh -A "$NODE" "cd $REMOTE_PATH && git pull origin main"; then
+             echo -e "${GREEN}✓ Code updated.${NC}"
         else
-            echo "Skipping $NODE. Use --force to override."
+             echo -e "${RED}✗ Git pull failed.${NC}"
+             continue
+        fi
+
+    else
+        echo -e "${YELLOW}Directory not found. Cloning repo...${NC}"
+        # Clone Repos (using Agent Forwarding)
+        # We use strict host key checking=no here just for the first clone to facilitate automation
+        if ssh -A "$NODE" "git -c core.sshCommand=\"ssh -o StrictHostKeyChecking=no\" clone $REPO_URL $REMOTE_PATH"; then
+            echo -e "${GREEN}✓ Repository cloned to $REMOTE_PATH.${NC}"
+        else
+            echo -e "${RED}✗ Git clone failed. Check SSH keys/Agent forwarding.${NC}"
             continue
         fi
     fi
 
-    # 2. Pull on remote
-    echo -e "${YELLOW}[2/3] Pulling on $NODE...${NC}"
-    ssh "$NODE" "cd $REMOTE_PATH_BASE && git pull origin main"
+    # 5. Update Submodules
+    echo -e "${YELLOW}[3/3] Updating submodules...${NC}"
+    ssh -A "$NODE" "cd $REMOTE_PATH && git submodule update --init --recursive" || echo "Submodule warning."
 
-    # 3. Update submodules
-    echo -e "${YELLOW}[3/3] Updating submodules on $NODE...${NC}"
-    ssh "$NODE" "cd $REMOTE_PATH_BASE && git submodule update --init --recursive" || echo "Submodule update skipped."
-
-    echo -e "${GREEN}✓ $NODE update complete.${NC}"
+    echo -e "${GREEN}✓ $NODE fully synced.${NC}"
 done
 
-echo -e "\n${GREEN}All reachable nodes updated.${NC}"
+echo -e "\n${GREEN}All reachable nodes processed.${NC}"
