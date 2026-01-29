@@ -35,3 +35,15 @@ $RECYCLE.BIN/
 secrets/
 Agent_Context/Personal_Profile/RESUME_VARIANTS.md
 logs/automation/resume_attachments/
+
+# Unified Core Additions
+node_modules/
+*.db
+.cache/
+.local/
+miniconda3/
+snap/
+*.deb
+gcp-monitoring-venv/
+monitoring-venv/
+.env
