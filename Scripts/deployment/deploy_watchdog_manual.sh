@@ -21,8 +21,8 @@ fi
 # 1. Copy file
 echo "📦 Copying watchdog.py..."
 # Assuming standard path structure on remote. If it fails, user might need to adjust path.
-# PATH A: ~/Documents/Unified_System/Windows_AI_Core/src/watchdog.py (WSL Dev)
-scp $SSH_OPT Windows_AI_Core/src/watchdog.py $TARGET_USER@$TARGET_HOST:~/Documents/Unified_System/Windows_AI_Core/src/watchdog.py
+# PATH A: ~/Documents/Unified_System/Projects/AI_Core/src/watchdog.py (WSL Dev)
+scp $SSH_OPT Projects/AI_Core/src/watchdog.py $TARGET_USER@$TARGET_HOST:~/Documents/Unified_System/Projects/AI_Core/src/watchdog.py
 
 if [ $? -eq 0 ]; then
     echo "✅ File copied successfully."
@@ -30,7 +30,7 @@ else
     echo "❌ Copy failed. Check paths and permissions."
     echo "Attempting alternative path (deployment folder)..."
     # PATH B: ~/bot/src/watchdog.py (VM Deploy)
-    scp $SSH_OPT Windows_AI_Core/src/watchdog.py $TARGET_USER@$TARGET_HOST:~/bot/src/watchdog.py
+    scp $SSH_OPT Projects/AI_Core/src/watchdog.py $TARGET_USER@$TARGET_HOST:~/bot/src/watchdog.py
 fi
 
 # 2. Restart Service

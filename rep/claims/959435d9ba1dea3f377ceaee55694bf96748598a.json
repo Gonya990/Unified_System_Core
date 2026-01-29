@@ -1,0 +1,17 @@
+[
+  {
+    "type": "Linkage",
+    "task_id": "GH-001",
+    "timestamp": "2026-01-13T13:49:35.068823"
+  },
+  {
+    "type": "Sensitivity",
+    "trigger": "structured_logging is enabled",
+    "impact": "rep_distiller MUST parse JSON logs.",
+    "raw": "IF structured_logging is enabled THEN rep_distiller MUST parse JSON logs.",
+    "variables": [
+      "logging_schema"
+    ],
+    "confidence": 1.0
+  }
+]

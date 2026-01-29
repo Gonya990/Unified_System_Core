@@ -116,7 +116,34 @@ else
     echo "   3. Download ZIP to: $EXPORT_DIR"
 fi
 
-# 4. Generate summary report
+# 4. Sync Shared Agent Memory
+echo ""
+echo "🧠 Syncing Shared Agent Memory..."
+echo "🧠 Синхронизация общей памяти агента..."
+echo ""
+
+SHARED_MEMORY="$UNIFIED_SYSTEM/Agent_Context/Shared_Memory.md"
+if [ -f "$SHARED_MEMORY" ]; then
+    cd "$UNIFIED_SYSTEM"
+    git add "$SHARED_MEMORY"
+    # Only commit if there are changes
+    if ! git diff --cached --quiet; then
+        git commit -m "chore: auto-sync Shared_Memory.md"
+        git push origin main || echo "⚠️  Push failed for Shared_Memory.md"
+        echo "✅ Shared_Memory.md synced and pushed"
+    else
+        echo "✅ No changes in Shared_Memory.md"
+    fi
+fi
+
+# 5. Autosave all other changes
+echo ""
+echo "💾 Running global autosave..."
+echo "💾 Запуск глобального автосохранения..."
+echo ""
+"$SCRIPT_DIR/autosave_changes.sh"
+
+# 5. Generate summary report
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "📊 Automation Summary | Сводка автоматизации"
@@ -125,6 +152,8 @@ echo ""
 echo "✅ CV Change Detection: Active"
 echo "✅ GitHub Sync: Active"
 echo "✅ OpenAI Export Check: Active"
+echo "✅ Shared Memory Sync: Active"
+echo "✅ Global Autosave: Active"
 echo ""
 echo "📁 Monitored locations:"
 echo "   - Personal Profile: $PROFILE_DIR"

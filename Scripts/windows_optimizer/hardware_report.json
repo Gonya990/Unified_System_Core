@@ -1,0 +1,92 @@
+[
+    {
+        "DeviceId": "0",
+        "MediaType": "SSD",
+        "BusType": "SATA",
+        "Model": "SAMSUNG SSD PM851 mSATA 256GB",
+        "SizeGB": 238.47,
+        "HealthStatus": "Healthy",
+        "Partitions": [
+            {
+                "DriveLetter": "F:",
+                "Label": "",
+                "FreeGB": 97.31,
+                "TotalGB": 237.84,
+                "PercentFree": 40.9
+            }
+        ],
+        "PerformanceTier": "TIER 2 (SATA SSD)"
+    },
+    {
+        "DeviceId": "1",
+        "MediaType": "Unspecified",
+        "BusType": "SATA",
+        "Model": "SAMSUNG HD322HJ",
+        "SizeGB": 298.09,
+        "HealthStatus": "Healthy",
+        "Partitions": [
+            {
+                "DriveLetter": "G:",
+                "Label": "DISK",
+                "FreeGB": 19.95,
+                "TotalGB": 298.09,
+                "PercentFree": 6.7
+            }
+        ],
+        "PerformanceTier": "TIER 3 (HDD)"
+    },
+    {
+        "DeviceId": "2",
+        "MediaType": "HDD",
+        "BusType": "SATA",
+        "Model": "WDC WD5000AAKX-00ERMA0",
+        "SizeGB": 465.76,
+        "HealthStatus": "Healthy",
+        "Partitions": [
+            {
+                "DriveLetter": "H:",
+                "Label": "DISK",
+                "FreeGB": 49.61,
+                "TotalGB": 465.63,
+                "PercentFree": 10.7
+            }
+        ],
+        "PerformanceTier": "TIER 3 (HDD)"
+    },
+    {
+        "DeviceId": "3",
+        "MediaType": "SSD",
+        "BusType": "SATA",
+        "Model": "Verbatim Vi550 S3",
+        "SizeGB": 238.47,
+        "HealthStatus": "Healthy",
+        "Partitions": [
+            {
+                "DriveLetter": "D:",
+                "Label": "",
+                "FreeGB": 12.02,
+                "TotalGB": 140.16,
+                "PercentFree": 8.6
+            }
+        ],
+        "PerformanceTier": "TIER 2 (SATA SSD)"
+    },
+    {
+        "DeviceId": "4",
+        "MediaType": "SSD",
+        "BusType": "NVMe",
+        "Model": "KINGSTON SKC2500M81000G",
+        "SizeGB": 931.51,
+        "HealthStatus": "Healthy",
+        "Partitions": [
+            {
+                "DriveLetter": "C:",
+                "Label": "",
+                "FreeGB": 225.77,
+                "TotalGB": 930.94,
+                "PercentFree": 24.3
+            }
+        ],
+        "PerformanceTier": "TIER 1 (NVMe SSD)"
+    }
+]

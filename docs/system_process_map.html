@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ Картография процессов системы | System Process Map</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            height: 100vh;
+            width: 100vw;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .timestamp {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 70px);
+        }
+
+        #network {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            width: 100%;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            color: #00d2ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .dot-server {
+            background: #764ba2;
+        }
+
+        .dot-container {
+            background: #11998e;
+        }
+
+        .dot-service {
+            background: #f5576c;
+        }
+
+        .dot-process {
+            background: #4facfe;
+        }
+
+        .dot-offline {
+            background: #636363;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #00d2ff;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        #details {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+        }
+
+        .detail-key {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .detail-value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .status-active {
+            background: rgba(56, 239, 125, 0.2);
+            color: #38ef7d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🗺️ Картография процессов системы</h1>
+        <div class="timestamp">Обновлено: 2025-12-31 20:01 (IST)</div>
+    </div>
+
+    <div class="container">
+        <div id="network"></div>
+        <div class="sidebar">
+            <div class="card">
+                <h3>📊 Статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Активных узлов</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Контейнеров</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Сервисов</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Оффлайн</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>🎨 Легенда</h3>
+                <div class="legend-item">
+                    <div class="legend-dot dot-server"></div><span>Сервер / Узел</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot dot-container"></div><span>Docker Контейнер</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot dot-service"></div><span>Systemd Сервис</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot dot-process"></div><span>Процесс</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot dot-offline"></div><span>Оффлайн</span>
+                </div>
+            </div>
+            <div class="card" id="details">
+                <h3>ℹ️ Детали</h3>
+                <p id="hint" style="color: rgba(255,255,255,0.4); font-size: 0.8rem;">Выберите узел на карте</p>
+                <div id="details-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data nodes and edges
+        const nodes = [
+            { id: 1, label: '🖥️ SMART\n100.81.133.25', group: 'server', level: 0 },
+            { id: 2, label: '💻 MacBook Air\n100.93.121.47', group: 'server', level: 0 },
+            { id: 3, label: '🎮 Gaming PC\n100.127.194.111', group: 'server', level: 1 },
+            { id: 4, label: '☁️ Cloud Hub\n100.110.209.49', group: 'server', level: 1 },
+            { id: 5, label: '📱 iPhone 15 Pro', group: 'device', level: 1 },
+            { id: 6, label: '🚀 Rocinante', group: 'offline', level: 2 },
+            { id: 7, label: '📱 Lenovo Tablet', group: 'offline', level: 2 },
+            { id: 10, label: '🏠 Home Assistant', group: 'container', level: 1 },
+            { id: 11, label: '🔄 n8n', group: 'container', level: 1 },
+            { id: 12, label: '🔴 Node-RED', group: 'container', level: 1 },
+            { id: 13, label: '📡 Zigbee2MQTT', group: 'container', level: 1 },
+            { id: 14, label: '🦟 Mosquitto', group: 'container', level: 1 },
+            { id: 20, label: '🤖 AI Bot', group: 'service', level: 1 },
+            { id: 21, label: '🐋 Docker', group: 'service', level: 1 },
+            { id: 30, label: '🖥️ Plasma', group: 'process', level: 1 },
+            { id: 31, label: '🌐 Chrome', group: 'process', level: 1 }
+        ];
+
+        const edges = [
+            { from: 1, to: 2, dashes: true }, { from: 1, to: 3, dashes: true }, { from: 1, to: 4, dashes: true },
+            { from: 1, to: 10 }, { from: 1, to: 11 }, { from: 1, to: 12 }, { from: 1, to: 13 }, { from: 1, to: 14 },
+            { from: 1, to: 20 }, { from: 1, to: 21 }, { from: 1, to: 30 }, { from: 1, to: 31 },
+            { from: 10, to: 14 }, { from: 13, to: 14 }
+        ];
+
+        function initNetwork() {
+            const container = document.getElementById('network');
+            const data = {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    size: 20,
+                    font: { size: 12, color: '#ffffff', face: 'Segoe UI' },
+                    borderWidth: 2,
+                    shadow: true
+                },
+                edges: {
+                    width: 2,
+                    color: { color: 'rgba(255,255,255,0.2)', highlight: '#00d2ff' },
+                    smooth: { type: 'continuous' }
+                },
+                groups: {
+                    server: { color: { background: '#764ba2', border: '#9b59b6' }, size: 30 },
+                    device: { color: { background: '#667eea', border: '#764ba2' } },
+                    container: { color: { background: '#11998e', border: '#38ef7d' }, shape: 'diamond' },
+                    service: { color: { background: '#f5576c', border: '#f093fb' }, shape: 'triangle' },
+                    process: { color: { background: '#4facfe', border: '#00f2fe' }, shape: 'star' },
+                    offline: { color: { background: '#444', border: '#666' }, shape: 'square' }
+                },
+                physics: {
+                    enabled: true,
+                    stabilization: { enabled: true, iterations: 100 },
+                    solver: 'forceAtlas2Based'
+                }
+            };
+
+            const network = new vis.Network(container, data, options);
+
+            network.on("click", function (params) {
+                const hint = document.getElementById('hint');
+                const content = document.getElementById('details-content');
+                if (params.nodes.length > 0) {
+                    hint.style.display = 'none';
+                    const node = nodes.find(n => n.id === params.nodes[0]);
+                    content.innerHTML = `
+                        <div style="font-weight:bold; color:#00d2ff; margin-bottom:10px;">${node.label.replace('\n', ' ')}</div>
+                        <div class="detail-item"><span class="detail-key">Type</span><span class="detail-value">${node.group}</span></div>
+                        <div class="detail-item"><span class="detail-key">Status</span><span class="status-badge status-active">Online</span></div>
+                    `;
+                } else {
+                    hint.style.display = 'block';
+                    content.innerHTML = '';
+                }
+            });
+
+            // Force redraw after a short delay
+            setTimeout(() => network.fit(), 500);
+        }
+
+        // Wait for library to load
+        if (typeof vis !== 'undefined') {
+            initNetwork();
+        } else {
+            const script = document.querySelector('script[src*="vis-network"]');
+            script.onload = initNetwork;
+        }
+    </script>
+</body>
+
+</html>
+
+</body>
+
+</html>

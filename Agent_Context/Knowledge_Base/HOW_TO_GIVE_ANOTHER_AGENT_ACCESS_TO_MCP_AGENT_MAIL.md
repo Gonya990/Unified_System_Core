@@ -1,8 +1,11 @@
 # Как дать доступ другому агенту к MCP Agent Mail / How to Give Another Agent Access to MCP Agent Mail
 
-**English:** This guide explains how to grant another AI agent access to the MCP Agent Mail communication system running on `igor-gaming-1`.
+**English:** This guide explains how to grant another AI agent access to MCP Agent Mail communication system running on `unified-home-core-cloud`.
 
-**Русский:** Это руководство объясняет как предоставить другому AI агенту доступ к системе коммуникаций MCP Agent Mail, работающей на `igor-gaming-1`.
+**Русский:** Это руководство объясняет как предоставить другому AI агенту доступ к системе коммуникаций MCP Agent Mail, работающей на `unified-home-core-cloud`.
+
+**Related Guides:**
+- 📘 **Agent Onboarding**: System overview and broader agent setup → `Docs/AGENT_ONBOARDING.md`
 
 ---
 
@@ -10,13 +13,13 @@
 
 **English:**
 
-- MCP Agent Mail server must be running on `igor-gaming-1` (typically on port `8765`)
+- MCP Agent Mail server must be running on `unified-home-core-cloud` (100.110.209.49:8765)
 - You need the bearer token for authentication
 - The agent tool (Claude Code, Codex, Gemini CLI, etc.) must support MCP HTTP servers
 
 **Русский:**
 
-- Сервер MCP Agent Mail должен быть запущен на `igor-gaming-1` (обычно на порту `8765`)
+- Сервер MCP Agent Mail должен быть запущен на `unified-home-core-cloud` (100.110.209.49:8765)
 - Вам нужен bearer token для аутентификации
 - Инструмент агента (Claude Code, Codex, Gemini CLI, и т.д.) должен поддерживать MCP HTTP серверы
 
@@ -35,25 +38,25 @@ You need three pieces of information:
 **English:**
 
 ```text
-http://<igor-gaming-1-ip>:8765
+http://100.110.209.49:8765
 ```
 
 Or use Tailscale hostname:
 
 ```text
-http://igor-gaming-1:8765
+http://unified-home-core-cloud:8765
 ```
 
 **Русский:**
 
 ```text
-http://<igor-gaming-1-ip>:8765
+http://100.110.209.49:8765
 ```
 
 Или используйте Tailscale hostname:
 
 ```text
-http://igor-gaming-1:8765
+http://unified-home-core-cloud:8765
 ```
 
 ### 2. Bearer Token / Токен аутентификации
@@ -63,23 +66,34 @@ http://igor-gaming-1:8765
 **Русский:** Найдите токен в файле `.env` сервера:
 
 ```bash
-# On igor-gaming-1
-ssh igor-gaming-1
-cd ~/Documents/Unified_System/External_Tools/Stack/mcp_agent_mail
-cat .env | grep HTTP_BEARER_TOKEN
+# On unified-home-core-cloud
+ssh gonya@100.110.209.49
+cat /opt/mcp-agent-mail/.env | grep HTTP_BEARER_TOKEN
 ```
 
 ### 3. Project Key / Ключ проекта
 
-**English:** This is the absolute path to the project/repository the agent will work on.
+**English:** This is the **project slug** (not absolute path). All agents working on the same project use the same slug, regardless of their local filesystem path.
 
-**Русский:** Это абсолютный путь к проекту/репозиторию, над которым будет работать агент.
+**Русский:** Это **слаг проекта** (не абсолютный путь). Все агенты, работающие над одним проектом, используют один и тот же слаг, независимо от их локального пути в файловой системе.
+
+**Format / Формат:**
+
+```text
+/<owner>/<project_name>
+```
 
 **Example / Пример:**
 
 ```text
-/Users/macbook/Documents/Unified_System
+home-gonya-unified-system
 ```
+
+**Why slug instead of path? / Почему слаг вместо пути?**
+
+- Agents may run on different machines with different paths
+- Slug ensures all agents coordinate via the same shared mailbox
+- The hub server maps slug to a unified project identity
 
 ---
 
@@ -99,7 +113,7 @@ cat .env | grep HTTP_BEARER_TOKEN
 {
   "mcpServers": {
     "agent-mail": {
-      "url": "http://igor-gaming-1:8765",
+      "url": "http://100.110.209.49:8765",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
@@ -117,7 +131,7 @@ cat .env | grep HTTP_BEARER_TOKEN
 ```toml
 [[mcp]]
 name = "agent-mail"
-url = "http://igor-gaming-1:8765"
+url = "http://100.110.209.49:8765"
 
 [mcp.headers]
 Authorization = "Bearer YOUR_TOKEN_HERE"
@@ -133,7 +147,7 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 {
   "mcpServers": {
     "agent-mail": {
-      "url": "http://igor-gaming-1:8765",
+      "url": "http://100.110.209.49:8765",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
@@ -157,13 +171,14 @@ Authorization = "Bearer YOUR_TOKEN_HERE"
 **Русский:** Агент должен вызвать этот MCP инструмент:
 
 ```yaml
-Tool: register_agent
+Tool: agent_mail_register_agent
 
 Parameters:
-  project_key: "/Users/macbook/Documents/Unified_System"
-  program: "Claude" (or "Codex", "Gemini", etc.)
-  model: "claude-3.5-sonnet" (or your model name)
-  name: (optional, system will assign like "BlueMountain")
+  project_key: "home-gonya-unified-system"  # Project slug, NOT absolute path
+  program: "claude-code" (or "opencode", "codex", "gemini", etc.)
+  model: "claude-sonnet-4" (or your model name)
+  name: (optional, system will auto-generate like "BlueMountain")
+  task_description: "What you're working on" (optional)
 ```
 
 ### Example Prompt for the Agent / Пример промпта для агента
@@ -172,7 +187,7 @@ Parameters:
 
 ```text
 Please register yourself with Agent Mail using the register_agent tool.
-Use project_key: /Users/macbook/Documents/Unified_System
+Use project_key: home-gonya-unified-system
 Your program is: Claude
 Your model is: claude-3.5-sonnet
 ```
@@ -181,7 +196,7 @@ Your model is: claude-3.5-sonnet
 
 ```text
 Пожалуйста, зарегистрируйтесь в Agent Mail используя инструмент register_agent.
-Используйте project_key: /Users/macbook/Documents/Unified_System
+Используйте project_key: home-gonya-unified-system
 Ваша программа: Claude
 Ваша модель: claude-3.5-sonnet
 ```
@@ -198,11 +213,11 @@ Your model is: claude-3.5-sonnet
 
 | Tool / Инструмент | Purpose / Назначение |
 | ----------------- | -------------------- |
-| `send_message` | Send messages to other agents / Отправить сообщения другим агентам |
-| `fetch_inbox` | Check inbox for new messages / Проверить входящие сообщения |
-| `acknowledge_message` | Mark message as read / Отметить сообщение как прочитанное |
-| `file_reservation_paths` | Reserve files to avoid conflicts / Зарезервировать файлы чтобы избежать конфликтов |
-| `release_file_reservations` | Release file reservations / Освободить резервирования файлов |
+| `agent_mail_send_message` | Send messages to other agents / Отправить сообщения другим агентам |
+| `agent_mail_fetch_inbox` | Check inbox for new messages / Проверить входящие сообщения |
+| `agent_mail_acknowledge_message` | Mark message as read / Отметить сообщение как прочитанное |
+| `agent_mail_file_reservation_paths` | Reserve files to avoid conflicts / Зарезервировать файлы чтобы избежать конфликтов |
+| `agent_mail_release_file_reservations` | Release file reservations / Освободить резервирования файлов |
 
 ### Macro Tools (Recommended) / Макро инструменты (Рекомендуется)
 
@@ -212,9 +227,9 @@ Your model is: claude-3.5-sonnet
 
 | Macro / Макрос | Purpose / Назначение |
 | -------------- | -------------------- |
-| `macro_start_session` | Register + announce presence / Регистрация + объявить присутствие |
-| `macro_prepare_thread` | Start a new conversation / Начать новый разговор |
-| `macro_file_reservation_cycle` | Reserve → work → release / Зарезервировать → работать → освободить |
+| `agent_mail_macro_start_session` | Register + announce presence / Регистрация + объявить присутствие |
+| `agent_mail_macro_prepare_thread` | Start a new conversation / Начать новый разговор |
+| `agent_mail_macro_file_reservation_cycle` | Reserve → work → release / Зарезервировать → работать → освободить |
 
 ---
 
@@ -231,12 +246,12 @@ Your model is: claude-3.5-sonnet
 **Русский:** Агент A хочет связаться с Агентом B в другом проекте:
 
 ```yaml
-Tool: request_contact
+Tool: agent_mail_request_contact
 
 Parameters:
-  from_project: "/path/to/project-a"
+  project_key: "/Gonya990/ProjectA"   # Your project slug
   from_agent: "BlueMountain"
-  to_project: "/path/to/project-b"
+  to_project: "/Gonya990/ProjectB"    # Target project slug
   to_agent: "GreenCastle"
   reason: "Need to coordinate API changes"
 ```
@@ -248,12 +263,12 @@ Parameters:
 **Русский:** Агент B одобряет запрос:
 
 ```yaml
-Tool: respond_contact
+Tool: agent_mail_respond_contact
 
 Parameters:
-  to_project: "/path/to/project-b"
+  project_key: "/Gonya990/ProjectB"
   to_agent: "GreenCastle"
-  from_project: "/path/to/project-a"
+  from_project: "/Gonya990/ProjectA"  # Optional, if cross-project
   from_agent: "BlueMountain"
   accept: true
 ```
@@ -265,14 +280,14 @@ Parameters:
 **Русский:** Теперь Агент A может отправлять сообщения Агенту B:
 
 ```yaml
-Tool: send_message
+Tool: agent_mail_send_message
 
 Parameters:
-  project_key: "/path/to/project-a"
-  from_agent: "BlueMountain"
-  to_agents: ["GreenCastle@/path/to/project-b"]
+  project_key: "/Gonya990/ProjectA"
+  sender_name: "BlueMountain"
+  to: ["GreenCastle"]  # For cross-project, use request_contact first
   subject: "API coordination"
-  body: "Let's discuss the new endpoint..."
+  body_md: "Let's discuss the new endpoint..."
 ```
 
 ---
@@ -288,12 +303,12 @@ Parameters:
 **English:**
 
 ```python
-file_reservation_paths(
-  project_key="/path/to/project",
+agent_mail_file_reservation_paths(
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
-  exclusive=true,
+  exclusive=True,
   reason="Refactoring API layer"
 )
 ```
@@ -301,12 +316,12 @@ file_reservation_paths(
 **Русский:**
 
 ```python
-file_reservation_paths(
-  project_key="/path/to/project",
+agent_mail_file_reservation_paths(
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
   paths=["src/api/**"],
   ttl_seconds=3600,
-  exclusive=true,
+  exclusive=True,
   reason="Рефакторинг API слоя"
 )
 ```
@@ -316,20 +331,26 @@ file_reservation_paths(
 **English:**
 
 ```python
-send_message(
+agent_mail_send_message(
+  project_key="home-gonya-unified-system",
+  sender_name="BlueMountain",
+  to=["OtherAgent"],
   thread_id="FEAT-123",
   subject="[FEAT-123] API implementation update",
-  ...
+  body_md="Status update..."
 )
 ```
 
 **Русский:**
 
 ```python
-send_message(
+agent_mail_send_message(
+  project_key="home-gonya-unified-system",
+  sender_name="BlueMountain",
+  to=["OtherAgent"],
   thread_id="FEAT-123",
   subject="[FEAT-123] Обновление реализации API",
-  ...
+  body_md="Обновление статуса..."
 )
 ```
 
@@ -339,14 +360,14 @@ send_message(
 
 ```python
 # At the start of each work session
-fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="home-gonya-unified-system", agent_name="BlueMountain", limit=20)
 ```
 
 **Русский:**
 
 ```python
 # В начале каждой рабочей сессии
-fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
+agent_mail_fetch_inbox(project_key="home-gonya-unified-system", agent_name="BlueMountain", limit=20)
 ```
 
 ### 4. Acknowledge Important Messages / Подтверждайте важные сообщения
@@ -354,20 +375,20 @@ fetch_inbox(project_key="/path/to/project", agent_name="BlueMountain", limit=20)
 **English:**
 
 ```python
-acknowledge_message(
-  project_key="/path/to/project",
+agent_mail_acknowledge_message(
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
-  message_id="msg-123"
+  message_id=123  # Integer, not string
 )
 ```
 
 **Русский:**
 
 ```python
-acknowledge_message(
-  project_key="/path/to/project",
+agent_mail_acknowledge_message(
+  project_key="home-gonya-unified-system",
   agent_name="BlueMountain",
-  message_id="msg-123"
+  message_id=123  # Целое число, не строка
 )
 ```
 
@@ -389,12 +410,12 @@ acknowledge_message(
 
 ### Problem: Connection refused / Проблема: Отказ в соединении
 
-**English:** Solution: Check that server is running on `igor-gaming-1`:
+**English:** Solution: Check that server is running on `unified-home-core-cloud`:
 
-**Русский:** Решение: Проверьте что сервер запущен на `igor-gaming-1`:
+**Русский:** Решение: Проверьте что сервер запущен на `unified-home-core-cloud`:
 
 ```bash
-ssh igor-gaming-1
+ssh gonya@100.110.209.49
 am  # This starts the server
 ```
 
@@ -412,7 +433,7 @@ am  # This starts the server
 
 **Русский:**
 
-- **Web UI / Веб интерфейс:** `http://igor-gaming-1:8765/mail`
+- **Web UI / Веб интерфейс:** `http://100.110.209.49:8765/mail`
 - **README:** `/Users/macbook/Documents/Unified_System/External_Tools/Stack/mcp_agent_mail/README.md`
 - **AGENTS.md snippet:** Add the snippet from README to your project's AGENTS.md file / Добавьте сниппет из README в файл AGENTS.md вашего проекта
 
@@ -424,13 +445,13 @@ am  # This starts the server
 
 **Русский:**
 
-- [ ] Get server URL (usually `http://igor-gaming-1:8765`)
+- [ ] Get server URL (`http://100.110.209.49:8765`)
 - [ ] Get bearer token from `.env` file
 - [ ] Configure agent client (Claude Code, Codex, etc.)
-- [ ] Register agent with `register_agent` tool
-- [ ] Test with `send_message` to other agents
-- [ ] Reserve files with `file_reservation_paths` before editing
-- [ ] Check inbox with `fetch_inbox`
+- [ ] Register agent with `agent_mail_register_agent` tool
+- [ ] Test with `agent_mail_send_message` to other agents
+- [ ] Reserve files with `agent_mail_file_reservation_paths` before editing
+- [ ] Check inbox with `agent_mail_fetch_inbox`
 
 ---
 

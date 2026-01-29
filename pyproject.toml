@@ -1,0 +1,36 @@
+[tool.ruff]
+# Target version for the project
+target-version = "py39"
+
+# Line length (matching your preference)
+line-length = 120
+
+# Enable rules
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+
+# Rule exclusions
+ignore = [
+    "E501", # line too long (handled by line-length and formatter)
+    "B008", # function call in argument defaults
+    "C901", # function too complex
+]
+
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+    "*.ipynb",
+]
+
+[tool.ruff.isort]
+known-first-party = ["Scripts", "Projects", "Utilities"]

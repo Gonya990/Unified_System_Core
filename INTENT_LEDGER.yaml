@@ -1,0 +1,45 @@
+# Git-native Intent Ledger (Domain A)
+# Used for decentralized coordination of agents (Stigmergy / Blackboard pattern)
+# Primitives: Intent -> Evidence -> Decision (Promotion to Truth)
+
+intents:
+  - id: "youtube_auth_20260112"
+    description: "Upgrade Google OAuth scopes to include YouTube Upload"
+    status: "claimed"
+    owner: "Vibranium-Assistant"
+    human_owner: "Gonya990"
+    lease_ttl: "2026-01-12T12:00:00+02:00"
+    renewal_count: 0
+    priority: "high"
+    evidence_pointers:
+      - "Projects/AI_Core/src/google_auth.py:12"
+      - "shipping.log:skip_youtube"
+
+  - id: "documentary_ship_20260112"
+    description: "Automated delivery of 2026-01-12 documentary to YT/IG/Threads"
+    status: "executing"
+    owner: "Production-Shipper"
+    human_owner: "Gonya990"
+    lease_ttl: "2026-01-12T11:00:00+02:00"
+    renewal_count: 1
+    evidence_pointers:
+      - "outputs/documentary_2026-01-12/documentary_weekly_20260112_final.mp4"
+      - "shipping.log:insta_failure_duration"
+
+  - id: "youtube_community_post"
+    description: "Publish update to YouTube Community Tab via Browser Automation"
+    status: "pending"
+    owner: "Browser-Agent"
+    human_owner: "Gonya990"
+    lease_ttl: "2026-01-13T12:00:00+02:00"
+    renewal_count: 0
+    priority: "medium"
+    evidence_pointers:
+      - "Projects/Content_Factory/src/uploaders/youtube_community.py"
+
+# Global System Constraints
+constraints:
+  - id: "ig_reels_max_duration"
+    value: 900 # seconds
+    unit: "s"
+    source: "Instagram API Specs"

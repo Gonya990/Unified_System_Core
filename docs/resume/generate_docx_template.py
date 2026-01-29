@@ -1,9 +1,8 @@
 from docx import Document
-from docx.shared import Pt, RGBColor, Inches, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_DIRECTION
-from docx.oxml.ns import qn, nsdecls
-from docx.oxml import OxmlElement, parse_xml
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Cm, Pt, RGBColor
 
 # --- Helpers ---
 
@@ -46,14 +45,14 @@ def create_header_bar(paragraph, text, bg_color="1B4D3E"): # Dark Green
     shd.set(qn('w:color'), 'auto')
     shd.set(qn('w:fill'), bg_color)
     pPr.append(shd)
-    
+
     # Add some spacing
     paragraph.paragraph_format.space_before = Pt(12)
     paragraph.paragraph_format.space_after = Pt(6)
 
 def create_resume_template():
     document = Document()
-    
+
     # 1. Set Margin to narrow to maximize space
     sections = document.sections
     for section in sections:
@@ -67,11 +66,11 @@ def create_resume_template():
     font = style.font
     font.name = 'Arial'
     font.size = Pt(10)
-    
+
     # 3. Create Main Layout Table (1 Row, 2 Cols)
     table = document.add_table(rows=1, cols=2)
     table.autofit = False
-    
+
     # Set Table Direction to RTL
     tblPr = table._tbl.tblPr
     if tblPr is None:
@@ -81,12 +80,12 @@ def create_resume_template():
     tblPr.append(bidiViz)
 
     # Column Widths
-    # Total width approx 18cm. 
+    # Total width approx 18cm.
     # Sidebar (Right in RTL) -> ~30% -> 6cm
     # Main (Left in RTL) -> ~70% -> 12cm
-    
+
     # In RTL table: Cell 0 is Right, Cell 1 is Left.
-    sidebar_cell = table.rows[0].cells[0] 
+    sidebar_cell = table.rows[0].cells[0]
     main_cell = table.rows[0].cells[1]
 
     sidebar_cell.width = Cm(6.5)
@@ -103,7 +102,7 @@ def create_resume_template():
     run_photo = p_photo.add_run("[תמונה]")
     run_photo.font.size = Pt(10)
     run_photo.font.color.rgb = RGBColor(100, 100, 100)
-    
+
     # Name
     p_name = sidebar_cell.add_paragraph()
     set_rtl(p_name)
@@ -112,7 +111,7 @@ def create_resume_template():
     run_name.bold = True
     run_name.font.size = Pt(28)
     run_name.font.color.rgb = RGBColor(40, 40, 40)
-    
+
     # Title
     p_title = sidebar_cell.add_paragraph()
     set_rtl(p_title)
@@ -160,7 +159,7 @@ def create_resume_template():
     run_l = p_lang.add_run(lang_text)
     run_l.font.color.rgb = RGBColor(50, 50, 50)
     p_lang.paragraph_format.space_after = Pt(20)
-    
+
     # Skills Summary for Sidebar
     p_skill_head = sidebar_cell.add_paragraph()
     set_rtl(p_skill_head)
@@ -185,7 +184,7 @@ def create_resume_template():
     p_sum_head = main_cell.paragraphs[0]
     set_rtl(p_sum_head)
     create_header_bar(p_sum_head, "   תמצית מקצועית   ")
-    
+
     p_summary = main_cell.add_paragraph()
     set_rtl(p_summary)
     p_summary.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -201,7 +200,7 @@ def create_resume_template():
     p_job1 = main_cell.add_paragraph()
     set_rtl(p_job1)
     p_job1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    
+
     r_date1 = p_job1.add_run("2023 – הווה")
     r_date1.bold = True
     r_date1.font.size = Pt(11)
@@ -214,7 +213,7 @@ def create_resume_template():
     r_comp1 = p_job1.add_run("Schindler Group")
     r_comp1.bold = False
     r_comp1.font.color.rgb = RGBColor(100, 100, 100)
-    
+
     p_desc1 = main_cell.add_paragraph()
     set_rtl(p_desc1)
     p_desc1.add_run("• ניהול והובלת התקנת מערכות מעליות מהירות בפרויקטי דגל רבי-קומות.\n• אחריות כוללת על פתרון בעיות מכאניות ולוגיסטיות בשטח בזמן אמת.\n• יישום נהלי בטיחות ומעקב אחר התקדמות הפרויקט.")
@@ -223,7 +222,7 @@ def create_resume_template():
     # Job 2
     p_job2 = main_cell.add_paragraph()
     set_rtl(p_job2)
-    
+
     r_date2 = p_job2.add_run("2019 – 2023")
     r_date2.bold = True
     p_job2.add_run("\n")
@@ -243,7 +242,7 @@ def create_resume_template():
     # Job 3
     p_job3 = main_cell.add_paragraph()
     set_rtl(p_job3)
-    
+
     r_date3 = p_job3.add_run("2020 – 2022")
     r_date3.bold = True
     p_job3.add_run("\n")
@@ -277,17 +276,17 @@ def create_resume_template():
     p_mil_head = main_cell.add_paragraph()
     set_rtl(p_mil_head)
     create_header_bar(p_mil_head, "   שירות צבאי   ")
-    
+
     p_mil = main_cell.add_paragraph()
     set_rtl(p_mil)
     p_mil.add_run("2013 – 2015").bold = True
     p_mil.add_run("\nחיל האוויר, נהג, דרגת סמ״ר.")
-    
+
     # Project (Optional, maybe fit in if space allows, or leave out to keep it clean like template)
     p_proj_head = main_cell.add_paragraph()
     set_rtl(p_proj_head)
     create_header_bar(p_proj_head, "   פרויקטים אישיים   ")
-    
+
     p_proj = main_cell.add_paragraph()
     set_rtl(p_proj)
     p_proj.add_run("תשתיות חכמות ואוטומציה: ").bold = True

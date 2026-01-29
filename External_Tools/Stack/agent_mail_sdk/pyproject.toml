@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-mail"
+version = "0.1.0"
+description = "Official Python SDK for Agent Mail (Unified System)"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "requests",
+    "python-dotenv",
+    "pydantic"
+]
+
+[project.scripts]
+agent-mail = "agent_mail.cli:main"

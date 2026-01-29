@@ -5,37 +5,38 @@ English: MCP server providing access to OpenAI ChatGPT API
 Russian: MCP сервер, предоставляющий доступ к API OpenAI ChatGPT
 """
 
-from fastmcp import FastMCP
-import os
-from dotenv import load_dotenv
-import openai
-from typing import Optional, List, Dict, Any
 import json
+import os
 from datetime import datetime
+from typing import Any, Optional
+
+import openai
+from dotenv import load_dotenv
+from fastmcp import FastMCP
 
 # Load environment variables
 load_dotenv()
 
 # Initialize FastMCP server
-mcp = FastMCP("openai-gateway", 
-              host="127.0.0.1", 
+mcp = FastMCP("openai-gateway",
+              host="127.0.0.1",
               port=8766)
 
 # Configure OpenAI client
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @mcp.tool()
-def list_conversations(limit: int = 20, offset: int = 0) -> List[Dict[str, Any]]:
+def list_conversations(limit: int = 20, offset: int = 0) -> list[dict[str, Any]]:
     """
     List ChatGPT conversations from OpenAI account.
-    
+
     English: Retrieve a list of recent conversations.
     Russian: Получить список недавних разговоров.
-    
+
     Args:
         limit: Maximum number of conversations to return
         offset: Number of conversations to skip
-    
+
     Returns:
         List of conversation objects with id, title, created_at
     """
@@ -43,7 +44,7 @@ def list_conversations(limit: int = 20, offset: int = 0) -> List[Dict[str, Any]]
         # Note: This endpoint might need to use the Chat API or custom endpoint
         # OpenAI's official API doesn't directly expose conversation history yet
         # This is a placeholder for when the feature becomes available
-        
+
         return {
             "status": "note",
             "message": "OpenAI API doesn't yet expose conversation history directly. Use export method or wait for official API support.",
@@ -59,18 +60,18 @@ def list_conversations(limit: int = 20, offset: int = 0) -> List[Dict[str, Any]]
 
 @mcp.tool()
 def send_message(message: str, conversation_id: Optional[str] = None,
-                model: str = "gpt-4") -> Dict[str, Any]:
+                model: str = "gpt-4") -> dict[str, Any]:
     """
     Send a message to ChatGPT and get response.
-    
+
     English: Send a message to OpenAI's ChatGPT model.
     Russian: Отправить сообщение модели ChatGPT от OpenAI.
-    
+
     Args:
         message: The message to send
         conversation_id: Optional conversation ID to continue (not yet supported)
         model: OpenAI model to use (gpt-4, gpt-3.5-turbo, etc.)
-    
+
     Returns:
         Response from ChatGPT
     """
@@ -81,7 +82,7 @@ def send_message(message: str, conversation_id: Optional[str] = None,
                 {"role": "user", "content": message}
             ]
         )
-        
+
         return {
             "status": "success",
             "response": response.choices[0].message.content,
@@ -97,13 +98,13 @@ def send_message(message: str, conversation_id: Optional[str] = None,
 
 
 @mcp.tool()
-def get_models() -> List[str]:
+def get_models() -> list[str]:
     """
     Get list of available OpenAI models.
-    
+
     English: Retrieve list of models you have access to.
     Russian: Получить список моделей, к которым у вас есть доступ.
-    
+
     Returns:
         List of available model IDs
     """
@@ -121,20 +122,20 @@ def get_models() -> List[str]:
 
 
 @mcp.tool()
-def get_account_info() -> Dict[str, Any]:
+def get_account_info() -> dict[str, Any]:
     """
     Get OpenAI account information.
-    
+
     English: Retrieve your OpenAI account details and API usage.
     Russian: Получить детали вашей учетной записи OpenAI и использование API.
-    
+
     Returns:
         Account information
     """
     try:
         # Get available models as a proxy for account access
         models = openai.models.list()
-        
+
         return {
             "status": "success",
             "api_key_valid": True,
@@ -150,22 +151,22 @@ def get_account_info() -> Dict[str, Any]:
 
 
 @mcp.tool()
-def chat_with_context(messages: List[Dict[str, str]], 
+def chat_with_context(messages: list[dict[str, str]],
                      model: str = "gpt-4",
                      temperature: float = 0.7,
-                     max_tokens: int = 4000) -> Dict[str, Any]:
+                     max_tokens: int = 4000) -> dict[str, Any]:
     """
     Send messages with full conversation context to ChatGPT.
-    
+
     English: Have a multi-turn conversation with ChatGPT.
     Russian: Провести многоходовой разговор с ChatGPT.
-    
+
     Args:
         messages: List of message objects with 'role' and 'content'
         model: OpenAI model to use
         temperature: Creativity level (0.0-1.0)
         max_tokens: Maximum tokens in response
-    
+
     Returns:
         ChatGPT response with usage statistics
     """
@@ -176,7 +177,7 @@ def chat_with_context(messages: List[Dict[str, str]],
             temperature=temperature,
             max_tokens=max_tokens
         )
-        
+
         return {
             "status": "success",
             "response": response.choices[0].message.content,
@@ -200,7 +201,7 @@ def chat_with_context(messages: List[Dict[str, str]],
 def get_server_status() -> str:
     """
     Get MCP server status and configuration.
-    
+
     Returns server health and configuration information.
     """
     try:
@@ -208,10 +209,10 @@ def get_server_status() -> str:
         models = openai.models.list()
         api_status = "connected"
         model_count = len(models.data)
-    except:
+    except Exception:
         api_status = "disconnected"
         model_count = 0
-    
+
     status = {
         "server": "openai-gateway",
         "status": "running",
@@ -225,7 +226,7 @@ def get_server_status() -> str:
             "get_account_info": "Account information"
         }
     }
-    
+
     return json.dumps(status, indent=2)
 
 
@@ -233,7 +234,7 @@ def get_server_status() -> str:
 def ask_chatgpt_prompt(question: str) -> str:
     """
     Pre-built prompt to ask ChatGPT a question.
-    
+
     English: Template for querying ChatGPT via OpenAI API.
     Russian: Шаблон для запроса ChatGPT через API OpenAI.
     """
@@ -253,7 +254,7 @@ if __name__ == "__main__":
     print("English: Starting MCP server on http://127.0.0.1:8766")
     print("Russian: Запуск MCP сервера на http://127.0.0.1:8766")
     print()
-    
+
     # Check API key
     if not os.getenv("OPENAI_API_KEY"):
         print("⚠️  WARNING | ПРЕДУПРЕЖДЕНИЕ:")
@@ -267,7 +268,7 @@ if __name__ == "__main__":
     else:
         print("✅ OpenAI API key found | API ключ OpenAI найден")
         print()
-    
+
     print("Available tools | Доступные инструменты:")
     print("  - send_message")
     print("  - chat_with_context")
@@ -277,5 +278,5 @@ if __name__ == "__main__":
     print()
     print("Press Ctrl+C to stop | Нажмите Ctrl+C для остановки")
     print()
-    
+
     mcp.run()

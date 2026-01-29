@@ -1,0 +1,30 @@
+# 🏛️ Unified System: RBAC Policy Configuration
+# Canonical Location: Unified_System/config/rbac_policy.yaml
+
+roles:
+  admin:
+    description: "Full access to all resources and high-cost tiers."
+    capabilities: ["*"]
+  pro_agent:
+    description: "Access to high-cost models (GPT-4, Claude 3 Opus) and large context windows."
+    capabilities: ["tier1", "pro"]
+  worker:
+    description: "Standard access to free and standard tier models."
+    capabilities: ["standard", "free"]
+
+agents:
+  # Chief Orchestrators
+  OrangeStone: "admin"
+  PinkLake: "admin"
+  
+  # Field Agents
+  VioletCastle: "admin"   # Kosta Desktop
+  FuchsiaCat: "admin"     # Kosta Laptop
+  CobaltRidge: "admin"    # Antigravity (Current Instance)
+  
+  # Automation Scripts
+  DailyFactory: "pro_agent"
+  ResearchBot: "worker"
+  GmailAgent: "worker"
+
+default_role: "worker"

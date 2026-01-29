@@ -16,8 +16,8 @@ import signal
 import socket
 import sys
 from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Any
+
 
 # Load environment from .env file
 def load_env():
@@ -26,7 +26,7 @@ def load_env():
         Path(__file__).parent / ".env",
         Path.cwd() / ".env"
     ]
-    
+
     for env_path in env_paths:
         if env_path.exists():
             with open(env_path) as f:
@@ -43,7 +43,7 @@ load_env()
 # Configuration from environment
 CONFIG = {
     "chrome_debug_port": int(os.getenv("CHROME_DEBUG_PORT", "9222")),
-    "chrome_executable": os.getenv("CHROME_EXECUTABLE", 
+    "chrome_executable": os.getenv("CHROME_EXECUTABLE",
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
     "socket_path": os.getenv("SOCKET_PATH", "/tmp/nodriver.sock"),
     "screenshot_path": os.getenv("SCREENSHOT_PATH", "/tmp/nodriver_screen.png"),
@@ -65,19 +65,19 @@ except ImportError:
 
 class BrowserDaemon:
     """Unix Socket daemon for browser control"""
-    
+
     def __init__(self):
         self.browser = None
         self.page = None
         self.tabs: list = []
         self.running = False
         self.socket_path = CONFIG["socket_path"]
-        
+
     async def connect_to_chrome(self) -> bool:
         """Connect to existing Chrome instance via CDP"""
         if not NODRIVER_AVAILABLE:
             return False
-            
+
         try:
             # Connect to existing Chrome with remote debugging
             self.browser = await uc.start(
@@ -86,24 +86,24 @@ class BrowserDaemon:
                     f"--remote-debugging-port={CONFIG['chrome_debug_port']}"
                 ]
             )
-            
+
             # Get first tab or create one
             self.page = await self.browser.get("about:blank")
             self.tabs = [self.page]
-            
+
             print(f"✓ Connected to Chrome on port {CONFIG['chrome_debug_port']}")
             return True
-            
+
         except Exception as e:
             print(f"✗ Failed to connect to Chrome: {e}")
-            print(f"  Make sure Chrome is running with:")
+            print("  Make sure Chrome is running with:")
             print(f"  {CONFIG['chrome_executable']} --remote-debugging-port={CONFIG['chrome_debug_port']}")
             return False
-    
-    async def handle_command(self, cmd: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def handle_command(self, cmd: dict[str, Any]) -> dict[str, Any]:
         """Process a single command and return result"""
         action = cmd.get("action", "").lower()
-        
+
         try:
             # Navigation
             if action == "goto":
@@ -111,7 +111,7 @@ class BrowserDaemon:
                 self.page = await self.browser.get(url)
                 title = await self.page.evaluate("document.title")
                 return {"ok": True, "title": title, "url": url}
-            
+
             # --- SHADOW DOM HELPER ---
             SHADOW_HELPER = """
             window.__ndc_find = (selector, root = document) => {
@@ -134,7 +134,7 @@ class BrowserDaemon:
                 path = cmd.get("path", CONFIG["screenshot_path"])
                 await self.page.save_screenshot(path)
                 return {"ok": True, "path": path}
-            
+
             # Click by text
             elif action == "click":
                 text = cmd.get("text", "")
@@ -143,7 +143,7 @@ class BrowserDaemon:
                     await element.click()
                     return {"ok": True, "clicked": text}
                 return {"ok": False, "error": f"Element not found: {text}"}
-            
+
             # Click by selector (Shadow DOM aware)
             elif action == "clicksel":
                 selector = cmd.get("selector", "")
@@ -159,7 +159,7 @@ class BrowserDaemon:
                 if clicked:
                     return {"ok": True, "clicked": selector}
                 return {"ok": False, "error": f"Selector not found: {selector}"}
-            
+
             # Hardware Key Press (Stealthier than JS)
             elif action == "press":
                 key = cmd.get("key", "Enter")
@@ -185,7 +185,7 @@ class BrowserDaemon:
                 """
                 result = await self.page.evaluate(js_code)
                 return result if isinstance(result, dict) else {"ok": True, "filled": selector}
-            
+
             # Type with delay (Shadow DOM aware)
             elif action == "type":
                 selector = cmd.get("selector", "")
@@ -207,20 +207,20 @@ class BrowserDaemon:
                 """
                 result = await self.page.evaluate(js_code)
                 return result if isinstance(result, dict) else {"ok": True, "typed": len(text)}
-            
+
             # Semantic Page Analysis
             elif action == "elements":
                 js_code = """
                 (() => {
                     const interactables = [];
                     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-                    
+
                     const isVisible = (el) => {
                         const style = window.getComputedStyle(el);
-                        return  style.display !== 'none' && 
-                                style.visibility !== 'hidden' && 
+                        return  style.display !== 'none' &&
+                                style.visibility !== 'hidden' &&
                                 style.opacity !== '0' &&
-                                el.offsetWidth > 0 && 
+                                el.offsetWidth > 0 &&
                                 el.offsetHeight > 0;
                     };
 
@@ -242,7 +242,7 @@ class BrowserDaemon:
                                 interactables.push(getElementInfo(el));
                             }
                         });
-                        
+
                         // Recursive Shadow DOM scan
                         root.querySelectorAll('*').forEach(el => {
                             if (el.shadowRoot) scan(el.shadowRoot);
@@ -286,13 +286,13 @@ class BrowserDaemon:
                 """
                 result = await self.page.evaluate(js_code)
                 return result if isinstance(result, dict) else {"ok": False, "error": "Unknown error"}
-            
+
             # Execute JavaScript
             elif action == "js":
                 code = cmd.get("code", "")
                 result = await self.page.evaluate(code)
                 return {"ok": True, "result": result}
-            
+
             # Get page HTML
             elif action == "html":
                 html = await self.page.evaluate("document.documentElement.outerHTML")
@@ -302,17 +302,17 @@ class BrowserDaemon:
                         f.write(html)
                     return {"ok": True, "path": path, "length": len(html)}
                 return {"ok": True, "html": html}
-            
+
             # Get page title
             elif action == "title":
                 title = await self.page.evaluate("document.title")
                 return {"ok": True, "title": title}
-            
+
             # Get current URL
             elif action == "url":
                 url = await self.page.evaluate("window.location.href")
                 return {"ok": True, "url": url}
-            
+
             # List tabs
             elif action == "tabs":
                 tabs_info = []
@@ -324,7 +324,7 @@ class BrowserDaemon:
                     except:
                         tabs_info.append({"index": i, "title": "?", "url": "?"})
                 return {"ok": True, "tabs": tabs_info, "active": 0}
-            
+
             # New tab
             elif action == "newtab":
                 url = cmd.get("url", "about:blank")
@@ -332,7 +332,7 @@ class BrowserDaemon:
                 self.tabs.append(new_page)
                 self.page = new_page
                 return {"ok": True, "index": len(self.tabs) - 1}
-            
+
             # Close tab
             elif action == "closetab":
                 index = cmd.get("index", -1)
@@ -344,7 +344,7 @@ class BrowserDaemon:
                         self.page = self.tabs[-1]
                     return {"ok": True, "closed": index}
                 return {"ok": False, "error": f"Invalid tab index: {index}"}
-            
+
             # Switch tab
             elif action == "switchtab":
                 index = cmd.get("index", 0)
@@ -352,7 +352,7 @@ class BrowserDaemon:
                     self.page = self.tabs[index]
                     return {"ok": True, "switched": index}
                 return {"ok": False, "error": f"Invalid tab index: {index}"}
-            
+
             # Scroll
             elif action == "scroll":
                 direction = cmd.get("direction", "down")
@@ -362,7 +362,7 @@ class BrowserDaemon:
                 else:
                     await self.page.scroll_up(amount)
                 return {"ok": True, "scrolled": direction, "amount": amount}
-            
+
             # Wait for element (Shadow DOM aware)
             elif action == "wait":
                 selector = cmd.get("selector", "")
@@ -389,7 +389,7 @@ class BrowserDaemon:
                     return {"ok": False, "error": f"Timeout waiting for: {selector}"}
                 except Exception as e:
                     return {"ok": False, "error": f"Wait error: {str(e)}"}
-            
+
             # Daemon status
             elif action == "status":
                 url = await self.page.evaluate("window.location.href") if self.page else "none"
@@ -403,39 +403,39 @@ class BrowserDaemon:
                         "socket": self.socket_path
                     }
                 }
-            
+
             # Stop daemon
             elif action == "stop":
                 self.running = False
                 return {"ok": True, "status": "stopping"}
-            
+
             else:
                 return {"ok": False, "error": f"Unknown action: {action}"}
-                
+
         except Exception as e:
             return {"ok": False, "error": str(e)}
-    
+
     async def run_server(self):
         """Run Unix socket server"""
         # Remove old socket
         if os.path.exists(self.socket_path):
             os.unlink(self.socket_path)
-        
+
         # Create socket
         server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(self.socket_path)
         server.listen(5)
         server.setblocking(False)
-        
+
         # Make socket accessible
         os.chmod(self.socket_path, 0o777)
-        
+
         print(f"✓ Socket server listening at {self.socket_path}")
         self.running = True
-        
+
         loop = asyncio.get_event_loop()
-        
+
         while self.running:
             try:
                 # Accept connection with timeout
@@ -446,33 +446,33 @@ class BrowserDaemon:
                     )
                 except asyncio.TimeoutError:
                     continue
-                
+
                 # Read command
                 data = await loop.sock_recv(conn, 65536)
                 if not data:
                     conn.close()
                     continue
-                
+
                 # Parse and handle command
                 try:
                     cmd = json.loads(data.decode())
                     result = await self.handle_command(cmd)
                 except json.JSONDecodeError as e:
                     result = {"ok": False, "error": f"Invalid JSON: {e}"}
-                
+
                 # Send response
                 response = json.dumps(result)
                 await loop.sock_sendall(conn, response.encode())
                 conn.close()
-                
+
             except Exception as e:
                 print(f"✗ Server error: {e}")
-        
+
         # Cleanup
         server.close()
         os.unlink(self.socket_path)
         print("✓ Server stopped")
-    
+
     async def start(self):
         """Start the daemon"""
         print("=" * 50)
@@ -481,25 +481,25 @@ class BrowserDaemon:
         print(f"  Chrome port: {CONFIG['chrome_debug_port']}")
         print(f"  Socket: {self.socket_path}")
         print("=" * 50)
-        
+
         # Connect to Chrome
         if not await self.connect_to_chrome():
             print("\n⚠ To start Chrome with remote debugging, run:")
             print(f'  "{CONFIG["chrome_executable"]}" --remote-debugging-port={CONFIG["chrome_debug_port"]}')
             print("\nOr set AUTO_START_CHROME=true in .env")
             sys.exit(1)
-        
+
         # Setup signal handlers
         def signal_handler(sig, frame):
             print("\n⚡ Received interrupt signal, stopping...")
             self.running = False
-        
+
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
-        
+
         # Run server
         await self.run_server()
-        
+
         # Cleanup browser
         if self.browser:
             self.browser.stop()

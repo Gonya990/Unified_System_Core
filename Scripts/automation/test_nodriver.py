@@ -1,5 +1,6 @@
-from aios_client import AIOSClient
 import json
+
+from aios_client import AIOSClient
 
 client = AIOSClient()
 print("--- Testing browser_goto with explicit tools ---")

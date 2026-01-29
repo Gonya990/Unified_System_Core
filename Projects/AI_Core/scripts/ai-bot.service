@@ -1,0 +1,16 @@
+[Unit]
+Description=AI Telegram Bot (Unified System)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Unified_System/Projects/AI_Core
+Environment="PYTHONUNBUFFERED=1"
+Environment="PYTHONPATH=%h/Unified_System/Projects/AI_Core"
+Environment="PATH=%h/Unified_System/Projects/AI_Core/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=%h/Unified_System/Projects/AI_Core/venv/bin/python3 -m src.main
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

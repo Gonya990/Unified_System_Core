@@ -1,7 +1,10 @@
 # 🌌 ANTIGRAVITY CONTEXT HANDOFF
 >
-> **Generated:** 2025-12-23  
+> **Generated:** 2026-01-29
 > **Purpose:** Complete system knowledge transfer for session continuity
+>
+> **Redirect:** Kostya is currently operating as **AzureBeacon**. All tasks
+> assigned to Kostya should be handled by/directed to AzureBeacon.
 
 ---
 
@@ -13,7 +16,7 @@
 
 ### Directory Structure
 
-```
+```text
 /home/gonya/
 ├── 00_NAV/                      # 📍 Navigation & Documentation
 │   ├── NAVIGATION.md            # Quick navigation guide
@@ -49,19 +52,28 @@
 
 ### Active Conversation Artifacts
 
+<!-- markdownlint-disable MD013 -->
 | Conversation ID | Title | Status | Key Artifacts |
 |-----------------|-------|--------|---------------|
-| `nodriver_implementation` | **Browser Control Daemon** | ✅ Implemented | nodriver_daemon.py, ndc CLI, UV setup |
-| `workflow_design_c651` | **Multi-Agent Workflow Design** | ✅ Complete | WORKFLOW_DESIGN_DECISIONS.md, discuss-design workflow |
-| `arthur_tablet_setup` | **Arthur Tablet Setup** | 🔄 In Progress | ADB setup, Family Link, Tailscale |
-| `6afbab64-f024-...` | **Codex Context Handoff (Mac)** | ✅ Complete | Artifact index, session handoff, task + walkthrough |
-| `0866ee1f-5969-...` | **Unified Topology Setup** | ✅ Complete | MCP server, n8n guide, walkthrough |
-| `a1c2070a-d35e-...` | **Proxmox Network Reconnaissance** | 🔄 In Progress | System inventory, deep clean briefing |
-| `b64b29bb-d3b8-...` | **Hybrid Cortex Activation** | ✅ Complete | RAG/Function calling implementation plan |
-| `bc334b70-7153-...` | **Grant Mac Service Access** | ✅ Complete | Host configuration guide |
-| `b32255f1-fc4d-...` | **Docker GPU Access Check** | ✅ Complete | Workflow verification |
-| `8c34a8bc-20df-...` | **Chrome Remote Debugging** | ✅ Complete | Docker CDP setup |
-| `30813860-99c6-...` | **File Organization** | ✅ Complete | Migration plan, navigation |
+| `nodriver_im...` | **Browser Control** | ✅ Done | nodriver_daemon.py, ndc |
+| `workflow_de...` | **Workflow Design** | ✅ Done | WORKFLOW_DESIGN.md |
+| `arthur_tabl...` | **Arthur Tablet** | 🔄 InPrg | MorningBrief, Mashov, ADB |
+| `6afbab64-f0...` | **Codex Handoff** | ✅ Done | Artifact index, handoff |
+| `0866ee1f-59...` | **Unified Topology** | ✅ Done | MCP server, n8n guide |
+| `a1c2070a-d3...` | **Proxmox Recon** | 🔄 InPrg | System inventory |
+| `b64b29bb-d3...` | **Hybrid Cortex** | ✅ Done | RAG implementation |
+| `bc334b70-71...` | **Mac Access** | ✅ Done | Host config guide |
+| `b32255f1-fc...` | **Docker GPU** | ✅ Done | Workflow verification |
+| `8c34a8bc-20...` | **Chrome Debug** | ✅ Done | Docker CDP setup |
+| `30813860-99...` | **File Org** | ✅ Done | Migration plan |
+| `2026-01-12_...` | **Mail Proctor** | ✅ Done | task.md, walkthrough |
+| `2026-01-12_...` | **Sync Cycle** | ✅ Done | task.md, walkthrough |
+| `2026-01-12_...` | **Comm CLI** | ✅ Done | task.md, walkthrough |
+| `b05bca38-e2...` | **System Sync & Youtube** | ✅ Done | task.md, walkthrough |
+| `75f5a657-2d...` | **Clockwork Governance** | 🔄 InPrg | task.md, walkthrough, conscience.py |
+| `2026-01-27_...` | **Cloud IP Migration** | ✅ Done | task.md, walkthrough |
+| `e37a3a79-d5...` | **Remote Update Fix** | 🔄 InPrg | task.md |
+<!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
 
@@ -132,12 +144,54 @@ Each conversation folder may contain:
 - [ ] Configure Home Assistant integration
 ```
 
+### From `2026-01-12_mail_processor_deployment` (Mail Processor) - COMPLETE ✅
+
+```markdown
+- [x] Configure systemd service for Mail Processor
+- [x] Ensure agent registration (AmberOwl) on server
+- [x] Test Telegram alerts integration
+- [x] Move diagnostic scripts to `Scripts/Maintenance/Diagnostics`
+  <!-- id: 202 -->
+- [x] Clean up Workspace root directory
+
+```
+
+### From `2026-01-12_sync` (Maintenance & Sync) - COMPLETE ✅
+
+```markdown
+- [ ] Execute /update-progress workflow
+- [ ] Execute /autosave workflow
+- [ ] Execute /sync-mail workflow
+- [ ] Execute /sync workflow
+
+
+```
+
+### From `2026-01-12_comm_cli_upgrade` (Comm CLI Upgrade) - COMPLETE ✅
+
+```markdown
+- [x] Implement File Reservation in SDK (US-l54)
+- [x] Implement File Reservation in CLI
+- [x] Verify Broadcast functionality
+```
+
+### From `2026-01-13_sync` (System Sync & Maintenance) - COMPLETE ✅
+
+```markdown
+- [x] Fetch Agent Mail inbox and sync Beads (US-l54)
+- [x] Mashov/Webtop Integrated (Auth + Client)
+- [x] Execute /update-progress workflow
+- [x] Execute /sync (Vibranium Full Sync)
+- [x] Execute /autosave workflow
+```
+
 ### General Outstanding Items
 
 - **📬 96 items** in `90_Inbox_ToSort/NEEDS_REVIEW` need attention
 - **PRJ-006_OpenCode** is paused, needs restart decision
 - **Google Cloud credentials** pending (credentials.json not yet obtained)
-- **BIOS Update (Proxmox):** Target 6203 (Stable) for ROG STRIX X370-F GAMING. Current 5220. USB at `/Volumes/Ventoy` (ExFAT).
+- **BIOS Update (Proxmox):** Target 6203 (Stable) for ROG STRIX X370-F GAMING.
+  Current 5220. USB at `/Volumes/Ventoy` (ExFAT).
 
 ---
 
@@ -231,7 +285,7 @@ flowchart TD
 
 **Location:** `/home/gonya/antigravity-mcp-server`
 
-```
+```text
 antigravity-mcp-server/
 ├── src/
 │   ├── index.ts          # SSE server on port 3005
@@ -262,11 +316,12 @@ antigravity-mcp-server/
 
 | Node | IP | OS | Status |
 |------|----|----|--------|
-| **igor-gaming-1** (this) | `100.88.65.71` | Linux/WSL2 | ✅ Active |
-| igor-gaming | `100.127.194.111` | Windows | ✅ Active |
-| macbook-air | `100.93.121.47` | macOS | ✅ Active |
-| iphone-15-pro | `100.86.233.87` | iOS | ⚠️ Idle |
-| pve (Proxmox) | `100.74.194.25` | Linux | ⚠️ Check |
+| **igor-gaming-1** (WSL) | `100.115.17.68` | Linux/WSL2 | ✅ Active |
+| igor-gaming | `100.126.23.67` | Windows | ✅ Active |
+| macbook-air-igor | `100.79.152.92` | macOS | ✅ Active |
+| gpu-node-1 | `100.67.107.71` | Linux | ✅ Active |
+| iphone-15-pro | `100.75.107.115` | iOS | ⚠️ Idle |
+| unified-home-core-cloud | `100.87.208.56` | Linux | ✅ Active |
 
 ### Running Services
 
@@ -323,7 +378,8 @@ For the next session, ensure:
 - [ ] Review any pending tasks in `90_Inbox_ToSort/`
 - [ ] Check for Proxmox upgrade completion status
 - [ ] Verify Tailscale connectivity
-- [ ] **BIOS Update:** Download version 6203. Put on `/Volumes/Ventoy`. Alert: ASUS EZ Flash 3 may require FAT32.
+- [ ] **BIOS Update:** Download version 6203. Put on `/Volumes/Ventoy`.
+  Alert: ASUS EZ Flash 3 may require FAT32.
 
 ---
 
@@ -339,4 +395,48 @@ For the next session, ensure:
 
 ---
 
-*This document serves as a complete knowledge transfer for Antigravity agent sessions. Refresh by running the documentation generation workflow.*
+*This document serves as a complete knowledge transfer for Antigravity agent
+sessions. Refresh by running the documentation generation workflow.*
+
+### From `agent_mail_mashov_fix` (Mac Agent Mail & Mashov) - PARTIAL ✅
+
+```markdown
+- [x] Fix Agent Mail 403 Forbidden (RBAC remote config)
+- [x] Verify Mail Processor functionality
+- [x] Fix lint in mashov_client.py
+- [x] Update Mashov School Symbol (641001)
+- [ ] Debug Mashov Login (MOE Portal flow blocked by headless detection/redirection)
+```
+
+### From `75f5a657` (Clockwork Governance) - IN PROGRESS 🔄
+
+```markdown
+- [x] Fix MailProcessor Auto-Ack Loop (Mail ID > 502)
+- [x] Implement Conscience module (`conscience.py`)
+- [x] Integrate Conscience into `unified.py`
+- [x] Create Billboard tasks GH-002, GH-003, GH-004
+- [/] Wait for VioletCastle feedback on Contact Form
+- [ ] Implement Vertex AI Search grounding (POC)
+```
+
+### From `2026-01-27_cloud_ip_migration` (Cloud IP Migration) - COMPLETE ✅
+
+```markdown
+- [x] Identify new cloud IP: 100.87.208.56
+- [x] Update system config (nodes.yaml, network map)
+- [x] Patch OPS_RUNBOOK with new SSH/health commands
+- [x] Update agent status reports
+- [x] Verify n8n/Mail service reachability
+```
+
+### From `e37a3a79` (Remote Update Fix) - IN PROGRESS 🔄
+
+```markdown
+- [x] Fix remote-update.sh connectivity checks
+- [x] Add Igor-Gaming support (Windows compatibility)
+- [x] Handle home directory git danger on Igor-Gaming
+- [x] Switch Igor-Gaming to Unified_System_Core directory
+- [x] Synchronize all nodes
+- [/] Run Vibranium Sync
+- [/] Update Progress Docs
+```

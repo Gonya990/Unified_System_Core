@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibranium System Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 20, 25, 0.8);
+            --vibranium-purple: #9d50bb;
+            --vibranium-green: #6eeb83;
+            --text-color: #e0e0e0;
+            --accent-glow: 0 0 15px rgba(157, 80, 187, 0.5);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(157, 80, 187, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(110, 235, 131, 0.05) 0%, transparent 50%);
+        }
+
+        header {
+            height: 200px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(5, 5, 5, 1)), url('vibranium_header_1767957159028.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid var(--vibranium-purple);
+            box-shadow: var(--accent-glow);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--vibranium-purple);
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            border-color: var(--vibranium-purple);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--vibranium-purple);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--vibranium-green);
+            box-shadow: 0 0 8px var(--vibranium-green);
+        }
+
+        .metric {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .architecture {
+            grid-column: span 3;
+            min-height: 400px;
+        }
+
+        .terminal {
+            grid-column: span 2;
+            background: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--vibranium-green);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--vibranium-green);
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .agents-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .agent-name {
+            font-weight: 700;
+        }
+
+        .agent-role {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .vibranium-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+                text-shadow: 0 0 20px var(--vibranium-purple);
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        .mermaid {
+            background: transparent;
+            display: flex;
+            justify-content: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .dist-ai {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .node-bar {
+            height: 10px;
+            background: #222;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .node-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--vibranium-purple), var(--vibranium-green));
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Vibranium Core</h1>
+    </header>
+
+    <div class="container">
+        <!-- Row 1: Key Metrics -->
+        <div class="panel">
+            <div class="panel-title">
+                <div class="status-dot"></div>
+                SYSTEM UPTIME
+            </div>
+            <div class="metric">99.98%</div>
+            <div class="label">Logic Health: Silicon/Vibranium</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <div class="status-dot"></div>
+                DISTRIBUTED AI
+            </div>
+            <div class="dist-ai">
+                <div>
+                    <span class="label">Titan RTX (Primary)</span>
+                    <div class="node-bar">
+                        <div class="node-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <span class="label">Igor Gaming (Fast)</span>
+                    <div class="node-bar">
+                        <div class="node-fill" style="width: 40%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <div class="status-dot"></div>
+                ACTIVE AGENTS
+            </div>
+            <div class="metric">12</div>
+            <div class="label">Consilium Connected</div>
+        </div>
+
+        <!-- Row 2: Architecture -->
+        <div class="panel architecture">
+            <div class="panel-title">SYSTEM ARCHITECTURE (CONSILIUM FLOW)</div>
+            <div class="mermaid">
+                graph TD
+                U((USER)) -- Telegram --> Bot[AI Telegram Bot V2]
+                Bot -- Logic --> Orchestrator[PinkLake: Orchestrator]
+                Orchestrator -- Task --> Antigravity[OrangeStone: Technical]
+                Orchestrator -- Automation --> FuchsiaCat[FuchsiaCat: Operations]
+
+                Antigravity -- Distributed --> Linux[Titan RTX Node]
+                Antigravity -- Distributed --> Windows[Igor Gaming Node]
+
+                subgraph Core_Stability
+                Logic[Silicon Logic]
+                Sync[Vibranium Sync]
+                Failover[Distributed Failover]
+                end
+
+                style Bot fill:#2a2a2a,stroke:#9d50bb,stroke-width:2px;
+                style Orchestrator fill:#2a2a2a,stroke:#9d50bb,stroke-width:2px;
+                style Antigravity fill:#2a2a2a,stroke:#6eeb83,stroke-width:2px;
+                style Linux fill:#111,stroke:#6eeb83;
+                style Windows fill:#111,stroke:#6eeb83;
+            </div>
+        </div>
+
+        <!-- Row 3: Terminal & Consilium -->
+        <div class="panel terminal">
+            <div style="margin-bottom: 10px; color: #aaa;">[VIBRANIUM_SYNC_LOG]</div>
+            <div>[13:13:33] Starting synchronization...</div>
+            <div>[13:13:45] Git repair: Submodules verified.</div>
+            <div>[13:13:58] Docker: Removing old containers...</div>
+            <div>[13:14:10] Docker: Building AI_Core (Local Profile)...</div>
+            <div>[13:14:25] Bot V2: Starting in Secure Mode...</div>
+            <div>[13:14:30] <span style="color: var(--vibranium-green);">READY: Bot V2 (AI_Core) is running.</span>
+            </div>
+            <div class="vibranium-pulse" style="margin-top: 20px;">> SYSTEM STABLE. WAITING FOR COMMANDS.</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">CONSILIUM STATUS</div>
+            <ul class="agents-list">
+                <li class="agent-item">
+                    <div>
+                        <div class="agent-name">PinkLake</div>
+                        <div class="agent-role">Верховный Оркестратор</div>
+                    </div>
+                    <div class="status-dot"></div>
+                </li>
+                <li class="agent-item">
+                    <div>
+                        <div class="agent-name">OrangeStone</div>
+                        <div class="agent-role">Главный Техник</div>
+                    </div>
+                    <div class="status-dot"></div>
+                </li>
+                <li class="agent-item">
+                    <div>
+                        <div class="agent-name">FuchsiaCat</div>
+                        <div class="agent-role">Операции</div>
+                    </div>
+                    <div class="status-dot"></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        UNIFIED SYSTEM CORE // VIBRANIUM EDITION // 2026
+    </footer>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+</body>
+
+</html>

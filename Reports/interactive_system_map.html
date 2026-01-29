@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified System Architecture Map</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+
+        #mynetwork {
+            flex-grow: 1;
+            height: 100%;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+
+        #sidebar {
+            width: 350px;
+            background: rgba(30, 41, 59, 0.95);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0;
+        }
+
+        .node-details {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-online {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .service-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .service-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-name {
+            font-weight: 500;
+        }
+
+        .service-port {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mynetwork"></div>
+
+    <div id="sidebar">
+        <h1>System Architecture</h1>
+        <p style="color: #94a3b8; font-size: 0.9rem;">Интерактивная карта системы Unified System. Нажмите на узел для
+            деталей.</p>
+
+        <div id="selected-node" class="node-details" style="display: none;">
+            <h2 id="node-title">Node Name</h2>
+            <span id="node-status" class="status-badge status-online">ONLINE</span>
+            <p id="node-ip" style="font-family: monospace; color: #cbd5e1;">IP: 100.x.x.x</p>
+
+            <h3>Services</h3>
+            <ul id="service-list" class="service-list">
+                <!-- Populated by JS -->
+            </ul>
+
+            <div class="actions">
+                <button class="btn" onclick="alert('Command sent: RESTART SERVICE on this node')">🔄 Restart
+                    Services</button>
+                <button class="btn btn-secondary" onclick="alert('Opening SSH terminal...')">💻 SSH Terminal</button>
+            </div>
+        </div>
+
+        <div id="default-view" class="node-details">
+            <h3>Global Actions</h3>
+            <button class="btn" style="background: #10b981;"
+                onclick="alert('Deploying current codebase to Production (igor-gaming-1)...')">🚀 Deploy to
+                Production</button>
+            <button class="btn btn-secondary" onclick="location.reload()">📡 Refresh Status</button>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="dot" style="background: #97c2fc;"></div> Compute / Server
+        </div>
+        <div class="legend-item">
+            <div class="dot" style="background: #fbbf24;"></div> IoT / Smart Home
+        </div>
+        <div class="legend-item">
+            <div class="dot" style="background: #f472b6;"></div> Cloud / External
+        </div>
+        <div class="legend-item">
+            <div class="dot" style="background: #34d399;"></div> Control / Mobile
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Define nodes
+        var nodes = new vis.DataSet([
+            { id: 1, label: 'MacBook Air\n(Control/Dev)', group: 'control', image: 'https://img.icons8.com/color/48/mac-os.png', shape: 'image', size: 30, data: { ip: '100.93.121.47', services: ['Antigravity Agent', 'Git Workspace', 'Nodriver'] } },
+            { id: 2, label: 'AI Server\n(igor-gaming-1)', group: 'server', image: 'https://img.icons8.com/color/48/linux--v1.png', shape: 'image', size: 40, data: { ip: '100.78.144.50', services: ['AI Bot Core 🧠', 'Ollama (LLM)', 'Home Assistant 🏠', 'n8n Automation'] } },
+            { id: 3, label: 'Windows PC\n(Gaming)', group: 'server', image: 'https://img.icons8.com/color/48/windows-11.png', shape: 'image', size: 35, data: { ip: '100.127.194.111', services: ['Sunshine/Moonlight', 'RDP', 'SSH'] } },
+            { id: 4, label: 'Cloud Gateway\n(GCP)', group: 'cloud', image: 'https://img.icons8.com/color/48/google-cloud-platform.png', shape: 'image', size: 35, data: { ip: '100.110.209.49', services: ['Vasya Gateway', 'Docker', 'Public Webhook'] } },
+            { id: 5, label: 'Proxmox VE\n(Hypervisor)', group: 'server', image: 'https://img.icons8.com/color/48/server.png', shape: 'image', size: 35, data: { ip: '100.74.137.122', services: ['VM Host', 'LXC Containers'] } },
+            { id: 6, label: 'External AI\n(Cloud)', group: 'cloud', image: 'https://img.icons8.com/color/48/artificial-intelligence.png', shape: 'image', size: 35, data: { ip: 'API', services: ['OpenRouter (Claude)', 'Google Gemini', 'SerpApi'] } },
+            { id: 7, label: 'Smart Hub\n(IoT)', group: 'iot', image: 'https://img.icons8.com/fluency/48/smart-home-shield.png', shape: 'image', size: 25, data: { ip: '100.81.133.25', services: ['Zigbee Sensors', 'Lights', 'Climate'] } },
+            { id: 8, label: 'iPhone 15\n(User)', group: 'mobile', image: 'https://img.icons8.com/color/48/iphone-x.png', shape: 'image', size: 25, data: { ip: '100.86.233.87', services: ['Telegram App', 'Dashboard Access'] } }
+        ]);
+
+        // Define edges
+        var edges = new vis.DataSet([
+            { from: 1, to: 2, label: 'SSH / Deploy', arrows: 'to', color: { color: '#60a5fa' }, dashes: true }, // Mac to AI Server
+            { from: 2, to: 6, label: 'API Calls', arrows: 'to', color: { color: '#f472b6' } }, // AI Server to External AI
+            { from: 2, to: 7, label: 'Control', arrows: 'to, from', color: { color: '#fbbf24' } }, // AI Server to Smart Hub
+            { from: 4, to: 2, label: 'Webhook Relay', arrows: 'to', color: { color: '#34d399' } }, // Cloud to AI Server
+            { from: 8, to: 4, label: 'HTTPS', arrows: 'to', color: { color: '#cbd5e1' } }, // iPhone to Cloud
+            { from: 5, to: 2, label: 'Hosts', arrows: 'to', color: { color: '#94a3b8' }, dashes: true }, // Proxmox hosts AI Server
+            { from: 2, to: 3, label: 'Monitor', arrows: 'to', color: { color: '#94a3b8' } } // AI Server monitors Windows
+        ]);
+
+        // Network options
+        var options = {
+            nodes: {
+                borderWidth: 2,
+                borderWidthSelected: 4,
+                color: {
+                    border: '#475569',
+                    background: '#1e293b',
+                    highlight: { border: '#60a5fa', background: '#334155' },
+                    hover: { border: '#60a5fa', background: '#334155' }
+                },
+                font: { color: '#e2e8f0', face: 'Outfit' }
+            },
+            edges: {
+                color: { color: '#64748b', highlight: '#94a3b8' },
+                width: 2,
+                smooth: { type: 'continuous' }
+            },
+            physics: {
+                stabilization: false,
+                barnesHut: { gravitationalConstant: -2000, springConstant: 0.04, springLength: 150 }
+            },
+            interaction: { hover: true }
+        };
+
+        var container = document.getElementById('mynetwork');
+        var data = { nodes: nodes, edges: edges };
+        var network = new vis.Network(container, data, options);
+
+        // Click handler
+        network.on("click", function (params) {
+            if (params.nodes.length > 0) {
+                var nodeId = params.nodes[0];
+                var nodeData = nodes.get(nodeId);
+                showDetails(nodeData);
+            } else {
+                showDefault();
+            }
+        });
+
+        function showDetails(data) {
+            document.getElementById('default-view').style.display = 'none';
+            document.getElementById('selected-node').style.display = 'block';
+
+            document.getElementById('node-title').innerText = data.label.replace('\n', ' ');
+            document.getElementById('node-ip').innerText = 'IP: ' + data.data.ip;
+
+            var list = document.getElementById('service-list');
+            list.innerHTML = '';
+            data.data.services.forEach(svc => {
+                var li = document.createElement('li');
+                li.className = 'service-item';
+                li.innerHTML = `<span class="service-name">${svc}</span><span class="service-port">Running</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        function showDefault() {
+            document.getElementById('selected-node').style.display = 'none';
+            document.getElementById('default-view').style.display = 'block';
+        }
+    </script>
+
+</body>
+
+</html>

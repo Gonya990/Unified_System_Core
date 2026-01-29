@@ -8,8 +8,8 @@ echo "[1/4] Preparing VM environment..."
 ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$VM_IP "sudo apt update && sudo apt install -y python3-pip python3-venv && mkdir -p ~/bot"
 
 echo "[2/4] Copying files..."
-scp -i $SSH_KEY -o StrictHostKeyChecking=no Windows_AI_Core/src/ai_telegram_bot_v2.py $USER@$VM_IP:~/bot/bot.py
-scp -i $SSH_KEY -o StrictHostKeyChecking=no Windows_AI_Core/src/bot_config_live.py $USER@$VM_IP:~/bot/bot_config.py
+scp -i $SSH_KEY -o StrictHostKeyChecking=no Projects/AI_Core/src/ai_telegram_bot_v2.py $USER@$VM_IP:~/bot/bot.py
+scp -i $SSH_KEY -o StrictHostKeyChecking=no Projects/AI_Core/src/bot_config_live.py $USER@$VM_IP:~/bot/bot_config.py
 
 echo "[3/4] Installing dependencies on VM..."
 ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$VM_IP "cd ~/bot && python3 -m venv venv && source venv/bin/activate && pip install python-telegram-bot aiohttp"

@@ -1,0 +1,26 @@
+{
+    "instagram": [
+        {
+            "username": "goncharenko9283",
+            "session_id": "YOUR_SESSION_ID_HERE"
+        }
+    ],
+    "youtube": [
+        {
+            "name": "MEGAFORMA Main",
+            "token_file": "youtube_token.json"
+        }
+    ],
+    "threads": [
+        {
+            "username": "goncharenko9283",
+            "session_id": "YOUR_SESSION_ID_HERE"
+        }
+    ],
+    "gemini_keys": [
+        {
+            "owner": "Kostya",
+            "key": "GOOGLE_AI_STUDIO_KEY_HERE"
+        }
+    ]
+}

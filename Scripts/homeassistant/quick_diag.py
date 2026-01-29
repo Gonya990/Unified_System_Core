@@ -3,9 +3,9 @@
 Быстрая диагностика Home Assistant через REST API
 """
 
-import requests
-import json
 from collections import Counter
+
+import requests
 
 # HA Configuration
 HA_URL = "http://100.81.133.25:8123"
@@ -61,7 +61,7 @@ if unavailable:
     print("  По доменам:")
     for domain, count in unavail_domains.most_common():
         print(f"    {domain}: {count}")
-    
+
     print("\n  Первые 15 недоступных:")
     for s in unavailable[:15]:
         name = s.get('attributes', {}).get('friendly_name', s['entity_id'])

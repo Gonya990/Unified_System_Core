@@ -2,8 +2,6 @@
 import json
 import socket
 import sys
-import os
-from pathlib import Path
 
 SOCKET_PATH = "/tmp/nodriver.sock"
 
@@ -26,12 +24,12 @@ def send_command(cmd):
 def analyze():
     status = send_command({"action": "status"})
     elements = send_command({"action": "elements"})
-    
+
     print("-" * 50)
     print(f"URL: {status.get('current_url', 'unknown')}")
     print("-" * 50)
     print("INTERACTABLE ELEMENTS:")
-    
+
     if elements.get("ok"):
         for i, el in enumerate(elements.get("elements", [])):
             text = el.get("text", "[no text]")

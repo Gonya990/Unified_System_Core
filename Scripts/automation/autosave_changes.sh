@@ -1,30 +1,32 @@
 #!/bin/bash
-# Autosave Changes Script
-# Automatically commits and pushes all changes to GitHub
+# Autosave Changes System
+# Система автосохранения изменений
 
-set -e
+# Detect repository root
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$REPO_ROOT"
 
-REPO_DIR="/home/gonya/Unified_System_Core"
-cd "$REPO_DIR"
+echo "🔍 Repository root: $REPO_ROOT"
 
-echo "🔍 Checking for changes..."
-if [[ -z $(git status --porcelain) ]]; then
-    echo "✅ No changes to autosave"
-    exit 0
+# Check for changes
+if [[ -n $(git status -s) ]]; then
+    echo "🔄 Changes detected! Autosaving..."
+    echo "🔄 Обнаружены изменения! Автосохранение..."
+    
+    # Check if we are already in a git add/commit process by another agent
+    if [ -f "$REPO_ROOT/.agent/.workflow-lock" ]; then
+        echo "⚠️ Workflow lock detected. Skipping autosave to avoid conflicts."
+        exit 0
+    fi
+
+    echo "📝 Changes:"
+    git status -s
+
+    git add .
+    git commit -m "chore: autosave changes $(date '+%Y-%m-%d %H:%M:%S')"
+    git push origin main || echo "⚠️ Push failed"
+    
+    echo "✅ Changes autosaved and pushed."
+else
+    echo "✅ No changes to save."
 fi
-
-echo "📝 Changes detected:"
-git status --short
-
-echo ""
-echo "➕ Staging all changes..."
-git add -A
-
-echo "💾 Committing changes..."
-TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-git commit -m "autosave: $TIMESTAMP"
-
-echo "🚀 Pushing to GitHub..."
-git push origin main
-
-echo "✅ Autosave complete!"

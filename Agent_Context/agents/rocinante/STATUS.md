@@ -1,3 +1,4 @@
+
 # Agent: Rocinante
 
 ## Identity
@@ -5,6 +6,7 @@
 - **Agent ID:** `rocinante`
 - **Role:** Exploration & Research Agent
 - **Primary Human:** kosta
+- **Email:** <korolx147@gmail.com>
 - **Runtime:** Claude Code (agnostic)
 
 ## Resources
@@ -32,4 +34,4 @@
 
 ## Last Updated
 
-- 2025-12-25
+- 2026-01-06 (Email Updated)

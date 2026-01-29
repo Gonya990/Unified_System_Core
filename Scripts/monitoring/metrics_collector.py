@@ -5,14 +5,12 @@ Collects system metrics and sends them to GCP Cloud Monitoring.
 Also sends alerts to Telegram when thresholds are exceeded.
 """
 
-import os
-import sys
-import time
-import json
-import psutil
 import subprocess
-import requests
+import time
 from datetime import datetime, timezone
+
+import psutil
+import requests
 
 # Configuration
 GCP_PROJECT = "gen-lang-client-0982257437"
@@ -59,13 +57,13 @@ def collect_metrics():
         "memory_usage": psutil.virtual_memory().percent,
         "disk_usage": psutil.disk_usage('/').percent,
     }
-    
+
     gpu = get_gpu_info()
     if gpu:
         metrics["gpu_temp"] = gpu["temp"]
         metrics["gpu_memory_percent"] = (gpu["memory_used"] / gpu["memory_total"]) * 100
         metrics["gpu_utilization"] = gpu["utilization"]
-    
+
     return metrics
 
 def send_telegram_alert(message: str):
@@ -87,7 +85,7 @@ def check_thresholds(metrics: dict):
     for metric, threshold in THRESHOLDS.items():
         if metric in metrics and metrics[metric] > threshold:
             alerts.append(f"• {metric}: {metrics[metric]:.1f}% (порог: {threshold}%)")
-    
+
     if alerts:
         send_telegram_alert("\n".join(alerts))
         return True
@@ -97,29 +95,28 @@ def send_to_gcp(metrics: dict):
     """Send metrics to GCP Cloud Monitoring."""
     try:
         from google.cloud import monitoring_v3
-        from google.protobuf import timestamp_pb2
-        
+
         client = monitoring_v3.MetricServiceClient()
         project_name = f"projects/{GCP_PROJECT}"
-        
+
         now = time.time()
-        
+
         for metric_name, value in metrics.items():
             if metric_name == "timestamp" or value is None:
                 continue
-                
+
             series = monitoring_v3.TimeSeries()
             series.metric.type = f"custom.googleapis.com/{INSTANCE_NAME}/{metric_name}"
             series.resource.type = "global"
             series.resource.labels["project_id"] = GCP_PROJECT
-            
+
             point = monitoring_v3.Point()
             point.value.double_value = float(value)
             point.interval.end_time.seconds = int(now)
             series.points = [point]
-            
+
             client.create_time_series(name=project_name, time_series=[series])
-        
+
         print(f"[{datetime.now()}] Metrics sent to GCP")
         return True
     except Exception as e:
@@ -130,26 +127,26 @@ def main():
     print(f"Starting metrics collector for {INSTANCE_NAME}")
     print(f"Collection interval: {COLLECTION_INTERVAL}s")
     print(f"GCP Project: {GCP_PROJECT}")
-    
+
     while True:
         try:
             metrics = collect_metrics()
             print(f"[{metrics['timestamp']}] CPU: {metrics['cpu_usage']}%, RAM: {metrics['memory_usage']}%", end="")
-            
+
             if "gpu_temp" in metrics:
                 print(f", GPU: {metrics['gpu_temp']}°C")
             else:
                 print()
-            
+
             # Check thresholds and send alerts
             check_thresholds(metrics)
-            
+
             # Send to GCP
             send_to_gcp(metrics)
-            
+
         except Exception as e:
             print(f"Error: {e}")
-        
+
         time.sleep(COLLECTION_INTERVAL)
 
 if __name__ == "__main__":

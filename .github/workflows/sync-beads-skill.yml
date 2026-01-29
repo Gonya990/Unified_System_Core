@@ -1,0 +1,76 @@
+name: Sync Beads Skill
+
+on:
+  schedule:
+    # Run weekly on Sundays at 00:00 UTC
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force sync even if no changes detected"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  sync:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync beads skill from upstream
+        run: |
+          # Create target directory
+          mkdir -p .claude/skills/beads/references
+
+          # Clone upstream repo (sparse checkout for just the skill)
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://github.com/steveyegge/beads.git /tmp/beads-upstream
+
+          cd /tmp/beads-upstream
+          git sparse-checkout set skills/beads
+
+          # Copy skill files to our repo
+          cp -r skills/beads/* $GITHUB_WORKSPACE/.claude/skills/beads/
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get upstream commit info
+        if: steps.changes.outputs.has_changes == 'true' || github.event.inputs.force == 'true'
+        id: upstream
+        run: |
+          cd /tmp/beads-upstream
+          COMMIT=$(git rev-parse --short HEAD)
+          DATE=$(git log -1 --format=%ci)
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          echo "date=$DATE" >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit changes
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(skills): sync beads skill from upstream (${{ steps.upstream.outputs.commit }})"
+          file_pattern: ".claude/skills/beads/**"
+          branch: main
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
+            echo "### Beads Skill Synced" >> $GITHUB_STEP_SUMMARY
+            echo "Upstream commit: ${{ steps.upstream.outputs.commit }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### No Changes" >> $GITHUB_STEP_SUMMARY
+            echo "Beads skill is already up to date." >> $GITHUB_STEP_SUMMARY
+          fi

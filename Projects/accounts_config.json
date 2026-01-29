@@ -1,0 +1,20 @@
+{
+    "instagram": [
+        {
+            "username": null,
+            "session_id": null
+        }
+    ],
+    "youtube": [
+        {
+            "name": "Main Channel",
+            "token_file": "youtube_token.json"
+        }
+    ],
+    "threads": [
+        {
+            "username": null,
+            "session_id": null
+        }
+    ]
+}

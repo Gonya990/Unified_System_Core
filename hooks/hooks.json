@@ -1,0 +1,113 @@
+{
+  "description": "Unified System Hooks Configuration - Agent lifecycle and automation triggers",
+  "version": "2.0.0",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/session-start-sync.sh",
+            "timeout": 15,
+            "enabled": true,
+            "description": "Sync with Agent Mail and load preferences on session start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Session ended at $(date)'",
+            "timeout": 5,
+            "enabled": false,
+            "description": "Log session end (disabled by default)"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Subagent task starting'",
+            "timeout": 5,
+            "enabled": false,
+            "description": "Log subagent start (disabled by default)"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/macbook/Documents/Unified_System/hooks/scripts/check-mail.sh",
+            "timeout": 10,
+            "enabled": true,
+            "description": "Remind agent to check mail after subagent task completes"
+          }
+        ]
+      }
+    ],
+    "PreCommit": [
+      {
+        "matcher": "*.py",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Running pre-commit checks for Python files'",
+            "timeout": 30,
+            "enabled": false,
+            "description": "Lint/format Python files before commit"
+          }
+        ]
+      }
+    ],
+    "PostSync": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Post-sync hook executed at $(date)'",
+            "timeout": 10,
+            "enabled": false,
+            "description": "Run after git sync operations"
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "supported_types": [
+      "SessionStart",
+      "SessionEnd",
+      "SubagentStart",
+      "SubagentStop",
+      "PreCommit",
+      "PostCommit",
+      "PreSync",
+      "PostSync",
+      "FileChange",
+      "Scheduled",
+      "Custom"
+    ],
+    "matcher_syntax": "glob pattern (* = any, specific filename, or regex with /pattern/)",
+    "hook_types": [
+      "command",
+      "script",
+      "http"
+    ],
+    "updated_at": "2026-01-11T15:37:00Z",
+    "updated_by": "Antigravity"
+  }
+}

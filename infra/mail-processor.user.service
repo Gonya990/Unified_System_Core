@@ -1,0 +1,17 @@
+[Unit]
+Description=MCP Mail Processor (Unified System) [user]
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/Documents/Unified_System_Core
+ExecStart=/run/current-system/sw/bin/bash -lc 'cd %h/Documents/Unified_System_Core && /run/current-system/sw/bin/devenv shell -- python3 Scripts/Orchestration/mail_processor.py'
+Restart=always
+RestartSec=10
+EnvironmentFile=%h/Documents/Unified_System_Core/.env
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

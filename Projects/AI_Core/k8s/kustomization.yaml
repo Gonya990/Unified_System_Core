@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: telegram-bot
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+
+images:
+  - name: ghcr.io/gonya990/ai-telegram-bot
+    newTag: 345aa48
+
+commonLabels:
+  app.kubernetes.io/part-of: unified-system
+  app.kubernetes.io/managed-by: kustomize

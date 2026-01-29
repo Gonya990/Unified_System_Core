@@ -4,19 +4,20 @@ Coordinates multiple LLMs through deliberation stages.
 """
 
 import asyncio
+import json
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 from datetime import datetime
-import json
 from pathlib import Path
+from typing import Optional
 
 from .providers import (
     BaseProvider,
-    ProviderResponse,
-    OpenAIProvider,
+    GeminiProvider,
     GitHubCopilotProvider,
     NVIDIANIMProvider,
+    OpenAIProvider,
+    ProviderResponse,
 )
 from .providers.base import PeerReview
 
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CouncilSession:
     """Represents a council deliberation session."""
-    
+
     session_id: str
     query: str
     timestamp: datetime = field(default_factory=datetime.now)
@@ -34,7 +35,7 @@ class CouncilSession:
     stage2_reviews: list[PeerReview] = field(default_factory=list)
     stage3_consensus: Optional[str] = None
     chairman_provider: str = ""
-    
+
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -55,7 +56,7 @@ class CouncilSession:
             "stage3_consensus": self.stage3_consensus,
             "chairman_provider": self.chairman_provider,
         }
-    
+
     def save(self, path: Path):
         """Save session to JSON file."""
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -66,13 +67,13 @@ class CouncilSession:
 class LLMCouncil:
     """
     Multi-LLM Council for deliberative AI responses.
-    
+
     Stages:
     1. Individual Responses - Each LLM answers independently
     2. Peer Review - LLMs evaluate each other's responses
     3. Consensus - Chairman synthesizes final answer
     """
-    
+
     def __init__(
         self,
         providers: list[BaseProvider],
@@ -85,17 +86,18 @@ class LLMCouncil:
         self.enable_peer_review = enable_peer_review
         self.history_dir = Path(history_dir) if history_dir else None
         self._session_counter = 0
-    
+
     @classmethod
     def from_env(cls, env_path: str = ".env") -> "LLMCouncil":
         """Create council from environment variables."""
-        from dotenv import load_dotenv
         import os
-        
-        load_dotenv(env_path)
-        
+
+        from dotenv import load_dotenv
+
+        load_dotenv(env_path, override=True)
+
         providers = []
-        
+
         # OpenAI
         openai_key = os.getenv("OPENAI_API_KEY")
         if openai_key and openai_key != "sk-your-key-here":
@@ -105,7 +107,7 @@ class LLMCouncil:
                 store=os.getenv("OPENAI_STORE", "false").lower() == "true"
             ))
             logger.info("✓ OpenAI provider initialized")
-        
+
         # GitHub Copilot
         github_token = os.getenv("GITHUB_TOKEN")
         if github_token and github_token != "ghp_your-token-here":
@@ -114,7 +116,7 @@ class LLMCouncil:
                 model=os.getenv("GITHUB_COPILOT_MODEL", "gpt-4o")
             ))
             logger.info("✓ GitHub Copilot provider initialized")
-        
+
         # NVIDIA NIM
         nvidia_key = os.getenv("NVIDIA_API_KEY")
         if nvidia_key and nvidia_key != "nvapi-your-key-here":
@@ -123,10 +125,10 @@ class LLMCouncil:
                 model=os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct")
             ))
             logger.info("✓ NVIDIA NIM provider initialized")
-        
+
         if not providers:
             raise ValueError("No valid API keys found. Check your .env file.")
-        
+
         # Chairman
         chairman_provider = os.getenv("CHAIRMAN_PROVIDER", "openai")
         chairman = None
@@ -134,23 +136,60 @@ class LLMCouncil:
             if p.name == chairman_provider or chairman_provider in p.name:
                 chairman = p
                 break
-        
+
         return cls(
             providers=providers,
             chairman=chairman,
             enable_peer_review=os.getenv("ENABLE_PEER_REVIEW", "true").lower() == "true",
             history_dir=os.getenv("HISTORY_DIR"),
         )
-    
+
+    @classmethod
+    def from_token_broker(cls, broker, tier: Optional[str] = None) -> "LLMCouncil":
+        """Create council using keys from TokenBroker."""
+        providers = []
+
+        # OpenAI
+        openai_key = broker.get_key("openai", tier=tier)
+        if openai_key:
+            providers.append(OpenAIProvider(
+                api_key=openai_key,
+                model="gpt-4o", # Default high quality
+                store=False
+            ))
+            logger.info(f"✓ OpenAI provider initialized via TokenBroker (Tier: {tier})")
+        else:
+            logger.warning(f"TokenBroker returned no key for OpenAI (Tier: {tier})")
+
+        # Gemini
+        gemini_key = broker.get_key("gemini", tier=tier)
+        if gemini_key:
+            providers.append(GeminiProvider(
+                api_key=gemini_key,
+                model="models/nano-banana-pro-preview" # Priority: Nana Banana
+            ))
+            logger.info(f"✓ Gemini provider initialized via TokenBroker (Tier: {tier})")
+        else:
+            logger.warning(f"TokenBroker returned no key for Gemini (Tier: {tier})")
+
+        if not providers:
+            raise ValueError("TokenBroker returned no valid keys for supported providers.")
+
+        return cls(
+            providers=providers,
+            chairman=providers[0] if providers else None,
+            enable_peer_review=True
+        )
+
     async def deliberate(
-        self, 
+        self,
         query: str,
         system_prompt: str = "",
         verbose: bool = False
     ) -> CouncilSession:
         """
         Run full council deliberation on a query.
-        
+
         Returns CouncilSession with all stages' results.
         """
         self._session_counter += 1
@@ -158,45 +197,45 @@ class LLMCouncil:
             session_id=f"council-{self._session_counter}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
             query=query,
         )
-        
+
         if verbose:
             logger.info(f"\n{'='*60}")
             logger.info(f"🏛️ COUNCIL SESSION: {session.session_id}")
             logger.info(f"📝 Query: {query[:100]}...")
             logger.info(f"{'='*60}\n")
-        
+
         # ===== STAGE 1: Individual Responses =====
         if verbose:
             logger.info("📊 STAGE 1: Gathering individual responses...")
-        
+
         session.stage1_responses = await self._stage1_individual_responses(
             query, system_prompt, verbose
         )
-        
+
         # ===== STAGE 2: Peer Review =====
         if self.enable_peer_review and len(session.stage1_responses) > 1:
             if verbose:
                 logger.info("\n🔍 STAGE 2: Peer review in progress...")
-            
+
             session.stage2_reviews = await self._stage2_peer_review(
                 query, session.stage1_responses, verbose
             )
-        
+
         # ===== STAGE 3: Chairman Consensus =====
         if verbose:
             logger.info("\n👑 STAGE 3: Chairman synthesizing consensus...")
-        
+
         session.stage3_consensus = await self._stage3_consensus(
             query, session, verbose
         )
         session.chairman_provider = self.chairman.name if self.chairman else "none"
-        
+
         # Save history
         if self.history_dir:
             session.save(self.history_dir / f"{session.session_id}.json")
-        
+
         return session
-    
+
     async def _stage1_individual_responses(
         self,
         query: str,
@@ -204,7 +243,7 @@ class LLMCouncil:
         verbose: bool
     ) -> list[ProviderResponse]:
         """Stage 1: Get independent responses from all providers."""
-        
+
         async def get_response(provider: BaseProvider) -> ProviderResponse:
             if verbose:
                 logger.info(f"  → Querying {provider.name} ({provider.model})...")
@@ -213,11 +252,11 @@ class LLMCouncil:
                 status = "✓" if response.success else "✗"
                 logger.info(f"  {status} {provider.name}: {len(response.content)} chars, {response.latency_ms:.0f}ms")
             return response
-        
+
         # Query all providers in parallel
         tasks = [get_response(p) for p in self.providers]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Filter out exceptions
         valid_responses = []
         for r in responses:
@@ -225,9 +264,9 @@ class LLMCouncil:
                 valid_responses.append(r)
             elif isinstance(r, Exception):
                 logger.error(f"Provider error: {r}")
-        
+
         return valid_responses
-    
+
     async def _stage2_peer_review(
         self,
         query: str,
@@ -236,16 +275,16 @@ class LLMCouncil:
     ) -> list[PeerReview]:
         """Stage 2: Each provider reviews the others' responses."""
         reviews = []
-        
+
         for reviewer in self.providers:
             for response in responses:
                 if response.provider_name != reviewer.name:
                     if verbose:
                         logger.info(f"  → {reviewer.name} reviewing {response.provider_name}...")
-                    
+
                     try:
                         review = await reviewer.peer_review(
-                            query, 
+                            query,
                             response,
                             [r for r in responses if r != response]
                         )
@@ -254,9 +293,9 @@ class LLMCouncil:
                             logger.info(f"    Score: {review.score}/10")
                     except Exception as e:
                         logger.error(f"Review failed: {e}")
-        
+
         return reviews
-    
+
     async def _stage3_consensus(
         self,
         query: str,
@@ -276,13 +315,13 @@ class LLMCouncil:
                     if r.provider_name == best:
                         return r.content
             return session.stage1_responses[0].content if session.stage1_responses else ""
-        
+
         # Build synthesis prompt
         synthesis_prompt = self._build_synthesis_prompt(query, session)
-        
+
         if verbose:
             logger.info(f"  → {self.chairman.name} synthesizing final response...")
-        
+
         response = await self.chairman.generate(
             synthesis_prompt,
             system_prompt="""You are the Chairman of an LLM Council. Your role is to:
@@ -294,9 +333,9 @@ class LLMCouncil:
 
 Output ONLY the final synthesized answer, not meta-commentary about the process."""
         )
-        
+
         return response.content
-    
+
     def _build_synthesis_prompt(self, query: str, session: CouncilSession) -> str:
         """Build the synthesis prompt for the Chairman."""
         prompt = f"""# COUNCIL DELIBERATION SYNTHESIS
@@ -306,24 +345,24 @@ Output ONLY the final synthesized answer, not meta-commentary about the process.
 
 ## Council Member Responses
 """
-        
+
         for i, response in enumerate(session.stage1_responses, 1):
             prompt += f"""
 ### Response {i} (from {response.provider_name}, {response.model})
 {response.content}
 
 """
-        
+
         if session.stage2_reviews:
             prompt += "\n## Peer Review Summary\n"
-            
+
             # Group reviews by reviewee
             by_reviewee = {}
             for review in session.stage2_reviews:
                 if review.reviewee not in by_reviewee:
                     by_reviewee[review.reviewee] = []
                 by_reviewee[review.reviewee].append(review)
-            
+
             for reviewee, reviews in by_reviewee.items():
                 avg_score = sum(r.score for r in reviews) / len(reviews)
                 prompt += f"\n**{reviewee}** - Average Score: {avg_score:.1f}/10\n"
@@ -333,7 +372,7 @@ Output ONLY the final synthesized answer, not meta-commentary about the process.
                         prompt += f"  Strengths: {', '.join(r.strengths[:2])}\n"
                     if r.weaknesses:
                         prompt += f"  Weaknesses: {', '.join(r.weaknesses[:2])}\n"
-        
+
         prompt += """
 ## Your Task
 Synthesize a comprehensive final answer that:
@@ -343,16 +382,16 @@ Synthesize a comprehensive final answer that:
 4. Provides a clear, actionable response
 
 Provide the final answer now:"""
-        
+
         return prompt
-    
+
     async def health_check(self) -> dict[str, bool]:
         """Check health of all providers."""
         results = {}
         for provider in self.providers:
             results[provider.name] = await provider.health_check()
         return results
-    
+
     async def close(self):
         """Cleanup all providers."""
         for provider in self.providers:

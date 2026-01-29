@@ -1,0 +1,36 @@
+================================================================================
+FULL MEDIA & DOCUMENT INVENTORY
+Date: January 21, 2026
+================================================================================
+
+[ STRATEGIC AUDIO FILES (HIGH VALUE) ]
+--------------------------------------------------------------------------------
+1.  Алгоритмы_Воля_План_Мир_2026.m4a (Algorithm-Will-Plan-World)
+2.  Битва_за_доверие_Трамп_Кийосаки_против_системы.m4a (Trust Battle)
+3.  Защита_кода_и_доказательство_авторства_для_гранта.m4a (Code Protection/Grant)
+4.  Карьера_программиста_как_стартап_План_действий.m4a (Career as Startup)
+5.  Локальные_ключи_против_глобального_цифрового_хаоса.m4a (Local Keys Security)
+6.  Смена_пароля_бесполезна_если_украден_токен.m4a (Token Security)
+7.  Цифровая_крепость_как_основа_израильского_стартапа.m4a (Digital Fortress)
+8.  Эволюция_AI_агентов_от_чат-бота_до_планировщика.m4a (Agent Evolution)
+... and 20+ more.
+
+[ CORE VIDEO FILES ]
+--------------------------------------------------------------------------------
+1.  Лента_2026.mp4 (The Feed 2026)
+2.  Цифровой_коллапс.mp4 (Digital Collapse)
+3.  Контроль,_когда_пароль_бессилен.mp4 (Control when password fails)
+4.  Ваш_проект_—_это_продукт.mp4 (Your project is a product)
+
+[ DOCUMENTATION (PDF) ]
+--------------------------------------------------------------------------------
+1.  Founder_Strategy_Survival_Q1_2026.pdf
+2.  Israel_Life_Administration_Manual.pdf
+3.  Entropy_Agency_Value.pdf
+4.  Integrated_Strategic_Review_2025-2026.pdf
+5.  Foundational_Systems_Rigor.pdf
+6.  Child_Development_Financial_Audit.pdf (Personal/Family)
+
+[ RESUMES ]
+--------------------------------------------------------------------------------
+Full suite of CVs in EN, RU, HE located in docs/resume/.
