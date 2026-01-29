@@ -63,10 +63,17 @@ for CONFIG in "${NODES[@]}"; do
         
         # 4. Pull Updates (using Agent Forwarding)
         echo -e "${YELLOW}[2/3] Pulling updates...${NC}"
-        if ssh -A "$NODE" "cd $REMOTE_PATH && git pull origin main"; then
+        
+        GIT_CMD="git pull origin main"
+        if [ "${1:-}" = "--force" ]; then
+             echo -e "${YELLOW}Force mode: Resetting to origin/main...${NC}"
+             GIT_CMD="git fetch origin && git reset --hard origin/main"
+        fi
+
+        if ssh -A "$NODE" "cd $REMOTE_PATH && $GIT_CMD"; then
              echo -e "${GREEN}✓ Code updated.${NC}"
         else
-             echo -e "${RED}✗ Git pull failed.${NC}"
+             echo -e "${RED}✗ Git update failed.${NC}"
              continue
         fi
 
