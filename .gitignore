@@ -127,3 +127,4 @@ unnamed.png
 
 *.env.*
 Projects/AI_Core/.venv.python39.bak/
+*.worktrees/
