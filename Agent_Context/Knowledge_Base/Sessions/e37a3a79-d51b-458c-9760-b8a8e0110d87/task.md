@@ -10,5 +10,5 @@
 
 ## Phase 2: System Synchronization <!-- id: 200 -->
 
-- [/] Run Vibranium Sync <!-- id: 201 --> <!-- CURRENT FOCUS -->
-- [/] Update Progress Docs <!-- id: 202 -->
+- [x] Run Vibranium Sync <!-- id: 201 --> <!-- CURRENT FOCUS -->
+- [x] Update Progress Docs <!-- id: 202 -->

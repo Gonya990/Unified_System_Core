@@ -2,7 +2,7 @@
 >
 > **Generated:** 2026-01-29
 > **Purpose:** Complete system knowledge transfer for session continuity
-
+>
 > **Redirect:** Kostya is currently operating as **AzureBeacon**. All tasks
 > assigned to Kostya should be handled by/directed to AzureBeacon.
 
@@ -316,11 +316,12 @@ antigravity-mcp-server/
 
 | Node | IP | OS | Status |
 |------|----|----|--------|
-| **igor-gaming-1** (this) | `100.88.65.71` | Linux/WSL2 | ✅ Active |
-| igor-gaming | `100.127.194.111` | Windows | ✅ Active |
-| macbook-air | `100.93.121.47` | macOS | ✅ Active |
-| iphone-15-pro | `100.86.233.87` | iOS | ⚠️ Idle |
-| pve (Proxmox) | `100.74.194.25` | Linux | ⚠️ Check |
+| **igor-gaming-1** (WSL) | `100.115.17.68` | Linux/WSL2 | ✅ Active |
+| igor-gaming | `100.126.23.67` | Windows | ✅ Active |
+| macbook-air-igor | `100.79.152.92` | macOS | ✅ Active |
+| gpu-node-1 | `100.67.107.71` | Linux | ✅ Active |
+| iphone-15-pro | `100.75.107.115` | iOS | ⚠️ Idle |
+| unified-home-core-cloud | `100.87.208.56` | Linux | ✅ Active |
 
 ### Running Services
 
