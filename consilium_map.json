@@ -1,0 +1,40 @@
+{
+    "version": "1.0",
+    "nodes": {
+        "igor-gaming": {
+            "ip": "100.126.23.67",
+            "roles": [
+                "interactive_compute",
+                "n8n_master",
+                "gpu_inference_primary"
+            ],
+            "storage_policy": "ephemeral_cache",
+            "archive_target": "unified-cloud-core"
+        },
+        "unified-cloud-core": {
+            "ip": "100.87.208.56",
+            "roles": [
+                "primary_archive",
+                "orchestrator",
+                "background_compute_cpu"
+            ],
+            "storage_policy": "long_term_storage",
+            "archive_target": "self"
+        },
+        "gpu-node-1": {
+            "ip": "100.67.107.71",
+            "roles": [
+                "secondary_compute_gpu",
+                "rendering",
+                "archive_shard_active"
+            ],
+            "storage_policy": "active_project_cache",
+            "archive_target": "unified-cloud-core"
+        }
+    },
+    "archive_paths": {
+        "unified-cloud-core": "/mnt/data/archive",
+        "gpu-node-1": "/home/gonya990/archive_shard",
+        "igor-gaming": "C:\\Users\\gonya\\archive_buffer"
+    }
+}
