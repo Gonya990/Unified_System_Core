@@ -25,4 +25,12 @@
       future builds <!-- id: 303 -->
 - [x] Verify full system status (AI + HA + Network) - ALL GREEN <!-- id: 304 -->
 
+## Phase 4: Content Factory & Assets <!-- id: 400 -->
+
+- [x] Unpack OneDrive_1 (3.9GB) from Google Archives <!-- id: 401 -->
+- [x] Index Meta, Google and OneDrive archives (20GB total) <!-- id: 402 -->
+- [/] Assembling and unpacking 28GB multi-part Recovery Archive to
+      Drive H: <!-- id: 403 -->
+- [ ] Final deep-scan and indexing of all 80GB+ assets <!-- id: 404 -->
+
 <!-- CURRENT FOCUS -->
