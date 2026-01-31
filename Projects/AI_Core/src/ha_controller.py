@@ -7,27 +7,37 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # Ensure current directory is in path for sibling imports
+# Correctly adjust path for imports
 current_dir = Path(__file__).resolve().parent
 if str(current_dir) not in sys.path:
     sys.path.insert(0, str(current_dir))
+    
+# Add parent directory as well
+parent_dir = current_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
 
-# Try to import ha_client from same directory first (Docker), then from Scripts
+# Try importing with multiple strategies
+HA_AVAILABLE = False
+HomeAssistantClient = None
+
 try:
+    # 1. Direct import (same directory)
     from ha_client import HAConfig, HomeAssistantClient
     HA_AVAILABLE = True
 except ImportError:
-    # Fallback: Add Scripts/homeassistant to path
-    current_dir = Path(__file__).resolve().parent
-    scripts_dir = current_dir.parent.parent / "Scripts" / "homeassistant"
-    if str(scripts_dir) not in sys.path:
-        sys.path.append(str(scripts_dir))
     try:
-        from ha_client import HAConfig, HomeAssistantClient
+        # 2. Package import (from src)
+        from src.ha_client import HAConfig, HomeAssistantClient
         HA_AVAILABLE = True
     except ImportError as e:
-        logger.error(f"Failed to import HomeAssistantClient: {e}")
-        HA_AVAILABLE = False
-        HomeAssistantClient = None
+        logger.error(f"Failed to import ha_client: {e}")
+        # Debug: list files in current dir
+        try:
+             files = [f.name for f in current_dir.iterdir()]
+             logger.error(f"Files in {current_dir}: {files}")
+        except:
+             pass
 
 class HAController:
     """
