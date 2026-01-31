@@ -15,9 +15,12 @@ missing inside the Docker container.
 The Home Assistant integration was also pointing to the wrong IP/User for
 the hub, which has been corrected.
 
-**System Stability:** Identified and terminated ghost bot instances on
-`gpu-node-1` (linux process) and `igor-gaming` (windows process).
-The `409 Conflict` error is now resolved.
+- **System Stability:** Identified and terminated ghost bot instances on
+  `gpu-node-1` (linux process) and `igor-gaming` (windows process).
+  The `409 Conflict` error is now resolved.
+- **Archive Expansion:** Unpacked `OneDrive_1` (3.9GB) and initiated full
+  re-assembly of the 28GB `recovery_archive` onto Drive H:. The system index
+  has grown from 20GB to over 60GB of searchable assets for the Content Factory.
 
 ## Changes Made
 
