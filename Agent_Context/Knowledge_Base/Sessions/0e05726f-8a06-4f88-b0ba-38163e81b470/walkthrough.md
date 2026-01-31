@@ -15,8 +15,9 @@ missing inside the Docker container.
 The Home Assistant integration was also pointing to the wrong IP/User for
 the hub, which has been corrected.
 
-**Current Conflict:** There is a `409 Conflict` on Telegram, meaning another
-instance of the bot is running elsewhere (suspected `gpu-node-1`).
+**System Stability:** Identified and terminated ghost bot instances on
+`gpu-node-1` (linux process) and `igor-gaming` (windows process).
+The `409 Conflict` error is now resolved.
 
 ## Changes Made
 

@@ -17,11 +17,12 @@
 
 ## Phase 3: Network & Stability <!-- id: 300 -->
 
-- [x] Resolve "Telegram Conflict 409" by killing zombie processes <!-- id: 301 -->
+- [x] Resolve "Telegram Conflict 409" by killing phantom instances on
+      GPU-NODE-1 and IGOR-GAMING <!-- id: 301 -->
 - [x] Install `iputils-ping` in Docker container to fix `/status`
       command <!-- id: 302 -->
 - [x] Update `Dockerfile` locally to include network tools for
       future builds <!-- id: 303 -->
-- [x] Verify full system status (AI + HA + Network) <!-- id: 304 -->
+- [x] Verify full system status (AI + HA + Network) - ALL GREEN <!-- id: 304 -->
 
 <!-- CURRENT FOCUS -->
