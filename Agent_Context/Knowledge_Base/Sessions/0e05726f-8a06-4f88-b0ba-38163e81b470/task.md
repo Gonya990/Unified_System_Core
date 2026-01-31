@@ -9,16 +9,19 @@
 
 ## Phase 2: Fix Home Assistant Integration <!-- id: 200 -->
 
-- [x] Diagnose "ImportError: No module named ha_client" inside container <!-- id: 201 -->
-- [x] Create and apply `ha_controller_fix.py` to handle import paths correctly <!-- id: 202 -->
+- [x] Diagnose "ImportError: No module named ha_client" inside container
+- [x] Create and apply `ha_controller_fix.py` to handle import paths
+      correctly <!-- id: 202 -->
 - [x] Verify HA client initialization success in logs <!-- id: 203 -->
 - [x] Apply fix to local repository for persistence <!-- id: 204 -->
 
 ## Phase 3: Network & Stability <!-- id: 300 -->
 
 - [x] Resolve "Telegram Conflict 409" by killing zombie processes <!-- id: 301 -->
-- [x] Install `iputils-ping` in Docker container to fix `/status` command <!-- id: 302 -->
-- [x] Update `Dockerfile` locally to include network tools for future builds <!-- id: 303 -->
+- [x] Install `iputils-ping` in Docker container to fix `/status`
+      command <!-- id: 302 -->
+- [x] Update `Dockerfile` locally to include network tools for
+      future builds <!-- id: 303 -->
 - [x] Verify full system status (AI + HA + Network) <!-- id: 304 -->
 
 <!-- CURRENT FOCUS -->

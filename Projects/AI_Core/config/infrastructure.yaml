@@ -5,7 +5,7 @@ nodes:
   - id: macbook-air
     name: MacBook Air
     fqdn: macbook-air.tail5e8a72.ts.net
-    ip: 100.93.121.47
+    ip: 100.79.152.92
     type: control
     os: macos
     services:
@@ -16,7 +16,7 @@ nodes:
   - id: igor-gaming-1
     name: AI Server (WSL2)
     fqdn: igor-gaming-1.tail5e8a72.ts.net
-    ip: 100.78.144.50
+    ip: 100.115.17.68
     type: compute
     os: ubuntu-wsl2
     services:
@@ -35,7 +35,7 @@ nodes:
   - id: igor-gaming
     name: Windows PC
     fqdn: igor-gaming.tail5e8a72.ts.net
-    ip: 100.127.194.111
+    ip: 100.126.23.67
     type: windows
     os: windows11
     services:
@@ -93,7 +93,7 @@ nodes:
   - id: unified-home-core-cloud
     name: Cloud Gateway (GCP)
     fqdn: unified-home-core-cloud.tail5e8a72.ts.net
-    ip: 100.110.209.49
+    ip: 100.87.208.56
     type: cloud
     os: debian
     services:
@@ -112,19 +112,22 @@ nodes:
       - name: LLM Council 🏛️
 
   - id: smart
-    name: Smart Home Hub
+    name: Home Assistant Hub (Raspberry Pi/Oranger)
     fqdn: smart.tail5e8a72.ts.net
-    ip: 100.81.133.25
+    ip: 100.118.179.47
     type: iot
-    os: debian
+    os: debian (igor)
     services:
-      - name: Sensors
-      - name: Automation
+      - name: Home Assistant
+        type: docker
+        port: 8123
+      - name: Zigbee2MQTT
+      - name: Node-RED
 
   - id: iphone
     name: iPhone 15 Pro
     fqdn: iphone-15-pro.tail5e8a72.ts.net
-    ip: 100.86.233.87
+    ip: 100.75.107.115
     type: mobile
     os: ios
     services:
