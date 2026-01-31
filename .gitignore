@@ -86,13 +86,36 @@ broll/
 *.m4a
 *.mov
 *.wav
+*.mp3
 *.dmg
 *.pkg
 *.iso
 *.zip
-*.tar.gz
+*.tar.*
 *.rar
 *.7z
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.webp
+*.ico
+*.plist
+*.exe
+*.bin
+*.out
+*.app
+
+# Specific asset folders
+assets/
+Local_Dev/Media/
+Projects/AI_Core/images/
+Reports/Archived_Status/
+Reports/media/
+docs/images/
+tmp/
 
 # Tool Caches and Node
 tools/npm-cache/
