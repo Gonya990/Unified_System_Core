@@ -1,9 +1,9 @@
 import os
 import subprocess
-import time
 from pathlib import Path
-from openai import OpenAI
+
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv(".env")
@@ -26,7 +26,7 @@ def split_audio(file_path, output_dir):
     print(f"Splitting: {file_path}")
     stem = Path(file_path).stem
     chunk_pattern = os.path.join(output_dir, f"{stem}_chunk_%03d.mp3")
-    
+
     # Extract audio and split into 10m chunks. 10m of 128kbps MP3 is ~10MB.
     cmd = [
         "ffmpeg", "-i", str(file_path),
@@ -44,7 +44,7 @@ def transcribe_chunk(chunk_path):
     try:
         with open(chunk_path, "rb") as audio_file:
             transcript = client.audio.transcriptions.create(
-                model="whisper-1", 
+                model="whisper-1",
                 file=audio_file,
                 response_format="text"
             )
@@ -56,7 +56,7 @@ def transcribe_chunk(chunk_path):
 def process_file(file_path, transcription_dir, temp_dir):
     file_path = Path(file_path)
     output_file = transcription_dir / f"{file_path.stem}.txt"
-    
+
     if output_file.exists():
         print(f"Skipping {file_path.name}, already exists.")
         return
@@ -64,7 +64,7 @@ def process_file(file_path, transcription_dir, temp_dir):
     # For OpenAI we always convert to MP3/split because even small videos might be >25MB
     # and Whisper-1 prefers small audio files.
     chunks = split_audio(file_path, temp_dir)
-    
+
     full_transcript = []
     for chunk in chunks:
         text = transcribe_chunk(chunk)
@@ -72,7 +72,7 @@ def process_file(file_path, transcription_dir, temp_dir):
             full_transcript.append(text)
         # Cleanup chunk
         os.remove(chunk)
-        
+
     if full_transcript:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write("\n".join(full_transcript))
@@ -82,7 +82,7 @@ def main():
     root_dir = Path(".")
     transcription_dir = Path("Transcriptions")
     temp_dir = Path("tmp_audio_chunks")
-    
+
     transcription_dir.mkdir(exist_ok=True)
     temp_dir.mkdir(exist_ok=True)
 

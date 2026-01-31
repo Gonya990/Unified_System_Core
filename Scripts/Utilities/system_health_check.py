@@ -5,10 +5,10 @@ Diagnoses common issues in the Unified System Core
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 
 def check_python_version() -> Tuple[bool, str]:
@@ -23,15 +23,15 @@ def check_ai_core_dependencies() -> Tuple[bool, str]:
     """Check if AI Core dependencies are installed"""
     ai_core_path = Path(__file__).parent.parent.parent / "Projects" / "AI_Core"
     requirements_file = ai_core_path / "requirements.txt"
-    
+
     if not requirements_file.exists():
         return False, "✗ AI Core requirements.txt not found"
-    
+
     try:
         # Try importing key dependencies
-        import telegram
-        import openai
         import google.generativeai
+        import openai
+        import telegram
         return True, "✓ AI Core dependencies installed"
     except ImportError as e:
         return False, f"✗ Missing dependency: {e.name}"
@@ -41,12 +41,12 @@ def check_env_files() -> Tuple[bool, str]:
     """Check if environment files exist"""
     root = Path(__file__).parent.parent.parent
     env_files = [".env.example", ".env.local"]
-    
+
     found = []
     for env_file in env_files:
         if (root / env_file).exists():
             found.append(env_file)
-    
+
     if found:
         return True, f"✓ Environment files: {', '.join(found)}"
     return False, "✗ No environment files found"
@@ -76,13 +76,13 @@ def check_scripts_executable() -> Tuple[bool, str]:
         "check_system.sh",
         "start_brain.sh",
     ]
-    
+
     executable = []
     for script in scripts:
         script_path = root / script
         if script_path.exists() and os.access(script_path, os.X_OK):
             executable.append(script)
-    
+
     if executable:
         return True, f"✓ Executable scripts: {len(executable)}/{len(scripts)}"
     return False, "✗ No executable scripts found"
@@ -96,12 +96,12 @@ def check_project_directories() -> Tuple[bool, str]:
         "Scripts",
         "Agent_Context",
     ]
-    
+
     missing = []
     for dir_path in required_dirs:
         if not (root / dir_path).exists():
             missing.append(dir_path)
-    
+
     if not missing:
         return True, f"✓ All {len(required_dirs)} project directories exist"
     return False, f"✗ Missing: {', '.join(missing)}"
@@ -113,7 +113,7 @@ def run_health_check():
     print("🏥 Unified System Core - Health Check")
     print("=" * 60)
     print()
-    
+
     checks = [
         ("Python Version", check_python_version),
         ("Project Directories", check_project_directories),
@@ -122,19 +122,19 @@ def run_health_check():
         ("Executable Scripts", check_scripts_executable),
         ("AI Core Dependencies", check_ai_core_dependencies),
     ]
-    
+
     results = []
     for name, check_func in checks:
         success, message = check_func()
         results.append((name, success, message))
         print(f"{message}")
-    
+
     print()
     print("=" * 60)
-    
+
     passed = sum(1 for _, success, _ in results if success)
     total = len(results)
-    
+
     if passed == total:
         print(f"✓ All checks passed ({passed}/{total})")
         print("=" * 60)

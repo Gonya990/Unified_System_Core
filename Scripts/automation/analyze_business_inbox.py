@@ -1,11 +1,11 @@
 
+import base64
+import json
 import os
 import sys
-import json
-import base64
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Dict, List
 
 import openai
 from dotenv import load_dotenv
@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 # Gmail imports
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 # --- Configuration ---
@@ -53,7 +52,7 @@ def get_gmail_service():
             print("❌ No valid token found.")
             print("Please run: python3 Scripts/automation/generate_auth_link.py")
             sys.exit(1)
-        
+
         # Save refreshed token
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
@@ -75,14 +74,14 @@ def get_email_content(payload) -> str:
 
 def analyze_and_draft_responses(emails: List[Dict]):
     client = openai.OpenAI(api_key=OPENAI_API_KEY)
-    
+
     analyzed_data = []
 
     print(f"🧠 Analyzing {len(emails)} emails with {OPENAI_MODEL}...")
 
     for i, email in enumerate(emails):
         print(f"[{i+1}/{len(emails)}] Processing: {email['subject'][:40]}...")
-        
+
         prompt = f"""
         You are a strategic business development AI. 
         
@@ -123,7 +122,7 @@ def analyze_and_draft_responses(emails: List[Dict]):
             )
             content = response.choices[0].message.content
             analysis = json.loads(content)
-            
+
             if analysis.get("is_relevant"):
                 analyzed_data.append({
                     "original": email,
@@ -144,55 +143,55 @@ def analyze_and_draft_responses(emails: List[Dict]):
 
 def main():
     print("🚀 Starting Business Email Analysis...")
-    
+
     # 1. Fetch Emails
     service = get_gmail_service()
-    
+
     # Last 30 days
     date_query = (datetime.now() - timedelta(days=30)).strftime("%Y/%m/%d")
     query = f"after:{date_query}"
     # Filter out common bulk senders to save AI tokens roughly (can refine later)
     query += " -category:promotions -category:social"
-    
+
     print(f"📥 Fetching emails since {date_query}...")
-    
+
     messages = []
     next_page_token = None
     target_count = 300
-    
+
     while len(messages) < target_count:
         results = service.users().messages().list(
-            userId="me", 
-            q=query, 
-            maxResults=min(100, target_count - len(messages)), 
+            userId="me",
+            q=query,
+            maxResults=min(100, target_count - len(messages)),
             pageToken=next_page_token
         ).execute()
-        
+
         batch = results.get("messages", [])
         messages.extend(batch)
         next_page_token = results.get("nextPageToken")
-        
+
         print(f"   Fetched {len(messages)} messages...")
         if not next_page_token or not batch:
             break
-            
+
     print(f"Found {len(messages)} recent emails.")
-    
+
     email_list = []
-    
+
     # Process mostly the newest ones first
     for msg in messages[:target_count]:
         try:
             full = service.users().messages().get(userId="me", id=msg["id"], format="full").execute()
             payload = full.get("payload", {})
             headers = payload.get("headers", [])
-            
+
             subject = next((h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)")
             sender = next((h["value"] for h in headers if h["name"] == "From"), "(Unknown)")
             date = next((h["value"] for h in headers if h["name"] == "Date"), "")
-            
+
             body = get_email_content(payload)
-            
+
             if body:
                 email_list.append({
                     "id": msg["id"],
@@ -210,32 +209,32 @@ def main():
         return
 
     results = analyze_and_draft_responses(email_list)
-    
+
     # 3. Report
     print(f"📝 Generating Report for {len(results)} relevant threads...")
-    
+
     with open(REPORT_FILE, "w") as f:
-        f.write(f"# Business Response Plan\n")
+        f.write("# Business Response Plan\n")
         f.write(f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
-        
+
         for item in results:
             orig = item["original"]
             anl = item["analysis"]
             strat = anl.get("strategy", {})
-            
+
             f.write(f"## 📧 {orig['sender']}\n")
             f.write(f"**Subject:** {orig['subject']}\n\n")
             f.write(f"**Relevance:** {anl.get('reason')}\n\n")
-            
-            f.write(f"### 🎯 Strategy\n")
+
+            f.write("### 🎯 Strategy\n")
             f.write(f"- **Plan:** {strat.get('plan')}\n")
             f.write(f"- **ROI/Benefit:** {strat.get('roi')}\n")
             f.write(f"- **Action:** {strat.get('action')}\n\n")
-            
-            f.write(f"### ✍️ Draft Reply\n")
+
+            f.write("### ✍️ Draft Reply\n")
             f.write(f"```text\n{anl.get('reply_draft')}\n```\n")
-            f.write(f"---\n\n")
-            
+            f.write("---\n\n")
+
     print(f"✅ Report saved to: {REPORT_FILE}")
 
 if __name__ == "__main__":

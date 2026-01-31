@@ -4,16 +4,16 @@ File Operations Tool for AI Agent
 Provides safe file system operations for the agent.
 """
 
-from pathlib import Path
-from typing import Dict, Any
 import logging
+from pathlib import Path
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
 
 class FileOpsTool:
     """File system operations tool"""
-    
+
     @staticmethod
     def get_definition() -> Dict[str, Any]:
         """Get OpenAI function definition for file_read"""
@@ -36,7 +36,7 @@ class FileOpsTool:
                 "required": ["path"]
             }
         }
-    
+
     @staticmethod
     async def handler(path: str, max_chars: int = 5000) -> str:
         """
@@ -51,26 +51,26 @@ class FileOpsTool:
         """
         try:
             file_path = Path(path).expanduser().resolve()
-            
+
             if not file_path.exists():
                 return f"❌ Error: File not found: {path}"
-            
+
             if not file_path.is_file():
                 return f"❌ Error: Path is not a file: {path}"
-            
+
             # Read file
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 content = f.read()
-            
+
             total_size = len(content)
-            
+
             # Truncate if needed
             if total_size > max_chars:
                 content = content[:max_chars]
                 truncated_msg = f"\n\n... (truncated {total_size - max_chars} characters)"
             else:
                 truncated_msg = ""
-            
+
             return f"""📄 **File:** {file_path.name}
 📍 **Path:** {path}
 📏 **Size:** {total_size} characters
@@ -79,7 +79,7 @@ class FileOpsTool:
 ```
 {content}{truncated_msg}
 ```"""
-            
+
         except UnicodeDecodeError:
             return f"❌ Error: File is not text (binary file): {path}"
         except PermissionError:
@@ -91,7 +91,7 @@ class FileOpsTool:
 
 class FileListTool:
     """Directory listing tool"""
-    
+
     @staticmethod
     def get_definition() -> Dict[str, Any]:
         """Get OpenAI function definition for file_list"""
@@ -114,7 +114,7 @@ class FileListTool:
                 "required": ["path"]
             }
         }
-    
+
     @staticmethod
     async def handler(path: str, pattern: str = "*") -> str:
         """
@@ -129,24 +129,24 @@ class FileListTool:
         """
         try:
             dir_path = Path(path).expanduser().resolve()
-            
+
             if not dir_path.exists():
                 return f"❌ Error: Directory not found: {path}"
-            
+
             if not dir_path.is_dir():
                 return f"❌ Error: Path is not a directory: {path}"
-            
+
             # List files
             items = sorted(dir_path.glob(pattern))
-            
+
             if not items:
                 return f"📁 **Directory:** {path}\n\n(Empty or no matches for pattern '{pattern}')"
-            
+
             files = [item for item in items if item.is_file()]
             dirs = [item for item in items if item.is_dir()]
-            
+
             result = f"📁 **Directory:** {path}\n\n"
-            
+
             if dirs:
                 result += "**Directories:**\n"
                 for d in dirs[:50]:  # Limit to 50
@@ -154,7 +154,7 @@ class FileListTool:
                 if len(dirs) > 50:
                     result += f"  ... and {len(dirs) - 50} more directories\n"
                 result += "\n"
-            
+
             if files:
                 result += "**Files:**\n"
                 for f in files[:50]:  # Limit to 50
@@ -163,9 +163,9 @@ class FileListTool:
                     result += f"  📄 {f.name} ({size_str})\n"
                 if len(files) > 50:
                     result += f"  ... and {len(files) - 50} more files\n"
-            
+
             return result
-            
+
         except PermissionError:
             return f"❌ Error: Permission denied: {path}"
         except Exception as e:

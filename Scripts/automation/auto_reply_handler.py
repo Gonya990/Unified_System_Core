@@ -1,14 +1,13 @@
 
-import os
-import re
 import base64
+from email.mime.text import MIMEText
 from pathlib import Path
-from google.oauth2.credentials import Credentials
+
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from email.mime.text import MIMEText
-from dotenv import load_dotenv
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -25,7 +24,7 @@ def get_gmail_service():
     creds = None
     if TOKEN_PATH.exists():
         creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
-    
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -36,10 +35,10 @@ def get_gmail_service():
                 str(CREDENTIALS_PATH), SCOPES
             )
             creds = flow.run_local_server(port=0)
-            
+
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
-            
+
     return build("gmail", "v1", credentials=creds)
 
 def create_draft(service, subject, body, placeholder_to):
@@ -48,10 +47,10 @@ def create_draft(service, subject, body, placeholder_to):
         # message["to"] = placeholder_to # Gmail API rejects invalid content in To header
         # Intentionally leaving 'to' empty so it saves as draft without destination
         message["subject"] = subject
-        
+
         raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
         body = {"message": {"raw": raw_message}}
-        
+
         draft = service.users().drafts().create(userId="me", body=body).execute()
         print(f"✅ Draft created: '{subject}' (ID: {draft['id']})")
         return draft
@@ -66,10 +65,10 @@ def send_email(service, to_email, subject, body_content):
         message = MIMEText(body_content)
         message["to"] = to_email
         message["subject"] = subject
-        
+
         raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
         body = {"message": {"raw": raw_message}}
-        
+
         sent = service.users().messages().send(userId="me", body={"raw": raw_message}).execute()
         print(f"🚀 SENT email to {to_email} (ID: {sent['id']})")
         return sent
@@ -82,30 +81,30 @@ def process_actions_and_send():
         print(f"Actions file not found at {ACTIONS_FILE}")
         return
 
-    with open(ACTIONS_FILE, "r") as f:
+    with open(ACTIONS_FILE) as f:
         actions = json.load(f)
-    
+
     print(f"Found {len(actions)} actions to process.")
-    
+
     service = get_gmail_service()
-    
+
     sent_count = 0
     draft_count = 0
-    
+
     for item in actions:
         analysis = item.get("analysis", {})
         original = item.get("original", {})
-        
+
         action_type = analysis.get("action_type", "MANUAL_REVIEW")
         recipient = analysis.get("recipient_email")
         subject = analysis.get("subject", f"Re: {original.get('subject')}")
         body = analysis.get("reply_body", "")
-        
+
         # Determine if we can auto-send
         can_auto_send = False
         if action_type == "AUTO_SEND" and recipient and "@" in recipient and "noreply" not in recipient:
             can_auto_send = True
-            
+
         if can_auto_send:
             print(f"📧 Auto-Sending to: {recipient}")
             send_email(service, recipient, subject, body)
@@ -114,7 +113,7 @@ def process_actions_and_send():
             # Fallback to draft
             reason = "Manual Review Required" if action_type == "MANUAL_REVIEW" else "No valid recipient found"
             print(f"📝 Creating Draft ({reason}) for subject: {subject[:30]}...")
-            
+
             # Add context to top of draft body for user
             context_header = f"""[AUTO-GENERATED DRAFT]
 Reason: {reason}
@@ -125,7 +124,7 @@ Original Sender: {original.get('sender')}
             create_draft(service, subject, context_header + body, "")
             draft_count += 1
 
-    print(f"\n🎉 Processing Complete.")
+    print("\n🎉 Processing Complete.")
     print(f"   🚀 Sent: {sent_count}")
     print(f"   📝 Drafts: {draft_count}")
 

@@ -1,7 +1,6 @@
 
-import os
-import sys
 from pathlib import Path
+
 from google_auth_oauthlib.flow import Flow
 
 # Paths
@@ -29,7 +28,7 @@ try:
     print(f"\n{auth_url}\n")
     print("2. Copy the authorization code.")
     print("3. Run this command in your terminal to complete setup:")
-    print(f"\npython3 Scripts/automation/complete_auth.py --code YOUR_CODE_HERE\n")
+    print("\npython3 Scripts/automation/complete_auth.py --code YOUR_CODE_HERE\n")
     print("="*80 + "\n")
 
 except Exception as e:

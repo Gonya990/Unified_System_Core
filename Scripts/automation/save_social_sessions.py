@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 
 # Paths to store browser session data for the cloud node

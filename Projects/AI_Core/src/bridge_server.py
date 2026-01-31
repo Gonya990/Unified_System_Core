@@ -2,21 +2,21 @@ import logging
 import os
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, HTTPException, Header, Request
-from pydantic import BaseModel
 import uvicorn
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel
 
 # Import local modules
 try:
+    from agent_orchestrator import AgentOrchestrator
     from config_manager import ConfigManager
     from inference_client import InferenceClient
-    from agent_orchestrator import AgentOrchestrator
 except ImportError:
     import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from agent_orchestrator import AgentOrchestrator
     from config_manager import ConfigManager
     from inference_client import InferenceClient
-    from agent_orchestrator import AgentOrchestrator
 
 # Setup logging
 logging.basicConfig(
@@ -57,7 +57,7 @@ async def health():
 async def handle_lead(lead: LeadData, authorization: Optional[str] = Header(None)):
     await verify_token(authorization)
     logger.info(f"Received lead from {lead.phone} ({lead.name})")
-    
+
     # Brain processing: Analyze lead importance
     prompt = (
         f"Analyze this business lead and suggest priority (High, Medium, Low):\n"
@@ -67,7 +67,7 @@ async def handle_lead(lead: LeadData, authorization: Optional[str] = Header(None
         f"Message: {lead.message}"
     )
     analysis = await inference.complete(prompt)
-    
+
     # Here we could record to Google Sheets or notify Telegram
     return {
         "status": "received",
@@ -79,11 +79,11 @@ async def handle_lead(lead: LeadData, authorization: Optional[str] = Header(None
 async def execute_command(req: CommandRequest, authorization: Optional[str] = Header(None)):
     await verify_token(authorization)
     logger.info(f"Executing external command: {req.command}")
-    
+
     if req.command == "sync":
         # Placeholder for triggering vibranium-sync.sh
         return {"status": "sync_triggered"}
-        
+
     return {"status": "unknown_command"}
 
 if __name__ == "__main__":

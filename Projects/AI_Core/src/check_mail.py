@@ -1,6 +1,6 @@
 import os
+
 import requests
-import json
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,12 +14,12 @@ def check_inbox(server_url):
     print(f"🔍 Checking inbox at {server_url}...")
     url = f"{server_url.rstrip('/')}/messages/inbox"
     headers = {"Authorization": f"Bearer {AGENT_MAIL_TOKEN}"}
-    
+
     try:
         response = requests.get(url, headers=headers, timeout=5)
         response.raise_for_status()
         messages = response.json()
-        
+
         print(f"📬 Found {len(messages)} messages in inbox.")
         for msg in messages:
             print(f"\n--- Message ID: {msg.get('id')} ---")
