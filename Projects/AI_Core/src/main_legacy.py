@@ -2,9 +2,9 @@
 AI Telegram Bot - Main Entry Point.
 Handles Telegram commands and message routing.
 """
+import os
 import asyncio
 import logging
-import os
 import sys
 from pathlib import Path
 
