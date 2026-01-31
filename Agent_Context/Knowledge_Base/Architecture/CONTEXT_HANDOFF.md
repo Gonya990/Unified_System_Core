@@ -465,3 +465,12 @@ sessions. Refresh by running the documentation generation workflow.*
 - [x] Run /autosave (Saved Content Factory scripts)
 - [x] Fix `gpu-node-1` git access rights (Sync failed) - RESOLVED
 ```
+
+### From `0e05726f` (AI Bot Repair) - COMPLETE ✅
+
+```markdown
+- [x] Fix AI Core (Ollama) port conflict (Zombie processes)
+- [x] Fix HA Integration (ImportError) via ha_controller_fix.py
+- [x] Fix Network Status (Missing ping in Docker)
+- [x] Verify Full System Functionality (AI + HA + Network)
+```
