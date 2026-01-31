@@ -463,5 +463,5 @@ sessions. Refresh by running the documentation generation workflow.*
 ```markdown
 - [x] Run /sinc workflow (Success - unified-home & igor-gaming synced)
 - [x] Run /autosave (Saved Content Factory scripts)
-- [ ] Fix gpu-node-1 git access rights (Sync failed)
+- [x] Fix `gpu-node-1` git access rights (Sync failed) - RESOLVED
 ```
