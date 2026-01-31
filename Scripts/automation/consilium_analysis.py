@@ -1,4 +1,3 @@
-import os
 import json
 import subprocess
 from pathlib import Path
@@ -41,29 +40,29 @@ def analyze_content_type(text):
 
 def process_file(file_path):
     print(f"🧐 Consilium Analysing: {file_path.name}")
-    
+
     # 1. Decrypt locally to vault (RAM-like speed inside ext4 on img)
     temp_file = SECURE_VAULT / f"temp_{file_path.stem}"
     try:
         if file_path.suffix == ".gpg":
             subprocess.run([
-                "gpg", "--batch", "--yes", "--output", str(temp_file), 
+                "gpg", "--batch", "--yes", "--output", str(temp_file),
                 "--decrypt", str(file_path)
             ], check=True)
         else:
             # If it's a raw file, copy to temp
             import shutil
             shutil.copy2(file_path, temp_file)
-            
+
         # 2. Extract content
         # For simplicity, we sample the header and metadata
         with open(temp_file, 'rb') as f:
             sample = f.read(5000).decode('utf-8', errors='ignore')
-            
+
         # 3. Classify
         tags = analyze_content_type(sample)
         print(f"   Tags identified: {tags}")
-        
+
         # 4. Ask the Consilium (Multiple Agents)
         results = {}
         target_dir = DATABASE_DIR
@@ -76,7 +75,7 @@ def process_file(file_path):
             prompt = f"Analyze this content fragment. Categories: {tags}. Extract key entities, dates, and actionable info. Content: {sample[:2000]}"
             print(f"   -> Agent {model} is thinking...")
             results[model] = run_ollama(prompt, model)
-            
+
         # 5. Save to Database
         doc_id = file_path.stem
         record = {
@@ -85,12 +84,12 @@ def process_file(file_path):
             "consilium_reports": results,
             "processed_at": "2026-01-28"
         }
-        
+
         with open(target_dir / f"{doc_id}.json", "w") as f:
             json.dump(record, f, indent=2)
-            
+
         print(f"✅ Indexed {doc_id} to Secure Vault")
-        
+
     finally:
         # 5. SECURE WIPE
         if temp_file.exists():
@@ -101,7 +100,7 @@ def start_processing():
     # Find all GPG files
     gpg_files = list(ARCHIVE_DIR.rglob("*.gpg"))
     print(f"📦 Found {len(gpg_files)} encrypted archives to process.")
-    
+
     for f in gpg_files:
         try:
             process_file(f)

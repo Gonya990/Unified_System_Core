@@ -1,7 +1,8 @@
 import os
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
-from pathlib import Path
 
 # Load environment variables from .env file (searching parent directories)
 env_path = Path(__file__).resolve().parents[3] / '.env'

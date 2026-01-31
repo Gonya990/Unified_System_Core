@@ -14,7 +14,8 @@ import functools
 import logging
 import random
 import time
-from typing import Callable, Optional, Sequence, Type, Union
+from collections.abc import Sequence
+from typing import Callable, Optional, Type
 
 logger = logging.getLogger(__name__)
 

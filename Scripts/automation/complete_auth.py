@@ -2,6 +2,7 @@
 import argparse
 import sys
 from pathlib import Path
+
 from google_auth_oauthlib.flow import Flow
 
 # Paths
@@ -34,7 +35,7 @@ def main():
         # Save token
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
-        
+
         print("\n✅ Authentication successful! Token saved.")
         print("You can now ask the agent to scan your emails.")
 

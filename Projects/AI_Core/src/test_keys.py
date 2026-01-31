@@ -1,6 +1,7 @@
 import os
-import openai
+
 import google.generativeai as genai
+import openai
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))

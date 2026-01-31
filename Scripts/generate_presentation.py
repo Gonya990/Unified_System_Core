@@ -1,12 +1,10 @@
-from reportlab.lib import colors
+import os
+
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Image
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-import textwrap
-import os
-from datetime import datetime
+from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer
 
 # Setup content for 3 languages
 CONTENT = {
@@ -130,25 +128,26 @@ CONTENT = {
 import arabic_reshaper
 from bidi.algorithm import get_display
 
+
 def create_pdf(lang, filename):
     doc = SimpleDocTemplate(filename, pagesize=landscape(A4))
     styles = getSampleStyleSheet()
-    
+
     # Register a font that supports Cyrillic and Hebrew if possible
     # For standard Mac, we might need a specific font path.
     # Using Helvetica as fallback, but ideally needs Unicode font.
     # Trying to find Arial or similar.
-    
+
     font_path = "/System/Library/Fonts/Supplemental/Arial.ttf"
     if not os.path.exists(font_path):
-        font_path = "/System/Library/Fonts/Helvetica.ttc" 
-        
+        font_path = "/System/Library/Fonts/Helvetica.ttc"
+
     try:
         pdfmetrics.registerFont(TTFont('Arial', font_path))
         font_name = 'Arial'
     except:
         font_name = 'Helvetica' # Fallback, might break HE/RU chars if not standard
-    
+
     # Define styles
     title_style = ParagraphStyle(
         'CustomTitle',
@@ -158,7 +157,7 @@ def create_pdf(lang, filename):
         spaceAfter=30,
         alignment=1 # Center
     )
-    
+
     body_style = ParagraphStyle(
         'CustomBody',
         parent=styles['Normal'],
@@ -174,31 +173,31 @@ def create_pdf(lang, filename):
     # Title Page
     t = data['title']
     s = data['subtitle']
-    
+
     if lang == "HE":
         t = get_display(arabic_reshaper.reshape(t))
         s = get_display(arabic_reshaper.reshape(s))
-        
+
     story.append(Spacer(1, 100))
     story.append(Paragraph(t, title_style))
     story.append(Paragraph(s, body_style))
     story.append(PageBreak())
-    
+
     # Slides
     for slide in data['slides']:
         st = slide['title']
         if lang == "HE":
             st = get_display(arabic_reshaper.reshape(st))
-            
+
         story.append(Paragraph(st, title_style))
         story.append(Spacer(1, 20))
-        
+
         for point in slide['points']:
             pt = f"• {point}"
             if lang == "HE":
                 pt = get_display(arabic_reshaper.reshape(pt))
             story.append(Paragraph(pt, body_style))
-            
+
         story.append(PageBreak())
 
     doc.build(story)

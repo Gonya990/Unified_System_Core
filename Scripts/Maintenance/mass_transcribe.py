@@ -1,7 +1,8 @@
 import os
 import time
-import google.generativeai as genai
 from pathlib import Path
+
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -61,12 +62,12 @@ def main():
     for f in media_files:
         if f.name in seen or "tmp/" in str(f) or ".venv" in str(f):
             continue
-        
+
         output_name = transcription_dir / f"{f.stem}.txt"
         if output_name.exists():
             print(f"Skipping {f.name}, already transcribed.")
             continue
-            
+
         seen.add(f.name)
         to_process.append(f)
 
@@ -75,13 +76,13 @@ def main():
     for i, file_path in enumerate(to_process):
         print(f"[{i+1}/{len(to_process)}] {file_path}")
         transcript = transcribe_file(file_path)
-        
+
         if transcript:
             output_file = transcription_dir / f"{file_path.stem}.txt"
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(transcript)
             print(f"Saved: {output_file}")
-        
+
         # Avoid rate limits
         time.sleep(5)
 
