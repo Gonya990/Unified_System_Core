@@ -3,6 +3,13 @@ FROM python:3.12-slim
 # Install UV for fast dependency management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+
 WORKDIR /app
 
 # Install dependencies using uv
