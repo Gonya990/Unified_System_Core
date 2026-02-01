@@ -4715,7 +4715,6 @@ def main():
     except Exception as e:
         logger.error(f"[STARTUP] Error restoring sessions: {e}")
 
-    # Agent Mail Startup Notification (Vibranium Integration)
     # try:
     #     am_client = AgentMailClient()
     #     am_client.register()
@@ -4729,7 +4728,7 @@ def main():
     #     logger.info("[STARTUP] Agent Mail notification sent (Vibranium Sync)")
     # except Exception as am_e:
     #     logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
-
+    
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Register error handler
