@@ -9,5 +9,8 @@
 
 ## Phase 2: Synchronization <!-- id: 200 -->
 
-- [ ] Execute `/sync` (Vibranium Full Sync) <!-- id: 201 -->
+- [x] Push `antibridge` submodule to origin <!-- id: 105 -->
+- [/] Execute `/sync` (Vibranium Full Sync) <!-- id: 201 -->
+  <!-- CURRENT FOCUS -->
+
 - [ ] Update `CONTEXT_HANDOFF.md` <!-- id: 202 -->
