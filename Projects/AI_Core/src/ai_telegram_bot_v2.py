@@ -4728,7 +4728,7 @@ def main():
     #     logger.info("[STARTUP] Agent Mail notification sent (Vibranium Sync)")
     # except Exception as am_e:
     #     logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
-    
+
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Register error handler
