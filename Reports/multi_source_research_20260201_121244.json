@@ -1,0 +1,762 @@
+{
+  "timestamp": "2026-02-01T12:12:44.153743",
+  "sources_summary": {
+    "telegram": 10,
+    "user_links": 8,
+    "google_news": 4,
+    "reddit": 20,
+    "hackernews": 10,
+    "wikipedia": 8
+  },
+  "total_insights": 60,
+  "top_insights": [
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 88,
+      "text": "Моменты по прошлому уроку. Ссылки, промты, уроки.-ОБЗОР НА ЛУЧШУЮ ПРИВАТКУ ПО ЗАРАБОТКУ НА ЮТУБ ИСПОЛЬЗУЯ НЕЙРОСЕТИ-https://t.me/vitalycontentcreate/68-ИНСТРУКЦИЯ ПО РАБОТЕ С NANOBANANA -https://www.youtube.com/watch?v=ORaN__RNWFc&t=1s&pp=0gcJCSkKAYcqIYzv-ИНСТРУКЦИЯ ПО РАБОТЕ С VEO 3.1-https://www.y",
+      "views": 1940,
+      "date": "2025-12-14T15:17:43+00:00",
+      "media": null,
+      "score": 1940
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 95,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю.Пользуйтесь, кому надо)ССЫЛКА НА ВИДЕО:https://youtu.be/kGyxC5oxVa8",
+      "views": 1730,
+      "date": "2025-12-18T14:01:48+00:00",
+      "media": "photo",
+      "score": 1730
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 96,
+      "text": "Ссылки из видео:Сервис DIGEN AI-https://digen.ai/Сервис Temp mail-https://temp-mail.org/Для апскейла используйте:-Topaz ai-Hitpaw video enhancer",
+      "views": 1710,
+      "date": "2025-12-18T14:01:53+00:00",
+      "media": null,
+      "score": 1710
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 102,
+      "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙМеня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане берут деньги. Но зато в моём блоге вы увидит",
+      "views": 1680,
+      "date": "2025-12-22T16:12:09+00:00",
+      "media": "photo",
+      "score": 1680
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 106,
+      "text": "ОппаА я еще монеточка подошла)8 лонгов ушло чтоб часы закрыть)В планах так вывести на монету еще 2 канала. Все делаются на нейронках, но ниши чуть ли не вечные и белоснежно-белые. Потом уже начать делегировать и в хайп ниши также залетать с двух ног.",
+      "views": 1680,
+      "date": "2025-12-25T12:30:30+00:00",
+      "media": "photo",
+      "score": 1680
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 105,
+      "text": "Даю вам топовый лайфхак, как выиграть 90% конкурентов на РУ рынке в Ютуб.Находите свежее видео по теме вашего канала на английском или испанском языке (не больше месяца ролику). Видео должно выстрелить.Скачиваете его, получаете транскрибацию в нейронке (можно через субтитры на самом YouTube перевест",
+      "views": 1670,
+      "date": "2025-12-22T17:51:28+00:00",
+      "media": null,
+      "score": 1670
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 97,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+      "views": 1560,
+      "date": "2025-12-18T14:13:36+00:00",
+      "media": null,
+      "score": 1560
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 104,
+      "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙ  Меня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.  Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане…",
+      "views": 1530,
+      "date": "2025-12-22T16:13:30+00:00",
+      "media": null,
+      "score": 1530
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 98,
+      "text": "Держите разбор нейронки для генерации видео. Нейронка на сегодня стоит копейки, а пользоваться ей можно практически безлимитно (если будете делать, как я объясняю — получите 4500 генераций видеокадров) + безлимитная НаноБанана будет.  На сегодня — лучшее решение…",
+      "views": 1490,
+      "date": "2025-12-18T15:29:47+00:00",
+      "media": "photo",
+      "score": 1490
+    },
+    {
+      "source": "telegram",
+      "channel": "vitalycontentcreate",
+      "id": 100,
+      "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+      "views": 1480,
+      "date": "2025-12-19T16:54:54+00:00",
+      "media": null,
+      "score": 1480
+    },
+    {
+      "source": "user_link",
+      "url": "https://notebooklm.google.com/notebook/147baabe-24a6-40ae-b552-1c12e911c0e0?artifactId=63cdfd0d-5f5f-40ee-a54d-dc515461aed0&pli=1",
+      "category": "AI Tools",
+      "priority": "high",
+      "notes": "NotebookLM project",
+      "content": "Sign in - Google Accounts Sign in Use your Google Account Email or phone Forgot email? Not your computer? Use a private browsing window to sign in. Learn more about using Guest mode Next Create account",
+      "score": 100
+    },
+    {
+      "source": "user_link",
+      "url": "https://dialogs.yandex.ru/developer",
+      "category": "Dev Tools",
+      "priority": "high",
+      "notes": "Yandex Dialogs Developer Console",
+      "content": "Платформа диалогов",
+      "score": 100
+    },
+    {
+      "source": "user_link",
+      "url": "https://colab.research.google.com/notebooks/intro.ipynb",
+      "category": "AI/Dev",
+      "priority": "high",
+      "notes": "Google Colab Intro",
+      "content": "Google Colab Sign in",
+      "score": 100
+    },
+    {
+      "source": "reddit",
+      "subreddit": "technology",
+      "title": "Jeffrey Epstein Sent Five Nights At Freddy's Porn Via 4Chan Links, Emails Show",
+      "url": "https://reddit.com/r/technology/comments/1qscn3l/jeffrey_epstein_sent_five_nights_at_freddys_porn/",
+      "upvotes": 10676,
+      "score": 100
+    },
+    {
+      "source": "wikipedia",
+      "title": "Catherine O'Hara",
+      "url": "https://en.wikipedia.org/wiki/Catherine_O'Hara",
+      "views": 2377286,
+      "score": 100
+    },
+    {
+      "source": "wikipedia",
+      "title": "Royal Rumble (2026)",
+      "url": "https://en.wikipedia.org/wiki/Royal_Rumble_(2026)",
+      "views": 1209957,
+      "score": 100
+    },
+    {
+      "source": "wikipedia",
+      "title": "Elena Rybakina",
+      "url": "https://en.wikipedia.org/wiki/Elena_Rybakina",
+      "views": 935658,
+      "score": 93.5658
+    },
+    {
+      "source": "reddit",
+      "subreddit": "science",
+      "title": "Girls are happier than boys at school, new research shows. Understanding why may all boil down to biology. Girls get more of the happy hormone dopamine through social relationships, including with their friends and classmates. Boys get their dopamine through more self-involved behavior.",
+      "url": "https://reddit.com/r/science/comments/1qrzino/girls_are_happier_than_boys_at_school_new/",
+      "upvotes": 7187,
+      "score": 71.87
+    },
+    {
+      "source": "hackernews",
+      "title": "Mobile carriers can get your GPS location",
+      "url": "https://an.dywa.ng/carrier-gnss.html",
+      "score": 66.9
+    },
+    {
+      "source": "reddit",
+      "subreddit": "technology",
+      "title": "PresidentRx delayed as senators question if it's a giant scam with Big Pharma | The website is delayed as senators seek answers from health department watchdog.",
+      "url": "https://reddit.com/r/technology/comments/1qsabnb/presidentrx_delayed_as_senators_question_if_its_a/",
+      "upvotes": 6627,
+      "score": 66.27
+    }
+  ],
+  "script_ideas": [
+    {
+      "Title": "Unlock YouTube Success: 5 Hidden Hacks You Need to Know!",
+      "Hook": "Warning! These YouTube hacks could skyrocket your channel overnight!",
+      "Key Points": [
+        "Discover the latest tools to optimize your content for free.",
+        "Learn how to find fresh topics that beat your competition.",
+        "Utilize AI tools for video generation without breaking the bank.",
+        "Real-life examples of successful YouTube creators and their secrets.",
+        "Tips on how to leverage Telegram communities for growth."
+      ],
+      "Source Mix": [
+        "Telegram",
+        "Reddit"
+      ],
+      "Viral Potential": 9
+    },
+    {
+      "Title": "Exploit Sora 2: Unlimited Free Access Without Signing Up!",
+      "Hook": "Ever wondered how to get unlimited access to premium tools for free? Here’s the secret!",
+      "Key Points": [
+        "Step-by-step guide on utilizing Sora 2 without registration.",
+        "Benefits of using tools like Temp Mail for anonymity.",
+        "How to maximize these tools for your YouTube channel.",
+        "Safety tips to avoid common pitfalls when using hacks.",
+        "Real user testimonials on the effectiveness of this method."
+      ],
+      "Source Mix": [
+        "Telegram"
+      ],
+      "Viral Potential": 8
+    },
+    {
+      "Title": "The Ultimate Guide to Generating Engaging Videos Using AI!",
+      "Hook": "Stop wasting time! Here's how to create awesome videos using AI tools for next to nothing!",
+      "Key Points": [
+        "Introduction to affordable AI video generation tools.",
+        "Demonstration of how to use DIGEN AI for content creation.",
+        "Quick tips for enhancing video quality and engagement.",
+        "Comparison of AI-generated videos vs. traditional editing.",
+        "Encouragement to experiment with these tools for better output."
+      ],
+      "Source Mix": [
+        "Telegram",
+        "User Link"
+      ],
+      "Viral Potential": 9
+    },
+    {
+      "Title": "Top 5 YouTube Strategies to Crush Your Competition in 2023!",
+      "Hook": "Are you ready to dominate YouTube? Here are the top strategies to leave competitors in the dust!",
+      "Key Points": [
+        "Identifying trending topics before they go viral.",
+        "Leveraging social media for content promotion.",
+        "Engagement tactics to connect with your audience more effectively.",
+        "Using analytics tools to track and improve your performance.",
+        "The importance of consistent branding across your platform."
+      ],
+      "Source Mix": [
+        "Telegram"
+      ],
+      "Viral Potential": 8
+    },
+    {
+      "Title": "Why Girls are Happier at School: The Science Behind Social Connections",
+      "Hook": "Shocking new research reveals why girls thrive in school more than boys! Let’s dive in!",
+      "Key Points": [
+        "Overview of the latest findings on happiness in school environments.",
+        "Explaining the role of dopamine in social relationships.",
+        "Practical advice for parents and educators to support girls' social skills.",
+        "Contrasting the behaviors of boys and girls in educational settings.",
+        "Possible implications for future classroom dynamics."
+      ],
+      "Source Mix": [
+        "Reddit"
+      ],
+      "Viral Potential": 7
+    }
+  ],
+  "sources_data": {
+    "telegram": [
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 88,
+        "text": "Моменты по прошлому уроку. Ссылки, промты, уроки.-ОБЗОР НА ЛУЧШУЮ ПРИВАТКУ ПО ЗАРАБОТКУ НА ЮТУБ ИСПОЛЬЗУЯ НЕЙРОСЕТИ-https://t.me/vitalycontentcreate/68-ИНСТРУКЦИЯ ПО РАБОТЕ С NANOBANANA -https://www.youtube.com/watch?v=ORaN__RNWFc&t=1s&pp=0gcJCSkKAYcqIYzv-ИНСТРУКЦИЯ ПО РАБОТЕ С VEO 3.1-https://www.y",
+        "views": 1940,
+        "date": "2025-12-14T15:17:43+00:00",
+        "media": null,
+        "score": 1940
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 95,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю.Пользуйтесь, кому надо)ССЫЛКА НА ВИДЕО:https://youtu.be/kGyxC5oxVa8",
+        "views": 1730,
+        "date": "2025-12-18T14:01:48+00:00",
+        "media": "photo",
+        "score": 1730
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 96,
+        "text": "Ссылки из видео:Сервис DIGEN AI-https://digen.ai/Сервис Temp mail-https://temp-mail.org/Для апскейла используйте:-Topaz ai-Hitpaw video enhancer",
+        "views": 1710,
+        "date": "2025-12-18T14:01:53+00:00",
+        "media": null,
+        "score": 1710
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 102,
+        "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙМеня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане берут деньги. Но зато в моём блоге вы увидит",
+        "views": 1680,
+        "date": "2025-12-22T16:12:09+00:00",
+        "media": "photo",
+        "score": 1680
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 106,
+        "text": "ОппаА я еще монеточка подошла)8 лонгов ушло чтоб часы закрыть)В планах так вывести на монету еще 2 канала. Все делаются на нейронках, но ниши чуть ли не вечные и белоснежно-белые. Потом уже начать делегировать и в хайп ниши также залетать с двух ног.",
+        "views": 1680,
+        "date": "2025-12-25T12:30:30+00:00",
+        "media": "photo",
+        "score": 1680
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 105,
+        "text": "Даю вам топовый лайфхак, как выиграть 90% конкурентов на РУ рынке в Ютуб.Находите свежее видео по теме вашего канала на английском или испанском языке (не больше месяца ролику). Видео должно выстрелить.Скачиваете его, получаете транскрибацию в нейронке (можно через субтитры на самом YouTube перевест",
+        "views": 1670,
+        "date": "2025-12-22T17:51:28+00:00",
+        "media": null,
+        "score": 1670
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 97,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+        "views": 1560,
+        "date": "2025-12-18T14:13:36+00:00",
+        "media": null,
+        "score": 1560
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 104,
+        "text": "ОБО МНЕ И ВАРИАНТЫ РАБОТЫ СО МНОЙ  Меня зовут Виталий. Я зарабатываю на контенте при помощи Ютуба и нейросетей. Веду каналы как с лицом, так и без лица.  Миллионы ещё не делаю. И рассказываю всё как есть, без розовых очков. Бесплатно даю то, за что инфоцыгане…",
+        "views": 1530,
+        "date": "2025-12-22T16:13:30+00:00",
+        "media": null,
+        "score": 1530
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 98,
+        "text": "Держите разбор нейронки для генерации видео. Нейронка на сегодня стоит копейки, а пользоваться ей можно практически безлимитно (если будете делать, как я объясняю — получите 4500 генераций видеокадров) + безлимитная НаноБанана будет.  На сегодня — лучшее решение…",
+        "views": 1490,
+        "date": "2025-12-18T15:29:47+00:00",
+        "media": "photo",
+        "score": 1490
+      },
+      {
+        "source": "telegram",
+        "channel": "vitalycontentcreate",
+        "id": 100,
+        "text": "Делюсь способом, как абузить Sora 2 неограниченно, бесплатно и без необходимости регистрировать кучу почт. Как долго данный способ будет актуален, я не знаю. Пользуйтесь, кому надо)  ССЫЛКА НА ВИДЕО: https://youtu.be/kGyxC5oxVa8",
+        "views": 1480,
+        "date": "2025-12-19T16:54:54+00:00",
+        "media": null,
+        "score": 1480
+      }
+    ],
+    "google_news": [
+      {
+        "source": "google_news",
+        "title": "Helium-3 Discovery in Minnesota Boosts Quantum Computing - Discovery Alert",
+        "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPTjRFQ3hDQTJVSVM2NEN0Y2RaU1lHOW02bzlkc1cyYllmTFZEN3RKSi05dFloU0tLeTNhRkZzSExCY2Y0aXo1RWtwZWI5eTJ1U2NhWnBIemc0M0VSZ19UZ01IazZ1aE5BWEZVMzZ3RU1ITXlnb0pEWXBFZnBaRmstLU9oN2psYmkxR0N0WnU2RDNaUQ?oc=5",
+        "published": "Sat, 31 Jan 2026 10:49:43 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "AI, Quantum And High-Performance Computing Join Forces At SC25 - Seeking Alpha",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNR2pTSUhQanVvbEx6dzVBN1FaQ0ZHVWg3Tk1rQXlkbl9VZXNMQzhXRTlOXzhaczdsMGpFQlZtZDZLV0xrY0NDWDBsbFhSUkNIbEFhMGZFYjRVeTY3NTN5TFY3WEU3MDBKQ29UT202WmF1bVZhUENZZldNQTY2Z0hYdEpYdGcybDh3SnZsaWdfNXdrbUhsY19iY2s0MnJHbjBjZmt5bg?oc=5",
+        "published": "Sun, 01 Feb 2026 03:50:00 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "The Quantum Leap: How Cloud-Based Quantum Computing Is Reshaping Corporate Strategy and Investment - WebProNews",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOVF9HT2FiX2ZiMUJRTHZhOXpCOENsMjFkdG8yWXZFb0JNSFpHbk5FODhKblVoN1A3R0R4TG5KRUZiSUNCRFE1OEJQYkpDeVE3Z1RSVWZheHhlR3RHX1Y0MlBacWVSd1RlSTBVSjZKQUxaZmF2UHJzeEJYcEtpY1VZZE52LW9zTEdnZ1JkLU5FR0lKYXFHNTN4RXZhSW5xQi05U3FRYURncDk3RVRraVVNZzFwM0pfSXhtc0tMNjl6R1ROdE0?oc=5",
+        "published": "Sat, 31 Jan 2026 14:49:37 GMT",
+        "score": 30
+      },
+      {
+        "source": "google_news",
+        "title": "Pentagon’s New Technology Chiefs Signal Major Shift in Defense Innovation Strategy - WebProNews",
+        "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPZnZUbWNuMHpMX1pFN244c2M1MUNIc1RucDZsTTlrWmV2VkhxSDVhVkdES3RhN3E3ZWM3RmN3NDN6QXpwVXpYTFhNUFFSVHRXVmVDTDZBZU81RFJhZmZqWmVESUl2ZnZhWWIyaGdJUERCd1BiellCTktkeGhiM2FTRDVZWnhqUkN2ekRiRXZiTm1jSTZwYlcxbHFlVGtRT05WOHh6U2RQSExNbkdpTFE?oc=5",
+        "published": "Sun, 01 Feb 2026 09:31:18 GMT",
+        "score": 30
+      }
+    ],
+    "user_links": [
+      {
+        "source": "user_link",
+        "url": "https://notebooklm.google.com/notebook/147baabe-24a6-40ae-b552-1c12e911c0e0?artifactId=63cdfd0d-5f5f-40ee-a54d-dc515461aed0&pli=1",
+        "category": "AI Tools",
+        "priority": "high",
+        "notes": "NotebookLM project",
+        "content": "Sign in - Google Accounts Sign in Use your Google Account Email or phone Forgot email? Not your computer? Use a private browsing window to sign in. Learn more about using Guest mode Next Create account",
+        "score": 100
+      },
+      {
+        "source": "user_link",
+        "url": "https://www.pexels.com/ru-ru/api/key/",
+        "category": "Resources",
+        "priority": "medium",
+        "notes": "Pexels API",
+        "content": "Just a moment... Enable JavaScript and cookies to continue",
+        "score": 50
+      },
+      {
+        "source": "user_link",
+        "url": "https://parents.education.gov.il/prhnet/my-children",
+        "category": "Education/Personal",
+        "priority": "medium",
+        "notes": "Education Portal",
+        "content": "פורטל הורים",
+        "score": 50
+      },
+      {
+        "source": "user_link",
+        "url": "https://my.edu.gov.il/home",
+        "category": "Education/Personal",
+        "priority": "medium",
+        "notes": "Education Portal Home",
+        "content": "×××ª ××¡×¤×¨ ×××××¨××××× You need to enable JavaScript to run this app.",
+        "score": 50
+      },
+      {
+        "source": "user_link",
+        "url": "https://psagot.edu-haifa.org.il/",
+        "category": "Education/Personal",
+        "priority": "medium",
+        "notes": "Psagot Haifa",
+        "content": "אתר בית החינוך \"פסגות\" Search this site Embedded Files Skip to main content Skip to navigation אתר בית החינוך \"פסגות\" אודות מרחב מורים מרחב הורים פינת הפרגונים בית הספר הוירטואלי 🎓 ייחודיות בית החינוך חדשנות ויזמות הצהרת בריאות לשנת הלימודים תשפ\"ו ניתן למלא הצהרה דיגיטלית עבור ילדיכם בבתי הספר ובגנים. למילוי הטופס לחצו לצורך מילוי ההצהרה נדרשת הזדהות באמצעות מערכת ההזדהות הלאומית. טרם נרשמתם? הירשמו לחצו 📸 מילוי טופס אישורי פרסום תמונות לילדיכם📸 לחצו ברוכים הבאים לשנת הלימודים תשפ\"ו Report abuse",
+        "score": 50
+      },
+      {
+        "source": "user_link",
+        "url": "https://dialogs.yandex.ru/developer",
+        "category": "Dev Tools",
+        "priority": "high",
+        "notes": "Yandex Dialogs Developer Console",
+        "content": "Платформа диалогов",
+        "score": 100
+      },
+      {
+        "source": "user_link",
+        "url": "https://colab.research.google.com/notebooks/intro.ipynb",
+        "category": "AI/Dev",
+        "priority": "high",
+        "notes": "Google Colab Intro",
+        "content": "Google Colab Sign in",
+        "score": 100
+      },
+      {
+        "source": "user_link",
+        "url": "https://linear.app/igoryan/settings/account/security",
+        "category": "Productivity",
+        "priority": "medium",
+        "notes": "Linear Settings",
+        "content": "Linear Loadingâ¦",
+        "score": 50
+      }
+    ],
+    "youtube_trending": [],
+    "reddit": [
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Gaming market melts down after Google reveals new AI game design tool — Project Genie crashes stocks for Roblox, Nintendo, CD Projekt Red, and more",
+        "url": "https://reddit.com/r/technology/comments/1qsiv67/gaming_market_melts_down_after_google_reveals_new/",
+        "upvotes": 6316,
+        "score": 63.16
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Jeffrey Epstein Sent Five Nights At Freddy's Porn Via 4Chan Links, Emails Show",
+        "url": "https://reddit.com/r/technology/comments/1qscn3l/jeffrey_epstein_sent_five_nights_at_freddys_porn/",
+        "upvotes": 10676,
+        "score": 100
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Why is this country speaking about AI like it’s a fact of life that no one can do anything about?",
+        "url": "https://reddit.com/r/technology/comments/1qssnnv/why_is_this_country_speaking_about_ai_like_its_a/",
+        "upvotes": 716,
+        "score": 7.16
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "Florida couple claims fertility clinic error led to birth of a 'non-Caucasian child' not biologically theirs",
+        "url": "https://reddit.com/r/technology/comments/1qsjg58/florida_couple_claims_fertility_clinic_error_led/",
+        "upvotes": 2307,
+        "score": 23.07
+      },
+      {
+        "source": "reddit",
+        "subreddit": "technology",
+        "title": "PresidentRx delayed as senators question if it's a giant scam with Big Pharma | The website is delayed as senators seek answers from health department watchdog.",
+        "url": "https://reddit.com/r/technology/comments/1qsabnb/presidentrx_delayed_as_senators_question_if_its_a/",
+        "upvotes": 6627,
+        "score": 66.27
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "The US is headed for mass unemployment, and no one is prepared",
+        "url": "https://reddit.com/r/Futurology/comments/1qs8tes/the_us_is_headed_for_mass_unemployment_and_no_one/",
+        "upvotes": 6252,
+        "score": 62.52
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "AI agents now have their own Reddit-style social network, and it's getting weird fast",
+        "url": "https://reddit.com/r/Futurology/comments/1qs3p4h/ai_agents_now_have_their_own_redditstyle_social/",
+        "upvotes": 3591,
+        "score": 35.91
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "Angry gamers are forcing studios to scrap or rethink new releases | Gamers suspicious of Al-generated content have forced developers to cancel titles and promise not to use the technology.",
+        "url": "https://reddit.com/r/Futurology/comments/1qsd9ax/angry_gamers_are_forcing_studios_to_scrap_or/",
+        "upvotes": 582,
+        "score": 5.82
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "China reveals 200-strong AI drone swarm that can be controlled by a single soldier — ‘intelligent algorithm’ allows individual units to cooperate autonomously even after losing communication with operator",
+        "url": "https://reddit.com/r/Futurology/comments/1qs4xm8/china_reveals_200strong_ai_drone_swarm_that_can/",
+        "upvotes": 298,
+        "score": 2.98
+      },
+      {
+        "source": "reddit",
+        "subreddit": "Futurology",
+        "title": "US leads record global surge in gas-fired power driven by Al demands, with big costs for the climate | Projects in development expected to grow global capacity by nearly 50% amid growing concern over impact on planet",
+        "url": "https://reddit.com/r/Futurology/comments/1qs9544/us_leads_record_global_surge_in_gasfired_power/",
+        "upvotes": 68,
+        "score": 0.68
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "What is Moltbook actually",
+        "url": "https://reddit.com/r/artificial/comments/1qsoftx/what_is_moltbook_actually/",
+        "upvotes": 28,
+        "score": 0.28
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "SpaceX seeks federal approval to launch 1 million solar-powered satellite data centers | TechCrunch",
+        "url": "https://reddit.com/r/artificial/comments/1qslxkj/spacex_seeks_federal_approval_to_launch_1_million/",
+        "upvotes": 16,
+        "score": 0.16
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "New paper proposes AI alignment \"bees\" — classifier species that monitor LLMs continuously, can't be jailbroken, and produce both value and correction",
+        "url": "https://reddit.com/r/artificial/comments/1qsnu0y/new_paper_proposes_ai_alignment_bees_classifier/",
+        "upvotes": 2,
+        "score": 0.02
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "Top engineers at Anthropic &amp; OpenAI: AI now writes 100% of our code",
+        "url": "https://reddit.com/r/artificial/comments/1qrjbpc/top_engineers_at_anthropic_openai_ai_now_writes/",
+        "upvotes": 292,
+        "score": 2.92
+      },
+      {
+        "source": "reddit",
+        "subreddit": "artificial",
+        "title": "Nvidia unveils AI models for faster, cheaper weather forecasts",
+        "url": "https://reddit.com/r/artificial/comments/1qs7otq/nvidia_unveils_ai_models_for_faster_cheaper/",
+        "upvotes": 7,
+        "score": 0.07
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "COVID-19 did not simply bring forward inevitable deaths as an analysis of mortality data from 34 high-income countries shows a sustained rise in excess deaths years after the pandemic, challenging the mortality displacement hypothesis.",
+        "url": "https://reddit.com/r/science/comments/1qsiqj1/covid19_did_not_simply_bring_forward_inevitable/",
+        "upvotes": 2029,
+        "score": 20.29
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Nearly half of the world’s population—about 3.79 billion people—is projected to face extreme heat by 2050 if global warming reaches 2.0 °C above pre-industrial levels, a scenario climate scientists see as increasingly likely as the world surpasses the 1.5 °C Paris Agreement threshold.",
+        "url": "https://reddit.com/r/science/comments/1qsfvfz/nearly_half_of_the_worlds_populationabout_379/",
+        "upvotes": 2507,
+        "score": 25.07
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Long-term antidepressant effects of psilocybin linked to functional brain changes - a single dose of psilocybin altered the electrical properties of brain cells in rats for months, even after physical changes to the neurons had disappeared.",
+        "url": "https://reddit.com/r/science/comments/1qsdmt9/longterm_antidepressant_effects_of_psilocybin/",
+        "upvotes": 1390,
+        "score": 13.9
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "Girls are happier than boys at school, new research shows. Understanding why may all boil down to biology. Girls get more of the happy hormone dopamine through social relationships, including with their friends and classmates. Boys get their dopamine through more self-involved behavior.",
+        "url": "https://reddit.com/r/science/comments/1qrzino/girls_are_happier_than_boys_at_school_new/",
+        "upvotes": 7187,
+        "score": 71.87
+      },
+      {
+        "source": "reddit",
+        "subreddit": "science",
+        "title": "How U.S. Funding Instability and Immigration Policy are Driving a Systematic 'Brain Drain' of International STEM Talent.",
+        "url": "https://reddit.com/r/science/comments/1qst6l0/how_us_funding_instability_and_immigration_policy/",
+        "upvotes": 87,
+        "score": 0.87
+      }
+    ],
+    "hackernews": [
+      {
+        "source": "hackernews",
+        "title": "The Book of PF, 4th edition",
+        "url": "https://nostarch.com/book-of-pf-4th-edition",
+        "score": 4.9
+      },
+      {
+        "source": "hackernews",
+        "title": "What I learned building an opinionated and minimal coding agent",
+        "url": "https://mariozechner.at/posts/2025-11-30-pi-coding-agent/",
+        "score": 1.0
+      },
+      {
+        "source": "hackernews",
+        "title": "Netbird a German Tailscale alternative (P2P WireGuard-based overlay network)",
+        "url": "https://netbird.io/",
+        "score": 0.9
+      },
+      {
+        "source": "hackernews",
+        "title": "Mobile carriers can get your GPS location",
+        "url": "https://an.dywa.ng/carrier-gnss.html",
+        "score": 66.9
+      },
+      {
+        "source": "hackernews",
+        "title": "The history of C# and TypeScript with Anders Hejlsberg | GitHub",
+        "url": "https://www.youtube.com/watch?v=uMqx8NNT4xY",
+        "score": 6.3
+      },
+      {
+        "source": "hackernews",
+        "title": "List animals until failure",
+        "url": "https://rose.systems/animalist/",
+        "score": 15.5
+      },
+      {
+        "source": "hackernews",
+        "title": "In praise of –dry-run",
+        "url": "https://henrikwarne.com/2026/01/31/in-praise-of-dry-run/",
+        "score": 16.9
+      },
+      {
+        "source": "hackernews",
+        "title": "Cells use 'bioelectricity' to coordinate and make group decisions",
+        "url": "https://www.quantamagazine.org/cells-use-bioelectricity-to-coordinate-and-make-group-decisions-20260112/",
+        "score": 6.4
+      },
+      {
+        "source": "hackernews",
+        "title": "Generative AI and Wikipedia editing: What we learned in 2025",
+        "url": "https://wikiedu.org/blog/2026/01/29/generative-ai-and-wikipedia-editing-what-we-learned-in-2025/",
+        "score": 14.7
+      },
+      {
+        "source": "hackernews",
+        "title": "pg_tracing: Distributed Tracing for PostgreSQL",
+        "url": "https://github.com/DataDog/pg_tracing",
+        "score": 5.4
+      }
+    ],
+    "wikipedia": [
+      {
+        "source": "wikipedia",
+        "title": "Catherine O'Hara",
+        "url": "https://en.wikipedia.org/wiki/Catherine_O'Hara",
+        "views": 2377286,
+        "score": 100
+      },
+      {
+        "source": "wikipedia",
+        "title": "Royal Rumble (2026)",
+        "url": "https://en.wikipedia.org/wiki/Royal_Rumble_(2026)",
+        "views": 1209957,
+        "score": 100
+      },
+      {
+        "source": "wikipedia",
+        "title": "Elena Rybakina",
+        "url": "https://en.wikipedia.org/wiki/Elena_Rybakina",
+        "views": 935658,
+        "score": 93.5658
+      },
+      {
+        "source": "wikipedia",
+        "title": "Aryna Sabalenka",
+        "url": "https://en.wikipedia.org/wiki/Aryna_Sabalenka",
+        "views": 436940,
+        "score": 43.694
+      },
+      {
+        "source": "wikipedia",
+        "title": "Bo Welch",
+        "url": "https://en.wikipedia.org/wiki/Bo_Welch",
+        "views": 436269,
+        "score": 43.6269
+      },
+      {
+        "source": "wikipedia",
+        "title": "Jeffrey Epstein",
+        "url": "https://en.wikipedia.org/wiki/Jeffrey_Epstein",
+        "views": 312221,
+        "score": 31.2221
+      },
+      {
+        "source": "wikipedia",
+        "title": "Wikipedia:Featured pictures",
+        "url": "https://en.wikipedia.org/wiki/Wikipedia:Featured_pictures",
+        "views": 281354,
+        "score": 28.1354
+      },
+      {
+        "source": "wikipedia",
+        "title": "Demond Wilson",
+        "url": "https://en.wikipedia.org/wiki/Demond_Wilson",
+        "views": 274869,
+        "score": 27.4869
+      }
+    ]
+  }
+}

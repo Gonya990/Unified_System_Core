@@ -9,7 +9,7 @@ CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDENTIALS_PATH = CREDS_DIR / "gmail_credentials.json"
 TOKEN_PATH = CREDS_DIR / "gmail_token.json"
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.compose"]
 
 try:
     flow = Flow.from_client_secrets_file(

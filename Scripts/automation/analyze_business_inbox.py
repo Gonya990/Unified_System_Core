@@ -22,7 +22,7 @@ ENV_PATH = BASE_DIR / "Projects" / "AI_Core" / ".env"
 load_dotenv(ENV_PATH)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = "gpt-4o"
+OPENAI_MODEL = "gpt-4o-mini"
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
@@ -106,9 +106,13 @@ def analyze_and_draft_responses(emails: List[Dict]):
             "is_relevant": true,
             "action_type": "AUTO_SEND" or "MANUAL_REVIEW",
             "recipient_email": "extracted_email@domain.com" or null,
-            "subject": "Strategic Proposal: ... (optimized subject line)",
+            "subject": "optimized subject line",
             "reply_body": "Full professional email body...",
-            "reason": "Why this action?"
+            "reason": "Why this action?",
+            "strategy": {{
+                "plan": "Step-by-step approach",
+                "roi": "Expected benefit"
+            }}
         }}
         
         If NOT relevant: {{"is_relevant": false}}
@@ -133,6 +137,7 @@ def analyze_and_draft_responses(emails: List[Dict]):
 
     # Save structured data for the auto-responder script
     ACTIONS_FILE = BASE_DIR / "Reports" / "email_actions.json"
+    os.makedirs(ACTIONS_FILE.parent, exist_ok=True)
     with open(ACTIONS_FILE, "w") as f:
         json.dump(analyzed_data, f, indent=2)
     print(f"💾 Structured actions saved to {ACTIONS_FILE}")
@@ -150,14 +155,14 @@ def main():
     # Last 30 days
     date_query = (datetime.now() - timedelta(days=30)).strftime("%Y/%m/%d")
     query = f"after:{date_query}"
-    # Filter out common bulk senders to save AI tokens roughly (can refine later)
+    # Filter out common bulk senders
     query += " -category:promotions -category:social"
 
     print(f"📥 Fetching emails since {date_query}...")
 
     messages = []
     next_page_token = None
-    target_count = 300
+    target_count = 450
 
     while len(messages) < target_count:
         results = service.users().messages().list(
@@ -179,7 +184,7 @@ def main():
 
     email_list = []
 
-    # Process mostly the newest ones first
+    # Process newest ones
     for msg in messages[:target_count]:
         try:
             full = service.users().messages().get(userId="me", id=msg["id"], format="full").execute()
@@ -213,6 +218,7 @@ def main():
     # 3. Report
     print(f"📝 Generating Report for {len(results)} relevant threads...")
 
+    os.makedirs(REPORT_FILE.parent, exist_ok=True)
     with open(REPORT_FILE, "w") as f:
         f.write("# Business Response Plan\n")
         f.write(f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
@@ -224,18 +230,19 @@ def main():
 
             f.write(f"## 📧 {orig['sender']}\n")
             f.write(f"**Subject:** {orig['subject']}\n\n")
-            f.write(f"**Relevance:** {anl.get('reason')}\n\n")
+            f.write(f"**Status:** {anl.get('action_type')}\n")
+            f.write(f"**Reason:** {anl.get('reason')}\n\n")
 
             f.write("### 🎯 Strategy\n")
             f.write(f"- **Plan:** {strat.get('plan')}\n")
-            f.write(f"- **ROI/Benefit:** {strat.get('roi')}\n")
-            f.write(f"- **Action:** {strat.get('action')}\n\n")
+            f.write(f"- **ROI/Benefit:** {strat.get('roi')}\n\n")
 
             f.write("### ✍️ Draft Reply\n")
-            f.write(f"```text\n{anl.get('reply_draft')}\n```\n")
+            f.write(f"```text\n{anl.get('reply_body')}\n```\n")
             f.write("---\n\n")
 
     print(f"✅ Report saved to: {REPORT_FILE}")
 
 if __name__ == "__main__":
     main()
+
