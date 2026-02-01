@@ -1,24 +1,53 @@
 {
-  "links": [
-    {
-      "url": "https://t.me/vitalycontentcreate",
-      "category": "Content Creation / AI Tools",
-      "priority": "high",
-      "notes": "Successful Russian AI content creator - analyzed for Content Factory strategy"
-    },
-    {
-      "url": "https://news.ycombinator.com",
-      "category": "Tech News",
-      "priority": "medium",
-      "notes": "Hacker News - trending tech discussions"
-    },
-    {
-      "url": "https://www.reddit.com/r/artificial",
-      "category": "AI Discussion",
-      "priority": "high",
-      "notes": "Latest AI developments and community insights"
-    }
-  ],
-  "instructions": "Add any URLs you want the Content Factory to analyze for script ideas. Format: {url, category, priority (high/medium/low), notes}",
-  "last_updated": "2026-01-11T15:00:00"
+    "links": [
+        {
+            "url": "https://notebooklm.google.com/notebook/147baabe-24a6-40ae-b552-1c12e911c0e0?artifactId=63cdfd0d-5f5f-40ee-a54d-dc515461aed0&pli=1",
+            "category": "AI Tools",
+            "priority": "high",
+            "notes": "NotebookLM project"
+        },
+        {
+            "url": "https://www.pexels.com/ru-ru/api/key/",
+            "category": "Resources",
+            "priority": "medium",
+            "notes": "Pexels API"
+        },
+        {
+            "url": "https://parents.education.gov.il/prhnet/my-children",
+            "category": "Education/Personal",
+            "priority": "medium",
+            "notes": "Education Portal"
+        },
+        {
+            "url": "https://my.edu.gov.il/home",
+            "category": "Education/Personal",
+            "priority": "medium",
+            "notes": "Education Portal Home"
+        },
+        {
+            "url": "https://psagot.edu-haifa.org.il/",
+            "category": "Education/Personal",
+            "priority": "medium",
+            "notes": "Psagot Haifa"
+        },
+        {
+            "url": "https://dialogs.yandex.ru/developer",
+            "category": "Dev Tools",
+            "priority": "high",
+            "notes": "Yandex Dialogs Developer Console"
+        },
+        {
+            "url": "https://colab.research.google.com/notebooks/intro.ipynb",
+            "category": "AI/Dev",
+            "priority": "high",
+            "notes": "Google Colab Intro"
+        },
+        {
+            "url": "https://linear.app/igoryan/settings/account/security",
+            "category": "Productivity",
+            "priority": "medium",
+            "notes": "Linear Settings"
+        }
+    ],
+    "last_updated": "2026-02-01T12:00:00"
 }
