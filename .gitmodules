@@ -13,3 +13,9 @@
 [submodule "tools/chrome-devtools-mcp"]
 	path = tools/chrome-devtools-mcp
 	url = https://github.com/ChromeDevTools/chrome-devtools-mcp.git
+[submodule "Projects/Content_Factory/src/lip_sync/Wav2Lip"]
+	path = Projects/Content_Factory/src/lip_sync/Wav2Lip
+	url = https://github.com/Rudrabha/Wav2Lip.git
+[submodule "Projects/Content_Factory/src/live_portrait"]
+	path = Projects/Content_Factory/src/live_portrait
+	url = https://github.com/KwaiVGI/LivePortrait.git
