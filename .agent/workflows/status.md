@@ -1,6 +1,8 @@
 ---
 description: Check system status across all nodes
 ---
+# 📊 System Status Check
+
 1. Check Tailscale connectivity:
 
 ```bash
@@ -10,8 +12,9 @@ tailscale status
 1. Ping primary nodes (excluding rocinante - deprecated):
 
 ```bash
-# pve-antigravity-1 | igor-gaming | smart | unified-home-core-cloud
-ping -c 2 100.74.137.122 && ping -c 2 100.127.194.111 && ping -c 2 100.81.133.25 && ping -c 2 100.110.209.49
+# gpu-node-1 | igor-gaming-1 | smart | unified-home-core-cloud
+ping -c 2 100.67.107.71 && ping -c 2 100.115.17.68 && \
+ping -c 2 100.118.179.47 && ping -c 2 100.87.208.56
 ```
 
 1. Check git status:
