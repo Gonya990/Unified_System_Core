@@ -54,9 +54,11 @@ for CONFIG in "${NODES[@]}"; do
             echo -e "${RED}! $NODE has uncommitted changes.${NC}"
             if [ "${1:-}" = "--force" ]; then
                 echo -e "${YELLOW}Discarding remote changes...${NC}"
-                ssh "$NODE" "cd $REMOTE_PATH && git checkout -- . && git clean -fd"
+                ssh "$NODE" "cd $REMOTE_PATH && git checkout -- . && git clean -fd && git submodule foreach --recursive git reset --hard"
             else
                 echo -e "${RED}Skipping $NODE (Dirty). Use --force to override.${NC}"
+                # Print status to help diagnose
+                ssh "$NODE" "cd $REMOTE_PATH && git status --short"
                 continue
             fi
         fi
