@@ -1834,8 +1834,14 @@ async def query_ollama_with_context(
     history = conv_manager.get_context_messages(user_id, limit=10)
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
+    import pytz
+    from datetime import datetime
+    
+    current_time = datetime.now(pytz.timezone("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
+
     system_prompt = (
         "You are Gonya, a powerful multilingual personal AI assistant. "
+        f"CURRENT TIME: {current_time}\n"
         "You serve as a core component of the Unified System Federation.\n\n"
         "=== FEDERATION CONTEXT ===\n"
         f"Branch: {branch_id}\n"

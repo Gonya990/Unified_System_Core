@@ -189,12 +189,76 @@ class InferenceClient:
 
     async def _chat_openai(self, messages: list, system_prompt: Optional[str] = None):
         """OpenAI API request."""
-        # Simplified OpenAI request
-        return "OpenAI integration stub", {}
+        api_key = self.config.get("OPENAI_API_KEY")
+        base_url = self.config.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        model = self.config.get("OPENAI_MODEL", "gpt-4o")
+
+        if not api_key:
+            return "Error: OpenAI API key not set.", {}
+
+        url = f"{base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        
+        payload_messages = []
+        if system_prompt:
+            payload_messages.append({"role": "system", "content": system_prompt})
+        payload_messages.extend(messages)
+
+        payload = {
+            "model": model,
+            "messages": payload_messages,
+            "stream": False
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        usage = data.get("usage", {})
+                        return content, usage
+                    return f"Error: OpenAI status {resp.status}", {}
+        except Exception as e:
+            return f"OpenAI Connection Error: {e}", {}
 
     async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""
-        return "OpenRouter integration stub", {}
+        api_key = self.config.get("OPENROUTER_API_KEY")
+        base_url = self.config.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        model = self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
+
+        if not api_key:
+            return "Error: OpenRouter API key not set.", {}
+
+        url = f"{base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": "https://github.com/Unified-system-Core/AI_Core",
+            "X-Title": "Unified AI Bot"
+        }
+        
+        payload_messages = []
+        if system_prompt:
+            payload_messages.append({"role": "system", "content": system_prompt})
+        payload_messages.extend(messages)
+
+        payload = {
+            "model": model,
+            "messages": payload_messages,
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        usage = data.get("usage", {})
+                        return content, usage
+                    return f"Error: OpenRouter status {resp.status} - {await resp.text()}", {}
+        except Exception as e:
+            return f"OpenRouter Connection Error: {e}", {}
 
     async def list_models(self):
         """List available models for the current provider."""
