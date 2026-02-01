@@ -4716,19 +4716,19 @@ def main():
         logger.error(f"[STARTUP] Error restoring sessions: {e}")
 
     # Agent Mail Startup Notification (Vibranium Integration)
-    try:
-        am_client = AgentMailClient()
-        am_client.register()
-        am_client.broadcast(
-            subject="Unified Bot Online",
-            body_md=f"🤖 **Unified AI Bot v2** is now online on `{os.uname().nodename}`.\n"
-                    f"Ready for cross-agent task coordination.\n"
-                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            importance="low"
-        )
-        logger.info("[STARTUP] Agent Mail notification sent (Vibranium Sync)")
-    except Exception as am_e:
-        logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
+    # try:
+    #     am_client = AgentMailClient()
+    #     am_client.register()
+    #     am_client.broadcast(
+    #         subject="Unified Bot Online",
+    #         body_md=f"🤖 **Unified AI Bot v2** is now online on `{os.uname().nodename}`.\n"
+    #                 f"Ready for cross-agent task coordination.\n"
+    #                 f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+    #         importance="low"
+    #     )
+    #     logger.info("[STARTUP] Agent Mail notification sent (Vibranium Sync)")
+    # except Exception as am_e:
+    #     logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
 
     application = Application.builder().token(token).post_init(post_init).build()
 
