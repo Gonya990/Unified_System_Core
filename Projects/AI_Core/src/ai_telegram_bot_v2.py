@@ -1834,9 +1834,10 @@ async def query_ollama_with_context(
     history = conv_manager.get_context_messages(user_id, limit=10)
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
-    import pytz
     from datetime import datetime
-    
+
+    import pytz
+
     current_time = datetime.now(pytz.timezone("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
 
     system_prompt = (

@@ -198,7 +198,7 @@ class InferenceClient:
 
         url = f"{base_url}/chat/completions"
         headers = {"Authorization": f"Bearer {api_key}"}
-        
+
         payload_messages = []
         if system_prompt:
             payload_messages.append({"role": "system", "content": system_prompt})
@@ -237,7 +237,7 @@ class InferenceClient:
             "HTTP-Referer": "https://github.com/Unified-system-Core/AI_Core",
             "X-Title": "Unified AI Bot"
         }
-        
+
         payload_messages = []
         if system_prompt:
             payload_messages.append({"role": "system", "content": system_prompt})
