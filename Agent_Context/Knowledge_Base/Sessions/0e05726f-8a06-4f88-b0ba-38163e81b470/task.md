@@ -32,8 +32,19 @@
 
 - [x] Unpack OneDrive_1 (3.9GB) from Google Archives <!-- id: 401 -->
 - [x] Index Meta, Google and OneDrive archives (20GB total) <!-- id: 402 -->
-- [/] Assembling and unpacking 28GB multi-part Recovery Archive to
+- [x] Assembling and unpacking 28GB multi-part Recovery Archive to
       Drive H: <!-- id: 403 -->
-- [ ] Final deep-scan and indexing of all 80GB+ assets <!-- id: 404 -->
+- [/] Final deep-scan & GPU Council Indexing (80GB+) - **30% COMPLETE
+      (5000/16500)** <!-- id: 404 -->
+
+## Phase 5: AntiBridge Backend & Web Control <!-- id: 500 -->
+
+- [x] Fix "MODULE_NOT_FOUND" by running npm install <!-- id: 501 -->
+- [x] Fix cross-platform path resolution for macOS (process.env.HOME)
+      <!-- id: 502 -->
+- [x] Successfully launch AntiBridge backend on port 8000 <!-- id: 503 -->
+
+<!-- CURRENT FOCUS: Deep indexing of all personal archives and GPU Council
+     stability -->
 
 <!-- CURRENT FOCUS -->
