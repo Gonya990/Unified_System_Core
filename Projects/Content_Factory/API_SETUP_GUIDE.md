@@ -75,6 +75,7 @@ mkdir -p /home/gonya/Unified_System_Core/Projects/Content_Factory/assets/music/c
 ### ✅ **КАК ПОЛУЧИТЬ КЛЮЧ:**
 
 #### **Шаг 1: Зайди на сайт**
+
 <https://lumalabs.ai/dream-machine/api>
 
 #### **Шаг 2: Авторизуйся**
@@ -129,7 +130,7 @@ mkdir -p /home/gonya/Unified_System_Core/Projects/Content_Factory/assets/music/c
 
 ### **Для будущего (опционально):**
 
-4. **SunoAPI (сторонний):** <https://sunoapi.org>
+1. **SunoAPI (сторонний):** <https://sunoapi.org>
 2. **AIMusic (сторонний):** <https://aimusic.so>
 
 ---

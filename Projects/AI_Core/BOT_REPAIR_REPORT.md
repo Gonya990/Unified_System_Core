@@ -21,7 +21,9 @@
 **Файл:** `inference_client.py`
 
 ```python
-async def generate_image(self, prompt: str, size: str = "1024x1024", quality: str = "standard") -> Optional[str]:
+async def generate_image(
+    self, prompt: str, size: str = "1024x1024", quality: str = "standard"
+) -> Optional[str]:
     """Generate image using DALL-E 3 (OpenAI)."""
     # Полная реализация с OpenAI API
 ```
@@ -91,7 +93,7 @@ application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
 
 ### ✅ **Все команды (57 шт):**
 
-```
+```text
 /start, /help, /brief, /memory, /newtask, /msg, /agent, /pipeline,
 /img, /image, /imagine,  ← DALL-E 3 ✅
 /tl, /set_key, /approve, /setrole, /dashboard, /status, /search,
@@ -149,7 +151,7 @@ application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
 
 1. **DALL-E 3:**
 
-   ```
+   ```text
    /img Футуристический город на закате
    ```
 

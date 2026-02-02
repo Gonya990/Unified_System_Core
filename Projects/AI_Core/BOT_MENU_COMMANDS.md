@@ -12,7 +12,7 @@
 3. **Выбери своего бота**
 4. **Скопируй и вставь ВСЁ ниже:**
 
-```
+```text
 start - Main menu
 help - Show help and available commands
 settings - AI model & provider settings
@@ -49,7 +49,7 @@ health - Health check
 
 Если хочешь добавить русские команды:
 
-```
+```text
 помощь - Помощь и доступные команды
 настройки - Настройки AI
 статус - Статус системы
@@ -66,7 +66,7 @@ health - Health check
 
 ## 📱 КАК ВЫГЛЯДИТ
 
-```
+```text
 /start - Main menu
 /help - Show help and available commands
 /img - Generate image with DALL-E 3

@@ -29,7 +29,7 @@
 
 ### **0:00-0:30 - HOOK (Хук)**
 
-```
+```text
 [Dramatic music]
 Экран: Дашборд с цифрами "24 videos generated"
 Голос (ElevenLabs, excited):
@@ -56,7 +56,7 @@ Let me show you how I did it."
 
 ### **0:30-1:30 - PROBLEM (Проблема)**
 
-```
+```text
 Голос (calm):
 
 "Creating content is HARD. I used to spend:
@@ -81,7 +81,7 @@ So I asked: What if AI did ALL of this?"
 
 ### **1:30-3:00 - SOLUTION (Решение)**
 
-```
+```text
 Голос (excited):
 
 "I built the AI Content Factory. Here's how it works:
@@ -128,7 +128,7 @@ STEP 5: Auto-Assembly
 
 ### **3:00-4:00 - RESULTS (Результаты)**
 
-```
+```text
 Голос (dramatic):
 
 "The results? Mind-blowing.
@@ -160,7 +160,7 @@ ROI? Already making $200+ from YouTube."
 
 ### **4:00-4:45 - TECH STACK (Как сделано)**
 
-```
+```text
 Голос (technical but simple):
 
 "Want to build this yourself?
@@ -187,7 +187,7 @@ GitHub code: FREE."
 
 ### **4:45-5:00 - CALL TO ACTION**
 
-```
+```text
 Голос (excited):
 
 "This is the future of content creation.
@@ -239,8 +239,8 @@ See you inside the AI revolution! 🚀"
 
 ### **Субтитры:**
 
-- Impact style (жирные, жёлтые)
-- Ключевые слова подсвечены
+1. Impact style (жирные, жёлтые)
+2. Ключевые слова подсвечены
 
 ---
 
@@ -270,11 +270,12 @@ See you inside the AI revolution! 🚀"
 
 ### **Tags:**
 
-ai automation, content creation, passive income, suno ai, elevenlabs, ai video, youtube automation, make money online, ai business, tech tutorial
+ai automation, content creation, passive income, suno ai, elevenlabs,
+ai video, youtube automation, make money online, ai business, tech tutorial
 
 ### **Description:**
 
-```
+```text
 I created a fully automated AI Content Factory that generates 
 professional videos 24/7. Here's the complete breakdown.
 
@@ -318,7 +319,7 @@ Discord: [link]
 
 Generate with DALL-E:
 
-```
+```text
 "YouTube thumbnail: Split screen design. 
 LEFT: Tired person manually editing video, 
 clock showing 7 hours, messy desk. 

@@ -72,7 +72,7 @@ python3 test_ai_factory.py
 
 ### Результат теста
 
-```
+```text
 ✅ PRODUCTION COMPLETE
 ============================================================
 
@@ -95,7 +95,7 @@ Generated 3 assets:
 
 ## 📁 ФАЙЛОВАЯ СТРУКТУРА
 
-```
+```text
 /home/gonya/Unified_System_Core/Projects/Content_Factory/
 ├── src/
 │   ├── audio/

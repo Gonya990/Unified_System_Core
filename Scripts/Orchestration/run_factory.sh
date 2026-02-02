@@ -7,11 +7,11 @@
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export ROOT_DIR="$HOME/Documents/Unified_System_Core"
 else
-    export ROOT_DIR="/home/gonya/Unified_System"
+    export ROOT_DIR="/home/gonya/Unified_System_Core"
 fi
 
 export FACTORY_DIR="$ROOT_DIR/Projects/Content_Factory"
-export VENV_PATH="$FACTORY_DIR/venv"
+export VENV_PATH="$FACTORY_DIR/.venv"
 export PATH="$VENV_PATH/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 
 # 2. Master Token for TokenBroker

@@ -10,7 +10,7 @@
 
 **Команды для @BotFather:**
 
-```
+```text
 start - Main menu
 help - Show help and available commands
 settings - AI model & provider settings
@@ -111,7 +111,7 @@ aisub - Generate stylized subtitles
 
 ## 📂 **СОЗДАННЫЕ ФАЙЛЫ:**
 
-```
+```text
 ✅ BOT_MENU_COMMANDS.md         - Команды для BotFather
 ✅ financial_tracker.py         - Парсер платежей из Gmail
 ✅ FINANCIAL_REPORT_FEB2026.md  - Финансовый отчёт
@@ -132,7 +132,7 @@ aisub - Generate stylized subtitles
 
 ### **Крипто-бот:**
 
-2. **Уточни:**
+1. **Уточни:**
    - Где должен быть бот?
    - Как назывался?
    - На каком сервере был?
@@ -140,7 +140,7 @@ aisub - Generate stylized subtitles
 
 ### **Финансы:**
 
-3. **Проверь квитанции:**
+1. **Проверь квитанции:**
    - Зайди в Gmail
    - Поиск: "receipt payment invoice"
    - Подтверди суммы
