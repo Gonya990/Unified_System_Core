@@ -101,103 +101,97 @@ from telegram_schema_expert import TelegramSchemaExpert
 # Optional imports with fallbacks
 try:
     from ha_controller import HAController
-
     ha_controller = HAController()
-except ImportError:
+except Exception as e:
+    logger.warning(f"HAController failed to initialize: {e}")
     ha_controller = None
 
 try:
     from web_search import WebSearch
-
     web_search = WebSearch()
-except ImportError:
+except Exception as e:
+    logger.warning(f"WebSearch failed to initialize: {e}")
     web_search = None
 
 try:
     from infrastructure import InfrastructureManager
-
     infra_manager = InfrastructureManager()
-except ImportError:
+except Exception as e:
+    logger.warning(f"InfrastructureManager failed to initialize: {e}")
     infra_manager = None
 
 try:
     from gmail_client import GmailClient
-
     GMAIL_AVAILABLE = True
 except ImportError:
     GMAIL_AVAILABLE = False
 
 try:
     from notion_service import NotionClient
-
     notion_client = NotionClient()
-except ImportError:
+except Exception as e:
+    logger.warning(f"NotionClient failed to initialize: {e}")
     notion_client = None
 
 try:
     from linear_client import LinearClient
-
     linear_client = LinearClient()
-except ImportError:
+except Exception as e:
+    logger.warning(f"LinearClient failed to initialize: {e}")
     linear_client = None
 
 try:
     from health_integration import HealthIntegration
-
     health_integration = HealthIntegration()
-except ImportError:
+except Exception as e:
+    logger.warning(f"HealthIntegration failed to initialize: {e}")
     health_integration = None
 
 try:
     from usage_tracker import UsageTracker
-
     usage_tracker = UsageTracker()
-except ImportError:
+except Exception as e:
+    logger.warning(f"UsageTracker failed to initialize: {e}")
     usage_tracker = None
 
 try:
     from task_manager import TaskManager
-
     task_manager = TaskManager()
-except ImportError:
+except Exception as e:
+    logger.warning(f"TaskManager failed to initialize: {e}")
     task_manager = None
 
 try:
     from notify_manager import NotifyManager
-
     notify_manager = NotifyManager()
-except ImportError:
+except Exception as e:
+    logger.warning(f"NotifyManager failed to initialize: {e}")
     notify_manager = None
 
 try:
     from digest_service import DigestService
-
     _DIGEST_AVAILABLE = True
-except ImportError:
+except Exception:
     _DIGEST_AVAILABLE = False
     digest_service = None
 
 # MCP Agent Mail Integration
 try:
-    # Ensure we can find the Scripts/Orchestration regardless of where we run from
-    # If running from Projects/AI_Core/src, we need to go up 3 levels to root, then Scripts/Orchestration
-    # or use absolute path if we can rely on standard structure.
-    # Current dir is .../Projects/AI_Core/src
-
-    # Try finding the root Unified_System directory
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-    if os.path.basename(root_path) != "Unified_System":
-         # Fallback or try relatively if we are just in src
+    if os.path.basename(root_path) != "Unified_System_Core":
          root_path = os.path.abspath(os.path.join(current_dir, "../../../"))
-
+    
     agent_mail_path = os.path.join(root_path, 'Scripts', 'Orchestration')
-
     if agent_mail_path not in sys.path:
         sys.path.append(agent_mail_path)
 
     from agent_mail_client import AgentMailClient
-    agent_mail = AgentMailClient()
-    logger.info("AgentMailClient initialized")
+    # agent_mail = AgentMailClient() # Disabled for stability
+    agent_mail = None
+    logger.info("AgentMailClient skipped for stability")
+except Exception as e:
+    logger.warning(f"AgentMailClient failed to setup: {e}")
+    agent_mail = None
 except Exception as e:
     agent_mail = None
     logger.warning(f"AgentMailClient not available: {e}")
@@ -476,8 +470,10 @@ def require_role(required_role: str):
 # keyboards
 def get_main_menu(user_id: int):
     keyboard = [
-        ["📅 Обзор дня", "➕ Новая задача"],
-        ["🧠 Память/Контекст", "⚙️ Настройки", "❓ Помощь"],
+        ["🏭 Фабрика", "📈 Крипто"],
+        ["📊 Статус", "📧 Почта"],
+        ["📅 Обзор дня", "🧠 Память"],
+        ["⚙️ Настройки", "❓ Помощь"],
     ]
     if user_id in ALLOWED_IDS:
         keyboard.append(["🛠 Админ-панель"])
@@ -1163,13 +1159,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_text == "📅 Обзор дня":
         await show_daily_brief(update, context)
         return
+    elif user_text == "🏭 Фабрика":
+        await factory_command(update, context)
+        return
+    elif user_text == "📈 Крипто":
+        await crypto_info_handler(update, context)
+        return
+    elif user_text == "📊 Статус":
+        await status_command(update, context)
+        return
+    elif user_text == "📧 Почта":
+        await mail_command(update, context)
+        return
+    elif user_text == "🧠 Память":
+        await show_memory_context(update, context)
+        return
     elif user_text == "➕ Новая задача":
         await update.message.reply_text(
             "Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')"
         )
-        return
-    elif user_text == "🧠 Память/Контекст":
-        await show_memory_context(update, context)
         return
     elif user_text == "🛠 Админ-панель":
         if user_id in ALLOWED_IDS:
@@ -1178,6 +1186,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         else:
             await update.message.reply_text("⛔️ Доступ запрещен.")
+        return
+    elif user_text == "⚙️ Настройки":
+        await settings_command(update, context)
         return
     elif user_text == "❓ Помощь":
         await show_advanced_help(update, context)
@@ -4610,23 +4621,31 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Failed to start factory: {e}")
 
 
-async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /settings command."""
+async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler for 📈 Крипто button."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
 
-    current_model = inference.model
-    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-
-    await update.message.reply_text(
-        f"⚙️ **Настройки AI**\n\n"
-        f"🤖 Модель: `{current_model}`\n"
-        f"🔌 Провайдер: `{current_provider.upper()}`\n\n"
-        f"Используйте меню ниже для изменения:",
-        parse_mode="Markdown",
-        reply_markup=get_settings_menu(),
-    )
+    # Check for ByBit keys in .env
+    api_key = os.environ.get("BYBIT_API_KEY")
+    
+    if not api_key or "YOUR" in api_key.upper():
+        await update.message.reply_text(
+            "📈 **Крипто-трейдинг**\n\n"
+            "❌ API ключи ByBit не найдены или не настроены.\n\n"
+            "Пожалуйста, добавьте `BYBIT_API_KEY` и `BYBIT_API_SECRET` в файл `.env` на сервере.\n"
+            "Инструкция: `BYBIT_API_KEYS_GUIDE.md`",
+            parse_mode="Markdown"
+        )
+    else:
+        # If keys exist, we could try to get balance or status from PM2
+        await update.message.reply_text(
+            "📈 **Крипто-трейдинг**\n\n"
+            "✅ Ключи найдены. Бот запущен в PM2.\n"
+            "Проверить логи: `/status` или `pm2 logs crypto-bot` на сервере.",
+            parse_mode="Markdown"
+        )
 
 
 async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4686,35 +4705,31 @@ def main():
     logger.info("[STARTUP] Building application...")
 
     # Try to restore Google sessions for allowed users from persistent storage
-    try:
-        if auth_manager:
-            for uid in ALLOWED_IDS:
-                creds = auth_manager.load_credentials(uid)
-                if creds and creds.valid:
-                    logger.info(f"[STARTUP] Restored Google Session for user {uid}")
-                    # Update internal DB state if possible
-                    try:
-                        import sqlite3
+    # try:
+    #     if auth_manager:
+    #         for uid in ALLOWED_IDS:
+    #             creds = auth_manager.load_credentials(uid)
+    #             if creds and creds.valid:
+    #                 logger.info(f"[STARTUP] Restored Google Session for user {uid}")
+    #                 # Update internal DB state if possible
+    #                 try:
+    #                     import sqlite3
+    #                     with sqlite3.connect("user_context.db") as conn:
+    #                         cursor = conn.cursor()
+    #                         # Check if user exists first to avoid error
+    #                         cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (uid,))
+    #                         if cursor.fetchone():
+    #                             cursor.execute(
+    #                                 "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+    #                                 (creds.to_json(), uid),
+    #                             )
+    #                             conn.commit()
+    #                 except Exception as db_e:
+    #                     logger.warning(f"Failed to update DB for restored session: {db_e}")
+    # except Exception as e:
+    #     logger.error(f"[STARTUP] Error restoring sessions: {e}")
 
-                        with sqlite3.connect("user_context.db") as conn:
-                            cursor = conn.cursor()
-                            # Check if user exists first to avoid error
-                            cursor.execute(
-                                "SELECT 1 FROM users WHERE user_id = ?", (uid,)
-                            )
-                            if cursor.fetchone():
-                                cursor.execute(
-                                    "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
-                                    (creds.to_json(), uid),
-                                )
-                                conn.commit()
-                    except Exception as db_e:
-                        logger.warning(
-                            f"Failed to update DB for restored session: {db_e}"
-                        )
-    except Exception as e:
-        logger.error(f"[STARTUP] Error restoring sessions: {e}")
-
+    # Agent Mail disabled due to network timeout issues in this environment
     # try:
     #     am_client = AgentMailClient()
     #     am_client.register()

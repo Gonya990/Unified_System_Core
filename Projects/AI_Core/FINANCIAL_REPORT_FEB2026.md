@@ -80,7 +80,7 @@ systemctl list-units | grep -i crypto
 
 ### Fixed Costs
 
-```
+```text
 Suno AI:      $10.00
 ElevenLabs:    $5.00
 Runway ML:    $12.00
@@ -90,7 +90,7 @@ TOTAL Fixed:  $27.00/мес
 
 ### Variable Costs
 
-```
+```text
 OpenAI API:   ~$5-10/мес (depends on usage)
 Other APIs:   ~$0-5/мес
 -----------------------

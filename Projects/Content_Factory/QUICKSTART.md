@@ -3,7 +3,9 @@
 ## ⚡ Быстрая команда для теста
 
 ```bash
-ssh unified-home-core-cloud "cd /home/gonya/Unified_System_Core/Projects/Content_Factory && python3 test_ai_factory.py"
+ssh unified-home-core-cloud \
+"cd /home/gonya/Unified_System_Core/Projects/Content_Factory && \
+python3 test_ai_factory.py"
 ```
 
 ---
@@ -41,7 +43,7 @@ pm2 restart factory
 
 ## 📝 Команды бота (когда будут добавлены)
 
-```
+```text
 /aimusic upbeat electronic 60    - Suno музыка
 /aivoice excited Hello AI!       - ElevenLabs голос
 /aisub impact Amazing future     - Impact субтитры

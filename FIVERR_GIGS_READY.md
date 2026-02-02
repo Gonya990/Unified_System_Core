@@ -2,23 +2,23 @@
 
 ## GIG 1: AI Voice-Over Service
 
-### Title
+### **G1: Title**
 
 "I will create professional AI voice-over in 21 voices with emotions"
 
-### Category
+### **G1: Category**
 
 Music & Audio > Voice Over
 
-### Price
+### **G1: Price**
 
 - Basic: $10 - Up to 100 words, 1 revision
 - Standard: $25 - Up to 300 words, 2 revisions
 - Premium: $50 - Up to 1000 words, unlimited revisions
 
-### Description
+### **G1: Description**
 
-```
+```text
 🎤 PROFESSIONAL AI VOICE-OVER SERVICE
 
 Need a professional voice-over but don't have the budget for expensive studios?
@@ -66,24 +66,25 @@ I'll create studio-quality voice-overs using cutting-edge AI technology (ElevenL
 Order now and bring your content to life! 🚀
 ```
 
-### Tags
+### **G1: Tags**
 
-voiceover, ai voice, text to speech, elevenlabs, professional voice, youtube voice, podcast voice, audiobook narrator
+voiceover, ai voice, text to speech, elevenlabs, professional voice, youtube voice,
+podcast voice, audiobook narrator
 
-### Requirements from Buyer
+### **G1: Requirements from Buyer**
 
 1. Full script/text (in English or Russian)
 2. Preferred voice type (male/female, age)
 3. Emotion/tone needed
 4. Any pronunciation notes
 
-### Delivery Time
+### **G1: Delivery Time**
 
 - Basic: 1 day
 - Standard: 2 days
 - Premium: 3 days
 
-### Revisions
+### **G1: Revisions**
 
 - Basic: 1
 - Standard: 2
@@ -93,23 +94,23 @@ voiceover, ai voice, text to speech, elevenlabs, professional voice, youtube voi
 
 ## GIG 2: AI Music Generation
 
-### Title
+### **G2: Title**
 
 "I will create original AI music for your video, podcast, or project"
 
-### Category
+### **G2: Category**
 
 Music & Audio > Producers & Composers
 
-### Price
+### **G2: Price**
 
 - Basic: $15 - 30 seconds, 1 track
 - Standard: $35 - 1 minute, 2 revisions
 - Premium: $75 - 3 minutes, unlimited revisions
 
-### Description
+### **G2: Description**
 
-```
+```text
 🎵 ORIGINAL AI MUSIC GENERATION
 
 Stop using overused stock music! Get 100% ORIGINAL tracks for your content.
@@ -159,31 +160,32 @@ I create custom music using Suno AI (Pro account):
 Make your content stand out with original music! 🎼
 ```
 
-### Tags
+### **G2: Tags**
 
-ai music, suno ai, original music, background music, youtube music, podcast music, royalty free, custom music
+ai music, suno ai, original music, background music, youtube music,
+podcast music, royalty free, custom music
 
 ---
 
 ## GIG 3: AI Video Subtitles
 
-### Title
+### **G3: Title**
 
 "I will add stunning AI-powered subtitles to your video in 4 styles"
 
-### Category
+### **G3: Category**
 
 Video & Animation > Subtitles & Captions
 
-### Price
+### **G3: Price**
 
 - Basic: $5 - Up to 1 minute, 1 style
 - Standard: $15 - Up to 5 minutes, 2 styles
 - Premium: $30 - Up to 15 minutes, all 4 styles
 
-### Description
+### **G3: Description**
 
-```
+```text
 ✨ PROFESSIONAL VIDEO SUBTITLES - 4 STYLES!
 
 Transform your videos with eye-catching subtitles that BOOST engagement!
@@ -239,31 +241,32 @@ Studies show: Videos with subtitles get 80% MORE views!
 Boost your engagement NOW! 📈
 ```
 
-### Tags
+### **G3: Tags**
 
-subtitles, captions, youtube subtitles, video subtitles, ai subtitles, srt file, video editing, shorts subtitles
+subtitles, captions, youtube subtitles, video subtitles, ai subtitles, srt file,
+video editing, shorts subtitles
 
 ---
 
 ## GIG 4: AI Video B-Roll
 
-### Title
+### **G4: Title**
 
 "I will generate cinematic AI B-roll footage for your videos"
 
-### Category
+### **G4: Category**
 
 Video & Animation > Video Editing
 
-### Price
+### **G4: Price**
 
 - Basic: $20 - 1 AI clip (5-10 sec)
 - Standard: $50 - 3 AI clips
 - Premium: $120 - 10 AI clips + editing
 
-### Description
+### **G4: Description**
 
-```
+```text
 🎬 CINEMATIC AI B-ROLL GENERATION
 
 No more expensive stock footage! Generate UNIQUE B-roll with AI.
@@ -309,31 +312,32 @@ I use cutting-edge AI (Luma AI, Runway ML) to create:
 Revolutionary AI video generation! 🚀
 ```
 
-### Tags
+### **G4: Tags**
 
-ai video, b roll, stock footage, runway ml, luma ai, video generation, cinematic video, custom footage
+ai video, b roll, stock footage, runway ml, luma ai, video generation,
+cinematic video, custom footage
 
 ---
 
 ## GIG 5: Complete AI Video Production
 
-### Title
+### **G5: Title**
 
 "I will create complete AI-generated videos with voice, music, and editing"
 
-### Category
+### **G5: Category**
 
 Video & Animation > Video Editing
 
-### Price
+### **G5: Price**
 
 - Basic: $50 - 1 minute video
 - Standard: $150 - 3 minute video
 - Premium: $300 - 5 minute video + revisions
 
-### Description
+### **G5: Description**
 
-```
+```text
 🎥 COMPLETE AI VIDEO PRODUCTION
 
 Get FULLY PRODUCED videos without filming anything!
@@ -395,9 +399,10 @@ Transform your content game with AI! 🚀
 ORDER NOW and let's create something amazing!
 ```
 
-### Tags
+### **G5: Tags**
 
-ai video production, full video service, youtube videos, ai content, video creation, automated videos, content creation, ai editing
+ai video production, full video service, youtube videos, ai content, video creation,
+automated videos, content creation, ai editing
 
 ---
 
@@ -427,7 +432,7 @@ ai video production, full video service, youtube videos, ai content, video creat
 
 ### Month 2+: PREMIUM PRICING
 
-- - $10-20 per gig
+- $10-20 per gig
 - Offer packages
 - Upsell services
 

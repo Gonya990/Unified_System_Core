@@ -6,7 +6,7 @@
 
 ## ✅ **ТЕКУЩИЙ СТАТУС:**
 
-```
+```text
 🤖 ByBit Trading Bot
 Status: ONLINE (10+ минут)
 Mode: TESTNET (безопасно!)
@@ -44,6 +44,7 @@ cat conf/conf_global.yml | grep -i bybit
 ### **ВАРИАНТ 2: СОЗДАТЬ НОВЫЕ КЛЮЧИ**
 
 #### **Шаг 1: Зайди на ByBit**
+
 <https://www.bybit.com/app/user/api-management>
 
 #### **Шаг 2: Create New Key**
@@ -118,7 +119,7 @@ pm2 logs crypto-bot
 
 **Должен показать:**
 
-```
+```text
 ✅ ByBit Bot WORKS!
 Balance: $XXX.XX USDT
 State: Analyzing market...
@@ -143,7 +144,7 @@ State: Analyzing market...
 
 ### **TESTNET Mode (сейчас):**
 
-```
+```text
 1. Бот подключится к ByBit Testnet
 2. Получит виртуальный баланс ($100K USDT)
 3. Начнёт виртуально торговать
@@ -155,7 +156,7 @@ State: Analyzing market...
 
 ### **LIVE Mode (потом):**
 
-```
+```text
 1. Измени в коде: testnet=False
 2. Перезапусти бота
 3. Начнёт РЕАЛЬНУЮ торговлю
@@ -210,7 +211,7 @@ State: Analyzing market...
 
 После добавления ключей, бот будет слать:
 
-```
+```text
 🤖 ByBit Bot:
 
 🚀 Trading Bot Started

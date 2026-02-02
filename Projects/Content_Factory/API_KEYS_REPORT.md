@@ -92,7 +92,7 @@ print(f'Generated: {audio}')
 
 **Результат теста:**
 
-```
+```txt
 ✅ ElevenLabs API WORKS! Found 21 voices
   - Roger: CwhRBWXzGAHq8TQ4Fs17
   - Sarah: EXAVITQu4vr4xnSDxMaL
@@ -119,7 +119,7 @@ print(f'Generated: {audio}')
 
 ## 📝 **ФАЙЛЫ ОБНОВЛЕНЫ:**
 
-```
+```txt
 /home/gonya/Unified_System_Core/Projects/Content_Factory/.env
   + ELEVENLABS_API_KEY=sk_057e... ✅
   + RUNWAY_API_KEY=key_c97c... ✅
@@ -146,12 +146,12 @@ print(f'Generated: {audio}')
 
 3. **Тестируй бота:**
 
-   ```
-   /aivoice excited Hello world!  ← ElevenLabs
-   /img Futuristic city          ← DALL-E (уже работает)
-   ```
+```txt
+/aivoice excited Hello world!  ← ElevenLabs
+/img Futuristic city          ← DALL-E (уже работает)
+```
 
-4. **Проверь Content Factory:**
+1. **Проверь Content Factory:**
 
    ```bash
    ssh unified-home-core-cloud
@@ -179,7 +179,7 @@ print(f'Generated: {audio}')
 
 ❌ **Cookies (НЕПРАВИЛЬНО для API):**
 
-```
+```txt
 __session=eyJhbGci...  ← Session token
 __client=eyJhbGci...   ← Client token
 _ga=GA1.1.284551...    ← Google Analytics
@@ -187,7 +187,7 @@ _ga=GA1.1.284551...    ← Google Analytics
 
 ✅ **API Key (ПРАВИЛЬНО):**
 
-```
+```txt
 sk_057e4ac167108...    ← ElevenLabs ✅
 key_c97c05d1f436...    ← Runway ML ✅
 sk-proj-DWeAr9za...    ← OpenAI ✅

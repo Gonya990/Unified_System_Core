@@ -8,6 +8,9 @@ import logging
 import os
 from datetime import datetime
 from typing import List, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -430,14 +433,22 @@ async def main():
         api_key = "test"
         api_secret = "test"
 
-    # Start in TESTNET for safety!
+    # Start in TESTNET or LIVE based on .env
+    testnet_env = os.getenv('BYBIT_TESTNET', 'true').lower()
+    is_testnet = testnet_env == 'true'
+
     bot = ByBitTradingBot(
         api_key=api_key,
         api_secret=api_secret,
         telegram_token=telegram_token,
         admin_chat_id=admin_chat_id,
-        testnet=True  # SAFE MODE!
+        testnet=is_testnet
     )
+
+    if not is_testnet:
+        print("🚀 STARTING IN LIVE MODE! REAL FUNDS!")
+    else:
+        print("🛡️ STARTING IN TESTNET MODE (Safe Mode)")
 
     try:
         await bot.run()

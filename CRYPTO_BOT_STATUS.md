@@ -9,54 +9,54 @@
 
 ### **1. Hummingbot УЖЕ ЗАПУЩЕН!** 🤖
 
-```
+```text
 Container: hummingbot
 Status: Up 4 hours
 Image: hummingbot/hummingbot:latest
 Location: /home/gonya/hummingbot/
 ```
 
-**Что есть:**
+**What is present:**
 
-- ✅ Hummingbot Docker container работает
-- ✅ Конфиг файлы: `/home/gonya/hummingbot/conf/`
-- ✅ Логи: `/home/gonya/hummingbot/logs/`
-- ✅ Данные: `/home/gonya/hummingbot/data/`
+- ✅ Hummingbot Docker container is working
+- ✅ Config files: `/home/gonya/hummingbot/conf/`
+- ✅ Logs: `/home/gonya/hummingbot/logs/`
+- ✅ Data: `/home/gonya/hummingbot/data/`
 
-### **2. ByBit Trading Bot СОЗДАН!** 💰
+### **2. ByBit Trading Bot CREATED!** 💰
 
-**Новый файл:** `bybit_trading_bot.py`
+**New file:** `bybit_trading_bot.py`
 
-**Функции:**
+**Functions:**
 
-- ✅ Консервативная стратегия (RSI + MA)
+- ✅ Conservative strategy (RSI + MA)
 - ✅ Stop-loss: -2%, Take-profit: +4%
-- ✅ Max 3% капитала на сделку
-- ✅ Telegram уведомления о каждой сделке
-- ✅ Testnet mode (безопасное тестирование)
+- ✅ Max 3% of capital per trade
+- ✅ Telegram notifications for every trade
+- ✅ Testnet mode (safe testing)
 
 ---
 
-## 🚀 **ДВА ВАРИАНТА ЗАПУСКА:**
+## 🚀 **TWO LAUNCH OPTIONS:**
 
-### **ВАРИАНТ A: Hummingbot (УЖЕ РАБОТАЕТ)**
+### **OPTION A: Hummingbot (ALREADY RUNNING)**
 
-**Проверка статуса:**
+**Status check:**
 
 ```bash
 ssh unified-home-core-cloud
 
-# Подключиться к контейнеру
+# Connect to container
 docker attach hummingbot
 
-# В Hummingbot:
-status           # Проверить статус
-balance          # Проверить баланс
-config           # Настройки
-start            # Запустить стратегию
+# In Hummingbot:
+status           # Check status
+balance          # Check balance
+config           # Settings
+start            # Start strategy
 ```
 
-**Если нужно перезапустить:**
+**If restart is needed:**
 
 ```bash
 cd /home/gonya/hummingbot
@@ -65,138 +65,138 @@ cd /home/gonya/hummingbot
 
 ---
 
-### **ВАРИАНТ B: Мой ByBit Bot (НОВЫЙ)**
+### **OPTION B: My ByBit Bot (NEW)**
 
-**Преимущества:**
+**Advantages:**
 
-- Полный контроль
-- Telegram уведомления
-- Моя стратегия
-- PM2 мониторинг
+- Full control
+- Telegram notifications
+- My strategy
+- PM2 monitoring
 
-**Запуск:**
+**Launch:**
 
 ```bash
 ssh unified-home-core-cloud
 cd /home/gonya/Unified_System_Core/Projects/AI_Core
 
-# Добавь API ключи в .env (если есть)
+# Add API keys to .env (if present)
 nano .env
 # BYBIT_API_KEY=...
 # BYBIT_API_SECRET=...
 
-# Тест (TESTNET)
+# Test (TESTNET)
 python3 src/bybit_trading_bot.py
 
-# Запуск в фоне
+# Run in background
 pm2 start src/bybit_trading_bot.py --name crypto-bot --interpreter python3
 
-# Мониторинг
+# Monitoring
 pm2 logs crypto-bot
 ```
 
 ---
 
-## 🔑 **API КЛЮЧИ:**
+## 🔑 **API KEYS:**
 
-### **Где они?**
+### **Where are they?**
 
-По твоему файлу task.md:
+According to your task.md:
 
-- [x] API-ключи ByBit/Binance **(получены)**
-- [x] Безопасный ввод API-ключей
+- [x] ByBit/Binance API keys **(obtained)**
+- [x] Secure entry of API keys
 
-**Найти ключи:**
+**Find keys:**
 
-1. **В Hummingbot конфиге:**
+1. **In Hummingbot config:**
 
 ```bash
 ssh unified-home-core-cloud
 cat /home/gonya/hummingbot/conf/conf_global.yml | grep -A5 bybit
 ```
 
-1. **Или создай новые:**
+1. **Or create new ones:**
    - <https://www.bybit.com/app/user/api-management>
    - Permissions: Read + Trade (Spot)
-   - **НЕ ВКЛЮЧАЙ Withdraw!**
+   - **DO NOT ENABLE Withdraw!**
 
 ---
 
 ## 💰 **TELEGRAM WALLET:**
 
-### **Как использовать:**
+### **How to use:**
 
-1. Открой @wallet в Telegram
-2. Проверь баланс TON
-3. Если есть "мелочь" → можно использовать
+1. Open @wallet in Telegram
+2. Check TON balance
+3. If there is "change" → it can be used
 
-**Стратегия:**
+**Strategy:**
 
-- Следи за ценой TON
-- Покупай при падении
-- Продавай при росте
-- Автоматически через бота!
+- Monitor TON price
+- Buy on dips
+- Sell on highs
+- Automatically via bot!
 
 ---
 
-## 📊 **ТЕКУЩИЙ СТАТУС:**
+## 📊 **CURRENT STATUS:**
 
-| Компонент | Статус | Действие |
+| Component | Status | Action |
 |-----------|--------|----------|
-| **Hummingbot** | ✅ Работает 4 часа | Проверить логи |
-| **ByBit Bot** | ✅ Создан | Добавить API ключи |
-| **Telegram Wallet** | ❓ Проверить | Баланс TON |
-| **API Keys** | ✅ Получены | Найти/добавить в .env |
+| **Hummingbot** | ✅ Running for 4 hours | Check logs |
+| **ByBit Bot** | ✅ Created | Add API keys |
+| **Telegram Wallet** | ❓ Check | TON Balance |
+| **API Keys** | ✅ Obtained | Find/add to .env |
 
 ---
 
-## 🎯 **СЛЕДУЮЩИЕ ШАГИ:**
+## 🎯 **NEXT STEPS:**
 
-### **СЕЙЧАС (5 минут):**
+### **NOW (5 minutes):**
 
-1. **Проверь Hummingbot:**
+1. **Check Hummingbot:**
 
 ```bash
 ssh unified-home-core-cloud
 docker attach hummingbot
-# Нажми Enter
+# Press Enter
 status
 balance
 ```
 
-1. **Найди API ключи:**
+1. **Find API keys:**
 
 ```bash
 cat /home/gonya/hummingbot/conf/conf_global.yml | grep bybit
-# Или
+# Or
 cat /home/gonya/hummingbot/conf/*.yml | grep api_key
 ```
 
-1. **Проверь Telegram Wallet:**
+1. **Check Telegram Wallet:**
    - @wallet
-   - Баланс TON
+   - TON Balance
 
 ---
 
-### **ПОТОМ (10 минут):**
+### **LATER (10 minutes):**
 
-1. **Настрой мой бот:**
+1. **Configure my bot:**
 
 ```bash
 nano /home/gonya/Unified_System_Core/Projects/AI_Core/.env
-# Добавь:
+# Add:
 # BYBIT_API_KEY=...
 # BYBIT_API_SECRET=...
 ```
 
-1. **Запусти в TESTNET:**
+1. **Run in TESTNET:**
 
 ```bash
 cd /home/gonya/Unified_System_Core/Projects/AI_Core
 python3 src/bybit_trading_bot.py
 ```
 
-1. **Если работает → PM2:**
+1. **If it works → PM2:**
 
 ```bash
 pm2 start src/bybit_trading_bot.py --name crypto-bot --interpreter python3
@@ -205,39 +205,43 @@ pm2 save
 
 ---
 
-## ⚠️ **ВАЖНО:**
+## ⚠️ **IMPORTANT:**
 
-### **Риски:**
+### **Risks:**
 
-- Можешь потерять деньги
-- Крипто волатильна
-- Начни с малого ($20-50 max)
+- You can lose money
+- Crypto is volatile
+- Start small ($20-50 max)
 
-### **Безопасность:**
+### **Security:**
 
-- ✅ TESTNET сначала (виртуальные деньги)
-- ✅ Stop-loss обязательно
-- ✅ Max 3% на сделку
-- ✅ Мониторинг каждый день
+- ✅ TESTNET first (virtual money)
+- ✅ Stop-loss mandatory
+- ✅ Max 3% per trade
+- ✅ Daily monitoring
 
 ---
 
-## 💡 **ПЛАН ЗАРАБОТКА (РЕАЛИСТИЧНЫЙ):**
+## 💡 **EARNING PLAN (REALISTIC):**
 
-### **2 недели до рождения сына:**
+### **2 weeks before son's birth:**
 
-**Вариант 1: Только Hummingbot**
+#### **Option 1: Hummingbot Only**
 
-- Если настроен: +$5-15/неделя
-- Риск средний
+- If configured: +$5-15/week
+- Medium risk
 
-**Вариант 2: Мой ByBit Bot**
+#### **Option 2: My ByBit Bot**
 
-- TESTNET неделю → Live
-- +$2-10/неделя
-- Риск контролируемый
+- TESTNET for a week → Live
+- +$2-10/week
+- Controlled risk
 
-**Вариант 3: YouTube + Fiverr (БЕЗОПАСНЕЕ!)**
+#### **Option 3: YouTube + Fiverr (SAFER!)**
+
+- $200-500/month GUARANTEED
+- Zero risk
+- Use AI Factory!
 
 - $200-500/мес ГАРАНТИРОВАННО
 - Нулевой риск

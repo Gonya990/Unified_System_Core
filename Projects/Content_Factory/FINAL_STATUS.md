@@ -23,7 +23,7 @@
 
 ### 1. **Suno AI** (Музыка) ✅
 
-```
+```bash
 Cookie: __session=eyJhbGci... ✅
 Status: Configured
 Features: 500 songs/мес, Pro quality
@@ -31,7 +31,7 @@ Features: 500 songs/мес, Pro quality
 
 ### 2. **ElevenLabs** (Голос) ✅
 
-```
+```bash
 API Key: sk_057e... ✅
 Test: 21 voices available
 Voices: Roger, Sarah, Laura, Antoni...
@@ -39,7 +39,7 @@ Voices: Roger, Sarah, Laura, Antoni...
 
 ### 3. **Luma AI** (Видео) ✅
 
-```
+```bash
 API Key: luma-8474... ✅  
 Test: Generation created!
 ID: 48186834-5df4-415b-b85d-e761683eb76e
@@ -50,14 +50,14 @@ Duration: 5s, 720p
 
 ### 4. **Runway ML** (Видео) ✅
 
-```
+```bash
 API Key: key_c97c... ✅
 Status: Ready (need credits)
 ```
 
 ### 5. **OpenAI DALL-E 3** (Картинки) ✅
 
-```
+```bash
 API Key: sk-proj-DWeAr... ✅
 Status: Working in bot
 Command: /img <prompt>
@@ -132,7 +132,7 @@ RUNWAY_API_KEY=key_c97c... ✅
 
 ### **Telegram Bot:**
 
-```
+```bash
 /img Futuristic city at sunset        ← DALL-E 3
 /aivoice excited Hello world!         ← ElevenLabs  
 /aisub impact AI is amazing          ← Subtitles
@@ -215,7 +215,7 @@ print(f'Generated: {video}')
 
 ## 🎬 **ГОТОВЫЙ ПАЙПЛАЙН:**
 
-```
+```bash
 1. AI Research (Daily) → Topic
 2. AI Music (Suno) → Background track ✅
 3. AI Voice (ElevenLabs) → Narration ✅
@@ -231,7 +231,7 @@ print(f'Generated: {video}')
 
 ## 📂 **ФАЙЛЫ НА СЕРВЕРЕ:**
 
-```
+```bash
 /home/gonya/Unified_System_Core/Projects/Content_Factory/
 ├── .env                    ✅ ALL KEYS CONFIGURED
 ├── src/audio/
@@ -257,20 +257,19 @@ print(f'Generated: {video}')
 
 1. **Тестируй бота в Telegram:**
 
-   ```
-   /img Robot in the future
-   /aivoice excited This is amazing!
-   ```
+```bash
+/img Robot in the future
+/aivoice excited This is amazing!
+```
 
-2. **Запусти тест фабрики:**
+1. **Запусти тест фабрики:**
 
-   ```bash
-   ssh unified-home-core-cloud
-   cd /home/gonya/Unified_System_Core/Projects/Content_Factory
-   python3 test_ai_factory.py
-   ```
+```bash
+ssh unified-home-core-cloud \
+"cd /home/gonya/Unified_System_Core/Projects/Content_Factory && python3 test_ai_factory.py"
+```
 
-3. **Создай первое видео:**
+1. **Создай первое видео:**
    - AI Researcher найдёт топик
    - Suno создаст музыку
    - ElevenLabs озвучит
@@ -278,7 +277,7 @@ print(f'Generated: {video}')
    - Фабрика соберёт всё
    - Автозагрузка на YouTube!
 
-4. **Настрой расписание:**
+2. **Настрой расписание:**
    - PM2 для 24/7 работы
    - Cron для ежедневных видео
    - Мониторинг через `/factory`

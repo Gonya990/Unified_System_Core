@@ -39,16 +39,21 @@ class FirestoreDB:
         self.use_firestore = False
 
         # Try to initialize Firestore
-        if FIRESTORE_AVAILABLE:
+        if FIRESTORE_AVAILABLE and os.environ.get("DISABLE_FIRESTORE", "false").lower() != "true":
             try:
                 creds_path = credentials_path or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
                 proj_id = project_id or os.environ.get("GCP_PROJECT_ID", "my-home-435112")
 
                 if creds_path and os.path.exists(creds_path):
-                    credentials = service_account.Credentials.from_service_account_file(creds_path)
-                    self.db = firestore.Client(project=proj_id, credentials=credentials)
-                    self.use_firestore = True
-                    logger.info(f"Firestore initialized for project: {proj_id}")
+                    try:
+                        credentials = service_account.Credentials.from_service_account_file(creds_path)
+                        # Test if credentials are valid (optional, but good for stability)
+                        self.db = firestore.Client(project=proj_id, credentials=credentials)
+                        self.use_firestore = True
+                        logger.info(f"Firestore initialized for project: {proj_id}")
+                    except Exception as cred_e:
+                        logger.error(f"Invalid Firestore credentials at {creds_path}: {cred_e}")
+                        self.use_firestore = False
                 elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
                     # Use default credentials
                     self.db = firestore.Client(project=proj_id)
@@ -58,6 +63,13 @@ class FirestoreDB:
                     logger.warning("No Firestore credentials found. Using SQLite fallback.")
             except Exception as e:
                 logger.error(f"Failed to initialize Firestore: {e}. Using SQLite fallback.")
+                self.use_firestore = False
+        else:
+            if os.environ.get("DISABLE_FIRESTORE") == "true":
+                logger.info("Firestore explicitly disabled. Using SQLite.")
+            else:
+                logger.warning("Firestore not available or missing credentials. Using SQLite.")
+            self.use_firestore = False
 
         # Fallback to SQLite
         if not self.use_firestore:

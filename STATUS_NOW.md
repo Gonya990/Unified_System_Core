@@ -74,7 +74,7 @@ BYBIT_API_KEY=твой_ключ
 BYBIT_API_SECRET=твой_секрет
 ```
 
-6. Перезапусти:
+1. Перезапусти:
 
 ```bash
 pm2 restart crypto-bot
@@ -104,13 +104,13 @@ pm2 logs crypto-bot
 
 ### **30 МИНУТ:**
 
-4. Залогинься Fiverr.com
+1. Залогинься Fiverr.com
 2. Публикуй 5 gigs
 3. Используй `FIVERR_GIGS_READY.md`
 
 ### **ВЕЧЕРОМ:**
 
-7. Проверь YouTube видео (я доделаю)
+1. Проверь YouTube видео (я доделаю)
 2. Мониторь крипто-бота
 3. Отвечай на Fiverr requests
 
@@ -145,7 +145,7 @@ pm2 logs crypto-bot
 
 ## 📁 **ВСЕ ФАЙЛЫ:**
 
-```
+```text
 ✅ BYBIT_API_KEYS_GUIDE.md     - Инструкция по ключам
 ✅ FIVERR_GIGS_READY.md        - 5 готовых объявлений
 ✅ FIRST_VIDEO_CONCEPT.md      - YouTube концепт
