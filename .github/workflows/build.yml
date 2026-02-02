@@ -168,18 +168,29 @@ jobs:
 
       - name: Update kustomization.yaml with new tag
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git rebase origin/main
+          
           cd Projects/AI_Core/k8s
           OLD_TAG=$(grep 'newTag:' kustomization.yaml | awk '{print $2}')
           NEW_TAG="${GITHUB_SHA::7}"
           sed -i "s/newTag: .*/newTag: ${NEW_TAG}/" kustomization.yaml
           echo "Updated image tag: ${OLD_TAG} -> ${NEW_TAG}"
 
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update image tag to ${{ github.sha }}"
-          file_pattern: "Projects/AI_Core/k8s/kustomization.yaml"
-          branch: main
+      - name: Commit and push changes
+        run: |
+          git add Projects/AI_Core/k8s/kustomization.yaml
+          git commit -m "chore: update image tag to ${{ github.sha }}" || echo "No changes to commit"
+          
+          # Retry push to handle race conditions
+          for i in {1..5}; do
+            git fetch origin main
+            git rebase origin/main
+            git push origin main && break || sleep 5
+          done
 
       - name: Update manifest summary
         if: always()

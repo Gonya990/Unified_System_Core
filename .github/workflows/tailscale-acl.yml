@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'infra/tailscale/policy.jsonl'
+      - "infra/tailscale/policy.jsonl"
 
 jobs:
   update-acl:
@@ -14,24 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Tailscale CLI
-        run: |
-          curl -fsSL https://tailscale.com/install.sh | sh
-
-      - name: Validate ACL syntax
-        run: |
-          tailscale configure acl validate infra/tailscale/policy.jsonl
-
       - name: Update Tailscale ACL
         env:
           TAILSCALE_API_KEY: ${{ secrets.TAILSCALE_API_KEY }}
           TAILNET: unified-system-core.org.github
         run: |
-          curl -X POST \
+          # The Tailscale API accepts HuJSON (JSON with comments/trailing commas)
+          curl -f -X POST \
             "https://api.tailscale.com/api/v2/tailnet/${TAILNET}/acl" \
             -H "Authorization: Bearer ${TAILSCALE_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d @infra/tailscale/policy.jsonl
+            --data-binary @infra/tailscale/policy.jsonl
 
       - name: Verify deployment
         run: |
