@@ -1,8 +1,9 @@
-import os
 import json
+import os
 import time
-from google.cloud import pubsub_v1
+
 from dotenv import load_dotenv
+from google.cloud import pubsub_v1
 
 load_dotenv()
 

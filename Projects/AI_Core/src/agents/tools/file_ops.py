@@ -6,7 +6,7 @@ Provides safe file system operations for the agent.
 
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class FileOpsTool:
     """File system operations tool"""
 
     @staticmethod
-    def get_definition() -> Dict[str, Any]:
+    def get_definition() -> dict[str, Any]:
         """Get OpenAI function definition for file_read"""
         return {
             "name": "file_read",
@@ -41,11 +41,11 @@ class FileOpsTool:
     async def handler(path: str, max_chars: int = 5000) -> str:
         """
         Read file contents.
-        
+
         Args:
             path: Absolute path to file
             max_chars: Maximum characters to return
-            
+
         Returns:
             File content with metadata
         """
@@ -93,7 +93,7 @@ class FileListTool:
     """Directory listing tool"""
 
     @staticmethod
-    def get_definition() -> Dict[str, Any]:
+    def get_definition() -> dict[str, Any]:
         """Get OpenAI function definition for file_list"""
         return {
             "name": "file_list",
@@ -119,11 +119,11 @@ class FileListTool:
     async def handler(path: str, pattern: str = "*") -> str:
         """
         List directory contents.
-        
+
         Args:
             path: Absolute path to directory
             pattern: Glob pattern for filtering
-            
+
         Returns:
             Formatted directory listing
         """

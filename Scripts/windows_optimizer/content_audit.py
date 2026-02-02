@@ -31,7 +31,7 @@ def load_hardware_report():
 def get_folder_size_gb(folder_path):
     total_size = 0
     try:
-        for dirpath, dirnames, filenames in os.walk(folder_path):
+        for dirpath, _dirnames, filenames in os.walk(folder_path):
             for f in filenames:
                 fp = os.path.join(dirpath, f)
                 if not os.path.islink(fp):
@@ -57,7 +57,6 @@ def main():
                 drives.append(drive_letter)
                 tier_map[drive_letter] = tier
 
-    recommendations = []
     found_assets = []
 
     for drive in drives:  # ["C:", "D:", ...]

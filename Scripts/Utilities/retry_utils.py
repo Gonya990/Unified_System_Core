@@ -15,7 +15,7 @@ import logging
 import random
 import time
 from collections.abc import Sequence
-from typing import Callable, Optional, Type
+from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ def retry_with_backoff(
     max_delay: float = 60.0,
     jitter: bool = True,
     retryable_codes: Sequence[int] = DEFAULT_RETRYABLE_CODES,
-    retryable_exceptions: Sequence[Type[Exception]] = DEFAULT_RETRYABLE_EXCEPTIONS,
+    retryable_exceptions: Sequence[type[Exception]] = DEFAULT_RETRYABLE_EXCEPTIONS,
     on_retry: Optional[Callable[[int, Exception, float], None]] = None,
 ):
     """
@@ -140,7 +140,7 @@ def async_retry_with_backoff(
     max_delay: float = 60.0,
     jitter: bool = True,
     retryable_codes: Sequence[int] = DEFAULT_RETRYABLE_CODES,
-    retryable_exceptions: Sequence[Type[Exception]] = DEFAULT_RETRYABLE_EXCEPTIONS,
+    retryable_exceptions: Sequence[type[Exception]] = DEFAULT_RETRYABLE_EXCEPTIONS,
     on_retry: Optional[Callable[[int, Exception, float], None]] = None,
 ):
     """

@@ -1,9 +1,10 @@
 import json
 import re
 
+
 def categorize(name, description, topics):
     text = f"{name} {description or ''} {' '.join(topics)}".lower()
-    
+
     categories = {
         "AI/Agents": ["agent", "ai", "llm", "gpt", "rag", "openai", "claude", "chatbot", "mcp", "machine-learning", "multi-agent", "embeddings", "vector-search", "neural", "antigravity", "codex", "genai", "generative-ai"],
         "DevOps/Infra": ["devops", "kubernetes", "k8s", "docker", "terraform", "ansible", "monitoring", "observability", "cloud", "ci", "cd", "paas", "gitops", "infrastructure", "sre", "prometheus", "grafana", "nixos", "nix", "jenkins", "argocd", "helm", "serverless"],
@@ -16,12 +17,12 @@ def categorize(name, description, topics):
         "Education/Resources": ["awesome", "awesome-list", "tutorial", "roadmap", "course", "interview", "learning", "certification", "cheatsheet", "handbook", "books", "reference"],
         "Networking/Communication": ["vpn", "wireguard", "ssh", "sip", "voip", "whatsapp", "discord", "matrix", "bridge", "tunnel", "networking", "http", "proxy", "nat", "tailscale"]
     }
-    
+
     matched_cats = []
     for cat, keywords in categories.items():
         if any(re.search(r'\b' + re.escape(k) + r'\b', text) for k in keywords):
             matched_cats.append(cat)
-            
+
     if not matched_cats:
         return "Miscellaneous"
     # Return the first match or prioritize
@@ -29,7 +30,7 @@ def categorize(name, description, topics):
 
 output = {}
 
-with open('/home/kosta/.local/share/opencode/tool-output/tool_bb7c545e90014PA4uhNYstRQ2T', 'r') as f:
+with open('/home/kosta/.local/share/opencode/tool-output/tool_bb7c545e90014PA4uhNYstRQ2T') as f:
     lines = f.readlines()
     for line in lines[6:]:  # Skip headers
         try:
@@ -40,13 +41,13 @@ with open('/home/kosta/.local/share/opencode/tool-output/tool_bb7c545e90014PA4uh
             desc = desc.split('. ')[0].split('? ')[0].split('! ')[0]
             if not desc.endswith(('.', '?', '!')):
                 desc += '.'
-            
+
             topics = repo.get('topics', [])
             cat = categorize(repo.get('name'), repo.get('description'), topics)
-            
+
             if cat not in output:
                 output[cat] = []
-            
+
             tags = ", ".join(topics) if topics else "no tags"
             entry = f"[{url}]({desc}) > {tags}"
             output[cat].append(entry)

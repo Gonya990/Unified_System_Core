@@ -8,7 +8,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 import google.generativeai as genai
 
@@ -20,7 +20,7 @@ class Tool:
     """Tool definition for function calling"""
     name: str
     description: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     handler: Callable
     requires_approval: bool = False
 
@@ -49,15 +49,15 @@ Be concise and direct in your responses."""
 
         genai.configure(api_key=api_key)
         self.model_name = model
-        self.tools: Dict[str, Tool] = {}
-        self.conversation_history: List[Dict] = []
+        self.tools: dict[str, Tool] = {}
+        self.conversation_history: list[dict] = []
 
     def register_tool(self, tool: Tool):
         """Register a tool"""
         self.tools[tool.name] = tool
         logger.info(f"Registered tool: {tool.name}")
 
-    def _build_gemini_tools(self) -> List[genai.protos.Tool]:
+    def _build_gemini_tools(self) -> list[genai.protos.Tool]:
         """Convert tools to Gemini format"""
         if not self.tools:
             return []
@@ -78,7 +78,7 @@ Be concise and direct in your responses."""
 
         return [genai.protos.Tool(function_declarations=function_declarations)]
 
-    def _convert_schema_to_gemini(self, openai_schema: Dict[str, Any]) -> genai.protos.Schema:
+    def _convert_schema_to_gemini(self, openai_schema: dict[str, Any]) -> genai.protos.Schema:
         """Convert OpenAI JSON Schema to Gemini Schema"""
         properties = {}
         required = openai_schema.get("required", [])
@@ -109,7 +109,7 @@ Be concise and direct in your responses."""
             required=required
         )
 
-    async def execute_tool(self, tool_name: str, arguments: Dict) -> str:
+    async def execute_tool(self, tool_name: str, arguments: dict) -> str:
         """Execute a tool"""
         if tool_name not in self.tools:
             return f"Error: Tool '{tool_name}' not found"

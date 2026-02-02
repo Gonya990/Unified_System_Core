@@ -5,7 +5,6 @@ Financial Tracker - Gmail Payment Parser
 """
 import re
 from datetime import datetime
-from typing import Dict, List
 
 
 class PaymentParser:
@@ -40,7 +39,7 @@ class PaymentParser:
 
         return 0.0
 
-    def detect_service(self, subject: str, sender: str) -> Dict:
+    def detect_service(self, subject: str, sender: str) -> dict:
         """Detect service from email."""
         text = f"{subject} {sender}".lower()
 
@@ -50,7 +49,7 @@ class PaymentParser:
 
         return {'name': 'Unknown', 'category': 'Other'}
 
-    def parse_emails(self, emails: List[Dict]) -> List[Dict]:
+    def parse_emails(self, emails: list[dict]) -> list[dict]:
         """Parse payment emails into structured data."""
         payments = []
 
@@ -77,7 +76,7 @@ class PaymentParser:
 
         return payments
 
-    def generate_report(self, payments: List[Dict]) -> str:
+    def generate_report(self, payments: list[dict]) -> str:
         """Generate financial report."""
         total = sum(p['amount'] for p in payments)
 

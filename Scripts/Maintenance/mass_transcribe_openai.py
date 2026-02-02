@@ -37,7 +37,7 @@ def split_audio(file_path, output_dir):
         chunk_pattern
     ]
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return sorted(list(Path(output_dir).glob(f"{stem}_chunk_*.mp3")))
+    return sorted(Path(output_dir).glob(f"{stem}_chunk_*.mp3"))
 
 def transcribe_chunk(chunk_path):
     print(f"Transcribing chunk: {chunk_path.name}")

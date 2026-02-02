@@ -126,7 +126,7 @@ def main():
                 print(f"   Contains {len(files)}+ files. Examples: {', '.join(files[:3])}...")
 
                 # Heuristic
-                is_game = any(f.endswith(".exe") or "data" in f.lower() for f in files)
+                any(f.endswith(".exe") or "data" in f.lower() for f in files)
 
                 analysis_output += "### 📦 Content Preview\n"
                 analysis_output += "```text\n" + "\n".join(files) + "\n```\n\n"

@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
+
 import requests
+from dotenv import load_dotenv
 
 load_dotenv('/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.env')
 

@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import Optional
 
 from dotenv import load_dotenv
 from google.cloud import discoveryengine_v1beta as discoveryengine
@@ -21,7 +21,7 @@ class VertexSearchClient:
         if not self.data_store_id:
             print("⚠️ GCP_SEARCH_DATA_STORE_ID is not set. Client will require manual ID passing.")
 
-    def search(self, query: str, data_store_id: Optional[str] = None) -> List[dict]:
+    def search(self, query: str, data_store_id: Optional[str] = None) -> list[dict]:
         """
         Performs a search query against the specified data store.
         """

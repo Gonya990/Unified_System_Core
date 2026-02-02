@@ -5,8 +5,6 @@ Note: You must have the 'copilot' CLI installed and in your PATH.
 """
 
 import asyncio
-import os
-import sys
 
 # Note: Since I couldn't download the SDK, this is a placeholder structure
 # based on the README snippets I saw.
