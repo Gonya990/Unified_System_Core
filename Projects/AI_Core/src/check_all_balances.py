@@ -1,6 +1,7 @@
 import os
-from pybit.unified_trading import HTTP
+
 from dotenv import load_dotenv
+from pybit.unified_trading import HTTP
 
 load_dotenv('/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.env')
 
@@ -15,9 +16,9 @@ def check_balances():
     )
 
     account_types = ["UNIFIED", "FUNDING", "SPOT"]
-    
+
     print("--- BYBIT BALANCE CHECK ---")
-    
+
     for acc in account_types:
         try:
             print(f"\nChecking {acc}...")
@@ -25,7 +26,7 @@ def check_balances():
                 result = session.get_coins_balance(accountType=acc)
             else:
                 result = session.get_wallet_balance(accountType=acc)
-                
+
             if result['retCode'] == 0:
                 print(f"Success! {acc} Data:")
                 # Simplified output
