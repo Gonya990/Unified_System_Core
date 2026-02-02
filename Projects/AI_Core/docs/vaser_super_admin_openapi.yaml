@@ -159,7 +159,7 @@ paths:
   /ha/service-call:
     post:
       tags: [home-assistant]
-      operationId: ha_service_call
+      operationId: ha.service_call
       summary: Call a Home Assistant service.
       requestBody:
         required: true
@@ -177,7 +177,7 @@ paths:
   /ha/get-state:
     post:
       tags: [home-assistant]
-      operationId: ha_get_state
+      operationId: ha.get_state
       summary: Get state for Home Assistant entities.
       requestBody:
         required: true
@@ -195,7 +195,7 @@ paths:
   /ha/set-state:
     post:
       tags: [home-assistant]
-      operationId: ha_set_state
+      operationId: ha.set_state
       summary: Set state for a Home Assistant entity.
       requestBody:
         required: true
@@ -213,7 +213,7 @@ paths:
   /ha/execute-script:
     post:
       tags: [home-assistant]
-      operationId: ha_execute_script
+      operationId: ha.execute_script
       summary: Execute a Home Assistant script.
       requestBody:
         required: true
@@ -232,7 +232,7 @@ paths:
   /local/run:
     post:
       tags: [local]
-      operationId: local_run
+      operationId: local.run
       summary: Run a local command via the Python gateway.
       requestBody:
         required: true
@@ -250,7 +250,7 @@ paths:
   /local/read:
     post:
       tags: [local]
-      operationId: local_read
+      operationId: local.read
       summary: Read a local file via the Python gateway.
       requestBody:
         required: true
@@ -268,7 +268,7 @@ paths:
   /local/write:
     post:
       tags: [local]
-      operationId: local_write
+      operationId: local.write
       summary: Write a local file via the Python gateway.
       requestBody:
         required: true
@@ -286,7 +286,7 @@ paths:
   /local/reminder:
     post:
       tags: [local]
-      operationId: local_reminder
+      operationId: local.reminder
       summary: Create a local reminder via the Python gateway.
       requestBody:
         required: true
