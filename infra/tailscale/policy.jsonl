@@ -1,4 +1,4 @@
-// Tailscale ACL for Unified System Core
+// Tailscale ACL for Unified System Core (Last sync check: 2026-02-02 19:40)
 {
 	"tagOwners": {
 		"tag:gaming":           ["autogroup:admin"],
