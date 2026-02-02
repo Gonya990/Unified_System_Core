@@ -4,7 +4,6 @@ import requests
 def main():
     server = "http://100.126.23.67:8765"
     token = "antigravity_secret"
-    project_key = "/home/gonya/Unified_System"
 
     payload = {
         "jsonrpc": "2.0",

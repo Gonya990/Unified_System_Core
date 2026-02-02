@@ -1,6 +1,5 @@
-import subprocess
-import sys
 import os
+import subprocess
 
 print("PATH:", os.environ.get("PATH"))
 try:

@@ -14,7 +14,6 @@ def search_takeout():
     # Search specifically for takeout emails
     emails = gmail_agent.get_recent_emails(service, hours=24*30, max_results=10, query="from:google.com subject:Takeout")
 
-    found_links = []
 
     for email in emails:
         print(f"\n📧 Found Email: {email['subject']} ({email['date']})")

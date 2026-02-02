@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class TelegramCryptoBot:
     """
     Conservative crypto trading bot for Telegram Wallet.
-    
+
     SAFETY FEATURES:
     - Max 5% of balance per trade
     - Stop-loss at -3%

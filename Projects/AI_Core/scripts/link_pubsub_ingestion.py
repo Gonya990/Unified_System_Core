@@ -1,6 +1,7 @@
 import os
-from google.cloud import discoveryengine_v1beta as discoveryengine
+
 from dotenv import load_dotenv
+from google.cloud import discoveryengine_v1beta as discoveryengine
 
 load_dotenv()
 
@@ -41,8 +42,8 @@ def link_pubsub_ingestion():
         print(f"⌛ Ingestion link started (Operation): {operation.operation.name}")
         # We don't necessarily wait for completion as ingestion is a continuous stream
         # but the setup operation should finish.
-        result = operation.result()
-        print(f"✅ Ingestion link established.")
+        operation.result()
+        print("✅ Ingestion link established.")
     except Exception as e:
         print(f"❌ Failed to link Pub/Sub: {e}")
 

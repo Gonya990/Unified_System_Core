@@ -5,7 +5,6 @@ import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List
 
 import openai
 from dotenv import load_dotenv
@@ -72,7 +71,7 @@ def get_email_content(payload) -> str:
 
 # --- AI Analysis ---
 
-def analyze_and_draft_responses(emails: List[Dict]):
+def analyze_and_draft_responses(emails: list[dict]):
     client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
     analyzed_data = []
@@ -83,24 +82,24 @@ def analyze_and_draft_responses(emails: List[Dict]):
         print(f"[{i+1}/{len(emails)}] Processing: {email['subject'][:40]}...")
 
         prompt = f"""
-        You are a strategic business development AI. 
-        
+        You are a strategic business development AI.
+
         SENDER: {email['sender']}
         SUBJECT: {email['subject']}
         BODY_SNIPPET: {email['body'][:4000]}
-        
+
         Task:
         1. Identify if this is a **LEAD** (job alert, direct email, inquiry).
         2. **CLASSIFY** the response type:
            - "AUTO_SEND": Standard pitch, job application follow-up, cold outreach to a job alert. Safe to send automatically if we have an address.
            - "MANUAL_REVIEW": Complex negotiation, sensitive topic, high-stakes investor reply. User must see it first.
            - "IGNORE": Not a business lead.
-        
+
         3. **EXTRACT RECIPIENT**:
            - Look for a real email address in the body (e.g., "send CV to hr@company.com").
            - If the SENDER is a "noreply" or "notifications" address, you MUST find an email in the body. If none, output null.
            - If the SENDER is a real person/recruiting alias, use that.
-        
+
         Output JSON:
         {{
             "is_relevant": true,
@@ -114,7 +113,7 @@ def analyze_and_draft_responses(emails: List[Dict]):
                 "roi": "Expected benefit"
             }}
         }}
-        
+
         If NOT relevant: {{"is_relevant": false}}
         """
 

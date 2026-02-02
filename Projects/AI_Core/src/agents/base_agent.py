@@ -8,7 +8,7 @@ to enable agentic workflows with tool execution.
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 from openai import AsyncOpenAI
 
@@ -20,7 +20,7 @@ class Tool:
     """Tool definition for OpenAI function calling"""
     name: str
     description: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     handler: Callable
     requires_approval: bool = False
 
@@ -28,13 +28,13 @@ class Tool:
 class AgentOrchestrator:
     """
     Main agent orchestration engine using OpenAI Function Calling.
-    
+
     This class manages:
     - Tool registration and execution
     - Conversation history
     - Multi-step reasoning with OpenAI models
     - Progress reporting
-    
+
     Example:
         agent = AgentOrchestrator()
         agent.register_tool(my_tool)
@@ -55,29 +55,29 @@ Be concise and direct in your responses."""
     def __init__(self, model: str = "gpt-4o", api_key: Optional[str] = None):
         """
         Initialize AgentOrchestrator.
-        
+
         Args:
             model: OpenAI model to use (default: gpt-4o)
             api_key: OpenAI API key (optional, uses env OPENAI_API_KEY if not provided)
         """
         self.client = AsyncOpenAI(api_key=api_key)
         self.model = model
-        self.tools: Dict[str, Tool] = {}
-        self.conversation_history: List[Dict] = [
+        self.tools: dict[str, Tool] = {}
+        self.conversation_history: list[dict] = [
             {"role": "system", "content": self.SYSTEM_PROMPT}
         ]
 
     def register_tool(self, tool: Tool):
         """
         Register a new tool for the agent to use.
-        
+
         Args:
             tool: Tool instance to register
         """
         self.tools[tool.name] = tool
         logger.info(f"Registered tool: {tool.name}")
 
-    def _build_tool_definitions(self) -> List[Dict]:
+    def _build_tool_definitions(self) -> list[dict]:
         """Convert registered tools to OpenAI function format"""
         return [
             {
@@ -91,14 +91,14 @@ Be concise and direct in your responses."""
             for tool in self.tools.values()
         ]
 
-    async def execute_tool(self, tool_name: str, arguments: Dict) -> str:
+    async def execute_tool(self, tool_name: str, arguments: dict) -> str:
         """
         Execute a tool and return result.
-        
+
         Args:
             tool_name: Name of tool to execute
             arguments: Tool arguments as dict
-            
+
         Returns:
             Tool execution result as string
         """
@@ -131,12 +131,12 @@ Be concise and direct in your responses."""
     ) -> str:
         """
         Run agent with user message, allowing multiple tool calls.
-        
+
         Args:
             user_message: User's task/question
             on_progress: Optional callback for progress updates
             max_iterations: Maximum number of agent iterations (default: 10)
-            
+
         Returns:
             Final agent response
         """
@@ -230,6 +230,6 @@ Be concise and direct in your responses."""
         ]
         logger.info("Conversation history reset")
 
-    def get_conversation_history(self) -> List[Dict]:
+    def get_conversation_history(self) -> list[dict]:
         """Get current conversation history"""
         return self.conversation_history.copy()

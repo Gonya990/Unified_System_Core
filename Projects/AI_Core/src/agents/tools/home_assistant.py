@@ -6,7 +6,7 @@ Provides smart home device control via Home Assistant API.
 
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import httpx
 
@@ -23,7 +23,7 @@ class HomeAssistantTool:
         if not self.token:
             logger.warning("HA_TOKEN not set - Home Assistant tool will not work")
 
-    def get_definition(self) -> Dict[str, Any]:
+    def get_definition(self) -> dict[str, Any]:
         """Get OpenAI function definition"""
         return {
             "name": "control_device",
@@ -64,13 +64,13 @@ class HomeAssistantTool:
     ) -> str:
         """
         Execute Home Assistant action.
-        
+
         Args:
             entity_id: Device entity ID
             action: Action to perform
             brightness: Optional brightness for lights
             temperature: Optional temperature for climate
-            
+
         Returns:
             Result message
         """

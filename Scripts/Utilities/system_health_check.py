@@ -8,10 +8,9 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Tuple
 
 
-def check_python_version() -> Tuple[bool, str]:
+def check_python_version() -> tuple[bool, str]:
     """Check if Python version is adequate"""
     version = sys.version_info
     if version.major >= 3 and version.minor >= 9:
@@ -19,7 +18,7 @@ def check_python_version() -> Tuple[bool, str]:
     return False, f"✗ Python {version.major}.{version.minor}.{version.micro} (need 3.9+)"
 
 
-def check_ai_core_dependencies() -> Tuple[bool, str]:
+def check_ai_core_dependencies() -> tuple[bool, str]:
     """Check if AI Core dependencies are installed"""
     ai_core_path = Path(__file__).parent.parent.parent / "Projects" / "AI_Core"
     requirements_file = ai_core_path / "requirements.txt"
@@ -37,7 +36,7 @@ def check_ai_core_dependencies() -> Tuple[bool, str]:
         return False, f"✗ Missing dependency: {e.name}"
 
 
-def check_env_files() -> Tuple[bool, str]:
+def check_env_files() -> tuple[bool, str]:
     """Check if environment files exist"""
     root = Path(__file__).parent.parent.parent
     env_files = [".env.example", ".env.local"]
@@ -52,7 +51,7 @@ def check_env_files() -> Tuple[bool, str]:
     return False, "✗ No environment files found"
 
 
-def check_git_status() -> Tuple[bool, str]:
+def check_git_status() -> tuple[bool, str]:
     """Check git repository status"""
     try:
         result = subprocess.run(
@@ -69,7 +68,7 @@ def check_git_status() -> Tuple[bool, str]:
         return False, "✗ Git status check failed"
 
 
-def check_scripts_executable() -> Tuple[bool, str]:
+def check_scripts_executable() -> tuple[bool, str]:
     """Check if key scripts are executable"""
     root = Path(__file__).parent.parent.parent
     scripts = [
@@ -88,7 +87,7 @@ def check_scripts_executable() -> Tuple[bool, str]:
     return False, "✗ No executable scripts found"
 
 
-def check_project_directories() -> Tuple[bool, str]:
+def check_project_directories() -> tuple[bool, str]:
     """Check if main project directories exist"""
     root = Path(__file__).parent.parent.parent
     required_dirs = [

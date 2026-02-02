@@ -1,7 +1,8 @@
 
 import os
-from pybit.unified_trading import HTTP
+
 from dotenv import load_dotenv
+from pybit.unified_trading import HTTP
 
 env_path = '/home/gonya/Unified_System_Core/Projects/AI_Core/.env'
 load_dotenv(env_path)

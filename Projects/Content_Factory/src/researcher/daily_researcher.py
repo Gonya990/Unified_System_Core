@@ -499,27 +499,27 @@ def check_local_context_files(scenes, output_dir: Path):
     context_dir = ROOT_DIR / "Context"
     if not context_dir.exists():
         return []
-        
+
     resolved = []
     import shutil
-    
+
     # Simple keyword matching from filenames
     # Get all image/video files
     candidates = list(context_dir.rglob("*.jpg")) + list(context_dir.rglob("*.png")) + list(context_dir.rglob("*.mp4"))
-    
+
     print(f"📂 Checking {len(candidates)} local context files for matches...")
-    
+
     for s in scenes:
         kw = s['keyword'].lower().split()
         best_match = None
-        
+
         for cand in candidates:
             # Check if any keyword matches filename
             cand_name = cand.stem.lower()
             if any(k in cand_name for k in kw):
                 best_match = cand
                 break
-        
+
         if best_match:
             # Copy to assets folder to ensure availability
             dest = output_dir / best_match.name
@@ -527,7 +527,7 @@ def check_local_context_files(scenes, output_dir: Path):
             s["resolved_path"] = str(dest)
             resolved.append(s)
             print(f"   ✅ Local Context Match: {s['image']} <- {best_match.name}")
-            
+
     return resolved
 
 

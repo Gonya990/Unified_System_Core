@@ -31,13 +31,13 @@ load_dotenv(ROOT_DIR / ".env")
 
 
 from account_manager import AccountManager  # noqa: E402
-from telegram_notifier import send_telegram_message  # noqa: E402
 from daily_researcher import (  # noqa: E402
     generate_vision_assets,
     run_daily_research,
     translate_to_english,
     translate_to_hebrew,
 )
+from telegram_notifier import send_telegram_message  # noqa: E402
 
 try:
     from insta_uploader import upload_reel  # noqa: E402
@@ -405,12 +405,12 @@ def start_scheduler():
 
     # Weekly Special
     schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
-    
+
     if LONGFORM_ENABLED:
         schedule.every().saturday.at("16:00").do(run_longform_production)
 
     print("🚀 COMPLIANT Scheduler running. Waiting for pending tasks...")
-    
+
     while True:
         schedule.run_pending()
         time.sleep(60) # Check every minute

@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException
@@ -43,7 +43,7 @@ class LeadData(BaseModel):
 
 class CommandRequest(BaseModel):
     command: str
-    payload: Dict[str, Any] = {}
+    payload: dict[str, Any] = {}
 
 async def verify_token(authorization: Optional[str] = Header(None)):
     if not authorization or authorization != f"Bearer {BRIDGE_TOKEN}":

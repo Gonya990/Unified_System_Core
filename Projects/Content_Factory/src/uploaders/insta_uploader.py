@@ -68,13 +68,13 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
             "video_path": video_path,
             "caption": final_caption[:2000]
         }
-        
+
         # Check if version supports is_ai_generated (Safe call)
         try:
             media = cl.clip_upload(**params, is_ai_generated=True)
         except TypeError:
             media = cl.clip_upload(**params)
-            
+
         print(f"✨ Successfully uploaded Reel! Media ID: {media.id}")
         return True
     except Exception as e:

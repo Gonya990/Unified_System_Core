@@ -1,8 +1,8 @@
 import os
-import time
-from google.cloud import discoveryengine_v1beta as discoveryengine
-from google.api_core import exceptions
+
 from dotenv import load_dotenv
+from google.api_core import exceptions
+from google.cloud import discoveryengine_v1beta as discoveryengine
 
 load_dotenv()
 
@@ -11,7 +11,6 @@ def create_data_store():
     project_id = "gen-lang-client-0982257437"
     location = "global"
     data_store_id = "gonya90-knowledge-store"
-    topic_id = f"projects/{project_id}/topics/gonya90-topic"
 
     # Set quota project
     os.environ["GOOGLE_CLOUD_QUOTA_PROJECT"] = project_id

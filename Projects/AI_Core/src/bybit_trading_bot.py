@@ -7,7 +7,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class ByBitTradingBot:
     """
     Ultra-conservative trading bot for ByBit.
-    
+
     SAFETY RULES:
     - Max 3% of balance per trade
     - Stop-loss: -2%
@@ -182,7 +182,7 @@ class ByBitTradingBot:
             logger.error(f"Market analysis failed: {e}")
             return None
 
-    def _calculate_rsi(self, prices: List[float], period: int = 14) -> float:
+    def _calculate_rsi(self, prices: list[float], period: int = 14) -> float:
         """Calculate RSI indicator."""
         deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
 
