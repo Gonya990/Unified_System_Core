@@ -180,7 +180,7 @@ try:
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
     if os.path.basename(root_path) != "Unified_System_Core":
          root_path = os.path.abspath(os.path.join(current_dir, "../../../"))
-    
+
     agent_mail_path = os.path.join(root_path, 'Scripts', 'Orchestration')
     if agent_mail_path not in sys.path:
         sys.path.append(agent_mail_path)
@@ -4629,7 +4629,7 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     # Check for ByBit keys in .env
     api_key = os.environ.get("BYBIT_API_KEY")
-    
+
     if not api_key or "YOUR" in api_key.upper():
         await update.message.reply_text(
             "📈 **Крипто-трейдинг**\n\n"
