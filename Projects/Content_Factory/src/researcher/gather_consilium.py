@@ -7,7 +7,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Setup paths to include AI_Core and Content_Factory
-ROOT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core")
+SCRIPT_DIR = Path(__file__).parent.resolve()
+ROOT_DIR = SCRIPT_DIR.parent.parent.parent.parent  # researcher -> src -> Content_Factory -> Projects -> ROOT
 sys.path.append(str(ROOT_DIR / "Projects/AI_Core/src"))
 sys.path.append(str(ROOT_DIR / "Projects/Content_Factory/src/researcher"))
 
