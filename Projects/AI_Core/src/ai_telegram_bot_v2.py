@@ -494,8 +494,17 @@ def get_admin_menu():
 
 def get_settings_menu():
     """Settings menu with model/provider options."""
-    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-    current_model = config.get("MODEL_NAME", "unknown")
+    current_provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
+    
+    if current_provider == "gemini":
+        current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+    elif current_provider == "openai":
+        current_model = config.get("OPENAI_MODEL", "gpt-4o-mini")
+    elif current_provider == "openrouter":
+        current_model = config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
+    else:
+        current_model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+
     keyboard = [
         [
             InlineKeyboardButton(
@@ -725,8 +734,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_memory_context(update, context)
 
     elif data == "settings_cb":
-        current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-        current_model = config.get("MODEL_NAME", "unknown")
+        current_provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
+        if current_provider == "gemini":
+            current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+        elif current_provider == "openai":
+            current_model = config.get("OPENAI_MODEL", "gpt-4o-mini")
+        elif current_provider == "openrouter":
+            current_model = config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
+        else:
+            current_model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+            
         await query.edit_message_text(
             f"⚙️ **Настройки AI**\n\n"
             f"🤖 Модель: `{current_model}`\n"
@@ -4592,8 +4609,18 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    current_provider = config.get("INFERENCE_PROVIDER", "ollama")
-    current_model = config.get("MODEL_NAME", "unknown")
+    current_provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
+    
+    # Get active model name based on provider
+    if current_provider == "gemini":
+        current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+    elif current_provider == "openai":
+        current_model = config.get("OPENAI_MODEL", "gpt-4o-mini")
+    elif current_provider == "openrouter":
+        current_model = config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
+    else:
+        current_model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+
     await update.message.reply_text(
         f"⚙️ **Настройки AI**\n\n"
         f"🤖 Модель: `{current_model}`\n"
