@@ -1158,29 +1158,37 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     if user_text == "📅 Обзор дня":
+        logger.info(f"[INTENT] Brief from {user_id}")
         await show_daily_brief(update, context)
         return
     elif user_text == "🏭 Фабрика":
+        logger.info(f"[INTENT] Factory from {user_id}")
         await factory_command(update, context)
         return
     elif user_text == "📈 Крипто":
+        logger.info(f"[INTENT] Crypto from {user_id}")
         await crypto_info_handler(update, context)
         return
     elif user_text == "📊 Статус":
+        logger.info(f"[INTENT] Status from {user_id}")
         await status_command(update, context)
         return
     elif user_text == "📧 Почта":
+        logger.info(f"[INTENT] Mail from {user_id}")
         await mail_command(update, context)
         return
     elif user_text == "🧠 Память":
+        logger.info(f"[INTENT] Memory from {user_id}")
         await show_memory_context(update, context)
         return
     elif user_text == "➕ Новая задача":
+        logger.info(f"[INTENT] New Task from {user_id}")
         await update.message.reply_text(
             "Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')"
         )
         return
     elif user_text == "🛠 Админ-панель":
+        logger.info(f"[INTENT] Admin Panel from {user_id}")
         if user_id in ALLOWED_IDS:
             await update.message.reply_text(
                 "🛠 **Центр управления админа**", reply_markup=get_admin_menu()
@@ -1189,9 +1197,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⛔️ Доступ запрещен.")
         return
     elif user_text == "⚙️ Настройки":
+        logger.info(f"[INTENT] Settings from {user_id}")
         await settings_command(update, context)
         return
     elif user_text == "❓ Помощь":
+        logger.info(f"[INTENT] Help from {user_id}")
         await show_advanced_help(update, context)
         return
 
