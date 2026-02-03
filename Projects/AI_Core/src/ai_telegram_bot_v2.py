@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import subprocess
 import pytz
 from datetime import datetime, timedelta
 from typing import Any, Optional
@@ -4706,11 +4707,33 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             parse_mode="Markdown"
         )
     else:
-        # If keys exist, we could try to get balance or status from PM2
+        # Fetch latest balance and market info from logs
+        balance_info = "Loading..."
+        market_info = "Loading..."
+        try:
+            # Read last few lines of crypto-bot error log (where balance is logged)
+            log_cmd = "tail -n 20 /home/gonya/.pm2/logs/crypto-bot-error.log"
+            log_out = subprocess.check_output(log_cmd, shell=True).decode()
+            
+            # Find last balance line
+            import re
+            balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
+            if balances:
+                balance_info = f"${balances[-1]} USDT"
+            
+            # Find last market info
+            markets = re.findall(r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)", log_out)
+            if markets:
+                market_info = markets[-1]
+        except Exception as e:
+            logger.error(f"Failed to fetch crypto logs: {e}")
+
         await update.message.reply_text(
-            "📈 **Крипто-трейдинг**\n\n"
-            "✅ Ключи найдены. Бот запущен в PM2.\n"
-            "Проверить логи: `/status` или `pm2 logs crypto-bot` на сервере.",
+            f"📈 **Крипто-трейдинг (ByBit)**\n\n"
+            f"💰 **Баланс:** `{balance_info}`\n"
+            f"📊 **Рынок:** `{market_info}`\n\n"
+            f"✅ Бот запущен и мониторит TON/USDT.\n"
+            f"Стратегия: RSI < 35 (Buy), RSI > 65 (Sell).",
             parse_mode="Markdown"
         )
 
