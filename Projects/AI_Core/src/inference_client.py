@@ -305,6 +305,7 @@ class InferenceClient:
 
             try:
                 import asyncio
+
                 from google.genai.types import Part
 
                 with open(file_path, "rb") as f:
@@ -314,7 +315,7 @@ class InferenceClient:
                     model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
                     if not model_name.startswith("models/"):
                         model_name = f"models/{model_name}"
-                        
+
                     return client.models.generate_content(
                         model=model_name,
                         contents=[

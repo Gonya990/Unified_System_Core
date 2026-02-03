@@ -1,11 +1,10 @@
-import os
-import json
-import time
-import subprocess
 import asyncio
-import aiohttp
+import json
 import logging
-from datetime import datetime
+import subprocess
+import time
+
+import aiohttp
 
 # ==========================================
 # CONFIGURATION
@@ -68,17 +67,17 @@ async def check_pm2():
     """Check PM2 process statuses and restart counts."""
     processes = await get_pm2_status()
     alerts = []
-    
+
     current_found = set()
     for proc in processes:
         name = proc.get("name")
         if name not in MONITORED_PROCESSES:
             continue
-        
+
         current_found.add(name)
         status = proc.get("pm2_env", {}).get("status")
         restarts = proc.get("pm2_env", {}).get("restart_time", 0)
-        
+
         prev = app_states.get(name)
         if prev:
             # Status Transition
@@ -86,19 +85,19 @@ async def check_pm2():
                 alerts.append(f"🔴 **CRITICAL: Process Down!**\nName: `{name}`\nStatus: `{status}`")
             elif status == "online" and prev.get("status") != "online":
                 alerts.append(f"✅ **RECOVERED: Process Online**\nName: `{name}`")
-            
+
             # Restart Anomaly
             if restarts > prev.get("restarts", 0):
                 diff = restarts - prev.get("restarts", 0)
                 alerts.append(f"⚠️ **WARNING: Process Restarted!**\nName: `{name}`\nRecent Restarts: `+{diff}`\nTotal: `{restarts}`")
-        
+
         # Update State
         app_states[name] = {
             "status": status,
             "restarts": restarts,
             "last_check": time.time()
         }
-    
+
     # Check for missing processes
     for name in MONITORED_PROCESSES:
         if name not in current_found:
@@ -108,7 +107,7 @@ async def check_pm2():
                  app_states[name] = {"status": "missing", "restarts": 0, "exists": False}
         else:
              app_states[name]["exists"] = True
-        
+
     for alert in alerts:
         await send_telegram_alert(alert)
 
@@ -133,7 +132,7 @@ async def check_http():
 async def main_loop():
     logger.info("Watchdog V2 initializing...")
     await send_telegram_alert("👁 **SYSTEM WATCHDOG V2 (Unified Home)**\nМониторинг активирован. Слежу за всеми процессами 24/7.")
-    
+
     # Initial state capture
     processes = await get_pm2_status()
     for proc in processes:
@@ -152,7 +151,7 @@ async def main_loop():
             await check_http()
         except Exception as e:
             logger.error(f"Error in main loop: {e}")
-            
+
         await asyncio.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":

@@ -253,16 +253,16 @@ class HAController:
         """Get condensed context of all relevant HA entities for LLM grounding."""
         if not self.client:
             return "Home Assistant is not integrated or offline."
-        
+
         try:
             states = self.client.get_states()
             context = []
-            
+
             for s in states:
                 eid = s.get('entity_id', '')
                 state = s.get('state', '')
                 fname = s.get('attributes', {}).get('friendly_name', '')
-                
+
                 # Filter for relevant domains
                 domain = eid.split('.')[0]
                 if domain in ['light', 'switch', 'sensor', 'binary_sensor', 'climate', 'media_player', 'script', 'scene']:
@@ -272,10 +272,10 @@ class HAController:
                             unit = s.get('attributes', {}).get('unit_of_measurement', '')
                             if unit: item += f" {unit}"
                         context.append(item)
-            
+
             if not context:
                 return "No active entities found in Home Assistant."
-                
+
             return "\n".join(context)
         except Exception as e:
             logger.error(f"Failed to get full context: {e}")

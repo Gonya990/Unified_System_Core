@@ -3,13 +3,13 @@ import json
 import logging
 import os
 import re
-import sys
 import subprocess
-import pytz
+import sys
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
 import aiohttp
+import pytz
 
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -496,7 +496,7 @@ def get_admin_menu():
 def get_settings_menu():
     """Settings menu with model/provider options."""
     current_provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
-    
+
     if current_provider == "gemini":
         current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
     elif current_provider == "openai":
@@ -744,7 +744,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             current_model = config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
         else:
             current_model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
-            
+
         await query.edit_message_text(
             f"⚙️ **Настройки AI**\n\n"
             f"🤖 Модель: `{current_model}`\n"
@@ -2952,7 +2952,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 restarts = p.get("pm2_env", {}).get("restart_time", 0)
                 icon = "🟢" if status == "online" else "🔴"
                 pm2_lines.append(f"• {icon} `{name}`: `{status}` (↺ {restarts})")
-            
+
             if pm2_lines:
                 pm2_section = "📊 **Processed (PM2)**\n" + "\n".join(pm2_lines) + "\n\n"
         except Exception as e:
@@ -4611,7 +4611,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     current_provider = config.get("INFERENCE_PROVIDER", "ollama").lower()
-    
+
     # Get active model name based on provider
     if current_provider == "gemini":
         current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
@@ -4714,13 +4714,13 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             # Read last few lines of crypto-bot error log (where balance is logged)
             log_cmd = "tail -n 20 /home/gonya/.pm2/logs/crypto-bot-error.log"
             log_out = subprocess.check_output(log_cmd, shell=True).decode()
-            
+
             # Find last balance line
             import re
             balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
             if balances:
                 balance_info = f"${balances[-1]} USDT"
-            
+
             # Find last market info
             markets = re.findall(r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)", log_out)
             if markets:
