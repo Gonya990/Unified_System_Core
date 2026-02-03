@@ -1,5 +1,5 @@
+
 from google import genai
-import os
 
 GEMINI_API_KEY = "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
 

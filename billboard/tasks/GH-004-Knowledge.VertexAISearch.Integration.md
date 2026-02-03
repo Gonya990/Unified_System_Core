@@ -9,7 +9,8 @@ Lease-Until: 2026-01-20
 
 # 📚 Integrate Vertex AI Search & Function Calling
 
-**Objective:**
+## Objective
+
 Provide the agent with direct access to static knowledge (Vertex AI Search) and
 dynamic tools (Function Calling) to enhance accuracy and autonomous decision
 making.

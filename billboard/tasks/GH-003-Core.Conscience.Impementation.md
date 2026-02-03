@@ -7,9 +7,10 @@ Status: Done
 Lease-Until: 2026-01-20
 ---
 
-# Implement "System Conscience" (Governance Layer)
+# 📋 Task: Implement "System Conscience" (Governance Layer)
 
-**Objective:**
+## Objective
+
 Integrate a morality/rules engine that parses `NOTEBOOK.md` to enforce
 operational constraints on the Unified System controller.
 
