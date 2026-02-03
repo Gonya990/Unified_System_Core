@@ -32,6 +32,12 @@
 		},
 		{
 			"action": "accept",
+			"src":    ["autogroup:admin"],
+			"dst":    ["tag:ResourceNode"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+		{
+			"action": "accept",
 			"src":    ["autogroup:member"],
 			"dst":    ["tag:ResourceNode"],
 			"users":  ["root"],
