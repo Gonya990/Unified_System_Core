@@ -125,6 +125,8 @@ class InferenceClient:
 
             # Call Gemini
             model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+            if not model_name.startswith("models/"):
+                model_name = f"models/{model_name}"
 
             # Use asyncio loop for blocking SDK call
             import asyncio
@@ -309,8 +311,12 @@ class InferenceClient:
                     file_data = f.read()
 
                 def call_sdk():
+                    model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+                    if not model_name.startswith("models/"):
+                        model_name = f"models/{model_name}"
+                        
                     return client.models.generate_content(
-                        model=self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+                        model=model_name,
                         contents=[
                             Part.from_bytes(data=file_data, mime_type=mime_type),
                             prompt
