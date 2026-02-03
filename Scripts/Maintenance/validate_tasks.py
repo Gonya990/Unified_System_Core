@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import re
 import sys
 from pathlib import Path
@@ -16,14 +15,14 @@ BILLBOARD_DIR = ROOT_DIR / "billboard/tasks"
 
 # Expanded valid statuses
 VALID_STATUSES = {
-    "Claimed", "In-Progress", "Completed", "Paused", "Open", "Done", 
+    "Claimed", "In-Progress", "Completed", "Paused", "Open", "Done",
     "InPrg", "Blocked", "Proposed", "Merged", "Rejected"
 }
 MANDATORY_FIELDS = ["Task-Id", "Status", "Context", "Task-Semantic"]
 
 def validate_tasks():
     print(f"{BLUE}📋 Enhanced Billboard Task Validation...{RESET}")
-    
+
     if not BILLBOARD_DIR.exists():
         print(f"{RED}❌ Billboard directory not found: {BILLBOARD_DIR}{RESET}")
         return False
@@ -35,16 +34,16 @@ def validate_tasks():
 
     errors = 0
     total_tasks = 0
-    
+
     for task_file in tasks:
         if task_file.name == "TEMPLATE.md":
             continue
-            
+
         total_tasks += 1
         file_errors = 0
         task_name = task_file.name
-        
-        with open(task_file, "r", encoding="utf-8") as f:
+
+        with open(task_file, encoding="utf-8") as f:
             content = f.read()
 
         # 1. Check for Frontmatter
@@ -53,9 +52,9 @@ def validate_tasks():
             print(f"{RED}❌ {task_name}: Missing or malformed frontmatter (--- block){RESET}")
             errors += 1
             continue
-            
+
         frontmatter = frontmatter_match.group(1)
-        
+
         # 2. Field Validation
         fields = {}
         for line in frontmatter.split("\n"):
@@ -92,11 +91,11 @@ def validate_tasks():
         if not re.search(r"^# .*", content, re.MULTILINE):
             print(f"{RED}❌ {task_name}: Missing main H1 header{RESET}")
             file_errors += 1
-        
+
         if not re.search(r"^##.*Objective", content, re.IGNORECASE | re.MULTILINE):
             print(f"{RED}❌ {task_name}: Missing Objective section (## Objective){RESET}")
             file_errors += 1
-            
+
         if not re.search(r"^##.*Acceptance Criteria", content, re.IGNORECASE | re.MULTILINE):
             print(f"{RED}❌ {task_name}: Missing Acceptance Criteria section (## Acceptance Criteria){RESET}")
             file_errors += 1
@@ -108,11 +107,11 @@ def validate_tasks():
 
     print(f"\n{BLUE}--- Validation Summary ---{RESET}")
     print(f"Total tasks checked: {total_tasks}")
-    
+
     if errors > 0:
         print(f"{RED}❌ Validation failed with {errors} total errors.{RESET}")
         return False
-    
+
     print(f"{GREEN}✨ All tasks are valid and consistency checks passed!{RESET}")
     return True
 
