@@ -83,7 +83,7 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
 
 if __name__ == "__main__":
     # Test path
-    test_video = "/Users/macbook/Documents/Unified_System/outputs/ai_council_ru_impact.mp4"
+    test_video = Path(__file__).parent.parent.parent / "outputs/latest_video.mp4"
     test_caption = "Будущее 2026: Эволюция Разума. #AI #Future #Technology #ImpactVision"
 
     if Path(test_video).exists():

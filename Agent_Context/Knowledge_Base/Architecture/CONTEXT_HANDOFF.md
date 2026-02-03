@@ -74,6 +74,7 @@
 | `2026-01-27_...` | **Cloud IP Migration** | ✅ Done | task.md, walkthrough |
 | `e37a3a79-d5...` | **Remote Update Fix** | 🔄 InPrg | task.md |
 | `4d03c916-38...` | **System Maintenance** | 🔄 InPrg | task.md |
+| `47610b42-64...` | **ByBit & Content Factory** | ✅ Done | task.md, walkthrough |
 <!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
@@ -470,4 +471,12 @@ sessions. Refresh by running the documentation generation workflow.*
 - [/] Investigate GPU Indexer status (Process failed/halted at 07:13 AM)
 - [x] Verify Telegram Bot status (Running on igor-gaming-1)
 - [ ] Execute `/sync` (Vibranium Full Sync)
+
+### From `47610b42` (ByBit & Content Factory Fixes) - COMPLETE ✅
+
+- [x] Fix ByBit Bot Min Order Error (170140)
+- [x] Implement baseCoin units for ByBit Spot Buy
+- [x] Fix Content Factory Researcher & Uploader paths
+- [x] Install Playwright Chromium dependencies
+- [x] Run /sync (Full System Sync)
 ```

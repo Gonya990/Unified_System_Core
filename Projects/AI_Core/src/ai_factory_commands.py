@@ -30,7 +30,14 @@ async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         import sys
-        sys.path.append("/home/gonya/Unified_System_Core/Projects/Content_Factory/src/audio")
+        from pathlib import Path
+        # Detect Unified_System_Core root
+        CURRENT_FILE = Path(__file__).resolve()
+        # ai_factory_commands.py is in Projects/AI_Core/src/
+        UNIFIED_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        FACTORY_SRC = UNIFIED_ROOT / "Projects/Content_Factory/src"
+
+        sys.path.append(str(FACTORY_SRC / "audio"))
         from music_generator import MusicGenerator
 
         gen = MusicGenerator(use_ai=True)
@@ -83,7 +90,13 @@ async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         import sys
-        sys.path.append("/home/gonya/Unified_System_Core/Projects/Content_Factory/src/audio")
+        from pathlib import Path
+        # Detect Unified_System_Core root
+        CURRENT_FILE = Path(__file__).resolve()
+        UNIFIED_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        FACTORY_SRC = UNIFIED_ROOT / "Projects/Content_Factory/src"
+
+        sys.path.append(str(FACTORY_SRC / "audio"))
         from voice_generator import VoiceGenerator
 
         gen = VoiceGenerator()
@@ -133,7 +146,12 @@ async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     try:
         import sys
         from pathlib import Path
-        sys.path.append("/home/gonya/Unified_System_Core/Projects/Content_Factory/src/video")
+        # Detect Unified_System_Core root
+        CURRENT_FILE = Path(__file__).resolve()
+        UNIFIED_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        FACTORY_SRC = UNIFIED_ROOT / "Projects/Content_Factory/src"
+
+        sys.path.append(str(FACTORY_SRC / "video"))
         from advanced_subtitles import AdvancedSubtitles, SubtitleSegment
 
         gen = AdvancedSubtitles(style=style)

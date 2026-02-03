@@ -51,6 +51,7 @@ class ByBitTradingBot:
         self.stop_loss_percent = 0.02  # -2% stop
         self.take_profit_percent = 0.04  # +4% target
         self.min_balance_usdt = 10  # Minimum $10
+        self.min_order_value = 5.1  # ByBit Spot API minimum is 5 USDT (added small buffer)
 
         # State
         self.balance = 0
@@ -207,6 +208,8 @@ class ByBitTradingBot:
         quantity: float
     ) -> bool:
         """Place market order on ByBit."""
+        # Ensure quantity is rounded (Spot TONUSDT usually 2 decimal places)
+        formatted_qty = f"{quantity:.2f}"
         try:
             from pybit.unified_trading import HTTP
 
@@ -216,14 +219,21 @@ class ByBitTradingBot:
                 api_secret=self.api_secret
             )
 
-            result = session.place_order(
-                category="spot",
-                symbol=symbol,
-                side=side,
-                orderType="Market",
-                qty=str(quantity),
-                timeInForce="IOC"  # Immediate or Cancel
-            )
+            kwargs = {
+                "category": "spot",
+                "symbol": symbol,
+                "side": side,
+                "orderType": "Market",
+                "qty": formatted_qty,
+                "timeInForce": "IOC"
+            }
+
+            # For Market Buy on Spot, ByBit defaults to quote coin (USDT).
+            # We specify baseCoin to use the TON quantity.
+            if side.lower() == "buy":
+                kwargs["marketUnit"] = "baseCoin"
+
+            result = session.place_order(**kwargs)
 
             if result['retCode'] == 0:
                 order_id = result['result']['orderId']
@@ -264,7 +274,17 @@ class ByBitTradingBot:
             if signal == 'BUY' and symbol not in self.positions:
                 # Calculate position size (3% of balance)
                 trade_amount = self.balance * self.max_trade_percent
-                quantity = trade_amount / price
+
+                # Check against exchange minimum (5 USDT)
+                if trade_amount < self.min_order_value:
+                    logger.warning(f"Trade amount ${trade_amount:.2f} too low. Using minimum ${self.min_order_value}")
+                    trade_amount = self.min_order_value
+
+                if trade_amount > self.balance:
+                    logger.error(f"Balance ${self.balance:.2f} too low for minimum order ${trade_amount:.2f}")
+                    return
+
+                quantity = round(trade_amount / price, 2)
 
                 # Place buy order
                 if await self.place_order(symbol, "Buy", quantity):

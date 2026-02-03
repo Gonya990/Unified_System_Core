@@ -18,16 +18,11 @@ from openai import OpenAI
 SRC_DIR = Path(__file__).parent.parent.resolve()  # Projects/Content_Factory/src
 FACTORY_DIR = SRC_DIR.parent  # Projects/Content_Factory
 PROJECTS_DIR = FACTORY_DIR.parent  # /Projects
-ROOT_DIR = PROJECTS_DIR.parent  # Unified_System (Root)
+ROOT_DIR = PROJECTS_DIR.parent  # Unified_System_Core
 
-# Add Script Subdirectories and Utilities
-sys.path.append(str(SRC_DIR / "researcher"))
-sys.path.append(str(SRC_DIR / "pipeline"))
-sys.path.append(str(SRC_DIR / "assets"))
-sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
-
+# Fixed paths for local development
 load_dotenv(ROOT_DIR / ".env")
-load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+load_dotenv(PROJECTS_DIR / "AI_Core/.env", override=True)
 
 # Import TokenBroker
 try:
@@ -276,17 +271,19 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
 
     # Strategy 3: Ollama (Rock Solid Local Fallback)
     if not data:
-        try:
-            print("🦙 Attempting Research via Ollama (llama3)...")
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={"model": "llama3", "prompt": f"{prompt}\nReturn ONLY JSON.", "stream": False, "format": "json"},
                 timeout=60,
             )
-            data = response.json().get("response")
-            if isinstance(data, str):
-                data = json.loads(data)
-            print("✅ Ollama Research successful!")
+            resp_json = response.json()
+            if resp_json and isinstance(resp_json, dict):
+                data = resp_json.get("response")
+                if isinstance(data, str):
+                    data = json.loads(data)
+                print("✅ Ollama Research successful!")
+            else:
+                print("⚠️ Ollama returned empty or invalid response")
         except Exception as e:
             print(f"❌ All Research models failed (including Ollama): {e}")
             return None
