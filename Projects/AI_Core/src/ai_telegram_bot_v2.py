@@ -2195,8 +2195,8 @@ async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         inf_ok = await inference.health_check() if inference else False
 
         tb_info = "N/A"
-        if swarm_manager:
-            stats = swarm_manager.get_stats()
+        if inference.swarm:
+            stats = inference.swarm.get_stats()
             tb = stats.get("token_broker", {})
             tb_info = f"{tb.get('active_keys', 0)}/{tb.get('total_keys', 0)} active, {tb.get('failed_keys', 0)} failed"
 
@@ -2922,9 +2922,9 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ha_status = "❌ Unreachable"
 
         swarm_section = ""
-        if swarm_manager:
+        if inference.swarm:
             try:
-                swarm_stats = swarm_manager.get_stats()
+                swarm_stats = inference.swarm.get_stats()
                 tb_health = swarm_stats.get("token_broker", {})
                 active = tb_health.get("active_keys", 0)
                 total = tb_health.get("total_keys", 0)
