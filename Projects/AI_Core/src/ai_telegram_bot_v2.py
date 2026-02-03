@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import pytz
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
@@ -1846,10 +1847,15 @@ async def query_ollama_with_context(
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
     from datetime import datetime
-
-    import pytz
-
     current_time = datetime.now(pytz.timezone("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
+
+    # 3. Get Home Assistant context if relevant
+    ha_context = ""
+    ha_keywords = ["home", "light", "temp", "status", "дом", "свет", "температур", "статус", "включи", "выключи", "световая", "сцена", "скрипт"]
+    if ha_controller and any(k in prompt.lower() for k in ha_keywords):
+        logger.info(f"[AI] Fetching HA context for prompt: '{prompt[:30]}...'")
+        ha_context = await ha_controller.get_full_context()
+        ha_context = f"\n=== SMART HOME STATE ===\n{ha_context}\n"
 
     system_prompt = (
         "You are Gonya, a powerful multilingual personal AI assistant. "
@@ -1874,8 +1880,12 @@ async def query_ollama_with_context(
         "- Create events: user can say 'добавь встречу на 15:00 название'\n"
         "- You can parse natural language requests for calendar events.\n\n"
         "🏠 HOME ASSISTANT & ALICE:\n"
+        "You have direct visibility into the home state (see SMART HOME STATE section).\n"
         "- Control smart home: You can output COMMANDS to control devices.\n"
-        "  Format: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
+        "  - Lights/Switches: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
+        "  - Climate: [[HA:temp:climate_entity:23.5]]\n"
+        "  - Scripts: [[HA:script:script_name]]\n"
+        "  - Scenes: [[HA:scene:scene_name]]\n"
         "- Yandex Alice TTS: If user asks to SAY something via Alice/station.\n"
         "  Format: [[ALICE:text_to_say]]\n\n"
         "📩 MESSAGING (RELAY SYSTEM):\n"
@@ -1907,7 +1917,7 @@ async def query_ollama_with_context(
     try:
         response_text, usage = await inference.chat(
             history + [{"role": "user", "content": prompt}],
-            system_prompt=system_prompt,
+            system_prompt=system_prompt + ha_context,
             branch_id=branch_id,
             project_context=project_context,
         )

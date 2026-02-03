@@ -286,8 +286,8 @@ class InferenceClient:
 
         return [self.model]
 
-    async def analyze_image(self, image_path: str, prompt: str):
-        """Analyze image using vision-capable models."""
+    async def analyze_multimodal(self, file_path: str, prompt: str, mime_type: str = "image/jpeg"):
+        """Analyze image or audio using vision/audio-capable models."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
 
         if provider == "gemini":
@@ -299,21 +299,20 @@ class InferenceClient:
 
             client = _get_gemini_client(api_key)
             if not client:
-                return "Error: Gemini vision not configured."
+                return "Error: Gemini provider not configured."
 
             try:
                 import asyncio
-
                 from google.genai.types import Part
 
-                with open(image_path, "rb") as f:
-                    image_data = f.read()
+                with open(file_path, "rb") as f:
+                    file_data = f.read()
 
                 def call_sdk():
                     return client.models.generate_content(
                         model=self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
                         contents=[
-                            Part.from_bytes(data=image_data, mime_type="image/jpeg"),
+                            Part.from_bytes(data=file_data, mime_type=mime_type),
                             prompt
                         ]
                     )
@@ -322,10 +321,14 @@ class InferenceClient:
                 response = await loop.run_in_executor(None, call_sdk)
                 return response.text
             except Exception as e:
-                logger.error(f"Gemini Vision Error: {e}")
-                return f"Error analyzing image: {e}"
+                logger.error(f"Gemini Multimodal Error: {e}")
+                return f"Error analyzing media: {e}"
 
-        return "Vision is currently only supported via Gemini provider."
+        return "Multimodal analysis is currently only supported via Gemini provider."
+
+    async def analyze_image(self, image_path: str, prompt: str):
+        """Analyze image using vision-capable models."""
+        return await self.analyze_multimodal(image_path, prompt, mime_type="image/jpeg")
 
     async def transcribe_audio(self, audio_path: str):
         """
@@ -345,8 +348,13 @@ class InferenceClient:
         # Fallback to Gemini (multimodal)
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
         if provider == "gemini":
-            # Similar to vision, Gemini 1.5/2.0 handles audio
-            return await self.analyze_image(audio_path, "Transcribe this audio exactly.")
+            # Detect mime type based on extension
+            mime_type = "audio/ogg" # Default for Telegram
+            if audio_path.endswith(".mp3"): mime_type = "audio/mpeg"
+            elif audio_path.endswith(".wav"): mime_type = "audio/wav"
+            elif audio_path.endswith(".m4a"): mime_type = "audio/mp4"
+
+            return await self.analyze_multimodal(audio_path, "Transcribe this audio exactly.", mime_type=mime_type)
 
         return "Audio transcription not available (configure VAPI or Gemini provider)."
 
