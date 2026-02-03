@@ -2912,12 +2912,32 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.debug(f"Swarm stats error: {e}")
                 swarm_section = "🔑 **Token Broker**: ❓ Unavailable\n\n"
 
+        # PM2 Statuses
+        pm2_section = ""
+        try:
+            pm2_out = subprocess.check_output(["pm2", "jlist"]).decode()
+            pm2_data = json.loads(pm2_out)
+            pm2_lines = []
+            for p in pm2_data:
+                name = p.get("name")
+                status = p.get("pm2_env", {}).get("status")
+                restarts = p.get("pm2_env", {}).get("restart_time", 0)
+                icon = "🟢" if status == "online" else "🔴"
+                pm2_lines.append(f"• {icon} `{name}`: `{status}` (↺ {restarts})")
+            
+            if pm2_lines:
+                pm2_section = "📊 **Processed (PM2)**\n" + "\n".join(pm2_lines) + "\n\n"
+        except Exception as e:
+            logger.error(f"Failed to get PM2 status for command: {e}")
+            pm2_section = "📊 **Processed (PM2)**: ❓ Error\n\n"
+
         dashboard = (
             f"📊 **System Status**\n\n"
             f"🖥 **Server**\n"
             f"• CPU: `{cpu_usage}%`\n"
             f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / {mem.total // 1024 // 1024}MB)\n"
             f"• Uptime: `{uptime_str}`\n\n"
+            f"{pm2_section}"
             f"🧠 **AI Core**\n"
             f"• Provider: `{inference.provider}`\n"
             f"• Model: `{inference.model}`\n"
