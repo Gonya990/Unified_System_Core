@@ -83,13 +83,19 @@ from telegram.ext import (
 )
 
 # Try Firestore first, fallback to SQLite
-try:
-    from firestore_db import FirestoreDB
-
-    _USE_FIRESTORE = True
-except ImportError:
-    from user_context_db import UserContextDB
-
+_USE_FIRESTORE = False
+if os.getenv("DISABLE_FIRESTORE", "false").lower() != "true":
+    try:
+        from firestore_db import FirestoreDB
+        _USE_FIRESTORE = True
+    except ImportError:
+        from user_context_db import UserContextDB
+        _USE_FIRESTORE = False
+else:
+    try:
+        from user_context_db import UserContextDB
+    except ImportError:
+        pass
     _USE_FIRESTORE = False
 
 from agent_orchestrator import PIPELINES, AgentOrchestrator

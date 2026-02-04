@@ -27,7 +27,7 @@ def run_js(ws_url, expression):
         result = json.loads(ws.recv())
         ws.close()
         return result.get("result", {}).get("result", {}).get("value")
-    except:
+    except Exception:
         return None
 
 def main():

@@ -294,7 +294,8 @@ class InferenceClient:
                 # Parse
                 if "choices" in data:
                     text = data["choices"][0]["message"]["content"]
-                    if "usage" in data: usage = data["usage"]
+                    if "usage" in data:
+                        usage = data["usage"]
                     return text, usage
                 elif "message" in data:
                     text = data["message"]["content"]

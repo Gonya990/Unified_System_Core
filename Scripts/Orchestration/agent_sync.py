@@ -210,7 +210,7 @@ class AgentSync:
                 if msg.get('ack_required') and msg.get('importance') in ('high', 'urgent'):
                     try:
                         self.mail_client.acknowledge_message(msg['id'])
-                    except:
+                    except Exception:
                         pass
 
             return SyncResult(
