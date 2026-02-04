@@ -23,4 +23,3 @@ google-auth-oauthlib>=1.0.0
 jinja2>=3.0.0
 deprecated>=1.2.0
 wrapt>=1.15.0
-msgchan>=0.0.3
