@@ -1,4 +1,5 @@
 
+import html
 import json
 import re
 from pathlib import Path
@@ -52,7 +53,7 @@ WEB_RESULTS = [
     }
 ]
 
-import html
+
 
 
 def clean_text(text):

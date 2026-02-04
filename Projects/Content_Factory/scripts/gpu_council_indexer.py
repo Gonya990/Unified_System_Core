@@ -146,8 +146,10 @@ class DeepIndexer:
                     with open(path, "rb") as f:
                         img_data = base64.b64encode(f.read()).decode()
                     prompt = "What is in this image? Provide a 1-sentence description and 3 tags."
-                    summary, _ = await self.client.chat([{"role": "user", "content": prompt, "images": [img_data]}],
-                                                     system_prompt="You are a high-speed vision indexer for the Unified System.")
+                    summary, _ = await self.client.chat([
+                        {"role": "user", "content": prompt, "images": [img_data]}
+                    ], system_prompt="You are a high-speed vision indexer for the Unified System.")
+                    
                     if summary:
                         with sqlite3.connect(DB_PATH) as conn:
                             conn.execute('UPDATE assets SET concept_summary = ? WHERE id = ?', (summary, asset_id))

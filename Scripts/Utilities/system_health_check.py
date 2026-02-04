@@ -26,14 +26,18 @@ def check_ai_core_dependencies() -> tuple[bool, str]:
     if not requirements_file.exists():
         return False, "✗ AI Core requirements.txt not found"
 
-    try:
-        # Try importing key dependencies
-        import google.generativeai
-        import openai
-        import telegram
+    dependencies = ["google.generativeai", "openai", "telegram"]
+    missing = []
+
+    import importlib.util
+    for dep in dependencies:
+        if importlib.util.find_spec(dep) is None:
+            missing.append(dep)
+
+    if not missing:
         return True, "✓ AI Core dependencies installed"
-    except ImportError as e:
-        return False, f"✗ Missing dependency: {e.name}"
+
+    return False, f"✗ Missing dependencies: {', '.join(missing)}"
 
 
 def check_env_files() -> tuple[bool, str]:

@@ -32,9 +32,11 @@ load_dotenv(ENV_PATH)
 
 def check_openai():
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: return "SKIPPED (No OPENAI_API_KEY in .env)"
+    if not api_key:
+        return "SKIPPED (No OPENAI_API_KEY in .env)"
 
-    if not is_lib_installed("openai"): return "SKIPPED (openai library missing)"
+    if not is_lib_installed("openai"):
+        return "SKIPPED (openai library missing)"
 
     try:
         from openai import OpenAI
@@ -47,9 +49,11 @@ def check_openai():
 
 def check_gemini():
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not api_key: return "SKIPPED (No GEMINI_API_KEY or GOOGLE_API_KEY)"
+    if not api_key:
+        return "SKIPPED (No GEMINI_API_KEY or GOOGLE_API_KEY)"
 
-    if not is_lib_installed("google.generativeai"): return "SKIPPED (google-generativeai library missing)"
+    if not is_lib_installed("google.generativeai"):
+        return "SKIPPED (google-generativeai library missing)"
 
     try:
         import google.generativeai as genai
@@ -62,9 +66,11 @@ def check_gemini():
 
 def check_telegram():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token: return "SKIPPED (No TELEGRAM_BOT_TOKEN)"
+    if not token:
+        return "SKIPPED (No TELEGRAM_BOT_TOKEN)"
 
-    if not is_lib_installed("requests"): return "SKIPPED (requests library missing)"
+    if not is_lib_installed("requests"):
+        return "SKIPPED (requests library missing)"
 
     try:
         import requests
@@ -81,9 +87,11 @@ def check_telegram():
 def check_bybit():
     key = os.getenv("BYBIT_API_KEY")
     secret = os.getenv("BYBIT_API_SECRET")
-    if not key or not secret: return "SKIPPED (No BYBIT_API_KEY/SECRET)"
+    if not key or not secret:
+        return "SKIPPED (No BYBIT_API_KEY/SECRET)"
 
-    if not is_lib_installed("pybit"): return "SKIPPED (pybit library missing)"
+    if not is_lib_installed("pybit"):
+        return "SKIPPED (pybit library missing)"
 
     try:
         from pybit.unified_trading import HTTP
@@ -99,9 +107,11 @@ def check_bybit():
 
 def check_github():
     token = os.getenv("GITHUB_TOKEN") or os.getenv("GITHUB_ACCESS_TOKEN")
-    if not token: return "SKIPPED (No GITHUB_TOKEN)"
+    if not token:
+        return "SKIPPED (No GITHUB_TOKEN)"
 
-    if not is_lib_installed("requests"): return "SKIPPED (requests library missing)"
+    if not is_lib_installed("requests"):
+        return "SKIPPED (requests library missing)"
 
     try:
         import requests

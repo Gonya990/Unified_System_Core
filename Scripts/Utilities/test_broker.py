@@ -42,7 +42,8 @@ class TestTokenBroker(unittest.TestCase):
         keys_seen = set()
         for _ in range(20):
             k = broker.get_key("openai")
-            if k: keys_seen.add(k)
+            if k:
+                keys_seen.add(k)
 
         self.assertTrue(len(keys_seen) > 0)
         print(f"Keys seen in rotation: {keys_seen}")
