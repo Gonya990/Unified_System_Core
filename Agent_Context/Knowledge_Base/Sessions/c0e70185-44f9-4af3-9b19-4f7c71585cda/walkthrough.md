@@ -5,12 +5,17 @@
 
 ## Summary
 
-Successfully restored the AI Telegram Bot service on `unified-home-core-cloud`. The bot was failing due to missing dependencies, build context issues, and a token conflict with a ghost instance.
+Successfully restored the AI Telegram Bot service on `unified-home-core-cloud`.
+The bot was failing due to missing dependencies, build context issues, and a
+token conflict with a ghost instance.
 
 ## Changes Made
 
-1. **Dependencies**: Added `pytz`, `google-auth-oauthlib`, `jinja2`, `uvicorn`, `PyYAML`, and others to `requirements.txt`. Relaxed version constraints.
-2. **Docker Build**: Updated `Dockerfile` and GitHub Workflow to use the repository root context. This ensures `External_Tools/Stack/agent_mail_sdk` is correctly copied into the container.
+1. **Dependencies**: Added `pytz`, `google-auth-oauthlib`, `jinja2`, `uvicorn`,
+   `PyYAML`, and others to `requirements.txt`. Relaxed version constraints.
+2. **Docker Build**: Updated `Dockerfile` and GitHub Workflow to use the
+   repository root context. This ensures `External_Tools/Stack/agent_mail_sdk`
+   is correctly copied into the container.
 3. **Kubernetes**:
     * Updated `update_k8s_secrets.sh` to use `sudo` for accessing k3s config.
     * Replaced the Telegram Bot Token in Kubernetes Secrets to resolve a conflict.
