@@ -431,13 +431,7 @@ logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
-    "костя": 578363419,
-    "kostya": 578363419,
-    "kosta": 578363419,
-    "коста": 578363419,
-    "nibbler": 578363419,
-    "nibbler420": 578363419,
-    "toxicfi7h": 578363419,
+    
     "igor": 708531393,
     "игорь": 708531393,
     "игорьку": 708531393,
