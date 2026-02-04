@@ -33,7 +33,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/ai-telegram-bot
+  IMAGE_NAME: gonya990/ai-telegram-bot
 
 jobs:
   build:
@@ -105,11 +105,11 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           input: /tmp/image.tar
-          format: 'table'
-          exit-code: '1'
+          format: "table"
+          exit-code: "1"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
 
       # Generate attestation for pushed images
       - name: Generate attestation
@@ -173,7 +173,7 @@ jobs:
           git fetch origin main
           git checkout main
           git rebase origin/main
-          
+
           cd Projects/AI_Core/k8s
           OLD_TAG=$(grep 'newTag:' kustomization.yaml | awk '{print $2}')
           NEW_TAG="${GITHUB_SHA::7}"
@@ -184,7 +184,7 @@ jobs:
         run: |
           git add Projects/AI_Core/k8s/kustomization.yaml
           git commit -m "chore: update image tag to ${{ github.sha }}" || echo "No changes to commit"
-          
+
           # Retry push to handle race conditions
           for i in {1..5}; do
             git fetch origin main

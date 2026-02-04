@@ -22,6 +22,8 @@ spec:
       labels:
         app: ai-telegram-bot
     spec:
+      imagePullSecrets:
+        - name: ghcr-login
       containers:
         - name: bot
           image: ghcr.io/gonya990/ai-telegram-bot:latest
