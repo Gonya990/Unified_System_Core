@@ -76,6 +76,7 @@
 | `4d03c916-38...` | **System Maintenance** | 🔄 InPrg | task.md |
 | `47610b42-64...` | **ByBit & Content Factory** | ✅ Done | task.md, walkthrough |
 | `c0e70185-44...` | **Sync Recovery** | ✅ Done | task.md, walkthrough |
+| `bd50d991-da...` | **Bot Recovery & API Sync** | ✅ Done | task.md, walkthrough |
 <!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
@@ -489,4 +490,14 @@ sessions. Refresh by running the documentation generation workflow.*
 - [x] Perform backup and safe reset
 - [x] Execute /sinc workflow (Vibranium Full Sync)
 - [x] Document recovery in walkthrough
+```
+
+### From `bd50d991` (Bot Recovery & API Key Sync) - COMPLETE ✅
+
+```markdown
+- [x] Fix TELEGRAM_BOT_TOKEN (InvalidToken)
+- [x] Update GEMINI_API_KEY
+- [x] Resolve Google Cloud JWT Signature Error (Firestore bypass)
+- [x] Update pyproject.toml with missing dependencies
+- [x] Run /sync (Vibranium Full Sync)
 ```
