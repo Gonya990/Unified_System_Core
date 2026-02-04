@@ -3,9 +3,11 @@
 ## Phase 1: Dependency & Build Fixes <!-- id: 200 -->
 
 - [x] Fix `pytz` ModuleNotFoundError <!-- id: 201 -->
-- [x] Fix `google-auth-oauthlib`, `jinja2`, `uvicorn` missing dependencies <!-- id: 202 -->
+- [x] Fix `google-auth-oauthlib`, `jinja2`, `uvicorn` missing dependencies
+  <!-- id: 202 -->
 - [x] Simplify `requirements.txt` versions to avoid conflicts <!-- id: 203 -->
-- [x] Fix Docker build context to include `External_Tools/Stack/agent_mail_sdk` <!-- id: 204 -->
+- [x] Fix Docker build context to include `External_Tools/Stack/agent_mail_sdk`
+  <!-- id: 204 -->
 
 ## Phase 2: Operations & Access <!-- id: 300 -->
 
