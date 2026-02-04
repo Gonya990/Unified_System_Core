@@ -2,6 +2,7 @@
 import base64
 from email.mime.text import MIMEText
 from pathlib import Path
+import json
 
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request

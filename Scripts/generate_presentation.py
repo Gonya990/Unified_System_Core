@@ -1,4 +1,6 @@
 import os
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -125,8 +127,7 @@ CONTENT = {
 }
 
 # Special handling for Hebrew (RTL)
-import arabic_reshaper
-from bidi.algorithm import get_display
+# Special handling for Hebrew (RTL)
 
 
 def create_pdf(lang, filename):
@@ -145,7 +146,7 @@ def create_pdf(lang, filename):
     try:
         pdfmetrics.registerFont(TTFont('Arial', font_path))
         font_name = 'Arial'
-    except:
+    except Exception:
         font_name = 'Helvetica' # Fallback, might break HE/RU chars if not standard
 
     # Define styles

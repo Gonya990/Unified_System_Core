@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 try:
     import psutil
     from google.cloud import monitoring_v3
-    from google.protobuf import timestamp_pb2
 except ImportError as e:
     logger.error(f"Missing dependency: {e}")
     logger.info("Install with: pip install google-cloud-monitoring psutil")

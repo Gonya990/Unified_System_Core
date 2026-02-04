@@ -1,7 +1,41 @@
+import os
+import time
+import logging
+import requests
+from dotenv import load_dotenv
 
-# ... (imports remain)
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# ... (existing logging/config)
+FAIL_THRESHOLD = 5
+CHECK_INTERVAL = 60
+
+def send_alert(message):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("ADMIN_CHAT_ID")
+    if not token or not chat_id:
+        logger.warning("Telegram token or chat_id not set, cannot send alert.")
+        return
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        logger.error(f"Failed to send telegram alert: {e}")
+
+def check_health():
+    try:
+        # Assuming port 8095 based on system_watchdog_v2.py
+        response = requests.get("http://localhost:8095/health", timeout=5)
+        return response.status_code == 200
+    except:
+        return False
 
 class BudgetMonitor:
     def __init__(self):

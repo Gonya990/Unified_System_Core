@@ -10,12 +10,12 @@ from dotenv import load_dotenv
 try:
     from browser_use import Agent
     from langchain_google_genai import ChatGoogleGenerativeAI
-    from langchain_openai import ChatOpenAI
 except ImportError:
     # Fallback for local dev without libs
     Agent = None
 
 from telegram_notify import send_telegram_message
+from gmail_agent import get_gmail_service, get_unread_emails
 
 # Setup logging
 logging.basicConfig(
@@ -78,7 +78,7 @@ def get_llm():
 # Job Hunter - Email Analysis Mode
 # Analyzes incoming Gmail vacancies against User CV
 
-from gmail_agent import get_gmail_service, get_unread_emails
+# Analyzes incoming Gmail vacancies against User CV
 
 
 async def process_profile(profile, llm):

@@ -56,14 +56,16 @@ import html
 
 
 def clean_text(text):
-    if not text: return ""
+    if not text:
+        return ""
     # Remove excessive whitespace
     text = re.sub(r'\s+', ' ', text).strip()
     # Escape HTML characters for ReportLab
     return html.escape(text)
 
 def clean_snippet(text):
-    if not text: return ""
+    if not text:
+        return ""
     # Remove HTML tags if present (simple regex)
     text = re.sub(r'<[^>]+>', '', text)
     text = re.sub(r'\s+', ' ', text).strip()
@@ -159,7 +161,8 @@ def main():
     keywords = ["operations", "manager", "site", "supervisor", "project", "logistics", "warehouse", "מנהל", "תפעול"]
 
     for email in emails:
-        if email['id'] in seen_ids: continue
+        if email['id'] in seen_ids:
+            continue
         seen_ids.add(email['id'])
 
         content = (email['subject'] + " " + email['content']).lower()
@@ -168,8 +171,10 @@ def main():
         if any(k in content for k in keywords):
             # Prioritize if email address found in body (rare for automated alerts, but good for direct comms)
             score = 0
-            if "@" in email['content']: score += 2
-            if "north" in content or "haifa" in content or "צפון" in content or "חיפה" in content: score += 1
+            if "@" in email['content']:
+                score += 2
+            if "north" in content or "haifa" in content or "צפון" in content or "חיפה" in content:
+                score += 1
 
             # Simple struct
             email['score'] = score
@@ -186,7 +191,8 @@ def main():
         if subj_clean not in seen_subjects:
             unique_jobs.append(j)
             seen_subjects.add(subj_clean)
-        if len(unique_jobs) >= 15: break
+        if len(unique_jobs) >= 15:
+            break
 
     create_pdf(unique_jobs)
 

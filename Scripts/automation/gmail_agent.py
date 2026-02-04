@@ -12,6 +12,7 @@ import base64
 import json
 import os
 import sys
+import argparse
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -324,8 +325,6 @@ def send_telegram_alert(category, subject, sender, body_preview):
     except Exception as e:
         print(f"⚠️ Error sending Telegram alert: {e}")
 
-
-import argparse
 
 
 def send_email(service, to, subject, body):

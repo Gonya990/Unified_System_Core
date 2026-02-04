@@ -14,9 +14,9 @@ def ask_gemini_3_for_ha_improvements():
     - Dedicated 'HAController' class with fuzzy matching for lights/switches.
     - Supports: turn_on_light, turn_off_light, set_temperature, get_sensors_report, speak_via_yandex, run_script, activate_scene.
     - The bot routes commands like /ha_status or attempts to parse natural language if it looks like a light control.
-    - Problem: Users feel management of HA is 'practically zero' and 'clunky'. 
+    - Problem: Users feel management of HA is 'practically zero' and 'clunky'.
     - The bot runs on a server with Tailscale access to the local HA instance.
-    
+
     GOAL: Leverage Gemini 3 capabilities (agentic Reasoning, multi-step planning) to make HA control feel 'magical' and proactive.
     """
 
