@@ -88,8 +88,12 @@ class DeepIndexer:
                 continue
                 
             logger.info(f'📂 Scanning {target}...')
+            dir_count = 0
             for root, dirs, files in os.walk(target):
                 dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
+                dir_count += 1
+                if dir_count % 100 == 0:
+                    logger.info(f'  [Scan Progress] {dir_count} directories visited in {target}...')
                 
                 batch = []
                 for f in files:
@@ -113,12 +117,15 @@ class DeepIndexer:
                     except Exception: continue
 
                 if batch:
-                    with sqlite3.connect(DB_PATH) as conn:
-                        conn.executemany('''
-                            INSERT OR IGNORE INTO assets (path, filename, extension, size_mb, mtime, category, last_indexed)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)
-                        ''', batch)
-                    total_discovered += len(batch)
+                    try:
+                        with sqlite3.connect(DB_PATH) as conn:
+                            conn.executemany('''
+                                INSERT OR IGNORE INTO assets (path, filename, extension, size_mb, mtime, category, last_indexed)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                            ''', batch)
+                        total_discovered += len(batch)
+                    except Exception as e:
+                        logger.error(f'Failed to insert batch from {root}: {e}')
         
         logger.info(f'✅ Discovery complete. Total files in DB: {total_discovered}')
 
