@@ -26,7 +26,7 @@ spec:
         - name: ghcr-login
       containers:
         - name: bot
-          image: ghcr.io/gonya990/ai-telegram-bot:latest
+          image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
           imagePullPolicy: Always
           envFrom:
             - secretRef:

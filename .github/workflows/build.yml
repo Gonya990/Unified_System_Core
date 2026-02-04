@@ -33,7 +33,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: gonya990/ai-telegram-bot
+  IMAGE_NAME: ${{ github.repository }}/ai-telegram-bot
 
 jobs:
   build:
