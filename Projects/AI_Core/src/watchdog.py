@@ -1,8 +1,8 @@
+import logging
 import os
 import time
-import logging
+
 import requests
-from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -17,7 +17,7 @@ def send_alert(message):
     if not token or not chat_id:
         logger.warning("Telegram token or chat_id not set, cannot send alert.")
         return
-    
+
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
         "chat_id": chat_id,

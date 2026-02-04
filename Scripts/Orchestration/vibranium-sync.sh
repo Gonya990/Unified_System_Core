@@ -16,19 +16,8 @@ UNIFIED_SYSTEM="$(cd "$SCRIPT_DIR/../.." && pwd)"
 echo -e "${GREEN}💎 VIBRANIUM SYNC STARTED${NC}"
 echo "=========================================="
 
-# 1. Local Auto-Commit
-echo -e "\n${YELLOW}[1/5] Saving local progress...${NC}"
-cd "$UNIFIED_SYSTEM"
-if [[ -n $(git status -s) ]]; then
-    git add .
-    git commit -m "chore: vibranium sync $(date '+%Y-%m-%d %H:%M:%S')"
-    echo -e "${GREEN}✓ Local changes saved.${NC}"
-else
-    echo -e "${GREEN}✓ Nothing to save locally.${NC}"
-fi
-
-# 2. Linting & Quality Check
-echo -e "\n${YELLOW}[2/5] Running Quality Check (Ruff)...${NC}"
+# 1. Linting & Quality Check
+echo -e "\n${YELLOW}[1/5] Running Quality Check (Ruff)...${NC}"
 if command -v ruff &> /dev/null; then
     RUFF_BIN="$(command -v ruff)"
     if "$RUFF_BIN" check Scripts/ Projects/AI_Core/src/ --fix; then
@@ -48,6 +37,17 @@ else
     else
         echo -e "${YELLOW}! Ruff not found. Skipping quality check.${NC}"
     fi
+fi
+
+# 2. Local Auto-Commit
+echo -e "\n${YELLOW}[2/5] Saving local progress...${NC}"
+cd "$UNIFIED_SYSTEM"
+if [[ -n $(git status -s) ]]; then
+    git add .
+    git commit -m "chore: vibranium sync $(date '+%Y-%m-%d %H:%M:%S')"
+    echo -e "${GREEN}✓ Local changes saved.${NC}"
+else
+    echo -e "${GREEN}✓ Nothing to save locally.${NC}"
 fi
 
 # 3. Main Sync (Git & Tasks)

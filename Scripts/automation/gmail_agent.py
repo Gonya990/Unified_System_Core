@@ -8,11 +8,11 @@ Automatically monitors and processes emails from gonya90.gg@gmail.com
 """
 
 # SECURITY: Using JSON instead of pickle for OAuth tokens (US-psm.1)
+import argparse
 import base64
 import json
 import os
 import sys
-import argparse
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from pathlib import Path

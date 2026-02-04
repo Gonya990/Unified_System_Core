@@ -14,8 +14,8 @@ except ImportError:
     # Fallback for local dev without libs
     Agent = None
 
-from telegram_notify import send_telegram_message
 from gmail_agent import get_gmail_service, get_unread_emails
+from telegram_notify import send_telegram_message
 
 # Setup logging
 logging.basicConfig(
