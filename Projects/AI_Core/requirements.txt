@@ -16,3 +16,6 @@ protobuf>=4.25.0
 cryptography>=41.0.0
 annotated-types>=0.6.0
 pydantic>=2.5.0
+PyYAML>=6.0
+uvicorn>=0.20.0
+fastapi>=0.100.0
