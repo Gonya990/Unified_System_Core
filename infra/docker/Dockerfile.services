@@ -17,7 +17,7 @@ WORKDIR /app
 COPY infra/docker/services.requirements.txt ./requirements.txt
 
 # Install dependencies
-RUN uv pip install --system --no-cache -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Post-install for Playwright
 RUN playwright install --with-deps chromium
