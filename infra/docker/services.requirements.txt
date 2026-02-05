@@ -5,9 +5,12 @@ schedule
 pytz
 pyyaml
 typing-extensions
+feedparser
+beautifulsoup4
 
 # AI & Content
 openai
+google-generativeai
 google-cloud-storage
 google-cloud-firestore
 google-cloud-pubsub
