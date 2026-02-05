@@ -26,7 +26,7 @@ RUN playwright install --with-deps chromium
 COPY . .
 
 # Environment
-ENV PYTHONPATH=/app:/app/Scripts:/app/Projects/Content_Factory/src/pipeline:/app/External_Tools/Stack/agent_mail_sdk/src
+ENV PYTHONPATH=/app:/app/Projects/Content_Factory/src/pipeline:/app/Projects/Content_Factory/src/researcher:/app/Projects/Content_Factory/src/pipeline/utils:/app/Scripts:/app/External_Tools/Stack/agent_mail_sdk/src
 ENV PYTHONUNBUFFERED=1
 
 # Default command (can be overridden in docker-compose)

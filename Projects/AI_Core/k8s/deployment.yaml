@@ -24,6 +24,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: ghcr-login
+      tolerations:
+        - key: "node.kubernetes.io/disk-pressure"
+          operator: "Exists"
+          effect: "NoSchedule"
       containers:
         - name: bot
           image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
