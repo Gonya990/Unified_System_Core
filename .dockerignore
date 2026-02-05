@@ -23,3 +23,6 @@ Projects/ChatKit_Dashboard/.next
 Projects/ChatKit_Dashboard/node_modules
 infra/cliproxyapi/src/vendor
 External_Tools/Stack/mcp_agent_mail/node_modules
+Scripts/Orchestration/broll
+**/*.mp4
+**/*.mov
