@@ -14,7 +14,7 @@ NC='\033[0m'
 # Format: "Host:RemotePath"
 NODES=(
     "unified-home-core-cloud:/home/gonya/Unified_System"
-    "gpu-node-1:/home/gonya990/Unified_System_Core"
+    "gpu-node-1:/home/gonya/Unified_System_Core"
     "igor-gaming:Unified_System_Core"
 )
 
