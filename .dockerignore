@@ -21,8 +21,11 @@ Projects/Content_Factory/outputs
 Projects/Content_Factory/venv
 Projects/ChatKit_Dashboard/.next
 Projects/ChatKit_Dashboard/node_modules
+Projects/connect-landing-page
 infra/cliproxyapi/src/vendor
 External_Tools/Stack/mcp_agent_mail/node_modules
 Scripts/Orchestration/broll
 **/*.mp4
 **/*.mov
+**/.next
+tools/npm-cache
