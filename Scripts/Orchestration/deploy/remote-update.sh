@@ -70,11 +70,13 @@ fi
         if [ -n "$REMOTE_STATUS" ]; then
             echo -e "${RED}! $NODE has uncommitted changes.${NC}"
             if [ "${1:-}" = "--force" ]; then
-                echo -e "${YELLOW}Discarding remote changes...${NC}"
-                ssh "$NODE" "cd $REMOTE_PATH && git checkout -- . && git clean -fd && git submodule foreach --recursive git reset --hard"
+                STASH_NAME="AUTO_SYNC_$(date '+%Y%m%d_%H%M%S')"
+                echo -e "${YELLOW}Safely stashing remote changes as: $STASH_NAME...${NC}"
+                
+                # Capture the diff before stashing to show the user
+                ssh "$NODE" "cd $REMOTE_PATH && echo 'Stashed Files:' && git diff --name-only && git stash push -m '$STASH_NAME' && echo '✓ Stash created: \$(git stash list | head -n 1)'"
             else
-                echo -e "${RED}Skipping $NODE (Dirty). Use --force to override.${NC}"
-                # Print status to help diagnose
+                echo -e "${RED}Skipping $NODE (Dirty). Use --force to stash and update.${NC}"
                 ssh "$NODE" "cd $REMOTE_PATH && git status --short"
                 continue
             fi
