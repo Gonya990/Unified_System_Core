@@ -84,7 +84,7 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using OpenAI TTS with Studio Post-Processing"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
 
-    api_key = broker.get_key("openai") if broker else os.getenv("OPENAI_API_KEY")
+    api_key = (broker.get_key("openai") if broker else None) or os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("❌ Error: OPENAI_API_KEY not found via TokenBroker or Environment.")
         return False
@@ -175,7 +175,7 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
 def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
     """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
     print("🌠 Falling back to Gemini for transcription...")
-    api_key = broker.get_key("gemini") if broker else (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
+    api_key = (broker.get_key("gemini") if broker else None) or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         print("❌ Gemini Transcription failed: No API Key found.")
         return []
@@ -223,7 +223,7 @@ def transcribe_audio_whisper(audio_path: Path) -> list[dict]:
     time.sleep(1.5)
 
     print("🧠 Transcribing audio for word-level subtitles...")
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = (broker.get_key("openai") if broker else None) or os.getenv("OPENAI_API_KEY")
 
     # 1. Main Strategy: OpenAI Whisper
     if api_key:

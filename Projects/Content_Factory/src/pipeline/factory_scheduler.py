@@ -85,7 +85,7 @@ def agent_sync(msg):
         print(f"🔄 Agent Sync: {msg[:50]}...")
 
         # Also notify via Telegram
-        telegram_msg = f"🏭 **Factory Status:** {msg}"
+        telegram_msg = f"🏭 <b>Factory Status:</b> {msg}"
         send_telegram_message(telegram_msg)
 
     except Exception as e:

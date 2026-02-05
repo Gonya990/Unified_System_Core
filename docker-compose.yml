@@ -44,6 +44,7 @@ services:
     env_file: .env
     volumes:
       - factory-outputs:/app/Projects/Content_Factory/outputs
+      - /home/gonya/.config/unified-system:/root/.config/unified-system:ro
     networks:
       - unified-net
 
