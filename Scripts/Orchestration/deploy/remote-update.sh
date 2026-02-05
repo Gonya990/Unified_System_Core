@@ -73,8 +73,9 @@ fi
                 STASH_NAME="AUTO_SYNC_$(date '+%Y%m%d_%H%M%S')"
                 echo -e "${YELLOW}Safely stashing remote changes as: $STASH_NAME...${NC}"
                 
-                # Capture the diff before stashing to show the user
-                ssh "$NODE" "cd $REMOTE_PATH && echo 'Stashed Files:' && git diff --name-only && git stash push -m '$STASH_NAME' && echo '✓ Stash created: \$(git stash list | head -n 1)'"
+                # Capture both tracked and untracked files, and use git native formatting
+                # We use -u to include untracked files (since git clean -fd was used before)
+                ssh "$NODE" "cd $REMOTE_PATH && echo 'Changed Files:' && git diff --name-only || true && echo 'Untracked Files:' && git ls-files --others --exclude-standard || true && git stash push -u -m '$STASH_NAME' && echo '✓ Stash created:' && git stash list -n 1"
             else
                 echo -e "${RED}Skipping $NODE (Dirty). Use --force to stash and update.${NC}"
                 ssh "$NODE" "cd $REMOTE_PATH && git status --short"
