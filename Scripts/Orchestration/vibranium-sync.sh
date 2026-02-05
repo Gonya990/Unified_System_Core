@@ -74,16 +74,16 @@ else
 fi
 
 # 2. Docker Compose (Services, Dashboard, MCP)
-echo -e "${YELLOW}Syncing Docker Compose manifests...${NC}"
-ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/docker-compose.yml" < "$UNIFIED_SYSTEM/docker-compose.yml"
-ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System/infra/docker"
-ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.services" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.services"
-ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.dashboard" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.dashboard"
-ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.markitdown" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.markitdown"
-ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/services.requirements.txt" < "$UNIFIED_SYSTEM/infra/docker/services.requirements.txt"
+echo -e "${YELLOW}Syncing Project Context for Containers...${NC}"
 
-echo -e "${YELLOW}Restarting Compose services (Background)...${NC}"
-# Use --build to ensure code changes are picked up if they were piped or if we use local context
+# Create a tarball of the current project (excluding large/unnecessary dirs) and pipe it to the cloud core
+# We use --exclude to match .dockerignore patterns
+tar --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.venv' \
+    --exclude='Projects/Content_Factory/outputs' --exclude='Projects/ChatKit_Dashboard/.next' \
+    -czf - . | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System"
+
+echo -e "${YELLOW}Restarting Compose services (Background Builder)...${NC}"
+# Use --build to ensure code changes are picked up
 ssh unified-home-core-cloud "cd /home/gonya/Unified_System && sudo docker compose up -d --build"
 
 # 5. Final Status
