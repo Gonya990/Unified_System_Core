@@ -271,6 +271,7 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
 
     # Strategy 3: Ollama (Rock Solid Local Fallback)
     if not data:
+        try:
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={"model": "llama3", "prompt": f"{prompt}\nReturn ONLY JSON.", "stream": False, "format": "json"},

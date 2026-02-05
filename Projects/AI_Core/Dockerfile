@@ -27,7 +27,7 @@ COPY External_Tools/Stack/agent_mail_sdk /app/External_Tools/Stack/agent_mail_sd
 # config/credential templates if needed (actual files mounted via volume)
 
 # Environment variables
-ENV PYTHONPATH=/app:/app/External_Tools/Stack/agent_mail_sdk/src
+ENV PYTHONPATH=/app:/app/src:/app/External_Tools/Stack/agent_mail_sdk/src
 ENV PYTHONUNBUFFERED=1
 
 # Run the bot
