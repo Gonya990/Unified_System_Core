@@ -39,6 +39,8 @@ services:
         "Projects/Content_Factory/src/pipeline/factory_scheduler.py",
         "--scheduler",
       ]
+    environment:
+      - OUTPUT_DIR_OVERRIDE=/app/Projects/Content_Factory/outputs
     env_file: .env
     volumes:
       - factory-outputs:/app/Projects/Content_Factory/outputs

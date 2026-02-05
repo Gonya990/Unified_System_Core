@@ -12,6 +12,9 @@ beautifulsoup4
 openai
 google-genai
 google-generativeai
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
 google-cloud-storage
 google-cloud-firestore
 google-cloud-pubsub
