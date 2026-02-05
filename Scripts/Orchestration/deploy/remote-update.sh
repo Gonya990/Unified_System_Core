@@ -37,12 +37,19 @@ for CONFIG in "${NODES[@]}"; do
         continue
     fi
 
-    # 2. Check/Setup Remote Directory
+    # 2. Skip Git for Production Cloud Nodes
+    if [[ "$NODE" == "unified-home-core-cloud" ]]; then
+        echo -e "${YELLOW}>>> NODE is Production Cloud Shell. Skipping Git operations...${NC}"
+        echo -e "${GREEN}✓ Node status: RUNNING (Container Only Mode)${NC}"
+        continue
+    fi
+
+    # 3. Check/Setup Remote Directory
     echo -e "${YELLOW}[1/3] Checking remote filesystem...${NC}"
     
     # Use 'cd && echo OK' which works on both Linux (bash) and Windows (cmd)
     if ssh "$NODE" "cd $REMOTE_PATH && echo OK" | grep -q "OK"; then
-        # 3. Check Git Status
+        # 4. Check Git Status
         REMOTE_STATUS=$(ssh "$NODE" "cd $REMOTE_PATH && git status --porcelain" 2>/dev/null || echo "GIT_ERROR")
         
         if [ "$REMOTE_STATUS" = "GIT_ERROR" ]; then
@@ -63,7 +70,7 @@ for CONFIG in "${NODES[@]}"; do
             fi
         fi
         
-        # 4. Pull Updates (using Agent Forwarding)
+        # 5. Pull Updates (using Agent Forwarding)
         echo -e "${YELLOW}[2/3] Pulling updates...${NC}"
         
         GIT_CMD="git pull origin main"
@@ -82,7 +89,6 @@ for CONFIG in "${NODES[@]}"; do
     else
         echo -e "${YELLOW}Directory not found. Cloning repo...${NC}"
         # Clone Repos (using Agent Forwarding)
-        # We use strict host key checking=no here just for the first clone to facilitate automation
         if ssh -A "$NODE" "git -c core.sshCommand=\"ssh -o StrictHostKeyChecking=no\" clone $REPO_URL $REMOTE_PATH"; then
             echo -e "${GREEN}✓ Repository cloned to $REMOTE_PATH.${NC}"
         else
@@ -91,7 +97,7 @@ for CONFIG in "${NODES[@]}"; do
         fi
     fi
 
-    # 5. Update Submodules
+    # 6. Update Submodules
     echo -e "${YELLOW}[3/3] Updating submodules...${NC}"
     ssh -A "$NODE" "cd $REMOTE_PATH && git submodule update --init --recursive" || echo "Submodule warning."
 

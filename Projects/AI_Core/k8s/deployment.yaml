@@ -38,7 +38,7 @@ spec:
               mountPath: /data
           ports:
             - name: health
-              containerPort: 8080
+              containerPort: 8095
               protocol: TCP
           resources:
             requests:
@@ -50,7 +50,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: health
+              port: 8095
             initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 5
@@ -58,7 +58,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /ready
-              port: health
+              port: 8095
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 3

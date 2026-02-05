@@ -57,9 +57,19 @@ bash "$SCRIPT_DIR/sync.sh" all
 # 4. Remote Update
 echo -e "\n${YELLOW}[4/5] Updating Remote Server...${NC}"
 if bash "$SCRIPT_DIR/deploy/remote-update.sh" --force; then
-    echo -e "${GREEN}✓ Remote server updated.${NC}"
+    echo -e "${GREEN}✓ Remote server code updated (where applicable).${NC}"
 else
-    echo -e "${RED}✗ Remote update failed. Check Tailscale!${NC}"
+    echo -e "${RED}✗ Remote handle failed. Check Tailscale!${NC}"
+fi
+
+# 4b. Production Container Deploy (K8s)
+echo -e "\n${YELLOW}[4b/5] Deploying Production Containers (K8s)...${NC}"
+if ssh unified-home-core-cloud "sudo kubectl apply -f -" < "$UNIFIED_SYSTEM/Projects/AI_Core/k8s/deployment.yaml"; then
+    echo -e "${GREEN}✓ AI Telegram Bot deployment updated.${NC}"
+    # Force a restart to ensure Always pull takes effect if tag is latest
+    ssh unified-home-core-cloud "sudo kubectl rollout restart deployment/ai-telegram-bot -n telegram-bot"
+else
+    echo -e "${RED}✗ K8s deployment failed.${NC}"
 fi
 
 # 5. Final Status
