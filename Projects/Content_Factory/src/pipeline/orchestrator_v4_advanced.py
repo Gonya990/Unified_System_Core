@@ -34,6 +34,66 @@ load_dotenv(ROOT_DIR.parent / "AI_Core" / ".env")
 GCS_BUCKET = "content-factory-outputs-435112"
 
 # =============================================================================
+#                           AUDIO GENERATION
+# =============================================================================
+
+def generate_audio_elevenlabs(text, output_path, api_key):
+    """Generate audio using ElevenLabs API (Premium)."""
+    print(f"🎤 Generating ElevenLabs Audio...")
+    try:
+        if not api_key: return False
+        headers = {'xi-api-key': api_key, 'Content-Type': 'application/json'}
+        data = {
+            'text': text, 
+            'model_id': 'eleven_multilingual_v2', 
+            'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75}
+        }
+        url = 'https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB'
+        resp = requests.post(url, json=data, headers=headers, timeout=60)
+        if resp.status_code == 200:
+            with open(output_path, 'wb') as f: f.write(resp.content)
+            print("✅ ElevenLabs Success!")
+            return True
+        print(f"❌ ElevenLabs Failed: {resp.status_code}")
+        return False
+    except Exception as e:
+        print(f"❌ ElevenLabs Exception: {e}"); return False
+
+def generate_audio_openai(text, output_path, voice="alloy"):
+    """Generate audio using OpenAI TTS."""
+    print(f"🎤 Generating OpenAI Audio ({voice})...")
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key: return False
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        response = client.audio.speech.create(model="tts-1", voice=voice, input=text)
+        response.stream_to_file(output_path)
+        print("✅ OpenAI Success!")
+        return True
+    except Exception as e:
+        print(f"❌ OpenAI TTS Error: {e}"); return False
+
+# =============================================================================
+#                           GCS UPLOAD
+# =============================================================================
+
+def upload_to_gcs(file_path: Path, bucket_name: str):
+    """Uploads a file to Google Cloud Storage."""
+    print(f"☁️ Uploading to GCS: {file_path.name}...")
+    try:
+        from google.cloud import storage
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(file_path.name)
+        blob.upload_from_filename(str(file_path))
+        print(f"✅ GCS Success: gs://{bucket_name}/{file_path.name}")
+        return True
+    except Exception as e:
+        print(f"❌ GCS Upload Failed: {e}")
+        return False
+
+# =============================================================================
 #                           DALL-E 3 FALLBACK
 # =============================================================================
 
@@ -74,8 +134,6 @@ def generate_image_imagen4(prompt, output_path):
         return generate_image_dalle3(prompt, output_path)
     
     try:
-        # Check if we should use Service Account (Vertex AI) if API key is failing
-        # For now, stick to Client(api_key=...) as it's the standard for AI Studio keys
         client = genai.Client(api_key=api_key)
         response = client.models.generate_images(
             model='imagen-4.0-generate-001',
@@ -125,12 +183,8 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
 
     # 1. AUDIO
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
-    # Logic for audio... (Existing logic is fine)
-    # ... assuming ElevenLabs/OpenAI generation here ...
-    # (Simplified for brevity in the tool call, but I will include the full functional code)
-
     eleven_key = os.getenv("ELEVENLABS_API_KEY")
-    # Audio generation is already in this file; no need to import from orchestrator_v4_advanced
+    
     if not (eleven_key and generate_audio_elevenlabs(text, audio_path, eleven_key)):
         generate_audio_openai(text, audio_path)
 
@@ -178,7 +232,7 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
             print(f"⚠️ Heavy Failsafe: Fetching random cinematic video for scene {i}")
             failsafe_keywords = ["galaxy space", "ocean waves cinematic", "forest aerial view", "urban city night"]
             fetch_pexels_video(random.choice(failsafe_keywords), clip_raw, pexels_key)
-            success = True # We force success here by using a generic clip
+            success = True 
 
         # Normalize
         cmd_norm = [
@@ -207,8 +261,6 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     print(f"✨ DONE: {final_video}")
 
     # 5. UPLOAD & NOTIFY
-    # (Include upload logic already in orchestrator_v4_advanced)
-    from orchestrator_v4_advanced import upload_to_gcs
     upload_to_gcs(final_video, GCS_BUCKET)
 
 if __name__ == "__main__":
