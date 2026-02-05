@@ -96,7 +96,8 @@ fi
 
 # Create tarball from tracked files + .env and pipe to cloud
 # We use --no-recursion because we are providing the file list explicitly
-echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System"
+# Suppress stderr to avoid "Ignoring unknown extended header" noise
+echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System 2>/dev/null"
 
 echo -e "${YELLOW}Restarting Compose services (Background Builder)...${NC}"
 # Use --build to ensure code changes are picked up
