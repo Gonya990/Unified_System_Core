@@ -39,15 +39,26 @@ else
     fi
 fi
 
-# 2. Local Auto-Commit
-echo -e "\n${YELLOW}[2/5] Saving local progress...${NC}"
+# 2. Local Commit (Mandatory)
+echo -e "\n${YELLOW}[2/5] Finalizing Local Changes...${NC}"
 cd "$UNIFIED_SYSTEM"
+
+# Run the automated descriptive committer
 if [[ -n $(git status -s) ]]; then
-    git add .
-    git commit -m "chore: vibranium sync $(date '+%Y-%m-%d %H:%M:%S')"
-    echo -e "${GREEN}✓ Local changes saved.${NC}"
+    if bash "$SCRIPT_DIR/sync/auto-commit.sh"; then
+        echo -e "${GREEN}✓ Local changes committed with descriptive title.${NC}"
+    else
+        echo -e "${RED}✗ Auto-commit failed. Please resolve manual conflicts.${NC}"
+        exit 1
+    fi
 else
-    echo -e "${GREEN}✓ Nothing to save locally.${NC}"
+    echo -e "${GREEN}✓ Working tree clean. Ready to sync.${NC}"
+fi
+
+# Double check status - sync MUST fail if uncommitted
+if [[ -n $(git status -s) ]]; then
+    echo -e "${RED}✗ SHUTDOWN: Working directory is still dirty. Aborting sync for safety.${NC}"
+    exit 1
 fi
 
 # 3. Main Sync (Git & Tasks)
