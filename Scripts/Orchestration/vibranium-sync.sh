@@ -74,12 +74,13 @@ else
 fi
 
 # 2. Docker Compose (Services, Dashboard, MCP)
-echo -e "${YELLOW}Syncing Project Context for Containers...${NC}"
+echo -e "${YELLOW}Syncing Project Context for Containers (Optimized)...${NC}"
 
-# Create a tarball of the current project (excluding large/unnecessary dirs) and pipe it to the cloud core
-# We use --exclude to match .dockerignore patterns
-tar --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.venv' \
+# Create a focused tarball of the project
+# We exclude the massive 12GB tmp, 700MB contexts, Archive, and local venvs
+tar --no-xattrs --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.venv' \
     --exclude='Projects/Content_Factory/outputs' --exclude='Projects/ChatKit_Dashboard/.next' \
+    --exclude='tmp' --exclude='Archive' --exclude='contexts' --exclude='*.m4a' --exclude='*.mp4' \
     -czf - . | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System"
 
 echo -e "${YELLOW}Restarting Compose services (Background Builder)...${NC}"
