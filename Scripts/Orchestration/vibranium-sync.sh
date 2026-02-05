@@ -85,14 +85,18 @@ else
 fi
 
 # 2. Docker Compose (Services, Dashboard, MCP)
-echo -e "${YELLOW}Syncing Project Context for Containers (Optimized)...${NC}"
+echo -e "${YELLOW}Syncing Tracked Project Context (High Speed)...${NC}"
 
-# Create a focused tarball of the project
-# We exclude the massive 12GB tmp, 700MB contexts, Archive, and local venvs
-tar --no-xattrs --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.venv' \
-    --exclude='Projects/Content_Factory/outputs' --exclude='Projects/ChatKit_Dashboard/.next' \
-    --exclude='tmp' --exclude='Archive' --exclude='contexts' --exclude='*.m4a' --exclude='*.mp4' \
-    -czf - . | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System"
+# Use git ls-files to only sync tracked files. This is extremely fast.
+# We also explicitly include any local .env file if it exists.
+files_to_sync=$(git ls-files)
+if [ -f ".env" ]; then
+    files_to_sync="$files_to_sync .env"
+fi
+
+# Create tarball from tracked files + .env and pipe to cloud
+# We use --no-recursion because we are providing the file list explicitly
+echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System"
 
 echo -e "${YELLOW}Restarting Compose services (Background Builder)...${NC}"
 # Use --build to ensure code changes are picked up
