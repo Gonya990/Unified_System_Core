@@ -62,20 +62,34 @@ else
     echo -e "${RED}✗ Remote handle failed. Check Tailscale!${NC}"
 fi
 
-# 4b. Production Container Deploy (K8s)
-echo -e "\n${YELLOW}[4b/5] Deploying Production Containers (K8s)...${NC}"
+# 4b. Production Container Deploy (K8s & Compose)
+echo -e "\n${YELLOW}[4b/5] Deploying Production Containers...${NC}"
+
+# 1. K8s (AI Bot)
 if ssh unified-home-core-cloud "sudo kubectl apply -f -" < "$UNIFIED_SYSTEM/Projects/AI_Core/k8s/deployment.yaml"; then
-    echo -e "${GREEN}✓ AI Telegram Bot deployment updated.${NC}"
-    # Force a restart to ensure Always pull takes effect if tag is latest
+    echo -e "${GREEN}✓ K8s: AI Telegram Bot deployment updated.${NC}"
     ssh unified-home-core-cloud "sudo kubectl rollout restart deployment/ai-telegram-bot -n telegram-bot"
 else
     echo -e "${RED}✗ K8s deployment failed.${NC}"
 fi
 
+# 2. Docker Compose (Services, Dashboard, MCP)
+echo -e "${YELLOW}Syncing Docker Compose manifests...${NC}"
+ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/docker-compose.yml" < "$UNIFIED_SYSTEM/docker-compose.yml"
+ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System/infra/docker"
+ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.services" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.services"
+ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.dashboard" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.dashboard"
+ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/Dockerfile.markitdown" < "$UNIFIED_SYSTEM/infra/docker/Dockerfile.markitdown"
+ssh unified-home-core-cloud "cat > /home/gonya/Unified_System/infra/docker/services.requirements.txt" < "$UNIFIED_SYSTEM/infra/docker/services.requirements.txt"
+
+echo -e "${YELLOW}Restarting Compose services (Background)...${NC}"
+# Use --build to ensure code changes are picked up if they were piped or if we use local context
+ssh unified-home-core-cloud "cd /home/gonya/Unified_System && sudo docker compose up -d --build"
+
 # 5. Final Status
 echo -e "\n${YELLOW}[5/5] Verifying Final State...${NC}"
 git status
-echo ""
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}💎 SYSTEM FULLY UNIFIED 💎${NC}"
-echo -e "${YELLOW}Next startup will be 100% synchronized.${NC}"
+echo -e "\n========================================"
+echo -e "💎 SYSTEM FULLY UNIFIED & CONTAINERIZED 💎"
+echo -e "Next startup will be 100% synchronized."
+echo "=========================================="

@@ -27,22 +27,32 @@ for CONFIG in "${NODES[@]}"; do
     NODE="${CONFIG%%:*}"
     REMOTE_PATH="${CONFIG#*:}"
     
-    echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
-    
-    # 1. Connectivity Check
-    if ssh -q -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit; then
-        echo -e "${GREEN}✓ Connected to $NODE${NC}"
-    else
-        echo -e "${RED}✗ Cannot connect to $NODE. Skipping.${NC}"
-        continue
-    fi
+# Nodes that use Container-Only mode (No Git)
+PRODUCTION_NODES=("unified-home-core-cloud")
 
-    # 2. Skip Git for Production Cloud Nodes
-    if [[ "$NODE" == "unified-home-core-cloud" ]]; then
-        echo -e "${YELLOW}>>> NODE is Production Cloud Shell. Skipping Git operations...${NC}"
-        echo -e "${GREEN}✓ Node status: RUNNING (Container Only Mode)${NC}"
-        continue
+echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
+
+# 1. Connectivity Check
+if ssh -q -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit; then
+    echo -e "${GREEN}✓ Connected to $NODE${NC}"
+else
+    echo -e "${RED}✗ Cannot connect to $NODE. Skipping.${NC}"
+    continue
+fi
+
+# 2. Skip Git for Production Cloud Nodes
+IS_PRODUCTION=false
+for P_NODE in "${PRODUCTION_NODES[@]}"; do
+    if [[ "$NODE" == "$P_NODE" ]]; then
+        IS_PRODUCTION=true
+        break
     fi
+done
+
+if [ "$IS_PRODUCTION" = true ]; then
+    echo -e "${YELLOW}>>> NODE is Production (Container-Only). Skipping Git...${NC}"
+    continue
+fi
 
     # 3. Check/Setup Remote Directory
     echo -e "${YELLOW}[1/3] Checking remote filesystem...${NC}"

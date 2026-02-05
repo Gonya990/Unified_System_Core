@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  # AI Telegram Bot (Primary)
+  ai-bot:
+    build:
+      context: .
+      dockerfile: Projects/AI_Core/Dockerfile
+    image: ghcr.io/unified-system-core/unified-system-core/ai-telegram-bot:latest
+    restart: always
+    env_file: .env
+    volumes:
+      - bot-data:/data
+    networks:
+      - unified-net
+
+  # Mail Intelligence Service
+  mail-intelligence:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.services
+    image: ghcr.io/unified-system-core/unified-system-core/mail-intelligence:latest
+    restart: always
+    command: ["python", "Scripts/Orchestration/mail_processor.py"]
+    env_file: .env
+    networks:
+      - unified-net
+
+  # Content Factory Scheduler
+  content-factory:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.services
+    image: ghcr.io/unified-system-core/unified-system-core/content-factory:latest
+    restart: always
+    command:
+      [
+        "python",
+        "Projects/Content_Factory/src/pipeline/factory_scheduler.py",
+        "--scheduler",
+      ]
+    env_file: .env
+    volumes:
+      - factory-outputs:/app/Projects/Content_Factory/outputs
+    networks:
+      - unified-net
+
+  # ChatKit Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.dashboard
+    image: ghcr.io/unified-system-core/unified-system-core/dashboard:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file: .env
+    networks:
+      - unified-net
+
+  # MarkItDown MCP Server
+  markitdown-mcp:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.markitdown
+    image: ghcr.io/unified-system-core/unified-system-core/markitdown-mcp:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file: .env
+    networks:
+      - unified-net
+
+networks:
+  unified-net:
+    driver: bridge
+
+volumes:
+  bot-data:
+  factory-outputs:

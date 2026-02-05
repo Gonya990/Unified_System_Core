@@ -1,0 +1,31 @@
+# General
+requests
+python-dotenv
+schedule
+pytz
+pyyaml
+typing-extensions
+
+# AI & Content
+openai
+google-cloud-storage
+google-cloud-firestore
+google-cloud-pubsub
+google-auth
+google-search-results
+anthropic
+
+# Media (if needed)
+moviepy
+Pillow
+tqdm
+
+# Async
+httpx
+fastmcp
+mcp[cli]
+
+# Social
+instagrapi
+playwright
+playwright-stealth
