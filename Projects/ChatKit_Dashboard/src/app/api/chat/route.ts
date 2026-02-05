@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const client = new OpenAI()
+// Lazy init client inside handler to avoid build-time errors
+// const client = new OpenAI()
 
 export async function POST(request: Request) {
     try {
+        const client = new OpenAI()
         const { messages } = await request.json()
         const userMessage = messages[messages.length - 1].content
 
