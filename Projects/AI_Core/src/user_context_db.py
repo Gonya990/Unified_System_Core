@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 class UserContextDB:
     def __init__(self, db_path="user_context.db"):
-        self.db_path = db_path
+        # Allow environment variable override for K8s/Docker persistence
+        self.db_path = os.getenv("DB_PATH", db_path)
         self._init_db()
 
     def _init_db(self):

@@ -75,7 +75,8 @@ if not os.path.exists(SECRETS_DIR):
 
 class GoogleAuthManager:
     def __init__(self, client_secrets_file="client_secret.json"):
-        self.client_secrets_file = client_secrets_file
+        # Allow environment variable override
+        self.client_secrets_file = os.getenv("GOOGLE_CLIENT_SECRETS", client_secrets_file)
         self._pending_flows = {}  # user_id -> Flow
 
         if not os.path.exists(self.client_secrets_file):
