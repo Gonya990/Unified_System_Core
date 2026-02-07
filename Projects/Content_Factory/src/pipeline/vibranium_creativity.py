@@ -19,6 +19,8 @@ def generate_dynamic_content():
     Include the word 'json' in your thinking.
     """
 
+    or_key = os.getenv("OPENROUTER_API_KEY")
+
     # Try OpenAI first
     if openai_key and not openai_key.startswith('PLEASE_UPDATE'):
         try:
@@ -31,7 +33,28 @@ def generate_dynamic_content():
             )
             return json.loads(response.choices[0].message.content)
         except Exception as e:
-            print(f"⚠️ OpenAI failed: {e}. Falling back to Gemini...")
+            print(f"⚠️ OpenAI failed: {e}. Falling back...")
+
+    # OpenRouter fallback (VERY RELIABLE)
+    if or_key:
+        try:
+            import requests
+            response = requests.post(
+                url="https://openrouter.ai/api/v1/chat/completions",
+                headers={"Authorization": f"Bearer {or_key}"},
+                json={
+                    "model": "google/gemini-pro-1.5",
+                    "messages": [{"role": "user", "content": prompt}]
+                }
+            )
+            data = response.json()
+            content = data['choices'][0]['message']['content']
+            # Basic JSON extractor
+            if "{" in content and "}" in content:
+                content = content[content.find("{"):content.rfind("}")+1]
+            return json.loads(content)
+        except Exception as e:
+            print(f"⚠️ OpenRouter failed: {e}")
 
     if gemini_key:
         import google.generativeai as genai
