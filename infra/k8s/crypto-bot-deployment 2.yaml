@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-bot
+  namespace: telegram-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-bot
+  template:
+    metadata:
+      labels:
+        app: crypto-bot
+    spec:
+      containers:
+        - name: crypto-bot
+          image: ghcr.io/unified-system-core/crypto-bot:latest
+          envFrom:
+            - secretRef:
+                name: telegram-bot-secrets
