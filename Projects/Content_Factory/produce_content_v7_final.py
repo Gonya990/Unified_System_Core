@@ -13,13 +13,13 @@ MEDIA_DIR = ROOT_DIR / 'Local_Dev/Media/daily_auto'
 
 sys.path.insert(0, str(FACTORY_DIR / 'src'))
 
-from audio.music_generator import MusicGenerator
-from pipeline.add_ai_watermark import add_ai_watermark
-from pipeline.orchestrator_v3_no_face import run_no_face_pipeline
-from pipeline.vibranium_creativity import generate_dynamic_content
-from uploaders.telegram_uploader import upload_telegram
-from uploaders.youtube_uploader import upload_video
-from video.ai_video_generator import VideoGenerator
+from audio.music_generator import MusicGenerator  # noqa: E402
+from pipeline.add_ai_watermark import add_ai_watermark  # noqa: E402
+from pipeline.orchestrator_v3_no_face import run_no_face_pipeline  # noqa: E402
+from pipeline.vibranium_creativity import generate_dynamic_content  # noqa: E402
+from uploaders.telegram_uploader import upload_telegram  # noqa: E402
+from uploaders.youtube_uploader import upload_video  # noqa: E402
+from video.ai_video_generator import VideoGenerator  # noqa: E402
 
 load_dotenv(ROOT_DIR / '.env')
 load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)

@@ -48,7 +48,8 @@ load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 # Masked key debug
 openai_key = os.getenv("OPENAI_API_KEY", "")
 pexels_key = os.getenv("PEXELS_API_KEY", "")
-print(f"📡 API Status: OpenAI={openai_key[:8]}... Pexels={pexels_key[:8]}...")
+masked_openai = f"{openai_key[:8]}...{openai_key[-4:]}" if openai_key else "None"
+print(f"📡 API Status: OpenAI={masked_openai} Pexels={pexels_key[:8]}...")
 
 # Import internal tools
 try:
