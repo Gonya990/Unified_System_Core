@@ -18,8 +18,9 @@ if sdk_path not in sys.path:
 try:
     from agent_mail import AgentMailClient, AgentMailConfig
 except ImportError:
-    print(f"❌ Critical: Could not import 'agent_mail' SDK from {sdk_path}")
-    sys.exit(1)
+    print(f"⚠️ Warning: Could not import 'agent_mail' SDK from {sdk_path}. Continuing in degraded mode.")
+    AgentMailClient = None
+    AgentMailConfig = None
 
 
 def main():
