@@ -53,8 +53,8 @@ print(f"📡 API Status: OpenAI={masked_openai} Pexels={pexels_key[:8]}...")
 
 # Import internal tools
 try:
-    from pexels_broll import semantic_search_broll
-    from video_assembler import create_video_with_broll, get_video_duration
+    from pexels_broll import semantic_search_broll  # noqa: F401
+    from video_assembler import create_video_with_broll, get_video_duration  # noqa: F401
 except ImportError:
     print("⚠️ Internal tools not found. Script might fail.")
 
