@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  ai-telegram-bot:
+    image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
+    container_name: ai-telegram-bot
+    restart: always
+    env_file: .env
+    volumes:
+      - ./Local_Dev/Data/bot:/data
+    ports:
+      - "8095:8095"
+
+  content-factory:
+    image: ghcr.io/unified-system-core/factory-server:latest
+    container_name: content-factory
+    restart: always
+    env_file: .env
+    volumes:
+      - ./Local_Dev/Media:/media
+      - ./Local_Dev/Reports:/reports
+    command: python3 Projects/Content_Factory/produce_content_v7_final.py
+
+  crypto-bot:
+    image: ghcr.io/unified-system-core/crypto-bot:latest
+    container_name: crypto-bot
+    restart: always
+    env_file: .env
+    command: python3 Projects/Crypto_Bot/main.py
+
+  watchdog:
+    image: python:3.12-slim
+    container_name: system-watchdog
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python3 Projects/AI_Core/watchdog.py
+    restart: always

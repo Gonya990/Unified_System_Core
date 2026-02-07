@@ -15,6 +15,12 @@ sys.path.insert(0, str(FACTORY_DIR / 'src'))
 from pipeline.orchestrator_v3_no_face import run_no_face_pipeline
 from uploaders.youtube_uploader import upload_video
 from uploaders.telegram_uploader import upload_telegram
+from audio.music_generator import MusicGenerator
+from video.ai_video_generator import VideoGenerator
+
+# Initialize AI tools
+music_gen = MusicGenerator(use_ai=True)
+video_gen = VideoGenerator(provider="runway")  # Fallback to runway as Luma is in beta
 from pipeline.add_ai_watermark import add_ai_watermark
 from pipeline.vibranium_creativity import generate_dynamic_content
 

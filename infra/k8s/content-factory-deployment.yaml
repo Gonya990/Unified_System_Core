@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content-factory
+  namespace: telegram-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: content-factory
+  template:
+    metadata:
+      labels:
+        app: content-factory
+    spec:
+      containers:
+        - name: factory
+          image: ghcr.io/unified-system-core/factory-server:latest
+          envFrom:
+            - secretRef:
+                name: telegram-bot-secrets
+          volumeMounts:
+            - name: media
+              mountPath: /media
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc
