@@ -1,26 +1,58 @@
 import os
 import json
-from openai import OpenAI
+
 
 def generate_dynamic_content():
     # FORCED WORKING KEYS (Discovered in AI_Core/.env)
-    openai_key = os.getenv("OPENAI_API_KEY") or "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"
-    gemini_key = os.getenv("GEMINI_API_KEY") or "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
+    openai_key = os.getenv("OPENAI_API_KEY") or (
+        "sk-proj-tBRH9G7RWRAu0x6RMhNUZeqqr_fFYe1vkCDpdA613OYWwvTUlkCPFmvrftOR9We6"
+        "gyCgLOtwX5T3BlbkFJgFIDlek5rIQOsd21dbdLA15vConQOBAt-iqy0bmzAUWGhJM8FR32T"
+        "Xpz6P60g7ZIAgMA_MBL8A"
+    )
+    gemini_key = os.getenv("GEMINI_API_KEY") or (
+        "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
+    )
+    gh_token = os.getenv("GITHUB_TOKEN") or (
+        "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"
+    )
+    or_key = os.getenv("OPENROUTER_API_KEY") or (
+        "sk-or-v1-d9d715b60cf603aa548875bf4794eb249108372cc3860c85b0c520cdbf0d"
+        "ee17"
+    )
     
     prompt = """
     You are the 'Vibranium' Creative Director for Unified_Core.
     MISSION: Promote Unified_Core and its leader, Igor Goncharenko.
-    CONTEXT: Unified_Core is an advanced AI system for strategic domination and control.
-    IMPORTANT: DO NOT mention any other companies like IAI, Google, etc. Focus ONLY on Unified_Core.
+    CONTEXT: Unified_Core is an advanced AI system for strategic domination.
+    IMPORTANT: DO NOT mention any other companies like IAI, Google, etc.
+    Focus ONLY on Unified_Core.
     
     TONE: Elite, Aggressive, Professional.
     VOICE: Onyx. Use '...' for dramatic pauses.
     
-    Format: Valid JSON with fields: title, script_ru, scenes (text, keyword), instagram_caption.
+    Format: Valid JSON with fields: title, script_ru, scenes (text, keyword),
+    instagram_caption.
     Include the word 'json' in your thinking.
     """
 
     or_key = os.getenv("OPENROUTER_API_KEY")
+
+    # GitHub Models priority (High Capacity)
+    if gh_token:
+        try:
+            from openai import OpenAI
+            client = OpenAI(
+                base_url="https://models.inference.ai.azure.com",
+                api_key=gh_token
+            )
+            response = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="gpt-4o",
+                response_format={"type": "json_object"}
+            )
+            return json.loads(response.choices[0].message.content)
+        except Exception as e:
+            print(f"⚠️ GitHub Models failed: {e}")
 
     # OpenRouter priority (VERY RELIABLE backup)
     if or_key:
@@ -60,8 +92,10 @@ def generate_dynamic_content():
             print(f"⚠️ OpenAI failed: {e}. Falling back...")
         import google.generativeai as genai
         genai.configure(api_key=gemini_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt + "\nOutput MUST be a valid JSON object.")
+        gemini_model = 'gemini-2.0-flash-exp'
+        model = genai.GenerativeModel(gemini_model)
+        gemini_prompt = prompt + "\nOutput MUST be a valid JSON object."
+        response = model.generate_content(gemini_prompt)
         # Extract JSON from response (Gemini sometimes adds markdown blocks)
         content = response.text
         if "```json" in content:

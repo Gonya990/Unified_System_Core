@@ -1,0 +1,8 @@
+ccxt>=4.2.0
+websockets>=12.0
+asyncio
+kubernetes>=29.0.0
+k8s-leaderelection>=0.0.1
+psycopg2-binary
+requests
+python-dotenv
