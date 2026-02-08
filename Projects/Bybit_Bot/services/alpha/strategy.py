@@ -129,7 +129,7 @@ class FundingArbStrategy:
         }
 
     async def run(self, amount):
-        logger.info(f"Alpha Engine started for {self.symbol}. Listening for market data...")
+        logger.info(f"Alpha Engine started: {self.symbol}. Listening...")
         stream = "market_data"
         group = "alpha-group"
         async for msg_id, state in self.messenger.consume(

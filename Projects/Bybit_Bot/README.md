@@ -2,15 +2,25 @@
 
 ## Overview
 
-A microservices-based, delta-neutral funding arbitrage bot designed for high fault tolerance, low latency, and full compliance with **DAC8** (EU Directive on Administrative Cooperation).
+A microservices-based, delta-neutral funding arbitrage bot designed for high
+fault tolerance, low latency, and full compliance with **DAC8** (EU Directive on
+Administrative Cooperation).
 
 ## Architecture
 
-1. **Service A (Ingestion):** WebSocket client for Bybit V5 Linear Public stream. Produces `market_data` to Redis Streams.
-2. **Service B (Alpha Engine):** Consumes `market_data`, performs ML-based funding rate prediction, calculates APR/Break-even metrics. Produces `signals`.
-3. **Service C (Execution Engine):** Consumes `orders_validated`, manages Leader Election (Single Writer via K8s Leases), executes Batch Orders on Bybit. Produces `execution_reports`.
-4. **Service D (Risk Guard):** Middleware. Consumes `signals`, validates leveraging, notional size, and daily loss limits. Produces `orders_validated`.
-5. **Service E (Compliance Logger):** Consumes `execution_reports`, persistence in TimescaleDB.
+1. **Service A (Ingestion):** WebSocket client for Bybit V5 Linear Public
+   stream. Produces `market_data` to Redis Streams.
+2. **Service B (Alpha Engine):** Consumes `market_data`, performs ML-based
+   funding rate prediction, calculates APR/Break-even metrics. Produces
+   `signals`.
+3. **Service C (Execution Engine):** Consumes `orders_validated`, manages Leader
+   Election (Single Writer via K8s Leases), executes Batch Orders on Bybit.
+   Produces `execution_reports`.
+4. **Service D (Risk Guard):** Middleware. Consumes `signals`, validates
+   leveraging, notional size, and daily loss limits. Produces
+   `orders_validated`.
+5. **Service E (Compliance Logger):** Consumes `execution_reports`, persistence
+   in TimescaleDB.
 
 ## DAC8 Compliance (Rigor)
 

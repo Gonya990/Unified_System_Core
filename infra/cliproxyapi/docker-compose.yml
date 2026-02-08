@@ -1,6 +1,6 @@
 services:
   cliproxy:
-    build: 
+    build:
       context: ./src
       dockerfile: Dockerfile
     container_name: cliproxyapi
@@ -25,6 +25,7 @@ services:
     environment:
       - WATCHTOWER_INCLUDE_STOPPED=true
       - WATCHTOWER_REVIVE_STOPPED=true
+      - DOCKER_API_VERSION=1.44
 
 networks:
   default:

@@ -8,5 +8,6 @@ tls:
   key: ""
 
 # Auth Storage
+auth-dir: "/root/.cli-proxy-api"
 # Mapping /root/.cli-proxy-api to a volume in docker-compose ensures persistence
 # The tool typically uses a local DB or file structure by default.

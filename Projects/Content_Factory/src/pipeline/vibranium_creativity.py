@@ -90,14 +90,15 @@ def generate_dynamic_content():
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             print(f"⚠️ OpenAI failed: {e}. Falling back...")
-            import google.generativeai as genai
-            genai.configure(api_key=gemini_key)
+            from google import genai
+            client = genai.Client(api_key=gemini_key)
             # 2026 Production Fallback
-            gemini_model = 'models/gemini-flash-latest'
-            model = genai.GenerativeModel(gemini_model)
-            gemini_prompt = prompt + "\nOutput MUST be a valid JSON object."
+            gemini_model = 'gemini-2.0-flash'
             try:
-                response = model.generate_content(gemini_prompt)
+                response = client.models.generate_content(
+                    model=gemini_model,
+                    contents=prompt + "\nOutput MUST be a valid JSON object."
+                )
                 content = response.text
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0].strip()
