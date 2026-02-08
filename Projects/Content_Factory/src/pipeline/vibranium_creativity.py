@@ -46,8 +46,17 @@ def generate_dynamic_content():
 
     # Try OpenAI (may fail with 401)
     if openai_key and not openai_key.startswith('PLEASE_UPDATE'):
-
-    if gemini_key:
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai_key)
+            response = client.chat.completions.create(
+                model='gpt-4o-mini',
+                messages=[{'role': 'user', 'content': prompt}],
+                response_format={'type': 'json_object'}
+            )
+            return json.loads(response.choices[0].message.content)
+        except Exception as e:
+            print(f"⚠️ OpenAI failed: {e}. Falling back...")
         import google.generativeai as genai
         genai.configure(api_key=gemini_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
