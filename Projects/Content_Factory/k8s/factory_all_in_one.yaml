@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: factory
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factory-orchestrator
+  namespace: factory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factory-orchestrator
+  template:
+    metadata:
+      labels:
+        app: factory-orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: gonya/content-factory:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          envFrom:
+            - secretRef:
+                name: factory-secrets
+          volumeMounts:
+            - name: storage
+              mountPath: /app/outputs
+      volumes:
+        - name: storage
+          hostPath:
+            path: /home/gonya/factory_outputs
+            type: DirectoryOrCreate
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-elite-researcher
+  namespace: factory
+spec:
+  schedule: "0 6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: researcher
+              image: gonya/content-factory:latest
+              command: ["python", "src/researcher/daily_researcher.py"]
+              envFrom:
+                - secretRef:
+                    name: factory-secrets
+          restartPolicy: OnFailure

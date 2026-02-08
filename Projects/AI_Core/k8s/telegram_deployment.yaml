@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-telegram-bot
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegram-bot
+  template:
+    metadata:
+      labels:
+        app: telegram-bot
+    spec:
+      containers:
+        - name: bot
+          image: gonya/ai-telegram-bot:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          env:
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bybit-secrets
+                  key: TELEGRAM_BOT_TOKEN
+            - name: BOT_INSTANCE
+              value: "production"
+            - name: INFERENCE_PROVIDER
+              value: "gemini"
+          volumeMounts:
+            - name: db-storage
+              mountPath: /app/data
+      volumes:
+        - name: db-storage
+          hostPath:
+            path: /home/gonya/bot_data
+            type: DirectoryOrCreate

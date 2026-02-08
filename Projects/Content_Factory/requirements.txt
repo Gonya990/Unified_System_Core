@@ -1,0 +1,20 @@
+# Core AI & Logic
+openai>=1.0.0
+google-generativeai
+python-dotenv
+requests
+feedparser
+beautifulsoup4
+
+# Video & Audio Production (Elite Tier)
+moviepy>=1.0.3
+elevenlabs
+edge-tts
+openai-whisper
+numpy
+Pillow
+
+# System & Utils
+pyyaml
+pathlib
+tqdm
