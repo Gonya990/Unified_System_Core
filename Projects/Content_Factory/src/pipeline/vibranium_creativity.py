@@ -43,7 +43,7 @@ def generate_dynamic_content():
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {or_key}"},
                 json={
-                    "model": "google/gemini-pro-1.5",
+                    "model": "anthropic/claude-3-haiku",
                     "messages": [{"role": "user", "content": prompt}]
                 }
             )
