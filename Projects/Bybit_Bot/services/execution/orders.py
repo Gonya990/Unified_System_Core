@@ -1,22 +1,21 @@
 import logging
 import asyncio
+import os
+from datetime import datetime
 from kubernetes import client, config
 from k8s_leaderelection import LeaderElection
+from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BybitExecution")
 
 class BybitExecutionEngine:
     """
-    Задача 2: Исполнение ордеров Bybit V5.
-    - Паттерн: Leader Election (Single Writer).
-    - API: Batch Creation.
+    Service C: Execution Engine
+    - Pattern: Leader Election (Single Writer).
+    - API: Bybit V5.
     - Rate Control: X-Bapi-Limit-Status.
     """
-import os
-from common.messaging import RedisStreamManager
-
-class BybitExecutionEngine:
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -31,8 +30,8 @@ class BybitExecutionEngine:
         except Exception:
             try:
                 config.load_kube_config()
-            except:
-                logger.warning("Kube config not found. Running without real LE.")
+            except Exception:
+                logger.warning("Kube config not found. Running without LE.")
             
         self.le = LeaderElection(
             client.CoordinationV1Api(),
@@ -85,5 +84,7 @@ class BybitExecutionEngine:
                 logger.debug(f"Passive mode: skipping order {msg_id}")
 
 if __name__ == "__main__":
-    engine = BybitExecutionEngine(os.getenv("BYBIT_API_KEY"), os.getenv("BYBIT_API_SECRET"))
+    key = os.getenv("BYBIT_API_KEY")
+    secret = os.getenv("BYBIT_API_SECRET")
+    engine = BybitExecutionEngine(key, secret)
     asyncio.run(engine.run())

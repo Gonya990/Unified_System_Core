@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bybit-risk-guard
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bybit-risk-guard
+  template:
+    metadata:
+      labels:
+        app: bybit-risk-guard
+    spec:
+      containers:
+        - name: risk-guard
+          image: gonya/bybit-risk-guard:latest
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bybit-bot-config
+                  key: redis_url
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "256Mi"

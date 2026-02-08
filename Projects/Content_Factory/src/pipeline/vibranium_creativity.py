@@ -90,21 +90,24 @@ def generate_dynamic_content():
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             print(f"⚠️ OpenAI failed: {e}. Falling back...")
-        import google.generativeai as genai
-        genai.configure(api_key=gemini_key)
-        gemini_model = 'gemini-2.0-flash-exp'
-        model = genai.GenerativeModel(gemini_model)
-        gemini_prompt = prompt + "\nOutput MUST be a valid JSON object."
-        response = model.generate_content(gemini_prompt)
-        # Extract JSON from response (Gemini sometimes adds markdown blocks)
-        content = response.text
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0].strip()
-        elif "```" in content:
-            content = content.split("```")[1].split("```")[0].strip()
-        return json.loads(content)
+            import google.generativeai as genai
+            genai.configure(api_key=gemini_key)
+            # 2026 Production Fallback
+            gemini_model = 'models/gemini-flash-latest'
+            model = genai.GenerativeModel(gemini_model)
+            gemini_prompt = prompt + "\nOutput MUST be a valid JSON object."
+            try:
+                response = model.generate_content(gemini_prompt)
+                content = response.text
+                if "```json" in content:
+                    content = content.split("```json")[1].split("```")[0].strip()
+                elif "```" in content:
+                    content = content.split("```")[1].split("```")[0].strip()
+                return json.loads(content)
+            except Exception as e2:
+                print(f"⚠️ Gemini failed: {e2}")
     
-    raise ValueError("No valid LLM API key found (OpenAI or Gemini)")
+    raise ValueError("No LLM services responded successfully.")
 
 if __name__ == '__main__':
     print(json.dumps(generate_dynamic_content(), ensure_ascii=False))

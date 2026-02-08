@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bybit-ingestion
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bybit-ingestion
+  template:
+    metadata:
+      labels:
+        app: bybit-ingestion
+    spec:
+      containers:
+        - name: ingestion
+          image: gonya/bybit-ingestion:latest
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bybit-bot-config
+                  key: redis_url
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
