@@ -13,17 +13,26 @@ class BybitExecutionEngine:
     - API: Batch Creation.
     - Rate Control: X-Bapi-Limit-Status.
     """
+import os
+from common.messaging import RedisStreamManager
+
+class BybitExecutionEngine:
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
         self.api_secret = api_secret
         self.is_leader = False
         self.rate_limit_remaining = 100
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        self.messenger = RedisStreamManager(redis_url)
         
         # Настройка Leader Election
         try:
             config.load_incluster_config()
         except Exception:
-            config.load_kube_config()
+            try:
+                config.load_kube_config()
+            except:
+                logger.warning("Kube config not found. Running without real LE.")
             
         self.le = LeaderElection(
             client.CoordinationV1Api(),
@@ -41,25 +50,40 @@ class BybitExecutionEngine:
         logger.warning("📉 Loss of leadership. API writing DISABLED.")
         self.is_leader = False
 
-    async def create_batch_orders(self, orders):
-        """
-        Отправка пакета ордеров через /v5/order/create-batch
-        """
+    async def execute_order(self, order):
         if not self.is_leader:
-            logger.debug("Skip: Not a leader.")
-            return
-
-        if self.rate_limit_remaining < 5:
-            logger.warning("Rate limit critically low. Backoff...")
-            await asyncio.sleep(1)
-
-        # Псевдокод вызова Bybit API v5
-        # Параметры: category, request: [ {symbol, side, orderType, qty, price...} ]
-        logger.info(f"Sending batch of {len(orders)} orders to Bybit.")
+            return None
         
-        # Эмуляция ответа и парсинга заголовков
-        # self.rate_limit_remaining = int(headers.get('X-Bapi-Limit-Status', 100))
-        pass
+        # Эмуляция исполнения ордера на Bybit
+        order_id = f"bit-{int(datetime.now().timestamp())}"
+        report = {
+            "order_id": order_id,
+            "asset_pair": order['symbol'],
+            "trade_side": order['side'],
+            "executed_qty": order['amount'],
+            "price_executed": order['price'],
+            "fmv_fiat_value": order['amount'] * order['price'],
+            "fee_amount": order['amount'] * order['price'] * 0.0006,
+            "fee_currency": "USDT"
+        }
+        return report
 
-    def run(self):
-        asyncio.create_task(self.le.run())
+    async def run(self):
+        # Start leader election in background
+        asyncio.create_task(asyncio.to_thread(self.le.run))
+        
+        logger.info("ExecutionEngine started. Listening for validated orders...")
+        stream = "orders_validated"
+        group = "execution-group"
+        async for msg_id, order in self.messenger.consume(stream, group, "exec-1"):
+            if self.is_leader:
+                report = await self.execute_order(order)
+                if report:
+                    await self.messenger.produce("execution_reports", report)
+                    logger.info(f"🚀 Executed and reported: {report['order_id']}")
+            else:
+                logger.debug(f"Passive mode: skipping order {msg_id}")
+
+if __name__ == "__main__":
+    engine = BybitExecutionEngine(os.getenv("BYBIT_API_KEY"), os.getenv("BYBIT_API_SECRET"))
+    asyncio.run(engine.run())

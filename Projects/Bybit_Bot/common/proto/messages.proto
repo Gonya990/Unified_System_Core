@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package bybit.bot.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Service A (Ingestion) -> Service B (Alpha)
+message MarketData {
+    string symbol = 1;
+    double spot_ask = 2;
+    double perp_bid = 3;
+    double funding_rate = 4;
+    google.protobuf.Timestamp timestamp = 5;
+}
+
+// Service B (Alpha) -> Service D (Risk)
+message Signal {
+    string symbol = 1;
+    string side = 2; // BUY/SELL
+    double amount = 3;
+    double leverage = 4;
+    double price = 5;
+    string action = 6; // OPEN/CLOSE
+}
+
+// Service D (Risk) -> Service C (Execution)
+message ValidatedOrder {
+    Signal signal = 1;
+    string risk_id = 2;
+    google.protobuf.Timestamp validated_at = 3;
+}
+
+// Service C (Execution) -> Service E (Compliance)
+message ExecutionReport {
+    string order_id = 1;
+    string asset_pair = 2;
+    string trade_side = 3;
+    double executed_qty = 4;
+    double price_executed = 5;
+    double fmv_fiat_value = 6;
+    double fee_amount = 7;
+    string fee_currency = 8;
+    google.protobuf.Timestamp executed_at = 9;
+}

@@ -1,61 +1,51 @@
 import logging
+import os
+import asyncio
+from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("RiskGuard")
 
 class RiskGuard:
-    """
-    Service D: Risk Guard (Риск-менеджер)
-    Middleware, который проверяет каждый ордер ДО отправки.
-    """
     def __init__(self, max_leverage=3, max_pos_size=1000, daily_loss_limit=500):
         self.max_leverage = max_leverage
         self.max_pos_size = max_pos_size
         self.daily_loss_limit = daily_loss_limit
         self.current_daily_loss = 0
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        self.messenger = RedisStreamManager(redis_url)
 
     def validate_order(self, order_data):
-        """
-        order_data: {
-            'symbol': 'BTCUSDT',
-            'side': 'Buy',
-            'amount': 0.01,
-            'leverage': 1,
-            'price': 100000
-        }
-        """
         # 1. Проверка плеча
-        if order_data['leverage'] > self.max_leverage:
-            logger.error(
-                f"❌ Плечо {order_data['leverage']} превышает "
-                f"лимит {self.max_leverage}"
-            )
+        lev = order_data.get('leverage', 1)
+        if lev > self.max_leverage:
+            logger.error(f"❌ Плечо {lev} > {self.max_leverage}")
             return False
 
-        # 2. Проверка размера позиции (Notional Value)
-        notional_value = order_data['amount'] * order_data['price']
-        if notional_value > self.max_pos_size:
-            logger.error(
-                f"❌ Размер позиции ${notional_value} превышает "
-                f"лимит ${self.max_pos_size}"
-            )
+        # 2. Проверка размера (Notional)
+        nv = order_data['amount'] * order_data['price']
+        if nv > self.max_pos_size:
+            logger.error(f"❌ Позиция ${nv} > ${self.max_pos_size}")
             return False
 
-        # 3. Kill Switch (Дневной убыток)
+        # 3. Kill Switch
         if self.current_daily_loss >= self.daily_loss_limit:
-            logger.critical("🛑 KILL SWITCH: Дневной лимит убытка достигнут!")
+            logger.critical("🛑 KILL SWITCH ACTIVE")
             return False
 
-        logger.info(
-            f"✅ Ордер валидирован: {order_data['symbol']} "
-            f"{order_data['side']} {order_data['amount']}"
-        )
         return True
+
+    async def run(self):
+        logger.info("RiskGuard started. Listening for signals...")
+        stream = "signals"
+        group = "risk-group"
+        async for msg_id, signal in self.messenger.consume(stream, group, "risk-1"):
+            if self.validate_order(signal):
+                logger.info(f"✅ Signal {msg_id} validated. Sending to execution.")
+                await self.messenger.produce("orders_validated", signal)
+            else:
+                logger.warning(f"⚠️ Signal {msg_id} rejected by risk.")
 
 if __name__ == "__main__":
     guard = RiskGuard()
-    test_order = {
-        'symbol': 'BTCUSDT', 'side': 'Buy', 'amount': 0.1,
-        'leverage': 1, 'price': 100000
-    }
-    guard.validate_order(test_order)
+    asyncio.run(guard.run())

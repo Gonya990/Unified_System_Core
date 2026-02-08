@@ -1,11 +1,20 @@
 import logging
 import asyncio
 from datetime import datetime
+import os
+from common.messaging import RedisStreamManager
+# AI / ML imports
+try:
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+except ImportError:
+    np = None
+    LinearRegression = None
 
 # Logging for DAC8
 log_fmt = '%(asctime)s [%(levelname)s] %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
-logger = logging.getLogger("BybitArb")
+logger = logging.getLogger("BybitArbAlpha")
 
 class FundingArbStrategy:
     """
@@ -13,12 +22,17 @@ class FundingArbStrategy:
     Стратегия: Delta Neutral Funding Arbitrage (Cash & Carry)
     Биржа: Bybit Unified Trading Account (UTA)
     """
-    def __init__(self, exchange, symbol="BTC/USDT", target_apr=0.12, leverage=1.0):
+    def __init__(
+        self, exchange, symbol="BTC/USDT", target_apr=0.12, leverage=1.0
+    ):
         self.exchange = exchange
         self.symbol = symbol
         self.target_apr = target_apr
         self.leverage = leverage
         self.is_active = False
+        self.history = [] # For ML features
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        self.messenger = RedisStreamManager(redis_url)
         
         # Институциональные комиссии Bybit (Maker/Taker)
         self.fees = {
@@ -59,11 +73,25 @@ class FundingArbStrategy:
                 "spot_ask": spot['ask'],
                 "perp_bid": perp['bid'],
                 "funding_rate": funding['fundingRate'],
-                "latency_ms": latency
+                "latency_ms": latency,
+                "timestamp": spot['timestamp']
             }
         except Exception as e:
             logger.error(f"❌ Ошибка сбора данных: {e}")
             return None
+
+    def _predict_funding_volatility(self):
+        """AI-компонент: Прогноз изменения ставки финансирования"""
+        if not LinearRegression or len(self.history) < 10:
+            return 0 # Neutral
+            
+        # Подготовка данных для регрессии
+        X = np.array(range(len(self.history))).reshape(-1, 1)
+        y = np.array([h['funding_rate'] for h in self.history])
+        
+        model = LinearRegression().fit(X, y)
+        prediction = model.predict([[len(self.history) + 1]])[0]
+        return prediction
 
     def calculate_metrics(self, state):
         """Расчет экономической целесообразности сделки"""
@@ -86,44 +114,64 @@ class FundingArbStrategy:
         denom = (spot_price * daily_yield)
         days_to_be = total_cycle_fees / denom if daily_yield > 0 else float('inf')
         
+        # 4. ML Overlay: Оптимизация точки входа
+        predicted_fr = self._predict_funding_volatility()
+        ml_score = 1.1 if predicted_fr > fr else 0.9 # Усиление если фандинг растет
+        
+        is_profitable = (annual_yield * ml_score >= self.target_apr) and \
+                        (days_to_be < 14)
+
         return {
             "apr": annual_yield,
             "days_to_be": days_to_be,
-            "is_profitable": (annual_yield >= self.target_apr) and (days_to_be < 14)
+            "is_profitable": is_profitable,
+            "ml_score": ml_score
         }
 
-    async def check_and_execute(self, amount):
-        """Основной цикл принятия решений"""
-        state = await self.get_market_state()
-        if not state: return
-        
-        metrics = self.calculate_metrics(state)
-        
-        logger.info(
-            f"📊 {self.symbol} | FR: {state['funding_rate']:.4%} | "
-            f"APR: {metrics['apr']:.2%} | BE: {metrics['days_to_be']:.1f}d"
-        )
-        
-        if metrics['is_profitable'] and not self.is_active:
-            logger.info("🚀 СИГНАЛ НА ВХОД: Рыночные условия оптимальны.")
-            # Здесь вызывается Execution Engine
-            await self.open_arbitrage_position(amount, state)
-        elif not metrics['is_profitable'] and self.is_active:
-            logger.info("📉 СИГНАЛ НА ВЫХОД: Доходность ниже порога.")
-            await self.close_arbitrage_position(amount)
+    async def run(self, amount):
+        logger.info(f"Alpha Engine started for {self.symbol}. Listening for market data...")
+        stream = "market_data"
+        group = "alpha-group"
+        async for msg_id, state in self.messenger.consume(
+            stream, group, "alpha-1"
+        ):
+            # Update history for ML
+            self.history.append(state)
+            if len(self.history) > 100:
+                self.history.pop(0)
 
-    async def open_arbitrage_position(self, amount, state):
-        """Параллельное исполнение: Long Spot + Short Perp"""
-        logger.info(
-            f"Executing: BUY {amount} {self.symbol} (Spot) & "
-            f"SELL {amount} (Perp)"
-        )
-        # Использование TWAP или Iceberg для крупных позиций
-        self.is_active = True
+            metrics = self.calculate_metrics(state)
+            
+            logger.debug(
+                f"📊 {self.symbol} | FR: {state['funding_rate']:.4%} | "
+                f"APR: {metrics['apr']:.2%} | ML: {metrics['ml_score']:.2f}"
+            )
+            
+            if metrics['is_profitable'] and not self.is_active:
+                logger.info("🚀 SIGNAL: Opening position.")
+                signal = {
+                    "symbol": self.symbol,
+                    "side": "SELL",
+                    "amount": amount,
+                    "leverage": self.leverage,
+                    "price": state['perp_bid'],
+                    "action": "OPEN"
+                }
+                await self.messenger.produce("signals", signal)
+                self.is_active = True
+            elif not metrics['is_profitable'] and self.is_active:
+                logger.info("📉 SIGNAL: Closing position.")
+                signal = {
+                    "symbol": self.symbol,
+                    "side": "BUY",
+                    "amount": amount,
+                    "price": state['perp_bid'],
+                    "action": "CLOSE"
+                }
+                await self.messenger.produce("signals", signal)
+                self.is_active = False
 
-    async def close_arbitrage_position(self, amount):
-        logger.info(
-            f"Closing: SELL {amount} {self.symbol} (Spot) & "
-            f"BUY {amount} (Perp)"
-        )
-        self.is_active = False
+if __name__ == "__main__":
+    # In production, exchange object would be initialized here
+    strategy = FundingArbStrategy(None, symbol="BTCUSDT")
+    asyncio.run(strategy.run(amount=0.01))

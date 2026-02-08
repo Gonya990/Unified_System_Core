@@ -2,20 +2,18 @@ import logging
 import asyncio
 import psycopg2
 import os
+from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ComplianceLogger")
 
 class ComplianceLogger:
-    """
-    Service E: Compliance Logger
-    Задача: Асинхронная запись всех транзакций в PostgreSQL/TimescaleDB (DAC8).
-    """
     def __init__(self):
         default_db = "postgresql://user:pass@localhost:5432/trading"
         self.db_url = os.getenv("DATABASE_URL", default_db)
         self.conn = None
-        self.queue = asyncio.Queue()
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        self.messenger = RedisStreamManager(redis_url)
 
     async def connect(self):
         try:
@@ -25,14 +23,12 @@ class ComplianceLogger:
         except Exception as e:
             logger.error(f"DB Connection failed: {e}")
 
-    async def log_trade(self, trade_data):
-        """Добавление сделки в очередь на запись"""
-        await self.queue.put(trade_data)
-
-    async def worker(self):
-        """Фоновый процесс записи из очереди"""
-        while True:
-            trade = await self.queue.get()
+    async def run(self):
+        await self.connect()
+        logger.info("ComplianceLogger started. Listening for execution reports...")
+        stream = "execution_reports"
+        group = "compliance-group"
+        async for msg_id, report in self.messenger.consume(stream, group, "comp-1"):
             try:
                 with self.conn.cursor() as cur:
                     cur.execute("""
@@ -41,21 +37,19 @@ class ComplianceLogger:
                             price_executed, fmv_fiat_value, fee_amount, fee_currency
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     """, (
-                        trade['order_id'],
-                        trade['asset_pair'],
-                        trade['trade_side'],
-                        trade['executed_qty'],
-                        trade['price_executed'],
-                        trade['fmv_fiat_value'],
-                        trade['fee_amount'],
-                        trade['fee_currency']
+                        report['order_id'],
+                        report['asset_pair'],
+                        report['trade_side'],
+                        report['executed_qty'],
+                        report['price_executed'],
+                        report['fmv_fiat_value'],
+                        report['fee_amount'],
+                        report['fee_currency']
                     ))
-                logger.info(f"Logged trade: {trade['order_id']}")
+                logger.info(f"✅ DAC8 Logged: {report['order_id']}")
             except Exception as e:
-                logger.error(f"Failed to log trade {trade.get('order_id')}: {e}")
-            finally:
-                self.queue.task_done()
+                logger.error(f"Failed to log trade: {e}")
 
-    async def run(self):
-        await self.connect()
-        asyncio.create_task(self.worker())
+if __name__ == "__main__":
+    logger_service = ComplianceLogger()
+    asyncio.run(logger_service.run())
