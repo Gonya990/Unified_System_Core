@@ -1,7 +1,6 @@
 import logging
 import asyncio
 import psycopg2
-from datetime import datetime, timezone
 import os
 
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +12,8 @@ class ComplianceLogger:
     Задача: Асинхронная запись всех транзакций в PostgreSQL/TimescaleDB (DAC8).
     """
     def __init__(self):
-        self.db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/trading")
+        default_db = "postgresql://user:pass@localhost:5432/trading"
+        self.db_url = os.getenv("DATABASE_URL", default_db)
         self.conn = None
         self.queue = asyncio.Queue()
 
@@ -41,9 +41,14 @@ class ComplianceLogger:
                             price_executed, fmv_fiat_value, fee_amount, fee_currency
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     """, (
-                        trade['order_id'], trade['asset_pair'], trade['trade_side'],
-                        trade['executed_qty'], trade['price_executed'],
-                        trade['fmv_fiat_value'], trade['fee_amount'], trade['fee_currency']
+                        trade['order_id'],
+                        trade['asset_pair'],
+                        trade['trade_side'],
+                        trade['executed_qty'],
+                        trade['price_executed'],
+                        trade['fmv_fiat_value'],
+                        trade['fee_amount'],
+                        trade['fee_currency']
                     ))
                 logger.info(f"Logged trade: {trade['order_id']}")
             except Exception as e:
