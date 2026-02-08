@@ -4,7 +4,7 @@ metadata:
   name: bybit-execution-engine
   namespace: trading
 spec:
-  replicas: 3 # Высокая доступность, но только один будет писать (Leader Election)
+  replicas: 3
   selector:
     matchLabels:
       app: bybit-bot
@@ -18,7 +18,7 @@ spec:
       serviceAccountName: bybit-executor-sa
       containers:
         - name: executor
-          image: ghcr.io/unified-system-core/bybit-execution:latest
+          image: gonya/bybit-execution:latest
           env:
             - name: BYBIT_API_KEY
               valueFrom:
@@ -30,13 +30,18 @@ spec:
                 secretKeyRef:
                   name: bybit-secrets
                   key: api-secret
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bybit-bot-config
+                  key: redis_url
           resources:
             requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
               cpu: "500m"
               memory: "512Mi"
-            limits:
-              cpu: "1000m"
-              memory: "1Gi"
 ---
 apiVersion: v1
 kind: ServiceAccount

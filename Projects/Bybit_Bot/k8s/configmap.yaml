@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: bot-config
+  name: bybit-bot-config
   namespace: trading
 data:
-  TARGET_SYMBOL: "BTC/USDT"
-  TARGET_APR: "0.15"
-  MAX_LEVERAGE: "3"
-  MAX_POS_SIZE: "2000"
-  DAILY_LOSS_LIMIT: "500"
-  REDIS_URL: "redis://redis-cluster.trading:6379"
-  DATABASE_URL: "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
-  LOG_LEVEL: "INFO"
+  target_symbol: "BTC/USDT"
+  target_apr: "0.15"
+  max_leverage: "3"
+  max_pos_size: "2000"
+  daily_loss_limit: "500"
+  redis_url: "redis://redis-cluster.trading:6379"
+  database_url: "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
+  log_level: "INFO"
