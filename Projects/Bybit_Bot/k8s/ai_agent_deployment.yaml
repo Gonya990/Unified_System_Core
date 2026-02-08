@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bybit-ai-alpha-agent
+  namespace: trading
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bybit-bot
+      component: alpha-agent
+  template:
+    metadata:
+      labels:
+        app: bybit-bot
+        component: alpha-agent
+    spec:
+      containers:
+        - name: alpha-agent
+          image: ghcr.io/unified-system-core/bybit-alpha:latest
+          resources:
+            limits:
+              nvidia.com/mig-1g.5gb: 1 # Институциональный уровень изоляции GPU
+              cpu: "2000m"
+              memory: "4Gi"
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 6379 # Проверка связи с Redis
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+            - name: REDIS_URL
+              value: "redis://redis-cluster.trading:6379"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bot-secrets
+                  key: github-token

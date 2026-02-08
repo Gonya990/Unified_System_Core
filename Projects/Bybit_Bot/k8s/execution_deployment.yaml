@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bybit-execution-engine
+  namespace: trading
+spec:
+  replicas: 3 # Высокая доступность, но только один будет писать (Leader Election)
+  selector:
+    matchLabels:
+      app: bybit-bot
+      component: executor
+  template:
+    metadata:
+      labels:
+        app: bybit-bot
+        component: executor
+    spec:
+      serviceAccountName: bybit-executor-sa
+      containers:
+        - name: executor
+          image: ghcr.io/unified-system-core/bybit-execution:latest
+          env:
+            - name: BYBIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bybit-secrets
+                  key: api-key
+            - name: BYBIT_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bybit-secrets
+                  key: api-secret
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bybit-executor-sa
+  namespace: trading
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: leaderelection-role
+  namespace: trading
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: leaderelection-rolebinding
+  namespace: trading
+subjects:
+  - kind: ServiceAccount
+    name: bybit-executor-sa
+    namespace: trading
+roleRef:
+  kind: Role
+  name: leaderelection-role
+  apiGroup: rbac.authorization.k8s.io

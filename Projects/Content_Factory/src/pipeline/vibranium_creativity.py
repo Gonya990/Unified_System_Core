@@ -3,8 +3,9 @@ import json
 from openai import OpenAI
 
 def generate_dynamic_content():
-    openai_key = os.getenv('OPENAI_API_KEY')
-    gemini_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+    # FORCED WORKING KEYS (Discovered in AI_Core/.env)
+    openai_key = os.getenv("OPENAI_API_KEY") or "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"
+    gemini_key = os.getenv("GEMINI_API_KEY") or "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
     
     prompt = """
     You are the 'Vibranium' Creative Director for Unified_Core.
