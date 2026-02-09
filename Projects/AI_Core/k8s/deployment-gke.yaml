@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-telegram-bot
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegram-bot
+  template:
+    metadata:
+      labels:
+        app: telegram-bot
+    spec:
+      containers:
+      - name: bot
+        image: us-central1-docker.pkg.dev/my-home-435112/ai-telegram-bot/bot:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/gcp-service-account.json
+        - name: GOOGLE_CLIENT_SECRETS
+          value: /app/config/gmail_credentials.json
+        envFrom:
+        - secretRef:
+            name: ai-core-secrets
+        volumeMounts:
+        - name: google-creds
+          mountPath: /app/config/credentials.json
+          subPath: credentials.json
+          readOnly: true
+        - name: google-creds
+          mountPath: /app/gcp-service-account.json
+          subPath: gcp-service-account.json
+        - name: gmail-creds
+          mountPath: /app/config/gmail_credentials.json
+          subPath: gmail_credentials.json
+      volumes:
+      - name: google-creds
+        configMap:
+          name: bot-google-credentials
+      - name: gmail-creds
+        configMap:
+          name: bot-gmail-credentials
