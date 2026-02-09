@@ -16,7 +16,7 @@ spec:
       containers:
         - name: bot
           image: gonya/ai-telegram-bot:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           resources:
             requests:
               cpu: "200m"
@@ -32,13 +32,27 @@ spec:
                   key: TELEGRAM_BOT_TOKEN
             - name: BOT_INSTANCE
               value: "production"
-            - name: INFERENCE_PROVIDER
-              value: "gemini"
+            - name: GOOGLE_CLIENT_SECRETS
+              value: "/app/config/credentials.json"
+            - name: DB_PATH
+              value: "/app/data/user_context.db"
+            - name: DISABLE_FIRESTORE
+              value: "true"
+            - name: ALLOWED_USERS
+              value: "708531393,5569219290,578363419"
+            - name: ADMIN_ID
+              value: "708531393"
           volumeMounts:
             - name: db-storage
               mountPath: /app/data
+            - name: google-creds
+              mountPath: /app/config
+              readOnly: true
       volumes:
         - name: db-storage
           hostPath:
             path: /home/gonya/bot_data
             type: DirectoryOrCreate
+        - name: google-creds
+          configMap:
+            name: bot-google-credentials
