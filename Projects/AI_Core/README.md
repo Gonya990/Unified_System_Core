@@ -56,9 +56,11 @@ GEMINI_API_KEY=your_key
 OPENAI_API_KEY=your_key
 OLLAMA_BASE_URL=http://localhost:11434
 
-# Home Assistant
-HA_API_URL=http://homeassistant:8123
-HA_API_TOKEN=your_ha_token
+# Home Assistant (preferred: HA_URL / HA_TOKEN)
+HA_URL=http://homeassistant:8123
+HA_TOKEN=your_ha_token
+# Backward compatible aliases:
+# HA_API_URL / HA_API_TOKEN or HASS_URL / HASS_TOKEN
 
 # Databases
 USAGE_DB_PATH=usage.db
