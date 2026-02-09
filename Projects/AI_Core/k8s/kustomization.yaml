@@ -13,7 +13,7 @@ resources:
 
 images:
   - name: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot
-    newTag: c4b4f53
+    newTag: 545e7fc
 
 commonLabels:
   app.kubernetes.io/part-of: unified-system
