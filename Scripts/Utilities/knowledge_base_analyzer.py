@@ -8,10 +8,12 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-CONTEXTS_DIR = Path("/Users/macbook/Documents/Unified_System/contexts")
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent.parent
+CONTEXTS_DIR = ROOT_DIR / "contexts"
 EXTRACT_DIR = CONTEXTS_DIR / "temp_extract"
 GDRIVE_PATH = Path(
-    "/Users/macbook/Library/CloudStorage/GoogleDrive-gonya90.gg@gmail.com/My Drive"
+    "/Users/igorgoncharenko/Library/CloudStorage/GoogleDrive-gonya90.gg@gmail.com/My Drive"
 )  # Assuming 'My Drive' is the root
 
 

@@ -14,9 +14,10 @@ NC='\033[0m'
 
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/config.json"
 PROCESSED_DIR="${SCRIPT_DIR}/data/processed"
-KNOWLEDGE_BASE="/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base"
+KNOWLEDGE_BASE="${ROOT_DIR}/Agent_Context/Knowledge_Base"
 OPENAI_KB_DIR="${KNOWLEDGE_BASE}/OpenAI_Conversations"
 
 echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
@@ -73,7 +74,7 @@ if [ "$UPDATE_AGENTS" = "True" ]; then
     echo -e "${YELLOW}English: Updating AGENTS.md...${NC}"
     echo -e "${YELLOW}Russian: Обновление AGENTS.md...${NC}"
     
-    AGENTS_MD="/Users/macbook/Documents/Unified_System/AGENTS.md"
+    AGENTS_MD="${ROOT_DIR}/AGENTS.md"
     TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
     
     # Add entry to AGENTS.md if not exists

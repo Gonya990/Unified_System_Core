@@ -194,7 +194,8 @@ def main():
         Colors.YELLOW
     )
 
-    agent_prefs_path = Path("/Users/macbook/Documents/Unified_System/Agent_Context/agent_preferences.json")
+    root_dir = script_dir.parent.parent
+    agent_prefs_path = root_dir / "Agent_Context" / "agent_preferences.json"
     create_agent_preferences(profile, agent_prefs_path)
 
     print_bilingual(

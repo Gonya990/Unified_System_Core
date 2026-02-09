@@ -668,10 +668,10 @@ def main():
     # 3. Handover to Orchestrator (Audio + Video Assembly)
     print("🤝 Handing over to Orchestrator v3 (No-Face)...")
     try:
-        # Add Production_Factory to path for internal imports
-        factory_path = ROOT_DIR.parent / "Production_Factory"
-        if str(factory_path) not in sys.path:
-            sys.path.append(str(factory_path))
+        # Add pipeline path for internal imports
+        pipeline_path = SRC_DIR / "pipeline"
+        if str(pipeline_path) not in sys.path:
+            sys.path.append(str(pipeline_path))
 
         import orchestrator_v3_no_face as orchestrator
 

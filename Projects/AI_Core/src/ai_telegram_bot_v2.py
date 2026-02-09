@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Optional
 
 import aiohttp
@@ -4777,14 +4778,26 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-    script_path = "/app/Scripts/Orchestration/daily_researcher.py"
-    if not os.path.exists(script_path):
+    script_path = Path("/app/Projects/Content_Factory/src/researcher/daily_researcher.py")
+    if not script_path.exists():
+        current_file = Path(__file__).resolve()
+        root_dir = None
+        for parent in current_file.parents:
+            if (parent / "AGENTS.md").exists() and (parent / "Projects").exists():
+                root_dir = parent
+                break
+        if root_dir is None:
+            root_dir = current_file.parent.parent.parent.parent
         script_path = (
-            "/Users/macbook/Documents/Unified_System/Scripts/"
-            "Orchestration/daily_researcher.py"
+            root_dir
+            / "Projects"
+            / "Content_Factory"
+            / "src"
+            / "researcher"
+            / "daily_researcher.py"
         )
 
-    cmd = ["python3", script_path]
+    cmd = ["python3", str(script_path)]
     if topic:
         cmd.extend(["--topic", topic])
 
@@ -4793,7 +4806,7 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            cwd=os.path.dirname(script_path),
+            cwd=str(script_path.parent),
         )
         await update.message.reply_text(f"🚀 Pipeline Started! PID: `{process.pid}`")
     except Exception as e:
