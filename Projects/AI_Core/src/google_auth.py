@@ -9,6 +9,9 @@ from google_auth_oauthlib.flow import Flow
 
 logger = logging.getLogger(__name__)
 
+# Default port for local OAuth callback server (if used)
+OAUTH_CALLBACK_PORT = 8080
+
 # Scopes required - must match OAuth consent screen configuration
 SCOPES = [
     'https://www.googleapis.com/auth/calendar',
@@ -44,7 +47,8 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 self.wfile.write(b'''
-                    <html><body style="font-family: Arial; text-align: center; padding-top: 50px;">
+                    <html><body style="font-family: Arial; text-align: center; 
+                    padding-top: 50px;">
                     <h1>Authorization Successful!</h1>
                     <p>You can close this window and return to Telegram.</p>
                     </body></html>
@@ -56,7 +60,8 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 self.wfile.write(f'''
-                    <html><body style="font-family: Arial; text-align: center; padding-top: 50px;">
+                    <html><body style="font-family: Arial; text-align: center; 
+                    padding-top: 50px;">
                     <h1>Authorization Failed</h1>
                     <p>Error: {error}</p>
                     </body></html>
@@ -68,19 +73,26 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
 
 
 # Directory for persistent tokens (mounted from ./secrets in docker-compose)
-SECRETS_DIR = "/app/secrets"
+SECRETS_DIR = os.getenv("TOKENS_PATH", "/app/data/tokens")
 if not os.path.exists(SECRETS_DIR):
-    # Fallback for local dev without docker
-    SECRETS_DIR = "."
+    try:
+        os.makedirs(SECRETS_DIR, exist_ok=True)
+    except Exception:
+        # Fallback for local dev without docker or permission issues
+        SECRETS_DIR = "."
 
 class GoogleAuthManager:
     def __init__(self, client_secrets_file="client_secret.json"):
         # Allow environment variable override
-        self.client_secrets_file = os.getenv("GOOGLE_CLIENT_SECRETS", client_secrets_file)
+        self.client_secrets_file = os.getenv(
+            "GOOGLE_CLIENT_SECRETS", client_secrets_file
+        )
         self._pending_flows = {}  # user_id -> Flow
 
         if not os.path.exists(self.client_secrets_file):
-            logger.warning(f"Client secrets file {self.client_secrets_file} not found locally.")
+            logger.warning(
+                f"Client secrets file {self.client_secrets_file} not found locally."
+            )
 
     def get_auth_url(self, user_id: int = None):
         """Generate Authorization URL for the user."""
@@ -112,7 +124,9 @@ class GoogleAuthManager:
         """Exchange auth code for credentials."""
         try:
             # Try to get stored flow, or create new one
-            flow = self._pending_flows.pop(user_id, None) or self._pending_flows.pop('default', None)
+            flow = self._pending_flows.pop(
+                user_id, None
+            ) or self._pending_flows.pop("default", None)
 
             if not flow:
                 # Create new flow if none stored
