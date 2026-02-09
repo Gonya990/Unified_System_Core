@@ -91,14 +91,33 @@
 
 ## ✅ Progress Update — 2026-02-09 08:20
 
-- **Host clutter purged:** Killed stray `mail_processor.py` on `unified-home-core-cloud`; only the K8s pod instance of `ai_telegram_bot_v2` remains.
-- **Bot database pinned to PVC:** `.env` now uses `SQLITE_DB_PATH=/data/user_context.db`; `docker-compose.yml` mounts `bot-data` at `/data` so approvals survive restarts.
-- **Gmail creds wired:** `docker-compose.yml` mounts `config/gmail_credentials.json` into the bot container (`/app/config/gmail_credentials.json`).
-- **K8s bot healthy:** Pod `trading/ai-telegram-bot-54697db754-gwdcr` is Running with `DB_PATH=/app/data/user_context.db` and hostPath `/home/gonya/bot_data` (`user_context.db` present, 32 KB).
-- **Content Factory status:** No K8s/Docker factory pods running yet—kept offline to avoid double-scheduling; start when ready to debug the 1‑second video issue.
-- **Crypto bot note:** Hummingbot logs still complain about missing API keys and `.password_verification`; needs keys + password file to turn green.
+* **Host clutter purged:** Killed stray `mail_processor.py` on
+  `unified-home-core-cloud`; only the K8s pod instance of
+  `ai_telegram_bot_v2` remains.
+* **Bot database pinned to PVC:** `.env` now uses
+  `SQLITE_DB_PATH=/data/user_context.db`; `docker-compose.yml` mounts
+  `bot-data` at `/data` so approvals survive restarts.
+* **Gmail creds wired:** `docker-compose.yml` mounts
+  `config/gmail_credentials.json` into the bot container
+  (`/app/config/gmail_credentials.json`).
+* **K8s bot healthy:** Pod `trading/ai-telegram-bot-54697db754-gwdcr` is
+  Running with `DB_PATH=/app/data/user_context.db` and hostPath
+  `/home/gonya/bot_data` (`user_context.db` present, 32 KB).
+* **Content Factory status:** No K8s/Docker factory pods running yet—kept
+  offline to avoid double-scheduling; start when ready to debug the
+  1‑second video issue.
+* **Crypto bot note:** Hummingbot logs still complain about missing API
+  keys and `.password_verification`; needs keys plus the password file
+  to turn green.
 
 ### Next 3 actions to make the board fully green
-1) **Verify bot DB persistence:** Tail `user_context.db` timestamps while approving a test user to confirm writes land on `/home/gonya/bot_data`.  
-2) **Restart mail processor inside container only:** If needed, run via `docker-compose` or K8s Job; keep host clean.  
-3) **Content Factory bring-up:** Deploy `infra/k8s/content-factory-deployment.yaml` (namespace `telegram-bot`) or start the docker-compose service, then run a manual render with verbose ffmpeg to reproduce the 1s issue.
+
+1. **Verify bot DB persistence:** Tail `user_context.db` timestamps while
+   approving a test user to confirm writes land on
+   `/home/gonya/bot_data`.
+2. **Restart mail processor inside container only:** If needed, run via
+   `docker-compose` or a K8s Job; keep host clean.
+3. **Content Factory bring-up:** Deploy
+   `infra/k8s/content-factory-deployment.yaml` (namespace
+   `telegram-bot`) or start the docker-compose service, then run a
+   manual render with verbose ffmpeg to reproduce the 1 s issue.
