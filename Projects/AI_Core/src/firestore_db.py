@@ -179,6 +179,22 @@ class FirestoreDB:
         else:
             return self._sqlite.get_inactive_users(hours)
 
+    def list_users(self) -> list[dict[str, Any]]:
+        """Return all users (admin/scheduler use)."""
+        if self.use_firestore:
+            docs = self.db.collection("users").stream()
+            results: list[dict[str, Any]] = []
+            for doc in docs:
+                data = doc.to_dict()
+                # Normalize Firestore timestamps
+                for key in ("last_interaction", "created_at"):
+                    if key in data and data[key]:
+                        val = data[key]
+                        data[key] = val.isoformat() if hasattr(val, "isoformat") else str(val)
+                results.append(data)
+            return results
+        return self._sqlite.list_users()
+
     # ==================== MEMORY OPERATIONS ====================
 
     def add_memory(self, user_id: int, fact_short: str, fact_full: str):

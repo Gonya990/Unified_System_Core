@@ -162,6 +162,14 @@ class UserContextDB:
             )
             return [dict(row) for row in cursor.fetchall()]
 
+    def list_users(self) -> list[dict[str, Any]]:
+        """Return all users (admin/scheduler use)."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users")
+            return [dict(row) for row in cursor.fetchall()]
+
     def get_user(self, user_id: int) -> Optional[dict[str, Any]]:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
