@@ -9,7 +9,9 @@ metadata:
   name: factory-orchestrator
   namespace: factory
 spec:
-  replicas: 1
+  # NOTE: elite_orchestrator.py is a one-shot script and exits immediately.
+  # Keep replicas at 0 to avoid CrashLoopBackOff; run as a Job/CronJob when needed.
+  replicas: 0
   selector:
     matchLabels:
       app: factory-orchestrator
@@ -55,6 +57,7 @@ spec:
           containers:
             - name: researcher
               image: gonya/content-factory:latest
+              imagePullPolicy: IfNotPresent
               command: ["python", "src/researcher/daily_researcher.py"]
               envFrom:
                 - secretRef:
