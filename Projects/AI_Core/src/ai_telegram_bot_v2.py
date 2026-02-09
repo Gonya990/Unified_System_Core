@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import json
 import logging
@@ -10,16 +11,44 @@ from typing import Any, Optional
 
 import aiohttp
 import pytz
+from dotenv import load_dotenv
+
+# Third-party imports
+from telegram import (
+    BotCommand,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    Update,
+)
+from telegram.constants import ChatAction
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+
+# Local imports (must be after sys.path adjustment if needed)
+from agent_orchestrator import PIPELINES, AgentOrchestrator
+from calendar_client import CalendarClient
+from config_manager import ConfigManager
+from conversation_manager import ConversationManager
+from daily_scheduler import DailyScheduler
+from google_auth import GoogleAuthManager
+from health import start_health_server
+from identity_orchestrator import IdentityOrchestrator
+from inference_client import InferenceClient
+from telegram_schema_expert import TelegramSchemaExpert
 
 # Ensure we can import sibling modules irrespective of execution context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-# Handle arguments before importing ConfigManager
-import argparse
-
-from dotenv import load_dotenv
+# Handle arguments before initializing config
 
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
 parser.add_argument("--env", help="Path to .env file", default=".env")
@@ -48,8 +77,6 @@ logger = logging.getLogger(__name__)
 logger.info(f"Bot instance: {bot_instance}, logging to {log_filename}")
 
 # Configuration
-from config_manager import ConfigManager
-from health import start_health_server
 
 config = ConfigManager()
 
@@ -64,23 +91,8 @@ except Exception as e:
     logger.error(f"Unexpected error importing DashboardService: {e}")
     DashboardService = None
 
-from inference_client import InferenceClient
-from telegram import (
-    BotCommand,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    ReplyKeyboardMarkup,
-    Update,
-)
-from telegram.constants import ChatAction
-from telegram.ext import (
-    Application,
-    CallbackQueryHandler,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters,
-)
+
+
 
 # Try Firestore first, fallback to SQLite
 _USE_FIRESTORE = False
@@ -98,13 +110,7 @@ else:
         pass
     _USE_FIRESTORE = False
 
-from agent_orchestrator import PIPELINES, AgentOrchestrator
-from calendar_client import CalendarClient
-from conversation_manager import ConversationManager
-from daily_scheduler import DailyScheduler
-from google_auth import GoogleAuthManager
-from identity_orchestrator import IdentityOrchestrator
-from telegram_schema_expert import TelegramSchemaExpert
+
 
 # Optional imports with fallbacks
 try:
