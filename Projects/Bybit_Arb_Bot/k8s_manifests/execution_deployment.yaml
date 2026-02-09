@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: execution-engine
+  namespace: trading
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: execution-engine
+  template:
+    metadata:
+      labels:
+        app: execution-engine
+    spec:
+      containers:
+        - name: bot
+          image: gonya/bybit-arb-bot:latest
+          envFrom:
+            - secretRef:
+                name: bybit-secrets
+          resources:
+            limits:
+              nvidia.com/mig-1g.5gb: 1
+              cpu: "1000m"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  name: execution-engine-leader
+  namespace: trading
+spec:
+  holderIdentity: execution-engine-pod-1
+  leaseDurationSeconds: 15
+  renewTime: "2026-02-09T16:00:00Z"

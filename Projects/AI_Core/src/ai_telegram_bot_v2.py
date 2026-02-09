@@ -1,18 +1,33 @@
 import argparse
 import asyncio
+import atexit
+import hashlib
 import json
 import logging
 import os
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
 import aiohttp
 import pytz
+
+# Local imports (must be after sys.path adjustment if needed)
+from agent_orchestrator import PIPELINES, AgentOrchestrator
+from calendar_client import CalendarClient
+from cloud_logger import setup_cloud_logging
+from config_manager import ConfigManager
+from conversation_manager import ConversationManager
+from daily_scheduler import DailyScheduler
 from dotenv import load_dotenv
+from google_auth import GoogleAuthManager
+from health import start_health_server
+from identity_orchestrator import IdentityOrchestrator
+from inference_client import InferenceClient
 
 # Third-party imports
 from telegram import (
@@ -31,17 +46,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
-# Local imports (must be after sys.path adjustment if needed)
-from agent_orchestrator import PIPELINES, AgentOrchestrator
-from calendar_client import CalendarClient
-from config_manager import ConfigManager
-from conversation_manager import ConversationManager
-from daily_scheduler import DailyScheduler
-from google_auth import GoogleAuthManager
-from health import start_health_server
-from identity_orchestrator import IdentityOrchestrator
-from inference_client import InferenceClient
 from telegram_schema_expert import TelegramSchemaExpert
 
 # Ensure we can import sibling modules irrespective of execution context
@@ -54,6 +58,10 @@ if current_dir not in sys.path:
 parser = argparse.ArgumentParser(description="AI Telegram Bot v2")
 parser.add_argument("--env", help="Path to .env file", default=".env")
 args, unknown = parser.parse_known_args()
+
+# Credentials path (allow override via env)
+DEFAULT_GCP_KEY = os.path.join(current_dir, "..", "gcp-service-account.json")
+GCP_KEY_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", DEFAULT_GCP_KEY)
 
 if args.env:
     os.environ["ENV_FILE"] = args.env
@@ -73,9 +81,91 @@ logging.basicConfig(
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 logging.getLogger("").addHandler(console)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 logger.info(f"Bot instance: {bot_instance}, logging to {log_filename}")
+
+if os.getenv("CLOUD_LOGGING", "false").lower() == "true":
+    setup_cloud_logging(service_name=f"ai-telegram-bot-{bot_instance}")
+
+_LOCK_FD = None
+_LOCK_PATH: Optional[Path] = None
+_LOCK_OWNED = False
+
+
+def _token_fingerprint(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()[:10]
+
+
+def _pid_is_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return True
+    return True
+
+
+def _release_instance_lock():
+    global _LOCK_FD, _LOCK_PATH, _LOCK_OWNED
+    if _LOCK_FD is not None:
+        try:
+            os.close(_LOCK_FD)
+        except Exception:
+            pass
+        _LOCK_FD = None
+    if _LOCK_OWNED and _LOCK_PATH:
+        try:
+            _LOCK_PATH.unlink()
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            logger.debug(f"Failed to remove lock file {_LOCK_PATH}: {e}")
+    _LOCK_OWNED = False
+
+
+def _acquire_instance_lock(token: str) -> bool:
+    global _LOCK_FD, _LOCK_PATH, _LOCK_OWNED
+    fingerprint = _token_fingerprint(token)
+    _LOCK_PATH = Path(tempfile.gettempdir()) / f"ai_core_bot_{fingerprint}.lock"
+    for _ in range(2):
+        try:
+            _LOCK_FD = os.open(_LOCK_PATH, os.O_CREAT | os.O_EXCL | os.O_RDWR)
+            os.write(_LOCK_FD, str(os.getpid()).encode("utf-8"))
+            _LOCK_OWNED = True
+            atexit.register(_release_instance_lock)
+            logger.info(f"[STARTUP] Acquired instance lock: {_LOCK_PATH}")
+            return True
+        except FileExistsError:
+            pid = None
+            try:
+                with open(_LOCK_PATH) as f:
+                    raw = f.read().strip()
+                    if raw:
+                        pid = int(raw)
+            except Exception:
+                pid = None
+            if pid and _pid_is_running(pid):
+                logger.error(
+                    "[STARTUP] Another bot instance is running "
+                    f"(PID {pid}). Exiting to avoid Telegram 409 conflicts."
+                )
+                return False
+            try:
+                _LOCK_PATH.unlink()
+            except FileNotFoundError:
+                pass
+            except Exception as e:
+                logger.error(f"[STARTUP] Failed to remove stale lock: {e}")
+                return False
+    logger.error("[STARTUP] Failed to acquire instance lock.")
+    return False
 
 # Configuration
 
@@ -224,7 +314,10 @@ inference = InferenceClient(config)
 # Initialize database (Firestore or SQLite fallback)
 if _USE_FIRESTORE:
     db = FirestoreDB()
-    logger.info("Using Firestore database")
+    if getattr(db, "use_firestore", False):
+        logger.info("Using Firestore database")
+    else:
+        logger.info("Using SQLite database (Firestore fallback)")
 else:
     db_path = os.getenv("DB_PATH", config.get("SQLITE_DB_PATH", "user_context.db"))
     logger.info(f"DB_PATH env: {os.getenv('DB_PATH')}")
@@ -1185,8 +1278,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     {"google_creds": credentials.to_json(), "is_google_connected": True}
                 )
             else:
-                import sqlite3
                 import os
+                import sqlite3
 
                 db_path = os.getenv("DB_PATH", "user_context.db")
                 with sqlite3.connect(db_path) as conn:
@@ -2085,7 +2178,9 @@ async def post_init(application: Application) -> None:
         )
 
     scheduler = DailyScheduler(application, db, inference=inference)
-    asyncio.create_task(scheduler.start())
+    scheduler_task = asyncio.create_task(scheduler.start(), name="daily_scheduler")
+    application.bot_data["daily_scheduler"] = scheduler
+    application.bot_data["daily_scheduler_task"] = scheduler_task
     logger.info("DailyScheduler background task started via post_init.")
 
     # Start Web Dashboard
@@ -2130,6 +2225,24 @@ async def post_init(application: Application) -> None:
                 logger.warning("MCP Mail Server unhealthy, skipping broadcast")
         except Exception as e:
             logger.error(f"Failed to broadcast online status: {e}")
+
+
+async def post_shutdown(application: Application) -> None:
+    scheduler = application.bot_data.get("daily_scheduler")
+    scheduler_task = application.bot_data.get("daily_scheduler_task")
+    if scheduler:
+        try:
+            await scheduler.stop()
+        except Exception as e:
+            logger.warning(f"DailyScheduler stop failed: {e}")
+    if scheduler_task:
+        scheduler_task.cancel()
+        try:
+            await scheduler_task
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            logger.warning(f"DailyScheduler shutdown error: {e}")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4921,6 +5034,9 @@ def main():
         logger.error("[STARTUP] TELEGRAM_BOT_TOKEN not set!")
         print("Error: TELEGRAM_BOT_TOKEN not set!")
         return
+    if not _acquire_instance_lock(token):
+        print("Another bot instance is already running. Exiting.")
+        return
 
     logger.info("[STARTUP] Building application...")
 
@@ -4968,7 +5084,13 @@ def main():
     # except Exception as am_e:
     #     logger.warning(f"[STARTUP] Agent Mail notification failed: {am_e}")
 
-    application = Application.builder().token(token).post_init(post_init).build()
+    application = (
+        Application.builder()
+        .token(token)
+        .post_init(post_init)
+        .post_shutdown(post_shutdown)
+        .build()
+    )
 
     # Register error handler
     application.add_error_handler(error_handler)

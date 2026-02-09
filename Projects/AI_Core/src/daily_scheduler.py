@@ -17,16 +17,23 @@ class DailyScheduler:
     async def start(self):
         self.running = True
         logger.info("Daily Scheduler/Nudger started.")
-        while self.running:
-            try:
-                await self.check_and_nudge()
-                await self.check_upcoming_events()
-                await self.schedule_daily_briefs()
-                # Check every minute to catch the 7:00 AM slot
-                await asyncio.sleep(60)
-            except Exception as e:
-                logger.error(f"Error in scheduler loop: {e}")
-                await asyncio.sleep(60)
+        try:
+            while self.running:
+                try:
+                    await self.check_and_nudge()
+                    await self.check_upcoming_events()
+                    await self.schedule_daily_briefs()
+                    # Check every minute to catch the 7:00 AM slot
+                    await asyncio.sleep(60)
+                except asyncio.CancelledError:
+                    logger.info("Daily Scheduler task cancelled.")
+                    raise
+                except Exception as e:
+                    logger.error(f"Error in scheduler loop: {e}")
+                    await asyncio.sleep(60)
+        finally:
+            self.running = False
+            logger.info("Daily Scheduler stopped.")
 
     async def stop(self):
         self.running = False

@@ -349,10 +349,10 @@ class UserContextDB:
                 )
                 conn.commit()
                 logger.debug(
-                    (
+
                         "[MASHOV] Cached "
                         f"{len(homework_data)} homework items for user {user_id}"
-                    )
+
                 )
                 return True
         except Exception as e:

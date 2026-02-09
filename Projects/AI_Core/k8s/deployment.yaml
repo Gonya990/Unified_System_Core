@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ai-telegram-bot
-  namespace: telegram-bot
+  namespace: trading
   labels:
     app: ai-telegram-bot
     app.kubernetes.io/name: ai-telegram-bot

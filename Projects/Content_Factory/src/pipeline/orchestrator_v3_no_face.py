@@ -55,8 +55,19 @@ print(f"📡 API Status: OpenAI={masked_openai} Pexels={pexels_key[:8]}...")
 try:
     from pexels_broll import semantic_search_broll  # noqa: F401
     from video_assembler import create_video_with_broll, get_video_duration  # noqa: F401
-except ImportError:
-    print("⚠️ Internal tools not found. Script might fail.")
+except ImportError as exc:
+    print(f"⚠️ Internal tools not found ({exc}). Falling back to no B-roll.")
+
+    def semantic_search_broll(*_args, **_kwargs) -> list[Path]:
+        print("⚠️ semantic_search_broll unavailable; skipping B-roll search.")
+        return []
+
+    def get_video_duration(_path: Path) -> float:
+        return 0.0
+
+    def create_video_with_broll(*_args, **_kwargs):
+        print("⚠️ create_video_with_broll unavailable; skipping B-roll assembly.")
+        return None
 
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR_OVERRIDE", str(ROOT_DIR / "outputs")))
 INPUT_DIR = Path(os.getenv("INPUT_DIR_OVERRIDE", str(ROOT_DIR / "inputs")))

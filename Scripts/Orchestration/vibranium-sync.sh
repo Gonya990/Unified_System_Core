@@ -79,7 +79,7 @@ echo -e "\n${YELLOW}[4b/5] Deploying Production Containers...${NC}"
 # 1. K8s (AI Bot)
 if ssh unified-home-core-cloud "sudo kubectl apply -f -" < "$UNIFIED_SYSTEM/Projects/AI_Core/k8s/deployment.yaml"; then
     echo -e "${GREEN}✓ K8s: AI Telegram Bot deployment updated.${NC}"
-    ssh unified-home-core-cloud "sudo kubectl rollout restart deployment/ai-telegram-bot -n telegram-bot"
+    ssh unified-home-core-cloud "sudo kubectl rollout restart deployment/ai-telegram-bot -n trading"
 else
     echo -e "${RED}✗ K8s deployment failed.${NC}"
 fi

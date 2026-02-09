@@ -1,9 +1,9 @@
 
 import os
 import sys
-import subprocess
-import time
 import random
+import requests
+import subprocess
 import requests
 from pathlib import Path
 from dotenv import load_dotenv
@@ -20,16 +20,17 @@ except ImportError:
 #                           CONFIGURATION
 # =============================================================================
 
-SRC_DIR = Path(__file__).parent.parent.parent.resolve()  
-ROOT_DIR = SRC_DIR.parent
-OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR_OVERRIDE", str(SRC_DIR.parent / "outputs")))
-INPUT_DIR = ROOT_DIR / "inputs"
+SRC_DIR = Path(__file__).parent.parent.parent.resolve()  # Projects/Content_Factory
+ROOT_DIR = SRC_DIR.parent.parent.resolve()              # Unified_System_Core
+OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR_OVERRIDE", str(SRC_DIR / "outputs")))
+INPUT_DIR = SRC_DIR / "inputs"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 INPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-load_dotenv(ROOT_DIR / ".env")
-load_dotenv(ROOT_DIR.parent / "AI_Core" / ".env")
+# Load environment variables
+load_dotenv(ROOT_DIR / ".env")                   # Root .env
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")  # AI Core .env
 
 GCS_BUCKET = "content-factory-outputs-435112"
 
@@ -39,7 +40,7 @@ GCS_BUCKET = "content-factory-outputs-435112"
 
 def generate_audio_elevenlabs(text, output_path, api_key):
     """Generate audio using ElevenLabs API (Premium)."""
-    print(f"🎤 Generating ElevenLabs Audio...")
+    print("🎤 Generating ElevenLabs Audio...")
     try:
         if not api_key: return False
         headers = {'xi-api-key': api_key, 'Content-Type': 'application/json'}
@@ -163,7 +164,10 @@ def fetch_pexels_video(keyword, output_path, api_key):
             data = resp.json()
             if data.get('videos'):
                 video_files = data['videos'][0]['video_files']
-                best_link = next((vf['link'] for vf in video_files if vf['width'] >= 720), video_files[0]['link'])
+                best_link = next(
+                    (vf['link'] for vf in video_files if vf['width'] >= 720),
+                    video_files[0]['link']
+                )
                 with open(output_path, "wb") as f: 
                     f.write(requests.get(best_link, timeout=30).content)
                 print(f"✅ Pexels Success: {keyword}")
@@ -192,7 +196,8 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     try:
         probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)])
         audio_duration = float(probe.strip())
-    except: audio_duration = 10.0
+    except Exception:
+        audio_duration = 10.0
     
     total_video_duration = audio_duration + 2.0 
     if not scenes: scenes = [{"keyword": "futuristic technology technology"}]
@@ -201,6 +206,7 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     # 3. VISUALS
     clips = []
     pexels_key = os.getenv("PEXELS_API_KEY")
+    FPS = 30
     
     for i, scene in enumerate(scenes):
         print(f"🎬 Processing Scene {i+1}/{len(scenes)}...")
@@ -218,45 +224,65 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
             if generate_image_imagen4(keyword + " cinematic, high detail, 8k", img_path):
-                # Animate (Zoom)
+                # Animate (Zoom) - Calculate d based on scene_duration and FPS
+                d_frames = int(scene_duration * FPS)
+                zoom_speed = 0.0015
                 cmd = [
-                    "ffmpeg", "-y", "-loop", "1", "-i", str(img_path), "-t", str(scene_duration),
-                    "-vf", "scale=-1:1920,zoompan=z='min(zoom+0.0015,1.5)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920",
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(clip_raw)
+                    "ffmpeg", "-y", "-loop", "1", "-i", str(img_path), 
+                    "-t", str(scene_duration),
+                    "-vf", (
+                        f"scale=-1:1920,zoompan=z='min(zoom+{zoom_speed},1.5)':"
+                        f"d={d_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+                        f"s=1080x1920,fps={FPS}"
+                    ),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS), str(clip_raw)
                 ]
-                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                subprocess.run(cmd, capture_output=True, check=False)
                 success = True
         
         # C) FINAL FAILSAFE: Generic Cinematic Video (No more stubs!)
         if not success:
             print(f"⚠️ Heavy Failsafe: Fetching random cinematic video for scene {i}")
-            failsafe_keywords = ["galaxy space", "ocean waves cinematic", "forest aerial view", "urban city night"]
+            failsafe_keywords = [
+                "galaxy space", "ocean waves cinematic", 
+                "forest aerial view", "urban city night"
+            ]
             fetch_pexels_video(random.choice(failsafe_keywords), clip_raw, pexels_key)
             success = True 
 
-        # Normalize
+        # Normalize clip to 1080x1920, exact duration, and 30fps
         cmd_norm = [
             "ffmpeg", "-y", "-i", str(clip_raw), "-t", str(scene_duration),
-            "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920",
+            "-vf", (
+                "scale=1080:1920:force_original_aspect_ratio=increase,"
+                "crop=1080:1920,fps=30"
+            ),
             "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", "-an", str(clip_final)
         ]
-        subprocess.run(cmd_norm, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        subprocess.run(cmd_norm, capture_output=True, check=False)
         clips.append(clip_final)
 
     # 4. CONCAT & MIX
     concat_list = OUTPUT_DIR / f"{output_name}_concat.txt"
     with open(concat_list, "w") as f:
-        for clip in clips: f.write(f"file '{clip}'\n")
+        for clip in clips:
+            f.write(f"file '{clip.absolute()}'\n")
 
     video_no_audio = OUTPUT_DIR / f"{output_name}_video.mp4"
     final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
 
-    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), "-c", "copy", str(video_no_audio)], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    # Concat clips
+    subprocess.run([
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), 
+        "-c", "copy", str(video_no_audio)
+    ], capture_output=True, check=False)
     
+    # Merge audio and video. Use -shortest carefully or pad video.
     subprocess.run([
         "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
-        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", "-shortest", str(final_video)
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", 
+        "-shortest", str(final_video)
+    ], capture_output=True, check=False)
 
     print(f"✨ DONE: {final_video}")
 
@@ -264,4 +290,6 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     upload_to_gcs(final_video, GCS_BUCKET)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1: run_advanced_pipeline(sys.argv[1], output_name="cli_test")
+    if len(sys.argv) > 1:
+        run_advanced_pipeline(sys.argv[1], output_name="cli_test")
+
