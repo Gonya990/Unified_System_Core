@@ -17,8 +17,17 @@ class HomeAssistantTool:
     """Home Assistant device control tool"""
 
     def __init__(self):
-        self.base_url = os.getenv("HA_URL", "http://homeassistant.local:8123")
-        self.token = os.getenv("HA_TOKEN")
+        self.base_url = (
+            os.getenv("HA_URL")
+            or os.getenv("HA_API_URL")
+            or os.getenv("HASS_URL")
+            or "http://homeassistant.local:8123"
+        )
+        self.token = (
+            os.getenv("HA_TOKEN")
+            or os.getenv("HA_API_TOKEN")
+            or os.getenv("HASS_TOKEN")
+        )
 
         if not self.token:
             logger.warning("HA_TOKEN not set - Home Assistant tool will not work")
