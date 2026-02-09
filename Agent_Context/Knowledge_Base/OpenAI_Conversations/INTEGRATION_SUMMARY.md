@@ -1,14 +1,14 @@
 # OpenAI Data Integration Summary
 # Сводка интеграции данных OpenAI
 
-**Integration Date | Дата интеграции:** 2026-01-12 21:13:14
+**Integration Date | Дата интеграции:** 2026-02-09 11:26:33
 
 ## Statistics | Статистика
 
-- **Total Conversations | Всего разговоров:** 50
+- **Total Conversations | Всего разговоров:** 51
 - **Source | Источник:** OpenAI ChatGPT Export
 - **Format | Формат:** Markdown
-- **Location | Расположение:** /Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base/OpenAI_Conversations
+- **Location | Расположение:** /Users/igorgoncharenko/Documents/Unified_System_Core/Agent_Context/Knowledge_Base/OpenAI_Conversations
 
 ## Contents | Содержимое
 
