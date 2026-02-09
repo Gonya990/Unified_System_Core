@@ -15,11 +15,18 @@ class WebSearch:
         self.serp_api_key = os.getenv("SERPAPI_KEY")
 
         try:
-            from duckduckgo_search import DDGS
+            from ddgs import DDGS  # preferred (new package)
             self.ddgs = DDGS()
             self.available = True
         except ImportError:
-            logger.error("duckduckgo-search not installed")
+            try:
+                from duckduckgo_search import DDGS  # legacy fallback
+                self.ddgs = DDGS()
+                self.available = True
+            except ImportError:
+                logger.error("ddgs/duckduckgo-search not installed")
+            except Exception as e:
+                logger.error(f"Failed to init DDGS (legacy): {e}")
         except Exception as e:
             logger.error(f"Failed to init DDGS: {e}")
 
