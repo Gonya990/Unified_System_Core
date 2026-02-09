@@ -1,0 +1,24 @@
+{
+  "created_from": "openai_profile",
+  "created_at": "2026-02-09T11:26:29.820308",
+  "user_context": {
+    "name": "User",
+    "background": "",
+    "communication_preferences": ""
+  },
+  "agent_behavior": {
+    "tone": "professional and helpful",
+    "verbosity": "balanced",
+    "code_style": "clean and well-documented",
+    "bilingual": true,
+    "languages": [
+      "en",
+      "ru"
+    ]
+  },
+  "openai_sync": {
+    "last_sync": "2026-02-09T11:26:29.820311",
+    "auto_sync": false,
+    "sync_interval_days": 7
+  }
+}
