@@ -3,71 +3,51 @@ kind: Deployment
 metadata:
   name: ai-telegram-bot
   namespace: trading
-  labels:
-    app: ai-telegram-bot
-    app.kubernetes.io/name: ai-telegram-bot
-    app.kubernetes.io/component: bot
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
   selector:
     matchLabels:
-      app: ai-telegram-bot
+      app: telegram-bot
   template:
     metadata:
       labels:
-        app: ai-telegram-bot
+        app: telegram-bot
     spec:
-      imagePullSecrets:
-        - name: ghcr-login
-      tolerations:
-        - key: "node.kubernetes.io/disk-pressure"
-          operator: "Exists"
-          effect: "NoSchedule"
       containers:
         - name: bot
           image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
           imagePullPolicy: Always
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/config/gcp-service-account.json
           envFrom:
             - secretRef:
                 name: telegram-bot-secrets
             - configMapRef:
                 name: telegram-bot-config
           volumeMounts:
-            - name: data
+            - name: google-creds
+              mountPath: /app/config/gcp-service-account.json
+              subPath: gcp-service-account.json
+            - name: config-host
+              mountPath: /app/config
+            - name: conversations-host
+              mountPath: /app/conversations
+            - name: db-storage
               mountPath: /data
-          ports:
-            - name: health
-              containerPort: 8095
-              protocol: TCP
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8095
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 8095
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: telegram-bot-pvc
+        - name: google-creds
+          configMap:
+            name: bot-google-credentials
+        - name: config-host
+          hostPath:
+            path: /home/gonya/Unified_System_Core/Projects/AI_Core/config
+            type: DirectoryOrCreate
+        - name: conversations-host
+          hostPath:
+            path: /home/gonya/Unified_System_Core/Projects/AI_Core/conversations
+            type: DirectoryOrCreate
+        - name: db-storage
+          hostPath:
+            path: /home/gonya/bot_data
+            type: DirectoryOrCreate
