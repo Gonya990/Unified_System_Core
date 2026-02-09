@@ -372,14 +372,18 @@ async def share_key_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 api_key, owner=user_name, branch_id=branch_id
             )
             await update.message.reply_text(
-                f"🐝 **Thanks!** Key added to the family swarm cluster for branch **{branch_id}**. 🦾",
+                f"🐝 **Thanks!** Key added to the family swarm cluster for "
+                f"branch **{branch_id}**. 🦾",
                 parse_mode="Markdown",
             )
             # Notify ADMIN
             if user_id != ADMIN_ID:
                 await context.bot.send_message(
                     chat_id=ADMIN_ID,
-                    text=f"🐝 User {user_name} contributed a Gemini API key to the {branch_id} swarm!",
+                text=(
+                    f"🐝 User {user_name} contributed a Gemini API key "
+                    f"to the {branch_id} swarm!"
+                ),
                 )
         except Exception as e:
             await update.message.reply_text(f"❌ Error: {e}")
@@ -411,7 +415,8 @@ async def login_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🔐 **Dashboard Login**\n\n"
         f"Ваша персональная ссылка для входа:\n"
         f"🔗 [ОТКРЫТЬ ПАНЕЛЬ УПРАВЛЕНИЯ]({login_link})\n\n"
-        f"⚠️ **Внимание**: Для открытия дашборда необходимо, чтобы на вашем устройстве был включен **Tailscale**.\n\n"
+        f"⚠️ **Внимание**: Для открытия дашборда необходимо, чтобы на вашем "
+        f"устройстве был включен **Tailscale**.\n\n"
         f"_Ссылка действительна 24 часа._",
         parse_mode="Markdown",
         disable_web_page_preview=True,
@@ -469,7 +474,8 @@ def require_role(required_role: str):
             if not db.has_permission(user_id, required_role):
                 role_names = {"ADMIN": "администратора", "MEMBER": "участника"}
                 await update.message.reply_text(
-                    f"⛔️ Требуется уровень доступа: {role_names.get(required_role, required_role)}"
+                    f"⛔️ Требуется уровень доступа: "
+                    f"{role_names.get(required_role, required_role)}"
                 )
                 return
             return await func(update, context, *args, **kwargs)
@@ -635,17 +641,20 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auth_url:
             await query.edit_message_text(
                 f"🔗 <b>Connect Google Calendar</b>\n\n"
-                f"1. 🚫 <b>НЕ НАЖИМАЙТЕ НА ССЫЛКУ!</b> Внутренний браузер Телеграм не даст скопировать код.\n\n"
+                f"1. 🚫 <b>НЕ НАЖИМАЙТЕ!</b> Внутренний браузер Телеграм не "
+                f"даст скопировать код.\n\n"
                 f"2. 👉 <b>Долгое нажатие</b> на ссылку -> <b>Скопировать</b>.\n\n"
                 f"3. Откройте <b>Safari</b> или <b>Chrome</b> и вставьте ссылку.\n\n"
                 f"4. Ссылка:\n<code>{auth_url}</code>\n\n"
-                f"5. После входа появится ошибка <i>«Не удается открыть»</i>. <b>ЭТО УСПЕХ!</b>\n"
-                f"6. Скопируйте адресную строку (всю ссылку с ошибкой) и пришлите боту.",
+                f"5. После входа появится ошибка <i>«Не удается открыть»</i>. "
+                f"<b>ЭТО УСПЕХ!</b>\n"
+                f"6. Скопируйте адресную строку и пришлите боту.",
                 parse_mode="HTML",
             )
         else:
             await query.edit_message_text(
-                "❌ Error: `client_secret.json` is missing on the server. Please contact Admin."
+                "❌ Error: `client_secret.json` is missing on the server. "
+                "Please contact Admin."
             )
 
     elif data == "help_onboarding":
@@ -669,7 +678,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             start_time = datetime.fromisoformat(pending["time"].replace("Z", "+00:00"))
         except (ValueError, TypeError) as e:
             logger.warning(
-                f"Failed to parse event time '{pending.get('time')}': {e}, using default"
+                f"Failed to parse event time '{pending.get('time')}': {e}"
             )
             start_time = datetime.now() + timedelta(hours=1)
 
@@ -688,7 +697,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if conflict:
             await query.edit_message_text(
-                f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\nВсё равно добавить?",
+                f"⚠️ **Конфликт!** В это время уже запланировано: "
+                f"`{conflict}`.\nВсё равно добавить?",
                 parse_mode="Markdown",
                 reply_markup=InlineKeyboardMarkup(
                     [
@@ -724,9 +734,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("❌ Создание события отменено.")
 
     elif data == "edit_context":
-        await query.edit_message_text(
-            "Feature coming soon! For now, try adding the event again with more details."
-        )
+            "Feature coming soon! For now, try adding the event again "
+            "with more details."
 
     elif data == "clear_memory":
         db.clear_memories(user_id)
@@ -750,10 +759,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             current_model = config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
         elif current_provider == "openai":
             current_model = config.get("OPENAI_MODEL", "gpt-4o-mini")
-        elif current_provider == "openrouter":
-            current_model = config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
+            current_model = config.get(
+                "OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"
+            )
         else:
-            current_model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+            current_model = config.get(
+                "OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2")
+            )
 
         await query.edit_message_text(
             f"⚙️ **Настройки AI**\n\n"
@@ -870,8 +882,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🟢 Scheduler: Active\n\n"
                 f"📊 System:\n"
                 f"  CPU: {cpu_percent:.1f}%\n"
-                f"  RAM: {memory.percent:.1f}% ({memory.used // (1024**3)}GB / {memory.total // (1024**3)}GB)\n"
-                f"  Disk: {disk.percent:.1f}% ({disk.used // (1024**3)}GB / {disk.total // (1024**3)}GB)"
+                f"  RAM: {memory.percent:.1f}% "
+                f"({memory.used // (1024**3)}GB / {memory.total // (1024**3)}GB)\n"
+                f"  Disk: {disk.percent:.1f}% "
+                f"({disk.used // (1024**3)}GB / {disk.total // (1024**3)}GB)"
             )
         except Exception as e:
             status = f"🔴 Error checking status: {e}"
@@ -962,8 +976,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Notify the approved user
         try:
             await context.bot.send_message(
-                chat_id=target_id,
-                text="🎉 **Доступ одобрен!**\n\nВаша заявка была одобрена администратором.\n\nОтправьте /start чтобы начать.",
+                text=(
+                    "🎉 **Доступ одобрен!**\n\nВаша заявка была одобрена "
+                    "администратором.\n\nОтправьте /start чтобы начать."
+                ),
                 parse_mode="Markdown",
             )
         except Exception as e:
@@ -1064,7 +1080,8 @@ async def show_advanced_help(update_or_query, context, edit=False):
         "Я могу помочь вам с:\n"
         "• **Календарь**: Подключите Google аккаунт для управления встречами.\n"
         "• **Память**: Я запоминаю важные факты, чтобы лучше помогать.\n"
-        "• **Контекст**: Спрашивайте 'Что мы решили по проекту X?', чтобы вспомнить детали.\n"
+        "• **Контекст**: Спрашивайте 'Что мы решили по проекту X?', "
+        "чтобы вспомнить детали.\n"
         "• **Проактивность**: Я напомню о себе, если мы давно не общались.\n\n"
         "**Быстрые действия:**"
     )
@@ -1103,7 +1120,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
             return
 
-    # If message starts with / but is actually a Russian text (user mistake), treat as text
+    # If message starts with / but is actually a Russian text (user mistake),
+    # treat as text
     if user_text.startswith("/") and len(user_text) > 1:
         # Check if it's one of our registered commands
         registered_cmds = [
@@ -1138,10 +1156,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
 
-    # Handle OAuth code - can start with "4/" or be a full URL (often Sent from mobile)
+    # Handle OAuth code - can start with "4/" or be a full URL
     auth_code = None
     if user_text.strip().startswith("4/"):
-        auth_code = user_text.strip()
+        # Clean code if it was copied with extra parameters like &scope or
+        # trailing spaces
+        auth_code = user_text.strip().split('&')[0].split(' ')[0]
     elif "code=" in user_text:
         # Extract code from URL like http://localhost:8085/oauth2callback?code=4/0ABC...
         # Also handles long URLs with other parameters
@@ -1215,14 +1235,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif user_text == "➕ Новая задача":
         logger.info(f"[INTENT] New Task from {user_id}")
         await update.message.reply_text(
-            "Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')"
+            "Что мне запланировать? "
+            "(например, 'Встреча с Сарой завтра в 10 утра')"
         )
         return
     elif user_text == "🛠 Админ-панель":
         logger.info(f"[INTENT] Admin Panel from {user_id}")
         if user_id in ALLOWED_IDS:
             await update.message.reply_text(
-                "🛠 **Центр управления админа**", reply_markup=get_admin_menu()
+                "🛠 **Центр управления админа**",
+                reply_markup=get_admin_menu()
             )
         else:
             await update.message.reply_text("⛔️ Доступ запрещен.")
@@ -1344,13 +1366,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 4. Image Generation Intent
     IMAGE_KEYWORDS = [
-        "создай картинку",
-        "нарисуй",
-        "сгенерируй изображение",
-        "картинка",
-        "draw",
-        "generate image",
-        "imagine",
+        "создай картинку", "нарисуй", "сгенерируй изображение",
+        "картинка", "draw", "generate image", "imagine",
     ]
     if any(k in lower_text for k in IMAGE_KEYWORDS):
         # Extract prompt: remove the keyword
@@ -1366,9 +1383,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 break
 
         if img_prompt:
-            # Delegate to img_command logic (simulated)
-            # We can just call img_command if we wrap it or copy logic
-            # For simplicity, let's call img_command by creating a dummy context or just call its logic
+            # For simplicity, let's call img_command logic.
+            # We call img_command by manually setting context.args.
             logger.info(f"Natural language image trigger: {img_prompt}")
             # Redirect to img_command by manually setting context.args
             context.args = img_prompt.split()
@@ -1439,13 +1455,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if is_vacancy_query:
                 # Search for job-related emails
-                query = "(vacancy OR job OR вакансия OR предложение OR recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
+                query = (
+                    "(vacancy OR job OR вакансия OR предложение OR "
+                    "recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
+                )
                 logger.info(
                     f"Searching vacancies with query: {query}, limit: {max_count}"
                 )
                 emails = gmail.search_emails(query, max_results=max_count)
                 if emails:
-                    msg = f"💼 **Найдено {len(emails)} писем о вакансиях** (показаны последние {min(len(emails), 30)}):\n\n"
+                    msg = (
+                        f"💼 **Найдено {len(emails)} писем о вакансиях** "
+                        f"(показаны последние {min(len(emails), 30)}):\n\n"
+                    )
                     # Show only top 30 to avoid hitting limits
                     for i, email in enumerate(emails[:30], 1):
                         sender = (
@@ -1470,7 +1492,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         snippet = (email.get("snippet", "") or "")[:300].replace(
                             "\n", " "
                         )
-                        email_context += f"- ID: {email['id']}\n  From: {email['from']}\n  Subject: {email['subject']}\n  Summary: {snippet}\n\n"
+                        email_context += (
+                            f"- ID: {email['id']}\n"
+                            f"  From: {email['from']}\n"
+                            f"  Subject: {email['subject']}\n"
+                            f"  Summary: {snippet[:100]}\n\n"
+                        )
 
                     conv_manager.add_message(
                         user_id, "user", f"[SYSTEM DATA]\n{email_context}"
@@ -1478,8 +1505,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Trigger analysis
                     analysis_prompt = (
-                        "Проанализируй эти письма (выше) и выбери 5-7 самых подходящих вакансий для меня. "
-                        "Моё резюме должно быть у тебя в памяти (если нет - просто ищи руководящие/технические позиции). "
+                        "Проанализируй эти письма (выше) и выбери 5-7 "
+                        "самых подходящих вакансий для меня. "
+                        "Моё резюме должно быть у тебя в памяти "
+                        "(если нет - просто ищи руководящие/технические позиции). "
                         "Формат ответа:\n"
                         "1. **Название/Тема** (Отправитель)\n"
                         "   Почему подходит: ...\n"
@@ -1497,14 +1526,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                 parse_mode="Markdown",
                             )
                         else:
+                            tip = "Попробуйте уточнить критерии поиска."
                             await update.message.reply_text(
-                                "🤔 Я изучил письма, но затрудняюсь выделить конкретные вакансии. Попробуйте уточнить критерии поиска.",
+                                f"🤔 Я изучил письма, но затрудняюсь выделить "
+                                f"конкретные вакансии. {tip}",
                                 reply_markup=get_main_menu(user_id),
                             )
                     except Exception as e:
                         logger.error(f"AI Analysis failed: {e}")
+                        err = "Попробуйте уменьшить выборку (/mail search)."
                         await update.message.reply_text(
-                            "❌ Произошла ошибка при анализе писем. Попробуйте уменьшить выборку (`/mail search query`).",
+                            f"❌ Ошибка при анализе писем. {err}",
                             reply_markup=get_main_menu(user_id),
                         )
                 else:
@@ -1527,7 +1559,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return
 
                 await update.message.reply_text(
-                    f"🔍 Загрузил последние {len(emails)} писем. Анализирую на предмет критических уведомлений и предупреждений...",
+                    f"🔍 Загрузил последние {len(emails)} писем. "
+                    "Анализирую на предмет критических уведомлений...",
                     reply_markup=get_main_menu(user_id),
                 )
 
@@ -1538,15 +1571,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if "<" in email["from"]
                         else email["from"]
                     )
-                    snippet = (email.get("snippet", "") or "")[:200].replace("\n", " ")
-                    email_context += f"{i}. От: {sender} | Тема: {email['subject']} | Суть: {snippet}\n"
+                    snippet = (email.get("snippet", "") or "")[:150]
+                    snippet = snippet.replace("\n", " ")
+                    email_context += (
+                        f"{i}. From: {sender} | Subj: {email['subject'][:40]}\n"
+                        f"   Snippet: {snippet}\n"
+                    )
 
                 full_analysis_prompt = (
                     f"Проанализируй следующий список из {len(emails)} писем.\n"
                     f"Контекст запроса пользователя: '{user_text}'\n"
                     "ИНСТРУКЦИИ:\n"
-                    "1. Игнорируй предложения о работе/вакансии (если пользователь так просил).\n"
-                    "2. Выдели КРИТИЧЕСКИЕ предупреждения, счета, уведомления безопасности или важные личные сообщения.\n"
+                    "1. Игнорируй предложения о работе/вакансии "
+                    "(если пользователь так просил).\n"
+                    "2. Выдели КРИТИЧЕСКИЕ предупреждения, счета, уведомления "
+                    "безопасности или важные личные сообщения.\n"
                     "3. Сгруппируй по важности.\n"
                     "4. Отвечай кратко и по делу на языке пользователя.\n\n"
                     f"{email_context}"
@@ -1565,7 +1604,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         )
                     else:
                         await update.message.reply_text(
-                            "🤔 Я просмотрел письма, но ничего критичного не обнаружил.",
+                            "🤔 Я просмотрел письма, но ничего важного не нашел.",
                             reply_markup=get_main_menu(user_id),
                         )
                 except Exception as e:
@@ -1657,7 +1696,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Validate response is not empty
     if not ai_response or not ai_response.strip():
-        ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз или смените провайдер через /settings."
+        ai_response = (
+            "🤔 Не удалось получить ответ. "
+            "Попробуйте ещё раз или смените провайдер."
+        )
 
     # --- PROCESSS AI COMMANDS ([[TAG:args]]) ---
     import re
@@ -1668,9 +1710,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if ha_controller:
             await ha_controller.speak_via_yandex(text_to_say)
             logger.info(f"[HA] Alice spoke: {text_to_say}")
-        ai_response = ai_response.replace(
-            f"[[ALICE:{text_to_say}]]", f"🔊 _(Озвучено Алисой: {text_to_say})_"
-        )
+            msg = f"🔊 _(Озвучено Алисой: {text_to_say[:50]}...)_"
+            ai_response = ai_response.replace(
+                f"[[ALICE:{text_to_say}]]", msg
+            )
 
     # 2. HA LIGHTS
     ha_matches = re.findall(r"\[\[HA:(.*?):(.*?)\]\]", ai_response)
@@ -1679,12 +1722,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if action == "light_on":
                 await ha_controller.turn_on_light(entity_name)
                 ai_response = ai_response.replace(
-                    f"[[HA:{action}:{entity_name}]]", f"💡 _(Включаю: {entity_name})_"
+                    f"[[HA:{action}:{entity_name}]]",
+                    f"💡 _(Включаю: {entity_name})_"
                 )
             elif action == "light_off":
                 await ha_controller.turn_off_light(entity_name)
                 ai_response = ai_response.replace(
-                    f"[[HA:{action}:{entity_name}]]", f"🌑 _(Выключаю: {entity_name})_"
+                    f"[[HA:{action}:{entity_name}]]",
+                    f"🌑 _(Выключаю: {entity_name})_"
                 )
         else:
             ai_response = ai_response.replace(
@@ -1698,13 +1743,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     for match in msg_matches:
         full_tag = match.group(0)
-        target_name = match.group(1).strip()
+        target_name = match.group(1).lower().strip()
         msg_text = match.group(2).strip()
+        logger.info(f"[MSG] AI requested to send message to {target_name}")
 
         target_id = None
 
         # Resolve target
-        target_clean = target_name.lower().lstrip("@")
+        target_clean = target_name.lstrip("@")
         if target_clean.isdigit():
             target_id = int(target_clean)
         elif target_clean in USER_ALIASES:
@@ -1726,9 +1772,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 sender_name = (
                     update.effective_user.username or update.effective_user.first_name
                 )
+                header = f"📩 **Сообщение от @{sender_name} (через Гоню):**"
                 await context.bot.send_message(
                     chat_id=target_id,
-                    text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n{msg_text}",
+                    text=f"{header}\n\n{msg_text}",
                     parse_mode="Markdown",
                 )
                 ai_response = ai_response.replace(
@@ -1748,7 +1795,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(
-        ai_response, reply_markup=get_main_menu(user_id), parse_mode="Markdown"
+        ai_response,
+        reply_markup=get_main_menu(user_id),
+        parse_mode="Markdown"
     )
 
     # Trigger async digestion if history is long
@@ -1782,8 +1831,8 @@ async def parse_event_details(text: str) -> Optional[dict[str, Any]]:
     prompt = (
         "Extract event details from this text for a calendar: '" + text + "'. "
         "Current local time: " + datetime.now().isoformat() + ". "
-        "Return ONLY a JSON object with keys: summary, time (ISO format), "
-        "duration_minutes (integer, default 60 if not specified), context (reason for event)."
+        "duration_minutes (integer, default 60 if not specified), "
+        "context (reason for event)."
     )
 
     response = await query_ollama(
@@ -1847,9 +1896,9 @@ async def digest_chat_memory(user_id: int):
     history_text = "\n".join([f"{m['role']}: {m['content']}" for m in history])
 
     prompt = (
-        "Analyze the following chat history and extract any NEW key facts "
-        "or preferences about the user (e.g., job, interests, business details, names). "
-        "Return results as a JSON array of objects with 'fact_short' and 'fact_full' keys. "
+        "or preferences about the user (e.g., job, interests, business details). "
+        "Return results as a JSON array of objects with 'fact_short' and "
+        "'fact_full' keys. "
         "If no new facts found, return empty array [].\n\nHistory:\n" + history_text
     )
 
@@ -1875,7 +1924,8 @@ async def query_ollama_with_context(
     project_context: str = "PERSONAL",
 ) -> str:
     logger.info(
-        f"[AI] Querying AI for user {user_id} (Branch: {branch_id}, Context: {project_context}), prompt length: {len(prompt)}"
+        f"[AI] Querying {user_id} (Branch: {branch_id}, Context: "
+        f"{project_context}), prompt: {len(prompt)}"
     )
 
     # 1. Get Long-term memories
@@ -1887,12 +1937,15 @@ async def query_ollama_with_context(
     history = conv_manager.get_context_messages(user_id, limit=10)
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
-    from datetime import datetime
-    current_time = datetime.now(pytz.timezone("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
+    tz = pytz.timezone("Asia/Jerusalem")
+    current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
 
     # 3. Get Home Assistant context if relevant
     ha_context = ""
-    ha_keywords = ["home", "light", "temp", "status", "дом", "свет", "температур", "статус", "включи", "выключи", "световая", "сцена", "скрипт"]
+    ha_keywords = [
+        "home", "light", "temp", "status", "дом", "свет", "температур",
+        "статус", "включи", "выключи", "световая", "сцена", "скрипт"
+    ]
     if ha_controller and any(k in prompt.lower() for k in ha_keywords):
         logger.info(f"[AI] Fetching HA context for prompt: '{prompt[:30]}...'")
         ha_context = await ha_controller.get_full_context()
@@ -1905,8 +1958,9 @@ async def query_ollama_with_context(
         "=== FEDERATION CONTEXT ===\n"
         f"Branch: {branch_id}\n"
         f"Project: {project_context}\n\n"
-        "You fluently understand and respond in English, Russian (русский), and Hebrew (עברית). "
-        "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote to you.\n\n"
+        "You fluently understand and respond in English, Russian (русский), "
+        "and Hebrew (עברית). "
+        "IMPORTANT: Always respond in the SAME LANGUAGE the user wrote.\n\n"
         # ... rest of system prompt
         "=== YOUR CAPABILITIES ===\n"
         "You have REAL access to the user's data and can perform actions:\n\n"
@@ -1915,13 +1969,13 @@ async def query_ollama_with_context(
         "- Search: /mail search <query>\n"
         "- Send: /mail send email | subject | body\n"
         "- Archive/Delete: /mail archive/trash <id>\n"
-        "When user asks about emails, tell them to use /mail commands or offer to explain how.\n\n"
+        "When user asks about emails, tell them to use /mail commands "
+        "or offer to explain how.\n\n"
         "📅 CALENDAR (Google):\n"
-        "- View events: /calendar or /brief\n"
         "- Create events: user can say 'добавь встречу на 15:00 название'\n"
         "- You can parse natural language requests for calendar events.\n\n"
         "🏠 HOME ASSISTANT & ALICE:\n"
-        "You have direct visibility into the home state (see SMART HOME STATE section).\n"
+        "You have visibility into the home state (see SMART HOME STATE section).\n"
         "- Control smart home: You can output COMMANDS to control devices.\n"
         "  - Lights/Switches: [[HA:light_on:name]] or [[HA:light_off:name]]\n"
         "  - Climate: [[HA:temp:climate_entity:23.5]]\n"
@@ -1930,14 +1984,18 @@ async def query_ollama_with_context(
         "- Yandex Alice TTS: If user asks to SAY something via Alice/station.\n"
         "  Format: [[ALICE:text_to_say]]\n\n"
         "📩 MESSAGING (RELAY SYSTEM):\n"
-        "You serve as a relay between users. If User A asks to tell/send/message User B, you MUST NOT respond to User A as if you are talking to User B. You MUST use the relay tag.\n"
+        "You serve as a relay between users. If User A asks to message User B, "
+        "you MUST NOT respond to User A as if you are talking to User B. "
+        "You MUST use the relay tag.\n"
         "- Relay tag format: [[RUN:MSG:<target>:<text>]]\n"
-        "- Valid targets: 'kostya', 'igor', or numeric ID.\n"
+        "- Valid targets: 'kostya', 'igor' or numeric ID.\n"
         "RULES:\n"
-        "1. NEVER output plain text intended for the target directly in the chat with the sender.\n"
+        "1. NEVER output plain text intended for the target directly "
+        "in the chat with the sender.\n"
         "2. ALWAYS wrap the relayed message in the [[RUN:MSG:...]] tag.\n"
         "3. Example of WRONG response: 'Игорь, нам нужно встретиться...'\n"
-        "4. Example of CORRECT response: 'Хорошо, передаю Игорю. [[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
+        "4. Example of CORRECT response: 'Хорошо, передаю Игорю. "
+        "[[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
         "- Image generation: /img <prompt>\n"
@@ -1949,7 +2007,8 @@ async def query_ollama_with_context(
         "- Kostya (Nibbler420): target='kostya'\n"
         "- Igor (Owner): target='igor'\n\n"
         "=== INSTRUCTIONS ===\n"
-        "1. Be proactive - if user asks to tell/send something to Kostya, use [[RUN:MSG:kostya:text]].\n"
+        "1. Be proactive - if user asks to tell/send something to Kostya, "
+        "use [[RUN:MSG:kostya:text]].\n"
         "2. Remember: timezone is Asia/Jerusalem (IST).\n"
         "3. Give short, helpful answers in user's language.\n"
         "4. If you can help with a task directly, do it or explain how."
@@ -2020,7 +2079,9 @@ async def post_init(application: Application) -> None:
         await application.bot.set_my_commands(commands)
         logger.info("Bot commands registered.")
     except Exception as e:
-        logger.warning(f"Could not register bot commands (likely flood control): {e}")
+        logger.warning(
+            f"Could not register bot commands (likely flood control): {e}"
+        )
 
     scheduler = DailyScheduler(application, db, inference=inference)
     asyncio.create_task(scheduler.start())
@@ -2057,7 +2118,10 @@ async def post_init(application: Application) -> None:
             if is_healthy:
                 await loop.run_in_executor(None, lambda: agent_mail.broadcast(
                     subject="Unified Bot Online (Vibranium Core)",
-                    body_md="The AI Telegram Bot V2 (Vibranium Core) has successfully started and is listening for commands.",
+                    body_md=(
+                        "The AI Telegram Bot V2 (Vibranium Core) has successfully "
+                        "started and is listening for commands."
+                    ),
                     importance="normal"
                 ))
                 logger.info("Broadcasted 'Unified Bot Online' via MCP Mail")
@@ -2160,10 +2224,11 @@ async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @require_role("ADMIN")
 async def setrole_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 2:
-        await update.message.reply_text(
-            "Usage: `/setrole USER_ID ROLE`\nRoles: ADMIN, MEMBER, GUEST",
-            parse_mode="Markdown",
+        msg = (
+            "Usage: /setrole <USER_ID> <ROLE>\n"
+            "Roles: ADMIN, MEMBER, GUEST"
         )
+        await update.message.reply_text(msg, parse_mode="Markdown")
         return
 
     try:
@@ -2212,7 +2277,9 @@ async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if inference.swarm:
             stats = inference.swarm.get_stats()
             tb = stats.get("token_broker", {})
-            tb_info = f"{tb.get('active_keys', 0)}/{tb.get('total_keys', 0)} active, {tb.get('failed_keys', 0)} failed"
+            act, tot = tb.get('active_keys', 0), tb.get('total_keys', 0)
+            fld = tb.get('failed_keys', 0)
+            tb_info = f"{act}/{tot} active, {fld} failed"
 
         admins = db.list_admins()
         admin_list = ", ".join([str(a.get("user_id")) for a in admins[:5]]) or "None"
@@ -2466,7 +2533,7 @@ async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO
     )
     await update.message.reply_text(
-        "🎨 Генерирую изображение... (��то может занять до 30 секунд)"
+        "🎨 Генерирую изображение... (то может занять до 30 секунд)"
     )
 
     try:
@@ -2590,9 +2657,9 @@ async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYP
     job_id = context.args[0]
 
     if job_id not in video_jobs:
+        tip = "Используйте /video_status без ID для списка всех заданий."
         await update.message.reply_text(
-            f"❌ Задание `{job_id}` не найдено.\n\n"
-            f"Используйте `/video_status` без ID для списка всех заданий."
+            f"❌ Задание `{job_id}` не найдено.\n\n{tip}"
         )
         return
 
@@ -2708,7 +2775,8 @@ async def mashov_homework_command(update: Update, context: ContextTypes.DEFAULT_
             "Для настройки:\n"
             "1. Найдите ID школы: `/mashov_find_school <название>`\n"
             "2. Обновите переменную `MASHOV_SCHOOL` в `.env`\n\n"
-            "Текущее значение: " + (f"`{mashov_school}`" if mashov_school else "`не установлено`"),
+            "Текущее значение: "
+            + (f"`{mashov_school}`" if mashov_school else "`не установлено`"),
             parse_mode="Markdown",
         )
         return
@@ -2796,9 +2864,10 @@ async def mashov_homework_command(update: Update, context: ContextTypes.DEFAULT_
 
             await update.message.reply_text(msg, parse_mode="Markdown")
 
-            # Cache the homework
             db.cache_homework(user_id, homework)
-            logger.info(f"[MASHOV] Cached {len(homework)} homework items for user {user_id}")
+            logger.info(
+                f"[MASHOV] Cached {len(homework)} items for user {user_id}"
+            )
 
     except ImportError as e:
         await update.message.reply_text("❌ Ошибка: модуль MashovClient не найден.")
@@ -2811,7 +2880,9 @@ async def mashov_homework_command(update: Update, context: ContextTypes.DEFAULT_
         logger.error(f"[MASHOV] Unexpected error: {e}", exc_info=True)
 
 
-async def mashov_find_school_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def mashov_find_school_command(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+):
     """Handle /mashov_find_school command - search for school by name."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
@@ -2869,10 +2940,11 @@ async def mashov_find_school_command(update: Update, context: ContextTypes.DEFAU
             )
 
     except Exception as e:
-        await update.message.reply_text(
-            f"❌ **Ошибка поиска школ**\n\n`{str(e)[:100]}`",
-            parse_mode="Markdown",
+        msg = (
+            "⚠️ **Gmail Error**\n\n"
+            "Не удалось получить почту. Проверьте подключение Google."
         )
+        await update.message.reply_text(msg, parse_mode="Markdown")
         logger.error(f"[MASHOV] School search error: {e}", exc_info=True)
 
 
@@ -2943,7 +3015,6 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.debug(f"HA status check failed: {e}")
                 ha_status = "❌ Unreachable"
 
-        swarm_section = ""
         if inference.swarm:
             try:
                 swarm_stats = inference.swarm.get_stats()
@@ -2984,7 +3055,8 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📊 **System Status**\n\n"
             f"🖥 **Server**\n"
             f"• CPU: `{cpu_usage}%`\n"
-            f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / {mem.total // 1024 // 1024}MB)\n"
+            f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / "
+            f"{mem.total // 1024 // 1024}MB)\n"
             f"• Uptime: `{uptime_str}`\n\n"
             f"{pm2_section}"
             f"🧠 **AI Core**\n"
@@ -3211,7 +3283,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle incoming voice messages - transcribe, process, and optionally respond with voice."""
+    """Handle incoming voice messages - transcribe, process, and response."""
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
@@ -3334,8 +3406,10 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "✅ Текст файла сохранен в контексте диалога."
             )
 
-            # Trigger AI analysis immediately with specific prompt
-            prompt = f"Я отправил файл {file_name}. Проанализируй его содержимое."
+            prompt = (
+                f"Я отправил файл {file_name}. "
+                "Проанализируй его содержимое."
+            )
             ai_response = await query_ollama_with_context(user_id, prompt)
 
             conv_manager.add_message(user_id, "assistant", ai_response)
@@ -3349,7 +3423,8 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif file_name.lower().endswith((".pdf", ".docx", ".doc")):
         await update.message.reply_text(
-            "ℹ️ PDF/DOCX пока не поддерживаются для чтения. Пожалуйста, скопируйте текст или сохраните как .txt"
+            "ℹ️ PDF/DOCX пока не поддерживаются. "
+            "Пожалуйста, скопируйте текст или сохраните как .txt"
         )
     else:
         # Just notify about receipt for other types
@@ -3413,7 +3488,8 @@ async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"⚙️ **Select AI Provider**\n\nCurrent: `{current.upper()}`\n\nClick to switch:",
+        f"⚙️ **Select AI Provider**\n\nCurrent: `{current.upper()}`\n\n"
+        "Click to switch:",
         parse_mode="Markdown",
         reply_markup=keyboard,
     )
@@ -3486,7 +3562,9 @@ async def costs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else {}
         )
         for provider, data in providers.items():
-            msg += f"  • {provider}: {data.get('tokens', 0):,} токенов ({data.get('requests', 0)} запросов)\n"
+            tk = data.get('tokens', 0)
+            rq = data.get('requests', 0)
+            msg += f"  • {provider}: {tk:,} токенов ({rq} запросов)\n"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -3610,7 +3688,7 @@ async def voice_mode_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     icon = "🔊" if new_mode == "voice" else "💬"
     await update.message.reply_text(
         f"{icon} Voice response mode: **{new_mode.upper()}**\n\n"
-        f"Voice messages will now get {'voice' if new_mode == 'voice' else 'text'} responses.",
+        f"Responses will now be {'voice' if new_mode == 'voice' else 'text'}.",
         parse_mode="Markdown"
     )
 
@@ -3635,14 +3713,17 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🔄 Checking Agent Mail...")
         try:
             loop = asyncio.get_running_loop()
-            messages = await loop.run_in_executor(None, lambda: agent_mail.fetch_inbox(limit=5))
+            messages = await loop.run_in_executor(
+                None, lambda: agent_mail.fetch_inbox(limit=5)
+            )
             if not messages:
                 await update.message.reply_text("📭 Agent Inbox empty.")
             else:
                 msg_text = f"📬 **Agent Inbox ({len(messages)}):**\n\n"
                 for m in messages:
                     status = '📖' if m.get('read') else '✉️'
-                    msg_text += f"{status} From: `{m['from']}`\nSubject: {m['subject']}\n\n"
+                    sender = m['from']
+                    msg_text += f"{status} From: `{sender}`\nSubj: {m['subject']}\n\n"
                 await update.message.reply_text(msg_text, parse_mode="Markdown")
         except Exception as e:
             await update.message.reply_text(f"❌ Error fetching agent mail: {e}")
@@ -3664,7 +3745,8 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         summary = gmail.get_email_summary()
         await update.message.reply_text(summary, parse_mode="Markdown")
         if agent_mail:
-             await update.message.reply_text("💡 Tip: Use `/mail agent` to check internal agent messages.")
+             tip = "Use `/mail agent` to check internal agent messages."
+             await update.message.reply_text(f"💡 Tip: {tip}")
         return
 
     cmd = context.args[0].lower()
@@ -3835,7 +3917,8 @@ async def notify_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         status = "🌙 Тихий режим" if quiet else "🔔 Активный режим"
         await update.message.reply_text(
             f"{status}\n\n"
-            f"Тихие часы: {notify_manager.quiet_start.strftime('%H:%M')} - {notify_manager.quiet_end.strftime('%H:%M')}\n\n"
+            f"Тихие часы: {notify_manager.quiet_start.strftime('%H:%M')} - "
+            f"{notify_manager.quiet_end.strftime('%H:%M')}\n\n"
             "Команды:\n"
             "/notify status - текущий статус\n"
             "/notify quiet HH:MM HH:MM - установить тихие часы"
@@ -3877,8 +3960,9 @@ async def remind_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if len(context.args) < 2:
-        await update.message.reply_text(
-            "Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d"
+        update.message.reply_text(
+            "Usage: /remind <time> <text>\n"
+            "Example: /remind 10m Выключи духовку\nTime units: s, m, h, d"
         )
         return
 
@@ -3934,7 +4018,8 @@ async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not context.args:
         await update.message.reply_text(
-            "Usage: /note <title> [| content]\nExample: /note Meeting Notes | Discussed project X"
+            "Usage: /note <title> [| content]\n"
+            "Example: /note Meeting | Discussed project X"
         )
         return
 
@@ -4062,7 +4147,8 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         await update.message.reply_text(
-            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Restarting service..."
+            f"✅ Code force-updated.\nOutput: {stdout.decode()[:150]}...\n\n"
+            "2. Restarting service..."
         )
 
         await update.message.reply_text(
@@ -4244,7 +4330,8 @@ async def linear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if issue:
             await update.message.reply_text(
-                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}",
+                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n"
+                f"{issue['title']}",
                 parse_mode="Markdown",
             )
         else:
@@ -4361,7 +4448,8 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             msg = "📬 **Agent Mail Inbox:**\n\n"
             for m in messages:
                 status = "✉️" if not m.get("read") else "📖"
-                msg += f"{status} `#{m['id']}` From: **{m['from']}**\n   _{m['subject']}_\n\n"
+                snd = m['from']
+                msg += f"{status} `#{m['id']}` From: **{snd}**\n   _{m['subject']}_\n\n"
 
             msg += "Используйте `/am read <id>` для подробностей."
             await update.message.reply_text(msg, parse_mode="Markdown")
@@ -4375,8 +4463,7 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             msg_id = int(context.args[1])
-            # fetch_inbox doesn't give full bodies in some versions, but we'll try
-            # For simplicity, we search in the batch (since Fetch Inbox includes bodies in this MCP)
+            # fetch_inbox includes bodies in this MCP
             messages = client.fetch_inbox(limit=20)
             target = next((m for m in messages if m["id"] == msg_id), None)
 
@@ -4400,7 +4487,9 @@ async def am_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_text = " ".join(context.args[1:])
         parts = [p.strip() for p in full_text.split("|")]
         if len(parts) < 3:
-            await update.message.reply_text("❌ Format: `/am send Agent | Subject | Body`")
+            await update.message.reply_text(
+                "❌ Format: `/am send Agent | Subject | Body`"
+            )
             return
 
         try:
@@ -4614,10 +4703,8 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("✅ Beads синхронизирован с репозиторием!")
 
         else:
-            await update.message.reply_text(
-                f"❌ Неизвестная команда: `{subcmd}`\n\nИспользуйте /beads для справки.",
-                parse_mode="Markdown",
-            )
+            msg = f"❌ Неизвестная команда: `{subcmd}`\n\nИспользуйте /beads."
+            await update.message.reply_text(msg, parse_mode="Markdown")
 
     except Exception as e:
         logger.error(f"[BEADS] Error: {e}")
@@ -4668,7 +4755,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text="❌ An error occurred while processing your request. Please try again.",
+                text="❌ An error occurred. Please try again.",
             )
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
@@ -4692,7 +4779,10 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     script_path = "/app/Scripts/Orchestration/daily_researcher.py"
     if not os.path.exists(script_path):
-        script_path = "/Users/macbook/Documents/Unified_System/Scripts/Orchestration/daily_researcher.py"
+        script_path = (
+            "/Users/macbook/Documents/Unified_System/Scripts/"
+            "Orchestration/daily_researcher.py"
+        )
 
     cmd = ["python3", script_path]
     if topic:
@@ -4723,7 +4813,7 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text(
             "📈 **Крипто-трейдинг**\n\n"
             "❌ API ключи ByBit не найдены или не настроены.\n\n"
-            "Пожалуйста, добавьте `BYBIT_API_KEY` и `BYBIT_API_SECRET` в файл `.env` на сервере.\n"
+            "Добавьте ключи ByBit в файл `.env` на сервере.\n"
             "Инструкция: `BYBIT_API_KEYS_GUIDE.md`",
             parse_mode="Markdown"
         )
@@ -4743,7 +4833,9 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 balance_info = f"${balances[-1]} USDT"
 
             # Find last market info
-            markets = re.findall(r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)", log_out)
+            markets = re.findall(
+                r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)", log_out
+            )
             if markets:
                 market_info = markets[-1]
         except Exception as e:
@@ -4797,13 +4889,17 @@ async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=f"📩 **Сообщение от @{sender_name}:**\n\n{message}",
                 parse_mode="Markdown",
             )
-            await update.message.reply_text(f"✅ Отправлено пользователю `{target_id}`")
+            await update.message.reply_text(
+                f"✅ Отправлено пользователю `{target_id}`"
+            )
         except Exception as e:
             await update.message.reply_text(
-                f"❌ Не удалось отправить (пользователь заблокировал бота?): {e}"
+                f"❌ Ошибка (пользователь заблокировал бота?): {e}"
             )
     else:
-        await update.message.reply_text(f"❌ Пользователь `{target}` не найден.")
+        await update.message.reply_text(
+            f"❌ Пользователь `{target}` не найден."
+        )
 
 
 def main():
@@ -4828,15 +4924,18 @@ def main():
     #                     with sqlite3.connect("user_context.db") as conn:
     #                         cursor = conn.cursor()
     #                         # Check if user exists first to avoid error
-    #                         cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (uid,))
+    #                         cursor.execute(
+    #                             "SELECT 1 FROM users WHERE user_id = ?", (uid,)
+    #                         )
     #                         if cursor.fetchone():
     #                             cursor.execute(
-    #                                 "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+    #                                 "UPDATE users SET google_creds = ?, "
+    #                                 "is_google_connected = 1 WHERE user_id = ?",
     #                                 (creds.to_json(), uid),
     #                             )
     #                             conn.commit()
     #                 except Exception as db_e:
-    #                     logger.warning(f"Failed to update DB for restored session: {db_e}")
+    #                     logger.warning(f"Failed to restore session: {db_e}")
     # except Exception as e:
     #     logger.error(f"[STARTUP] Error restoring sessions: {e}")
 
@@ -4846,7 +4945,8 @@ def main():
     #     am_client.register()
     #     am_client.broadcast(
     #         subject="Unified Bot Online",
-    #         body_md=f"🤖 **Unified AI Bot v2** is now online on `{os.uname().nodename}`.\n"
+    #         body_md=f"🤖 **Unified AI Bot v2** is now online on "
+    #                 f"`{os.uname().nodename}`.\n"
     #                 f"Ready for cross-agent task coordination.\n"
     #                 f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
     #         importance="low"
@@ -4874,7 +4974,9 @@ def main():
                 return
             application.add_handler(CommandHandler(cmd_name, handler_func))
         except Exception as e:
-            logger.error(f"❌ [VIBRANIUM] Failed to register command '{cmd_name}': {e}")
+            logger.error(
+                f"❌ [VIBRANIUM] Failed to register command '{cmd_name}': {e}"
+            )
 
     # Register command handlers safely
     commands_to_register = {
