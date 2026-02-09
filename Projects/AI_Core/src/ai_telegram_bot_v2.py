@@ -225,12 +225,16 @@ if _USE_FIRESTORE:
     db = FirestoreDB()
     logger.info("Using Firestore database")
 else:
-    db_path = config.get("SQLITE_DB_PATH", "user_context.db")
+    db_path = os.getenv("DB_PATH", config.get("SQLITE_DB_PATH", "user_context.db"))
+    logger.info(f"DB_PATH env: {os.getenv('DB_PATH')}")
+    logger.info(f"SQLITE_DB_PATH config: {config.get('SQLITE_DB_PATH')}")
     db = UserContextDB(db_path=db_path)
     logger.info(f"Using SQLite database (local mode): {db_path}")
 
 # Video generation job tracker
-video_jobs = {}  # {job_id: {"user_id": int, "prompt": str, "status": str, "created_at": datetime, "video_path": str}}
+# {job_id: {"user_id": int, "prompt": str, "status": str,
+#           "created_at": datetime, "video_path": str}}
+video_jobs = {}
 
 
 # Vibranium commands
@@ -1161,11 +1165,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             else:
                 import sqlite3
+                import os
 
-                with sqlite3.connect("user_context.db") as conn:
+                db_path = os.getenv("DB_PATH", "user_context.db")
+                with sqlite3.connect(db_path) as conn:
                     cursor = conn.cursor()
                     cursor.execute(
-                        "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+                        "UPDATE users SET google_creds = ?, is_google_connected = 1 "
+                        "WHERE user_id = ?",
                         (credentials.to_json(), user_id),
                     )
                     conn.commit()
@@ -2630,13 +2637,15 @@ async def video_status_command(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text(msg, parse_mode="Markdown")
 
 
-async def generate_video_background(job_id: str, prompt: str, user_id: int, context: ContextTypes.DEFAULT_TYPE):
+async def generate_video_background(
+    job_id: str, prompt: str, user_id: int, context: ContextTypes.DEFAULT_TYPE
+):
     """Background task to generate video (simplified MVP)."""
     try:
         video_jobs[job_id]["status"] = "processing"
         logger.info(f"[VIDEO] Started processing job {job_id}")
 
-        # Simulate video generation (in production, call actual video generation service)
+        # Simulate video generation (in production, call video generation service)
         # For now, just update status after a delay
         await asyncio.sleep(3)  # Simulate processing
 
@@ -2650,7 +2659,10 @@ async def generate_video_background(job_id: str, prompt: str, user_id: int, cont
         try:
             await context.bot.send_message(
                 chat_id=user_id,
-                text=f"✅ Видео готово!\n\nJob ID: `{job_id}`\n\nИспользуйте `/video_status {job_id}` для просмотра.",
+                text=(
+                    f"✅ Видео готово!\n\nJob ID: `{job_id}`\n\n"
+                    f"Используйте `/video_status {job_id}` для просмотра."
+                ),
                 parse_mode="Markdown"
             )
         except Exception as e:
@@ -2665,7 +2677,10 @@ async def generate_video_background(job_id: str, prompt: str, user_id: int, cont
         try:
             await context.bot.send_message(
                 chat_id=user_id,
-                text=f"❌ Ошибка генерации видео: {e}\n\nJob ID: `{job_id}`",
+                text=(
+                    f"❌ Ошибка генерации видео: {e}\n\n"
+                    f"Job ID: `{job_id}`"
+                ),
                 parse_mode="Markdown"
             )
         except Exception as notify_err:
