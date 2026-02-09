@@ -37,11 +37,15 @@ class UserContextDB:
 
             if "branch_id" not in columns:
                 logger.info("Migrating: Adding branch_id column to users table")
-                cursor.execute("ALTER TABLE users ADD COLUMN branch_id TEXT DEFAULT 'HOME_HQ'")
+                cursor.execute(
+                    "ALTER TABLE users ADD COLUMN branch_id TEXT DEFAULT 'HOME_HQ'"
+                )
 
             if "role" not in columns:
                 logger.info("Migrating: Adding role column to users table")
-                cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MEMBER'")
+                cursor.execute(
+                    "ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MEMBER'"
+                )
 
             conn.commit()
             # Events context table
@@ -99,9 +103,17 @@ class UserContextDB:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT OR IGNORE INTO users (user_id, username, full_name, branch_id, role, last_interaction, created_at)
+                INSERT OR IGNORE INTO users (
+                    user_id,
+                    username,
+                    full_name,
+                    branch_id,
+                    role,
+                    last_interaction,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
+                """,
                 (
                     user_id,
                     username,
@@ -119,7 +131,13 @@ class UserContextDB:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO chat_memories (user_id, fact_short, fact_full, source_date, created_at)
+                INSERT INTO chat_memories (
+                    user_id,
+                    fact_short,
+                    fact_full,
+                    source_date,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?)
             """,
                 (user_id, fact_short, fact_full, datetime.now(), datetime.now()),
@@ -131,7 +149,13 @@ class UserContextDB:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT * FROM chat_memories WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+                """
+                SELECT *
+                FROM chat_memories
+                WHERE user_id = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
                 (user_id, limit),
             )
             return [dict(row) for row in cursor.fetchall()]
@@ -157,7 +181,12 @@ class UserContextDB:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT * FROM users WHERE last_interaction < datetime('now', '-' || ? || ' hours') AND is_approved = 1",
+                """
+                SELECT *
+                FROM users
+                WHERE last_interaction < datetime('now', '-' || ? || ' hours')
+                  AND is_approved = 1
+                """,
                 (hours,),
             )
             return [dict(row) for row in cursor.fetchall()]
@@ -222,9 +251,15 @@ class UserContextDB:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO event_contexts (user_id, event_title, context_description, event_time, created_at)
+                INSERT INTO event_contexts (
+                    user_id,
+                    event_title,
+                    context_description,
+                    event_time,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?)
-            """,
+                """,
                 (user_id, event_title, context_description, event_time, datetime.now()),
             )
             conn.commit()
@@ -301,7 +336,9 @@ class UserContextDB:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 # Delete old cache for this user
-                cursor.execute("DELETE FROM mashov_homework WHERE user_id = ?", (user_id,))
+                cursor.execute(
+                    "DELETE FROM mashov_homework WHERE user_id = ?", (user_id,)
+                )
                 # Insert new cache
                 cursor.execute(
                     """
@@ -311,13 +348,20 @@ class UserContextDB:
                     (user_id, homework_json, datetime.now()),
                 )
                 conn.commit()
-                logger.debug(f"[MASHOV] Cached {len(homework_data)} homework items for user {user_id}")
+                logger.debug(
+                    (
+                        "[MASHOV] Cached "
+                        f"{len(homework_data)} homework items for user {user_id}"
+                    )
+                )
                 return True
         except Exception as e:
             logger.error(f"[MASHOV] Failed to cache homework: {e}")
             return False
 
-    def get_cached_homework(self, user_id: int, max_age_hours: int = 24) -> Optional[list]:
+    def get_cached_homework(
+        self, user_id: int, max_age_hours: int = 24
+    ) -> Optional[list]:
         """
         Get cached homework data if it's recent enough.
 
