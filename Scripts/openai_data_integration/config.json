@@ -1,19 +1,19 @@
 {
     "openai": {
         "export_url": "https://chatgpt.com",
-        "download_dir": "/Users/macbook/Documents/Unified_System/Scripts/openai_data_integration/data/raw",
+        "download_dir": "/Users/igorgoncharenko/Documents/Unified_System_Core/Scripts/openai_data_integration/data/raw",
         "auto_cleanup": false,
         "check_interval_days": 7
     },
     "processing": {
-        "output_dir": "/Users/macbook/Documents/Unified_System/Scripts/openai_data_integration/data/processed",
-        "archive_dir": "/Users/macbook/Documents/Unified_System/Scripts/openai_data_integration/data/archive",
+        "output_dir": "/Users/igorgoncharenko/Documents/Unified_System_Core/Scripts/openai_data_integration/data/processed",
+        "archive_dir": "/Users/igorgoncharenko/Documents/Unified_System_Core/Scripts/openai_data_integration/data/archive",
         "format": "markdown",
         "include_timestamps": true,
         "group_by": "date"
     },
     "integration": {
-        "knowledge_base_dir": "/Users/macbook/Documents/Unified_System/Agent_Context/Knowledge_Base",
+        "knowledge_base_dir": "/Users/igorgoncharenko/Documents/Unified_System_Core/Agent_Context/Knowledge_Base",
         "create_index": true,
         "update_agents_md": true,
         "backup_before_integration": true
@@ -22,7 +22,7 @@
         "map_custom_instructions": true,
         "map_preferences": true,
         "map_workspace_settings": true,
-        "target_agent_config": "/Users/macbook/Documents/Unified_System/Agent_Context/agent_preferences.json"
+        "target_agent_config": "/Users/igorgoncharenko/Documents/Unified_System_Core/Agent_Context/agent_preferences.json"
     },
     "automation": {
         "enabled": false,
