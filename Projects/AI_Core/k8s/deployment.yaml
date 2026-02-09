@@ -14,40 +14,63 @@ spec:
         app: telegram-bot
     spec:
       containers:
-        - name: bot
-          image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
-          imagePullPolicy: Always
-          env:
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /app/config/gcp-service-account.json
-          envFrom:
-            - secretRef:
-                name: telegram-bot-secrets
-            - configMapRef:
-                name: telegram-bot-config
-          volumeMounts:
-            - name: google-creds
-              mountPath: /app/config/gcp-service-account.json
-              subPath: gcp-service-account.json
-            - name: config-host
-              mountPath: /app/config
-            - name: conversations-host
-              mountPath: /app/conversations
-            - name: db-storage
-              mountPath: /data
-      volumes:
+      - name: bot
+        image: ai-telegram-bot:local
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/gcp-service-account.json
+        - name: GOOGLE_CLIENT_SECRETS
+          value: /app/config/gmail_credentials.json
+        envFrom:
+        - secretRef:
+            name: ai-core-secrets
+        volumeMounts:
         - name: google-creds
-          configMap:
-            name: bot-google-credentials
+          mountPath: /app/config/credentials.json
+          subPath: credentials.json
+          readOnly: true
+        - name: google-creds
+          mountPath: /app/gcp-service-account.json
+          subPath: gcp-service-account.json
+        - name: gmail-creds
+          mountPath: /app/config/gmail_credentials.json
+          subPath: gmail_credentials.json
         - name: config-host
-          hostPath:
-            path: /home/gonya/Unified_System_Core/Projects/AI_Core/config
-            type: DirectoryOrCreate
+          mountPath: /app/config
         - name: conversations-host
-          hostPath:
-            path: /home/gonya/Unified_System_Core/Projects/AI_Core/conversations
-            type: DirectoryOrCreate
+          mountPath: /app/conversations
         - name: db-storage
-          hostPath:
-            path: /home/gonya/bot_data
-            type: DirectoryOrCreate
+          mountPath: /app/data
+        - name: claude-agents
+          mountPath: /app/.claude/agents
+      volumes:
+      - name: google-creds
+        configMap:
+          name: bot-google-credentials
+      - name: gmail-creds
+        configMap:
+          name: bot-gmail-credentials
+      - name: config-host
+        hostPath:
+          path: /home/gonya/Unified_System_Core/Projects/AI_Core/config
+          type: DirectoryOrCreate
+      - name: conversations-host
+        hostPath:
+          path: /home/gonya/Unified_System_Core/Projects/AI_Core/conversations
+          type: DirectoryOrCreate
+      - name: db-storage
+        hostPath:
+          path: /home/gonya/bot_data
+          type: DirectoryOrCreate
+      - name: claude-agents
+        hostPath:
+          path: /home/gonya/Unified_System_Core/.claude/agents
+          type: DirectoryOrCreate

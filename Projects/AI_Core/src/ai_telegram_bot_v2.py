@@ -267,10 +267,10 @@ except Exception as e:
     task_manager = None
 
 try:
-    from notify_manager import NotifyManager
-    notify_manager = NotifyManager()
+    from notification_manager import NotificationManager
+    notify_manager = NotificationManager()
 except Exception as e:
-    logger.warning(f"NotifyManager failed to initialize: {e}")
+    logger.warning(f"NotificationManager failed to initialize: {e}")
     notify_manager = None
 
 try:

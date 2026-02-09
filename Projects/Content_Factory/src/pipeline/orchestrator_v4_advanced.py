@@ -193,14 +193,23 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
         generate_audio_openai(text, audio_path)
 
     # 2. DURATION
-    try:
-        probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)])
-        audio_duration = float(probe.strip())
-    except Exception:
+    if not audio_path.exists():
+        print(f"⚠️ Audio File NOT found: {audio_path}. Failsafe duration 10s.")
         audio_duration = 10.0
+    else:
+        try:
+            probe = subprocess.check_output([
+                "ffprobe", "-v", "error", "-show_entries", "format=duration", 
+                "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
+            ])
+            audio_duration = float(probe.strip())
+            print(f"🎵 Audio Duration: {audio_duration}s")
+        except Exception as e:
+            print(f"⚠️ FFProbe Error: {e}. Defaulting to 10s.")
+            audio_duration = 10.0
     
     total_video_duration = audio_duration + 2.0 
-    if not scenes: scenes = [{"keyword": "futuristic technology technology"}]
+    if not scenes: scenes = [{"keyword": "futuristic technology"}]
     scene_duration = total_video_duration / len(scenes)
 
     # 3. VISUALS
@@ -272,17 +281,24 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
 
     # Concat clips
+    print(f"🎞️ Concatenating {len(clips)} segments...")
     subprocess.run([
         "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), 
         "-c", "copy", str(video_no_audio)
-    ], capture_output=True, check=False)
+    ], capture_output=True, check=True)
     
-    # Merge audio and video. Use -shortest carefully or pad video.
-    subprocess.run([
-        "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
-        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", 
-        "-shortest", str(final_video)
-    ], capture_output=True, check=False)
+    # Merge audio and video
+    if audio_path.exists():
+        print(f"🔊 Mixing Audio and Video...")
+        # Use -filter_complex for better merging if needed, or simple mix
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
+            "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", 
+            "-shortest", "-movflags", "+faststart", str(final_video)
+        ], capture_output=True, check=True)
+    else:
+        print("⚠️ No audio found, renaming video_no_audio to final...")
+        video_no_audio.rename(final_video)
 
     print(f"✨ DONE: {final_video}")
 
