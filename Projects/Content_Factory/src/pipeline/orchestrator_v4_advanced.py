@@ -29,8 +29,8 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 INPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Load environment variables
-load_dotenv(ROOT_DIR / ".env")                   # Root .env
-load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")  # AI Core .env
+load_dotenv(ROOT_DIR / ".env", override=True)                   # Root .env
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)  # AI Core .env
 
 GCS_BUCKET = "content-factory-outputs-435112"
 
@@ -158,7 +158,10 @@ def fetch_pexels_video(keyword, output_path, api_key):
     try:
         if not api_key: return False
         headers = {'Authorization': api_key}
-        url = f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
+        url = (
+            "https://api.pexels.com/videos/search?"
+            f"query={keyword}&per_page=1&orientation=portrait&size=medium"
+        )
         resp = requests.get(url, headers=headers, timeout=10)
         if resp.status_code == 200:
             data = resp.json()
@@ -180,7 +183,13 @@ def fetch_pexels_video(keyword, output_path, api_key):
 #                           MAIN PIPELINE
 # =============================================================================
 
-def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video_v4", scenes: list[dict] = None, style: str = "impact"):
+def run_advanced_pipeline(
+    text: str, 
+    lang: str = "ru", 
+    output_name: str = "video_v4", 
+    scenes: list[dict] = None, 
+    style: str = "impact"
+):
     print(f"\n🚀 Starting ORCHESTRATOR V4.1 (IRONCLAD VISUALS - style={style})")
     
     if not text: return
@@ -232,7 +241,8 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
         # B) AI Image Gen (Imagen 4 -> DALL-E 3)
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
-            if generate_image_imagen4(keyword + " cinematic, high detail, 8k", img_path):
+            img_prompt = f"{keyword} cinematic, high detail, 8k"
+            if generate_image_imagen4(img_prompt, img_path):
                 # Animate (Zoom) - Calculate d based on scene_duration and FPS
                 d_frames = int(scene_duration * FPS)
                 zoom_speed = 0.0015
@@ -244,7 +254,8 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
                         f"d={d_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
                         f"s=1080x1920,fps={FPS}"
                     ),
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS), str(clip_raw)
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS),
+                    str(clip_raw)
                 ]
                 subprocess.run(cmd, capture_output=True, check=False)
                 success = True
@@ -289,7 +300,7 @@ def run_advanced_pipeline(text: str, lang: str = "ru", output_name: str = "video
     
     # Merge audio and video
     if audio_path.exists():
-        print(f"🔊 Mixing Audio and Video...")
+        print("🔊 Mixing Audio and Video...")
         # Use -filter_complex for better merging if needed, or simple mix
         subprocess.run([
             "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
