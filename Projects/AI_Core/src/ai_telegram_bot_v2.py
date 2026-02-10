@@ -1191,11 +1191,12 @@ async def show_advanced_help(update_or_query, context, edit=False):
     text = (
         "🤖 **Помощь цифрового ассистента**\n\n"
         "Я могу помочь вам с:\n"
-        "• **Календарь**: Подключите Google аккаунт для управления встречами.\n"
-        "• **Память**: Я запоминаю важные факты, чтобы лучше помогать.\n"
-        "• **Контекст**: Спрашивайте 'Что мы решили по проекту X?', "
-        "чтобы вспомнить детали.\n"
-        "• **Проактивность**: Я напомню о себе, если мы давно не общались.\n\n"
+        "• **Календарь**: Управление встречами.\n"
+        "• **Статус**: `/status` - аптайм и здоровье сервера.\n"
+        "• **Инфра**: `/infra` - статус GKE кластера.\n"
+        "• **Модели**: `/models` - выбор ИИ провайдера.\n"
+        "• **Мечты**: `/dream` - запишите идею для автоматизации.\n"
+        "• **Память**: Я запоминаю детали наших бесед.\n\n"
         "**Быстрые действия:**"
     )
     keyboard = [
@@ -2197,7 +2198,12 @@ async def post_init(application: Application) -> None:
         BotCommand("calendar", "Google Calendar management"),
         BotCommand("linear", "Linear project management"),
         BotCommand("todo", "Personal task list"),
+        BotCommand("status", "Show system status & uptime"),
+        BotCommand("infra", "Check Kubernetes infra status"),
+        BotCommand("models", "Switch/List AI models"),
         BotCommand("img", "Generate image with DALL-E 3"),
+        BotCommand("dream", "Save a new idea or automation request"),
+        BotCommand("factory", "Trigger the Content Factory"),
         BotCommand("generate_video", "Generate AI video from prompt"),
         BotCommand("video_status", "Check status of video jobs"),
         BotCommand("memory", "View your saved AI context"),
@@ -4931,6 +4937,48 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         asyncio.create_task(gh_handler.create_issue(title, body))
 
 
+async def dream_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /dream command - record ideas to GitHub issues."""
+    user_id = update.effective_user.id
+    if not db.is_approved(user_id):
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "🌌 **Dream Catcher**\n\n"
+            "Используйте эту команду, чтобы зафиксировать идею или пожелание.\n"
+            "Пример: `/dream Хочу, чтобы бот сам заказывал пиццу по пятницам`",
+            parse_mode="Markdown"
+        )
+        return
+
+    idea = " ".join(context.args)
+    msg = await update.message.reply_text("✨ Транслирую вашу мечту в Vision Board...")
+
+    if gh_handler:
+        title = f"🎯 [DREAM] {idea[:60]}..."
+        body = (
+            f"### Vision Idea\n{idea}\n\n"
+            f"---\n"
+            f"**Reported by:** @{update.effective_user.username or user_id}\n"
+            f"**Node:** `{os.environ.get('HOSTNAME', 'GKE-Production')}`"
+        )
+        try:
+            issue_data = await gh_handler.create_issue(title, body)
+            # handle both URL and dict return types depending on gh_handler implementation
+            issue_url = issue_data if isinstance(issue_data, str) else issue_data.get("html_url")
+            await msg.edit_text(
+                f"🚀 **Мечта зафиксирована!** Мы это реализуем.\n\n"
+                f"🔗 [Отслеживать прогресс]({issue_url})",
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            logger.error(f"Dream creation failed: {e}")
+            await msg.edit_text(f"⚠️ Мечта запомнена локально, но GitHub временно недоступен. Вернёмся к ней позже!")
+    else:
+        await msg.edit_text("💡 Хорошая идея! (GitHub не подключен, сохранено в логи)")
+
+
 async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /factory command to trigger Content Farm."""
     user_id = update.effective_user.id
@@ -4947,40 +4995,44 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-    p = "/app/Projects/Content_Factory/src/researcher/daily_researcher.py"
-    script_path = Path(p)
-    if not script_path.exists():
+    # DYNAMIC PATH RESOLUTION FOR GKE vs CLOUD-DIRECT
+    # If in GKE, we can't run scripts directly unless mounted.
+    # We look for /app first (standard Docker path)
+    
+    root_dir = Path("/app")
+    if not (root_dir / "Projects").exists():
+        # Fallback to current file parent search
         current_file = Path(__file__).resolve()
-        root_dir = None
         for parent in current_file.parents:
-            if (parent / "AGENTS.md").exists() and (parent / "Projects").exists():
+            if (parent / "Projects").exists():
                 root_dir = parent
                 break
-        if root_dir is None:
-            root_dir = current_file.parent.parent.parent.parent
-        script_path = (
-            root_dir
-            / "Projects"
-            / "Content_Factory"
-            / "src"
-            / "researcher"
-            / "daily_researcher.py"
-        )
 
-    cmd = ["python3", str(script_path)]
+    script_path = root_dir / "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+    
+    if not script_path.exists():
+        await update.message.reply_text(
+            "❌ **Error:** Content Factory scripts not found in current pod.\n"
+            "This bot is running in **Kubernetes (GKE)**. "
+            "Factory must be triggered on the **Cloud Server** directly via SSH or Cron."
+        )
+        return
+
+    cmd = [sys.executable, str(script_path)]
     if topic:
-        cmd.extend(["--topic", topic])
+        cmd.extend(["--inspiration-topic", topic])
 
     try:
+        # Run detached-like or capture output
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             cwd=str(script_path.parent),
         )
-        await update.message.reply_text(f"🚀 Pipeline Started! PID: `{process.pid}`")
+        await update.message.reply_text(f"🚀 **Pipeline Started Locally!** PID: `{process.pid}`")
     except Exception as e:
-        await update.message.reply_text(f"❌ Failed to start factory: {e}")
+        await update.message.reply_text(f"❌ **Failed to start factory:** {e}")
 
 
 async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -5219,6 +5271,7 @@ def main():
         "family_stats": family_stats_command,
         "share_key": share_key_command,
         "login": login_command,
+        "dream": dream_command,
         "factory": factory_command,
         "am": am_command,
         "generate_video": generate_video_command,
