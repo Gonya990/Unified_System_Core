@@ -49,12 +49,6 @@ check_env_files() {
         exit 1
     fi
     print_success ".env.igor exists"
-
-    if [[ ! -f "$PROJECT_ROOT/.env.kostya" ]]; then
-        print_error ".env.kostya not found"
-        exit 1
-    fi
-    print_success ".env.kostya exists"
 }
 
 start_bots() {
