@@ -38,20 +38,23 @@ class ByBitTradingBot:
         api_secret: str,
         telegram_token: str,
         admin_chat_id: str,
-        testnet: bool = True
+        testnet: bool = True,
+        monitor_only: bool = True
     ):
         self.api_key = api_key
         self.api_secret = api_secret
         self.telegram_token = telegram_token
         self.admin_chat_id = admin_chat_id
         self.testnet = testnet
+        self.monitor_only = monitor_only
 
         # Trading parameters (VERY CONSERVATIVE)
         self.max_trade_percent = 0.03  # Only 3%!
         self.stop_loss_percent = 0.02  # -2% stop
         self.take_profit_percent = 0.04  # +4% target
         self.min_balance_usdt = 10  # Minimum $10
-        self.min_order_value = 5.1  # ByBit Spot API minimum is 5 USDT (added small buffer)
+        # ByBit Spot API minimum is 5 USDT (added small buffer)
+        self.min_order_value = 5.1
 
         # State
         self.balance = 0
@@ -59,6 +62,7 @@ class ByBitTradingBot:
         self.is_active = False
         self.trades_today = 0
         self.max_trades_per_day = 5  # Limit trades
+        self.last_notified_low_balance = None
 
         # Stats
         self.total_trades = 0
@@ -166,7 +170,10 @@ class ByBitTradingBot:
             sma_long = sum(closes[-30:]) / 30
             current_price = closes[-1]
 
-            logger.info(f"Market: RSI={rsi:.1f}, SMA_short={sma_short:.4f}, SMA_long={sma_long:.4f}")
+            logger.info(
+                f"Market: RSI={rsi:.1f}, SMA_short={sma_short:.4f}, "
+                f"SMA_long={sma_long:.4f}"
+            )
 
             # Trading signals
             if rsi < 35 and current_price < sma_long * 0.98:
@@ -207,7 +214,11 @@ class ByBitTradingBot:
         side: str,  # Buy or Sell
         quantity: float
     ) -> bool:
-        """Place market order on ByBit."""
+        """Place market order on ByBit (or skip if monitoring only)."""
+        if self.monitor_only:
+            logger.info(f"[MONITOR ONLY] Would place {side} {quantity} {symbol}")
+            return True
+
         # Ensure quantity is rounded (Spot TONUSDT usually 2 decimal places)
         formatted_qty = f"{quantity:.2f}"
         try:
@@ -239,12 +250,19 @@ class ByBitTradingBot:
                 order_id = result['result']['orderId']
                 logger.info(f"Order placed: {side} {quantity} {symbol}, ID: {order_id}")
 
+                action_name = (
+                    'RECOMMENDATION' if self.monitor_only else 'Order Executed'
+                )
+                notif_suffix = (
+                    'Recommendation only - no real trade placed.' 
+                    if self.monitor_only else f'Order ID: {order_id}'
+                )
                 await self.notify(
-                    f"✅ **Order Executed**\n"
-                    f"Side: {side}\n"
+                    f"✅ **{action_name}**\n"
+                    f"Action: {side}\n"
                     f"Symbol: {symbol}\n"
                     f"Quantity: {quantity}\n"
-                    f"Order ID: {order_id}"
+                    f"{notif_suffix}"
                 )
 
                 return True
@@ -277,11 +295,17 @@ class ByBitTradingBot:
 
                 # Check against exchange minimum (5 USDT)
                 if trade_amount < self.min_order_value:
-                    logger.warning(f"Trade amount ${trade_amount:.2f} too low. Using minimum ${self.min_order_value}")
+                    logger.warning(
+                        f"Trade amount ${trade_amount:.2f} too low. "
+                        f"Using minimum ${self.min_order_value}"
+                    )
                     trade_amount = self.min_order_value
 
                 if trade_amount > self.balance:
-                    logger.error(f"Balance ${self.balance:.2f} too low for minimum order ${trade_amount:.2f}")
+                    logger.error(
+                        f"Balance ${self.balance:.2f} too low for "
+                        f"minimum order ${trade_amount:.2f}"
+                    )
                     return
 
                 quantity = round(trade_amount / price, 2)
@@ -395,14 +419,24 @@ class ByBitTradingBot:
                 self.balance = await self.get_balance()
 
                 if self.balance < self.min_balance_usdt:
-                    await self.notify(
-                        f"⚠️ **Low Balance**\n"
-                        f"Current: ${self.balance:.2f}\n"
-                        f"Minimum: ${self.min_balance_usdt:.2f}\n"
-                        "Trading paused.",
-                        urgent=True
+                    now = datetime.now()
+                    # Only notify once every 24 hours
+                    should_notify = (
+                        self.last_notified_low_balance is None or 
+                        (now - self.last_notified_low_balance).total_seconds() > 86400
                     )
-                    await asyncio.sleep(3600)  # Wait 1 hour
+                    
+                    if should_notify:
+                        await self.notify(
+                            f"⚠️ **Low Balance**\n"
+                            f"Current: ${self.balance:.2f}\n"
+                            f"Minimum: ${self.min_balance_usdt:.2f}\n"
+                            "Trading paused. (Notification throttled for 24h)",
+                            urgent=True
+                        )
+                        self.last_notified_low_balance = now
+                    
+                    await asyncio.sleep(3600)  # Wait 1 hour before next balance check
                     continue
 
                 # Check existing positions
@@ -457,13 +491,17 @@ async def main():
     # Start in TESTNET or LIVE based on .env
     testnet_env = os.getenv('BYBIT_TESTNET', 'true').lower()
     is_testnet = testnet_env == 'true'
+    
+    monitor_only_env = os.getenv('BYBIT_MONITOR_ONLY', 'true').lower()
+    is_monitor_only = monitor_only_env == 'true'
 
     bot = ByBitTradingBot(
         api_key=api_key,
         api_secret=api_secret,
         telegram_token=telegram_token,
         admin_chat_id=admin_chat_id,
-        testnet=is_testnet
+        testnet=is_testnet,
+        monitor_only=is_monitor_only
     )
 
     if not is_testnet:

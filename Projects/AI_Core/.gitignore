@@ -1,6 +1,7 @@
 # Environment files
 .env
-*.env.local
+*.env.*
+!.env.igor
 
 # Python
 __pycache__/
@@ -10,6 +11,7 @@ __pycache__/
 .Python
 venv/
 .venv/
+.venv*/
 env/
 .eggs/
 *.egg-info/
@@ -33,9 +35,15 @@ logs/
 # Data (runtime config)
 data/
 bot_config.json
+*.db
+*.db-journal
 
-# Docker
-.docker/
+# Archives and Backups
+*.zip
+*.tar.gz
+*.bak
+*.old
+* 2.*
 
 # Credentials (sensitive)
 credentials/
@@ -43,3 +51,5 @@ google_token.json
 client_secret.json
 *.credentials.json
 watchtower-config.json
+gcp-service-account.json
+gmail_credentials.json

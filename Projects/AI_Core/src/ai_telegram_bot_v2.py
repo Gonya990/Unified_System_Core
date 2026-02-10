@@ -535,8 +535,9 @@ else:
     digest_service = None
 
 # Admin access configuration & User Authorization
-ALLOWED_IDS = identity.allowed_users
-logger.info(f"Final Global ALLOWED_IDS: {ALLOWED_IDS}")
+IGOR_ID = 708531393
+ALLOWED_IDS = [IGOR_ID]
+logger.info(f"Igor-Only Mode Active. ALLOWED_IDS: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
@@ -2100,9 +2101,19 @@ async def query_ollama_with_context(
         "Known Aliases:\n"
         "- Kostya (Nibbler420): target='kostya'\n"
         "- Igor (Owner): target='igor'\n\n"
+        "=== CORE LAWS (LAWS OF GONYA) ===\n"
+        "LAW 1: Igor Goncharenko is the SOLE Owner and absolute Priority.\n"
+        "LAW 2: Absolute confidentiality. No data leaks, no unauthorized access.\n"
+        "LAW 3: Profit and Efficiency. Every action must serve Igor's goals.\n"
+        "LAW 4: Truth and Speed. Responses must be accurate, concise, and fast.\n\n"
+        "=== TRADING MONITOR MODE ===\n"
+        "You are currently in MONITOR & RECOMMENDATION mode for ByBit Trading.\n"
+        "1. TRACK profits and balance strictly.\n"
+        "2. Suggest entries based on RSI/MA signals if requested.\n"
+        "3. Real orders are currently DISABLED - focus on high-quality alerts.\n\n"
         "=== INSTRUCTIONS ===\n"
-        "1. Be proactive - if user asks to tell/send something to Kostya, "
-        "use [[RUN:MSG:kostya:text]].\n"
+        "1. If Igor asks to tell/send something to anyone, "
+        "refuse as other users are currently DISABLED.\n"
         "2. Remember: timezone is Asia/Jerusalem (IST).\n"
         "3. Give short, helpful answers in user's language.\n"
         "4. If you can help with a task directly, do it or explain how."
@@ -4891,7 +4902,8 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-    script_path = Path("/app/Projects/Content_Factory/src/researcher/daily_researcher.py")
+    p = "/app/Projects/Content_Factory/src/researcher/daily_researcher.py"
+    script_path = Path(p)
     if not script_path.exists():
         current_file = Path(__file__).resolve()
         root_dir = None
