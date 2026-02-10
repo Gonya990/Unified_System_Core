@@ -4975,7 +4975,7 @@ async def dream_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             logger.error(f"Dream creation failed: {e}")
-            await msg.edit_text(f"⚠️ Мечта запомнена локально, но GitHub временно недоступен. Вернёмся к ней позже!")
+            await msg.edit_text("⚠️ Мечта запомнена локально, но GitHub временно недоступен. Вернёмся к ней позже!")
     else:
         await msg.edit_text("💡 Хорошая идея! (GitHub не подключен, сохранено в логи)")
 
@@ -4999,7 +4999,7 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # DYNAMIC PATH RESOLUTION FOR GKE vs CLOUD-DIRECT
     # If in GKE, we can't run scripts directly unless mounted.
     # We look for /app first (standard Docker path)
-    
+
     root_dir = Path("/app")
     if not (root_dir / "Projects").exists():
         # Fallback to current file parent search
@@ -5012,7 +5012,7 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     script_path = root_dir / (
         "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
     )
-    
+
     if not script_path.exists():
         await update.message.reply_text(
             "❌ **Error:** Content Factory scripts not found.\n"

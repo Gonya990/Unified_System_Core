@@ -98,22 +98,22 @@ class InferenceClient:
     ):
         """Routed chat request with branch awareness and auto-failover."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
-        
+
         # Primary attempt
         response, usage = await self._dispatch_chat(
             provider, messages, system_prompt, branch_id, project_context
         )
-        
+
         # Failover logic: If primary fails and it wasn't already GitHub Models
         if (isinstance(response, str) and response.startswith("Error:")) and provider != "github":
             logger.warning(f"Primary provider {provider} failed: {response}. Attempting failover to GitHub Models...")
-            
+
             # Use GitHub Models as universal failover
             fallback_response, fallback_usage = await self._chat_github_models(messages, system_prompt)
-            
+
             if not (isinstance(fallback_response, str) and fallback_response.startswith("Error:")):
                 return f"[FALLBACK] {fallback_response}", fallback_usage
-                
+
         return response, usage
 
     async def _dispatch_chat(
@@ -197,15 +197,15 @@ class InferenceClient:
             # Parse usage
             usage = {
                 "prompt_tokens": (
-                    response.usage_metadata.prompt_token_count 
+                    response.usage_metadata.prompt_token_count
                     if response.usage_metadata else 0
                 ),
                 "completion_tokens": (
-                    response.usage_metadata.candidates_token_count 
+                    response.usage_metadata.candidates_token_count
                     if response.usage_metadata else 0
                 ),
                 "total_tokens": (
-                    response.usage_metadata.total_token_count 
+                    response.usage_metadata.total_token_count
                     if response.usage_metadata else 0
                 )
             }
@@ -243,7 +243,7 @@ class InferenceClient:
                         data = await resp.json()
                         return data.get("message", {}).get("content", ""), {
                             "total_tokens": (
-                                data.get("prompt_eval_count", 0) 
+                                data.get("prompt_eval_count", 0)
                                 + data.get("eval_count", 0)
                             )
                         }
@@ -502,8 +502,8 @@ class InferenceClient:
             elif audio_path.endswith(".m4a"): mime_type = "audio/mp4"
 
             return await self.analyze_multimodal(
-                audio_path, 
-                "Transcribe this audio exactly.", 
+                audio_path,
+                "Transcribe this audio exactly.",
                 mime_type=mime_type
             )
 

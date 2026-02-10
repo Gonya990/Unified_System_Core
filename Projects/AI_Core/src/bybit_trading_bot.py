@@ -3,13 +3,13 @@
 ByBit + Telegram Crypto Trading Bot
 Реальная торговля с ОЧЕНЬ консервативной стратегией
 """
+import argparse
 import asyncio
 import logging
 import os
 from datetime import datetime
 from typing import Optional
 
-import argparse
 from dotenv import load_dotenv
 
 # Handle arguments
@@ -263,7 +263,7 @@ class ByBitTradingBot:
                     'RECOMMENDATION' if self.monitor_only else 'Order Executed'
                 )
                 notif_suffix = (
-                    'Recommendation only - no real trade placed.' 
+                    'Recommendation only - no real trade placed.'
                     if self.monitor_only else f'Order ID: {order_id}'
                 )
                 await self.notify(
@@ -431,10 +431,10 @@ class ByBitTradingBot:
                     now = datetime.now()
                     # Only notify once every 24 hours
                     should_notify = (
-                        self.last_notified_low_balance is None or 
+                        self.last_notified_low_balance is None or
                         (now - self.last_notified_low_balance).total_seconds() > 86400
                     )
-                    
+
                     if should_notify:
                         await self.notify(
                             f"⚠️ **Low Balance**\n"
@@ -444,7 +444,7 @@ class ByBitTradingBot:
                             urgent=True
                         )
                         self.last_notified_low_balance = now
-                    
+
                     await asyncio.sleep(3600)  # Wait 1 hour before next balance check
                     continue
 
@@ -500,7 +500,7 @@ async def main():
     # Start in TESTNET or LIVE based on .env
     testnet_env = os.getenv('BYBIT_TESTNET', 'true').lower()
     is_testnet = testnet_env == 'true'
-    
+
     monitor_only_env = os.getenv('BYBIT_MONITOR_ONLY', 'true').lower()
     is_monitor_only = monitor_only_env == 'true'
 
