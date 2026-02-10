@@ -905,7 +905,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "settings_provider":
         # Show provider selection
-        providers = ["ollama", "openai", "gemini", "openrouter", "council"]
+        providers = ["ollama", "openai", "gemini", "openrouter", "github", "council"]
         current = config.get("INFERENCE_PROVIDER", "ollama")
         buttons = []
         provider_info = {
@@ -3577,7 +3577,7 @@ async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    providers = ["ollama", "openai", "gemini", "openrouter", "council"]
+    providers = ["ollama", "openai", "gemini", "openrouter", "github", "council"]
     current = config.get("INFERENCE_PROVIDER", "ollama")
 
     if context.args:
@@ -3597,6 +3597,11 @@ async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE
             hint = "Set your API key with /set_key OPENAI_API_KEY <key>"
         elif provider == "gemini":
             hint = "Set your Gemini API key with /set_key GEMINI_API_KEY <key>"
+        elif provider == "github":
+            hint = (
+                "Set your GitHub Token with /set_key GITHUB_TOKEN <token>\n"
+                "Models can be set with /set_key GITHUB_MODELS_DEFAULT_MODEL <model>"
+            )
         else:
             hint = "Make sure Ollama is running"
 
