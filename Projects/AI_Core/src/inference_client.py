@@ -96,9 +96,35 @@ class InferenceClient:
         branch_id: str = "HOME_HQ",
         project_context: str = "PERSONAL"
     ):
-        """Routed chat request with branch awareness."""
+        """Routed chat request with branch awareness and auto-failover."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
+        
+        # Primary attempt
+        response, usage = await self._dispatch_chat(
+            provider, messages, system_prompt, branch_id, project_context
+        )
+        
+        # Failover logic: If primary fails and it wasn't already GitHub Models
+        if (isinstance(response, str) and response.startswith("Error:")) and provider != "github":
+            logger.warning(f"Primary provider {provider} failed: {response}. Attempting failover to GitHub Models...")
+            
+            # Use GitHub Models as universal failover
+            fallback_response, fallback_usage = await self._chat_github_models(messages, system_prompt)
+            
+            if not (isinstance(fallback_response, str) and fallback_response.startswith("Error:")):
+                return f"[FALLBACK] {fallback_response}", fallback_usage
+                
+        return response, usage
 
+    async def _dispatch_chat(
+        self,
+        provider: str,
+        messages: list,
+        system_prompt: Optional[str] = None,
+        branch_id: str = "HOME_HQ",
+        project_context: str = "PERSONAL"
+    ):
+        """Internal dispatcher for chat providers."""
         if provider == "gemini":
             return await self._chat_gemini(
                 messages, system_prompt, branch_id, project_context
@@ -107,6 +133,8 @@ class InferenceClient:
             return await self._chat_openai(messages, system_prompt)
         elif provider == "github":
             return await self._chat_github_models(messages, system_prompt)
+        elif provider == "openrouter":
+            return await self._chat_openrouter(messages, system_prompt)
         else:
             return await self._chat_ollama(messages, system_prompt)
 
