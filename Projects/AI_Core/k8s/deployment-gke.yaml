@@ -29,6 +29,10 @@ spec:
           value: /app/gcp-service-account.json
         - name: GOOGLE_CLIENT_SECRETS
           value: /app/config/gmail_credentials.json
+        - name: PROJECT_ID
+          value: "my-home-435112"
+        - name: BOT_INSTANCE
+          value: "igor"
         envFrom:
         - secretRef:
             name: ai-core-secrets

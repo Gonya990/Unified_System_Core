@@ -5,19 +5,21 @@ Handles persistent storage with encryption for sensitive values.
 
 import base64
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Optional
 
-# Load .env file automatically or from specified path
-from dotenv import load_dotenv
-
-env_file = os.environ.get("ENV_FILE", ".env")
-load_dotenv(env_file)
-
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
+
+# Load .env file automatically or from specified path
+env_file = os.environ.get("ENV_FILE", ".env")
+load_dotenv(env_file)
 
 
 class ConfigManager:
@@ -31,6 +33,10 @@ class ConfigManager:
         "OPENAI_API_KEY",
         "OPENROUTER_API_KEY",
         "VAPI_API_KEY",
+        "GITHUB_TOKEN",
+        "HA_TOKEN",
+        "LINEAR_API_KEY",
+        "SERPAPI_KEY",
     }
 
     def __init__(self):
@@ -101,7 +107,31 @@ class ConfigManager:
             "VAPI_PHONE_NUMBER_ID": os.environ.get("VAPI_PHONE_NUMBER_ID", ""),
             "VAPI_ASSISTANT_ID": os.environ.get("VAPI_ASSISTANT_ID", ""),
             "VAPI_VOICE_ID": os.environ.get("VAPI_VOICE_ID", "rachel"),
+            "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", ""),
+            "HA_TOKEN": os.environ.get("HA_TOKEN", ""),
+            "LINEAR_API_KEY": os.environ.get("LINEAR_API_KEY", ""),
+            "SERPAPI_KEY": os.environ.get("SERPAPI_KEY", ""),
         }
+
+        # Load secrets from GCP Secret Manager if PROJECT_ID is available
+        project_id = os.environ.get("PROJECT_ID")
+        if project_id:
+            try:
+                from secret_manager import SecretManager
+                sm = SecretManager(project_id)
+                gcp_secrets = sm.load_all_secrets()
+                for key, val in gcp_secrets.items():
+                    if val:
+                        self._config[key] = val
+                        # Also set in env for other modules that might use it
+                        os.environ[key] = val
+                logger.info(
+                    f"Loaded {len(gcp_secrets)} secrets from GCP Secret Manager"
+                )
+            except Exception as e:
+                logger.warning(
+                    f"Could not load secrets from GCP Secret Manager: {e}"
+                )
 
         # Override with persisted config if exists
         if self.CONFIG_FILE.exists():
@@ -109,7 +139,7 @@ class ConfigManager:
                 with open(self.CONFIG_FILE) as f:
                     stored = json.load(f)
                     for key, value in stored.items():
-                        # Skip empty values to preserve Environment Variables precedence if config is broken
+                        # Skip empty values
                         if not value:
                             continue
 
