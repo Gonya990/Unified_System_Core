@@ -39,7 +39,8 @@ class SecretManager:
             "serpapi-key",
             "linear-api-key",
             "ha-token",
-            "github-token"
+            "github-token",
+            "allowed-users"
         ]
         
         results = {}

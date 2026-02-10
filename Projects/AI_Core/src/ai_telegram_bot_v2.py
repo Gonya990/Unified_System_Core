@@ -542,8 +542,20 @@ else:
 
 # Admin access configuration & User Authorization
 IGOR_ID = 708531393
-ALLOWED_IDS = [IGOR_ID]
-logger.info(f"Igor-Only Mode Active. ALLOWED_IDS: {ALLOWED_IDS}")
+# Dynamic allowed users from config
+ALLOWED_USERS_STR = config.get("ALLOWED_USERS", str(IGOR_ID))
+try:
+    ALLOWED_IDS = [
+        int(uid.strip()) for uid in ALLOWED_USERS_STR.split(",") if uid.strip()
+    ]
+except Exception as e:
+    logger.warning(
+        f"Failed to parse ALLOWED_USERS '{ALLOWED_USERS_STR}': {e}. "
+        "Falling back to Igor-only."
+    )
+    ALLOWED_IDS = [IGOR_ID]
+
+logger.info(f"Bot Authorized Users: {ALLOWED_IDS}")
 
 # User aliases for messaging (name -> Telegram user ID)
 USER_ALIASES = {
