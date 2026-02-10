@@ -251,7 +251,11 @@ class InferenceClient:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        content = (
+                            data.get("choices", [{}])[0]
+                            .get("message", {})
+                            .get("content", "")
+                        )
                         usage = data.get("usage", {})
                         return content, usage
                     return f"Error: OpenAI status {resp.status}", {}
@@ -293,16 +297,21 @@ class InferenceClient:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        content = (
+                            data.get("choices", [{}])[0]
+                            .get("message", {})
+                            .get("content", "")
+                        )
                         usage = data.get("usage", {})
                         return content, usage
-                        err_msg = await resp.text()
-                        return (
-                            f"Error: OpenRouter status {resp.status} - {err_msg}",
-                            {}
-                        )
+                    err_msg = await resp.text()
+                    return (
+                        f"Error: OpenRouter status {resp.status} - {err_msg}",
+                        {}
+                    )
         except Exception as e:
             return f"OpenRouter Connection Error: {e}", {}
+
     async def _chat_github_models(
         self, messages: list, system_prompt: Optional[str] = None
     ):
@@ -340,7 +349,11 @@ class InferenceClient:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        content = (
+                            data.get("choices", [{}])[0]
+                            .get("message", {})
+                            .get("content", "")
+                        )
                         usage = data.get("usage", {})
                         return content, usage
                     err_msg = await resp.text()
