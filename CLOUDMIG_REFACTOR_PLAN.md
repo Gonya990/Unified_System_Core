@@ -26,15 +26,12 @@ GitHub Models.
     * Автоматическая сборка Docker-образа при пуше в `main`.
     * Автоматический пуш в Artifact Registry.
 3. **Secret Manager Integration / Интеграция Secret Manager:**
-    * Migrate all keys (ByBit, Telegram, AI) from `.env` to GCP Secret Manager.
-    * Refactor bot to fetch secrets via IAM Service Account.
-    * Перенести все ключи из `.env` в GCP Secret Manager.
-    * Рефакторинг бота для получения секретов через IAM Service Account.
+    * [x] Migrate all keys (ByBit, Telegram, AI) from `.env` to GCP Secret Manager.
+    * [x] Refactor bot to fetch secrets via IAM Service Account.
 4. **ArgoCD (GitOps) Deployment / Развертывание через ArgoCD:**
-    * Install ArgoCD in the Kubernetes cluster.
-    * Link to the `/k8s` folder in GitHub for automatic "Pull" deployment.
-    * Установить ArgoCD в кластер Kubernetes.
-    * Связать с папкой `/k8s` в GitHub для автоматического деплоя.
+    * [x] Install ArgoCD in the Kubernetes cluster.
+    * [x] Link to the `/k8s` folder in GitHub for automatic "Pull" deployment.
+    * [x] Configured Repository Secrets for private access.
 
 ---
 
