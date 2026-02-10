@@ -21,3 +21,4 @@ tqdm
 schedule
 aiohttp
 cryptography
+playwright
