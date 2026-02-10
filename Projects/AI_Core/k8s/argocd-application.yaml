@@ -8,12 +8,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Gonya990/Unified_System_Core.git
+    repoURL: https://github.com/Unified-system-Core/Unified_System_Core.git
     targetRevision: main
     path: Projects/AI_Core/k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: telegram-bot
+    namespace: trading
   syncPolicy:
     automated:
       prune: true

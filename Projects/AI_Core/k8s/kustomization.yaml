@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: telegram-bot
+namespace: trading
 
 resources:
   - namespace.yaml
   - configmap.yaml
   - secrets.yaml
   - pvc.yaml
-  - deployment.yaml
+  - deployment-gke.yaml
   - service.yaml
 
 images:
