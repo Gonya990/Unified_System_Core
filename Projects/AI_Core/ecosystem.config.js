@@ -28,6 +28,21 @@ module.exports = {
         "venv",
         "venv_mac"
       ]
+    },
+    {
+      name: "bybit-monitor",
+      script: "src/bybit_trading_bot.py",
+      interpreter: "python3",
+      env: {
+        BYBIT_MONITOR_ONLY: "true",
+        BYBIT_TESTNET: "false"
+      },
+      error_file: "logs/bybit-error.log",
+      out_file: "logs/bybit-out.log",
+      log_file: "logs/bybit-combined.log",
+      time: true,
+      max_memory_restart: "200M",
+      watch: false
     }
   ]
 };
