@@ -2438,21 +2438,25 @@ async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             tb_info = f"{act}/{tot} active, {fld} failed"
 
         admins = db.list_admins()
-        admin_list = ", ".join([str(a.get("user_id")) for a in admins[:5]]) or "None"
+        admin_list = (
+            ", ".join([str(a.get("user_id")) for a in admins[:3]]) or "None"
+        )
 
         dashboard = (
-            f"📊 **Admin Dashboard**\n\n"
-            f"**System**\n"
-            f"├ CPU: `{cpu}%`\n"
+            "🏛 **Unified System HQ - Dashboard**\n\n"
+            "**🖥 SYSTEM STATUS**\n"
+            f"├ CPU: `{cpu}%` "
+            f"`{'█' * (int(cpu)//10)}{'░' * (10-int(cpu)//10)}` \n"
             f"├ RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB)\n"
-            f"├ Disk: `{disk.percent}%` ({disk.free // 1024 // 1024 // 1024}GB free)\n"
+            f"├ Disk: `{disk.free // 1024 // 1024 // 1024}GB` free\n"
             f"└ Uptime: `{int(days)}d {int(hours)}h {int(mins)}m`\n\n"
-            f"**Services**\n"
+            "**⚡️ CORE SERVICES**\n"
             f"├ Inference: {'✅' if inf_ok else '❌'}\n"
-            f"└ TokenBroker: `{tb_info}`\n\n"
-            f"**RBAC**\n"
+            f"├ Tokens: `{tb_info}`\n"
             f"└ Admins: `{admin_list}`\n\n"
-            f"🕒 `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
+            "**📈 TRADING STATUS**\n"
+            "├ TON/USDT Agent: ⚪️ Monitoring\n"
+            "└ Portfolio AI: ⏳ Initializing..."
         )
         await msg.edit_text(dashboard, parse_mode="Markdown")
     except Exception as e:
@@ -2460,9 +2464,6 @@ async def dashboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def tl_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if not db.is_approved(user_id):
-        return
     user_id = update.effective_user.id
     if not db.is_approved(user_id):
         return
@@ -5008,13 +5009,14 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 root_dir = parent
                 break
 
-    script_path = root_dir / "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+    script_path = root_dir / (
+        "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+    )
     
     if not script_path.exists():
         await update.message.reply_text(
-            "❌ **Error:** Content Factory scripts not found in current pod.\n"
-            "This bot is running in **Kubernetes (GKE)**. "
-            "Factory must be triggered on the **Cloud Server** directly via SSH or Cron."
+            "❌ **Error:** Content Factory scripts not found.\n"
+            "Bot is in **GKE**. Factory must run on **Cloud Server**."
         )
         return
 
@@ -5030,7 +5032,8 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stderr=asyncio.subprocess.PIPE,
             cwd=str(script_path.parent),
         )
-        await update.message.reply_text(f"🚀 **Pipeline Started Locally!** PID: `{process.pid}`")
+        msg = f"🚀 **Pipeline Started Locally!** PID: `{process.pid}`"
+        await update.message.reply_text(msg)
     except Exception as e:
         await update.message.reply_text(f"❌ **Failed to start factory:** {e}")
 
@@ -5081,7 +5084,7 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             f"💰 **Баланс:** `{balance_info}`\n"
             f"📊 **Рынок:** `{market_info}`\n\n"
             f"✅ Бот запущен и мониторит TON/USDT.\n"
-            f"Стратегия: RSI < 35 (Buy), RSI > 65 (Sell).",
+            "Стратегия: RSI < 35 (Buy), RSI > 65 (Sell).",
             parse_mode="Markdown"
         )
 
