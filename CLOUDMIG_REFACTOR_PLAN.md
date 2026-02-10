@@ -64,5 +64,7 @@ GitHub Models.
 * [x] Create Artifact Registry Repository (**Done**)
 * [x] Create `.github/workflows/deploy.yaml` (**Done**)
 * [x] Register GitHub Models API in the bot logic (**Done**)
-* [ ] Provision GCP Secret Manager secrets
-* [ ] Update GKE Deployment manifests to bind Secrets
+* [x] Provision GCP Secret Manager secrets (**Done**)
+* [x] Update GKE Deployment manifests to bind Secrets (**Done**)
+* [x] Grant permissions to Kostik (sys-admin level) (**Done**)
+* [x] Integrate Automated Self-Healing (GitHub Issues) (**Done**)
