@@ -172,6 +172,12 @@ def _acquire_instance_lock(token: str) -> bool:
 config = ConfigManager()
 
 try:
+    from github_handler import GitHubHandler
+    gh_handler = GitHubHandler(config.get("GITHUB_TOKEN"))
+except ImportError:
+    gh_handler = None
+
+try:
     from dashboard import DashboardService
 
     logger.info("DashboardService imported successfully")
@@ -4896,6 +4902,21 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
             )
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
+
+    # Self-Healing: Create GitHub Issue if running in cloud
+    if gh_handler and os.environ.get("PROJECT_ID"):
+        title = f"[BOT ERROR] {str(context.error)[:50]}..."
+        body = (
+            f"### Error Details\n"
+            f"**Error:** `{context.error}`\n\n"
+            f"### Traceback\n"
+            f"```python\n{tb_str}\n```\n\n"
+            f"### Context\n"
+            f"- **Pod:** `{os.environ.get('HOSTNAME', 'unknown')}`\n"
+            f"- **Instance:** `{config.get('BOT_INSTANCE', 'unknown')}`\n"
+        )
+        import asyncio
+        asyncio.create_task(gh_handler.create_issue(title, body))
 
 
 async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
