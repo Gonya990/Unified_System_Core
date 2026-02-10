@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: telegram-bot
+  name: trading
   labels:
     app.kubernetes.io/name: ai-telegram-bot
     app.kubernetes.io/part-of: unified-system
