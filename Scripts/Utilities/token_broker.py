@@ -411,7 +411,18 @@ class TokenBroker:
         if tier and tier in ["pro", "tier1", "high"]:
             return agent_role in ["admin", "pro_agent"]
 
-        return True # Default access for lower tiers
+    def get_key_with_failover(
+        self, providers: list[str], tier: str = None, session_id: str = None
+    ) -> Optional[tuple[str, str]]:
+        """
+        Attempts to get a key from a list of providers in order.
+        Returns (selected_provider, selected_key) or None.
+        """
+        for provider in providers:
+            key = self.get_key(provider, tier, session_id)
+            if key:
+                return provider, key
+        return None
 
 
 if __name__ == "__main__":
