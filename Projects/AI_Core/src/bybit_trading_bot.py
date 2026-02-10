@@ -9,9 +9,18 @@ import os
 from datetime import datetime
 from typing import Optional
 
+import argparse
 from dotenv import load_dotenv
 
-load_dotenv()
+# Handle arguments
+parser = argparse.ArgumentParser(description="ByBit Trading Bot")
+parser.add_argument("--env", help="Path to .env file", default=".env")
+args, unknown = parser.parse_known_args()
+
+if os.path.exists(args.env):
+    load_dotenv(args.env)
+else:
+    load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,

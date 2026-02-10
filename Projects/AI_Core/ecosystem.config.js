@@ -33,6 +33,7 @@ module.exports = {
       name: "bybit-monitor",
       script: "src/bybit_trading_bot.py",
       interpreter: "python3",
+      args: "--env .env.igor",
       env: {
         BYBIT_MONITOR_ONLY: "true",
         BYBIT_TESTNET: "false"
