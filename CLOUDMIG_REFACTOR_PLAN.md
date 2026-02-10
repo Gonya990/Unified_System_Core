@@ -67,4 +67,7 @@ GitHub Models.
 * [x] Provision GCP Secret Manager secrets (**Done**)
 * [x] Update GKE Deployment manifests to bind Secrets (**Done**)
 * [x] Grant permissions to Kostik (sys-admin level) (**Done**)
+* [x] Implement AI provider failover to GitHub Models (**Done**)
 * [x] Integrate Automated Self-Healing (GitHub Issues) (**Done**)
+* [x] Resolve Bot Instance Conflicts (Stopped rogue processes) (**Done**)
+* [x] Repair Content Factory cloud deployment (Paths & Deps) (**Done**)
