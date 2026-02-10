@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: bot
-        image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:latest
+        image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
         imagePullPolicy: Always
         resources:
           requests:

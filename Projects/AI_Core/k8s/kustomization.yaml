@@ -5,8 +5,6 @@ namespace: trading
 
 resources:
   - namespace.yaml
-  - configmap.yaml
-  - secrets.yaml
   - pvc.yaml
   - deployment-gke.yaml
   - service.yaml
@@ -15,6 +13,4 @@ images:
   - name: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot
     newTag: 40018a9
 
-commonLabels:
-  app.kubernetes.io/part-of: unified-system
-  app.kubernetes.io/managed-by: kustomize
+
