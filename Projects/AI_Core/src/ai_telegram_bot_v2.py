@@ -4966,8 +4966,11 @@ async def dream_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         try:
             issue_data = await gh_handler.create_issue(title, body)
-            # handle both URL and dict return types depending on gh_handler implementation
-            issue_url = issue_data if isinstance(issue_data, str) else issue_data.get("html_url")
+            # handle both URL and dict return types
+            if isinstance(issue_data, str):
+                issue_url = issue_data
+            else:
+                issue_url = issue_data.get("html_url")
             await msg.edit_text(
                 f"🚀 **Мечта зафиксирована!** Мы это реализуем.\n\n"
                 f"🔗 [Отслеживать прогресс]({issue_url})",
@@ -4975,7 +4978,11 @@ async def dream_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             logger.error(f"Dream creation failed: {e}")
-            await msg.edit_text("⚠️ Мечта запомнена локально, но GitHub временно недоступен. Вернёмся к ней позже!")
+            await msg.edit_text(
+                "⚠️ Мечта запомнена локально, "
+                "но GitHub временно недоступен. "
+                "Вернёмся к ней позже!"
+            )
     else:
         await msg.edit_text("💡 Хорошая идея! (GitHub не подключен, сохранено в логи)")
 

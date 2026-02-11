@@ -60,7 +60,8 @@ class TokenBroker:
         self.master_key = (
             master_key
             or os.getenv(
-                "AGENT_MAIL_TOKEN", "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+                "AGENT_MAIL_TOKEN",
+                "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb",
             )
         ).encode()
 
@@ -76,7 +77,8 @@ class TokenBroker:
 
     def _derive_key(self, salt: bytes, kdf_type: str = "argon2id") -> Optional[bytes]:
         """
-        Derive encryption key from master key using Argon2id (preferred) or PBKDF2 (fallback).
+        Derive encryption key from master key using Argon2id (preferred)
+        or PBKDF2 (fallback).
 
         Argon2id parameters (OWASP recommended):
         - memory_cost: 65536 KB (64 MB)
@@ -125,7 +127,8 @@ class TokenBroker:
                 return sticky_key
             else:
                 logger.warning(
-                    f"TokenBroker: Sticky key for session '{session_id}' is blacklisted. Falling back."
+                    f"TokenBroker: Sticky key for session '{session_id}' "
+                    "is blacklisted. Falling back."
                 )
                 del self._session_sticky_keys[session_id]
 
@@ -180,7 +183,7 @@ class TokenBroker:
         return None
 
     def load_vault(self):
-        """Loads and decrypts the token vault. Supports both Argon2id and PBKDF2 vaults."""
+        """Loads and decrypts the token vault. Supports Argon2id/PBKDF2."""
         if not os.path.exists(self.vault_path):
             logger.info("Token vault not found. Using legacy fallback.")
             self._try_legacy_import()
@@ -205,14 +208,20 @@ class TokenBroker:
                 aesgcm = AESGCM(key)
                 decrypted = aesgcm.decrypt(nonce, encrypted_data, None)
                 self.key_store = yaml.safe_load(decrypted)
-                logger.info(f"Vault loaded and decrypted ({kdf_type}): {self.vault_path}")
+                logger.info(
+                    f"Vault loaded and decrypted ({kdf_type}): {self.vault_path}"
+                )
         except Exception as e:
             logger.error(f"TokenBroker: Failed to load vault: {e}")
 
-    def save_vault(self, tokens: dict[str, list[dict[str, Any]]] = None, force_kdf: str = None):
+    def save_vault(
+        self,
+        tokens: dict[str, list[dict[str, Any]]] = None,
+        force_kdf: str = None,
+    ):
         """
         Encrypts and saves the current key_store to YAML.
-        Uses Argon2id for new vaults (if available), PBKDF2 as fallback.
+        Uses Argon2id for new vaults (if available), PBKDF2 fallback.
         """
         if tokens is not None:
             self.key_store = tokens
@@ -251,7 +260,9 @@ class TokenBroker:
 
     def _try_legacy_import(self):
         """Attempts to import from old keys.json if vault is missing."""
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        base_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
         legacy_path = os.path.join(base_dir, "secrets", "keys.json")
 
         if os.path.exists(legacy_path):
@@ -285,7 +296,9 @@ class TokenBroker:
         logger.warning(f"Key failure for {provider}. Cooldown initiated.")
         self._blacklist[key] = time.time()
 
-    def encrypt_value(self, plaintext: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
+    def encrypt_value(
+        self, plaintext: str, salt: bytes = b"unified-system-vibranium-salt"
+    ) -> Optional[str]:
         """Encrypt a single value with AES-256-GCM (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
@@ -299,7 +312,9 @@ class TokenBroker:
         ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
         return base64.b64encode(nonce + ciphertext).decode()
 
-    def decrypt_value(self, encrypted: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
+    def decrypt_value(
+        self, encrypted: str, salt: bytes = b"unified-system-vibranium-salt"
+    ) -> Optional[str]:
         """Decrypt a single AES-256-GCM encrypted value (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
@@ -377,13 +392,17 @@ class TokenBroker:
             logger.error(f"TokenBroker: Failed to reload keys: {e}")
             return False
 
-    def check_permission(self, agent_name: str, provider: str, tier: str = None) -> bool:
+    def check_permission(
+        self, agent_name: str, provider: str, tier: str = None
+    ) -> bool:
         """
         RBAC Check: Does this agent have access to this resource?
-        Loads from config/rbac_policy.yaml (canonical) or falls back to runtime.
+        Loads from config/rbac_policy.yaml or falls back to runtime.
         """
         # 1. Try Canonical Config Folder (Unified_System/config/rbac_policy.yaml)
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        root_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
         canonical_path = os.path.join(root_dir, "config", "rbac_policy.yaml")
         runtime_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
 
