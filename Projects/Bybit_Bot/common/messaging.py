@@ -26,8 +26,8 @@ class RedisStreamManager:
             # Создаем группу, если не существует
             try:
                 await self.redis.xgroup_create(stream_name, group_name, mkstream=True)
-            except redis.exceptions.ResponseError:
-                pass # Already exists
+            except Exception:
+                pass # Already exists or stream not ready
 
             while True:
                 # Читаем новые сообщения

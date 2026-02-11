@@ -1,8 +1,19 @@
+import sys
 import logging
 import asyncio
-from datetime import datetime
 import os
+from datetime import datetime
+from pathlib import Path
+
+# Add project root to path for common imports
+ROOT = Path(__file__).resolve().parent.parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
+import ccxt
+from common.token_broker import TokenBroker
 from common.messaging import RedisStreamManager
+
 # AI / ML imports
 try:
     import numpy as np
@@ -22,10 +33,17 @@ class FundingArbStrategy:
     Стратегия: Delta Neutral Funding Arbitrage (Cash & Carry)
     Биржа: Bybit Unified Trading Account (UTA)
     """
-    def __init__(
-        self, exchange, symbol="BTC/USDT", target_apr=0.12, leverage=1.0
-    ):
-        self.exchange = exchange
+    def __init__(self, symbol="BTC/USDT", target_apr=0.12, leverage=1.0):
+        self.broker = TokenBroker()
+        # Fallback to env if not in broker
+        api_key = os.getenv("BYBIT_API_KEY")
+        api_secret = os.getenv("BYBIT_API_SECRET")
+        
+        self.exchange = ccxt.bybit({
+            'apiKey': api_key,
+            'secret': api_secret,
+            'enableRateLimit': True,
+        })
         self.symbol = symbol
         self.target_apr = target_apr
         self.leverage = leverage
@@ -34,7 +52,7 @@ class FundingArbStrategy:
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
         self.messenger = RedisStreamManager(redis_url)
         
-        # Институциональные комиссии Bybit (Maker/Taker)
+        # Институциональные комиссии Bybit (Maker/ Taker)
         self.fees = {
             "spot_taker": 0.001,
             "perp_taker": 0.00055,
@@ -112,6 +130,7 @@ class FundingArbStrategy:
         # Учитываем комиссию на вход и выход (2x)
         total_cycle_fees = entry_fees * 2
         denom = (spot_price * daily_yield)
+        denom = denom if denom != 0 else 0.0001
         days_to_be = total_cycle_fees / denom if daily_yield > 0 else float('inf')
         
         # 4. ML Overlay: Оптимизация точки входа
@@ -172,6 +191,5 @@ class FundingArbStrategy:
                 self.is_active = False
 
 if __name__ == "__main__":
-    # In production, exchange object would be initialized here
-    strategy = FundingArbStrategy(None, symbol="BTCUSDT")
+    strategy = FundingArbStrategy(symbol="BTC/USDT")
     asyncio.run(strategy.run(amount=0.01))

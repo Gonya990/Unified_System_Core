@@ -1,6 +1,9 @@
 # Core AI & Logic
 openai>=1.0.0
 google-generativeai
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
 python-dotenv
 requests
 feedparser

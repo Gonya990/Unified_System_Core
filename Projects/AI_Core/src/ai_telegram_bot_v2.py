@@ -28,6 +28,7 @@ from google_auth import GoogleAuthManager
 from health import start_health_server
 from identity_orchestrator import IdentityOrchestrator
 from inference_client import InferenceClient
+from api_proxy import run_proxy, set_bot_instance
 
 # Third-party imports
 from telegram import (
@@ -303,9 +304,6 @@ try:
 except Exception as e:
     logger.warning(f"AgentMailClient failed to setup: {e}")
     agent_mail = None
-except Exception as e:
-    agent_mail = None
-    logger.warning(f"AgentMailClient not available: {e}")
 
 try:
     from modules.proxmox_manager import ProxmoxManager
@@ -330,6 +328,13 @@ else:
     logger.info(f"SQLITE_DB_PATH config: {config.get('SQLITE_DB_PATH')}")
     db = UserContextDB(db_path=db_path)
     logger.info(f"Using SQLite database (local mode): {db_path}")
+
+try:
+    from finance_manager import FinanceManager
+    finance_manager = FinanceManager(db)
+except Exception as e:
+    logger.warning(f"FinanceManager failed to initialize: {e}")
+    finance_manager = None
 
 # Video generation job tracker
 # {job_id: {"user_id": int, "prompt": str, "status": str,
@@ -534,8 +539,15 @@ agent_orchestrator = AgentOrchestrator(inference)
 # Initialize digest service (requires other services)
 if _DIGEST_AVAILABLE and usage_tracker and task_manager:
     digest_service = DigestService(
-        usage_tracker, task_manager, linear_client, infra_manager
+        usage_tracker,
+        task_manager,
+        linear_client,
+        infra_manager,
+        calendar_client=None,
+        ha_controller=ha_controller,
     )
+    # Inject finance_manager for shopping recommendations
+    digest_service.finance_manager = finance_manager
     logger.info("Digest service initialized")
 else:
     digest_service = None
@@ -1907,6 +1919,85 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             logger.warning(f"[MSG] Could not resolve target: {target_name}")
 
+    # 4. LINEAR TASK CREATION
+    task_matches = re.findall(r"\[\[TASK:(.*?)(?::(.*?))?\]\]", ai_response)
+    for title, description in task_matches:
+        if linear_client and linear_client.api_key:
+            try:
+                desc = description or "Created via Gonya AI"
+                issue = await asyncio.to_thread(linear_client.create_issue, title, desc)
+                if issue:
+                    tag_id = f"{title}:{description}" if description else title
+                    ai_response = ai_response.replace(
+                        f"[[TASK:{tag_id}]]", f"📋 _(Создана задача в Linear: {title})_"
+                    )
+            except Exception as e:
+                logger.error(f"Failed to create Linear task from tag: {e}")
+                ai_response = ai_response.replace(
+                    f"[[TASK:{title}]]", "❌ _(Ошибка создания задачи)_"
+                )
+        else:
+            ai_response = ai_response.replace(
+                f"[[TASK:{title}]]", "⚠️ _(Linear не настроен)_"
+            )
+
+    # 5. EXPENSE RECORDING
+    expense_matches = re.findall(r"\[\[EXPENSE:(.*?):(.*?)(?::(.*?))?\]\]", ai_response)
+    for amount, category, desc in expense_matches:
+        try:
+            if finance_manager:
+                expense_data = {
+                    "amount": amount,
+                    "category": category,
+                    "description": desc or "AI recorded",
+                    "merchant": "Manual/Voice",
+                    "source": "telegram_chat",
+                }
+                await finance_manager.log_expense(user_id, expense_data)
+
+            tag_id = f"{amount}:{category}:{desc}" if desc else f"{amount}:{category}"
+            ai_response = ai_response.replace(
+                f"[[EXPENSE:{tag_id}]]", f"💰 _(Записан расход: {amount} {category})_"
+            )
+            db.add_memory(
+                user_id, f"Expense: {amount} for {category} ({desc or 'no desc'})"
+            )
+        except Exception as e:
+            logger.error(f"Failed to record expense: {e}")
+
+    # 6. CALENDAR EVENT CREATION
+    event_matches = re.findall(
+        r"\[\[EVENT:(.*?):(.*?)(?::(.*?))?(?::(.*?))?\]\]", ai_response
+    )
+    for summary, time_str, duration, description in event_matches:
+        cal = get_calendar_client(user_id)
+        if cal and cal.is_valid():
+            try:
+                from dateutil import parser as date_parser
+
+                start_dt = date_parser.parse(time_str)
+                dur = int(duration) if duration and duration.isdigit() else 60
+                desc = description or "Created via Gonya AI"
+
+                res = await asyncio.to_thread(
+                    cal.create_event, summary, start_dt, dur, desc
+                )
+                if res:
+                    tag_id = (
+                        f"{summary}:{time_str}"
+                        + (f":{duration}" if duration else "")
+                        + (f":{description}" if description else "")
+                    )
+                    # Handle multiple potential matches for different duration/desc
+                    ai_response = ai_response.replace(
+                        f"[[EVENT:{tag_id}]]",
+                        f"📅 _(Создано событие: {summary} на {time_str})_",
+                    )
+            except Exception as e:
+                logger.error(f"Failed to create Calendar event from tag: {e}")
+        else:
+            logger.warning(f"Calendar not available for user {user_id}")
+
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(
         ai_response,
@@ -2110,6 +2201,12 @@ async def query_ollama_with_context(
         "3. Example of WRONG response: 'Игорь, нам нужно встретиться...'\n"
         "4. Example of CORRECT response: 'Хорошо, передаю Игорю. "
         "[[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
+        "📋 TASKS & PROJECTS:\n"
+        "- Create Linear task: [[TASK:title:description]] (description is optional)\n"
+        "  - Expenses: [[EXPENSE:amount:category:description]]\n"
+        "  - Calendar: [[EVENT:summary:iso_time:duration_mins:description]]\n"
+        "  - Direct Messages: [[RUN:MSG:target:message]]\n\n"
+        "If user says 'напомни сделать отчет', output 'Ок! [[TASK:Сделать отчет]]'.\n\n"
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
         "- Image generation: /img <prompt>\n"
@@ -2315,6 +2412,39 @@ async def memory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     db.update_last_interaction(user_id)
     await show_memory_context(update, context)
+
+
+async def shopping_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /shopping command."""
+    user_id = update.effective_user.id
+    logger.info(f"[CMD] /shopping from {user_id}")
+    if not db.is_approved(user_id):
+        logger.warning(f"[CMD] /shopping denied - user {user_id} not approved")
+        await update.message.reply_text("⛔️ Access denied.")
+        return
+    db.update_last_interaction(user_id)
+    
+    if not finance_manager:
+        await update.message.reply_text("❌ Finance Manager not initialized.")
+        return
+
+    await update.message.chat.send_action(ChatAction.TYPING)
+    report = await finance_manager.get_shopping_recommendations(user_id)
+    await update.message.reply_text(report, parse_mode="Markdown")
+
+
+async def process_api_command(user_id: int, text: str) -> str:
+    """
+    Bridge method for Mobile Proxy API.
+    Simulates a message handling cycle and returns the text response.
+    """
+    logger.info(f"[API] Command from {user_id}: {text}")
+    if not db.is_approved(user_id):
+        return "⛔️ Access denied (User not approved)."
+    
+    # Process with orchestrator
+    response = await query_ollama_with_context(user_id, text)
+    return response
 
 
 async def newtask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3429,10 +3559,74 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             temp_path = f.name
 
         await file.download_to_drive(temp_path)
-        response = await inference.analyze_image(temp_path, prompt)
+
+        # Detect intent
+        lower_prompt = prompt.lower()
+        is_finance = any(
+            k in lower_prompt
+            for k in [
+                "чек",
+                "расход",
+                "трата",
+                "купил",
+                "оплата",
+                "receipt",
+                "expense",
+                "bill",
+                "invoice",
+            ]
+        )
+        
+        if is_finance:
+            ocr_prompt = (
+                "This is a receipt or bank statement. Please extract the following "
+                "information in JSON format: "
+                "{merchant, date, amount, currency, category, items, description}. "
+                "Also provide a human-readable summary. "
+                "If you find an expense, ALWAYS include the tag "
+                "[[EXPENSE:amount:category:description]] at the end of your response."
+            )
+            response = await inference.analyze_image(temp_path, ocr_prompt)
+        else:
+            response = await inference.analyze_image(temp_path, prompt)
 
         os.remove(temp_path)
-        await update.message.reply_text(response, parse_mode="Markdown")
+
+        # Process the response (to handle [[EXPENSE:...]] tags)
+        # We can reuse the logic from the text message processor if we extract it,
+        # but for now, let's keep it simple.
+        
+        # Post-process response tags (EXPENSE, TASK, etc.)
+        processed_response = response
+        
+        # Simple tag handling for photos
+        expense_matches = re.findall(
+            r"\[\[EXPENSE:(.*?):(.*?)(?::(.*?))?\]\]", processed_response
+        )
+        for amount, category, desc in expense_matches:
+            try:
+                if finance_manager:
+                    expense_data = {
+                        "amount": amount,
+                        "category": category,
+                        "description": desc or "Photo receipt",
+                        "merchant": "Extracted from photo",
+                        "source": "telegram_photo"
+                    }
+                    await finance_manager.log_expense(user_id, expense_data)
+                    tag_id = (
+                        f"{amount}:{category}:{desc}"
+                        if desc
+                        else f"{amount}:{category}"
+                    )
+                    processed_response = processed_response.replace(
+                        f"[[EXPENSE:{tag_id}]]",
+                        f"💰 _(Записан расход: {amount} {category})_",
+                    )
+            except Exception as fe:
+                logger.error(f"Finance logging from photo failed: {fe}")
+
+        await update.message.reply_text(processed_response, parse_mode="Markdown")
 
     except Exception as e:
         logger.error(f"Photo handling failed: {e}")
@@ -5294,6 +5488,7 @@ def main():
         "video_status": video_status_command,
         "mashov_homework": mashov_homework_command,
         "mashov_find_school": mashov_find_school_command,
+        "shopping": shopping_command,
     }
 
     for cmd, func in commands_to_register.items():
@@ -5328,6 +5523,23 @@ def main():
     health_port = int(config.get("HEALTH_PORT", 8095))
     start_health_server(port=health_port, health_callback=get_health_info)
     logger.info(f"[STARTUP] Health server started on port {health_port}")
+
+    # Start Mobile Proxy API (FastAPI)
+    api_port = int(config.get("API_PORT", 8080))
+    # We use a simple class/object bridge for the proxy
+    class BotBridge:
+        async def process_api_command(self, user_id, command):
+            return await process_api_command(user_id, command)
+
+    set_bot_instance(BotBridge())
+    
+    def start_api():
+        logger.info(f"[STARTUP] Mobile Proxy API starting on port {api_port}")
+        run_proxy(port=api_port)
+
+    import threading
+    api_thread = threading.Thread(target=start_api, daemon=True)
+    api_thread.start()
 
     logger.info("[STARTUP] Starting polling...")
     print("Bot V2 (AI_Core) is running...")

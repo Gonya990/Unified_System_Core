@@ -1,3 +1,4 @@
+# DO NOT UN-IGNORE .GIT
 .git
 .github
 .vscode
@@ -5,27 +6,44 @@
 .agents
 .codex
 .gemini
-node_modules
-venv
-.venv
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+
+# Exclude all node_modules and venv
+**/node_modules
+**/venv
+**/.venv
+**/__pycache__
+
+# Exclude heavy assets and contexts
+contexts
+tmp
+Archive
+secure_vault
+assets
+docs
+inputs
+outputs
+
+# Exclude artifacts of build
+**/.next
+**/dist
+**/build
+
+# Specific large project folders
+Projects/connect-landing-page
+Projects/ChatKit_Dashboard
+
+# Logs and configs
+*.log
 .db
 .sqlite
-*.log
-tmp
-outputs
-Projects/Content_Factory/outputs
-Projects/Content_Factory/venv
-Projects/ChatKit_Dashboard/.next
-Projects/ChatKit_Dashboard/node_modules
-Projects/connect-landing-page
-infra/cliproxyapi/src/vendor
-External_Tools/Stack/mcp_agent_mail/node_modules
-Scripts/Orchestration/broll
-**/*.mp4
-**/*.mov
-**/.next
-tools/npm-cache
+
+# Root media
+/*.mp4
+/*.mov
+/*.m4a
+/*.wav
+/*.zip
+/*.tar.gz
+/*.png
+/*.jpg
+/*.jpeg

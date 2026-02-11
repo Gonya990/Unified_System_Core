@@ -1,26 +1,44 @@
 import sys
 import os
 import time
+import logging
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Setup paths
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-SRC_DIR = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/src')
+# Setup dynamic paths
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CURRENT_DIR.parent.parent
+SRC_DIR = CURRENT_DIR / 'src'
+
 sys.path.insert(0, str(SRC_DIR))
 sys.path.insert(0, str(SRC_DIR / 'researcher'))
 sys.path.insert(0, str(SRC_DIR / 'pipeline'))
+sys.path.insert(0, str(SRC_DIR / 'uploaders'))
 
 # Load Core Modules
 import scheduler
 from daily_researcher import generate_vision_assets
 import orchestrator_v3_no_face as orchestrator
 
+# Import Uploaders
+try:
+    from telegram_uploader import send_video as tg_upload
+    from youtube_uploader import upload_video as yt_upload
+    from insta_uploader import upload_reel as insta_upload
+    from account_manager import AccountManager
+except ImportError as e:
+    print(f"⚠️ Warning: Some uploaders could not be imported: {e}")
+
 load_dotenv(ROOT_DIR / '.env')
 load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
 
+logger = logging.getLogger("ContentFactory")
+
 def run_production_cycle():
     print("🏭 CONTENT FACTORY: STARTING PRODUCTION CYCLE...")
+    
+    # Initialize account manager
+    acc_manager = AccountManager()
     
     # 1. Get Plan
     plan = scheduler.get_daily_production_plan()
@@ -31,25 +49,44 @@ def run_production_cycle():
         slot = task['slot']
         print(f"\n🚀 Processing: {lang.upper()} ({slot}) ...")
         
-        # 2. Mine Topic (Simulated for safety, would be real research in prod)
-        topic = "Future of Business 2026" # Default
-        
-        # 3. Generate Content
-        # We need a function to generate script based on Lang + Topic
-        # For now, we reuse the Legacy Wealth logic but adapted for dynamic lang
-        
+        # 2. Topic Mining (Simplified for base version)
+        topic = "Future of Business 2026"
         output_name = f"content_{slot}_{lang}"
         
-        # (Placeholder for real generation logic, mapped to Orchestrator)
-        # implementation details would go here...
-        print(f"✅ {output_name} produced successfully (Simulation).")
+        # 3. Content Generation (Assuming orchestrator handles it)
+        # video_path = orchestrator.generate_full_video(topic=topic, lang=lang)
+        # For now, we simulate success with a placeholder path
+        video_path = ROOT_DIR / f"outputs/daily/{output_name}.mp4"
         
-        # 4. Upload
-        if os.getenv('AUTOMATION_MODE') == 'True':
-            print(f"📤 Uploading {output_name} to Telegram...")
-            # Call telegram uploader
-            # Call youtube uploader
-            # Call insta uploader
+        print(f"✅ {output_name} production simulation complete.")
+        
+        # 4. Automate Uploads
+        if os.getenv('AUTOMATION_MODE', 'False') == 'True':
+            print(f"📤 Uploading {output_name} to platforms...")
+            
+            # Telegram
+            chat_id = os.getenv("TELEGRAM_ADMIN_ID")
+            if chat_id:
+                try:
+                    tg_upload(str(video_path), f"Daily Content: {topic}", chat_id)
+                except Exception as e:
+                    print(f"❌ TG Upload failed: {e}")
+
+            # YouTube
+            yt_accounts = acc_manager.get_accounts("youtube")
+            for acc in yt_accounts:
+                try:
+                    yt_upload(video_path, title=f"AI Future: {topic}", token_file=acc.get("token_file"))
+                except Exception as e:
+                    print(f"❌ YT Upload failed for {acc.get('name')}: {e}")
+
+            # Instagram
+            insta_accounts = acc_manager.get_accounts("instagram")
+            for acc in insta_accounts:
+                try:
+                    insta_upload(str(video_path), f"AI Daily Brief #AI #Future", session_id=acc.get("session_id"))
+                except Exception as e:
+                    print(f"❌ Insta Upload failed for {acc.get('username')}: {e}")
             
     print("\n💤 Cycle Complete. Sleeping until next trigger.")
 

@@ -78,6 +78,28 @@ services:
     networks:
       - unified-net
 
+  # Gmail Intelligence Agent - DISPATCHER & MONITOR
+  gmail-agent:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.services
+    image: ghcr.io/unified-system-core/unified-system-core/gmail-agent:latest
+    restart: always
+    command: ["python", "Scripts/Orchestration/gmail_agent.py"]
+    env_file: .env
+    environment:
+      - DB_PATH=/data/user_context.db
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-key.json
+      - GCP_PROJECT_ID=my-home-435112
+      - PROJECT_ID=my-home-435112
+    volumes:
+      - bot-data:/data
+      - ./gcp-service-account.json:/app/gcp-key.json:ro
+    depends_on:
+      - markitdown-mcp
+    networks:
+      - unified-net
+
 networks:
   unified-net:
     driver: bridge

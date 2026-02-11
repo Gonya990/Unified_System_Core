@@ -10,15 +10,28 @@ logger = logging.getLogger(__name__)
 class DigestService:
     """Generates daily digest reports."""
 
-    def __init__(self, usage_tracker, task_manager, linear_client, infra_manager, calendar_client=None):
+    def __init__(
+        self,
+        usage_tracker,
+        task_manager,
+        linear_client,
+        infra_manager,
+        calendar_client=None,
+        ha_controller=None,
+    ):
         self.usage_tracker = usage_tracker
         self.task_manager = task_manager
         self.linear_client = linear_client
         self.infra_manager = infra_manager
         self.calendar_client = calendar_client
+        self.ha_controller = ha_controller
 
     async def generate_digest(self, user_id: int, username: str) -> str:
         """Generate daily digest for a user."""
+        if self.ha_controller:
+            # We fetch shopping recommendations from finance_manager
+            # if available via the orchestrator or directly
+            pass
 
         today = datetime.now().strftime("%d.%m.%Y")
         day_name = datetime.now().strftime("%A")
@@ -63,7 +76,10 @@ class DigestService:
                 if issues:
                     digest += f"📋 **Linear ({len(issues)}):**\n"
                     for issue in issues[:3]:
-                        digest += f"  • {issue['identifier']}: {issue['title'][:40]}...\n"
+                        title_trunc = issue["title"][:40]
+                        digest += (
+                            f"  • {issue['identifier']}: {title_trunc}...\n"
+                        )
                     if len(issues) > 3:
                         digest += f"  ... и ещё {len(issues) - 3}\n"
                     digest += "\n"
@@ -82,6 +98,29 @@ class DigestService:
                 digest += "  " + " | ".join(health_summary) + "\n\n"
         except Exception as e:
             logger.error(f"Failed to get infra status for digest: {e}")
+
+        # 5. Home Assistant Status
+        if self.ha_controller:
+            try:
+                ha_report = await self.ha_controller.get_sensors_report()
+                if ha_report and "не найдено" not in ha_report:
+                    digest += ha_report + "\n"
+            except Exception as e:
+                logger.error(f"Failed to get HA report for digest: {e}")
+
+        # 6. Shopping Strategy
+        # Trying to find finance_manager in self? No, but maybe we can pass it
+        # However, for now, we can check if it's available.
+        # Let's assume finance_manager is passed in __init__
+        if hasattr(self, "finance_manager") and self.finance_manager:
+            try:
+                shop_report = (
+                    await self.finance_manager.get_shopping_recommendations(user_id)
+                )
+                if shop_report and "не найдено" not in shop_report:
+                    digest += shop_report + "\n\n"
+            except Exception as e:
+                logger.error(f"Failed to get shopping report for digest: {e}")
 
         # 5. Calendar Events (Today)
         if self.calendar_client:

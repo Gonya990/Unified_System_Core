@@ -1,55 +1,107 @@
-# 🌌 Unified System Vision & Dreams
+# 🌌 Видение и Мечты Единой Системы (Unified System Vision & Dreams)
 
-This is the central vault for future automations, integrations, and strategic
-expansions. It serves as the roadmap for the **Unified_System_Core** evolution.
+Это центральное хранилище для будущих автоматизаций, интеграций и стратегических
+расширений. Оно служит дорожной картой для эволюции **Unified_System_Core**.
 
-## 🌈 Active Dreams & Progress
+## 🌈 Активные Мечты и Прогресс
 
-### 🏗️ Infrastructure & Core
+### 🏗️ Инфраструктура и Ядро (Infrastructure & Core)
 
-- [x] **GitHub Issues Integration**: `/dream` command now creates trackable
-  issues automatically.
-- [ ] **Full GitOps Transition**: Complete removal of manual `kubectl` or `ssh`
-  calls. All state managed by ArgoCD.
-- [ ] **Vibranium Self-Healing**: Automated recovery for CrashLoop pods and
-  failed pipeline steps.
-- [ ] **Token Broker v2**: Multi-provider failover (if OpenAI is down,
-  auto-switch to Gemini/OpenRouter).
+- [x] **Интеграция с GitHub Issues**: Команда `/dream` теперь автоматически создает
+  отслеживаемые задачи.
+- [x] **Гармонизация инстансов**: Устранены конфликты нескольких копий путем
+  централизации логики в GKE и очистки лишних локальных кластеров.
 
-### 🎬 Content Factory 3.0
+- [ ] **Полный переход на GitOps**: Завершение перехода на ArgoCD и Flux для
+  развертывания всех сервисов.
+- [ ] **Vibranium v2 (Pulse)**: Продвинутое самовосстановление, которое не только
+  перезапускает, но и анализирует логи с помощью ИИ (LLM) для исправления
+  собственного кода.
+- [ ] **Token Broker v2**: Отказоустойчивость с несколькими провайдерами (если
+  OpenAI недоступен, автопереключение на Gemini/OpenRouter).
 
-- [x] **Path Stabilization**: Cloud paths mapped and absolute references fixed.
-- [ ] **TikTok/Reels Full Auto**: Automated cookie management and browser-based
-  uploads without API limits.
-- [ ] **Voice Cloning**: Use ElevenLabs with high-quality personal voice models
-  for consistent branding.
-- [ ] **Narrative Engine**: AI that analyzes trends and generates "viral"
-  scripts autonomously.
+### 🎬 Фабрика Контента 3.0 (Content Factory 3.0)
 
-### 💰 Finance & Trading
+- [x] **Стабилизация путей**: Облачные пути сопоставлены, абсолютные ссылки
+  исправлены.
+- [x] **Dino Talk 2.0 (Directed)**: Внедрен многоагентный движок сценариев (Rex vs
+  Trike) с режиссерскими метаданными (ракурсы, B-roll).
+- [ ] **Интеграция GEN 4.5 / GPT-4.5**: Переход на модели с высоким эмоциональным
+  интеллектом для "живых" диалогов.
+- [ ] **Runway Gen-3 Alpha / Luma Integration**: Переход от Ken Burns к
+  полноценному генеративному видео для персонажей.
+- [ ] **Полная автономия TikTok/Reels**: Автоматическое управление куки и загрузка
+  через браузер без ограничений API.
+- [ ] **Клонирование голоса**: Использование ElevenLabs с высококачественными
+  персональными моделями голоса для единого брендинга.
+- [ ] **Движок повествования (Narrative Engine)**: ИИ, который анализирует тренды и
+  автономно генерирует «виральные» сценарии.
 
-- [ ] **Trading Dashboard**: Real-time balance and "Fear/Greed" index
-  monitoring in the bot.
-- [ ] **Multi-Exchange Support**: Expand ByBit bot to OKX and Binance for
-  arbitrage opportunities.
-- [ ] **Expense AI**: Forward receipts to the bot for automatic categorization
-  in Firestore/Notion.
+### 💰 Финансы и Трейдинг | Finance & Trading
 
-### 🏠 Vision & Home Control
+- [ ] **Торговый дашборд | Trading Dashboard**: Мониторинг баланса и индекса
+  «Страха/Жадности» в реальном времени через бота. | Real-time balance and
+  "Fear/Greed" index monitoring in the bot.
+- [ ] **Поддержка нескольких бирж | Multi-Exchange Support**: Расширение бота ByBit
+  на OKX и Binance для возможностей арбитража. | Expand ByBit bot to OKX and
+  Binance for arbitrage opportunities.
+- [x] **Expense AI (ИИ Расходов)**: Пересылка чеков или голосовых заметок боту для
+  автоматической категоризации и хранения в Firestore. | Forward receipts or
+  voice notes to the bot for automatic categorization and memory storage in
+  Firestore.
 
-- [ ] **Vision Intelligence**: Bot connects to RTSP streams to describe what
-  happens in real-life ("Igor just came home").
-- [ ] **Home Assistant Bridge**: Unified control of smart devices via secure
-  Telegram tunnels.
+### 🛡 Безопасность и CI/CD | Security & CI/CD
 
-## 🛠 Strategic Goals (World Domination)
+Мы следуем циклу управления уязвимостями (GitLab Security Best Practices):
+We follow the vulnerability management cycle (GitLab Security Best Practices):
 
-1. **Autonomous Operation**: The system must run for 30 days without Igor ever
-   needing to SSH into a server.
-2. **Infinite Content**: Produce 10+ high-quality clips per day across 5+
-   platforms.
-3. **Financial Sovereignty**: Automated trading bots achieving consistent 1-2%
-   monthly growth.
+1. **Обнаружение (Detect)**: Автоматическое сканирование кода в CI/CD. |
+   Automated code scanning in CI/CD.
+2. **Сортировка (Triage)**: Оценка рисков и приоритизация. | Risk assessment and
+   prioritization.
+3. **Анализ (Analyze)**: Детальный разбор влияния уязвимостей. | Detailed impact
+   analysis of vulnerabilities.
+4. **Устранение (Remediate)**: Исправление кода или минимизация рисков. | Code
+   fixes or risk mitigation.
+5. **Оптимизация (Optimize)**: Улучшение правил обнаружения. | Improvement of
+   detection rules.
+
+### 📧 Интеллект и Коммуникации (Intelligence & Communication)
+
+- [x] **Умный Gmail Агент**: Мониторинг почты с фильтрацией ИИ, который понимает
+  контекст и уведомляет только о критических событиях, заменяя шумные уведомления
+  телефона.
+- [x] **Подавление шума в Linear**: Точечные интеграции для предотвращения спама в
+  проектных досках от логов бота.
+- [x] **Голос-в-Задачу (Voice-to-Task)**: Отправка голосового сообщения боту для
+  мгновенного создания полного плана проекта в Linear/GitHub.
+- [x] **Ежедневный интеллект-дайджест**: Morning report с харизмой, охватывающий
+  финансы, задачи и состояние системы через `/digest`.
+
+### 🏠 Видение и Управление Домом | Vision & Home Control
+
+- [ ] **Интеллект Зрения (Vision Intelligence)**: Бот подключается к RTSP-потокам и
+  описывает происходящее в реальности («Игорь только что пришел домой»).
+- [x] **Мост Home Assistant**: Единое управление умными устройствами (свет, климат,
+  сценарии) через безопасные туннели Telegram и ИИ-теги.
+
+### 📅 Календарь и Планирование | Calendar & Scheduling
+
+- [x] **Умное Расписание**: Автоматическое создание событий Google Календаря из
+  чата с использованием тегов `[[EVENT:...]]`.
+- [x] **Smart Scheduling**: Automated Google Calendar event creation from chat using
+  `[[EVENT:...]]` tags.
+
+## 🛠 Стратегические Цели (Мировое Господство)
+
+1. **Автономная работа**: Система должна работать 30 дней без необходимости
+   SSH-доступа от Игоря.
+2. **[x] Ноль Техно-Спама**: Никаких случайных уведомлений; только значимые
+   человеческие или стратегические алерты (шум Linear/Gmail подавлен).
+3. **Бесконечный контент**: Производство 10+ высококачественных клипов в день на 5+
+   платформах.
+4. **Финансовый суверенитет**: Автоматизированные торговые боты, достигающие
+   стабильного роста 1-2% в месяц.
 
 ---
-*Updated by the Vibranium Agent on February 10, 2026.*
+*Обновлено Агентом Vibranium 11 февраля 2026 года.*

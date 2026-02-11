@@ -9,18 +9,13 @@ from common.messaging import RedisStreamManager
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BybitExecution")
 
+from common.token_broker import TokenBroker
+
 class BybitExecutionEngine:
-    """
-    Service C: Execution Engine
-    - Pattern: Leader Election (Single Writer).
-    - API: Bybit V5.
-    - Rate Control: X-Bapi-Limit-Status.
-    """
-    def __init__(self, api_key, api_secret):
-        self.api_key = api_key
-        self.api_secret = api_secret
+    def __init__(self, provider="bybit"):
+        self.broker = TokenBroker()
+        self.api_key = self.broker.get_key(provider)
         self.is_leader = False
-        self.rate_limit_remaining = 100
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
         self.messenger = RedisStreamManager(redis_url)
         
@@ -84,7 +79,5 @@ class BybitExecutionEngine:
                 logger.debug(f"Passive mode: skipping order {msg_id}")
 
 if __name__ == "__main__":
-    key = os.getenv("BYBIT_API_KEY")
-    secret = os.getenv("BYBIT_API_SECRET")
-    engine = BybitExecutionEngine(key, secret)
+    engine = BybitExecutionEngine()
     asyncio.run(engine.run())

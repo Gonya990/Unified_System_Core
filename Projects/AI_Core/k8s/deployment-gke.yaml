@@ -13,14 +13,16 @@ spec:
       labels:
         app: telegram-bot
     spec:
+      imagePullSecrets:
+      - name: ghcr-auth
       containers:
       - name: bot
-        image: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot:latest
+        image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:8389d764840146cda117b6a4fc2444b5b72d1f68
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "200m"
+            memory: "512Mi"
           limits:
             cpu: "1000m"
             memory: "2Gi"
@@ -47,6 +49,9 @@ spec:
         - name: gmail-creds
           mountPath: /app/config/gmail_credentials.json
           subPath: gmail_credentials.json
+        - name: vibranium-vault
+          mountPath: /root/.config/unified-system/tokens.yaml
+          subPath: tokens.yaml
       volumes:
       - name: google-creds
         configMap:
@@ -54,3 +59,6 @@ spec:
       - name: gmail-creds
         configMap:
           name: bot-gmail-credentials
+      - name: vibranium-vault
+        secret:
+          secretName: vibranium-tokens

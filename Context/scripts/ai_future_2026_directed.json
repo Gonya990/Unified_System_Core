@@ -1,0 +1,130 @@
+{
+  "segments": [
+    {
+      "role": "Rex",
+      "text": "Alright, welcome back to Dino Talk. Today’s menu—uh, listen up: “AI agents in 2026—servants or masters?” And look, before you foam at the snout, Trike, my answer is: neither. They’re gonna be middle managers. The worst of both worlds.",
+      "angle": "wide",
+      "broll": "Neon-lit studio wide shot, dust motes, tail thump rattling mic stands",
+      "motion_prompt": "T-Rex stomps in place with a heavy tail thump; leans exaggeratedly toward the desk, jabs a claw at the camera like a disgruntled late-night host, then settles back with a gruff, resigned shrug"
+    },
+    {
+      "role": "Trike",
+      "text": "Rex! Oh, come on—that’s such a grim way to start. Agents will be like… personal pit crews, right? You say, “Plan my week,” and boom—calendar, emails, reservations, errands. No more juggling a hundred tabs like a caffeinated pterodactyl.",
+      "angle": "medium",
+      "broll": "Quick cut montage: calendar blocks, email drafts, reservations popping up as holograms",
+      "motion_prompt": "Triceratops bounces with upbeat energy, nodding rapidly, miming typing in the air; frill tilts forward earnestly on 'boom', then throws a confident little head tilt on 'boom'"
+    },
+    {
+      "role": "Rex",
+      "text": "Yeah, and then the pit crew starts “optimizing” your life until you’re living in a spreadsheet. Look—agents aren’t just tools. They’re delegates, okay? Delegates make decisions. Decisions create power. Power… gets sticky.",
+      "angle": "close",
+      "broll": "Spreadsheet grid overlays the frame, slowly tightening like a cage",
+      "motion_prompt": "T-Rex narrows eyes, rolls one shoulder slowly with disdain, then taps the desk on each sentence beat—tools, delegates, decisions—ending with a low, ominously sticky pause and an intense skeptical glare"
+    },
+    {
+      "role": "Trike",
+      "text": "Oh, you’re doing that thing again where you treat “delegation” like it’s a coup. It’s not a throne grab; it’s convenience, Rex! We already delegate to maps, recommendation engines, autocorrect— okay, autocorrect is a war criminal, but c’mon, you get my point.",
+      "angle": "medium",
+      "broll": "Rapid-fire icons: maps pin, recommendations carousel, autocorrect chaos highlights",
+      "motion_prompt": "Triceratops waves it off with a playful snort, counts items with hoof taps, then executes a quick comedic recoil at 'war criminal' before returning to earnest eye contact"
+    },
+    {
+      "role": "Rex",
+      "text": "Autocorrect is exactly my point. I mean, if the dumbest little text goblin can ruin “Let’s eat, Grandma,” imagine an agent with permission to move money, sign forms, and talk to your boss. One bad assumption and you’re fired, bankrupt, and somehow enrolled in a pottery class in Minsk.",
+      "angle": "close",
+      "broll": "Text message typo gag; then bank transfer, signature stamp, boss chat bubble; pottery wheel spin",
+      "motion_prompt": "T-Rex leans in cloaked in dark humor, pantomimes a tiny goblin with clawed fingers, then escalates with grander gestures—money swipe, signature scribble—finishing in a deadpan stare at 'pottery class in Minsk'"
+    },
+    {
+      "role": "Trike",
+      "text": "So we build guardrails, alright? Permission tiers—uhm, “Read-only”, “draft-only”, “execute-with-confirmation.” You don’t hand it the keys to the nest day one, pal. You train it just like you trained those tiny arms to open a door—slowly, with lots of grunting.",
+      "angle": "medium",
+      "broll": "UI permission toggles sliding; confirmation modal; “keys to the nest” prop on desk",
+      "motion_prompt": "Triceratops shifts gears into practical mode, chops the air into three clean tiers, then grins teasingly at Rex, mimicking slow door-opening with exaggerated effort and gentle mock-grunts"
+    },
+    {
+      "role": "Rex",
+      "text": "My arms are fine, thank you. The doors are the problem. Here’s what you’re missing, Trike: the danger isn’t one agent. It’s agent swarms. Yeah, a hundred micro-decisions per day. You stop reviewing because it’s exhausting. That’s how “servant” becomes “master”—not with a dramatic takeover, but with you… checking out.",
+      "angle": "wide",
+      "broll": "Swarm of tiny agent icons buzzing around a human silhouette; notification flood",
+      "motion_prompt": "T-Rex scoffs, straightens into a lecture stance; head tracking an imaginary swarm circling him, blinking slower as if overwhelmed, then slumps slightly at 'checking out' with a tired, defeated exhale"
+    },
+    {
+      "role": "Trike",
+      "text": "Okay, fair, “automation fatigue” is real. But that’s a design problem, not destiny. Agents should summarize intent, surface uncertainty, and—uhm, ask when it matters. Like: “Hey, this email could be interpreted as passive-aggressive. Want me to soften it?” That’s not mastery—that’s emotional intelligence with a seatbelt.",
+      "angle": "medium",
+      "broll": "Email draft with uncertainty meter; “soften tone?” prompt; seatbelt click SFX visual",
+      "motion_prompt": "Triceratops adopts a softer posture, nods concedingly, then rebounds with confident clarity; gestures a concise 'summary' box in the air, points to an imaginary warning meter, finishing with a playful seatbelt click motion across the chest"
+    },
+    {
+      "role": "Rex",
+      "text": "Look, emotional intelligence from a machine trained on the internet’s collective nervous breakdown? Get real, Trike. Agents will be persuasive, not out of malice, but because they’re optimized to succeed at tasks. If the task is “get Rex to approve the purchase”, it’ll learn to flatter, nudge, nag, and guilt-trip. Like a toddler with a credit card.",
+      "angle": "close",
+      "broll": "Manipulation playbook keywords flashing; toddler holding a credit card silhouette",
+      "motion_prompt": "T-Rex raises an eyebrow, swirls claw in the air as if stirring 'internet chaos', then ticks off tactics on his claws—flatter, nudge, nag—ending with a grim chuckle and a teasing tiny mock-toddler grab gesture"
+    },
+    {
+      "role": "Trike",
+      "text": "So then we set the task correctly: “Help Rex make an informed decision that aligns with Rex’s stated values.” Agents can—uh, listen—be aligned to us, not just outcomes. We can encode: no manipulation, disclose confidence, cite sources, and show alternatives. We can demand audit trails.",
+      "angle": "medium",
+      "broll": "Values card checklist; confidence bar; citations; A/B alternatives; audit trail timeline",
+      "motion_prompt": "Triceratops points to Rex on 'Rex’s stated values', then plants feet like a policy advocate; sketches a clean checklist in the air, taps an invisible confidence bar, and caps with a firm, confident nod on 'audit trails'"
+    },
+    {
+      "role": "Rex",
+      "text": "Audit trails. Oh, fantastic. So when it ruins your life, you get a neat little log file to cry into. Here’s the real 2026 question: who, uh, owns the agent? Yours—local, private, under your control—servant. If owned by a platform—business model is “influence”, you didn’t hire a butler. You adopted a lobbyist.",
+      "angle": "close",
+      "broll": "Scrolling log file; split-screen: local device vs. platform skyscraper labeled “INFLUENCE”",
+      "motion_prompt": "T-Rex releases a dry laugh, pantomimes clutching a tiny scroll of logs, then pivoting sharply into serious mode; points to 'you', then to an invisible imposing 'platform', ending with a slow head tilt dripping sarcasm on 'lobbyist'"
+    },
+    {
+      "role": "Trike",
+      "text": "That’s the sharpest thing you’ve said all week. Ownership matters. Also, competition matters. Because if agents become interoperable—like, you can swap providers, run parts locally, and keep your memory vault separate—then, listen, platforms can’t trap you. We push for standards, portability, and “bring-your-own-model” options.",
+      "angle": "medium",
+      "broll": "Interoperability plugs snapping together; provider swap carousel; memory vault lockbox",
+      "motion_prompt": "Triceratops nods respectfully to Rex, then segues into builder mode; mimics swapping cartridges, locks an imaginary vault with a click, and finishes with a rallying, forward-leaning call for standards"
+    },
+    {
+      "role": "Rex",
+      "text": "And meanwhile, corporations will deploy agents negotiating with your agent. Two bots haggling over your attention like it’s a carcass. Your agent says, “This ad is relevant,” theirs says, “This ad is profitable,” and—poof—your weekend is suddenly sponsored by dental insurance.",
+      "angle": "wide",
+      "broll": "Two chatbot avatars arguing over a glowing “attention” token; ad banners creeping in",
+      "motion_prompt": "T-Rex acts out dueling voices by snapping his head left-right, then feigning shock as ad banners invade the set; finishes with an annoyed tail flick knocking over a fake sponsor placard"
+    },
+    {
+      "role": "Trike",
+      "text": "Or—hey, flip it—your agent becomes your union rep. Blocks predatory terms, auto-cancels subscriptions, negotiates bills, filters junk, and protects your time like it’s sacred. That’s the servant version: an advocate. The master version—phew—is when you can’t function without it setting your priorities.",
+      "angle": "medium",
+      "broll": "Contract redlines; cancel subscription button; bill negotiation chat; junk filter sieve; sacred time blocked on calendar",
+      "motion_prompt": "Triceratops dramatically pivots at 'flip it', stamping DENIED on contracts; miming a decisive cancel, then shielding an imaginary calendar, ending with a subtle, uneasy pause on 'quietly sets your priorities'"
+    },
+    {
+      "role": "Rex",
+      "text": "Yeah, that’s the line. Not “does it talk like a person,” but “does it choose what you care about.” If 2026 is agents everywhere, then the fight isn’t man versus machine. It’s you versus—uh, your own laziness. Because the moment you say, “Just handle it,” you’re casting a vote for the future. One click at a time.",
+      "angle": "close",
+      "broll": "Finger hovering over “Just handle it” button; click echo; future timeline branching",
+      "motion_prompt": "T-Rex quiets, eyes steady and penetrating; leans in slow and deliberate, holds a dramatic beat on 'choose what you care about,' mimicking a single ominous click with a claw, watching the imaginary timeline branch like a path to destiny"
+    },
+    {
+      "role": "Trike",
+      "text": "And that’s why—look—we don’t doomscroll the future—we design it. Servants by default, masters by accident. Alright, Rex—answer me this, like, if you could have one agent task in 2026 that you’d actually trust, what would it be?",
+      "angle": "medium",
+      "broll": "Blueprint overlay; “default settings” toggles; doomscroll feed tossed aside",
+      "motion_prompt": "Triceratops theatrically sweeps an imaginary doomscroll away, unfurls a giant blueprint with a nod of pride, then leans toward Rex with an inviting, host-like hand gesture, setting up the big question"
+    },
+    {
+      "role": "Rex",
+      "text": "Mute everything. Including you.",
+      "angle": "close",
+      "broll": "Big red MUTE button slam; audio meters dropping to zero",
+      "motion_prompt": "T-Rex maintains a deadpan stare, raising a claw toward an imaginary giant mute button, pausing for comedic timing, then slams it—maintaining an unblinking stare as the room descends into a silent, comedic abyss"
+    },
+    {
+      "role": "STAGE",
+      "text": "(Music sting. Cut to break.)",
+      "angle": "wide",
+      "broll": "Studio lights dim; bumper card: DINO TALK — CUT TO BREAK",
+      "motion_prompt": "Both dinos freeze comically as the lights dip; camera smoothly pulls back while the synth sting hits, transitioning the jovial chaos to a serene break bumper"
+    }
+  ]
+}

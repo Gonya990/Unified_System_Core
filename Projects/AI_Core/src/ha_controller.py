@@ -23,21 +23,21 @@ HomeAssistantClient = None
 
 try:
     # 1. Direct import (same directory)
-    from ha_client import HAConfig, HomeAssistantClient
+    from ha_client import HomeAssistantClient
     HA_AVAILABLE = True
 except ImportError:
     try:
         # 2. Package import (from src)
-        from src.ha_client import HAConfig, HomeAssistantClient
+        from src.ha_client import HomeAssistantClient
         HA_AVAILABLE = True
     except ImportError as e:
         logger.error(f"Failed to import ha_client: {e}")
         # Debug: list files in current dir
         try:
-             files = [f.name for f in current_dir.iterdir()]
-             logger.error(f"Files in {current_dir}: {files}")
-        except:
-             pass
+            files = [f.name for f in current_dir.iterdir()]
+            logger.error(f"Files in {current_dir}: {files}")
+        except Exception:
+            pass
 
 class HAController:
     """
@@ -81,17 +81,22 @@ class HAController:
         if target not in entity_ids:
             # Fuzzy match
             import difflib
-            # Filter for lights/switches
-            candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
+            candidates = [
+                e
+                for e in entity_ids
+                if e.startswith("light.") or e.startswith("switch.")
+            ]
             # Try to match simple name (e.g. "corridor" against "light.corridor_switch_1")
 
             # 1. Search by Friendly Name (Russian/Exact)
             # Create map of name -> entity_id
             name_map = {}
             for s in states:
-                eid = s['entity_id']
-                if eid.startswith('light.') or eid.startswith('switch.'):
-                    fname = s.get('attributes', {}).get('friendly_name', '').lower()
+                eid = s["entity_id"]
+                if eid.startswith("light.") or eid.startswith("switch."):
+                    fname = (
+                        s.get("attributes", {}).get("friendly_name", "").lower()
+                    )
                     if fname:
                         name_map[fname] = eid
 
@@ -130,15 +135,22 @@ class HAController:
         if target not in entity_ids:
             # Fuzzy match
             import difflib
-            candidates = [e for e in entity_ids if e.startswith('light.') or e.startswith('switch.')]
+
+            candidates = [
+                e
+                for e in entity_ids
+                if e.startswith("light.") or e.startswith("switch.")
+            ]
 
             # 1. Search by Friendly Name (Russian/Exact)
             # Create map of name -> entity_id
             name_map = {}
             for s in states:
-                eid = s['entity_id']
-                if eid.startswith('light.') or eid.startswith('switch.'):
-                    fname = s.get('attributes', {}).get('friendly_name', '').lower()
+                eid = s["entity_id"]
+                if eid.startswith("light.") or eid.startswith("switch."):
+                    fname = (
+                        s.get("attributes", {}).get("friendly_name", "").lower()
+                    )
                     if fname:
                         name_map[fname] = eid
 
@@ -191,32 +203,61 @@ class HAController:
         return self.client.call_service("scene", "turn_on", entity_id=entity_id)
 
     async def get_sensors_report(self) -> str:
-        """Get summary of sensors."""
-        if not self.client: return "HA unavailable"
+        """Get structured summary of sensors, grouped by category."""
+        if not self.client:
+            return "HA unavailable"
 
-        states = self.client.get_states()
-        sensors = []
+        try:
+            states = self.client.get_states()
+        except Exception as e:
+            return f"Error getting HA states: {e}"
+
+        groups = {
+            "⚡ Энергия": [],
+            "🌡 Климат": [],
+            "🔒 Безопасность": [],
+            "🔋 Питание": [],
+            "📊 Прочее": [],
+        }
 
         for s in states:
-            eid = s.get('entity_id', '')
-            state = s.get('state', '')
-            unit = s.get('attributes', {}).get('unit_of_measurement', '')
-            name = s.get('attributes', {}).get('friendly_name', eid)
+            eid = s.get("entity_id", "")
+            state = s.get("state", "")
+            attr = s.get("attributes", {})
+            unit = attr.get("unit_of_measurement", "")
+            name = attr.get("friendly_name", eid)
 
-            if eid.startswith("sensor.") and state not in ["unknown", "unavailable"]:
-                # Filter useful sensors but be more inclusive
-                # Standard physical measurements
-                important_units = ["°C", "%", "W", "lx", "V", "A", "kWh", "ppm", "m/s", "mm", "hPa", "dB"]
-                if unit in important_units or "battery" in eid:
-                    sensors.append(f"🔹 **{name}**: {state} {unit}")
+            if state in ["unknown", "unavailable", "none"]:
+                continue
 
-        if not sensors:
-            return "Сенсоров не найдено."
+            # Skip non-sensors
+            if not eid.startswith(("sensor.", "binary_sensor.")):
+                continue
 
-        # Sort by name
-        sensors.sort()
+            info = f"• **{name}**: {state}{unit}"
 
-        return "📊 **Показания датчиков**:\n" + "\n".join(sensors)
+            if unit == "W" or unit == "kWh" or "power" in eid:
+                groups["⚡ Энергия"].append(info)
+            elif unit in ["°C", "%"] or "temperature" in eid or "humidity" in eid:
+                groups["🌡 Климат"].append(info)
+            elif "battery" in eid or unit == "%" and "battery" in name.lower():
+                groups["🔋 Питание"].append(info)
+            elif eid.startswith("binary_sensor."):
+                groups["🔒 Безопасность"].append(info)
+            else:
+                # Filter for useful units only to avoid noise
+                important_units = ["lx", "V", "A", "ppm", "m/s", "mm", "hPa", "dB"]
+                if unit in important_units:
+                    groups["📊 Прочее"].append(info)
+
+        report = "🏠 **Статус дома**:\n\n"
+        found = False
+        for title, items in groups.items():
+            if items:
+                report += f"{title}:\n" + "\n".join(items[:10]) + "\n\n"
+                found = True
+
+        return report if found else "Активных датчиков не найдено."
 
     async def get_integrations(self):
         """Get list of integrations."""
@@ -233,16 +274,23 @@ class HAController:
         if not self.client:
             return False
         try:
-            self.client.call_service("tts", "yandex_station_say", entity_id=entity_id, message=message)
+            self.client.call_service(
+                "tts",
+                "yandex_station_say",
+                entity_id=entity_id,
+                message=message,
+            )
             return True
         except Exception as e:
             logger.error(f"Yandex TTS failed: {e}")
             # Try alternative method via media_player
             try:
-                self.client.call_service("media_player", "play_media",
+                self.client.call_service(
+                    "media_player",
+                    "play_media",
                     entity_id=entity_id,
                     media_content_type="text",
-                    media_content_id=message
+                    media_content_id=message,
                 )
                 return True
             except Exception as e2:
@@ -264,13 +312,26 @@ class HAController:
                 fname = s.get('attributes', {}).get('friendly_name', '')
 
                 # Filter for relevant domains
-                domain = eid.split('.')[0]
-                if domain in ['light', 'switch', 'sensor', 'binary_sensor', 'climate', 'media_player', 'script', 'scene']:
-                    if state not in ['unknown', 'unavailable']:
+                domain = eid.split(".")[0]
+                relevant_domains = [
+                    "light",
+                    "switch",
+                    "sensor",
+                    "binary_sensor",
+                    "climate",
+                    "media_player",
+                    "script",
+                    "scene",
+                ]
+                if domain in relevant_domains:
+                    if state not in ["unknown", "unavailable"]:
                         item = f"{eid} ({fname}): {state}"
-                        if domain == 'sensor':
-                            unit = s.get('attributes', {}).get('unit_of_measurement', '')
-                            if unit: item += f" {unit}"
+                        if domain == "sensor":
+                            unit = s.get("attributes", {}).get(
+                                "unit_of_measurement", ""
+                            )
+                            if unit:
+                                item += f" {unit}"
                         context.append(item)
 
             if not context:
