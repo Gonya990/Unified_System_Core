@@ -52,8 +52,21 @@ def search_finance_emails(service):
     messages = results.get('messages', [])
 
     for msg in messages:
-        msg_data = service.users().messages().get(userId='me', id=msg['id'], format='metadata', metadataHeaders=['From', 'Subject', 'Date']).execute()
-        headers = {h['name']: h['value'] for h in msg_data.get('payload', {}).get('headers', [])}
+        msg_data = (
+            service.users()
+            .messages()
+            .get(
+                userId="me",
+                id=msg["id"],
+                format="metadata",
+                metadataHeaders=["From", "Subject", "Date"],
+            )
+            .execute()
+        )
+        headers = {
+            h["name"]: h["value"]
+            for h in msg_data.get("payload", {}).get("headers", [])
+        }
 
         found_emails.append({
             'from': headers.get('From'),
@@ -66,7 +79,8 @@ def search_finance_emails(service):
 
 def main():
     service = get_gmail_service()
-    if not service: return
+    if not service:
+        return
 
     emails = search_finance_emails(service)
     print(f"\n✅ Found {len(emails)} relevant financial emails:")

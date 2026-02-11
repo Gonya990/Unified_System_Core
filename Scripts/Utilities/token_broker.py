@@ -201,7 +201,7 @@ class TokenBroker:
             encrypted_data = bytes.fromhex(data["encrypted_data"])
             nonce = bytes.fromhex(data["nonce"])
             salt = bytes.fromhex(data["salt"])
-            kdf_type = data.get("kdf", "pbkdf2")  # Default to pbkdf2 for existing vaults
+            kdf_type = data.get("kdf", "pbkdf2")  # Legacy fallback
 
             key = self._derive_key(salt, kdf_type=kdf_type)
             if key and HAS_CRYPTO and AESGCM:
@@ -269,7 +269,9 @@ class TokenBroker:
             try:
                 with open(legacy_path) as f:
                     self.key_store = json.load(f)
-                logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
+                logger.info(
+                    f"Imported legacy keys from {legacy_path}. Encrypting now..."
+                )
                 self.save_vault()
             except Exception as e:
                 logger.error(f"TokenBroker: Legacy import failed: {e}")

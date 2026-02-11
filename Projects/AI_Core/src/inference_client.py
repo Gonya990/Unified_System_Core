@@ -105,13 +105,25 @@ class InferenceClient:
         )
 
         # Failover logic: If primary fails and it wasn't already GitHub Models
-        if (isinstance(response, str) and response.startswith("Error:")) and provider != "github":
-            logger.warning(f"Primary provider {provider} failed: {response}. Attempting failover to GitHub Models...")
+        if (
+            isinstance(response, str)
+            and response.startswith("Error:")
+            and provider != "github"
+        ):
+            logger.warning(
+                f"Primary provider {provider} failed: {response}. "
+                "Attempting failover to GitHub Models..."
+            )
 
             # Use GitHub Models as universal failover
-            fallback_response, fallback_usage = await self._chat_github_models(messages, system_prompt)
+            fallback_response, fallback_usage = await self._chat_github_models(
+                messages, system_prompt
+            )
 
-            if not (isinstance(fallback_response, str) and fallback_response.startswith("Error:")):
+            if not (
+                isinstance(fallback_response, str)
+                and fallback_response.startswith("Error:")
+            ):
                 return f"[FALLBACK] {fallback_response}", fallback_usage
 
         return response, usage
@@ -290,7 +302,9 @@ class InferenceClient:
         except Exception as e:
             return f"OpenAI Connection Error: {e}", {}
 
-    async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
+    async def _chat_openrouter(
+        self, messages: list, system_prompt: Optional[str] = None
+    ):
         """OpenRouter API request."""
         api_key = self.config.get("OPENROUTER_API_KEY")
         base_url = self.config.get(

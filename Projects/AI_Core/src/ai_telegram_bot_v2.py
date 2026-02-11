@@ -2248,25 +2248,25 @@ async def post_init(application: Application) -> None:
         logger.warning("⚠️ DashboardService not available, skipping startup")
 
     # Broadcast Online Status via MCP Mail
-    if agent_mail:
-        try:
-            # Run in executor to avoid blocking async loop with sync requests
-            loop = asyncio.get_running_loop()
-            is_healthy = await loop.run_in_executor(None, agent_mail.health_check)
-            if is_healthy:
-                await loop.run_in_executor(None, lambda: agent_mail.broadcast(
-                    subject="Unified Bot Online (Vibranium Core)",
-                    body_md=(
-                        "The AI Telegram Bot V2 (Vibranium Core) has successfully "
-                        "started and is listening for commands."
-                    ),
-                    importance="normal"
-                ))
-                logger.info("Broadcasted 'Unified Bot Online' via MCP Mail")
-            else:
-                logger.warning("MCP Mail Server unhealthy, skipping broadcast")
-        except Exception as e:
-            logger.error(f"Failed to broadcast online status: {e}")
+    # if agent_mail:
+    #     try:
+    #         # Run in executor to avoid blocking async loop with sync requests
+    #         loop = asyncio.get_running_loop()
+    #         is_healthy = await loop.run_in_executor(None, agent_mail.health_check)
+    #         if is_healthy:
+    #             await loop.run_in_executor(None, lambda: agent_mail.broadcast(
+    #                 subject="Unified Bot Online (Vibranium Core)",
+    #                 body_md=(
+    #                     "The AI Telegram Bot V2 (Vibranium Core) has successfully "
+    #                     "started and is listening for commands."
+    #                 ),
+    #                 importance="normal"
+    #             ))
+    #             logger.info("Broadcasted 'Unified Bot Online' via MCP Mail")
+    #         else:
+    #             logger.warning("MCP Mail Server unhealthy, skipping broadcast")
+    #     except Exception as e:
+    #         logger.error(f"Failed to broadcast online status: {e}")
 
 
 async def post_shutdown(application: Application) -> None:
@@ -4923,19 +4923,25 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
 
     # Self-Healing: Create GitHub Issue if running in cloud
-    if gh_handler and os.environ.get("PROJECT_ID"):
-        title = f"[BOT ERROR] {str(context.error)[:50]}..."
-        body = (
-            f"### Error Details\n"
-            f"**Error:** `{context.error}`\n\n"
-            f"### Traceback\n"
-            f"```python\n{tb_str}\n```\n\n"
-            f"### Context\n"
-            f"- **Pod:** `{os.environ.get('HOSTNAME', 'unknown')}`\n"
-            f"- **Instance:** `{config.get('BOT_INSTANCE', 'unknown')}`\n"
-        )
-        import asyncio
-        asyncio.create_task(gh_handler.create_issue(title, body))
+    # EMERGENCY DISABLE: Stopping spam as requested by user.
+    # from telegram.error import Conflict, NetworkError, TimedOut
+    # if (
+    #     gh_handler and
+    #     os.environ.get("PROJECT_ID") and
+    #     not isinstance(context.error, (Conflict, NetworkError, TimedOut))
+    # ):
+    #     title = f"[BOT ERROR] {str(context.error)[:50]}..."
+    #     body = (
+    #         f"### Error Details\n"
+    #         f"**Error:** `{context.error}`\n\n"
+    #         f"### Traceback\n"
+    #         f"```python\n{tb_str}\n```\n\n"
+    #         f"### Context\n"
+    #         f"- **Pod:** `{os.environ.get('HOSTNAME', 'unknown')}`\n"
+    #         f"- **Instance:** `{config.get('BOT_INSTANCE', 'unknown')}`\n"
+    #     )
+    #     import asyncio
+    #     asyncio.create_task(gh_handler.create_issue(title, body))
 
 
 async def dream_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
