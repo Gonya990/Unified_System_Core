@@ -111,9 +111,11 @@ GitHub Models.
     * Автоматизировать SBOM (Syft) и скан уязвимостей (Grype/Artifact Analysis)
         в CI.
 3. **Binary Authorization / Бинарная авторизация:**
-    * [x] Enable Binary Authorization on GKE Autopilot (PROJECT_SINGLETON_POLICY).
+    * [x] Enable Binary Authorization on GKE Autopilot
+        (PROJECT_SINGLETON_POLICY).
     * [x] Configure Attestors and Policy (`policy.yaml` enforced).
-    * [x] Требовать подписанные аттестации образов из CI; блокировать неподписанные деплои в GKE.
+    * [x] Требовать подписанные аттестации образов из CI; блокировать
+        неподписанные деплои в GKE.
 4. **Secrets Hygiene / Гигиена секретов:**
     * 90-day rotation policy; automated drift detection between Secret Manager
         and manifests.
