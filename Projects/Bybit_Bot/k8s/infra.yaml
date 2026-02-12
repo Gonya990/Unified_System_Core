@@ -1,0 +1,87 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cluster
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+  namespace: trading
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timescaledb
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timescale
+  template:
+    metadata:
+      labels:
+        app: timescale
+    spec:
+      containers:
+      - name: timescale
+        image: timescale/timescaledb:latest-pg15
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "trading_pass"
+        - name: POSTGRES_USER
+          value: "trading_user"
+        - name: POSTGRES_DB
+          value: "trading"
+        ports:
+        - containerPort: 5432
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: timescaledb
+  namespace: trading
+spec:
+  selector:
+    app: timescale
+  ports:
+  - port: 5432
+    targetPort: 5432

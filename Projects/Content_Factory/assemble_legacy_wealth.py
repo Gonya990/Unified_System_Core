@@ -1,9 +1,9 @@
 import os
-import sys
-import json
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Setup paths
@@ -20,15 +20,16 @@ sys.path.append(str(ROOT_DIR / 'Scripts/Utilities'))
 
 import orchestrator_v3_no_face as orchestrator
 
+
 def run_assembly():
     print("🎬 RE-PROCESSING: Legacy Wealth Short (Speed 1.15x, Fixed Year)...")
-    
+
     orchestrator.broker = None
     os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-    
+
     day_str = datetime.now().strftime('%Y-%m-%d')
     assets_dir = ROOT_DIR / 'Local_Dev' / 'Media' / 'legacy_wealth' / day_str
-    
+
     # Phonetic year to ensure 'Две тысячи двадцать шестой'
     script_ru = """
 Почему девяносто процентов предпринимателей провалятся в две тысячи двадцать шестом году? 🛑
@@ -54,29 +55,29 @@ def run_assembly():
         {'image': str(assets_dir / 'scene_5_sovereign_living.jpg'), 'keyword': 'sovereign living'},
         {'image': str(assets_dir / 'scene_6_cta.jpg'), 'keyword': 'cta light'}
     ]
-            
+
     orchestrator.INPUT_DIR = assets_dir
     orchestrator.OUTPUT_DIR = assets_dir
     orchestrator.BROLL_DIR = ROOT_DIR / 'broll'
-    
+
     # Monkey-patch generate_audio to support speedup
     original_gen_audio = orchestrator.generate_audio
-    
+
     def speed_up_audio(text, output_path, lang="en"):
         if original_gen_audio(text, output_path, lang):
             print("⚡ Speeding up audio (1.15x)...")
             temp_path = output_path.with_suffix('.tmp.wav')
             output_path.rename(temp_path)
             subprocess.run([
-                'ffmpeg', '-y', '-i', str(temp_path), 
-                '-filter:a', 'atempo=1.15', 
+                'ffmpeg', '-y', '-i', str(temp_path),
+                '-filter:a', 'atempo=1.15',
                 str(output_path)
             ], check=True)
             return True
         return False
-        
+
     orchestrator.generate_audio = speed_up_audio
-    
+
     final_video = orchestrator.run_no_face_pipeline(
         text=script_ru,
         lang="ru",
@@ -84,7 +85,7 @@ def run_assembly():
         scenes=assets,
         style="impact"
     )
-    
+
     if final_video:
         print(f"🎉 SUCCESS! V2 video: {final_video}")
     else:

@@ -1,5 +1,6 @@
-from google_auth_oauthlib.flow import InstalledAppFlow
 from pathlib import Path
+
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.readonly']
 # Paths relative to this file

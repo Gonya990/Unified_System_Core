@@ -175,7 +175,7 @@ def generate_voiceover_xtts(script_file):
 if __name__ == "__main__":
     import sys
     SCRIPTS_DIR = CONTEXT_DIR / "scripts"
-    
+
     if len(sys.argv) > 1:
         script_file = Path(sys.argv[1])
         if script_file.exists():

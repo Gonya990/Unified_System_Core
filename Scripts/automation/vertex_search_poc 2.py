@@ -1,14 +1,15 @@
+import os
 from google import genai
 from google.genai.types import GenerateContentConfig, GoogleSearch, Tool
-
-# Setup keys
-GEMINI_API_KEY = "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
-PROJECT_ID = "gen-lang-client-0982257437"
 
 def run_vertex_search_poc():
     print("🔍 Starting Vertex AI Search (Grounding) POC...")
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        raise RuntimeError("Set GEMINI_API_KEY in env before running this script")
+
+    client = genai.Client(api_key=gemini_key)
 
     # Define Grounding Tool
     # This uses Google Search for grounding.

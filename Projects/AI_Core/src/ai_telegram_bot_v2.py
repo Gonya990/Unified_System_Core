@@ -18,6 +18,7 @@ import pytz
 
 # Local imports (must be after sys.path adjustment if needed)
 from agent_orchestrator import PIPELINES, AgentOrchestrator
+from api_proxy import run_proxy, set_bot_instance
 from calendar_client import CalendarClient
 from cloud_logger import setup_cloud_logging
 from config_manager import ConfigManager
@@ -28,7 +29,6 @@ from google_auth import GoogleAuthManager
 from health import start_health_server
 from identity_orchestrator import IdentityOrchestrator
 from inference_client import InferenceClient
-from api_proxy import run_proxy, set_bot_instance
 
 # Third-party imports
 from telegram import (
@@ -2423,7 +2423,7 @@ async def shopping_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Access denied.")
         return
     db.update_last_interaction(user_id)
-    
+
     if not finance_manager:
         await update.message.reply_text("❌ Finance Manager not initialized.")
         return
@@ -2441,7 +2441,7 @@ async def process_api_command(user_id: int, text: str) -> str:
     logger.info(f"[API] Command from {user_id}: {text}")
     if not db.is_approved(user_id):
         return "⛔️ Access denied (User not approved)."
-    
+
     # Process with orchestrator
     response = await query_ollama_with_context(user_id, text)
     return response
@@ -3576,7 +3576,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "invoice",
             ]
         )
-        
+
         if is_finance:
             ocr_prompt = (
                 "This is a receipt or bank statement. Please extract the following "
@@ -3595,10 +3595,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Process the response (to handle [[EXPENSE:...]] tags)
         # We can reuse the logic from the text message processor if we extract it,
         # but for now, let's keep it simple.
-        
+
         # Post-process response tags (EXPENSE, TASK, etc.)
         processed_response = response
-        
+
         # Simple tag handling for photos
         expense_matches = re.findall(
             r"\[\[EXPENSE:(.*?):(.*?)(?::(.*?))?\]\]", processed_response
@@ -5532,7 +5532,7 @@ def main():
             return await process_api_command(user_id, command)
 
     set_bot_instance(BotBridge())
-    
+
     def start_api():
         logger.info(f"[STARTUP] Mobile Proxy API starting on port {api_port}")
         run_proxy(port=api_port)

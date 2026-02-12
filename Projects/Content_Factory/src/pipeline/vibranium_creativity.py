@@ -1,25 +1,14 @@
-import os
 import json
+import os
 
 
 def generate_dynamic_content():
-    # FORCED WORKING KEYS (Discovered in AI_Core/.env)
-    openai_key = os.getenv("OPENAI_API_KEY") or (
-        "sk-proj-tBRH9G7RWRAu0x6RMhNUZeqqr_fFYe1vkCDpdA613OYWwvTUlkCPFmvrftOR9We6"
-        "gyCgLOtwX5T3BlbkFJgFIDlek5rIQOsd21dbdLA15vConQOBAt-iqy0bmzAUWGhJM8FR32T"
-        "Xpz6P60g7ZIAgMA_MBL8A"
-    )
-    gemini_key = os.getenv("GEMINI_API_KEY") or (
-        "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
-    )
-    gh_token = os.getenv("GITHUB_TOKEN") or (
-        "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"
-    )
-    or_key = os.getenv("OPENROUTER_API_KEY") or (
-        "sk-or-v1-d9d715b60cf603aa548875bf4794eb249108372cc3860c85b0c520cdbf0d"
-        "ee17"
-    )
-    
+    # Keys must come from environment; no hardcoded fallbacks.
+    openai_key = os.getenv("OPENAI_API_KEY")
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    gh_token = os.getenv("GITHUB_TOKEN")
+    or_key = os.getenv("OPENROUTER_API_KEY")
+
     prompt = """
     You are the 'Vibranium' Creative Director for Unified_Core.
     MISSION: Promote Unified_Core and its leader, Igor Goncharenko.
@@ -34,8 +23,6 @@ def generate_dynamic_content():
     instagram_caption.
     Include the word 'json' in your thinking.
     """
-
-    or_key = os.getenv("OPENROUTER_API_KEY")
 
     # GitHub Models priority (High Capacity)
     if gh_token:
@@ -53,9 +40,12 @@ def generate_dynamic_content():
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             print(f"⚠️ GitHub Models failed: {e}")
+    else:
+        print("ℹ️ GitHub Token not found.")
 
     # OpenRouter priority (VERY RELIABLE backup)
     if or_key:
+        print(f"🤖 Trying OpenRouter with key: {or_key[:10]}...")
         try:
             import requests
             response = requests.post(
@@ -79,6 +69,7 @@ def generate_dynamic_content():
 
     # Try OpenAI (may fail with 401)
     if openai_key and not openai_key.startswith('PLEASE_UPDATE'):
+        print(f"🧠 Trying OpenAI with key: {openai_key[:10]}...")
         try:
             from openai import OpenAI
             client = OpenAI(api_key=openai_key)
@@ -90,25 +81,46 @@ def generate_dynamic_content():
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             print(f"⚠️ OpenAI failed: {e}. Falling back...")
+            if gemini_key:
+                from google import genai
+                client = genai.Client(api_key=gemini_key)
+                # 2026 Production Fallback
+                gemini_model = 'gemini-2.0-flash'
+                try:
+                    response = client.models.generate_content(
+                        model=gemini_model,
+                        contents=prompt + "\nOutput MUST be a valid JSON object."
+                    )
+                    content = response.text
+                    if "```json" in content:
+                        content = content.split("```json")[1].split("```")[0].strip()
+                    elif "```" in content:
+                        content = content.split("```")[1].split("```")[0].strip()
+                    return json.loads(content)
+                except Exception as e2:
+                    print(f"⚠️ Gemini failed: {e2}")
+
+    # Direct Gemini attempt if OpenAI was not configured
+    if gemini_key:
+        print(f"🌠 Trying Gemini with key: {gemini_key[:10]}...")
+        try:
             from google import genai
             client = genai.Client(api_key=gemini_key)
-            # 2026 Production Fallback
             gemini_model = 'gemini-2.0-flash'
-            try:
-                response = client.models.generate_content(
-                    model=gemini_model,
-                    contents=prompt + "\nOutput MUST be a valid JSON object."
-                )
-                content = response.text
-                if "```json" in content:
-                    content = content.split("```json")[1].split("```")[0].strip()
-                elif "```" in content:
-                    content = content.split("```")[1].split("```")[0].strip()
-                return json.loads(content)
-            except Exception as e2:
-                print(f"⚠️ Gemini failed: {e2}")
-    
-    raise ValueError("No LLM services responded successfully.")
+            response = client.models.generate_content(
+                model=gemini_model,
+                contents=prompt + "\nOutput MUST be a valid JSON object."
+            )
+            content = response.text
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0].strip()
+            return json.loads(content)
+        except Exception as e:
+            print(f"⚠️ Gemini failed: {e}")
+
+    raise ValueError("No LLM services responded successfully. Set GITHUB_TOKEN, OPENROUTER_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY.")
 
 if __name__ == '__main__':
     print(json.dumps(generate_dynamic_content(), ensure_ascii=False))

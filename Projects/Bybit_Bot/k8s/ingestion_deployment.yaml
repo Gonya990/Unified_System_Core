@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ingestion
-          image: gonya/bybit-ingestion:latest
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-ingestion:latest
           env:
             - name: REDIS_URL
               valueFrom:

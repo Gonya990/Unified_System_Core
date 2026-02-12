@@ -1,15 +1,15 @@
-import logging
 import asyncio
+import logging
 import os
 from datetime import datetime
-from kubernetes import client, config
-from k8s_leaderelection import LeaderElection
+
+from common.leader import LeaderElection
 from common.messaging import RedisStreamManager
+from common.token_broker import TokenBroker
+from kubernetes import client, config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BybitExecution")
-
-from common.token_broker import TokenBroker
 
 class BybitExecutionEngine:
     def __init__(self, provider="bybit"):
@@ -18,65 +18,62 @@ class BybitExecutionEngine:
         self.is_leader = False
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
         self.messenger = RedisStreamManager(redis_url)
-        
-        # Настройка Leader Election
-        try:
-            config.load_incluster_config()
-        except Exception:
-            try:
-                config.load_kube_config()
-            except Exception:
-                logger.warning("Kube config not found. Running without LE.")
-            
-        self.le = LeaderElection(
-            client.CoordinationV1Api(),
-            namespace="trading",
-            name="bybit-executor-lock",
-            on_started_leading=self._on_start_leading,
-            on_stopped_leading=self._on_stop_leading
-        )
 
-    def _on_start_leading(self):
-        logger.info("👑 I am the LEADER. API writing ENABLED.")
+    def on_start(self):
         self.is_leader = True
+        logger.info("Leadership acquired. Starting execution loop.")
 
-    def _on_stop_leading(self):
-        logger.warning("📉 Loss of leadership. API writing DISABLED.")
+    def on_stop(self):
         self.is_leader = False
+        logger.info("Leadership lost. Stopping execution loop.")
 
-    async def execute_order(self, order):
+    async def execute_order(self, signal):
+        """Execute order via Bybit API (DAC8 Compliant logging)"""
         if not self.is_leader:
-            return None
-        
-        # Эмуляция исполнения ордера на Bybit
-        order_id = f"bit-{int(datetime.now().timestamp())}"
-        report = {
-            "order_id": order_id,
-            "asset_pair": order['symbol'],
-            "trade_side": order['side'],
-            "executed_qty": order['amount'],
-            "price_executed": order['price'],
-            "fmv_fiat_value": order['amount'] * order['price'],
-            "fee_amount": order['amount'] * order['price'] * 0.0006,
-            "fee_currency": "USDT"
+            return
+
+        logger.info(f"Executing {signal['action']} for {signal['symbol']}")
+        # Simulating API call
+        await asyncio.sleep(0.1)
+
+        # Compliance Log
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "symbol": signal['symbol'],
+            "action": signal['action'],
+            "price": signal['price'],
+            "amount": signal['amount'],
+            "status": "FILLED"
         }
-        return report
+        await self.messenger.produce("compliance_logs", log_entry)
 
     async def run(self):
-        # Start leader election in background
-        asyncio.create_task(asyncio.to_thread(self.le.run))
-        
-        logger.info("ExecutionEngine started. Listening for validated orders...")
-        stream = "orders_validated"
+        # Leader Election Setup
+        try:
+            config.load_incluster_config()
+        except config.ConfigException:
+            config.load_kube_config()
+
+        namespace = os.getenv("K8S_NAMESPACE", "trading")
+        api = client.CoordinationV1Api()
+
+        le = LeaderElection(
+            api, namespace, "bybit-execution-lock",
+            self.on_start, self.on_stop
+        )
+
+        # Run leader election in background
+        asyncio.create_task(asyncio.to_thread(le.run))
+
+        logger.info("Bybit Execution Engine started. Waiting for leadership...")
+
+        stream = "signals"
         group = "execution-group"
-        async for msg_id, order in self.messenger.consume(stream, group, "exec-1"):
+        async for msg_id, signal in self.messenger.consume(stream, group, "exec-1"):
             if self.is_leader:
-                report = await self.execute_order(order)
-                if report:
-                    await self.messenger.produce("execution_reports", report)
-                    logger.info(f"🚀 Executed and reported: {report['order_id']}")
+                await self.execute_order(signal)
             else:
-                logger.debug(f"Passive mode: skipping order {msg_id}")
+                logger.debug("Ignoring signal (not leader)")
 
 if __name__ == "__main__":
     engine = BybitExecutionEngine()

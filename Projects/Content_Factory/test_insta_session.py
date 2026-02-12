@@ -1,9 +1,7 @@
-import sys
-import os
-import json
 from pathlib import Path
-from instagrapi import Client
+
 from dotenv import load_dotenv
+from instagrapi import Client
 
 # Setup paths
 ROOT_DIR = Path('/home/gonya/Unified_System_Core')
@@ -12,11 +10,11 @@ load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
 
 def test_session():
     print("🕵️ Testing Instagram Session Injection...")
-    
+
     cl = Client()
     # Load settings from file (which we just wrote with user cookies)
     session_path = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/insta_session.json')
-    
+
     try:
         if session_path.exists():
             cl.load_settings(session_path)

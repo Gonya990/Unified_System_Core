@@ -20,4 +20,5 @@ COPY . .
 RUN useradd -m botuser && chown -R botuser /app
 USER botuser
 
-ENTRYPOINT ["python", "orders.py"]
+ENV PYTHONPATH=/app
+ENTRYPOINT ["python", "services/execution/orders.py"]

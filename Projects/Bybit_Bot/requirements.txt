@@ -7,7 +7,6 @@ numpy>=1.26.0
 grpcio>=1.60.0
 grpcio-tools>=1.60.0
 kubernetes>=29.0.0
-k8s-leaderelection>=0.0.1
 psycopg2-binary
 requests
 python-dotenv

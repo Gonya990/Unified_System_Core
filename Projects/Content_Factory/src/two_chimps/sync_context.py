@@ -1,12 +1,11 @@
-import os
 import io
 import pickle
-import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from pathlib import Path
+
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -20,7 +19,7 @@ def get_drive_service():
     if TOKEN_FILE.exists():
         with open(TOKEN_FILE, 'rb') as token:
             creds = pickle.load(token)
-    
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -31,7 +30,7 @@ def get_drive_service():
             flow = InstalledAppFlow.from_client_secrets_file(
                 str(CREDENTIALS_FILE), SCOPES)
             creds = flow.run_local_server(port=0)
-        
+
         with open(TOKEN_FILE, 'wb') as token:
             pickle.dump(creds, token)
 
@@ -52,7 +51,7 @@ def create_folder(service, name, parent_id=None):
     }
     if parent_id:
         file_metadata['parents'] = [parent_id]
-        
+
     file = service.files().create(body=file_metadata, fields='id').execute()
     return file.get('id')
 
@@ -62,7 +61,7 @@ def sync_context_folder():
         return
 
     print("🔄 Checking Google Drive connection...")
-    
+
     # 1. Find or Create 'Context' folder on Drive
     results = list_files(service)
     if not results:
@@ -76,10 +75,10 @@ def sync_context_folder():
     print("📤 Syncing Local -> Drive...")
     if not LOCAL_CONTEXT_DIR.exists():
         LOCAL_CONTEXT_DIR.mkdir(parents=True)
-    
+
     drive_files = list_files(service, folder_id)
     drive_filenames = [f['name'] for f in drive_files]
-    
+
     for file_path in LOCAL_CONTEXT_DIR.glob("*"):
         if file_path.name not in drive_filenames and file_path.is_file():
             print(f"⬆️ Uploading {file_path.name}...")
@@ -92,7 +91,7 @@ def sync_context_folder():
     for file in drive_files:
         if file['mimeType'] == 'application/vnd.google-apps.folder':
             continue
-            
+
         local_file = LOCAL_CONTEXT_DIR / file['name']
         if not local_file.exists():
             print(f"⬇️ Downloading {file['name']}...")

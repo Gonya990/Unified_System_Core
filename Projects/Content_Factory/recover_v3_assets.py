@@ -1,8 +1,6 @@
-import os
 import sys
-import json
-import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Setup paths
@@ -15,12 +13,13 @@ load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
 sys.path.insert(0, str(SRC_DIR / 'researcher'))
 from daily_researcher import generate_dalle_assets
 
+
 def recover():
     print("🚑 RECOVERY MODE: Checking for missing V3 assets...")
-    
+
     day_str = datetime.now().strftime('%Y-%m-%d')
     assets_dir = ROOT_DIR / "Local_Dev" / "Media" / "legacy_wealth_v3" / day_str
-    
+
     all_scenes = [
         {'image': 'scene_1_hook', 'keyword': 'business man laptop city office cinematic handheld'},
         {'image': 'scene_2_trump_kiyosaki', 'keyword': 'luxury wealth gold coins assets success'},
@@ -29,7 +28,7 @@ def recover():
         {'image': 'scene_5_sovereign_living', 'keyword': 'modern luxury mansion pool aerial cinematic'},
         {'image': 'scene_6_cta', 'keyword': 'mountain peak sunrise triumph success'}
     ]
-    
+
     missing = []
     for s in all_scenes:
         expected_path = assets_dir / f"{s['image']}.jpg"
@@ -38,7 +37,7 @@ def recover():
             missing.append(s)
         else:
             print(f"✅ Exists: {s['image']}")
-            
+
     if missing:
         print(f"🎨 Generating {len(missing)} missing assets via DALL-E...")
         try:

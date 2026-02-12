@@ -1,18 +1,18 @@
-import sys
-import logging
 import asyncio
+import logging
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
+
+import ccxt
+from common.messaging import RedisStreamManager
+from common.token_broker import TokenBroker
 
 # Add project root to path for common imports
 ROOT = Path(__file__).resolve().parent.parent.parent
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
-
-import ccxt
-from common.token_broker import TokenBroker
-from common.messaging import RedisStreamManager
 
 # AI / ML imports
 try:
@@ -38,7 +38,13 @@ class FundingArbStrategy:
         # Fallback to env if not in broker
         api_key = os.getenv("BYBIT_API_KEY")
         api_secret = os.getenv("BYBIT_API_SECRET")
-        
+        if not api_key or not api_secret:
+            logger.error(
+                "Missing BYBIT_API_KEY/BYBIT_API_SECRET. "
+                "Set env vars or mount k8s secret 'bybit-secrets'."
+            )
+            raise RuntimeError("Bybit API credentials are required")
+
         self.exchange = ccxt.bybit({
             'apiKey': api_key,
             'secret': api_secret,
@@ -51,7 +57,7 @@ class FundingArbStrategy:
         self.history = [] # For ML features
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
         self.messenger = RedisStreamManager(redis_url)
-        
+
         # Институциональные комиссии Bybit (Maker/ Taker)
         self.fees = {
             "spot_taker": 0.001,
@@ -63,7 +69,7 @@ class FundingArbStrategy:
         """Сбор данных L2 + Funding Rate с проверкой на устаревание"""
         try:
             perp_symbol = f"{self.symbol}:USDT"
-            
+
             ticker_task = asyncio.create_task(
                 self.exchange.fetch_ticker(self.symbol)
             )
@@ -80,7 +86,7 @@ class FundingArbStrategy:
                 funding_task
             )
             spot, perp, funding = res
-            
+
             # Проверка на "грязные данные" (Data Staleness)
             latency = (datetime.now().timestamp() * 1000) - spot['timestamp']
             if latency > 1000: # Более 1 секунды задержки
@@ -102,11 +108,11 @@ class FundingArbStrategy:
         """AI-компонент: Прогноз изменения ставки финансирования"""
         if not LinearRegression or len(self.history) < 10:
             return 0 # Neutral
-            
+
         # Подготовка данных для регрессии
         X = np.array(range(len(self.history))).reshape(-1, 1)
         y = np.array([h['funding_rate'] for h in self.history])
-        
+
         model = LinearRegression().fit(X, y)
         prediction = model.predict([[len(self.history) + 1]])[0]
         return prediction
@@ -116,27 +122,27 @@ class FundingArbStrategy:
         spot_price = state['spot_ask']
         perp_price = state['perp_bid']
         fr = state['funding_rate']
-        
+
         # 1. Стоимость входа (Entry Cost)
         entry_fees = (spot_price * self.fees['spot_taker']) + \
                      (perp_price * self.fees['perp_taker'])
-        
+
         # 2. Ожидаемая годовая доходность (APR)
         # Фандинг каждые 8 часов (3 раза в день)
         daily_yield = fr * 3
         annual_yield = daily_yield * 365
-        
+
         # 3. Точка безубыточности (Break-even days)
         # Учитываем комиссию на вход и выход (2x)
         total_cycle_fees = entry_fees * 2
         denom = (spot_price * daily_yield)
         denom = denom if denom != 0 else 0.0001
         days_to_be = total_cycle_fees / denom if daily_yield > 0 else float('inf')
-        
+
         # 4. ML Overlay: Оптимизация точки входа
         predicted_fr = self._predict_funding_volatility()
         ml_score = 1.1 if predicted_fr > fr else 0.9 # Усиление если фандинг растет
-        
+
         is_profitable = (annual_yield * ml_score >= self.target_apr) and \
                         (days_to_be < 14)
 
@@ -160,12 +166,12 @@ class FundingArbStrategy:
                 self.history.pop(0)
 
             metrics = self.calculate_metrics(state)
-            
+
             logger.debug(
                 f"📊 {self.symbol} | FR: {state['funding_rate']:.4%} | "
                 f"APR: {metrics['apr']:.2%} | ML: {metrics['ml_score']:.2f}"
             )
-            
+
             if metrics['is_profitable'] and not self.is_active:
                 logger.info("🚀 SIGNAL: Opening position.")
                 signal = {

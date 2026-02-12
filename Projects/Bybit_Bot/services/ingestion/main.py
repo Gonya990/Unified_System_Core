@@ -2,8 +2,9 @@ import asyncio
 import json
 import logging
 import os
-import websockets
 from datetime import datetime
+
+import websockets
 from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +26,7 @@ class BybitDataIngestion:
                     subs = [f"tickers.{s}" for s in self.symbols]
                     payload = {"op": "subscribe", "args": subs}
                     await ws.send(json.dumps(payload))
-                    
+
                     async for message in ws:
                         data = json.loads(message)
                         if "data" in data and "topic" in data:

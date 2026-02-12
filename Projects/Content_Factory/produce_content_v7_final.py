@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import time
@@ -7,9 +8,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Add src to path (must be before internal imports)
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-FACTORY_DIR = ROOT_DIR / 'Projects/Content_Factory'
-MEDIA_DIR = ROOT_DIR / 'Local_Dev/Media/daily_auto'
+ROOT_DIR = Path(
+    os.getenv("UNIFIED_SYSTEM_ROOT", str(Path(__file__).resolve().parents[2]))
+)
+FACTORY_DIR = ROOT_DIR / "Projects/Content_Factory"
+MEDIA_DIR = ROOT_DIR / "Local_Dev/Media/daily_auto"
 
 sys.path.insert(0, str(FACTORY_DIR / 'src'))
 
@@ -43,7 +46,19 @@ def notify_manual_upload(video_path: Path, caption: str):
     except Exception as e:
         print(f'⚠️ Notify error: {e}')
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Vibranium content pipeline")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run pipeline without external uploads or notifications",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+    dry_run = args.dry_run
     print('🎨 Generating VIBRANIUM Content...')
     try:
         content = generate_dynamic_content()
@@ -58,25 +73,28 @@ def main():
     today = datetime.now().strftime('%Y-%m-%d')
     output_dir = MEDIA_DIR / today
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     timestamp = str(int(time.time()))
     base_name = f'vibranium_{timestamp}'
-    
+
     output_path = str(output_dir / base_name)
     success = run_no_face_pipeline(
         script_ru, lang='ru', output_name=output_path, scenes=scenes
     )
-    
+
     if success:
         temp_video = output_dir / f'{base_name}_final.mp4'
         final_video = output_dir / f'{base_name}_final_ai.mp4'
         add_ai_watermark(temp_video, final_video)
-        
-        upload_telegram(str(final_video), caption)
-        upload_video(
-            final_video, title, caption, tags=['AI', 'Future'], privacy_status='public'
-        )
-        notify_manual_upload(final_video, caption)
+
+        if dry_run:
+            print("DRY RUN: Skipping Telegram/YouTube uploads and notifications.")
+        else:
+            upload_telegram(str(final_video), caption)
+            upload_video(
+                final_video, title, caption, tags=['AI', 'Future'], privacy_status='public'
+            )
+            notify_manual_upload(final_video, caption)
         print(f'✅ Production Complete: {final_video}')
 
 if __name__ == '__main__':

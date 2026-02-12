@@ -1,7 +1,5 @@
-import sys
-import os
-import json
 from pathlib import Path
+
 from instagrapi import Client
 
 # Paths
@@ -11,15 +9,15 @@ SESSION_FILE = CREDENTIALS_DIR / "insta_session.json"
 
 def upload_reel(video_path, caption):
     print(f"📸 Preparing to upload to Instagram: {video_path}")
-    
+
     cl = Client()
-    
+
     # Load session
     if SESSION_FILE.exists():
         try:
             print("📂 Loading session from: " + str(SESSION_FILE))
             cl.load_settings(SESSION_FILE)
-            
+
             # Verify
             if cl.user_id:
                  print(f"✅ Authenticated as user: {cl.user_id}")

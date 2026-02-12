@@ -37,11 +37,11 @@ class FinanceManager:
                 .document(str(user_id))
                 .collection("expenses")
             )
-            
+
             # Ensure date is a timestamp or string
             if "date" not in expense_data or not expense_data["date"]:
                 expense_data["date"] = datetime.now().isoformat()
-            
+
             expense_data["created_at"] = datetime.now()
 
             doc_ref = expenses_ref.add(expense_data)
@@ -61,7 +61,7 @@ class FinanceManager:
         try:
             from datetime import timedelta
             cutoff = datetime.now() - timedelta(days=days)
-            
+
             expenses = self.db.db.collection("users").document(str(user_id))\
                 .collection("expenses")\
                 .where("created_at", ">=", cutoff)\
@@ -107,7 +107,7 @@ class FinanceManager:
         try:
             from datetime import timedelta
             cutoff = datetime.now() - timedelta(days=60)
-            
+
             expenses = self.db.db.collection("users").document(str(user_id))\
                 .collection("expenses")\
                 .where("created_at", ">=", cutoff)\
@@ -133,14 +133,17 @@ class FinanceManager:
             recurring = [
                 name for name, count in item_counts.items() if count >= 3
             ]
-            
+
             if not recurring:
-                return "Недостаточно данных для формирования списка покупок. Продолжайте сканировать чеки! 🛒"
+                return (
+                    "Недостаточно данных для формирования списка покупок. "
+                    "Продолжайте сканировать чеки! 🛒"
+                )
 
             summary = "🛒 **Рекомендации к покупке (частые товары):**\n"
             for item in sorted(recurring):
                 summary += f"  • {item.capitalize()}\n"
-            
+
             summary += "\n*Основано на вашей истории за последние 60 дней.*"
             return summary
         except Exception as e:

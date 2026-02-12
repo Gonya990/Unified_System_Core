@@ -1,6 +1,6 @@
 
-import os
 import sys
+
 
 def test_factory():
     print("Checking dependencies...")
@@ -17,10 +17,10 @@ def test_factory():
     except ImportError as e:
         print(f"❌ Coqui TTS missing: {e}")
         # Not blocking for now if we can't fully run it, but good to know
-    
+
     try:
         import moviepy
-        print(f"✅ MoviePy imported")
+        print("✅ MoviePy imported")
     except ImportError:
         print("❌ MoviePy missing")
 
@@ -30,10 +30,10 @@ def test_factory():
         with open("test_output.txt", "w") as f:
             f.write("Factory is writing.")
         print("✅ Filesystem write OK")
-        
+
         # We won't run full TTS in this simple test as it requires model download and might block
         # But we can try to initialize if needed. For now, imports + FS write is a good "Green Light".
-        
+
     except Exception as e:
         print(f"❌ Test failed: {e}")
         sys.exit(1)

@@ -1,12 +1,15 @@
+import os
 from google import genai
 from google.genai.types import GenerateContentConfig
-
-GEMINI_API_KEY = "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
 
 def ask_gemini_3_for_ha_improvements():
     print("🧠 Asking Gemini 3 for Smart Home Architecture Improvements...")
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        raise RuntimeError("Set GEMINI_API_KEY in env before running this script")
+
+    client = genai.Client(api_key=gemini_key)
 
     # Context about current HA integration
     context = """

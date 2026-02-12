@@ -1,6 +1,7 @@
 import os
-import openai
 from pathlib import Path
+
+import openai
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -42,10 +43,10 @@ A raw transcript of a voice note from Igor (the creator).
 
 def generate_script(transcript_text, filename):
     print(f"🧠 Generating dialogue for: {filename}...")
-    
+
     try:
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        
+
         response = client.chat.completions.create(
             model="gpt-4o",  # Or gpt-4-turbo
             messages=[
@@ -54,16 +55,16 @@ def generate_script(transcript_text, filename):
             ],
             temperature=0.7
         )
-        
+
         script_content = response.choices[0].message.content
-        
+
         output_file = SCRIPTS_DIR / f"{Path(filename).stem}_script.md"
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(script_content)
-            
+
         print(f"✅ Script saved: {output_file.name}")
         return output_file
-        
+
     except Exception as e:
         print(f"❌ Error generating script: {e}")
         return None
@@ -78,14 +79,14 @@ def process_new_transcripts():
         script_file = SCRIPTS_DIR / f"{transcript_file.stem}_script.md"
         if script_file.exists():
             continue
-            
-        with open(transcript_file, "r", encoding="utf-8") as f:
+
+        with open(transcript_file, encoding="utf-8") as f:
             text = f.read()
-            
+
         if len(text) < 50:
             print(f"⚠️ Skipping short transcript: {transcript_file.name}")
             continue
-            
+
         generate_script(text, transcript_file.name)
 
 if __name__ == "__main__":

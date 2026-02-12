@@ -1,21 +1,14 @@
-
-import os
-import json
 import logging
 import sys
 from pathlib import Path
 
-# Paths
-CURRENT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = CURRENT_DIR.parent.parent.parent.parent.parent
-# /Users/igorgoncharenko/Documents/Unified_System_Core
-# Use absolute path for reliability
+# Add AI_Core/src to path for TokenBroker BEFORE other internal imports
 AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
-from token_broker import TokenBroker
 import openai
+from token_broker import TokenBroker
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -40,7 +33,7 @@ class DinoScriptEngine:
 
     def generate_debate(self, topic: str):
         print(f"🦖 Stage 1: Rex and Trike (GPT-5.2) are debating about: {topic}...")
-        
+
         system_prompt = (
             "You are a scriptwriter for 'Dino Talk', a high-end AI podcast. "
             "Characters:\n"
@@ -62,7 +55,7 @@ class DinoScriptEngine:
 
     def director_pass(self, raw_debate: str):
         print("🎬 Stage 2: Director is adding cinematic cues, B-roll, and SORA-2 motion prompts...")
-        
+
         system_prompt = (
             "You are the Director. Transform the debate into a JSON list of segments.\n"
             "Each segment: 'role', 'text', 'angle' (wide, medium, close), 'broll' (optional phrase).\n"
@@ -83,7 +76,7 @@ class DinoScriptEngine:
 
     def polish_wit(self, script_json: str):
         print("🎭 Stage 3: Adding wit, fillers, and personality (GPT-5.2 Polish)...")
-        
+
         system_prompt = (
             "You are a Dialogue Polisher. Using GPT-5.2 advanced context, make it feel like a real podcast. "
             "Add 'uhm', 'listen', 'look', sharp humor, and interruptions. "
@@ -105,11 +98,11 @@ class DinoScriptEngine:
         debate = self.generate_debate(topic)
         directed_json = self.director_pass(debate)
         final_polished_json = self.polish_wit(directed_json)
-        
+
         output_path = SCRIPTS_DIR / f"{filename}_directed.json"
         with open(output_path, "w") as f:
             f.write(final_polished_json)
-        
+
         print(f"✅ Polished Directed script saved to: {output_path}")
         return output_path
 

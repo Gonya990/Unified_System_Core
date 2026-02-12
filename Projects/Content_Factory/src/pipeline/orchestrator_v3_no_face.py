@@ -501,6 +501,13 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
         else:
             vf_img = "scale=w=1080:h=1920:force_original_aspect_ratio=increase,crop=1080:1920,fade=in:0:5:color=pink"
 
+        if not img_path or img_path == "None":
+            # Fallback: create a black frame if no image
+            placeholder = INPUT_DIR / "placeholder.jpg"
+            if not placeholder.exists():
+                subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "color=c=black:s=1080x1920", "-frames:v", "1", str(placeholder)], capture_output=True)
+            img_path = str(placeholder)
+
         subprocess.run([
             "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
             "-t", str(img_dur),

@@ -1,8 +1,6 @@
 
-import os
 import json
-import mimetypes
-from pathlib import Path
+import os
 from datetime import datetime
 
 # Configuration
@@ -22,8 +20,8 @@ MEDIA_TYPES = ['.mp4', '.mov', '.mp3', '.wav', '.jpg', '.png']
 IGNORED_DIRS = {'.venv', '.git', 'node_modules', '__pycache__', 'venv', 'env', '.idea', '.vscode'}
 
 def scan_archives():
-    print(f"🕵️‍♂️ Starting Archive Scan...")
-    
+    print("🕵️‍♂️ Starting Archive Scan...")
+
     knowledge_index = {
         "documents": [],
         "media_assets": [],
@@ -38,24 +36,24 @@ def scan_archives():
         if not os.path.exists(base_path):
             print(f"⚠️ Path not found (skipping): {base_path}")
             continue
-            
+
         print(f"📂 Scanning: {base_path}")
-        
+
         for root, dirs, files in os.walk(base_path):
             # Modify dirs in-place to exclude ignored directories
             dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
-            
+
             for file in files:
                 try:
                     ext = os.path.splitext(file)[1].lower()
                     full_path = os.path.join(root, file)
-                    
+
                     # Skip if it's a broken link
                     if not os.path.exists(full_path):
                         continue
-                        
+
                     size_mb = os.path.getsize(full_path) / (1024 * 1024)
-                    
+
                     knowledge_index["stats"]["total_files"] += 1
                     knowledge_index["stats"]["total_size_mb"] += size_mb
 
@@ -72,7 +70,7 @@ def scan_archives():
                         knowledge_index["documents"].append(item)
                     elif ext in MEDIA_TYPES:
                         knowledge_index["media_assets"].append(item)
-                    
+
                     # Special handling for JSON exports (Messenger/Insta)
                     if ext == '.json' and ('message' in file or 'chat' in file):
                         knowledge_index["conversations"].append(item)
@@ -84,7 +82,7 @@ def scan_archives():
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(knowledge_index, f, indent=2)
 
-    print(f"\n✅ Indexing Complete!")
+    print("\n✅ Indexing Complete!")
     print(f"📄 Documents: {len(knowledge_index['documents'])}")
     print(f"🎬 Media Assets: {len(knowledge_index['media_assets'])}")
     print(f"💾 Total Size: {int(knowledge_index['stats']['total_size_mb'])} MB")

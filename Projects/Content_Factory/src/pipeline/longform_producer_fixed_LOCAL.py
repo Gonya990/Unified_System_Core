@@ -5,16 +5,14 @@ Produces 25-30 minute deep-dive documentaries using LLM Council for research.
 Direct ENV Key Injection to avoid Broker issues.
 """
 
-import json
 import logging
+import os
+import subprocess
 import sys
 import time
-import os
-import random
-import subprocess
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
+
 from dotenv import load_dotenv
 
 # Setup logging
@@ -57,26 +55,26 @@ class EnvBroker:
         if name == "ELEVENLABS": return os.getenv("ELEVENLABS_API_KEY")
         if name == "PEXELS": return os.getenv("PEXELS_API_KEY")
         return os.getenv(f"{name}_API_KEY")
-    
+
     def get_token(self, name, **kwargs):
         return self.get_key(name, **kwargs)
 
 BROKER = EnvBroker()
 
 # =============================================================================
-#                           DEEP RESEARCH 
+#                           DEEP RESEARCH
 # =============================================================================
 
 def deep_research_with_council(topic: str) -> Optional[dict]:
     print(f"\n🧠 PHASE 1: Planning Documentary Structure for '{topic}'")
-    
+
     # Structure Template
     structure = {
         "title": f"Documentary: {topic}",
         "description": "Auto-generated documentary",
         "segments": []
     }
-    
+
     # 6 Segments hardcoded logic since Council is flaky
     subtopics = [
         "Introduction & History",
@@ -86,7 +84,7 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
         "Future Predictions 2030",
         "Conclusion: What lies ahead"
     ]
-    
+
     for i, sub in enumerate(subtopics):
         structure["segments"].append({
             "name": sub,
@@ -94,7 +92,7 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
             "visual_theme": "documentary",
             "script": generate_script_direct(topic, sub) # Generate script immediately
         })
-        
+
     return structure
 
 def generate_script_direct(topic, subtopic):
@@ -104,11 +102,11 @@ def generate_script_direct(topic, subtopic):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return f"Script generation failed. Topic: {topic}. Subtopic: {subtopic}. (No API Key)"
-        
+
     try:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
-        
+
         prompt = f"""
         Write a 3-minute documentary narration script (Russian language) about: {topic}
         Focus specifically on: {subtopic}
@@ -117,7 +115,7 @@ def generate_script_direct(topic, subtopic):
         Length: Approx 400-500 words.
         Format: Just the text for Voiceover. No scene directions in text.
         """
-        
+
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
@@ -134,20 +132,20 @@ def generate_script_direct(topic, subtopic):
 
 def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     from orchestrator_v3_no_face import run_no_face_pipeline
-    
+
     segments = data.get("segments", [])
     segment_videos = []
-    
+
     for i, seg in enumerate(segments):
         print(f"\n📹 Processing Segment {i+1}: {seg['name']}")
-        
+
         script = seg.get("script", "")
         if len(script) < 100:
             print("⚠️ Script too short, skipping.")
             continue
-            
+
         seg_name = f"longform_part_{i}"
-        
+
         # Determine Scenes keywords based on segment name
         keywords = seg['name'].split()
         scenes = [
@@ -155,7 +153,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
              {'keyword': f"{keywords[-1]} detail"},
              {'keyword': "future world"}
         ]
-        
+
         # Use existing powerful V3 pipeline
         run_no_face_pipeline(
             text=script,
@@ -164,7 +162,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
             scenes=scenes,
             style="impact" # Uses ElevenLabs + Pexels
         )
-        
+
         # The V3 pipeline saves to FACTORY/outputs/
         # We need to find it and move/symlink or just add to list
         expected_path = FACTORY_DIR / f"outputs/{seg_name}_final.mp4"
@@ -173,20 +171,20 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
             print(f"✅ Segment {i+1} Ready: {expected_path}")
         else:
             print(f"❌ Segment {i+1} Failed to produce video")
-            
+
     if not segment_videos:
         print("❌ No segments produced.")
         return None
-        
+
     # Concatenate
     print(f"\n🔗 Concatenating {len(segment_videos)} segments...")
     concat_file = output_dir / "concat_list.txt"
     final_output = output_dir / f"FULL_DOCUMENTARY_{int(time.time())}.mp4"
-    
+
     with open(concat_file, "w") as f:
         for v in segment_videos:
             f.write(f"file '{v}'\n")
-            
+
     cmd = [
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_file),
@@ -206,24 +204,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--topic", default=topic)
     args = parser.parse_args()
-    
+
     # 1. Research (Simplified)
     data = deep_research_with_council(args.topic)
-    
+
     # 2. Output Dir
     out_dir = FACTORY_DIR / "outputs"
     out_dir.mkdir(exist_ok=True)
-    
+
     # 3. Produce
     vid = assemble_longform_video(data, out_dir)
-    
+
     if vid:
         # Notify Telegram
         msg = f"🎬 <b>ДОКУМЕНТАЛЬНЫЙ ФИЛЬМ ГОТОВ!</b>\n\n<b>Тема:</b> {args.topic}\n<b>Файл:</b> {vid.name}"
         subprocess.run([
-            'curl', '-F', f'video=@{vid}', 
-            '-F', 'chat_id=708531393', 
-            '-F', f'caption={msg}', 
+            'curl', '-F', f'video=@{vid}',
+            '-F', 'chat_id=708531393',
+            '-F', f'caption={msg}',
             '-F', 'parse_mode=HTML',
             'https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendVideo'
         ])

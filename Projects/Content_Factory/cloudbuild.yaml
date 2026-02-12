@@ -1,0 +1,6 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-factory'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory:latest', '.']
+images:
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory:latest'

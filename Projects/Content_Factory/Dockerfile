@@ -16,11 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
 COPY src/ ./src/
-COPY .env .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV OUTPUT_DIR=/app/outputs
+ENV PYTHONPATH=/app
 
 # Create entrypoint
 CMD ["python", "src/pipeline/elite_orchestrator.py"]

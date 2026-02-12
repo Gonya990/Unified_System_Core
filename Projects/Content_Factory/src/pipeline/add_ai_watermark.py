@@ -1,12 +1,13 @@
 import subprocess
 from pathlib import Path
 
+
 def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
     """
     Adds 'Created by AI' watermark to video WITHOUT re-encoding.
     Uses same quality as original.
     """
-    
+
     # Get input video bitrate to match it
     probe_cmd = [
         'ffprobe', '-v', 'error',
@@ -15,14 +16,14 @@ def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
         '-of', 'default=noprint_wrappers=1:nokey=1',
         str(input_video)
     ]
-    
+
     try:
         result = subprocess.run(probe_cmd, capture_output=True, text=True)
         bitrate = int(result.stdout.strip()) if result.stdout.strip() else 3267000
         bitrate_k = bitrate // 1000
     except:
         bitrate_k = 3267  # Default
-    
+
     # FFmpeg command with matched bitrate
     cmd = [
         'ffmpeg', '-y',
@@ -37,7 +38,7 @@ def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
         '-c:a', 'copy',  # Copy audio without re-encoding
         str(output_video)
     ]
-    
+
     try:
         result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print(f"✅ Watermark added (bitrate: {bitrate_k}k): {output_video}")

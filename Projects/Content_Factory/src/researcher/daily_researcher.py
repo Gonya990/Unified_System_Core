@@ -24,15 +24,23 @@ ROOT_DIR = PROJECTS_DIR.parent  # Unified_System_Core
 load_dotenv(ROOT_DIR / ".env")
 load_dotenv(PROJECTS_DIR / "AI_Core/.env", override=True)
 
-# Import TokenBroker
+# Import TokenBroker and KnowledgeBase
 try:
+    # Add AI_Core to path for common modules
+    AI_CORE_SRC = PROJECTS_DIR / "AI_Core/src"
+    if str(AI_CORE_SRC) not in sys.path:
+        sys.path.insert(0, str(AI_CORE_SRC))
+    
     from token_broker import TokenBroker
-
+    from modules.knowledge_base import KnowledgeBase
+    
     BROKER = TokenBroker()
-    print("✅ TokenBroker imported successfully")
+    KB = KnowledgeBase()
+    print("✅ TokenBroker and KnowledgeBase integrated")
 except ImportError:
-    print("⚠️ TokenBroker not found, falling back to ENV")
+    print("⚠️ Core modules not fully integrated, falling back")
     BROKER = None
+    KB = None
 
 
 # Configuration

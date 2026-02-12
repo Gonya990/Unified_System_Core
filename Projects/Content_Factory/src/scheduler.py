@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
 
+
 class ContentLanguage(Enum):
     RU = "ru"
     EN = "en"
@@ -13,21 +14,21 @@ def get_daily_production_plan():
     now = datetime.datetime.now()
     weekday = now.weekday() # 0 = Mon, 6 = Sun
     hour = now.hour
-    
+
     tasks = []
-    
+
     # RU Base Schedule (Daily)
     # Triggered at 08:30 for 09:00 post, and 17:30 for 18:00 post
     # But for simplicity, we return the plan for the *whole day* if run in morning.
-    
+
     tasks.append({"lang": ContentLanguage.RU, "slot": "morning"})
     tasks.append({"lang": ContentLanguage.RU, "slot": "evening"})
-    
+
     # Language Expansions (Mon=0, Thu=3)
     if weekday in [0, 3]:
         tasks.append({"lang": ContentLanguage.EN, "slot": "afternoon"})
         tasks.append({"lang": ContentLanguage.HE, "slot": "late_afternoon"})
-        
+
     return tasks
 
 if __name__ == '__main__':

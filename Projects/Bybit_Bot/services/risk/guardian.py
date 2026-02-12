@@ -1,6 +1,7 @@
+import asyncio
 import logging
 import os
-import asyncio
+
 from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)

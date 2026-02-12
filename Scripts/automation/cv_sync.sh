@@ -4,7 +4,9 @@
 
 set -e
 
-PROFILE_DIR="/Users/macbook/Documents/Unified_System/Agent_Context/Personal_Profile"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UNIFIED_SYSTEM="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROFILE_DIR="$UNIFIED_SYSTEM/Agent_Context/Personal_Profile"
 PROFILE_MD="$PROFILE_DIR/PROFILE.md"
 
 echo "╔══════════════════════════════════════════════════════════════╗"

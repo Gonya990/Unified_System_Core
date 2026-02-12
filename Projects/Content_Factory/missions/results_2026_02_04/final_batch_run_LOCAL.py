@@ -1,10 +1,10 @@
 
 import os
+import subprocess
 import sys
 import time
-import subprocess
-import requests
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Force load ENV
@@ -62,16 +62,16 @@ def run_reels():
                 scenes=item['scenes'],
                 style='impact'
             )
-            
+
             output_file = Path(FACTORY_ROOT) / f'outputs/{name}_final.mp4'
             if output_file.exists():
                 print(f'📤 Sending {name} to Telegram...')
                 caption = f'🎞️ <b>Reel {i+1}/5: {item["title"]}</b>\n\n✅ <b>Voice:</b> ElevenLabs\n✅ <b>Video:</b> Pexels API\n\n<a href="https://www.pexels.com">Photos provided by Pexels</a>'
                 subprocess.run([
-                    'curl', 
-                    '-F', f'video=@{output_file}', 
-                    '-F', 'chat_id=708531393', 
-                    '-F', f'caption={caption}', 
+                    'curl',
+                    '-F', f'video=@{output_file}',
+                    '-F', 'chat_id=708531393',
+                    '-F', f'caption={caption}',
                     '-F', 'parse_mode=HTML',
                     'https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendVideo'
                 ])
@@ -82,16 +82,16 @@ def run_longform():
     print('📽️ Starting LONG-FORM DOCUMENTARY...')
     # Topic
     topic = "The Future of Humanity 2026"
-    
+
     # Run Orchestrator command
     cmd = f'nohup uv run --with google-generativeai --with python-dotenv --with edge-tts --with openai --with pyyaml --with requests python3 {FACTORY_ROOT}/src/pipeline/longform_producer.py --topic "{topic}" > {FACTORY_ROOT}/missions/results_2026_02_04/longform_final.log 2>&1 &'
     os.system(cmd)
     print('✅ Longform Producer detached. Check Telegram for updates.')
-    
+
     # Inform User via Telegram
     msg = f'📽️ <b>ЗАПУЩЕНА ГЕНЕРАЦИЯ ДОКУМЕНТАЛЬНОГО ФИЛЬМА</b>\n\n<b>Тема:</b> {topic}\n<b>Длительность:</b> 15-30 мин\n<b>Инструменты:</b> GCP Vertex AI, ElevenLabs, Pexels.\n\n⏳ Ожидайте уведомления по завершению.'
     subprocess.run([
-        'curl', 
+        'curl',
         '-X', 'POST',
         'https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendMessage',
         '-d', f'chat_id=708531393&text={msg}&parse_mode=HTML'

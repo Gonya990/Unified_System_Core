@@ -1,13 +1,11 @@
+import asyncio
+import base64
+import logging
 import os
 import sqlite3
-import json
-import asyncio
-import logging
 import sys
-import base64
-from pathlib import Path
 from datetime import datetime
-import mimetypes
+from pathlib import Path
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -22,8 +20,8 @@ DB_PATH = AI_CORE_PATH / 'knowledge_base.db'
 sys.path.append(str(AI_CORE_PATH / 'src'))
 
 try:
-    from inference_client import InferenceClient
     from config_manager import ConfigManager
+    from inference_client import InferenceClient
 except ImportError as e:
     logger.error(f'Failed to import core modules: {e}')
     sys.exit(1)
@@ -81,12 +79,12 @@ class DeepIndexer:
     async def scan_folders(self):
         logger.info('🚀 Starting deep scan of folders...')
         total_discovered = 0
-        
+
         for target in SCAN_TARGETS:
             if not os.path.exists(target):
                 logger.warning(f'Target not found: {target}')
                 continue
-                
+
             logger.info(f'📂 Scanning {target}...')
             dir_count = 0
             for root, dirs, files in os.walk(target):
@@ -94,23 +92,23 @@ class DeepIndexer:
                 dir_count += 1
                 if dir_count % 100 == 0:
                     logger.info(f'  [Scan Progress] {dir_count} directories visited in {target}...')
-                
+
                 batch = []
                 for f in files:
                     full_path = str(Path(root) / f)
                     ext = os.path.splitext(f)[1].lower()
-                    
+
                     try:
                         stat = os.stat(full_path)
                         mtime = datetime.fromtimestamp(stat.st_mtime).isoformat()
                         size_mb = stat.st_size / (1024 * 1024)
-                        
+
                         category = 'other'
                         if ext in TEXT_EXTS: category = 'text'
                         elif ext in {'.jpg', '.png', '.jpeg', '.gif'}: category = 'image'
                         elif ext in {'.mp4', '.mov', '.avi'}: category = 'video'
                         elif ext in {'.pdf', '.docx'}: category = 'doc'
-                        
+
                         batch.append((
                             full_path, f, ext, size_mb, mtime, category, datetime.now().isoformat()
                         ))
@@ -126,22 +124,22 @@ class DeepIndexer:
                         total_discovered += len(batch)
                     except Exception as e:
                         logger.error(f'Failed to insert batch from {root}: {e}')
-        
+
         logger.info(f'✅ Discovery complete. Total files in DB: {total_discovered}')
 
     async def summarize_asset(self, asset_id, path, category, size_mb):
         """Use AI to summarize a single asset."""
         try:
             if category == 'text':
-                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(path, encoding='utf-8', errors='ignore') as f:
                     content = f.read(4000) # First 4k chars
-                
+
                 if not content.strip(): return True
 
                 prompt = f"Analyze this file and provide a 1-sentence summary of its content and 3 key tags. Path: {path}\nContent snippet: {content[:2000]}"
-                summary, _ = await self.client.chat([{"role": "user", "content": prompt}], 
+                summary, _ = await self.client.chat([{"role": "user", "content": prompt}],
                                                  system_prompt="You are a high-speed knowledge indexer for the Unified System. Be concise and technical.")
-                
+
                 if summary:
                     with sqlite3.connect(DB_PATH) as conn:
                         conn.execute('UPDATE assets SET concept_summary = ? WHERE id = ?', (summary, asset_id))
@@ -156,7 +154,7 @@ class DeepIndexer:
                     summary, _ = await self.client.chat([
                         {"role": "user", "content": prompt, "images": [img_data]}
                     ], system_prompt="You are a high-speed vision indexer for the Unified System.")
-                    
+
                     if summary:
                         with sqlite3.connect(DB_PATH) as conn:
                             conn.execute('UPDATE assets SET concept_summary = ? WHERE id = ?', (summary, asset_id))
@@ -185,7 +183,7 @@ class DeepIndexer:
             return
 
         logger.info(f'🧠 Processing {len(queue)} assets with the GPU Council (Full Gas Edition)...')
-        
+
         # Parallel processing
         batch_size = 50
         for i in range(0, len(queue), batch_size):

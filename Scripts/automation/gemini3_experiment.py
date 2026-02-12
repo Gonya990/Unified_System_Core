@@ -1,12 +1,15 @@
+import os
 from google import genai
 from google.genai.types import GenerateContentConfig, GoogleSearch, Tool
-
-GEMINI_API_KEY = "AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU"
 
 def test_gemini_3():
     print("🚀 Experimenting with Gemini 3 (The Future)...")
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        raise RuntimeError("Set GEMINI_API_KEY in env before running this script")
+
+    client = genai.Client(api_key=gemini_key)
 
     # We'll try gemini-3-flash-preview as it's likely more stable for initial tests
     model_id = "models/gemini-3-flash-preview"

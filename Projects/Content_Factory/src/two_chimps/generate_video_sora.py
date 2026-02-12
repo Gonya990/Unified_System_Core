@@ -1,9 +1,8 @@
 
-import os
 import json
-import time
 import logging
 import sys
+import time
 from pathlib import Path
 
 # Paths
@@ -15,8 +14,8 @@ AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Project
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
-from token_broker import TokenBroker
 import openai
+from token_broker import TokenBroker
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +38,7 @@ class SoraVideoGenerator:
     def generate_video(self, segment_id, prompt, role, angle):
         print(f"🎬 [SORA-2] Generating motion for segment {segment_id} ({role})...")
         print(f"   Prompt: {prompt}")
-        
+
         try:
             # Using the sora-2 model as seen in model list
             # Note: API syntax based on 2025/2026 specs for Sora-2
@@ -49,10 +48,10 @@ class SoraVideoGenerator:
                 duration=5,
                 aspect_ratio="16:9"
             )
-            
+
             job_id = response.id
             print(f"   🚀 Job created: {job_id}. Polling for completion...")
-            
+
             while True:
                 job = self.client.video.generations.retrieve(job_id)
                 if job.status == "completed":
@@ -63,29 +62,29 @@ class SoraVideoGenerator:
                     print(f"   ❌ Sora job failed: {job.error}")
                     return None
                 time.sleep(5)
-                
+
         except Exception as e:
             print(f"   ❌ Sora API Error: {e}")
             return None
 
     def process_script(self, script_path):
-        with open(script_path, "r") as f:
+        with open(script_path) as f:
             data = json.loads(f.read())
-        
+
         segments = data.get("segments", [])
         for i, seg in enumerate(segments):
             # Only generate if motion_prompt exists and we don't have it yet
             motion_prompt = seg.get("motion_prompt")
             if not motion_prompt:
                 continue
-                
+
             output_name = f"sora_{Path(script_path).stem}_{i}.mp4"
             output_path = VIDEO_CLIPS_DIR / output_name
-            
+
             if output_path.exists():
                 print(f"   ⏭️ Skipping existing clip: {output_name}")
                 continue
-                
+
             video_url = self.generate_video(i, motion_prompt, seg['role'], seg['angle'])
             if video_url:
                 # Download (pseudo-code for brevity, would use requests)

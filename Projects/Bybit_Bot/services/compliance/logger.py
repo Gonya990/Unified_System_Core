@@ -1,7 +1,8 @@
-import logging
 import asyncio
-import psycopg2
+import logging
 import os
+
+import psycopg2
 from common.messaging import RedisStreamManager
 
 logging.basicConfig(level=logging.INFO)

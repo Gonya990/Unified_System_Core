@@ -1,7 +1,7 @@
-import os
-import whisper
 import warnings
 from pathlib import Path
+
+import whisper
 from tqdm import tqdm
 
 # Suppress FP16 warning on CPU
@@ -15,19 +15,19 @@ def transcribe_all():
     print("🎙 Loading Whisper model (base)...")
     # Using 'base' for speed on CPU/MPS, can upgrade to 'small' or 'medium' if needed
     model = whisper.load_model("base")
-    
+
     if not TRANSCRIPTS_DIR.exists():
         TRANSCRIPTS_DIR.mkdir()
-        
+
     files = [f for f in CONTEXT_DIR.iterdir() if f.suffix.lower() in SUPPORTED_EXTS]
     print(f"📂 Found {len(files)} media files in Context.")
-    
+
     for file_path in tqdm(files, desc="Transcribing"):
         output_file = TRANSCRIPTS_DIR / f"{file_path.stem}.txt"
-        
+
         if output_file.exists():
             continue
-            
+
         print(f"🗣 Processing: {file_path.name}")
         try:
             result = model.transcribe(str(file_path))

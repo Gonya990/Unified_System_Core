@@ -70,7 +70,8 @@ class HAController:
             return {"status": "error", "message": str(e)}
 
     async def turn_on_light(self, entity_id: str):
-        if not self.client: return None
+        if not self.client:
+            return None
 
         # Try exact match first
         # If entity_id not found in states, try fuzzy match
@@ -86,7 +87,8 @@ class HAController:
                 for e in entity_ids
                 if e.startswith("light.") or e.startswith("switch.")
             ]
-            # Try to match simple name (e.g. "corridor" against "light.corridor_switch_1")
+            # Try to match simple name (e.g. "corridor" against
+            # "light.corridor_switch_1")
 
             # 1. Search by Friendly Name (Russian/Exact)
             # Create map of name -> entity_id
@@ -105,27 +107,39 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    logger.info(
+                        f"Friendly name match found: {entity_id} "
+                        f"-> {fname} ({target})"
+                    )
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
+                    logger.info(
+                        f"Exact partial entity_id match found: "
+                        f"{entity_id} -> {target}"
+                    )
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    matches = difflib.get_close_matches(
+                        target, candidates, n=1, cutoff=0.5
+                    )
                     if matches:
                         target = matches[0]
-                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                        logger.info(
+                            f"Fuzzy entity_id match found: "
+                            f"{entity_id} -> {target}"
+                        )
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
         return self.client.turn_on_light(target)
 
     async def turn_off_light(self, entity_id: str):
-        if not self.client: return None
+        if not self.client:
+            return None
 
         # Try exact match first
         states = self.client.get_states()
@@ -159,39 +173,52 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    logger.info(
+                        f"Friendly name match found: {entity_id} -> {fname} ({target})"
+                    )
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
+                    logger.info(
+                        f"Exact partial entity_id match found: "
+                        f"{entity_id} -> {target}"
+                    )
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    matches = difflib.get_close_matches(
+                        target, candidates, n=1, cutoff=0.5
+                    )
                     if matches:
                         target = matches[0]
-                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                        logger.info(
+                            f"Fuzzy entity_id match found: {entity_id} -> {target}"
+                        )
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
         return self.client.turn_off_light(target)
 
     async def set_temperature(self, entity_id: str, temp: float):
-        if not self.client: return None
+        if not self.client:
+            return None
         return self.client.set_temperature(entity_id, temp)
 
     async def get_states(self):
-        if not self.client: return []
+        if not self.client:
+            return []
         return self.client.get_states()
 
     async def run_script(self, entity_id: str):
         """Run a HA script."""
-        if not self.client: return None
+        if not self.client:
+            return None
         # Scripts are services in 'script' domain
-        # E.g. script.goodnight -> domain=script, service=goodnight OR domain=script, service=turn_on?
-        # Usually service: script.something is deprecated, better use service: script.turn_on entity_id=script.something
+        #   entity_id=script.something
+        # Usually service: script.something is deprecated, better use service:
+        #   script.turn_on entity_id=script.something
         # But actually for scripts: domain='script', service=name_after_dot
 
         name = entity_id.replace("script.", "")
@@ -199,7 +226,8 @@ class HAController:
 
     async def activate_scene(self, entity_id: str):
         """Activate a scene."""
-        if not self.client: return None
+        if not self.client:
+            return None
         return self.client.call_service("scene", "turn_on", entity_id=entity_id)
 
     async def get_sensors_report(self) -> str:
@@ -261,15 +289,21 @@ class HAController:
 
     async def get_integrations(self):
         """Get list of integrations."""
-        if not self.client: return []
+        if not self.client:
+            return []
         return self.client.get_integrations()
 
     async def reload_integration(self, entry_id: str):
         """Reload an integration."""
-        if not self.client: return None
+        if not self.client:
+            return None
         return self.client.reload_integration(entry_id)
 
-    async def speak_via_yandex(self, message: str, entity_id: str = "media_player.yandex_station_c00tc40000wq8k"):
+    async def speak_via_yandex(
+        self,
+        message: str,
+        entity_id: str = "media_player.yandex_station_c00tc40000wq8k"
+    ):
         """Send TTS message via Yandex Station."""
         if not self.client:
             return False

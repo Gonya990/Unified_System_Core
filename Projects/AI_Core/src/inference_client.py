@@ -2,6 +2,7 @@
 Unified Inference Client for AI Telegram Bot.
 Supports Ollama, OpenAI-compatible, Gemini, and custom endpoints.
 """
+import asyncio
 import logging
 from pathlib import Path
 from typing import Optional
@@ -36,7 +37,7 @@ except ImportError:
     logger.debug("VAPIClient not available")
 
 
-def _get_gemini_client(api_key: str):
+def _get_gemini_client(api_key: str, use_vertex: bool = False, project: str = None):
     """Lazy load and configure Gemini client using new SDK."""
     global _gemini_client, _gemini_client_key
     try:
@@ -44,7 +45,12 @@ def _get_gemini_client(api_key: str):
         # from google.genai.types import GenerateContentConfig
 
         if not _gemini_client or _gemini_client_key != api_key:
-            _gemini_client = genai.Client(api_key=api_key)
+            if use_vertex:
+                _gemini_client = genai.Client(
+                    vertexai=True, project=project, location="us-central1"
+                )
+            else:
+                _gemini_client = genai.Client(api_key=api_key)
             _gemini_client_key = api_key
         return _gemini_client
     except ImportError:
@@ -168,7 +174,10 @@ class InferenceClient:
             if swarm_key:
                 api_key = swarm_key
 
-        client = _get_gemini_client(api_key)
+        use_vertex = self.config.get("USE_VERTEX_AI", False)
+        project = self.config.get("GCP_PROJECT_ID", "gen-lang-client-0982257437")
+
+        client = _get_gemini_client(api_key, use_vertex=use_vertex, project=project)
         if not client:
             return "Error: Gemini client not configured.", {}
 
@@ -191,7 +200,6 @@ class InferenceClient:
                 model_name = f"models/{model_name}"
 
             # Use asyncio loop for blocking SDK call
-            import asyncio
             loop = asyncio.get_event_loop()
 
             def call_sdk():
@@ -456,8 +464,6 @@ class InferenceClient:
                 return "Error: Gemini provider not configured."
 
             try:
-                import asyncio
-
                 from google.genai.types import Part
 
                 with open(file_path, "rb") as f:

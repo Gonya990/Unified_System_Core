@@ -1,9 +1,9 @@
 import os
-import sys
-import json
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Setup paths
@@ -20,20 +20,21 @@ sys.path.append(str(ROOT_DIR / 'Scripts/Utilities'))
 
 import orchestrator_v3_no_face as orchestrator
 
+
 def run_assembly():
     print("🎬 V3 ASSEMBLY: PEXELS + AI (Fast & Kinetic)...")
-    
+
     # RE-VALIDATE PEXELS KEY
     pexels_key = os.getenv('PEXELS_API_KEY')
     print(f"🔑 PEXELS KEY IN ENV: {pexels_key[:5] if pexels_key else 'MISSING'}...")
-    
+
     orchestrator.broker = None
     os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
     os.environ['PEXELS_API_KEY'] = pexels_key
-    
+
     day_str = datetime.now().strftime('%Y-%m-%d')
     assets_dir = ROOT_DIR / 'Local_Dev' / 'Media' / 'legacy_wealth_v3' / day_str
-    
+
     script_ru = """
 Почему девяносто процентов предпринимателей провалятся в две тысячи двадцать шестом году? 🛑
 Потому что они застряли в модели 'работа за деньги'. Трамп всегда говорил: 'Думай масштабно'. Кийосаки учил: 'Заставляй деньги работать на себя'. 📉
@@ -53,26 +54,26 @@ def run_assembly():
         {'image': str(assets_dir / 'scene_5_sovereign_living.jpg'), 'keyword': 'modern luxury mansion pool aerial cinematic'},
         {'image': str(assets_dir / 'scene_6_cta.jpg'), 'keyword': 'mountain peak sunrise triumph success'}
     ]
-            
+
     orchestrator.INPUT_DIR = assets_dir
     orchestrator.OUTPUT_DIR = assets_dir
     orchestrator.BROLL_DIR = ROOT_DIR / 'broll'
-    
+
     def speed_up_audio(text, output_path, lang="en"):
         if orchestrator.generate_audio_openai(text, output_path, "alloy"):
             print("⚡ Speeding up audio (1.15x)...")
             temp_path = output_path.with_suffix('.tmp.wav')
             output_path.rename(temp_path)
             subprocess.run([
-                'ffmpeg', '-y', '-i', str(temp_path), 
-                '-filter:a', 'atempo=1.15', 
+                'ffmpeg', '-y', '-i', str(temp_path),
+                '-filter:a', 'atempo=1.15',
                 str(output_path)
             ], check=True)
             return True
         return False
-        
+
     orchestrator.generate_audio = speed_up_audio
-    
+
     print("🚀 Starting HYBRID Pipeline (Pexels enabled via ENV)...")
     final_video = orchestrator.run_no_face_pipeline(
         text=script_ru,
@@ -81,7 +82,7 @@ def run_assembly():
         scenes=assets,
         style="impact"
     )
-    
+
     if final_video:
         print(f"🎉 SUCCESS! V3 HYBRID video: {final_video}")
     else:

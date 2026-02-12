@@ -1,0 +1,23 @@
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-alpha'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-alpha:latest', '-f', 'services/alpha/Dockerfile', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-execution'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-execution:latest', '-f', 'services/execution/Dockerfile', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-ingestion'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-ingestion:latest', '-f', 'services/ingestion/Dockerfile', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-risk'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-risk:latest', '-f', 'services/risk/Dockerfile', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-compliance'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-compliance:latest', '-f', 'services/compliance/Dockerfile', '.']
+images:
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-alpha:latest'
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-execution:latest'
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-ingestion:latest'
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-risk:latest'
+- 'us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-compliance:latest'

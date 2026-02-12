@@ -4,7 +4,7 @@
 
 set -e
 
-UNIFIED_SYSTEM="/Users/macbook/Documents/Unified_System"
+UNIFIED_SYSTEM="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 COLLABORATION_LOG="$UNIFIED_SYSTEM/logs/collaboration/github_chatgpt.log"
 
 mkdir -p "$(dirname "$COLLABORATION_LOG")"

@@ -1,6 +1,7 @@
-import redis.asyncio as redis
 import json
 import logging
+
+import redis.asyncio as redis
 
 logger = logging.getLogger("Messaging")
 

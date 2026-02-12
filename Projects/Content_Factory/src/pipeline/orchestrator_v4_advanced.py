@@ -1,11 +1,11 @@
 
 import os
-import sys
 import random
-import requests
 import subprocess
-import requests
+import sys
 from pathlib import Path
+
+import requests
 from dotenv import load_dotenv
 
 # Import NEW Google GenAI SDK
@@ -45,8 +45,8 @@ def generate_audio_elevenlabs(text, output_path, api_key):
         if not api_key: return False
         headers = {'xi-api-key': api_key, 'Content-Type': 'application/json'}
         data = {
-            'text': text, 
-            'model_id': 'eleven_multilingual_v2', 
+            'text': text,
+            'model_id': 'eleven_multilingual_v2',
             'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75}
         }
         url = 'https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB'
@@ -130,10 +130,10 @@ def generate_image_dalle3(prompt, output_path):
 def generate_image_imagen4(prompt, output_path):
     print(f"🎨 Generating Imagen 4.0 Image: {prompt}...")
     api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key or not genai: 
+    if not api_key or not genai:
         print("⚠️ Gemini Key/SDK missing, trying DALL-E 3...")
         return generate_image_dalle3(prompt, output_path)
-    
+
     try:
         client = genai.Client(api_key=api_key)
         response = client.models.generate_images(
@@ -171,7 +171,7 @@ def fetch_pexels_video(keyword, output_path, api_key):
                     (vf['link'] for vf in video_files if vf['width'] >= 720),
                     video_files[0]['link']
                 )
-                with open(output_path, "wb") as f: 
+                with open(output_path, "wb") as f:
                     f.write(requests.get(best_link, timeout=30).content)
                 print(f"✅ Pexels Success: {keyword}")
                 return True
@@ -184,20 +184,20 @@ def fetch_pexels_video(keyword, output_path, api_key):
 # =============================================================================
 
 def run_advanced_pipeline(
-    text: str, 
-    lang: str = "ru", 
-    output_name: str = "video_v4", 
-    scenes: list[dict] = None, 
+    text: str,
+    lang: str = "ru",
+    output_name: str = "video_v4",
+    scenes: list[dict] = None,
     style: str = "impact"
 ):
     print(f"\n🚀 Starting ORCHESTRATOR V4.1 (IRONCLAD VISUALS - style={style})")
-    
+
     if not text: return
 
     # 1. AUDIO
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
     eleven_key = os.getenv("ELEVENLABS_API_KEY")
-    
+
     if not (eleven_key and generate_audio_elevenlabs(text, audio_path, eleven_key)):
         generate_audio_openai(text, audio_path)
 
@@ -208,7 +208,7 @@ def run_advanced_pipeline(
     else:
         try:
             probe = subprocess.check_output([
-                "ffprobe", "-v", "error", "-show_entries", "format=duration", 
+                "ffprobe", "-v", "error", "-show_entries", "format=duration",
                 "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
             ])
             audio_duration = float(probe.strip())
@@ -216,8 +216,8 @@ def run_advanced_pipeline(
         except Exception as e:
             print(f"⚠️ FFProbe Error: {e}. Defaulting to 10s.")
             audio_duration = 10.0
-    
-    total_video_duration = audio_duration + 2.0 
+
+    total_video_duration = audio_duration + 2.0
     if not scenes: scenes = [{"keyword": "futuristic technology"}]
     scene_duration = total_video_duration / len(scenes)
 
@@ -225,19 +225,19 @@ def run_advanced_pipeline(
     clips = []
     pexels_key = os.getenv("PEXELS_API_KEY")
     FPS = 30
-    
+
     for i, scene in enumerate(scenes):
         print(f"🎬 Processing Scene {i+1}/{len(scenes)}...")
         keyword = scene.get("keyword", "abstract futuristic")
         clip_final = OUTPUT_DIR / f"{output_name}_seg_{i}.mp4"
         clip_raw = OUTPUT_DIR / f"{output_name}_raw_seg_{i}.mp4"
-        
+
         success = False
-        
+
         # A) Pexels (Stock Video)
         if pexels_key and fetch_pexels_video(keyword, clip_raw, pexels_key):
             success = True
-            
+
         # B) AI Image Gen (Imagen 4 -> DALL-E 3)
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
@@ -247,7 +247,7 @@ def run_advanced_pipeline(
                 d_frames = int(scene_duration * FPS)
                 zoom_speed = 0.0015
                 cmd = [
-                    "ffmpeg", "-y", "-loop", "1", "-i", str(img_path), 
+                    "ffmpeg", "-y", "-loop", "1", "-i", str(img_path),
                     "-t", str(scene_duration),
                     "-vf", (
                         f"scale=-1:1920,zoompan=z='min(zoom+{zoom_speed},1.5)':"
@@ -259,16 +259,16 @@ def run_advanced_pipeline(
                 ]
                 subprocess.run(cmd, capture_output=True, check=False)
                 success = True
-        
+
         # C) FINAL FAILSAFE: Generic Cinematic Video (No more stubs!)
         if not success:
             print(f"⚠️ Heavy Failsafe: Fetching random cinematic video for scene {i}")
             failsafe_keywords = [
-                "galaxy space", "ocean waves cinematic", 
+                "galaxy space", "ocean waves cinematic",
                 "forest aerial view", "urban city night"
             ]
             fetch_pexels_video(random.choice(failsafe_keywords), clip_raw, pexels_key)
-            success = True 
+            success = True
 
         # Normalize clip to 1080x1920, exact duration, and 30fps
         cmd_norm = [
@@ -294,17 +294,17 @@ def run_advanced_pipeline(
     # Concat clips
     print(f"🎞️ Concatenating {len(clips)} segments...")
     subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), 
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list),
         "-c", "copy", str(video_no_audio)
     ], capture_output=True, check=True)
-    
+
     # Merge audio and video
     if audio_path.exists():
         print("🔊 Mixing Audio and Video...")
         # Use -filter_complex for better merging if needed, or simple mix
         subprocess.run([
             "ffmpeg", "-y", "-i", str(video_no_audio), "-i", str(audio_path),
-            "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0", 
+            "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
             "-shortest", "-movflags", "+faststart", str(final_video)
         ], capture_output=True, check=True)
     else:

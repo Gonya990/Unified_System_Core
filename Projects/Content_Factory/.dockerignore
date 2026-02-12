@@ -1,0 +1,16 @@
+venv/
+outputs/
+assets/
+branding/
+inputs/
+reports/
+research/
+docs/
+*.mp4
+*.wav
+*.jpg
+*.png
+.git/
+.DS_Store
+__pycache__/
+*.pyc

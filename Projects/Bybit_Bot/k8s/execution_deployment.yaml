@@ -18,7 +18,7 @@ spec:
       serviceAccountName: bybit-executor-sa
       containers:
         - name: executor
-          image: gonya/bybit-execution:latest
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-execution:latest
           env:
             - name: BYBIT_API_KEY
               valueFrom:

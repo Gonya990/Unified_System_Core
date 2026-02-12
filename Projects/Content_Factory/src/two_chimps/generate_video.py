@@ -1,12 +1,11 @@
-import os
-import random
 from pathlib import Path
+
 import PIL.Image
 
 if not hasattr(PIL.Image, 'ANTIALIAS'):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
-from moviepy.editor import ImageClip, CompositeVideoClip
+from moviepy.editor import CompositeVideoClip, ImageClip
 
 # Paths
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -22,7 +21,7 @@ def create_directed_clip(image_path, output_path, duration=10.0, shot_type="medi
     Creates a video clip from an image with dynamic movement based on shot type.
     """
     print(f"🎬 Generating {shot_type} motion clip for: {image_path.name}")
-    
+
     # Load image
     clip = ImageClip(str(image_path)).set_duration(duration)
     w, h = clip.size
@@ -44,14 +43,14 @@ def create_directed_clip(image_path, output_path, duration=10.0, shot_type="medi
 
     # Apply Zoom and subtle rotation/pan for "premium" feel
     clip = clip.resize(resize_func)
-    
+
     # Center the zoomed image
     final = CompositeVideoClip([clip.set_position("center")], size=(w, h))
 
     final.write_videofile(
-        str(output_path), 
-        fps=24, 
-        codec="libx264", 
+        str(output_path),
+        fps=24,
+        codec="libx264",
         audio=False,
         preset="medium",
         ffmpeg_params=["-pix_fmt", "yuv420p"]
@@ -71,7 +70,7 @@ def generate_angles():
         if not path.exists():
             print(f"⚠️ Avatar not found: {path}")
             continue
-            
+
         for angle in angles:
             output = VIDEO_DIR / f"{name.lower()}_{angle}.mp4"
             create_directed_clip(path, output, duration=10.0, shot_type=angle)

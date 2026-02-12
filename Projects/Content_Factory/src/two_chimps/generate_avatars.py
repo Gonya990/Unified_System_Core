@@ -1,7 +1,8 @@
 import os
+from pathlib import Path
+
 import openai
 import requests
-from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -35,7 +36,7 @@ def generate_image(prompt, filename):
     print(f"🎨 Generating {filename}...")
     try:
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        
+
         response = client.images.generate(
             model="dall-e-3",
             prompt=prompt,
@@ -43,18 +44,18 @@ def generate_image(prompt, filename):
             quality="standard",
             n=1,
         )
-        
+
         image_url = response.data[0].url
-        
+
         # Download image
         img_data = requests.get(image_url).content
         output_path = ASSETS_DIR / f"{filename}.png"
-        
+
         with open(output_path, 'wb') as handler:
             handler.write(img_data)
-            
+
         print(f"✅ Saved: {output_path.name}")
-        
+
     except Exception as e:
         print(f"❌ Error generating {filename}: {e}")
 

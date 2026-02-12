@@ -13,8 +13,6 @@ spec:
       labels:
         app: telegram-bot
     spec:
-      imagePullSecrets:
-      - name: ghcr-auth
       containers:
       - name: bot
         image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:8389d764840146cda117b6a4fc2444b5b72d1f68
@@ -35,6 +33,12 @@ spec:
           value: "my-home-435112"
         - name: BOT_INSTANCE
           value: "igor"
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: ai-core-secrets
+              key: GITHUB_TOKEN
+              optional: true
         envFrom:
         - secretRef:
             name: ai-core-secrets

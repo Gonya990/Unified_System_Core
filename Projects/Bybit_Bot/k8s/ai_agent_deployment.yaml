@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: alpha-agent
-          image: gonya/bybit-alpha:latest
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-alpha:latest
           resources:
             limits:
               cpu: "1000m"
@@ -31,3 +31,13 @@ spec:
                 configMapKeyRef:
                   name: bybit-bot-config
                   key: redis_url
+            - name: BYBIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bybit-secrets
+                  key: api-key
+            - name: BYBIT_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bybit-secrets
+                  key: api-secret

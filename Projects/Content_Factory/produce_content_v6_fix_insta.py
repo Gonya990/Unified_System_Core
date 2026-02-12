@@ -1,9 +1,8 @@
-import sys
-import os
 import datetime
-import telebot
 import subprocess
+import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 ROOT_DIR = Path('/home/gonya/Unified_System_Core')
@@ -23,14 +22,14 @@ load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
 def convert_for_instagram(input_path: Path) -> Path:
     output_path = input_path.parent / (input_path.stem + "_insta_ready.mp4")
     print(f"Converting: {input_path}")
-    
+
     cmd = [
         "ffmpeg", "-y",
         "-i", str(input_path),
         "-c:v", "libx264",
         "-preset", "medium",
         "-crf", "23",
-        "-maxrate", "8M", 
+        "-maxrate", "8M",
         "-bufsize", "16M",
         "-profile:v", "high",
         "-pix_fmt", "yuv420p",
@@ -41,7 +40,7 @@ def convert_for_instagram(input_path: Path) -> Path:
         "-movflags", "+faststart",
         str(output_path)
     ]
-    
+
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print("Conversion Complete""")
@@ -52,11 +51,11 @@ def convert_for_instagram(input_path: Path) -> Path:
 
 def run():
     print("CONTENT FACTORY V6: INSTAGRAM REPAIR")
-    
+
     day_str = datetime.datetime.now().strftime('%Y-%m-%d')
     assets_dir = ROOT_DIR / 'Local_Dev' / 'Media' / 'daily_auto' / day_str
     existing_video = assets_dir / "daily_infinite_game_final.mp4"
-    
+
     caption_full = """♾️ **Бесконечная Игра 2026**
 
 Бизнес — это не спринт. Победит тот, кто останется в игре, когда остальные выгорят.
@@ -68,7 +67,7 @@ def run():
     if existing_video.exists():
         print(f"Found video: {existing_video}")
         insta_video = convert_for_instagram(existing_video)
-        
+
         if insta_video and insta_video.exists():
             print("Retrying Instagram Upload...")
             try:

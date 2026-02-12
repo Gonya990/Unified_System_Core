@@ -4,6 +4,7 @@ import random
 import subprocess
 import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Try to import GenAI (Optional)
@@ -32,14 +33,14 @@ VOICE_RU = "ru-RU-DmitryNeural"
 VOICE_EN = "en-US-ChristopherNeural"
 
 def generate_audio_elevenlabs(text, output_path, api_key):
-    print(f"🎤 Generating ElevenLabs Audio...")
+    print("🎤 Generating ElevenLabs Audio...")
     try:
         import requests
         if not api_key: return False
         headers = {'xi-api-key': api_key, 'Content-Type': 'application/json'}
         data = {
-            'text': text, 
-            'model_id': 'eleven_multilingual_v2', 
+            'text': text,
+            'model_id': 'eleven_multilingual_v2',
             'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75}
         }
         # Adam Voice ID or other
@@ -59,8 +60,9 @@ def generate_audio_elevenlabs(text, output_path, api_key):
 
 def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
     print(f"🎤 Generating Enhanced Edge-TTS Audio (voice={voice})...")
-    import edge_tts
     import asyncio
+
+    import edge_tts
     async def _gen():
         tts = edge_tts.Communicate(text, voice)
         await tts.save(str(output_path))
@@ -75,7 +77,7 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
 
 def generate_audio_openai(text: str, output_path: Path, voice: str = "alloy") -> bool:
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: 
+    if not api_key:
         print("⚠️ OpenAI Key not found, skipping OpenAI TTS")
         return False
     try:
@@ -91,20 +93,20 @@ def generate_audio_openai(text: str, output_path: Path, voice: str = "alloy") ->
 def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: list[dict] = None, style: str = "impact"):
     # Load ENV again to be sure
     load_dotenv(ROOT_DIR / ".env")
-    
+
     print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang}, style={style})")
-    
+
     # 1. Generate Audio
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
-    
+
     # Try ElevenLabs FIRST (Premium)
     eleven_key = os.getenv("ELEVENLABS_API_KEY")
     audio_generated = False
-    
+
     if eleven_key:
         if generate_audio_elevenlabs(text, audio_path, eleven_key):
              audio_generated = True
-    
+
     if not audio_generated:
         print("⚠️ Falling back to OpenAI/Edge-TTS...")
         # Try OpenAI
@@ -132,19 +134,19 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
 
     # 3. Prepare Clips
     clips: list[Path] = []
-    
+
     # Pexels Key
     pexels_key = os.getenv("PEXELS_API_KEY")
     if not pexels_key:
         print("⚠️ Warn: PEXELS_API_KEY Missing")
-    
+
     for i, scene in enumerate(scenes or []):
         print(f"🎬 Processing Scene {i}...")
         time.sleep(1)
-        
+
         keyword = scene.get("keyword", "abstract")
         image_path = scene.get("image")
-        
+
         clip_name = f"{output_name}_raw_seg_{i}.mp4"
         clip_out = OUTPUT_DIR / clip_name
 
@@ -167,7 +169,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
                 continue
             except Exception as e:
                 print(f"❌ FFmpeg error: {e}")
-        
+
         # B) Try Pexels (Video B-Roll)
         success = False
         if pexels_key:
@@ -178,13 +180,13 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
                 # Request 1 video, portrait, medium size
                 url = f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
                 resp = requests.get(url, headers=headers)
-                
+
                 if resp.status_code == 200 and resp.json().get('videos'):
                     video_files = resp.json()['videos'][0]['video_files']
                     # Find best match for 1080x1920 or closest
                     # Simple strategy: take first
                     video_url = video_files[0]['link']
-                    
+
                     print(f"⬇️ Downloading Pexels Clip: {video_url}")
                     v_resp = requests.get(video_url)
                     with open(clip_out, "wb") as f:
@@ -196,7 +198,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
                         print("❌ Pexels Unauthorized (Check Key!)")
             except Exception as e:
                 print(f"❌ Pexels Exception: {e}")
-        
+
         if success:
             # Resize/Crop downloaded clip to 1080x1920 just in case
             processed_clip = OUTPUT_DIR / f"{output_name}_proc_seg_{i}.mp4"
@@ -238,7 +240,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
 
     raw_video = OUTPUT_DIR / f"{output_name}_raw.mp4"
     print("🎬 Concatenating...")
-    
+
     cmd_concat = [
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_list_path),
@@ -253,7 +255,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     # 5. Final Mix (Audio + Video)
     final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
     print("🔊 Mixing Final Audio...")
-    
+
     cmd_mix = [
         "ffmpeg", "-y",
         "-i", str(raw_video),

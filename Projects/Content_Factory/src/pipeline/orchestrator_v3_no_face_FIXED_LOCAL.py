@@ -1,10 +1,9 @@
 
 import os
-import sys
-import subprocess
-import time
 import random
+import subprocess
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Try to import for type checking, but handle import errors gracefully
@@ -45,28 +44,28 @@ def generate_audio_elevenlabs(text, output_path, api_key):
     Generate audio using ElevenLabs API (Premium).
     Returns True if successful, False otherwise.
     """
-    print(f"🎤 Generating ElevenLabs Audio...")
+    print("🎤 Generating ElevenLabs Audio...")
     try:
         import requests
         if not api_key: return False
-        
+
         headers = {
-            'xi-api-key': api_key, 
+            'xi-api-key': api_key,
             'Content-Type': 'application/json'
         }
-        
+
         # Using "Adam" or a deep narration voice
         # Voice ID: pNInz6obpgDQGcFmaJgB (Adam) - reliable professional male
         data = {
-            'text': text, 
-            'model_id': 'eleven_multilingual_v2', 
+            'text': text,
+            'model_id': 'eleven_multilingual_v2',
             'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75}
         }
-        
+
         url = 'https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB'
-        
+
         response = requests.post(url, json=data, headers=headers, timeout=60)
-        
+
         if response.status_code == 200:
             with open(output_path, 'wb') as f:
                 f.write(response.content)
@@ -75,7 +74,7 @@ def generate_audio_elevenlabs(text, output_path, api_key):
         else:
             print(f"❌ ElevenLabs Failed: {response.status_code} - {response.text}")
             return False
-            
+
     except Exception as e:
         print(f"❌ ElevenLabs Exception: {e}")
         return False
@@ -86,7 +85,7 @@ def generate_audio_openai(text, output_path, voice="alloy"):
     """
     print(f"🎤 Generating OpenAI Audio ({voice})...")
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: 
+    if not api_key:
         print("⚠️ OpenAI Key not found, skipping OpenAI TTS")
         return False
     try:
@@ -105,13 +104,14 @@ def generate_audio_edge(text, output_path, voice):
     Generate audio using EdgeTTS (Fallback).
     """
     print(f"🎤 Generating Edge-TTS Audio (voice={voice})...")
-    import edge_tts
     import asyncio
-    
+
+    import edge_tts
+
     async def _gen():
         tts = edge_tts.Communicate(text, voice)
         await tts.save(str(output_path))
-        
+
     try:
         asyncio.run(_gen())
         if output_path.exists() and output_path.stat().st_size > 1000:
@@ -135,16 +135,16 @@ def generate_image_imagen(prompt, output_path):
     if not api_key:
         print("⚠️ Gemini Key not found, skipping Imagen.")
         return False
-        
+
     if not genai:
         print("⚠️ google.generativeai not installed/imported.")
         return False
-        
+
     try:
         genai.configure(api_key=api_key)
         # Check for model access helper or assume model name
         model = genai.GenerativeModel('imagen-3.0-generate-001')
-        
+
         # Note: The API call might differ slightly based on specific version
         # This is a standard specialized generation call pattern
         images = model.generate_images(
@@ -152,9 +152,9 @@ def generate_image_imagen(prompt, output_path):
             number_of_images=1,
             aspect_ratio="9:16",
             safety_filter_level="block_only_high",
-            person_generation="allow_adult" 
+            person_generation="allow_adult"
         )
-        
+
         if images and images[0]:
             images[0].save(output_path)
             print("✅ Imagen Success!")
@@ -172,11 +172,11 @@ def generate_image_dalle(prompt, output_path):
     print(f"🎨 Generating DALL-E 3 Image: {prompt}...")
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key: return False
-    
+
     try:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
-        
+
         response = client.images.generate(
             model="dall-e-3",
             prompt=prompt,
@@ -184,7 +184,7 @@ def generate_image_dalle(prompt, output_path):
             quality="standard",
             n=1,
         )
-        
+
         image_url = response.data[0].url
         import requests
         img_data = requests.get(image_url).content
@@ -204,12 +204,12 @@ def fetch_pexels_video(keyword, output_path, api_key):
     try:
         import requests
         if not api_key: return False
-        
+
         headers = {'Authorization': api_key}
         url = f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
-        
+
         resp = requests.get(url, headers=headers, timeout=10)
-        
+
         if resp.status_code == 200:
             data = resp.json()
             if data.get('videos'):
@@ -222,13 +222,13 @@ def fetch_pexels_video(keyword, output_path, api_key):
                         best_link = vf['link']
                         break
                 if not best_link: best_link = video_files[0]['link']
-                
+
                 print(f"⬇️ Downloading Pexels Clip: {best_link}")
                 v_resp = requests.get(best_link, timeout=30)
                 with open(output_path, "wb") as f:
                     f.write(v_resp.content)
                 return True
-        
+
         print(f"⚠️ Pexels not found for '{keyword}'")
         return False
     except Exception as e:
@@ -240,7 +240,7 @@ def fetch_pexels_video(keyword, output_path, api_key):
 # =============================================================================
 
 def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_face_video", scenes: list[dict] = None, style: str = "impact"):
-    
+
     print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang}, style={style})")
     print(f"📂 Output Path: {OUTPUT_DIR / output_name}")
 
@@ -251,12 +251,12 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     # 1. Generate Audio
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
     audio_generated = False
-    
+
     # Try ElevenLabs FIRST
     eleven_key = os.getenv("ELEVENLABS_API_KEY")
     if eleven_key and generate_audio_elevenlabs(text, audio_path, eleven_key):
         audio_generated = True
-        
+
     # Validations Fallback
     if not audio_generated:
         print("⚠️ Falling back to OpenAI/Edge-TTS...")
@@ -277,37 +277,37 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
         audio_duration = float(probe.strip())
     except Exception:
         audio_duration = 10.0 # fallback
-        
+
     print(f"⏱️ Audio Duration: {audio_duration:.2f}s")
-    
+
     # Make video slightly longer than audio to prevent cutoff
-    total_video_duration = audio_duration + 2.0 
-    
+    total_video_duration = audio_duration + 2.0
+
     # Calculate Scene Duration
     if not scenes: scenes = [{"keyword": "digital abstract background"}]
     num_scenes = len(scenes)
     scene_duration = total_video_duration / num_scenes
-    
+
     print(f"⏱️ Scene Duration: {scene_duration:.2f}s (x{num_scenes} scenes)")
 
     # 3. Prepare Clips
     clips: list[Path] = []
     pexels_key = os.getenv("PEXELS_API_KEY")
-    
+
     for i, scene in enumerate(scenes):
         print(f"🎬 Processing Scene {i+1}/{num_scenes}...")
-        
+
         keyword = scene.get("keyword", "abstract")
         clip_name = f"{output_name}_seg_{i}.mp4"
         clip_raw = OUTPUT_DIR / f"{output_name}_raw_seg_{i}.mp4"
         clip_final = OUTPUT_DIR / clip_name
-        
+
         success = False
-        
+
         # A) Try Pexels (Motion)
         if pexels_key and fetch_pexels_video(keyword, clip_raw, pexels_key):
             success = True
-            
+
         # B) Try AI Image Gen (Static -> Video) if Pexels failed
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
@@ -322,7 +322,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
                 ]
                 subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 success = True
-                
+
         # C) Fallback Color
         if not success:
             print(f"🎨 Generating fallback for scene {i}")
@@ -335,7 +335,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
                 str(clip_raw)
             ]
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-        
+
         # Normalize Clip (Resize/Crop/Time)
         # We ensure every clip is EXACTLY scene_duration
         cmd_norm = [
@@ -356,7 +356,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
 
     video_no_audio = OUTPUT_DIR / f"{output_name}_video.mp4"
     print("🎬 Concatenating...")
-    
+
     cmd_concat = [
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_list),
@@ -371,11 +371,11 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
     # 5. Final Mix (Audio + Music + Video)
     final_video = OUTPUT_DIR / f"{output_name}_final.mp4"
     print("🔊 Mixing Final Audio & Video...")
-    
+
     # Simple placeholder music synthesis (nullsrc) or file check
     # In future: download or generate music to music.mp3
     # For now: We use a filter to keep audio length correct
-    
+
     cmd_mix = [
         "ffmpeg", "-y",
         "-i", str(video_no_audio),
@@ -388,7 +388,7 @@ def run_no_face_pipeline(text: str, lang: str = "ru", output_name: str = "no_fac
         "-fflags", "+shortest",
         str(final_video)
     ]
-    
+
     try:
         subprocess.run(cmd_mix, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         print(f"\n✨ DONE: {final_video}")

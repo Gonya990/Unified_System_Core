@@ -1,7 +1,8 @@
 import logging
+from typing import Optional
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +36,10 @@ async def execute_command(request: CommandRequest):
         # We simulate the bot handling the message
         # In ai_telegram_bot_v2.py, handle_message is the entry point.
         # However, for API, we might want to directly call the orchestrator/inference.
-        
+
         # For now, we reuse the query_ollama_with_context or agent_orchestrator
         # To avoid circular imports, we assume _BOT_INSTANCE has the necessary methods.
-        
+
         response = await _BOT_INSTANCE.process_api_command(
             request.user_id, request.command
         )

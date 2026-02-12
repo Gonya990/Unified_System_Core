@@ -3,9 +3,10 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+
 from dotenv import load_dotenv
 
-# Setup paths 
+# Setup paths
 ROOT_DIR = Path('/home/gonya/Unified_System_Core')
 SRC_DIR = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/src')
 
@@ -18,6 +19,7 @@ sys.path.insert(0, str(SRC_DIR / 'pipeline'))
 sys.path.insert(0, str(SRC_DIR / 'video'))
 
 from daily_researcher import generate_vision_assets
+
 
 def generate_script():
     script_ru = """
@@ -49,17 +51,17 @@ def run():
         {'image': 'scene_5_sovereign_living', 'keyword': 'modern luxury house architecture pool sunset sky'},
         {'image': 'scene_6_cta', 'keyword': 'epic mountain peak sunrise clouds achievement'}
     ]
-    
+
     day_str = datetime.now().strftime('%Y-%m-%d')
     assets_dir = ROOT_DIR / "Local_Dev" / "Media" / "legacy_wealth_v3" / day_str
     assets_dir.mkdir(parents=True, exist_ok=True)
-    
+
     print(f"🎨 Using PEXELS API Key: {os.getenv('PEXELS_API_KEY')[:5]}...")
-    
+
     try:
         # Style 'impact' will trigger Pexels fallback if Gemini/SDXL fails
         assets = generate_vision_assets(scenes, assets_dir, style="cinematic_impact")
-        
+
         production_config = {
             'title': 'The 2026 Founder Strategy V3',
             'script_ru': script,
@@ -67,12 +69,12 @@ def run():
             'assets': assets,
             'timestamp': datetime.now().isoformat()
         }
-        
+
         with open(assets_dir / "production_config.json", 'w', encoding='utf-8') as f:
             json.dump(production_config, f, indent=2, ensure_ascii=False)
-            
+
         print("✅ V3 Assets ready (Hybrid IA + Real Footage).")
-        
+
     except Exception as e:
         print(f"❌ Error: {e}")
 

@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+
 try:
     from elevenlabs import generate, save, set_api_key
     HAS_ELEVEN = True
@@ -25,7 +26,7 @@ class EliteContentOrchestrator:
                 check=True,
             )
             return audio_path
-        
+
         voice = "Antoni" # Elite
         audio = generate(text=text, voice=voice, model="eleven_multilingual_v2")
         path = self.output_dir / "elite_voice.mp3"

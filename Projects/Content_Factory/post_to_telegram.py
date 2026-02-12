@@ -1,7 +1,7 @@
 import os
-import sys
-import telebot
 from pathlib import Path
+
+import telebot
 from dotenv import load_dotenv
 
 ROOT_DIR = Path('/home/gonya/Unified_System_Core')

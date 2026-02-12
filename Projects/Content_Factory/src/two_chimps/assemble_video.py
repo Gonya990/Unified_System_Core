@@ -1,20 +1,18 @@
-import sys
-import PIL.Image
-import os
-import shutil
 import time
 from pathlib import Path
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from google_auth_oauthlib.flow import InstalledAppFlow
+
+import PIL.Image
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 # Patch Pillow for MoviePy 1.x
 if not hasattr(PIL.Image, 'ANTIALIAS'):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
-from moviepy.editor import AudioFileClip, ImageClip, CompositeVideoClip
+from moviepy.editor import AudioFileClip, CompositeVideoClip, ImageClip
 
 # Paths
 ROOT = Path(__file__).parent
@@ -51,13 +49,13 @@ def get_authenticated_service():
             if not CREDENTIALS_FILE.exists():
                 print(f"❌ Credentials not found at {CREDENTIALS_FILE}")
                 return None
-            
+
             print(f"🔐 Initiating Login using: {CREDENTIALS_FILE.name}")
             flow = InstalledAppFlow.from_client_secrets_file(
                 str(CREDENTIALS_FILE), SCOPES)
             # Use a fixed port to avoid random port issues if specific redirect URIs are set
             creds = flow.run_local_server(port=8080)
-        
+
         with open(TOKEN_FILE, 'w') as token:
             token.write(creds.to_json())
 
@@ -83,9 +81,9 @@ def upload_to_youtube(video_path, title, description):
         }
     }
 
-    media = MediaFileUpload(str(video_path), 
-                          chunksize=4*1024*1024, 
-                          resumable=True, 
+    media = MediaFileUpload(str(video_path),
+                          chunksize=4*1024*1024,
+                          resumable=True,
                           mimetype='video/mp4')
 
     request = youtube.videos().insert(
@@ -112,42 +110,42 @@ def upload_to_youtube(video_path, title, description):
 
 def make_video(audio_path):
     print(f"🎬 Assembling Dino Talk for: {audio_path.name}...")
-    
+
     try:
         audio = AudioFileClip(str(audio_path))
         duration = audio.duration
-        
+
         # Load Dino Assets
         img_skeptic = ImageClip(str(ASSETS_DIR / "dino_skeptic.png")).set_duration(duration)
         img_enthusiast = ImageClip(str(ASSETS_DIR / "dino_enthusiast.png")).set_duration(duration)
         bg = ImageClip(str(ASSETS_DIR / "dino_studio_background.png")).set_duration(duration)
-        
+
         # Layout
         img_skeptic = img_skeptic.resize(height=450).set_position(("left", "bottom"))
         img_enthusiast = img_enthusiast.resize(height=450).set_position(("right", "bottom"))
-        
+
         final_video = CompositeVideoClip(
             [bg, img_skeptic, img_enthusiast],
             size=bg.size
         )
-        
+
         final_video = final_video.set_audio(audio)
-        
+
         output_path = VIDEO_DIR / f"{audio_path.stem}.mp4"
         final_video.write_videofile(
-            str(output_path), 
-            fps=24, 
-            codec="libx264", 
+            str(output_path),
+            fps=24,
+            codec="libx264",
             audio_codec="aac"
         )
-        
+
         print(f"✅ Video saved: {output_path.name}")
-        
+
         # Auto-Upload
         title = f"Dino Talk: {audio_path.stem.replace('_', ' ').title()}"
         description = "AI-generated podcast hosted by T-Rex and Triceratops.\n\nCreated by Unified System Core."
         upload_to_youtube(output_path, title, description)
-        
+
     except Exception as e:
         print(f"❌ Error assembling/uploading video: {e}")
 
@@ -155,7 +153,7 @@ if __name__ == "__main__":
     if not AUDIO_DIR.exists():
         print("❌ Audio output directory not found.")
         exit()
-        
+
     for audio_file in AUDIO_DIR.glob("*.mp3"):
         # We generally expect one file for the test run
         make_video(audio_file)

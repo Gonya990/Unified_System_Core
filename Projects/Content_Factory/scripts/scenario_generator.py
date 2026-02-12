@@ -1,10 +1,10 @@
 
 import json
-import sqlite3
 import os
-import requests
-from datetime import datetime
+import sqlite3
 from collections import Counter
+
+import requests
 
 # Configuration
 INDEX_FILE = "/home/gonya/Unified_System_Core/Projects/Content_Factory/config/knowledge_base_index.json"
@@ -29,12 +29,12 @@ def get_recent_topics(db_path, limit=50):
 
 def analyze_index(index_path):
     """Analyze file structure to guess content themes."""
-    with open(index_path, 'r') as f:
+    with open(index_path) as f:
         data = json.load(f)
-    
+
     docs = data.get('documents', [])
     media = data.get('media_assets', [])
-    
+
     # Extract keywords from filenames
     keywords = []
     for item in docs + media:
@@ -42,11 +42,11 @@ def analyze_index(index_path):
         # Simple cleanup
         name = os.path.splitext(name)[0].replace('_', ' ').replace('-', ' ')
         keywords.extend(name.split())
-    
+
     # Filter common stop words (very basic)
     stop_words = {'video', 'image', 'photo', 'chat', 'message', 'copy', 'of', 'the', 'and', 'json', 'html', 'txt', 'jpg', 'mp4'}
     keywords = [w for w in keywords if w not in stop_words and len(w) > 3]
-    
+
     common = Counter(keywords).most_common(20)
     return common, len(docs), len(media)
 
@@ -82,7 +82,7 @@ def query_llm(prompt):
     try:
         # Try local Ollama (via host.docker.internal if inside docker, or localhost if undefined)
         # Since we run this script on the HOST (igor-gaming-1), use localhost
-        url = "http://localhost:11434/api/generate" 
+        url = "http://localhost:11434/api/generate"
         response = requests.post(url, json=payload)
         if response.status_code == 200:
             return response.json().get('response', '')
@@ -93,30 +93,30 @@ def query_llm(prompt):
 
 def main():
     print("🧠 Consilium: Analyzing data footprint...")
-    
+
     # 1. Analyze Files
     if not os.path.exists(INDEX_FILE):
         print("❌ Index not found. Run archive_indexer.py first.")
         return
-    
+
     file_stats = analyze_index(INDEX_FILE)
     print(f"📊 Analyzed {file_stats[1]} docs and {file_stats[2]} media files.")
-    
+
     # 2. Analyze Messages
     messages = get_recent_topics(DB_PATH)
     print(f"💬 Read {len(messages)} recent messages.")
-    
+
     # 3. Generate
     print("💡 Designing content strategy...")
     prompt = generate_prompt(None, file_stats, messages)
-    
+
     plan = query_llm(prompt)
-    
+
     print("\n" + "="*40)
     print("🎬 CONSILIUM: CONTENT SERIES PLAN")
     print("="*40 + "\n")
     print(plan)
-    
+
     # Save plan
     report_path = "/home/gonya/Unified_System_Core/Projects/Content_Factory/reports/series_plan_v1.md"
     os.makedirs(os.path.dirname(report_path), exist_ok=True)

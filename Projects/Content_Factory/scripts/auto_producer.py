@@ -1,9 +1,10 @@
 
-import os
-import time
-import requests
 import json
 import logging
+import os
+import time
+
+import requests
 
 # Config
 LLM_URL = "http://localhost:11434/api/generate"
@@ -39,7 +40,7 @@ def generate_scenario_json():
     ]
     Based on the theme: 'Building a Cyberpunk Digital Life from Archives'.
     """
-    
+
     retries = 10
     while retries > 0:
         try:
@@ -61,36 +62,36 @@ def mock_render_video(episode):
     """Simulate video rendering (since we don't have the full video engine linked yet)."""
     filename = f"Episode_{episode['episode']}_{episode['title'].replace(' ', '_')}.mp4"
     filepath = os.path.join(OUTPUT_DIR, filename)
-    
+
     logging.info(f"🎬 Rendering {filename}...")
     time.sleep(5) # Simulate work
-    
+
     # Create a dummy video file or text file for now if moviepy fails/is complex headers
     with open(filepath, "w") as f:
         f.write(f"VIDEO DATA FOR: {episode['title']}\nSCRIPT: {episode['script']}")
-    
+
     logging.info(f"✅ Rendered: {filepath}")
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
+
     logging.info("🌙 Nightly Producer Initialized.")
     check_system_load()
-    
+
     plan = generate_scenario_json()
     if not plan:
         logging.error("❌ Failed to generate plan after retries.")
         # Fallback plan
         plan = [{"episode": 1, "title": "System_Boot_Sequence", "script": "Hello World", "keywords": []}]
-    
+
     # Save Plan
     with open(SCENARIO_FILE, 'w') as f:
         json.dump(plan, f, indent=2)
-        
+
     # Render
     for ep in plan:
         mock_render_video(ep)
-        
+
     logging.info("💤 Production complete. Going to sleep.")
 
 if __name__ == "__main__":
