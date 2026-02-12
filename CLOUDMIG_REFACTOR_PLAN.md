@@ -101,9 +101,9 @@ GitHub Models.
 ## и цепочки поставок
 
 1. **IAM & Network Policy / IAM и сетевые политики:**
-    * Enforce least-privilege roles; Namespace RBAC + NetworkPolicy to isolate
+    * [x] Enforce least-privilege roles; Namespace RBAC + NetworkPolicy to isolate
         services.
-    * Минимизировать роли; включить Namespace RBAC и NetworkPolicy для изоляции
+    * [x] Минимизировать роли; включить Namespace RBAC и NetworkPolicy для изоляции
         сервисов.
 2. **Image & SBOM Hygiene / Гигиена образов и SBOM:**
     * [x] Automate SBOM (Syft) + vulnerability scan (Grype) in GitHub Actions.
@@ -112,9 +112,8 @@ GitHub Models.
         в CI.
 3. **Binary Authorization / Бинарная авторизация:**
     * [x] Enable Binary Authorization on GKE Autopilot (PROJECT_SINGLETON_POLICY).
-    * [ ] Configure Attestors and Policy (Planned for Week 2).
-    * Требовать подписанные аттестации образов из CI; блокировать неподписанные
-        деплои в GKE.
+    * [x] Configure Attestors and Policy (`policy.yaml` enforced).
+    * [x] Требовать подписанные аттестации образов из CI; блокировать неподписанные деплои в GKE.
 4. **Secrets Hygiene / Гигиена секретов:**
     * 90-day rotation policy; automated drift detection between Secret Manager
         and manifests.
