@@ -6,23 +6,24 @@ import requests
 from dotenv import load_dotenv
 
 # Load environment
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+ROOT_DIR = Path("/home/gonya/Unified_System_Core")
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+
 
 def upload_reel_meta_api(video_path: str, caption: str) -> bool:
     """
     Upload Instagram Reel using official Meta Graph API.
-    
+
     Requirements:
     - INSTAGRAM_BUSINESS_ACCOUNT_ID
     - META_ACCESS_TOKEN (with business_content_publish permission)
-    
+
     The video must be hosted on a publicly accessible URL.
     """
 
-    ig_account_id = os.getenv('INSTAGRAM_BUSINESS_ACCOUNT_ID')
-    access_token = os.getenv('META_ACCESS_TOKEN')
+    ig_account_id = os.getenv("INSTAGRAM_BUSINESS_ACCOUNT_ID")
+    access_token = os.getenv("META_ACCESS_TOKEN")
 
     if not ig_account_id or not access_token:
         print("❌ Missing INSTAGRAM_BUSINESS_ACCOUNT_ID or META_ACCESS_TOKEN")
@@ -44,11 +45,11 @@ def upload_reel_meta_api(video_path: str, caption: str) -> bool:
     container_url = f"https://graph.facebook.com/v21.0/{ig_account_id}/media"
 
     container_params = {
-        'media_type': 'REELS',
-        'video_url': video_url,
-        'caption': caption,
-        'access_token': access_token,
-        'share_to_feed': True  # Also post to main feed
+        "media_type": "REELS",
+        "video_url": video_url,
+        "caption": caption,
+        "access_token": access_token,
+        "share_to_feed": True,  # Also post to main feed
     }
 
     print("📦 Creating media container...")
@@ -58,7 +59,7 @@ def upload_reel_meta_api(video_path: str, caption: str) -> bool:
         print(f"❌ Container creation failed: {container_response.text}")
         return False
 
-    creation_id = container_response.json().get('id')
+    creation_id = container_response.json().get("id")
     print(f"✅ Container created: {creation_id}")
 
     # Step 3: Wait for processing (recommended 15+ seconds)
@@ -68,10 +69,7 @@ def upload_reel_meta_api(video_path: str, caption: str) -> bool:
     # Step 4: Publish the reel
     publish_url = f"https://graph.facebook.com/v21.0/{ig_account_id}/media_publish"
 
-    publish_params = {
-        'creation_id': creation_id,
-        'access_token': access_token
-    }
+    publish_params = {"creation_id": creation_id, "access_token": access_token}
 
     print("📤 Publishing reel...")
     publish_response = requests.post(publish_url, data=publish_params)
@@ -80,11 +78,12 @@ def upload_reel_meta_api(video_path: str, caption: str) -> bool:
         print(f"❌ Publishing failed: {publish_response.text}")
         return False
 
-    media_id = publish_response.json().get('id')
+    media_id = publish_response.json().get("id")
     print(f"✅ Reel published successfully! Media ID: {media_id}")
     return True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Test
     print("Meta Instagram API Uploader Ready")
     print("To use: Set INSTAGRAM_BUSINESS_ACCOUNT_ID and META_ACCESS_TOKEN in .env")

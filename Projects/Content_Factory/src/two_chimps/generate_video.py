@@ -2,7 +2,7 @@ from pathlib import Path
 
 import PIL.Image
 
-if not hasattr(PIL.Image, 'ANTIALIAS'):
+if not hasattr(PIL.Image, "ANTIALIAS"):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
 from moviepy.editor import CompositeVideoClip, ImageClip
@@ -15,6 +15,7 @@ VIDEO_DIR = CONTEXT_DIR / "video_clips"
 
 if not VIDEO_DIR.exists():
     VIDEO_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def create_directed_clip(image_path, output_path, duration=10.0, shot_type="medium"):
     """
@@ -33,7 +34,7 @@ def create_directed_clip(image_path, output_path, duration=10.0, shot_type="medi
     elif shot_type == "medium":
         # 1.3x Zoom
         zoom_start, zoom_end = 1.2, 1.4
-    else: # wide
+    else:  # wide
         # Subtle zoom
         zoom_start, zoom_end = 1.0, 1.1
 
@@ -53,15 +54,16 @@ def create_directed_clip(image_path, output_path, duration=10.0, shot_type="medi
         codec="libx264",
         audio=False,
         preset="medium",
-        ffmpeg_params=["-pix_fmt", "yuv420p"]
+        ffmpeg_params=["-pix_fmt", "yuv420p"],
     )
     print(f"✅ Saved directed clip: {output_path.name}")
+
 
 def generate_angles():
     # Regular Avatars
     avatars = {
         "Rex": AVATARS_DIR / "dino_skeptic.png",
-        "Trike": AVATARS_DIR / "dino_enthusiast.png"
+        "Trike": AVATARS_DIR / "dino_enthusiast.png",
     }
 
     angles = ["wide", "medium", "close"]
@@ -81,6 +83,7 @@ def generate_angles():
         print(f"🎬 Found B-roll: {broll_path.name}")
         output = VIDEO_DIR / f"{broll_path.stem}_motion.mp4"
         create_directed_clip(broll_path, output, duration=10.0, shot_type="wide")
+
 
 if __name__ == "__main__":
     generate_angles()

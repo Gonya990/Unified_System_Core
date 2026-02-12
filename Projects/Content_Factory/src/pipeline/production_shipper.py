@@ -25,12 +25,23 @@ from uploaders.youtube_uploader import upload_video
 def get_video_duration(path):
     try:
         result = subprocess.run(
-            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
-            capture_output=True, text=True
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
         )
         return float(result.stdout.strip())
     except Exception:
         return 0
+
 
 async def task_youtube(video_path, title, description, tags, skip):
     if skip:
@@ -39,15 +50,18 @@ async def task_youtube(video_path, title, description, tags, skip):
 
     creds_dir = current_dir.parent / "uploaders" / ".credentials"
     if not (creds_dir / "youtube_token.json").exists():
-         print("⏭ Skipping YouTube: No token found.")
-         return
+        print("⏭ Skipping YouTube: No token found.")
+        return
 
     print("📺 Shipping to YouTube...")
     try:
         # Run blocking upload in a thread
-        await asyncio.to_thread(upload_video, Path(video_path), title, description, tags, "28", "public")
+        await asyncio.to_thread(
+            upload_video, Path(video_path), title, description, tags, "28", "public"
+        )
     except Exception as e:
         print(f"⚠️ YouTube failed: {e}")
+
 
 async def task_instagram(video_path, title, description, skip):
     if skip:
@@ -67,9 +81,21 @@ async def task_instagram(video_path, title, description, skip):
             # with other tasks if wrapped in to_thread, or just acceptable.
             # safe to execute in this async func as long as it doesn't block others for *too* long
             # but better to separate heavy compute.
-            subprocess.run([
-                "ffmpeg", "-y", "-i", video_path, "-t", "899", "-c", "copy", trimmed_path
-            ], check=True, capture_output=True)
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    video_path,
+                    "-t",
+                    "899",
+                    "-c",
+                    "copy",
+                    trimmed_path,
+                ],
+                check=True,
+                capture_output=True,
+            )
             ig_video = trimmed_path
             print(f"✅ Trimmed version created: {trimmed_path}")
         except Exception as e:
@@ -82,9 +108,10 @@ async def task_instagram(video_path, title, description, skip):
         await asyncio.to_thread(upload_reel, ig_video, caption[:2000])
 
         if ig_video != video_path and os.path.exists(ig_video):
-            os.remove(ig_video) # Cleanup
+            os.remove(ig_video)  # Cleanup
     except Exception as e:
         print(f"⚠️ Instagram failed: {e}")
+
 
 async def task_threads(video_path, title, description, skip):
     if skip:
@@ -102,6 +129,7 @@ async def task_threads(video_path, title, description, skip):
     except Exception as e:
         print(f"⚠️ Threads failed: {e}")
 
+
 async def task_community(video_path, title, description, skip):
     if skip:
         print("⏭ Skipping YouTube Community (Requested)")
@@ -110,6 +138,7 @@ async def task_community(video_path, title, description, skip):
     print("📢 Posting to YouTube Community...")
     try:
         from uploaders.youtube_community import YouTubeCommunity
+
         yt_comm = YouTubeCommunity(headless=True)
         comm_text = f"🎥 NEW DOCUMENTARY: {title}\n\n👇 Watch the full video here:\nhttps://www.youtube.com/@TheU-AI/videos\n\n{description[:100]}...\n\n#AI #Future"
 
@@ -120,7 +149,15 @@ async def task_community(video_path, title, description, skip):
     except Exception as e:
         print(f"⚠️ Community Post failed: {e}")
 
-async def ship_production(video_path: str, data_path: str, skip_youtube=False, skip_instagram=False, skip_threads=False, skip_community=False):
+
+async def ship_production(
+    video_path: str,
+    data_path: str,
+    skip_youtube=False,
+    skip_instagram=False,
+    skip_threads=False,
+    skip_community=False,
+):
     print(f"📦 Starting shipping for {video_path}")
 
     if not os.path.exists(video_path):
@@ -136,7 +173,10 @@ async def ship_production(video_path: str, data_path: str, skip_youtube=False, s
 
     # Add chapters to description for YouTube
     chapters = ""
-    chapters_path = Path(video_path).parent / f"{Path(video_path).stem.replace('_final', '_chapters')}.txt"
+    chapters_path = (
+        Path(video_path).parent
+        / f"{Path(video_path).stem.replace('_final', '_chapters')}.txt"
+    )
     if chapters_path.exists():
         with open(chapters_path) as f:
             chapters = "\n\nChapters:\n" + f.read()
@@ -148,14 +188,16 @@ async def ship_production(video_path: str, data_path: str, skip_youtube=False, s
         task_youtube(video_path, title, full_description, tags, skip_youtube),
         task_instagram(video_path, title, description, skip_instagram),
         task_threads(video_path, title, description, skip_threads),
-        task_community(video_path, title, description, skip_community)
+        task_community(video_path, title, description, skip_community),
     )
 
     print("✅ Shipping complete!")
 
+
 if __name__ == "__main__":
     # Parse args for selective shipping
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("video_path")
     parser.add_argument("data_path")
@@ -171,8 +213,13 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    asyncio.run(ship_production(args.video_path, args.data_path,
-                                skip_youtube=args.skip_youtube,
-                                skip_instagram=args.skip_instagram,
-                                skip_threads=args.skip_threads,
-                                skip_community=args.skip_community))
+    asyncio.run(
+        ship_production(
+            args.video_path,
+            args.data_path,
+            skip_youtube=args.skip_youtube,
+            skip_instagram=args.skip_instagram,
+            skip_threads=args.skip_threads,
+            skip_community=args.skip_community,
+        )
+    )

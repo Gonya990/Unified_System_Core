@@ -7,6 +7,7 @@ current_file = Path(__file__).resolve()
 CREDENTIALS_DIR = current_file.parent / ".credentials"
 SESSION_FILE = CREDENTIALS_DIR / "insta_session.json"
 
+
 def upload_reel(video_path, caption):
     print(f"📸 Preparing to upload to Instagram: {video_path}")
 
@@ -20,9 +21,9 @@ def upload_reel(video_path, caption):
 
             # Verify
             if cl.user_id:
-                 print(f"✅ Authenticated as user: {cl.user_id}")
+                print(f"✅ Authenticated as user: {cl.user_id}")
             else:
-                 print("⚠️ Session loaded but user_id is empty?")
+                print("⚠️ Session loaded but user_id is empty?")
         except Exception as e:
             print(f"❌ Session load error: {e}")
     else:
@@ -41,5 +42,7 @@ def upload_reel(video_path, caption):
     except Exception as e:
         print(f"❌ Upload Failed: {e}")
         if "login_required" in str(e):
-            print("💡 Hint: The session might be invalid or IP locked. Try logging in again locally and extracting cookies.")
+            print(
+                "💡 Hint: The session might be invalid or IP locked. Try logging in again locally and extracting cookies."
+            )
         return False

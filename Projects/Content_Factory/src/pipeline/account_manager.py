@@ -10,6 +10,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 ACCOUNTS_CONFIG = ROOT_DIR / "accounts_config.json"
 
+
 class AccountManager:
     """Manages multiple social media accounts for content distribution."""
 
@@ -24,21 +25,16 @@ class AccountManager:
             "instagram": [
                 {
                     "username": os.getenv("INSTAGRAM_USERNAME"),
-                    "session_id": os.getenv("INSTAGRAM_SESSION_ID")
+                    "session_id": os.getenv("INSTAGRAM_SESSION_ID"),
                 }
             ],
-            "youtube": [
-                {
-                    "name": "Main Channel",
-                    "token_file": "youtube_token.json"
-                }
-            ],
+            "youtube": [{"name": "Main Channel", "token_file": "youtube_token.json"}],
             "threads": [
                 {
                     "username": os.getenv("INSTAGRAM_USERNAME"),
-                    "session_id": os.getenv("INSTAGRAM_SESSION_ID")
+                    "session_id": os.getenv("INSTAGRAM_SESSION_ID"),
                 }
-            ]
+            ],
         }
 
     def get_accounts(self, platform):
@@ -53,6 +49,7 @@ class AccountManager:
             self.accounts[platform] = []
         self.accounts[platform].append(data)
         self.save_accounts()
+
 
 if __name__ == "__main__":
     manager = AccountManager()

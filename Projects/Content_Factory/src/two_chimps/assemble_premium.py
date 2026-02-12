@@ -17,6 +17,7 @@ SCRIPTS_DIR = CONTEXT_DIR / "scripts"
 if not FINAL_VIDEO_DIR.exists():
     FINAL_VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 
+
 def parse_script(lines):
     """Parse dialogue script (JSON or text)."""
     content = "".join(lines)
@@ -51,6 +52,7 @@ def parse_script(lines):
             script_data.append({"role": role, "text": text})
     return script_data
 
+
 def assemble_directed_video(script_file):
     """Assemble final video from segments."""
     print(f"🎬 [DIRECTOR'S CUT] Assembling: {script_file.name}...")
@@ -66,13 +68,13 @@ def assemble_directed_video(script_file):
         "Skeptic": {
             "wide": str(VIDEO_CLIPS_DIR / "rex_wide.mp4"),
             "medium": str(VIDEO_CLIPS_DIR / "rex_medium.mp4"),
-            "close": str(VIDEO_CLIPS_DIR / "rex_close.mp4")
+            "close": str(VIDEO_CLIPS_DIR / "rex_close.mp4"),
         },
         "Enthusiast": {
             "wide": str(VIDEO_CLIPS_DIR / "trike_wide.mp4"),
             "medium": str(VIDEO_CLIPS_DIR / "trike_medium.mp4"),
-            "close": str(VIDEO_CLIPS_DIR / "trike_close.mp4")
-        }
+            "close": str(VIDEO_CLIPS_DIR / "trike_close.mp4"),
+        },
     }
 
     broll_clips = list(VIDEO_CLIPS_DIR.glob("broll_*_motion.mp4"))
@@ -121,11 +123,12 @@ def assemble_directed_video(script_file):
             codec="libx264",
             audio_codec="aac",
             temp_audiofile="temp-audio.m4a",
-            remove_temp=True
+            remove_temp=True,
         )
         print(f"✅ Directed Premium Video saved: {output_path.name}")
     else:
         print("❌ Assembly failed: No clips.")
+
 
 if __name__ == "__main__":
     valid_patterns = ["*_script.md", "*.json"]

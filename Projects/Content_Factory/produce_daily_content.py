@@ -1,4 +1,3 @@
-
 import logging
 import os
 import sys
@@ -9,38 +8,39 @@ from dotenv import load_dotenv
 # Setup dynamic paths
 CURRENT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CURRENT_DIR.parent.parent
-SRC_DIR = CURRENT_DIR / 'src'
+SRC_DIR = CURRENT_DIR / "src"
 
 # Inject paths for imports
 paths_to_add = [
     SRC_DIR,
-    SRC_DIR / 'researcher',
-    SRC_DIR / 'pipeline',
-    SRC_DIR / 'uploaders'
+    SRC_DIR / "researcher",
+    SRC_DIR / "pipeline",
+    SRC_DIR / "uploaders",
 ]
 for p in paths_to_add:
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
 # Load project components AFTER path injection
-import scheduler
+import scheduler  # noqa: E402
 
 # from daily_researcher import generate_vision_assets
 # import orchestrator_v3_no_face as orchestrator
 
 # Import Uploaders
 try:
-    from account_manager import AccountManager
+    from account_manager import AccountManager  # noqa: E402
     from insta_uploader import upload_reel as insta_upload
     from telegram_uploader import send_video as tg_upload
     from youtube_uploader import upload_video as yt_upload
 except ImportError as e:
     print(f"⚠️ Warning: Some uploaders could not be imported: {e}")
 
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 logger = logging.getLogger("ContentFactory")
+
 
 def run_production_cycle():
     print("🏭 CONTENT FACTORY: STARTING PRODUCTION CYCLE...")
@@ -53,8 +53,8 @@ def run_production_cycle():
     print(f"📅 Today's Plan: {len(plan)} slots")
 
     for task in plan:
-        lang = task['lang'].value
-        slot = task['slot']
+        lang = task["lang"].value
+        slot = task["slot"]
         print(f"\n🚀 Processing: {lang.upper()} ({slot}) ...")
 
         # 2. Topic Mining (Simplified for base version)
@@ -69,7 +69,7 @@ def run_production_cycle():
         print(f"✅ {output_name} production simulation complete.")
 
         # 4. Automate Uploads
-        if os.getenv('AUTOMATION_MODE', 'False') == 'True':
+        if os.getenv("AUTOMATION_MODE", "False") == "True":
             print(f"📤 Uploading {output_name} to platforms...")
 
             # Telegram
@@ -87,7 +87,7 @@ def run_production_cycle():
                     yt_upload(
                         video_path,
                         title=f"AI Future: {topic}",
-                        token_file=acc.get("token_file")
+                        token_file=acc.get("token_file"),
                     )
                 except Exception as e:
                     print(f"❌ YT Upload failed for {acc.get('name')}: {e}")
@@ -99,12 +99,13 @@ def run_production_cycle():
                     insta_upload(
                         str(video_path),
                         "AI Daily Brief #AI #Future",
-                        session_id=acc.get("session_id")
+                        session_id=acc.get("session_id"),
                     )
                 except Exception as e:
                     print(f"❌ Insta Upload failed for {acc.get('username')}: {e}")
 
     print("\n💤 Cycle Complete. Sleeping until next trigger.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run_production_cycle()

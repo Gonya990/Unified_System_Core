@@ -2,7 +2,7 @@ from pathlib import Path
 
 import PIL.Image
 
-if not hasattr(PIL.Image, 'ANTIALIAS'):
+if not hasattr(PIL.Image, "ANTIALIAS"):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
 from moviepy.editor import CompositeVideoClip, ImageClip
@@ -16,6 +16,7 @@ VIDEO_DIR = CONTEXT_DIR / "video_clips"
 
 if not VIDEO_DIR.exists():
     VIDEO_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def create_ken_burns_clip(image_path, output_path, duration=5.0, zoom_factor=1.1):
     """
@@ -31,7 +32,7 @@ def create_ken_burns_clip(image_path, output_path, duration=5.0, zoom_factor=1.1
     w, h = clip.size
 
     # Zoom In: Начало 1.0, Увеличение со временем
-    clip = clip.resize(lambda t: 1 + 0.02 * t) # Медленный зум
+    clip = clip.resize(lambda t: 1 + 0.02 * t)  # Медленный зум
 
     # Центрирование (CompositeVideoClip автоматически центрирует)
     final = CompositeVideoClip([clip], size=(w, h))
@@ -42,15 +43,16 @@ def create_ken_burns_clip(image_path, output_path, duration=5.0, zoom_factor=1.1
         codec="libx264",
         audio=False,
         preset="medium",
-        ffmpeg_params=["-pix_fmt", "yuv420p"] # Важно для совместимости
+        ffmpeg_params=["-pix_fmt", "yuv420p"],  # Важно для совместимости
     )
     print(f"✅ Видеоклип сохранен: {output_path.name}")
+
 
 def generate_dynamic_avatars():
     avatars = {
         "Rex": AVATARS_DIR / "dino_skeptic.png",
         "Trike": AVATARS_DIR / "dino_enthusiast.png",
-        "Studio": AVATARS_DIR / "dino_studio_background.png"
+        "Studio": AVATARS_DIR / "dino_studio_background.png",
     }
 
     for name, path in avatars.items():
@@ -60,6 +62,7 @@ def generate_dynamic_avatars():
 
         output = VIDEO_DIR / f"{name.lower()}_motion.mp4"
         create_ken_burns_clip(path, output, duration=10.0)
+
 
 if __name__ == "__main__":
     generate_dynamic_avatars()

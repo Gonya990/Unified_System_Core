@@ -436,9 +436,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         existing_events = client.get_upcoming_events(days=1)
         conflict = None
         for e in existing_events:
-            e_start_str = e.get("start", {}).get("dateTime") or e.get(
-                "start", {}
-            ).get("date")
+            e_start_str = e.get("start", {}).get("dateTime") or e.get("start", {}).get(
+                "date"
+            )
             if e_start_str:
                 # Simplistic check
                 if pending["time"] in e_start_str:
@@ -485,9 +485,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "edit_context":
         await query.edit_message_text(
-                "Feature coming soon! For now, try adding the event again "
-                "with more details."
-            )
+            "Feature coming soon! For now, try adding the event again "
+            "with more details."
+        )
 
     elif data == "clear_memory":
         db.clear_memories(user_id)
@@ -803,12 +803,13 @@ async def process_event_creation(query, user_id, client, pending, start_time, co
             user_id, pending["summary"], pending.get("context", ""), start_time
         )
         await query.edit_message_text(
-            f"✅ Запланировано: **{pending['summary']}**\n"
-            f"Время: {pending['time']}",
+            f"✅ Запланировано: **{pending['summary']}**\n" f"Время: {pending['time']}",
             parse_mode="Markdown",
         )
     else:
-        await query.edit_message_text("❌ Не удалось создать событие в Google Calendar.")
+        await query.edit_message_text(
+            "❌ Не удалось создать событие в Google Calendar."
+        )
 
     context.user_data.pop("pending_event", None)
 
@@ -1002,7 +1003,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Exclude messaging keywords from event detection to prevent hijacking
     MSG_START_KEYWORDS = [
-        "tell", "say", "send", "скажи", "передай", "отправь", "сообщи", "напиши"
+        "tell",
+        "say",
+        "send",
+        "скажи",
+        "передай",
+        "отправь",
+        "сообщи",
+        "напиши",
     ]
 
     # Check for "Add Event" intent
@@ -1271,9 +1279,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if "<" in email["from"]
                         else email["from"]
                     )
-                    snippet = (email.get("snippet", "") or "")[:200].replace(
-                        "\n", " "
-                    )
+                    snippet = (email.get("snippet", "") or "")[:200].replace("\n", " ")
                     email_context += (
                         f"{i}. От: {sender} | Тема: {email['subject']} | "
                         f"Суть: {snippet}\n"
@@ -2388,7 +2394,15 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Text-based files processing
     text_extensions = (
-        ".txt", ".md", ".py", ".json", ".yaml", ".yml", ".csv", ".log", ".rtf"
+        ".txt",
+        ".md",
+        ".py",
+        ".json",
+        ".yaml",
+        ".yml",
+        ".csv",
+        ".log",
+        ".rtf",
     )
     if file_name.lower().endswith(text_extensions):
         try:
@@ -3036,7 +3050,9 @@ async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"✅ Created Note: [{title}]({url})", parse_mode="Markdown"
             )
         else:
-            await update.message.reply_text("❌ Failed to create note. Check logs/config.")
+            await update.message.reply_text(
+                "❌ Failed to create note. Check logs/config."
+            )
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -3100,15 +3116,15 @@ async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     found = True
 
             if not found:
-                await update.message.reply_text("⚠️ Не найдено файлов баз данных для бэкапа.")
+                await update.message.reply_text(
+                    "⚠️ Не найдено файлов баз данных для бэкапа."
+                )
                 os.remove(backup_name)
                 return
 
         await update.message.reply_document(
             document=open(backup_name, "rb"),
-            caption=(
-                f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"
-            ),
+            caption=(f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"),
         )
         os.remove(backup_name)
 
@@ -3121,7 +3137,9 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
-        await update.message.reply_text("❌ Только главный администратор может обновлять бота.")
+        await update.message.reply_text(
+            "❌ Только главный администратор может обновлять бота."
+        )
         return
 
     await update.message.reply_text(
@@ -3148,7 +3166,8 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         await update.message.reply_text(
-            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Restarting service..."
+            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n"
+            "2. Restarting service..."
         )
 
         await update.message.reply_text(
@@ -3457,9 +3476,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Ошибка: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
             output = stdout.decode().strip()
@@ -3479,8 +3496,8 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif subcmd == "create":
             if len(context.args) < 2:
                 await update.message.reply_text(
-                "Usage: `/beads create <title>`", parse_mode="Markdown"
-            )
+                    "Usage: `/beads create <title>`", parse_mode="Markdown"
+                )
                 return
 
             title = " ".join(context.args[1:])
@@ -3495,9 +3512,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Ошибка: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
             output = stdout.decode().strip()
@@ -3508,8 +3523,8 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif subcmd == "show":
             if len(context.args) < 2:
                 await update.message.reply_text(
-                "Usage: `/beads show <issue-id>`", parse_mode="Markdown"
-            )
+                    "Usage: `/beads show <issue-id>`", parse_mode="Markdown"
+                )
                 return
 
             issue_id = context.args[1]
@@ -3524,19 +3539,22 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(f"❌ Задача не найдена: {stderr.decode()}")
+                await update.message.reply_text(
+                    f"❌ Задача не найдена: {stderr.decode()}"
+                )
                 return
 
             output = stdout.decode().strip()
             await update.message.reply_text(
-                f"📿 **Детали задачи:**\n\n```\n{output[:3000]}\n```", parse_mode="Markdown"
+                f"📿 **Детали задачи:**\n\n```\n{output[:3000]}\n```",
+                parse_mode="Markdown",
             )
 
         elif subcmd == "start":
             if len(context.args) < 2:
                 await update.message.reply_text(
-                "Usage: `/beads start <issue-id>`", parse_mode="Markdown"
-            )
+                    "Usage: `/beads start <issue-id>`", parse_mode="Markdown"
+                )
                 return
 
             issue_id = context.args[1]
@@ -3553,9 +3571,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Ошибка: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
             await update.message.reply_text(
@@ -3565,8 +3581,8 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif subcmd == "done":
             if len(context.args) < 2:
                 await update.message.reply_text(
-                "Usage: `/beads done <issue-id>`", parse_mode="Markdown"
-            )
+                    "Usage: `/beads done <issue-id>`", parse_mode="Markdown"
+                )
                 return
 
             issue_id = context.args[1]
@@ -3583,9 +3599,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Ошибка: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
             await update.message.reply_text(
@@ -3606,7 +3620,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if process.returncode != 0:
                 await update.message.reply_text(
                     f"❌ Ошибка синхронизации: {stderr.decode()}"
-            )
+                )
                 return
 
             await update.message.reply_text("✅ Beads синхронизирован с репозиторием!")
@@ -3657,7 +3671,8 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text="❌ An error occurred while processing your request. Please try again.",
+                text="❌ An error occurred while processing your request. "
+                "Please try again.",
             )
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")

@@ -24,7 +24,9 @@ class Wav2LipController:
         # Prefer GAN model for better visual quality
         self.checkpoint_path = self.checkpoints_dir / "wav2lip_gan.pth"
 
-    def animate(self, face_path: str, audio_path: str, output_filename: str = None) -> str:
+    def animate(
+        self, face_path: str, audio_path: str, output_filename: str = None
+    ) -> str:
         """
         Runs Wav2Lip inference.
 
@@ -84,7 +86,9 @@ class Wav2LipController:
 
         except subprocess.CalledProcessError as e:
             logger.error(f"Wav2Lip failed with exit code {e.returncode}")
-            raise RuntimeError("Lip-Sync inference failed. Check terminal output for details.") from e
+            raise RuntimeError(
+                "Lip-Sync inference failed. Check terminal output for details."
+            ) from e
 
 
 # Simple CLI test

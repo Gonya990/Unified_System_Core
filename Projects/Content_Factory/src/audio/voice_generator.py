@@ -31,7 +31,7 @@ class VoiceGenerator:
         voice_id: Optional[str] = None,
         voice_name: str = "Antoni",
         emotion: str = "neutral",
-        output_path: Optional[Path] = None
+        output_path: Optional[Path] = None,
     ) -> Optional[Path]:
         """
         Generate speech from text.
@@ -56,10 +56,7 @@ class VoiceGenerator:
                 voice_id = self._get_voice_id(voice_name)
 
             # Generate speech
-            headers = {
-                "xi-api-key": self.api_key,
-                "Content-Type": "application/json"
-            }
+            headers = {"xi-api-key": self.api_key, "Content-Type": "application/json"}
 
             # Map emotion to voice settings
             voice_settings = self._get_voice_settings(emotion)
@@ -67,21 +64,24 @@ class VoiceGenerator:
             payload = {
                 "text": text,
                 "model_id": "eleven_multilingual_v2",  # Supports multiple languages
-                "voice_settings": voice_settings
+                "voice_settings": voice_settings,
             }
 
-            logger.info(f"🎤 ElevenLabs: Generating {len(text)} chars with {emotion} emotion...")
+            logger.info(
+                f"🎤 ElevenLabs: Generating {len(text)} chars with {emotion} emotion..."
+            )
 
             response = requests.post(
                 f"{ELEVENLABS_BASE_URL}/text-to-speech/{voice_id}",
                 json=payload,
                 headers=headers,
-                timeout=60
+                timeout=60,
             )
             response.raise_for_status()
 
             if not output_path:
                 import hashlib
+
                 text_hash = hashlib.md5(text.encode()).hexdigest()[:8]
                 output_path = Path(f"/tmp/elevenlabs_{voice_name}_{text_hash}.mp3")
 
@@ -103,9 +103,7 @@ class VoiceGenerator:
         headers = {"xi-api-key": self.api_key}
 
         response = requests.get(
-            f"{ELEVENLABS_BASE_URL}/voices",
-            headers=headers,
-            timeout=10
+            f"{ELEVENLABS_BASE_URL}/voices", headers=headers, timeout=10
         )
         response.raise_for_status()
 
@@ -130,7 +128,7 @@ class VoiceGenerator:
             "stability": 0.5,
             "similarity_boost": 0.75,
             "style": 0.5,
-            "use_speaker_boost": True
+            "use_speaker_boost": True,
         }
 
         # Emotion-specific adjustments
@@ -149,10 +147,7 @@ class VoiceGenerator:
         return settings
 
     def clone_voice(
-        self,
-        name: str,
-        audio_files: list[Path],
-        description: str = ""
+        self, name: str, audio_files: list[Path], description: str = ""
     ) -> Optional[str]:
         """
         Clone a voice from audio samples.
@@ -185,10 +180,7 @@ class VoiceGenerator:
             logger.error("No valid audio files for voice cloning")
             return None
 
-        data = {
-            "name": name,
-            "description": description or f"Cloned voice: {name}"
-        }
+        data = {"name": name, "description": description or f"Cloned voice: {name}"}
 
         logger.info(f"🎭 Cloning voice '{name}' from {len(files)} samples...")
 
@@ -198,7 +190,7 @@ class VoiceGenerator:
                 headers=headers,
                 data=data,
                 files=files,
-                timeout=120
+                timeout=120,
             )
             response.raise_for_status()
 
@@ -230,7 +222,7 @@ if __name__ == "__main__":
     audio = gen.generate_speech(
         text="Welcome to the future of AI voice synthesis. This is a demonstration of emotional text-to-speech.",
         voice_name="Antoni",
-        emotion="excited"
+        emotion="excited",
     )
 
     if audio:

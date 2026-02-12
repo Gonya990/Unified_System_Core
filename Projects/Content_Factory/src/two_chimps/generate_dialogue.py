@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 # Load environment variables
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 TRANSCRIPTS_DIR = CONTEXT_DIR / "transcripts"
@@ -18,11 +18,13 @@ if not SCRIPTS_DIR.exists():
 
 SYSTEM_PROMPT = """
 You are the producer of the "Dino Talk" podcast. 
-Your goal is to turn a raw thought/note into an engaging dialogue between two AI Dinosaur hosts.
+Your goal is to turn a raw thought/note into an engaging dialogue between two AI 
+Dinosaur hosts.
 
 **Host 1: The Skeptic (T-Rex)**
 - Name: Rex
-- Personality: Critical, analytical, a bit grumpy (has short arms), asks "Why?", looks for holes in logic.
+- Personality: Critical, analytical, a bit grumpy (has short arms), 
+  asks "Why?", looks for holes in logic.
 - Often starts sentences with "Hold on...", "Wait, let me digest that..."
 
 **Host 2: The Enthusiast (Triceratops)**
@@ -31,7 +33,8 @@ Your goal is to turn a raw thought/note into an engaging dialogue between two AI
 - Often says "Exactly! And imagine if...", "Boom! That's the meteor size idea!"
 
 **Format:**
-- Output a JSON-compatible list of dialogue objects with "role" (Rex or Trike) and "text".
+- Output a JSON-compatible list of dialogue objects with "role" (Rex or Trike) 
+  and "text".
 - Keep it natural, conversational, and fun.
 - Use emojis occasionally.
 - Language: Russian (unless the input is English).
@@ -40,6 +43,7 @@ Your goal is to turn a raw thought/note into an engaging dialogue between two AI
 **Input:**
 A raw transcript of a voice note from Igor (the creator).
 """
+
 
 def generate_script(transcript_text, filename):
     print(f"🧠 Generating dialogue for: {filename}...")
@@ -51,9 +55,12 @@ def generate_script(transcript_text, filename):
             model="gpt-4o",  # Or gpt-4-turbo
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Here is the raw note:\n\n{transcript_text}"}
+                {
+                    "role": "user",
+                    "content": f"Here is the raw note:\n\n{transcript_text}",
+                },
             ],
-            temperature=0.7
+            temperature=0.7,
         )
 
         script_content = response.choices[0].message.content
@@ -68,6 +75,7 @@ def generate_script(transcript_text, filename):
     except Exception as e:
         print(f"❌ Error generating script: {e}")
         return None
+
 
 def process_new_transcripts():
     if not TRANSCRIPTS_DIR.exists():
@@ -88,6 +96,7 @@ def process_new_transcripts():
             continue
 
         generate_script(text, transcript_file.name)
+
 
 if __name__ == "__main__":
     process_new_transcripts()

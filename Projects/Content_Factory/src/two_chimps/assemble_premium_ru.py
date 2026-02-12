@@ -16,6 +16,7 @@ SCRIPTS_DIR = CONTEXT_DIR / "scripts"
 if not FINAL_VIDEO_DIR.exists():
     FINAL_VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 
+
 def parse_script(lines):
     """Parse dialogue script (JSON or text)."""
     content = "".join(lines)
@@ -47,6 +48,7 @@ def parse_script(lines):
         if text:
             script_data.append({"role": role, "text": text})
     return script_data
+
 
 def assemble_video(script_file):
     """Assemble final video from segments."""
@@ -95,14 +97,12 @@ def assemble_video(script_file):
         final_video = concatenate_videoclips(clips, method="compose")
         output_path = FINAL_VIDEO_DIR / f"{script_file.stem}_premium.mp4"
         final_video.write_videofile(
-            str(output_path),
-            fps=24,
-            codec="libx264",
-            audio_codec="aac"
+            str(output_path), fps=24, codec="libx264", audio_codec="aac"
         )
         print(f"✅ Премиум Видео сохранено: {output_path.name}")
     else:
         print("❌ Клипы не собраны.")
+
 
 if __name__ == "__main__":
     script_files = list(SCRIPTS_DIR.glob("*_script.md"))

@@ -4,9 +4,11 @@ from pathlib import Path
 
 try:
     from elevenlabs import generate, save, set_api_key
+
     HAS_ELEVEN = True
 except ImportError:
     HAS_ELEVEN = False
+
 
 class EliteContentOrchestrator:
     def __init__(self):
@@ -27,7 +29,7 @@ class EliteContentOrchestrator:
             )
             return audio_path
 
-        voice = "Antoni" # Elite
+        voice = "Antoni"  # Elite
         audio = generate(text=text, voice=voice, model="eleven_multilingual_v2")
         path = self.output_dir / "elite_voice.mp3"
         save(audio, str(path))
@@ -35,9 +37,10 @@ class EliteContentOrchestrator:
 
     def run_elite_pipeline(self, script_data):
         print("🚀 ELITE CONTENT PIPELINE STARTED")
-        audio_path = self.generate_elite_audio(script_data['script_ru'])
+        audio_path = self.generate_elite_audio(script_data["script_ru"])
         print(f"✅ Audio Ready: {audio_path}")
         print("✅ Pipeline Initial Stage Complete. Moving to Visuals...")
+
 
 if __name__ == "__main__":
     orch = EliteContentOrchestrator()

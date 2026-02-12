@@ -14,6 +14,7 @@ from playwright.async_api import async_playwright
 STATE_FILE = Path(__file__).parent / ".credentials" / "youtube_browser_state.json"
 STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
 
+
 class YouTubeCommunity:
     def __init__(self, headless: bool = True):
         self.headless = headless
@@ -37,7 +38,8 @@ class YouTubeCommunity:
     async def login_manual(self):
         """Interactive login to save session"""
         print("🔐 Opening YouTube Studio for manual login...")
-        if self.browser: await self.browser.close()
+        if self.browser:
+            await self.browser.close()
 
         self.playwright = await async_playwright().start()
         # Headless=False so user can see
@@ -57,7 +59,8 @@ class YouTubeCommunity:
         await self.close()
 
     async def post_community_update(self, text, image_path=None):
-        if not self.page: await self.start()
+        if not self.page:
+            await self.start()
 
         print("📝 Navigating to Community Tab...")
         # Direct link to create post usually tricky, better go to channel content or main studio
@@ -106,13 +109,18 @@ class YouTubeCommunity:
             await self.page.screenshot(path="community_fail.png")
 
     async def close(self):
-        if self.context: await self.context.close()
-        if self.browser: await self.browser.close()
-        if hasattr(self, 'playwright'): await self.playwright.stop()
+        if self.context:
+            await self.context.close()
+        if self.browser:
+            await self.browser.close()
+        if hasattr(self, "playwright"):
+            await self.playwright.stop()
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "login":
         import asyncio
+
         yt = YouTubeCommunity(headless=False)
         asyncio.run(yt.login_manual())
     else:

@@ -41,12 +41,14 @@ load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 # Import custom modules
 try:
     from token_broker import TokenBroker
+
     BROKER = TokenBroker()
 except ImportError:
     BROKER = None
 
 try:
     from agent_mail_client import AgentMailClient
+
     MAIL_CLIENT = AgentMailClient()
 except ImportError:
     MAIL_CLIENT = None
@@ -71,19 +73,20 @@ class MultiSourceResearcher:
             "youtube_trending": [],
             "reddit": [],
             "hackernews": [],
-            "wikipedia": []
+            "wikipedia": [],
         }
 
     def _get_key(self, provider):
         """Get API key from broker or env"""
         if BROKER:
             k = BROKER.get_key(provider)
-            if k: return k
+            if k:
+                return k
 
         env_map = {
             "openai": "OPENAI_API_KEY",
             "gemini": "GEMINI_API_KEY",
-            "serpapi": "SERPAPI_KEY"
+            "serpapi": "SERPAPI_KEY",
         }
         return os.getenv(env_map.get(provider))
 
@@ -101,26 +104,30 @@ class MultiSourceResearcher:
             latest = reports[-1]
             data = json.loads(latest.read_text())
 
-            messages = data.get('messages', [])
+            messages = data.get("messages", [])
 
             # Sort by views (top trending)
-            trending = sorted(messages, key=lambda m: m.get('views', 0), reverse=True)[:10]
+            trending = sorted(messages, key=lambda m: m.get("views", 0), reverse=True)[
+                :10
+            ]
 
             insights = []
             for msg in trending:
-                insights.append({
-                    'source': 'telegram',
-                    'channel': data.get('channel'),
-                    'id': msg.get('id'),
-                    'text': msg.get('text', '')[:300],
-                    'views': msg.get('views', 0),
-                    'date': msg.get('date'),
-                    'media': msg.get('media'),
-                    'score': msg.get('views', 0)  # Use views as relevance score
-                })
+                insights.append(
+                    {
+                        "source": "telegram",
+                        "channel": data.get("channel"),
+                        "id": msg.get("id"),
+                        "text": msg.get("text", "")[:300],
+                        "views": msg.get("views", 0),
+                        "date": msg.get("date"),
+                        "media": msg.get("media"),
+                        "score": msg.get("views", 0),  # Use views as relevance score
+                    }
+                )
 
             print(f"   ✅ Found {len(insights)} trending Telegram posts")
-            self.sources_data['telegram'] = insights
+            self.sources_data["telegram"] = insights
             return insights
 
         except Exception as e:
@@ -142,35 +149,39 @@ class MultiSourceResearcher:
                         "url": "https://example.com/article",
                         "category": "AI/Tech/Science",
                         "priority": "high/medium/low",
-                        "notes": "Why this is interesting"
+                        "notes": "Why this is interesting",
                     }
                 ],
-                "last_updated": datetime.now().isoformat()
+                "last_updated": datetime.now().isoformat(),
             }
             RESEARCH_LINKS_FILE.write_text(json.dumps(template, indent=2))
             return []
 
         try:
             data = json.loads(RESEARCH_LINKS_FILE.read_text())
-            links = data.get('links', [])
+            links = data.get("links", [])
 
             insights = []
             for link in links:
                 # Fetch content from URL
-                content = self._fetch_url_content(link['url'])
+                content = self._fetch_url_content(link["url"])
 
-                insights.append({
-                    'source': 'user_link',
-                    'url': link['url'],
-                    'category': link.get('category', 'general'),
-                    'priority': link.get('priority', 'medium'),
-                    'notes': link.get('notes', ''),
-                    'content': content[:500] if content else '',
-                    'score': {'high': 100, 'medium': 50, 'low': 10}.get(link.get('priority'), 50)
-                })
+                insights.append(
+                    {
+                        "source": "user_link",
+                        "url": link["url"],
+                        "category": link.get("category", "general"),
+                        "priority": link.get("priority", "medium"),
+                        "notes": link.get("notes", ""),
+                        "content": content[:500] if content else "",
+                        "score": {"high": 100, "medium": 50, "low": 10}.get(
+                            link.get("priority"), 50
+                        ),
+                    }
+                )
 
             print(f"   ✅ Loaded {len(insights)} user links")
-            self.sources_data['user_links'] = insights
+            self.sources_data["user_links"] = insights
             return insights
 
         except Exception as e:
@@ -183,14 +194,19 @@ class MultiSourceResearcher:
 
         if not topics:
             topics = [
-                "ai breakthrough 2026", "fusion energy progress",
-                "mars mission update", "quantum computing advancement",
-                "renewable energy innovation", "medical ai discovery",
-                "space exploration milestone", "climate tech solution"
+                "ai breakthrough 2026",
+                "fusion energy progress",
+                "mars mission update",
+                "quantum computing advancement",
+                "renewable energy innovation",
+                "medical ai discovery",
+                "space exploration milestone",
+                "climate tech solution",
             ]
 
         query = random.choice(topics)
         import urllib.parse
+
         encoded = urllib.parse.quote(query)
         url = f"https://news.google.com/rss/search?q={encoded}+when:1d&hl=en-US&gl=US&ceid=US:en"
 
@@ -199,16 +215,18 @@ class MultiSourceResearcher:
             insights = []
 
             for entry in feed.entries[:5]:
-                insights.append({
-                    'source': 'google_news',
-                    'title': entry.title,
-                    'link': entry.link,
-                    'published': entry.get('published', ''),
-                    'score': 30  # Medium priority
-                })
+                insights.append(
+                    {
+                        "source": "google_news",
+                        "title": entry.title,
+                        "link": entry.link,
+                        "published": entry.get("published", ""),
+                        "score": 30,  # Medium priority
+                    }
+                )
 
             print(f"   ✅ Found {len(insights)} news articles")
-            self.sources_data['google_news'] = insights
+            self.sources_data["google_news"] = insights
             return insights
 
         except Exception as e:
@@ -220,34 +238,36 @@ class MultiSourceResearcher:
         print("🔴 Fetching Reddit trending...")
 
         if not subreddits:
-            subreddits = ['technology', 'Futurology', 'artificial', 'science']
+            subreddits = ["technology", "Futurology", "artificial", "science"]
 
         insights = []
 
         for sub in subreddits:
             try:
                 url = f"https://www.reddit.com/r/{sub}/hot.json?limit=10"
-                headers = {'User-Agent': USER_AGENT}
+                headers = {"User-Agent": USER_AGENT}
 
                 response = requests.get(url, headers=headers, timeout=10)
                 data = response.json()
 
-                for post in data['data']['children'][:5]:
-                    p = post['data']
-                    insights.append({
-                        'source': 'reddit',
-                        'subreddit': sub,
-                        'title': p['title'],
-                        'url': f"https://reddit.com{p['permalink']}",
-                        'upvotes': p.get('ups', 0),
-                        'score': min(p.get('ups', 0) / 100, 100)  # Normalize score
-                    })
+                for post in data["data"]["children"][:5]:
+                    p = post["data"]
+                    insights.append(
+                        {
+                            "source": "reddit",
+                            "subreddit": sub,
+                            "title": p["title"],
+                            "url": f"https://reddit.com{p['permalink']}",
+                            "upvotes": p.get("ups", 0),
+                            "score": min(p.get("ups", 0) / 100, 100),  # Normalize score
+                        }
+                    )
 
             except Exception as e:
                 print(f"   ⚠️  r/{sub} failed: {e}")
 
         print(f"   ✅ Found {len(insights)} Reddit posts")
-        self.sources_data['reddit'] = insights
+        self.sources_data["reddit"] = insights
         return insights
 
     def fetch_hackernews(self) -> list[dict]:
@@ -256,24 +276,32 @@ class MultiSourceResearcher:
 
         try:
             # Get top story IDs
-            response = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10)
+            response = requests.get(
+                "https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10
+            )
             story_ids = response.json()[:10]
 
             insights = []
             for sid in story_ids:
-                story_response = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{sid}.json", timeout=5)
+                story_response = requests.get(
+                    f"https://hacker-news.firebaseio.com/v0/item/{sid}.json", timeout=5
+                )
                 story = story_response.json()
 
-                if story and story.get('type') == 'story':
-                    insights.append({
-                        'source': 'hackernews',
-                        'title': story.get('title'),
-                        'url': story.get('url', f"https://news.ycombinator.com/item?id={sid}"),
-                        'score': min(story.get('score', 0) / 10, 100)
-                    })
+                if story and story.get("type") == "story":
+                    insights.append(
+                        {
+                            "source": "hackernews",
+                            "title": story.get("title"),
+                            "url": story.get(
+                                "url", f"https://news.ycombinator.com/item?id={sid}"
+                            ),
+                            "score": min(story.get("score", 0) / 10, 100),
+                        }
+                    )
 
             print(f"   ✅ Found {len(insights)} HN stories")
-            self.sources_data['hackernews'] = insights
+            self.sources_data["hackernews"] = insights
             return insights
 
         except Exception as e:
@@ -288,29 +316,33 @@ class MultiSourceResearcher:
             # Get most viewed articles
             yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y/%m/%d")
             url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{yesterday}"
-            headers = {'User-Agent': USER_AGENT}
+            headers = {"User-Agent": USER_AGENT}
 
             response = requests.get(url, headers=headers, timeout=10)
             data = response.json()
 
             insights = []
-            articles = data.get('items', [{}])[0].get('articles', [])
+            articles = data.get("items", [{}])[0].get("articles", [])
 
             for article in articles[:10]:
                 # Skip meta pages
-                if article['article'].startswith('Main_Page') or article['article'].startswith('Special:'):
+                if article["article"].startswith("Main_Page") or article[
+                    "article"
+                ].startswith("Special:"):
                     continue
 
-                insights.append({
-                    'source': 'wikipedia',
-                    'title': article['article'].replace('_', ' '),
-                    'url': f"https://en.wikipedia.org/wiki/{article['article']}",
-                    'views': article.get('views', 0),
-                    'score': min(article.get('views', 0) / 10000, 100)
-                })
+                insights.append(
+                    {
+                        "source": "wikipedia",
+                        "title": article["article"].replace("_", " "),
+                        "url": f"https://en.wikipedia.org/wiki/{article['article']}",
+                        "views": article.get("views", 0),
+                        "score": min(article.get("views", 0) / 10000, 100),
+                    }
+                )
 
             print(f"   ✅ Found {len(insights)} trending wiki topics")
-            self.sources_data['wikipedia'] = insights
+            self.sources_data["wikipedia"] = insights
             return insights
 
         except Exception as e:
@@ -320,14 +352,14 @@ class MultiSourceResearcher:
     def _fetch_url_content(self, url: str) -> str:
         """Extract text content from URL"""
         try:
-            headers = {'User-Agent': USER_AGENT}
+            headers = {"User-Agent": USER_AGENT}
             response = requests.get(url, headers=headers, timeout=10)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response.text, "html.parser")
 
-            for tag in soup(['script', 'style', 'nav', 'footer']):
+            for tag in soup(["script", "style", "nav", "footer"]):
                 tag.decompose()
 
-            text = ' '.join(soup.get_text(separator=' ').split())
+            text = " ".join(soup.get_text(separator=" ").split())
             return text[:3000]
 
         except Exception as e:
@@ -350,7 +382,7 @@ class MultiSourceResearcher:
         all_insights.extend(self.fetch_wikipedia_trending())
 
         # Sort by score (relevance)
-        all_insights.sort(key=lambda x: x.get('score', 0), reverse=True)
+        all_insights.sort(key=lambda x: x.get("score", 0), reverse=True)
 
         print(f"\n📊 TOTAL INSIGHTS: {len(all_insights)}")
         print(f"   Telegram: {len(self.sources_data['telegram'])}")
@@ -372,13 +404,15 @@ class MultiSourceResearcher:
 
         # Prepare context from top insights
         top_insights = insights[:20]
-        context = "\n\n".join([
-            f"SOURCE: {i['source']}\n"
-            f"TITLE: {i.get('title', i.get('text', '')[:100])}\n"
-            f"SCORE: {i.get('score', 0)}\n"
-            f"URL: {i.get('url', i.get('link', 'N/A'))}"
-            for i in top_insights
-        ])
+        context = "\n\n".join(
+            [
+                f"SOURCE: {i['source']}\n"
+                f"TITLE: {i.get('title', i.get('text', '')[:100])}\n"
+                f"SCORE: {i.get('score', 0)}\n"
+                f"URL: {i.get('url', i.get('link', 'N/A'))}"
+                for i in top_insights
+            ]
+        )
 
         prompt = f"""Based on these trending topics and insights from multiple sources, generate {count} compelling video script ideas.
 
@@ -404,17 +438,21 @@ Output as JSON array."""
             response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a viral content strategist analyzing multi-source research data."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a viral content strategist analyzing multi-source research data.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
-                temperature=0.8
+                temperature=0.8,
             )
 
             content = response.choices[0].message.content
 
             # Extract JSON
             import re
-            json_match = re.search(r'\[.*\]', content, re.DOTALL)
+
+            json_match = re.search(r"\[.*\]", content, re.DOTALL)
             if json_match:
                 ideas = json.loads(json_match.group())
                 print(f"   ✅ Generated {len(ideas)} script ideas")
@@ -435,17 +473,17 @@ Output as JSON array."""
         report = {
             "timestamp": datetime.now().isoformat(),
             "sources_summary": {
-                "telegram": len(self.sources_data['telegram']),
-                "user_links": len(self.sources_data['user_links']),
-                "google_news": len(self.sources_data['google_news']),
-                "reddit": len(self.sources_data['reddit']),
-                "hackernews": len(self.sources_data['hackernews']),
-                "wikipedia": len(self.sources_data['wikipedia'])
+                "telegram": len(self.sources_data["telegram"]),
+                "user_links": len(self.sources_data["user_links"]),
+                "google_news": len(self.sources_data["google_news"]),
+                "reddit": len(self.sources_data["reddit"]),
+                "hackernews": len(self.sources_data["hackernews"]),
+                "wikipedia": len(self.sources_data["wikipedia"]),
             },
             "total_insights": len(insights),
             "top_insights": insights[:20],
             "script_ideas": ideas,
-            "sources_data": self.sources_data
+            "sources_data": self.sources_data,
         }
 
         report_file.write_text(json.dumps(report, indent=2, ensure_ascii=False))
@@ -478,7 +516,7 @@ Output as JSON array."""
                 MAIL_CLIENT.broadcast(
                     subject="🔍 Multi-Source Research Complete",
                     body_md=summary,
-                    importance="normal"
+                    importance="normal",
                 )
                 print("   ✅ Sent via Agent Mail")
             except Exception:

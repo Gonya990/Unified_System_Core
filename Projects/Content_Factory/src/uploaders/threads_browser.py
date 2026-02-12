@@ -13,6 +13,7 @@ from playwright.async_api import async_playwright
 # Paths
 STATE_FILE = Path(__file__).parent / ".threads_state.json"
 
+
 class ThreadsBrowser:
     def __init__(self, headless: bool = True):
         self.headless = headless
@@ -72,7 +73,9 @@ class ThreadsBrowser:
         try:
             # Look for compose button or "New thread" area
             # Wait for the main feed to load
-            await self.page.wait_for_selector('[data-pressable-container="true"]', timeout=10000)
+            await self.page.wait_for_selector(
+                '[data-pressable-container="true"]', timeout=10000
+            )
 
             # Find and click "Start a thread" or compose button
             compose_selectors = [
@@ -96,7 +99,7 @@ class ThreadsBrowser:
             textarea_selectors = [
                 '[contenteditable="true"]',
                 'div[role="textbox"]',
-                'textarea',
+                "textarea",
             ]
 
             for selector in textarea_selectors:
@@ -116,13 +119,17 @@ class ThreadsBrowser:
             if image_path:
                 try:
                     # Convert single string to list
-                    files_to_upload = [image_path] if isinstance(image_path, str) else image_path
+                    files_to_upload = (
+                        [image_path] if isinstance(image_path, str) else image_path
+                    )
 
                     # Validate files exist
                     valid_files = [f for f in files_to_upload if Path(f).exists()]
 
                     if valid_files:
-                        file_input = await self.page.query_selector('input[type="file"]')
+                        file_input = await self.page.query_selector(
+                            'input[type="file"]'
+                        )
                         if file_input:
                             await file_input.set_input_files(valid_files)
                             await self.page.wait_for_timeout(2000)
@@ -166,7 +173,7 @@ class ThreadsBrowser:
             await self.context.close()
         if self.browser:
             await self.browser.close()
-        if hasattr(self, 'playwright'):
+        if hasattr(self, "playwright"):
             await self.playwright.stop()
 
 

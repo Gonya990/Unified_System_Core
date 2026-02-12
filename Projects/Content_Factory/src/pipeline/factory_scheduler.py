@@ -67,8 +67,8 @@ POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
 # --- MONETIZATION SAFETY LIMITS (STRICT COMPLIANCE) ---
 DAILY_VIDEOS_LIMIT = 3  # Maximum 3 videos per day to avoid "Spam" flags
 MIN_INTERVAL_HOURS = 4  # Minimum gap between any two posts
-INSTA_ACTION_DELAY = 120 # Delayed actions for human-like behavior
-AI_LABEL_MANDATORY = True # Always label as AI for Meta compliance
+INSTA_ACTION_DELAY = 120  # Delayed actions for human-like behavior
+AI_LABEL_MANDATORY = True  # Always label as AI for Meta compliance
 # ----------------------------------------------------------
 
 
@@ -79,9 +79,13 @@ def agent_sync(msg):
         sync_script = ROOT_DIR / "Scripts/Orchestration/sync_agent.py"
         env = os.environ.copy()
         if "AGENT_MAIL_TOKEN" not in env:
-            env["AGENT_MAIL_TOKEN"] = "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+            env["AGENT_MAIL_TOKEN"] = (
+                "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
+            )
 
-        subprocess.run(["python3", str(sync_script), msg], capture_output=True, text=True, env=env)
+        subprocess.run(
+            ["python3", str(sync_script), msg], capture_output=True, text=True, env=env
+        )
         print(f"🔄 Agent Sync: {msg[:50]}...")
 
         # Also notify via Telegram
@@ -116,7 +120,14 @@ def is_already_posted(topic):
 
 def mark_as_posted(topic, prefix, lang):
     history = load_history()
-    history.append({"topic": topic, "prefix": prefix, "lang": lang, "timestamp": datetime.now().isoformat()})
+    history.append(
+        {
+            "topic": topic,
+            "prefix": prefix,
+            "lang": lang,
+            "timestamp": datetime.now().isoformat(),
+        }
+    )
     # Keep history manageable
     save_history(history[-200:])
 
@@ -128,13 +139,22 @@ def get_static_fallback():
     """
     day_str = datetime.now().strftime("%Y-%m-%d")
     topics = [
-        ("AI Agents Revolution", "How autonomous agents are taking over digital tasks."),
+        (
+            "AI Agents Revolution",
+            "How autonomous agents are taking over digital tasks.",
+        ),
         ("Quantum Supremacy", "The race for the first practical quantum computer."),
         ("Space Exploration 2026", "Mars colonization and the moon gateway mission."),
-        ("Neural interface evolution", "Connecting human brains directly to the cloud."),
+        (
+            "Neural interface evolution",
+            "Connecting human brains directly to the cloud.",
+        ),
         ("Sustainable Fusion Energy", "Clean, infinite power is finally within reach."),
         ("Robotics in Everyday Life", "How machines are helping us in our homes."),
-        ("The Future of Medicine", "AI-driven diagnostics and personalized treatments."),
+        (
+            "The Future of Medicine",
+            "AI-driven diagnostics and personalized treatments.",
+        ),
     ]
     # Filter out already posted topics if possible
     available_topics = [t for t in topics if not is_already_posted(t[0])]
@@ -190,7 +210,9 @@ def generate_english_content(russian_content):
     }
 
 
-def run_factory_production(mode="daily", manual_topic=None, manual_outline=None, style_override=None):
+def run_factory_production(
+    mode="daily", manual_topic=None, manual_outline=None, style_override=None
+):
     day_str = datetime.now().strftime("%Y-%m-%d")
 
     # Auto-detect mode based on day if not specified
@@ -219,7 +241,9 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
     print(f"🎨 Visual Style: {style.upper()}")
 
     try:
-        content_data = run_daily_research(style=style, manual_topic=manual_topic, manual_outline=manual_outline)
+        content_data = run_daily_research(
+            style=style, manual_topic=manual_topic, manual_outline=manual_outline
+        )
 
         if not content_data:
             agent_sync("Исследование не дало результатов, использую Fallback")
@@ -230,8 +254,12 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
         if not manual_topic and is_already_posted(topic):
             agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
             content_data = run_daily_research()  # Retry once
-            if not content_data or is_already_posted(content_data.get("selected_topic", "")):
-                content_data = get_static_fallback()  # Fallback ensures variety better now
+            if not content_data or is_already_posted(
+                content_data.get("selected_topic", "")
+            ):
+                content_data = (
+                    get_static_fallback()
+                )  # Fallback ensures variety better now
     except Exception as e:
         agent_sync(f"Ошибка исследования: {e}")
         content_data = get_static_fallback()
@@ -264,7 +292,9 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
     assets_dir.mkdir(parents=True, exist_ok=True)
 
     final_scenes = []
-    assets = generate_vision_assets(content_data.get("scenes", []), assets_dir, style=style)
+    assets = generate_vision_assets(
+        content_data.get("scenes", []), assets_dir, style=style
+    )
     for a in assets:
         if a.get("resolved_path"):
             final_scenes.append({"image": a["resolved_path"], "keyword": a["keyword"]})
@@ -279,7 +309,11 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
     out_name = f"{prefix}_{day_str.replace('-', '')}"
     try:
         video_path = run_no_face_pipeline(
-            text=script, lang=lang, output_name=out_name, scenes=final_scenes, style=style
+            text=script,
+            lang=lang,
+            output_name=out_name,
+            scenes=final_scenes,
+            style=style,
         )
 
         # 5. UPLOAD (Instagram + YouTube)
@@ -289,18 +323,27 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
             insta_accounts = acc_manager.get_accounts("instagram")
 
             # Define caption common for all platforms
-            caption = content_data.get("description", f"New AI vision: {content_data.get('selected_topic', '')}")
+            caption = content_data.get(
+                "description",
+                f"New AI vision: {content_data.get('selected_topic', '')}",
+            )
 
             if INSTA_ENABLED:
                 for acc in insta_accounts:
-                    agent_sync(f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})...")
+                    agent_sync(
+                        f"Загружаю {prefix} в Instagram ({acc.get('username') or 'Account'})..."
+                    )
 
                     try:
                         # Respect action delay
                         time.sleep(INSTA_ACTION_DELAY)
-                        insta_success = upload_reel(str(video_path), caption, session_id=acc.get("session_id"))
+                        insta_success = upload_reel(
+                            str(video_path), caption, session_id=acc.get("session_id")
+                        )
                         if insta_success:
-                            agent_sync(f"🚀 Instagram ({acc.get('username')}): Успешно!")
+                            agent_sync(
+                                f"🚀 Instagram ({acc.get('username')}): Успешно!"
+                            )
                         else:
                             agent_sync(f"❌ Instagram ({acc.get('username')}): Ошибка")
                     except Exception as e:
@@ -311,7 +354,9 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
             # 5.2 YouTube (Multi-channel)
             yt_accounts = acc_manager.get_accounts("youtube")
             for acc in yt_accounts:
-                agent_sync(f"Загружаю {prefix} в YouTube ({acc.get('name') or 'Channel'})...")
+                agent_sync(
+                    f"Загружаю {prefix} в YouTube ({acc.get('name') or 'Channel'})..."
+                )
                 title = content_data.get("selected_topic", f"New AI Video {day_str}")
                 desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
                 tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
@@ -351,7 +396,9 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
                 threads_text = f"{content_data.get('selected_topic', '')}\n\n{content_data.get('description', '')[:450]}...\n\n#AI #Future"
 
                 # Use asyncio.run for calling async code from sync
-                threads_success = asyncio.run(threads_bot.post(threads_text, str(video_path)))
+                threads_success = asyncio.run(
+                    threads_bot.post(threads_text, str(video_path))
+                )
 
                 if threads_success:
                     agent_sync("🚀 Threads: Успешно опубликован!")
@@ -413,26 +460,47 @@ def start_scheduler():
 
     while True:
         schedule.run_pending()
-        time.sleep(60) # Check every minute
+        time.sleep(60)  # Check every minute
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Content Farm Scheduler")
-    parser.add_argument("--hebrew", action="store_true", help="Force Hebrew weekly special")
-    parser.add_argument("--english", action="store_true", help="Force English weekly special")
-    parser.add_argument("--cartoon", action="store_true", help="Force Cartoon/Animation daily mode")
+    parser.add_argument(
+        "--hebrew", action="store_true", help="Force Hebrew weekly special"
+    )
+    parser.add_argument(
+        "--english", action="store_true", help="Force English weekly special"
+    )
+    parser.add_argument(
+        "--cartoon", action="store_true", help="Force Cartoon/Animation daily mode"
+    )
     parser.add_argument("--auto", action="store_true", help="Detect mode based on day")
-    parser.add_argument("--scheduler", action="store_true", help="Run in infinity loop mode")
-    parser.add_argument("--longform", action="store_true", help="Force 30-min Documentary mode")
+    parser.add_argument(
+        "--scheduler", action="store_true", help="Run in infinity loop mode"
+    )
+    parser.add_argument(
+        "--longform", action="store_true", help="Force 30-min Documentary mode"
+    )
     parser.add_argument("--longform-topic", type=str, help="Topic for documentary")
 
-    parser.add_argument("--auto-upload", action="store_true", help="Force enable auto upload")
     parser.add_argument(
-        "--style", type=str, choices=["impact", "cartoon", "sketch", "painting"], help="Force visual style"
+        "--auto-upload", action="store_true", help="Force enable auto upload"
     )
-    parser.add_argument("--inspiration-topic", type=str, help="Manually provided topic from YouTube Inspiration Tab")
     parser.add_argument(
-        "--inspiration-outline", type=str, help="Manually provided outline from YouTube Inspiration Tab"
+        "--style",
+        type=str,
+        choices=["impact", "cartoon", "sketch", "painting"],
+        help="Force visual style",
+    )
+    parser.add_argument(
+        "--inspiration-topic",
+        type=str,
+        help="Manually provided topic from YouTube Inspiration Tab",
+    )
+    parser.add_argument(
+        "--inspiration-outline",
+        type=str,
+        help="Manually provided outline from YouTube Inspiration Tab",
     )
 
     args = parser.parse_args()

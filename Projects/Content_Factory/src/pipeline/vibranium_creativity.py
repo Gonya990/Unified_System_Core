@@ -28,14 +28,14 @@ def generate_dynamic_content():
     if gh_token:
         try:
             from openai import OpenAI
+
             client = OpenAI(
-                base_url="https://models.inference.ai.azure.com",
-                api_key=gh_token
+                base_url="https://models.inference.ai.azure.com", api_key=gh_token
             )
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model="gpt-4o",
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"},
             )
             return json.loads(response.choices[0].message.content)
         except Exception as e:
@@ -48,19 +48,20 @@ def generate_dynamic_content():
         print(f"🤖 Trying OpenRouter with key: {or_key[:10]}...")
         try:
             import requests
+
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {or_key}"},
                 json={
                     "model": "anthropic/claude-3-haiku",
-                    "messages": [{"role": "user", "content": prompt}]
-                }
+                    "messages": [{"role": "user", "content": prompt}],
+                },
             )
             data = response.json()
-            if 'choices' in data:
-                content = data['choices'][0]['message']['content']
+            if "choices" in data:
+                content = data["choices"][0]["message"]["content"]
                 if "{" in content and "}" in content:
-                    content = content[content.find("{"):content.rfind("}")+1]
+                    content = content[content.find("{") : content.rfind("}") + 1]
                 return json.loads(content)
             else:
                 print(f"⚠️ OpenRouter API error: {data}")
@@ -68,28 +69,30 @@ def generate_dynamic_content():
             print(f"⚠️ OpenRouter failed: {e}")
 
     # Try OpenAI (may fail with 401)
-    if openai_key and not openai_key.startswith('PLEASE_UPDATE'):
+    if openai_key and not openai_key.startswith("PLEASE_UPDATE"):
         print(f"🧠 Trying OpenAI with key: {openai_key[:10]}...")
         try:
             from openai import OpenAI
+
             client = OpenAI(api_key=openai_key)
             response = client.chat.completions.create(
-                model='gpt-4o-mini',
-                messages=[{'role': 'user', 'content': prompt}],
-                response_format={'type': 'json_object'}
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
             )
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             print(f"⚠️ OpenAI failed: {e}. Falling back...")
             if gemini_key:
                 from google import genai
+
                 client = genai.Client(api_key=gemini_key)
                 # 2026 Production Fallback
-                gemini_model = 'gemini-2.0-flash'
+                gemini_model = "gemini-2.0-flash"
                 try:
                     response = client.models.generate_content(
                         model=gemini_model,
-                        contents=prompt + "\nOutput MUST be a valid JSON object."
+                        contents=prompt + "\nOutput MUST be a valid JSON object.",
                     )
                     content = response.text
                     if "```json" in content:
@@ -105,11 +108,12 @@ def generate_dynamic_content():
         print(f"🌠 Trying Gemini with key: {gemini_key[:10]}...")
         try:
             from google import genai
+
             client = genai.Client(api_key=gemini_key)
-            gemini_model = 'gemini-2.0-flash'
+            gemini_model = "gemini-2.0-flash"
             response = client.models.generate_content(
                 model=gemini_model,
-                contents=prompt + "\nOutput MUST be a valid JSON object."
+                contents=prompt + "\nOutput MUST be a valid JSON object.",
             )
             content = response.text
             if "```json" in content:
@@ -120,7 +124,11 @@ def generate_dynamic_content():
         except Exception as e:
             print(f"⚠️ Gemini failed: {e}")
 
-    raise ValueError("No LLM services responded successfully. Set GITHUB_TOKEN, OPENROUTER_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY.")
+    raise ValueError(
+        "No LLM services responded successfully. Set GITHUB_TOKEN, OPENROUTER_API_KEY, "
+        "OPENAI_API_KEY, or GEMINI_API_KEY."
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print(json.dumps(generate_dynamic_content(), ensure_ascii=False))

@@ -16,8 +16,12 @@ try:
 except ImportError:
     TTS = None
 
-from Projects.Content_Factory.src.lip_sync.live_portrait_controller import LivePortraitController  # noqa: E402
-from Projects.Content_Factory.src.lip_sync.wav2lip_controller import Wav2LipController  # noqa: E402
+from Projects.Content_Factory.src.lip_sync.live_portrait_controller import (
+    LivePortraitController,
+)  # noqa: E402
+from Projects.Content_Factory.src.lip_sync.wav2lip_controller import (
+    Wav2LipController,
+)  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -57,12 +61,19 @@ def produce_broadcast(character_id="unit_x", text=None, output_filename=None):
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
     tts = TTS(model_name).to(device)
-    tts.tts_to_file(text=text, speaker_wav=str(ref_wav), language=char["primary_language"], file_path=str(audio_path))
+    tts.tts_to_file(
+        text=text,
+        speaker_wav=str(ref_wav),
+        language=char["primary_language"],
+        file_path=str(audio_path),
+    )
 
     # 2. Generate Motion
     logger.info("🎬 Generating Motion (LivePortrait)...")
     lp_controller = LivePortraitController()
-    lp_video_path = lp_controller.animate(str(avatar_path), output_filename=f"{character_id}_motion.mp4")
+    lp_video_path = lp_controller.animate(
+        str(avatar_path), output_filename=f"{character_id}_motion.mp4"
+    )
 
     if not lp_video_path:
         return None

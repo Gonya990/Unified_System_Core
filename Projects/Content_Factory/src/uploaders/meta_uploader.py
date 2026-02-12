@@ -11,6 +11,7 @@ from typing import Optional
 # Try to import instagrapi for Instagram
 try:
     from instagrapi import Client
+
     INSTAGRAPI_AVAILABLE = True
 except ImportError:
     INSTAGRAPI_AVAILABLE = False
@@ -20,10 +21,9 @@ except ImportError:
 INSTAGRAM_USERNAME = os.getenv("INSTAGRAM_USERNAME", "")
 INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD", "")
 
+
 def upload_reel_instagram(
-    video_path: Path,
-    caption: str,
-    thumbnail_path: Optional[Path] = None
+    video_path: Path, caption: str, thumbnail_path: Optional[Path] = None
 ) -> bool:
     """
     Upload Reel to Instagram using Instagrapi
@@ -58,9 +58,7 @@ def upload_reel_instagram(
 
         # Upload as Reel
         media = client.clip_upload(
-            video_path,
-            caption=caption,
-            thumbnail=thumbnail_path
+            video_path, caption=caption, thumbnail=thumbnail_path
         )
 
         print(f"✅ Reel uploaded! Media ID: {media.pk}")
@@ -69,6 +67,7 @@ def upload_reel_instagram(
     except Exception as e:
         print(f"❌ Instagram upload error: {e}")
         return False
+
 
 def upload_story_instagram(video_path: Path) -> bool:
     """Upload video as Instagram Story"""
@@ -94,6 +93,7 @@ def upload_story_instagram(video_path: Path) -> bool:
         print(f"❌ Instagram Story error: {e}")
         return False
 
+
 def upload_facebook_reels(video_path: Path, caption: str) -> bool:
     """
     Upload to Facebook Reels
@@ -103,6 +103,7 @@ def upload_facebook_reels(video_path: Path, caption: str) -> bool:
     print("Consider using Meta Business Suite for automated uploads")
     print(f"Video ready for manual upload: {video_path}")
     return False
+
 
 if __name__ == "__main__":
     # Test upload (requires credentials)

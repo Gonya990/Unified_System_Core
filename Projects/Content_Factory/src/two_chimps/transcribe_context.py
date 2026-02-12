@@ -9,7 +9,8 @@ warnings.filterwarnings("ignore")
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 TRANSCRIPTS_DIR = CONTEXT_DIR / "transcripts"
-SUPPORTED_EXTS = {'.mp3', '.mp4', '.m4a', '.wav', '.mov'}
+SUPPORTED_EXTS = {".mp3", ".mp4", ".m4a", ".wav", ".mov"}
+
 
 def transcribe_all():
     print("🎙 Loading Whisper model (base)...")
@@ -36,6 +37,7 @@ def transcribe_all():
             print(f"✅ Saved: {output_file.name}")
         except Exception as e:
             print(f"❌ Error transcribing {file_path.name}: {e}")
+
 
 if __name__ == "__main__":
     transcribe_all()

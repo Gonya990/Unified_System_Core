@@ -20,6 +20,7 @@ ROYALTY_FREE_LIBRARY = Path(__file__).parent.parent.parent / "assets" / "music"
 SUNO_API_KEY = os.getenv("SUNO_API_KEY")
 SUNO_BASE_URL = "https://api.suno.ai/v1"
 
+
 class MusicGenerator:
     """Generate background music using Suno AI or local library."""
 
@@ -33,7 +34,7 @@ class MusicGenerator:
         mood: str = "upbeat",
         duration: int = 60,
         genre: str = "electronic",
-        output_path: Optional[Path] = None
+        output_path: Optional[Path] = None,
     ) -> Path:
         """
         Generate background music.
@@ -51,21 +52,19 @@ class MusicGenerator:
             try:
                 return self._generate_suno(mood, duration, genre, output_path)
             except Exception as e:
-                logger.error(f"Suno generation failed: {e}. Falling back to local library.")
+                logger.error(
+                    f"Suno generation failed: {e}. Falling back to local library."
+                )
 
         return self._get_royalty_free(mood, duration, genre)
 
     def _generate_suno(
-        self,
-        mood: str,
-        duration: int,
-        genre: str,
-        output_path: Optional[Path]
+        self, mood: str, duration: int, genre: str, output_path: Optional[Path]
     ) -> Path:
         """Generate music using Suno AI API."""
         headers = {
             "Authorization": f"Bearer {SUNO_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         # Suno prompt engineering
@@ -75,16 +74,13 @@ class MusicGenerator:
             "prompt": prompt,
             "duration": duration,
             "instrumental": True,
-            "genre": genre
+            "genre": genre,
         }
 
         logger.info(f"🎵 Generating Suno music: {prompt}")
 
         response = requests.post(
-            f"{SUNO_BASE_URL}/generate",
-            json=payload,
-            headers=headers,
-            timeout=60
+            f"{SUNO_BASE_URL}/generate", json=payload, headers=headers, timeout=60
         )
         response.raise_for_status()
 
@@ -107,12 +103,7 @@ class MusicGenerator:
         logger.info(f"✅ Suno music saved: {output_path}")
         return output_path
 
-    def _get_royalty_free(
-        self,
-        mood: str,
-        duration: int,
-        genre: str
-    ) -> Path:
+    def _get_royalty_free(self, mood: str, duration: int, genre: str) -> Path:
         """Get royalty-free music from local library."""
         ROYALTY_FREE_LIBRARY.mkdir(parents=True, exist_ok=True)
 
@@ -121,7 +112,7 @@ class MusicGenerator:
             "upbeat": "energetic",
             "calm": "ambient",
             "dramatic": "cinematic",
-            "mysterious": "dark"
+            "mysterious": "dark",
         }
 
         mood_dir = ROYALTY_FREE_LIBRARY / mood_map.get(mood, "ambient")
@@ -141,10 +132,22 @@ class MusicGenerator:
 
         # Generate silent MP3 using ffmpeg
         import subprocess
-        subprocess.run([
-            "ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-            "-t", str(duration), "-y", str(placeholder)
-        ], check=True, capture_output=True)
+
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-f",
+                "lavfi",
+                "-i",
+                "anullsrc=r=44100:cl=stereo",
+                "-t",
+                str(duration),
+                "-y",
+                str(placeholder),
+            ],
+            check=True,
+            capture_output=True,
+        )
 
         return placeholder
 
@@ -153,13 +156,20 @@ class MusicGenerator:
         text_lower = script_text.lower()
 
         # Keyword-based mood detection
-        if any(word in text_lower for word in ["breakthrough", "innovation", "future", "amazing"]):
+        if any(
+            word in text_lower
+            for word in ["breakthrough", "innovation", "future", "amazing"]
+        ):
             return "upbeat"
-        elif any(word in text_lower for word in ["meditation", "calm", "peaceful", "nature"]):
+        elif any(
+            word in text_lower for word in ["meditation", "calm", "peaceful", "nature"]
+        ):
             return "calm"
         elif any(word in text_lower for word in ["danger", "crisis", "war", "threat"]):
             return "dramatic"
-        elif any(word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]):
+        elif any(
+            word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]
+        ):
             return "mysterious"
 
         return "upbeat"  # Default
@@ -170,9 +180,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     gen = MusicGenerator(use_ai=False)
 
-    track = gen.generate_music(
-        mood="upbeat",
-        duration=30,
-        genre="electronic"
-    )
+    track = gen.generate_music(mood="upbeat", duration=30, genre="electronic")
     print(f"Generated: {track}")

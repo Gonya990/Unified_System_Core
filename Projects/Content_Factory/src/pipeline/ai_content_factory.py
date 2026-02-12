@@ -28,7 +28,7 @@ class AIContentFactory:
         use_ai_music: bool = True,
         use_ai_video: bool = True,
         use_ai_voice: bool = True,
-        video_provider: str = "runway"
+        video_provider: str = "runway",
     ):
         """
         Args:
@@ -39,7 +39,9 @@ class AIContentFactory:
         """
         self.music_gen = MusicGenerator(use_ai=use_ai_music)
         self.voice_gen = VoiceGenerator() if use_ai_voice else None
-        self.video_gen = VideoGenerator(provider=video_provider) if use_ai_video else None
+        self.video_gen = (
+            VideoGenerator(provider=video_provider) if use_ai_video else None
+        )
         self.subtitle_gen = AdvancedSubtitles(style="impact")
 
     def create_video_content(
@@ -48,7 +50,7 @@ class AIContentFactory:
         lang: str = "ru",
         style: str = "impact",
         duration: int = 60,
-        output_dir: Path = Path("/tmp/content_factory")
+        output_dir: Path = Path("/tmp/content_factory"),
     ) -> dict[str, Path]:
         """
         Generate complete video content with all AI enhancements.
@@ -66,7 +68,9 @@ class AIContentFactory:
         output_dir.mkdir(parents=True, exist_ok=True)
         assets = {}
 
-        logger.info(f"🎬 Starting AI Content Factory pipeline ({style} style, {duration}s)")
+        logger.info(
+            f"🎬 Starting AI Content Factory pipeline ({style} style, {duration}s)"
+        )
 
         # 1. Generate voiceover (with emotion detection)
         emotion = self._detect_emotion(script)
@@ -77,7 +81,7 @@ class AIContentFactory:
                 text=script,
                 voice_name="Antoni",
                 emotion=emotion,
-                output_path=output_dir / "voiceover.mp3"
+                output_path=output_dir / "voiceover.mp3",
             )
             if voice_path:
                 assets["voiceover"] = voice_path
@@ -89,7 +93,7 @@ class AIContentFactory:
             mood=mood,
             duration=duration,
             genre=self._style_to_genre(style),
-            output_path=output_dir / "background_music.mp3"
+            output_path=output_dir / "background_music.mp3",
         )
         assets["music"] = music_path
         logger.info(f"✅ Music: {music_path}")
@@ -104,7 +108,7 @@ class AIContentFactory:
                     prompt=scene["description"],
                     duration=min(scene["duration"], 10),
                     style=style,
-                    output_path=output_dir / f"broll_{i+1}.mp4"
+                    output_path=output_dir / f"broll_{i+1}.mp4",
                 )
                 if clip_path:
                     video_clips.append(clip_path)
@@ -135,15 +139,24 @@ class AIContentFactory:
         """Detect emotion from script text."""
         text_lower = text.lower()
 
-        if any(word in text_lower for word in ["breakthrough", "amazing", "incredible", "wow"]):
+        if any(
+            word in text_lower
+            for word in ["breakthrough", "amazing", "incredible", "wow"]
+        ):
             return "excited"
-        elif any(word in text_lower for word in ["danger", "crisis", "warning", "threat"]):
+        elif any(
+            word in text_lower for word in ["danger", "crisis", "warning", "threat"]
+        ):
             return "dramatic"
-        elif any(word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]):
+        elif any(
+            word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]
+        ):
             return "mysterious"
         elif any(word in text_lower for word in ["sad", "tragedy", "loss", "death"]):
             return "sad"
-        elif any(word in text_lower for word in ["calm", "peaceful", "meditation", "nature"]):
+        elif any(
+            word in text_lower for word in ["calm", "peaceful", "meditation", "nature"]
+        ):
             return "calm"
 
         return "neutral"
@@ -156,7 +169,7 @@ class AIContentFactory:
             "mysterious": "mysterious",
             "sad": "calm",
             "calm": "calm",
-            "neutral": "upbeat"
+            "neutral": "upbeat",
         }
         return mood_map.get(emotion, "upbeat")
 
@@ -166,7 +179,7 @@ class AIContentFactory:
             "impact": "electronic",
             "cartoon": "upbeat",
             "cinematic": "cinematic",
-            "minimal": "ambient"
+            "minimal": "ambient",
         }
         return genre_map.get(style, "electronic")
 
@@ -178,14 +191,18 @@ class AIContentFactory:
 
         for sentence in sentences[:5]:  # Max 5 scenes
             if len(sentence.strip()) > 20:
-                scenes.append({
-                    "description": sentence.strip(),
-                    "duration": 5  # Default 5s per scene
-                })
+                scenes.append(
+                    {
+                        "description": sentence.strip(),
+                        "duration": 5,  # Default 5s per scene
+                    }
+                )
 
         return scenes
 
-    def _script_to_segments(self, script: str, total_duration: int) -> list[SubtitleSegment]:
+    def _script_to_segments(
+        self, script: str, total_duration: int
+    ) -> list[SubtitleSegment]:
         """Convert script to subtitle segments with timing."""
         sentences = [s.strip() + "." for s in script.split(".") if s.strip()]
 
@@ -205,19 +222,21 @@ class AIContentFactory:
             words = []
             word_time = current_time
             for word in words_list:
-                words.append(SubtitleWord(
-                    text=word,
-                    start=word_time,
-                    end=word_time + word_duration
-                ))
+                words.append(
+                    SubtitleWord(
+                        text=word, start=word_time, end=word_time + word_duration
+                    )
+                )
                 word_time += word_duration
 
-            segments.append(SubtitleSegment(
-                text=sentence,
-                start=current_time,
-                end=current_time + duration_per_sentence,
-                words=words
-            ))
+            segments.append(
+                SubtitleSegment(
+                    text=sentence,
+                    start=current_time,
+                    end=current_time + duration_per_sentence,
+                    words=words,
+                )
+            )
 
             current_time += duration_per_sentence
 
@@ -230,7 +249,7 @@ if __name__ == "__main__":
     factory = AIContentFactory(
         use_ai_music=True,
         use_ai_video=False,  # Disable for testing
-        use_ai_voice=False    # Disable for testing
+        use_ai_voice=False,  # Disable for testing
     )
 
     test_script = """
@@ -240,10 +259,7 @@ if __name__ == "__main__":
     """
 
     assets = factory.create_video_content(
-        script=test_script,
-        lang="ru",
-        style="impact",
-        duration=15
+        script=test_script, lang="ru", style="impact", duration=15
     )
 
     print("\n✅ Generated assets:")

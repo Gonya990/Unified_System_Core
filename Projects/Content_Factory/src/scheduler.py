@@ -7,12 +7,13 @@ class ContentLanguage(Enum):
     EN = "en"
     HE = "he"
 
+
 def get_daily_production_plan():
     """
     Returns a list of content tasks for the current day/time based on Master Plan.
     """
     now = datetime.datetime.now()
-    weekday = now.weekday() # 0 = Mon, 6 = Sun
+    weekday = now.weekday()  # 0 = Mon, 6 = Sun
     hour = now.hour
 
     tasks = []
@@ -31,7 +32,8 @@ def get_daily_production_plan():
 
     return tasks
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     plan = get_daily_production_plan()
     print(f"📅 Plan for today ({datetime.datetime.now().strftime('%A')}):")
     for t in plan:

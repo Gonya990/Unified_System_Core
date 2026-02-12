@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SubtitleWord:
     """Single word with timing."""
+
     text: str
     start: float
     end: float
@@ -20,6 +21,7 @@ class SubtitleWord:
 @dataclass
 class SubtitleSegment:
     """Subtitle segment with words."""
+
     text: str
     start: float
     end: float
@@ -40,7 +42,7 @@ class AdvancedSubtitles:
             "bold": True,
             "uppercase": True,
             "position": "center",  # center, top, bottom
-            "animation": "fade_in"  # fade_in, slide_up, scale_bounce
+            "animation": "fade_in",  # fade_in, slide_up, scale_bounce
         },
         "karaoke": {
             "font": "Montserrat-Bold",
@@ -51,7 +53,7 @@ class AdvancedSubtitles:
             "outline_width": 3,
             "position": "bottom",
             "word_by_word": True,  # Highlight each word
-            "animation": "karaoke"
+            "animation": "karaoke",
         },
         "cartoon": {
             "font": "Comic Sans MS",
@@ -61,7 +63,7 @@ class AdvancedSubtitles:
             "outline_width": 5,
             "shadow": True,
             "bounce": True,
-            "position": "bottom"
+            "position": "bottom",
         },
         "minimal": {
             "font": "Helvetica-Bold",
@@ -70,8 +72,8 @@ class AdvancedSubtitles:
             "outline_color": "#000000",
             "outline_width": 2,
             "position": "bottom",
-            "animation": "fade"
-        }
+            "animation": "fade",
+        },
     }
 
     def __init__(self, style: str = "impact"):
@@ -83,10 +85,7 @@ class AdvancedSubtitles:
         self.style = self.STYLES.get(style, self.STYLES["impact"])
 
     def generate_srt(
-        self,
-        segments: list[SubtitleSegment],
-        output_path: Path,
-        add_emoji: bool = True
+        self, segments: list[SubtitleSegment], output_path: Path, add_emoji: bool = True
     ) -> Path:
         """
         Generate SRT subtitle file.
@@ -132,7 +131,7 @@ class AdvancedSubtitles:
         segments: list[SubtitleSegment],
         output_path: Path,
         video_width: int = 1920,
-        video_height: int = 1080
+        video_height: int = 1080,
     ) -> Path:
         """
         Generate ASS subtitle file with advanced styling.
@@ -151,7 +150,9 @@ class AdvancedSubtitles:
 
         # Events
         ass_content.append("[Events]")
-        ass_content.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text")
+        ass_content.append(
+            "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"
+        )
 
         for segment in segments:
             start_time = self._format_ass_timestamp(segment.start)
@@ -182,11 +183,7 @@ class AdvancedSubtitles:
 
     def _generate_ass_header(self, width: int, height: int) -> list[str]:
         """Generate ASS file header with style definitions."""
-        pos_y_map = {
-            "top": 50,
-            "center": height // 2,
-            "bottom": height - 100
-        }
+        pos_y_map = {"top": 50, "center": height // 2, "bottom": height - 100}
 
         pos_y = pos_y_map.get(self.style.get("position", "bottom"), height - 100)
 
@@ -200,13 +197,17 @@ class AdvancedSubtitles:
             "[V4+ Styles]",
             "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
             f"Style: Default,{self.style['font']},{self.style['font_size']},{self._color_to_ass(self.style['font_color'])},{self._color_to_ass(self.style.get('highlight_color', '#FFFFFF'))},{self._color_to_ass(self.style['outline_color'])},&H00000000,-1,0,0,0,100,100,0,0,1,{self.style['outline_width']},{3 if self.style.get('shadow') else 0},2,10,10,{pos_y},1",
-            ""
+            "",
         ]
 
     def _color_to_ass(self, hex_color: str) -> str:
         """Convert hex color to ASS format (&HAABBGGRR)."""
         hex_color = hex_color.lstrip("#")
-        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        r, g, b = (
+            int(hex_color[0:2], 16),
+            int(hex_color[2:4], 16),
+            int(hex_color[4:6], 16),
+        )
         return f"&H00{b:02X}{g:02X}{r:02X}"
 
     def _format_timestamp(self, seconds: float) -> str:
@@ -249,7 +250,7 @@ class AdvancedSubtitles:
             "computer": "💻",
             "innovation": "✨",
             "question": "❓",
-            "amazing": "🔥"
+            "amazing": "🔥",
         }
 
         text_lower = text.lower()
@@ -277,8 +278,8 @@ if __name__ == "__main__":
                 SubtitleWord("the", 0.7, 0.9),
                 SubtitleWord("future", 0.9, 1.5),
                 SubtitleWord("of", 1.5, 1.7),
-                SubtitleWord("AI", 1.7, 2.0)
-            ]
+                SubtitleWord("AI", 1.7, 2.0),
+            ],
         )
     ]
 

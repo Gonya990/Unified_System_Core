@@ -1,4 +1,3 @@
-
 import json
 import logging
 import sys
@@ -10,7 +9,9 @@ CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent.parent.parent.parent
 # /Users/igorgoncharenko/Documents/Unified_System_Core
 # Use absolute path for reliability
-AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+AI_CORE_SRC_PATH = (
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+)
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
@@ -25,11 +26,13 @@ CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context
 VIDEO_CLIPS_DIR = CONTEXT_DIR / "video_clips"
 SCRIPTS_DIR = CONTEXT_DIR / "scripts"
 
+
 class SoraVideoGenerator:
     """
     Generates realistic video clips using OpenAI Sora-2.
     Replaces static 'zooming' images with actual character motion.
     """
+
     def __init__(self):
         self.broker = TokenBroker()
         self.api_key = self.broker.get_key("openai")
@@ -46,7 +49,7 @@ class SoraVideoGenerator:
                 model="sora-2",
                 prompt=f"A cinematic {angle} shot of a {role} dinosaur in a podcast studio. {prompt}. High fidelity, 4k.",
                 duration=5,
-                aspect_ratio="16:9"
+                aspect_ratio="16:9",
             )
 
             job_id = response.id
@@ -85,14 +88,16 @@ class SoraVideoGenerator:
                 print(f"   ⏭️ Skipping existing clip: {output_name}")
                 continue
 
-            video_url = self.generate_video(i, motion_prompt, seg['role'], seg['angle'])
+            video_url = self.generate_video(i, motion_prompt, seg["role"], seg["angle"])
             if video_url:
                 # Download (pseudo-code for brevity, would use requests)
                 import requests
+
                 r = requests.get(video_url)
                 with open(output_path, "wb") as f:
                     f.write(r.content)
                 print(f"   💾 Saved to: {output_path}")
+
 
 if __name__ == "__main__":
     generator = SoraVideoGenerator()

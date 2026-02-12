@@ -18,13 +18,17 @@ class LivePortraitController:
             self.root_dir = Path(__file__).parent.parent.parent.parent.parent.resolve()
             self.base_dir = self.root_dir / "Projects/Content_Factory/src/live_portrait"
 
-        self.output_dir = self.root_dir / "Projects/Content_Factory/outputs/live_portrait"
+        self.output_dir = (
+            self.root_dir / "Projects/Content_Factory/outputs/live_portrait"
+        )
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Default driving video (from the repo examples)
         self.default_driving = self.base_dir / "assets/examples/driving/d0.mp4"
 
-    def animate(self, source_path: str, driving_path: str = None, output_filename: str = None) -> str:
+    def animate(
+        self, source_path: str, driving_path: str = None, output_filename: str = None
+    ) -> str:
         """
         Runs LivePortrait inference.
 

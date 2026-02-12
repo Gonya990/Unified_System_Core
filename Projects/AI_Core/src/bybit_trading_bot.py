@@ -10,7 +10,13 @@ import os
 from datetime import datetime
 from typing import Optional
 
+import aiohttp
 from dotenv import load_dotenv
+
+try:
+    from pybit.unified_trading import HTTP
+except ImportError:
+    HTTP = None
 
 # Handle arguments
 parser = argparse.ArgumentParser(description="ByBit Trading Bot")
@@ -23,10 +29,10 @@ else:
     load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class ByBitTradingBot:
     """
@@ -48,7 +54,7 @@ class ByBitTradingBot:
         telegram_token: str,
         admin_chat_id: str,
         testnet: bool = True,
-        monitor_only: bool = True
+        monitor_only: bool = True,
     ):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -81,16 +87,14 @@ class ByBitTradingBot:
     async def notify(self, message: str, urgent: bool = False):
         """Send Telegram notification."""
         try:
-            import aiohttp
-
             emoji = "🚨" if urgent else "📊"
             text = f"{emoji} **ByBit Bot**\n\n{message}"
 
             url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
             payload = {
-                'chat_id': self.admin_chat_id,
-                'text': text,
-                'parse_mode': 'Markdown'
+                "chat_id": self.admin_chat_id,
+                "text": text,
+                "parse_mode": "Markdown",
             }
 
             async with aiohttp.ClientSession() as session:
@@ -103,19 +107,18 @@ class ByBitTradingBot:
 
     async def get_balance(self) -> float:
         """Get USDT balance from ByBit."""
+        if not HTTP:
+            logger.error("pybit not installed")
+            return 0.0
         try:
-            from pybit.unified_trading import HTTP
-
             session = HTTP(
-                testnet=self.testnet,
-                api_key=self.api_key,
-                api_secret=self.api_secret
+                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
             )
 
             result = session.get_wallet_balance(accountType="UNIFIED", coin="USDT")
 
-            if result['retCode'] == 0:
-                balance = float(result['result']['list'][0]['coin'][0]['walletBalance'])
+            if result["retCode"] == 0:
+                balance = float(result["result"]["list"][0]["coin"][0]["walletBalance"])
                 logger.info(f"Balance: ${balance:.2f} USDT")
                 return balance
 
@@ -128,15 +131,15 @@ class ByBitTradingBot:
 
     async def get_price(self, symbol: str = "TONUSDT") -> float:
         """Get current market price."""
+        if not HTTP:
+            return 0.0
         try:
-            from pybit.unified_trading import HTTP
-
             session = HTTP(testnet=self.testnet)
 
             result = session.get_tickers(category="spot", symbol=symbol)
 
-            if result['retCode'] == 0:
-                price = float(result['result']['list'][0]['lastPrice'])
+            if result["retCode"] == 0:
+                price = float(result["result"]["list"][0]["lastPrice"])
                 return price
 
             return 0.0
@@ -152,23 +155,20 @@ class ByBitTradingBot:
         - RSI > 70 = OVERBOUGHT → SELL
         - Moving Average crossover
         """
+        if not HTTP:
+            return None
         try:
-            from pybit.unified_trading import HTTP
-
             session = HTTP(testnet=self.testnet)
 
             # Get kline data (1 hour candles, last 50)
             result = session.get_kline(
-                category="spot",
-                symbol=symbol,
-                interval="60",
-                limit=50
+                category="spot", symbol=symbol, interval="60", limit=50
             )
 
-            if result['retCode'] != 0:
+            if result["retCode"] != 0:
                 return None
 
-            klines = result['result']['list']
+            klines = result["result"]["list"]
             closes = [float(k[4]) for k in klines]  # Close prices
 
             # Calculate RSI
@@ -187,11 +187,11 @@ class ByBitTradingBot:
             # Trading signals
             if rsi < 35 and current_price < sma_long * 0.98:
                 # Oversold + below long MA = BUY signal
-                return 'BUY'
+                return "BUY"
 
-            elif rsi > 65 and current_price > sma_long * 1.02:
+            if rsi > 65 and current_price > sma_long * 1.02:
                 # Overbought + above long MA = SELL signal
-                return 'SELL'
+                return "SELL"
 
             return None
 
@@ -201,7 +201,7 @@ class ByBitTradingBot:
 
     def _calculate_rsi(self, prices: list[float], period: int = 14) -> float:
         """Calculate RSI indicator."""
-        deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+        deltas = [prices[i] - prices[i - 1] for i in range(1, len(prices))]
 
         gains = [d if d > 0 else 0 for d in deltas]
         losses = [-d if d < 0 else 0 for d in deltas]
@@ -217,26 +217,20 @@ class ByBitTradingBot:
 
         return rsi
 
-    async def place_order(
-        self,
-        symbol: str,
-        side: str,  # Buy or Sell
-        quantity: float
-    ) -> bool:
+    async def place_order(self, symbol: str, side: str, quantity: float) -> bool:
         """Place market order on ByBit (or skip if monitoring only)."""
         if self.monitor_only:
             logger.info(f"[MONITOR ONLY] Would place {side} {quantity} {symbol}")
             return True
 
+        if not HTTP:
+            return False
+
         # Ensure quantity is rounded (Spot TONUSDT usually 2 decimal places)
         formatted_qty = f"{quantity:.2f}"
         try:
-            from pybit.unified_trading import HTTP
-
             session = HTTP(
-                testnet=self.testnet,
-                api_key=self.api_key,
-                api_secret=self.api_secret
+                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
             )
 
             kwargs = {
@@ -245,7 +239,7 @@ class ByBitTradingBot:
                 "side": side,
                 "orderType": "Market",
                 "qty": formatted_qty,
-                "timeInForce": "IOC"
+                "timeInForce": "IOC",
             }
 
             # For Market Buy on Spot, ByBit defaults to quote coin (USDT).
@@ -255,16 +249,17 @@ class ByBitTradingBot:
 
             result = session.place_order(**kwargs)
 
-            if result['retCode'] == 0:
-                order_id = result['result']['orderId']
+            if result["retCode"] == 0:
+                order_id = result["result"]["orderId"]
                 logger.info(f"Order placed: {side} {quantity} {symbol}, ID: {order_id}")
 
                 action_name = (
-                    'RECOMMENDATION' if self.monitor_only else 'Order Executed'
+                    "RECOMMENDATION" if self.monitor_only else "Order Executed"
                 )
                 notif_suffix = (
-                    'Recommendation only - no real trade placed.'
-                    if self.monitor_only else f'Order ID: {order_id}'
+                    "Recommendation only - no real trade placed."
+                    if self.monitor_only
+                    else f"Order ID: {order_id}"
                 )
                 await self.notify(
                     f"✅ **{action_name}**\n"
@@ -276,12 +271,8 @@ class ByBitTradingBot:
 
                 return True
 
-            else:
-                await self.notify(
-                    f"❌ **Order Failed**\n{result['retMsg']}",
-                    urgent=True
-                )
-                return False
+            await self.notify(f"❌ **Order Failed**\n{result['retMsg']}", urgent=True)
+            return False
 
         except Exception as e:
             logger.error(f"Order placement failed: {e}")
@@ -298,7 +289,7 @@ class ByBitTradingBot:
 
             price = await self.get_price(symbol)
 
-            if signal == 'BUY' and symbol not in self.positions:
+            if signal == "BUY" and symbol not in self.positions:
                 # Calculate position size (3% of balance)
                 trade_amount = self.balance * self.max_trade_percent
 
@@ -322,11 +313,11 @@ class ByBitTradingBot:
                 # Place buy order
                 if await self.place_order(symbol, "Buy", quantity):
                     self.positions[symbol] = {
-                        'entry_price': price,
-                        'quantity': quantity,
-                        'entry_time': datetime.now().isoformat(),
-                        'stop_loss': price * (1 - self.stop_loss_percent),
-                        'take_profit': price * (1 + self.take_profit_percent)
+                        "entry_price": price,
+                        "quantity": quantity,
+                        "entry_time": datetime.now().isoformat(),
+                        "stop_loss": price * (1 - self.stop_loss_percent),
+                        "take_profit": price * (1 + self.take_profit_percent),
                     }
 
                     self.trades_today += 1
@@ -342,14 +333,14 @@ class ByBitTradingBot:
                         f"Take-Profit: ${self.positions[symbol]['take_profit']:.4f}"
                     )
 
-            elif signal == 'SELL' and symbol in self.positions:
+            elif signal == "SELL" and symbol in self.positions:
                 pos = self.positions[symbol]
-                quantity = pos['quantity']
+                quantity = pos["quantity"]
 
                 # Place sell order
                 if await self.place_order(symbol, "Sell", quantity):
                     # Calculate profit
-                    entry = pos['entry_price']
+                    entry = pos["entry_price"]
                     profit_pct = (price - entry) / entry * 100
                     profit_usd = (price - entry) * quantity
 
@@ -380,25 +371,25 @@ class ByBitTradingBot:
                 price = await self.get_price(symbol)
 
                 # Stop-loss hit
-                if price <= pos['stop_loss']:
+                if price <= pos["stop_loss"]:
                     await self.notify(
                         f"🛑 **STOP-LOSS TRIGGERED**\n"
                         f"Symbol: {symbol}\n"
                         f"Price: ${price:.4f}\n"
                         f"Stop-Loss: ${pos['stop_loss']:.4f}",
-                        urgent=True
+                        urgent=True,
                     )
-                    await self.execute_trade('SELL', symbol)
+                    await self.execute_trade("SELL", symbol)
 
                 # Take-profit hit
-                elif price >= pos['take_profit']:
+                elif price >= pos["take_profit"]:
                     await self.notify(
                         f"🎯 **TAKE-PROFIT HIT**\n"
                         f"Symbol: {symbol}\n"
                         f"Price: ${price:.4f}\n"
-                        f"Target: ${pos['take_profit']:.4f}"
+                        f"Target: ${pos['take_profit']:.4f}",
                     )
-                    await self.execute_trade('SELL', symbol)
+                    await self.execute_trade("SELL", symbol)
 
             except Exception as e:
                 logger.error(f"Stop-loss check failed: {e}")
@@ -431,8 +422,11 @@ class ByBitTradingBot:
                     now = datetime.now()
                     # Only notify once every 24 hours
                     should_notify = (
-                        self.last_notified_low_balance is None or
-                        (now - self.last_notified_low_balance).total_seconds() > 86400
+                        self.last_notified_low_balance is None
+                        or (
+                            now - self.last_notified_low_balance
+                        ).total_seconds()
+                        > 86400
                     )
 
                     if should_notify:
@@ -441,7 +435,7 @@ class ByBitTradingBot:
                             f"Current: ${self.balance:.2f}\n"
                             f"Minimum: ${self.min_balance_usdt:.2f}\n"
                             "Trading paused. (Notification throttled for 24h)",
-                            urgent=True
+                            urgent=True,
                         )
                         self.last_notified_low_balance = now
 
@@ -472,7 +466,7 @@ class ByBitTradingBot:
 
         # Close all positions
         for symbol in list(self.positions.keys()):
-            await self.execute_trade('SELL', symbol)
+            await self.execute_trade("SELL", symbol)
 
         await self.notify(
             "🛑 **Bot Stopped**\n\n"
@@ -486,10 +480,10 @@ class ByBitTradingBot:
 async def main():
     """Run the bot."""
     # Load credentials
-    api_key = os.getenv('BYBIT_API_KEY', '')
-    api_secret = os.getenv('BYBIT_API_SECRET', '')
-    telegram_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
-    admin_chat_id = os.getenv('ADMIN_CHAT_ID', '708531393')
+    api_key = os.getenv("BYBIT_API_KEY", "")
+    api_secret = os.getenv("BYBIT_API_SECRET", "")
+    telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    admin_chat_id = os.getenv("ADMIN_CHAT_ID", "708531393")
 
     if not api_key or not api_secret:
         print("❌ Set BYBIT_API_KEY and BYBIT_API_SECRET in .env")
@@ -498,11 +492,11 @@ async def main():
         api_secret = "test"
 
     # Start in TESTNET or LIVE based on .env
-    testnet_env = os.getenv('BYBIT_TESTNET', 'true').lower()
-    is_testnet = testnet_env == 'true'
+    testnet_env = os.getenv("BYBIT_TESTNET", "true").lower()
+    is_testnet = testnet_env == "true"
 
-    monitor_only_env = os.getenv('BYBIT_MONITOR_ONLY', 'true').lower()
-    is_monitor_only = monitor_only_env == 'true'
+    monitor_only_env = os.getenv("BYBIT_MONITOR_ONLY", "true").lower()
+    is_monitor_only = monitor_only_env == "true"
 
     bot = ByBitTradingBot(
         api_key=api_key,
@@ -510,7 +504,7 @@ async def main():
         telegram_token=telegram_token,
         admin_chat_id=admin_chat_id,
         testnet=is_testnet,
-        monitor_only=is_monitor_only
+        monitor_only=is_monitor_only,
     )
 
     if not is_testnet:

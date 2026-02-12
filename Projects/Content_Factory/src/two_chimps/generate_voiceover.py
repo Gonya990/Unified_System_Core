@@ -1,5 +1,6 @@
 import json
 import re
+import sys
 from pathlib import Path
 
 import torch
@@ -16,14 +17,14 @@ try:
         [XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs]
     )
 except AttributeError:
-    pass # Older torch versions don't need this
+    pass  # Older torch versions don't need this
 
 # Paths
 CURRENT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CURRENT_DIR.parent.parent.parent.parent
 # Load environment variables
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
@@ -39,6 +40,7 @@ MODEL_NAME = "tts_models/multilingual/multi-dataset/xtts_v2"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 if torch.backends.mps.is_available():
     DEVICE = "mps"
+
 
 def parse_script(lines):
     """
@@ -74,13 +76,10 @@ def parse_script(lines):
             continue
 
         role = "Unknown"
-        if "Skeptic" in text or "Host 1" in text or "Rex" in text or "T-Rex" in text:
+        if any(kw in text for kw in ["Skeptic", "Host 1", "Rex", "T-Rex"]):
             role = "Skeptic"
             text = re.sub(r"^(Host 1|Skeptic|Rex|T-Rex):", "", text).strip()
-        elif (
-            "Enthusiast" in text or "Host 2" in text or
-            "Trike" in text or "Triceratops" in text
-        ):
+        elif any(kw in text for kw in ["Enthusiast", "Host 2", "Trike", "Triceratops"]):
             role = "Enthusiast"
             text = re.sub(r"^(Host 2|Enthusiast|Trike|Triceratops):", "", text).strip()
 
@@ -89,10 +88,11 @@ def parse_script(lines):
 
     return script_data
 
-def generate_voiceover_xtts(script_file):
-    print(f"🎤 Generating XTTS v2 Voiceover for: {script_file.name}...")
 
-    with open(script_file) as f:
+def generate_voiceover_xtts(script_path):
+    print(f"🎤 Generating XTTS v2 Voiceover for: {script_path.name}...")
+
+    with open(script_path) as f:
         lines = f.readlines()
 
     script_data = parse_script(lines)
@@ -124,11 +124,9 @@ def generate_voiceover_xtts(script_file):
             continue
 
         # Select Voice
-        if role == "Skeptic" or "Rex" in role:
-            speaker_wav = str(ref_rex)
-            # Assuming script is RU based on prompt, but XTTS detects it
-        else:
-            speaker_wav = str(ref_trike)
+        speaker_wav = (
+            str(ref_rex) if (role == "Skeptic" or "Rex" in role) else str(ref_trike)
+        )
 
         print(f"  🗣️ {role}: {text[:30]}...")
 
@@ -137,14 +135,14 @@ def generate_voiceover_xtts(script_file):
         try:
             # Generate Audio via XTTS
             # Check if text contains cyrillic to set language?
-            is_cyrillic = bool(re.search('[а-яА-Я]', text))
+            is_cyrillic = bool(re.search("[а-яА-Я]", text))
             lang = "ru" if is_cyrillic else "en"
 
             tts.tts_to_file(
                 text=text,
                 speaker_wav=speaker_wav,
                 language=lang,
-                file_path=str(output_segment_path)
+                file_path=str(output_segment_path),
             )
 
             # Add to list
@@ -157,23 +155,14 @@ def generate_voiceover_xtts(script_file):
     if audio_segments:
         final_audio = concatenate_audioclips(audio_segments)
         # Save as MP3
-        output_path = AUDIO_DIR / f"{script_file.stem}.mp3"
+        output_path = AUDIO_DIR / f"{script_path.stem}.mp3"
         final_audio.write_audiofile(str(output_path))
         print(f"✅ XTTS Audio saved: {output_path.name}")
-
-        # Cleanup temp files - DISABLED for premium assembly
-        # for segment in audio_segments:
-        #     try:
-        #         segment.close()
-        #         if os.path.exists(segment.filename):
-        #             os.remove(segment.filename)
-        #     except Exception as e:
-        #         print(f"⚠️ Cleanup warning: {e}")
     else:
         print("❌ No audio generated.")
 
+
 if __name__ == "__main__":
-    import sys
     SCRIPTS_DIR = CONTEXT_DIR / "scripts"
 
     if len(sys.argv) > 1:
@@ -186,11 +175,13 @@ if __name__ == "__main__":
         # Process all script files in SCRIPTS dir
         if not SCRIPTS_DIR.exists():
             print(f"❌ Scripts directory not found: {SCRIPTS_DIR}")
-            exit()
+            sys.exit(1)
 
-        script_files = list(SCRIPTS_DIR.glob("*_script.md")) + list(SCRIPTS_DIR.glob("*.json"))
+        script_files = list(SCRIPTS_DIR.glob("*_script.md")) + list(
+            SCRIPTS_DIR.glob("*.json")
+        )
         if not script_files:
             print(f"❌ No script files found in {SCRIPTS_DIR}.")
 
-        for script_file in script_files:
-            generate_voiceover_xtts(script_file)
+        for f_path in script_files:
+            generate_voiceover_xtts(f_path)

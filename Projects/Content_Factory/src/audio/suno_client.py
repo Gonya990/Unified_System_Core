@@ -12,6 +12,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 class SunoAIClient:
     """Unofficial Suno AI client using session cookies."""
 
@@ -34,7 +35,7 @@ class SunoAIClient:
         duration: int = 60,
         instrumental: bool = True,
         genre: str = "electronic",
-        output_path: Optional[Path] = None
+        output_path: Optional[Path] = None,
     ) -> Optional[Path]:
         """
         Generate music using your Suno Pro subscription.
@@ -56,16 +57,18 @@ class SunoAIClient:
         headers = {
             "Cookie": self.cookie,
             "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0"
+            "User-Agent": "Mozilla/5.0",
         }
 
         # Construct prompt
-        full_prompt = f"{prompt}, {genre}, instrumental" if instrumental else f"{prompt}, {genre}"
+        full_prompt = (
+            f"{prompt}, {genre}, instrumental" if instrumental else f"{prompt}, {genre}"
+        )
 
         payload = {
             "prompt": full_prompt,
             "make_instrumental": instrumental,
-            "wait_audio": True
+            "wait_audio": True,
         }
 
         try:
@@ -76,7 +79,7 @@ class SunoAIClient:
                 f"{self.base_url}/api/generate/v2/",
                 json=payload,
                 headers=headers,
-                timeout=120
+                timeout=120,
             )
             response.raise_for_status()
 
@@ -122,7 +125,7 @@ if __name__ == "__main__":
     track = client.generate_music(
         prompt="upbeat energetic electronic background music",
         duration=30,
-        instrumental=True
+        instrumental=True,
     )
 
     if track:

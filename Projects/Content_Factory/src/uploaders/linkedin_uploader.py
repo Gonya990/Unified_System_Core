@@ -18,6 +18,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 LINKEDIN_EMAIL = os.getenv("LINKEDIN_EMAIL", "")
 LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD", "")
 
+
 def create_driver(headless: bool = True) -> webdriver.Chrome:
     """Create Chrome driver with options"""
     options = Options()
@@ -29,6 +30,7 @@ def create_driver(headless: bool = True) -> webdriver.Chrome:
     options.add_argument("--window-size=1920,1080")
 
     return webdriver.Chrome(options=options)
+
 
 def login_linkedin(driver: webdriver.Chrome) -> bool:
     """Login to LinkedIn"""
@@ -66,10 +68,9 @@ def login_linkedin(driver: webdriver.Chrome) -> bool:
         print(f"❌ LinkedIn login error: {e}")
         return False
 
+
 def upload_video_linkedin(
-    video_path: Path,
-    caption: str,
-    headless: bool = True
+    video_path: Path, caption: str, headless: bool = True
 ) -> bool:
     """
     Upload video to LinkedIn
@@ -106,14 +107,18 @@ def upload_video_linkedin(
 
         # Click "Start a post"
         start_post = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.share-box-feed-entry__trigger'))
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "button.share-box-feed-entry__trigger")
+            )
         )
         start_post.click()
         time.sleep(2)
 
         # Click media button
         media_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[aria-label*="Add media"]'))
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'button[aria-label*="Add media"]')
+            )
         )
         media_button.click()
         time.sleep(2)
@@ -127,12 +132,14 @@ def upload_video_linkedin(
         time.sleep(30)  # Videos take time to upload
 
         # Enter caption
-        text_area = driver.find_element(By.CSS_SELECTOR, 'div[data-placeholder]')
+        text_area = driver.find_element(By.CSS_SELECTOR, "div[data-placeholder]")
         text_area.send_keys(caption)
         time.sleep(1)
 
         # Click Post button
-        post_button = driver.find_element(By.CSS_SELECTOR, 'button.share-actions__primary-action')
+        post_button = driver.find_element(
+            By.CSS_SELECTOR, "button.share-actions__primary-action"
+        )
         post_button.click()
 
         print("✅ LinkedIn video posted successfully!")
@@ -146,6 +153,7 @@ def upload_video_linkedin(
     finally:
         if driver:
             driver.quit()
+
 
 if __name__ == "__main__":
     # Test upload (requires credentials)

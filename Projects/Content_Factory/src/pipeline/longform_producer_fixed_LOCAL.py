@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("LongFormProducer")
 
@@ -46,24 +46,31 @@ if os.getenv("ELEVENLABS_API_KEY"):
 if os.getenv("PEXELS_API_KEY"):
     os.environ["PEXELS_API_KEY"] = os.getenv("PEXELS_API_KEY")
 
+
 # Mock Broker that just returns env vars to satisfy LLMCouncil if it needs it
 class EnvBroker:
     def get_key(self, name, tier=None, session_id=None):
         name = name.upper()
-        if name == "OPENAI": return os.getenv("OPENAI_API_KEY")
-        if name == "GEMINI": return os.getenv("GEMINI_API_KEY")
-        if name == "ELEVENLABS": return os.getenv("ELEVENLABS_API_KEY")
-        if name == "PEXELS": return os.getenv("PEXELS_API_KEY")
+        if name == "OPENAI":
+            return os.getenv("OPENAI_API_KEY")
+        if name == "GEMINI":
+            return os.getenv("GEMINI_API_KEY")
+        if name == "ELEVENLABS":
+            return os.getenv("ELEVENLABS_API_KEY")
+        if name == "PEXELS":
+            return os.getenv("PEXELS_API_KEY")
         return os.getenv(f"{name}_API_KEY")
 
     def get_token(self, name, **kwargs):
         return self.get_key(name, **kwargs)
+
 
 BROKER = EnvBroker()
 
 # =============================================================================
 #                           DEEP RESEARCH
 # =============================================================================
+
 
 def deep_research_with_council(topic: str) -> Optional[dict]:
     print(f"\n🧠 PHASE 1: Planning Documentary Structure for '{topic}'")
@@ -72,7 +79,7 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
     structure = {
         "title": f"Documentary: {topic}",
         "description": "Auto-generated documentary",
-        "segments": []
+        "segments": [],
     }
 
     # 6 Segments hardcoded logic since Council is flaky
@@ -82,18 +89,27 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
         "Real World Applications",
         "Challenges and Risks",
         "Future Predictions 2030",
-        "Conclusion: What lies ahead"
+        "Conclusion: What lies ahead",
     ]
 
     for i, sub in enumerate(subtopics):
-        structure["segments"].append({
-            "name": sub,
-            "focus_points": [f"Deep dive into {sub}", "Expert opinions", "Statistics"],
-            "visual_theme": "documentary",
-            "script": generate_script_direct(topic, sub) # Generate script immediately
-        })
+        structure["segments"].append(
+            {
+                "name": sub,
+                "focus_points": [
+                    f"Deep dive into {sub}",
+                    "Expert opinions",
+                    "Statistics",
+                ],
+                "visual_theme": "documentary",
+                "script": generate_script_direct(
+                    topic, sub
+                ),  # Generate script immediately
+            }
+        )
 
     return structure
+
 
 def generate_script_direct(topic, subtopic):
     """
@@ -105,6 +121,7 @@ def generate_script_direct(topic, subtopic):
 
     try:
         from openai import OpenAI
+
         client = OpenAI(api_key=api_key)
 
         prompt = f"""
@@ -119,16 +136,18 @@ def generate_script_direct(topic, subtopic):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=2000
+            max_tokens=2000,
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"❌ OpenAI Error: {e}")
         return f"Error generating script for {subtopic}."
 
+
 # =============================================================================
 #                           VIDEO ASSEMBLY
 # =============================================================================
+
 
 def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     from orchestrator_v3_no_face import run_no_face_pipeline
@@ -147,11 +166,11 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         seg_name = f"longform_part_{i}"
 
         # Determine Scenes keywords based on segment name
-        keywords = seg['name'].split()
+        keywords = seg["name"].split()
         scenes = [
-             {'keyword': f"{keywords[0]} abstract technology"},
-             {'keyword': f"{keywords[-1]} detail"},
-             {'keyword': "future world"}
+            {"keyword": f"{keywords[0]} abstract technology"},
+            {"keyword": f"{keywords[-1]} detail"},
+            {"keyword": "future world"},
         ]
 
         # Use existing powerful V3 pipeline
@@ -160,7 +179,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
             lang="ru",
             output_name=seg_name,
             scenes=scenes,
-            style="impact" # Uses ElevenLabs + Pexels
+            style="impact",  # Uses ElevenLabs + Pexels
         )
 
         # The V3 pipeline saves to FACTORY/outputs/
@@ -186,21 +205,33 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
             f.write(f"file '{v}'\n")
 
     cmd = [
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", str(concat_file),
-        "-c", "copy", str(final_output)
+        "ffmpeg",
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        str(concat_file),
+        "-c",
+        "copy",
+        str(final_output),
     ]
     try:
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        subprocess.run(
+            cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
+        )
         print(f"✅ FULL MOVIE SAVED: {final_output}")
         return final_output
     except Exception as e:
         print(f"❌ Concat Error: {e}")
         return None
 
+
 if __name__ == "__main__":
     topic = "The Future of Humanity 2026"
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--topic", default=topic)
     args = parser.parse_args()
@@ -218,10 +249,17 @@ if __name__ == "__main__":
     if vid:
         # Notify Telegram
         msg = f"🎬 <b>ДОКУМЕНТАЛЬНЫЙ ФИЛЬМ ГОТОВ!</b>\n\n<b>Тема:</b> {args.topic}\n<b>Файл:</b> {vid.name}"
-        subprocess.run([
-            'curl', '-F', f'video=@{vid}',
-            '-F', 'chat_id=708531393',
-            '-F', f'caption={msg}',
-            '-F', 'parse_mode=HTML',
-            'https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendVideo'
-        ])
+        subprocess.run(
+            [
+                "curl",
+                "-F",
+                f"video=@{vid}",
+                "-F",
+                "chat_id=708531393",
+                "-F",
+                f"caption={msg}",
+                "-F",
+                "parse_mode=HTML",
+                "https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendVideo",
+            ]
+        )

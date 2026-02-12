@@ -3,7 +3,9 @@ import sys
 from pathlib import Path
 
 # Add AI_Core/src to path for TokenBroker BEFORE other internal imports
-AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+AI_CORE_SRC_PATH = (
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+)
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
@@ -17,6 +19,7 @@ logger = logging.getLogger("DinoDirector")
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 SCRIPTS_DIR = CONTEXT_DIR / "scripts"
 
+
 class DinoScriptEngine:
     """
     Multi-Agent Script Generation for 'Dino Talk'.
@@ -24,6 +27,7 @@ class DinoScriptEngine:
     Stage 2: Director Pass (Add B-roll cues, camera angles, and timings).
     Stage 3: Polish & Wit (Add fillers, witty remarks, interruptions).
     """
+
     def __init__(self):
         self.broker = TokenBroker()
         self.api_key = self.broker.get_key("openai")
@@ -47,14 +51,16 @@ class DinoScriptEngine:
             model="gpt-5.2",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Topic: {topic}. Start the debate."}
+                {"role": "user", "content": f"Topic: {topic}. Start the debate."},
             ],
-            temperature=0.8
+            temperature=0.8,
         )
         return response.choices[0].message.content
 
     def director_pass(self, raw_debate: str):
-        print("🎬 Stage 2: Director is adding cinematic cues, B-roll, and SORA-2 motion prompts...")
+        print(
+            "🎬 Stage 2: Director is adding cinematic cues, B-roll, and SORA-2 motion prompts..."
+        )
 
         system_prompt = (
             "You are the Director. Transform the debate into a JSON list of segments.\n"
@@ -68,9 +74,12 @@ class DinoScriptEngine:
             model="gpt-5.2",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Format this debate into JSON with MOTION PROMPTS:\n\n{raw_debate}"}
+                {
+                    "role": "user",
+                    "content": f"Format this debate into JSON with MOTION PROMPTS:\n\n{raw_debate}",
+                },
             ],
-            response_format={"type": "json_object"}
+            response_format={"type": "json_object"},
         )
         return response.choices[0].message.content
 
@@ -88,9 +97,12 @@ class DinoScriptEngine:
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Polish this JSON for max chemistry:\n\n{script_json}"}
+                {
+                    "role": "user",
+                    "content": f"Polish this JSON for max chemistry:\n\n{script_json}",
+                },
             ],
-            response_format={"type": "json_object"}
+            response_format={"type": "json_object"},
         )
         return response.choices[0].message.content
 
@@ -105,6 +117,7 @@ class DinoScriptEngine:
 
         print(f"✅ Polished Directed script saved to: {output_path}")
         return output_path
+
 
 if __name__ == "__main__":
     engine = DinoScriptEngine()

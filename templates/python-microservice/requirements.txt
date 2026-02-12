@@ -1,0 +1,11 @@
+fastapi==0.109.2
+uvicorn==0.27.1
+google-cloud-logging==3.9.0
+google-cloud-monitoring==2.18.0
+python-dotenv==1.0.1
+pydantic==2.6.4
+requests==2.31.0
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-gcp-trace
+# Unified libraries (install from local or private repo in future)

@@ -16,14 +16,14 @@ try:
         [XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs]
     )
 except AttributeError:
-    pass # Older torch versions don't need this
+    pass  # Older torch versions don't need this
 
 # Пути
 CURRENT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CURRENT_DIR.parent.parent.parent.parent
 # Загрузка переменных окружения
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
@@ -39,6 +39,7 @@ MODEL_NAME = "tts_models/multilingual/multi-dataset/xtts_v2"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 if torch.backends.mps.is_available():
     DEVICE = "mps"
+
 
 def parse_script(lines):
     """
@@ -76,8 +77,10 @@ def parse_script(lines):
             role = "Skeptic"
             text = re.sub(r"^(Host 1|Skeptic|Rex|T-Rex):", "", text).strip()
         elif (
-            "Enthusiast" in text or "Host 2" in text or
-            "Trike" in text or "Triceratops" in text
+            "Enthusiast" in text
+            or "Host 2" in text
+            or "Trike" in text
+            or "Triceratops" in text
         ):
             role = "Enthusiast"
             text = re.sub(r"^(Host 2|Enthusiast|Trike|Triceratops):", "", text).strip()
@@ -86,6 +89,7 @@ def parse_script(lines):
             script_data.append({"role": role, "text": text})
 
     return script_data
+
 
 def generate_voiceover_xtts(script_file):
     print(f"🎤 Генерация озвучки XTTS v2 для: {script_file.name}...")
@@ -133,14 +137,14 @@ def generate_voiceover_xtts(script_file):
 
         try:
             # Генерация аудио через XTTS
-            is_cyrillic = bool(re.search('[а-яА-Я]', text))
+            is_cyrillic = bool(re.search("[а-яА-Я]", text))
             lang = "ru" if is_cyrillic else "en"
 
             tts.tts_to_file(
                 text=text,
                 speaker_wav=speaker_wav,
                 language=lang,
-                file_path=str(output_segment_path)
+                file_path=str(output_segment_path),
             )
 
             # Добавление в список
@@ -167,6 +171,7 @@ def generate_voiceover_xtts(script_file):
         #         print(f"⚠️ Ошибка очистки: {e}")
     else:
         print("❌ Аудио не сгенерировано.")
+
 
 if __name__ == "__main__":
     # Обработка всех файлов сценариев в папке scripts

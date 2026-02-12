@@ -20,7 +20,6 @@ import pytz
 from agent_orchestrator import PIPELINES, AgentOrchestrator
 from api_proxy import run_proxy, set_bot_instance
 from calendar_client import CalendarClient
-from cloud_logger import setup_cloud_logging
 from config_manager import ConfigManager
 from conversation_manager import ConversationManager
 from daily_scheduler import DailyScheduler
@@ -73,22 +72,40 @@ bot_instance = os.getenv("BOT_INSTANCE", "default")
 log_filename = f"bot_{bot_instance}.log"
 
 # Setup logging with instance-specific filename
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename=log_filename,
-    filemode="a",
-)
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-logging.getLogger("").addHandler(console)
-logging.getLogger("httpx").setLevel(logging.WARNING)
+# Unified Logging Configuration (Phase 3)
+# If running in Cloud (K8s or explicitly requested), use JSON structure.
+_is_k8s = os.getenv("KUBERNETES_SERVICE_HOST")
+_is_cloud_logging = os.getenv("CLOUD_LOGGING", "false").lower() == "true"
+is_cloud = _is_k8s or _is_cloud_logging
 
-logger = logging.getLogger(__name__)
-logger.info(f"Bot instance: {bot_instance}, logging to {log_filename}")
-
-if os.getenv("CLOUD_LOGGING", "false").lower() == "true":
-    setup_cloud_logging(service_name=f"ai-telegram-bot-{bot_instance}")
+if is_cloud:
+    try:
+        from unified_logger import setup_unified_logging
+        # Set service name for context
+        os.environ["SERVICE_NAME"] = f"ai-telegram-bot-{bot_instance}"
+        setup_unified_logging()
+        logger = logging.getLogger(__name__)
+        logger.info(f"🚀 Unified Logging Active (Instance: {bot_instance})")
+    except ImportError:
+        # Fallback if file missing
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+        logger.warning("⚠️ unified_logger not found, using basic logging.")
+else:
+    # Local Development: Standard readable logs
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+        filename=log_filename,
+        filemode="a",
+    )
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    logging.getLogger("").addHandler(console)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    
+    logger = logging.getLogger(__name__)
+    logger.info(f"Bot instance: {bot_instance}, logging to {log_filename} (Local Mode)")
 
 _LOCK_FD = None
 _LOCK_PATH: Optional[Path] = None
@@ -233,6 +250,16 @@ except Exception as e:
     infra_manager = None
 
 try:
+    from alert_listener import AlertListener
+except ImportError:
+    AlertListener = None
+
+try:
+    from modules.self_healing import SelfHealer
+except ImportError:
+    SelfHealer = None
+
+try:
     from gmail_client import GmailClient
     GMAIL_AVAILABLE = True
 except ImportError:
@@ -298,12 +325,29 @@ try:
         sys.path.append(agent_mail_path)
 
     from agent_mail_client import AgentMailClient
-    # agent_mail = AgentMailClient() # Disabled for stability
     agent_mail = None
     logger.info("AgentMailClient skipped for stability")
 except Exception as e:
     logger.warning(f"AgentMailClient failed to setup: {e}")
     agent_mail = None
+
+# Unified Observability (Phase 3)
+try:
+    from unified_monitoring import get_monitor
+    from unified_tracer import get_tracer
+    
+    # Initialize singleton instances
+    monitor = get_monitor(f"ai-telegram-bot-{bot_instance}")
+    monitor.start_heartbeat(interval=60)
+    
+    tracer = get_tracer(f"ai-telegram-bot-{bot_instance}")
+    if tracer:
+        logger.info("🔍 Unified Cloud Tracing Enabled")
+    
+except ImportError:
+    logger.warning("⚠️ Unified Observability modules not found")
+    monitor = None
+    tracer = None
 
 try:
     from modules.proxmox_manager import ProxmoxManager
@@ -1282,6 +1326,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.update_last_interaction(user_id)
     logger.info(f"[MESSAGE] Processing message from approved user {user_id}")
 
+    if monitor:
+        monitor.send_metric("messages_processed", 1)
+
     # Handle OAuth code - can start with "4/" or be a full URL
     auth_code = None
     if user_text.strip().startswith("4/"):
@@ -1998,6 +2045,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             logger.warning(f"Calendar not available for user {user_id}")
 
+    # 7. NOTION NOTE CREATION
+    notion_matches = re.findall(r"\[\[NOTION:(.*?)(?::(.*?))?\]\]", ai_response)
+    for title, content in notion_matches:
+        if notion_client:
+            try:
+                content = content or "Created via Gonya AI"
+                # Call notion client
+                url = await notion_client.create_page(title, content)
+                
+                # Construct tag for replacement
+                is_default = content == "Created via Gonya AI"
+                content_part = "" if is_default else f":{content}"
+                tag_re = f"[[NOTION:{title}{content_part}]]"
+                
+                if url:
+                    ai_response = ai_response.replace(
+                        tag_re,
+                        f"📝 _(Заметка Notion создана: [{title}]({url}))_"
+                    )
+                else:
+                    ai_response = ai_response.replace(tag_re, "❌ _(Ошибка Notion)_")
+            except Exception as e:
+                logger.error(f"Failed to create Notion page: {e}")
+        else:
+             logger.warning("Notion client not active")
+
+
     conv_manager.add_message(user_id, "assistant", ai_response)
     await update.message.reply_text(
         ai_response,
@@ -2202,11 +2276,16 @@ async def query_ollama_with_context(
         "4. Example of CORRECT response: 'Хорошо, передаю Игорю. "
         "[[RUN:MSG:igor:Игорь, нам нужно встретиться...]]'\n\n"
         "📋 TASKS & PROJECTS:\n"
-        "- Create Linear task: [[TASK:title:description]] (description is optional)\n"
+        "- Create Linear Issue: [[TASK:title:description]] (description is optional)\n"
+        "- Create Notion Note: [[NOTION:title:content]] (content is optional)\n"
+        "  (Use NOTION for research, ideas, long text. "
+        "Use TASK for actionable bugs/features)\n"
         "  - Expenses: [[EXPENSE:amount:category:description]]\n"
         "  - Calendar: [[EVENT:summary:iso_time:duration_mins:description]]\n"
         "  - Direct Messages: [[RUN:MSG:target:message]]\n\n"
-        "If user says 'напомни сделать отчет', output 'Ок! [[TASK:Сделать отчет]]'.\n\n"
+        "If user says 'напомни сделать отчет', output 'Ок! [[TASK:Сделать отчет]]'.\n"
+        "If user says 'сохрани идею для видео', output "
+        "'Супер! [[NOTION:Идея видео:Текст]]'.\n\n"
         "🔍 OTHER TOOLS:\n"
         "- Web search: /search <query>\n"
         "- Image generation: /img <prompt>\n"
@@ -5540,6 +5619,77 @@ def main():
     import threading
     api_thread = threading.Thread(target=start_api, daemon=True)
     api_thread.start()
+
+    # Start Alert Listener if configured
+    try:
+        if AlertListener:
+            project_id = os.getenv("GCP_PROJECT_ID", "my-home-435112")
+            
+            # Start listener in a separate thread because we don't have easy access to the event loop here 
+            # (application.run_polling manages its own loop usually)
+            # Actually, run_polling blocks. We need to start this BEFORE run_polling.
+            
+            # Define alert callback
+            async def handle_gcp_alert_wrapper(data):
+                try:
+                    # Basic formatting for Telegram
+                    incident = data.get("incident", {})
+                    summary = incident.get("summary", "No summary")
+                    url = incident.get("url", "#")
+                    state = incident.get("state", "UNKNOWN")
+                    
+                    # Format message
+                    emoji = "🚨" if state == "OPEN" else "✅"
+                    msg = (
+                        f"{emoji} **GCP Alert: {state}**\n\n"
+                        f"**Summary:** {summary}\n"
+                        f"**Link:** [View Incident]({url})\n"
+                        f"**Resource:** {incident.get('resource_name', 'N/A')}"
+                    )
+                    
+                    # Send to all admins
+                    admins = db.list_admins()
+                    for admin in admins:
+                        try:
+                            # We need to schedule this on the bot's loop
+                            await application.bot.send_message(
+                                chat_id=admin["user_id"],
+                                text=msg,
+                                parse_mode="Markdown"
+                            )
+                        except Exception as e:
+                            logger.error(f"Failed to send alert to {admin['user_id']}: {e}")
+
+                except Exception as e:
+                    logger.error(f"Error handling GCP alert payload: {e}")
+
+            # Instantiate listener
+            alert_listener = AlertListener(project_id, "gcp-alerts-bot-sub")
+
+            # Hook into post_init to get the running loop
+            original_post_init = application.post_init
+
+            async def post_init_wrapper(app):
+                if original_post_init:
+                    await original_post_init(app)
+                loop = asyncio.get_running_loop()
+                # Pass the loop explicitly so listener can schedule callbacks on it
+                alert_listener.start(handle_gcp_alert_wrapper, loop)
+                logger.info("✅ GCP Alert Listener started (via post_init)")
+                
+                # Start Self-Healing Watchdog
+                if SelfHealer:
+                    healer = SelfHealer(namespace="default") # Assuming default namespace for now
+                    if healer.is_active:
+                        asyncio.create_task(healer.run_loop())
+                        logger.info("✅ Self-Healing Watchdog started")
+                    else:
+                        logger.warning("⚠️ Self-Healing Watchdog inactive (missing k8s config)")
+
+            application.post_init = post_init_wrapper
+
+    except Exception as e:
+        logger.error(f"Failed to configure GCP Alert Listener: {e}")
 
     logger.info("[STARTUP] Starting polling...")
     print("Bot V2 (AI_Core) is running...")

@@ -44,14 +44,16 @@ class VideoGenerator:
             self.api_key = KLING_API_KEY
             self.base_url = KLING_BASE_URL
         else:
-            logger.warning(f"Provider '{provider}' not configured. Video generation disabled.")
+            logger.warning(
+                f"Provider '{provider}' not configured. Video generation disabled."
+            )
 
     def generate_video(
         self,
         prompt: str,
         duration: int = 4,
         style: str = "realistic",
-        output_path: Optional[Path] = None
+        output_path: Optional[Path] = None,
     ) -> Optional[Path]:
         """
         Generate AI video clip.
@@ -81,36 +83,31 @@ class VideoGenerator:
             return None
 
     def _generate_runway(
-        self,
-        prompt: str,
-        duration: int,
-        style: str,
-        output_path: Optional[Path]
+        self, prompt: str, duration: int, style: str, output_path: Optional[Path]
     ) -> Path:
         """Generate video using Runway ML Gen-3."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         # Enhance prompt with style
-        full_prompt = f"{prompt}, {style} style, high quality, professional cinematography"
+        full_prompt = (
+            f"{prompt}, {style} style, high quality, professional cinematography"
+        )
 
         payload = {
             "text_prompt": full_prompt,
             "duration": duration,
             "aspect_ratio": "16:9",
-            "model": "gen3"
+            "model": "gen3",
         }
 
         logger.info(f"🎬 Runway Gen-3: {prompt[:50]}...")
 
         # Step 1: Create generation task
         response = requests.post(
-            f"{self.base_url}/generate",
-            json=payload,
-            headers=headers,
-            timeout=30
+            f"{self.base_url}/generate", json=payload, headers=headers, timeout=30
         )
         response.raise_for_status()
 
@@ -123,9 +120,7 @@ class VideoGenerator:
 
         while time.time() - start_time < max_wait:
             status_response = requests.get(
-                f"{self.base_url}/tasks/{task_id}",
-                headers=headers,
-                timeout=10
+                f"{self.base_url}/tasks/{task_id}", headers=headers, timeout=10
             )
             status_response.raise_for_status()
 
@@ -158,31 +153,24 @@ class VideoGenerator:
         raise TimeoutError("Runway generation timed out")
 
     def _generate_luma(
-        self,
-        prompt: str,
-        duration: int,
-        style: str,
-        output_path: Optional[Path]
+        self, prompt: str, duration: int, style: str, output_path: Optional[Path]
     ) -> Path:
         """Generate video using Luma AI Dream Machine."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         payload = {
             "prompt": f"{prompt}, {style}",
             "aspect_ratio": "16:9",
-            "loop": False
+            "loop": False,
         }
 
         logger.info(f"🌙 Luma AI: {prompt[:50]}...")
 
         response = requests.post(
-            f"{self.base_url}/generations",
-            json=payload,
-            headers=headers,
-            timeout=30
+            f"{self.base_url}/generations", json=payload, headers=headers, timeout=30
         )
         response.raise_for_status()
 
@@ -196,7 +184,7 @@ class VideoGenerator:
             status_response = requests.get(
                 f"{self.base_url}/generations/{generation_id}",
                 headers=headers,
-                timeout=10
+                timeout=10,
             )
             status_response.raise_for_status()
 
@@ -226,32 +214,25 @@ class VideoGenerator:
         raise TimeoutError("Luma generation timed out")
 
     def _generate_kling(
-        self,
-        prompt: str,
-        duration: int,
-        style: str,
-        output_path: Optional[Path]
+        self, prompt: str, duration: int, style: str, output_path: Optional[Path]
     ) -> Path:
         """Generate video using Kling AI."""
         # Kling API implementation (placeholder - adapt to actual API)
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         payload = {
             "prompt": f"{prompt}, {style} style",
             "duration": duration,
-            "resolution": "1080p"
+            "resolution": "1080p",
         }
 
         logger.info(f"🎥 Kling AI: {prompt[:50]}...")
 
         response = requests.post(
-            f"{self.base_url}/text2video",
-            json=payload,
-            headers=headers,
-            timeout=30
+            f"{self.base_url}/text2video", json=payload, headers=headers, timeout=30
         )
         response.raise_for_status()
 
@@ -263,9 +244,7 @@ class VideoGenerator:
 
         while time.time() - start_time < max_wait:
             status_response = requests.get(
-                f"{self.base_url}/task/{task_id}",
-                headers=headers,
-                timeout=10
+                f"{self.base_url}/task/{task_id}", headers=headers, timeout=10
             )
             status_response.raise_for_status()
 
@@ -300,7 +279,7 @@ if __name__ == "__main__":
     video_path = gen.generate_video(
         prompt="A futuristic cityscape at sunset, flying cars in the sky, neon lights",
         duration=5,
-        style="cinematic"
+        style="cinematic",
     )
 
     if video_path:

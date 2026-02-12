@@ -1,0 +1,19 @@
+{
+  "defaults": {
+    "output_language": "en",
+    "translation_tag": "[translated]",
+    "strip_original": true
+  },
+  "users": {
+    "igor": {
+      "output_language": "ru",
+      "translation_tag": "[перевод]",
+      "strip_original": true
+    }
+  },
+  "agents": {
+    "Antigravity": {
+      "user": "igor"
+    }
+  }
+}

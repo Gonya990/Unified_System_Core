@@ -10,3 +10,6 @@ kubernetes>=29.0.0
 psycopg2-binary
 requests
 python-dotenv
+google-cloud-monitoring>=2.14.0
+google-cloud-logging>=3.5.0
+google-cloud-trace>=1.0.0

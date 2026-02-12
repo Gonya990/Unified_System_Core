@@ -24,10 +24,14 @@ def add_subtitles(video_path: str, output_path: str, text: str):
     cmd = [
         "pycaps",
         str(video_path),
-        "-o", str(output_path),
-        "--style", "hormozi",  # Dynamic word-by-word style
-        "--font-size", "60",
-        "--stroke-width", "3"
+        "-o",
+        str(output_path),
+        "--style",
+        "hormozi",  # Dynamic word-by-word style
+        "--font-size",
+        "60",
+        "--stroke-width",
+        "3",
     ]
 
     try:
@@ -40,6 +44,7 @@ def add_subtitles(video_path: str, output_path: str, text: str):
     except FileNotFoundError:
         print("❌ Error: 'pycaps' command not found")
         return False
+
 
 if __name__ == "__main__":
     import sys
