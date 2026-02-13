@@ -151,7 +151,7 @@ GitHub Models.
     * [x] Enable Firebase MCP features for project management.
 2. **Gemini Code Assist / Ассистент Gemini:**
     * [x] Enable `cloudaicompanion.googleapis.com` API.
-    * [ ] Verify IDE integration (manual user step).
+    * [x] Verify IDE integration (manual user step).
 3. **VirusTotal Security Pipeline / Пайплайн безопасности VirusTotal:**
     * [x] Implement `scripts/security/scan_release.py` (Zip + Hash + VT Check).
     * [x] Integrate into "Release" workflow (GitHub Actions).
