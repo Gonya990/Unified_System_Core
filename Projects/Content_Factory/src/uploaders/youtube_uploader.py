@@ -38,7 +38,9 @@ def get_authenticated_service(token_file=None):
     # Check if token exists
     if active_token_file.exists():
         try:
-            creds = Credentials.from_authorized_user_file(str(active_token_file), SCOPES)
+            creds = Credentials.from_authorized_user_file(
+                str(active_token_file), SCOPES
+            )
         except Exception as e:
             print(f"⚠️ Error loading token: {e}")
             creds = None
@@ -55,7 +57,9 @@ def get_authenticated_service(token_file=None):
 
         if not creds:
             if not CLIENT_SECRETS_FILE.exists():
-                print(f"❌ Error: Client secrets file not found at {CLIENT_SECRETS_FILE}")
+                print(
+                    f"❌ Error: Client secrets file not found at {CLIENT_SECRETS_FILE}"
+                )
                 print(
                     "ℹ️  Please download 'client_secrets.json' from Google Cloud "
                     "Console (OAuth 2.0 Client ID) and place it there."
@@ -63,7 +67,9 @@ def get_authenticated_service(token_file=None):
                 return None
 
             print("🔐 Initiating OAuth 2.0 login flow...")
-            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS_FILE), SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                str(CLIENT_SECRETS_FILE), SCOPES
+            )
             creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
@@ -115,9 +121,13 @@ def upload_video(
     print(f"🚀 Uploading '{title}'...")
 
     # Chunk size: 4MB
-    media = MediaFileUpload(str(file_path), chunksize=4 * 1024 * 1024, resumable=True, mimetype="video/mp4")
+    media = MediaFileUpload(
+        str(file_path), chunksize=4 * 1024 * 1024, resumable=True, mimetype="video/mp4"
+    )
 
-    request = youtube.videos().insert(part=",".join(body.keys()), body=body, media_body=media)
+    request = youtube.videos().insert(
+        part=",".join(body.keys()), body=body, media_body=media
+    )
 
     response = None
     while response is None:
@@ -127,7 +137,9 @@ def upload_video(
                 print(f"📊 Uploaded {int(status.progress() * 100)}%")
         except HttpError as e:
             if e.resp.status in [500, 502, 503, 504]:
-                print(f"⚠️ Media upload failed with error {e}. Retrying in 5 seconds...")
+                print(
+                    f"⚠️ Media upload failed with error {e}. Retrying in 5 seconds..."
+                )
                 time.sleep(5)
                 continue
             else:

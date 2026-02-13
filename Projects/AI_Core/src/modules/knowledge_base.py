@@ -14,7 +14,9 @@ class KnowledgeBase:
     """
 
     def __init__(self, db_url=None):
-        default_url = "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
+        default_url = (
+            "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
+        )
         self.db_url = db_url or os.getenv("DATABASE_URL", default_url)
         self.conn = None
 
@@ -34,7 +36,8 @@ class KnowledgeBase:
         self.connect()
         with self.conn.cursor() as cur:
             # Table for agent experiences and learnings
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS agent_memories (
                     id SERIAL PRIMARY KEY,
                     agent_name TEXT NOT NULL,
@@ -43,9 +46,11 @@ class KnowledgeBase:
                     importance INTEGER DEFAULT 1,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
-            """)
+            """
+            )
             # Table for tracking project-wide state and progress
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS project_status (
                     project_id TEXT PRIMARY KEY,
                     current_milestone TEXT,
@@ -53,10 +58,15 @@ class KnowledgeBase:
                     metadata JSONB DEFAULT '{}',
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
-            """)
+            """
+            )
             # Create indexes for performance
-            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_agent ON agent_memories(agent_name);")
-            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_type ON agent_memories(memory_type);")
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_memories_agent ON agent_memories(agent_name);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_memories_type ON agent_memories(memory_type);"
+            )
             logger.info("Knowledge Base schema initialized.")
 
     def add_memory(self, agent_name, content, memory_type="general", importance=1):
@@ -127,7 +137,12 @@ if __name__ == "__main__":
     kb = KnowledgeBase()
     try:
         kb.init_schema()
-        kb.update_project_status("Unified_System_Core", "Knowledge Base Implementation", "OK", {"version": "3.0"})
+        kb.update_project_status(
+            "Unified_System_Core",
+            "Knowledge Base Implementation",
+            "OK",
+            {"version": "3.0"},
+        )
         print("Knowledge Base initialized and tested.")
     except Exception as e:
         print(f"Initialization failed: {e}")

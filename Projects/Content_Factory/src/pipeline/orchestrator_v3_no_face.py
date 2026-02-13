@@ -103,7 +103,9 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using OpenAI TTS with Studio Post-Processing"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
 
-    api_key = (broker.get_key("openai") if broker else None) or os.getenv("OPENAI_API_KEY")
+    api_key = (broker.get_key("openai") if broker else None) or os.getenv(
+        "OPENAI_API_KEY"
+    )
     if not api_key:
         print("❌ Error: OPENAI_API_KEY not found via TokenBroker or Environment.")
         return False
@@ -133,7 +135,9 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
                 "-i",
                 str(mp3_path),
                 "-af",
-                ("bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"),
+                (
+                    "bass=g=4:f=100,treble=g=2:f=8000,acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
+                ),
                 "-ar",
                 "44100",
                 "-ac",
@@ -224,7 +228,9 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
     """Fallback: Transcription using Gemini 1.5 Flash (Vibranium Resilience)"""
     print("🌠 Falling back to Gemini for transcription...")
     api_key = (
-        (broker.get_key("gemini") if broker else None) or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        (broker.get_key("gemini") if broker else None)
+        or os.getenv("GEMINI_API_KEY")
+        or os.getenv("GOOGLE_API_KEY")
     )
     if not api_key:
         print("❌ Gemini Transcription failed: No API Key found.")
@@ -246,7 +252,9 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
         )
 
         # Structure payload correctly for Gemini
-        response = model.generate_content([prompt, {"mime_type": "audio/wav", "data": audio_data}])
+        response = model.generate_content(
+            [prompt, {"mime_type": "audio/wav", "data": audio_data}]
+        )
 
         text = response.text.strip()
         if "```json" in text:
@@ -276,7 +284,9 @@ def transcribe_audio_whisper(audio_path: Path) -> list[dict]:
     time.sleep(1.5)
 
     print("🧠 Transcribing audio for word-level subtitles...")
-    api_key = (broker.get_key("openai") if broker else None) or os.getenv("OPENAI_API_KEY")
+    api_key = (broker.get_key("openai") if broker else None) or os.getenv(
+        "OPENAI_API_KEY"
+    )
 
     # 1. Main Strategy: OpenAI Whisper
     if api_key:
@@ -335,7 +345,9 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     return generate_audio_edge(text, output_path, fallback_voice)
 
 
-def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: str = "impact") -> bool:
+def add_subtitles(
+    video_path: Path, output_path: Path, lang: str = "ru", style: str = "impact"
+) -> bool:
     """Add dynamic word-by-word subtitles matching style"""
     style_label = "Impact Vision" if style == "impact" else "Cartoon Fun"
     print(f"📝 Burning '{style_label}' Style Subtitles...")
@@ -366,7 +378,13 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "ru", style: 
         end = w.end if hasattr(w, "end") else w.get("end", 0)
         text = w.word if hasattr(w, "word") else w.get("word", "")
 
-        text = text.upper().replace("'", "").replace(":", "").replace('"', "").replace("\\", "")
+        text = (
+            text.upper()
+            .replace("'", "")
+            .replace(":", "")
+            .replace('"', "")
+            .replace("\\", "")
+        )
 
         if style == "impact":
             # Color: Golden Yellow (0xFFD700)
@@ -439,7 +457,9 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
     # If audio duration is 0 or invalid, use a fallback and warn
     if not audio_duration or audio_duration <= 0:
         audio_duration = 10.0  # Fallback to 10 seconds
-        msg = f"❌ Could not estimate segment duration: {audio_path.name}. Using fallback."
+        msg = (
+            f"❌ Could not estimate segment duration: {audio_path.name}. Using fallback."
+        )
         print(msg)
 
     print(f"⏱ Audio duration: {audio_duration}s")
@@ -457,7 +477,9 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
         remaining = audio_duration - current_time
         target_duration = min(clip_duration, remaining)
 
-        trimmed_path = output_path.parent / f"temp_{output_path.stem}_clip_{len(final_clips)}.mp4"
+        trimmed_path = (
+            output_path.parent / f"temp_{output_path.stem}_clip_{len(final_clips)}.mp4"
+        )
         subprocess.run(
             [
                 "ffmpeg",
@@ -467,7 +489,9 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
                 "-t",
                 str(target_duration),
                 "-vf",
-                ("scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"),  # Vertical format
+                (
+                    "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+                ),  # Vertical format
                 "-c:v",
                 "libx264",
                 "-pix_fmt",
@@ -544,7 +568,9 @@ def assemble_broll_only_video(audio_path: Path, clips: list[Path], output_path: 
 # API Setup (loaded from .env)
 
 
-def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Path, style: str = "impact"):
+def assemble_hybrid_video(
+    audio_path: Path, scenes: list[dict], output_path: Path, style: str = "impact"
+):
     """
     Create a CINEMATIC or CARTOON high-energy video.
     """
@@ -575,7 +601,9 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
     else:
         duration_per_scene = 5.0  # Fallback
 
-    print(f"⏱️ Exact Scene Duration: {duration_per_scene:.2f}s (Total: {audio_duration:.2f}s)")
+    print(
+        f"⏱️ Exact Scene Duration: {duration_per_scene:.2f}s (Total: {audio_duration:.2f}s)"
+    )
 
     segments = []
 
@@ -752,7 +780,9 @@ def assemble_hybrid_video(audio_path: Path, scenes: list[dict], output_path: Pat
         # Ultra-clean audio with minimal reverb for heavy documentaries
         audio_filter = "acompressor=threshold=-15dB:ratio=4:attack=5:release=50,aecho=0.8:0.3:20:0.1,loudnorm"
     else:
-        audio_filter = "acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
+        audio_filter = (
+            "acompressor=threshold=-12dB:ratio=3:attack=5:release=50,loudnorm"
+        )
 
     try:
         subprocess.run(
@@ -892,7 +922,9 @@ if __name__ == "__main__":
     )
 
     # Mapping scenes to images (using the ones generated across steps)
-    gen_dir = Path("/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16")
+    gen_dir = Path(
+        "/Users/macbook/.gemini/antigravity/brain/74acf072-6bc0-4fdc-9ad0-33f04fb9fa16"
+    )
 
     # Selecting the best 15 images and defining keywords for B-roll
     # (POWER, NATURE, CINEMA)
@@ -945,7 +977,9 @@ if __name__ == "__main__":
     for scene in scene_data:
         matches = list(gen_dir.glob(f"{scene['image']}_*.png"))
         if matches:
-            selected_scenes.append({"image": sorted(matches)[-1], "keyword": scene["keyword"]})
+            selected_scenes.append(
+                {"image": sorted(matches)[-1], "keyword": scene["keyword"]}
+            )
         else:
             print(f"⚠️ Image {scene['image']} not found in {gen_dir}")
 
@@ -953,7 +987,9 @@ if __name__ == "__main__":
 
     # Run RU pipeline
     if len(selected_scenes) >= 15:
-        run_no_face_pipeline(script_ru, lang="ru", output_name="ai_council_ru", scenes=selected_scenes)
+        run_no_face_pipeline(
+            script_ru, lang="ru", output_name="ai_council_ru", scenes=selected_scenes
+        )
 
         # English translation (Refined for Natural TTS)
         script_en = (
@@ -991,6 +1027,10 @@ if __name__ == "__main__":
             "mind and technology unite to create a completely new world... "
             "the world of tomorrow."
         )
-        run_no_face_pipeline(script_en, lang="en", output_name="ai_council_en", scenes=selected_scenes)
+        run_no_face_pipeline(
+            script_en, lang="en", output_name="ai_council_en", scenes=selected_scenes
+        )
     else:
-        print(f"❌ Not enough images found ({len(selected_scenes)}/15). Check gen_dir: {gen_dir}")
+        print(
+            f"❌ Not enough images found ({len(selected_scenes)}/15). Check gen_dir: {gen_dir}"
+        )

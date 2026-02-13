@@ -11,7 +11,8 @@ SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 LOCAL_CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 CREDENTIALS_FILE = (
-    Path(__file__).resolve().parent.parent.parent.parent.parent / "Projects/AI_Core/config/gmail_credentials.json"
+    Path(__file__).resolve().parent.parent.parent.parent.parent
+    / "Projects/AI_Core/config/gmail_credentials.json"
 )
 TOKEN_FILE = Path(__file__).parent / "drive_token.pickle"
 
@@ -29,7 +30,9 @@ def get_drive_service():
             if not CREDENTIALS_FILE.exists():
                 print(f"❌ Credentials file not found at {CREDENTIALS_FILE}")
                 return None
-            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                str(CREDENTIALS_FILE), SCOPES
+            )
             creds = flow.run_local_server(port=0)
 
         with open(TOKEN_FILE, "wb") as token:
@@ -47,7 +50,9 @@ def list_files(service, folder_id=None):
             q=(
                 f"'{folder_id}' in parents"
                 if folder_id
-                else ("name = 'Context' and mimeType = 'application/vnd.google-apps.folder'")
+                else (
+                    "name = 'Context' and mimeType = 'application/vnd.google-apps.folder'"
+                )
             ),
         )
         .execute()
@@ -93,7 +98,9 @@ def sync_context_folder():
             print(f"⬆️ Uploading {file_path.name}...")
             file_metadata = {"name": file_path.name, "parents": [folder_id]}
             media = MediaFileUpload(str(file_path), resumable=True)
-            service.files().create(body=file_metadata, media_body=media, fields="id").execute()
+            service.files().create(
+                body=file_metadata, media_body=media, fields="id"
+            ).execute()
 
     # 3. Download missing Drive files
     print("📥 Syncing Drive -> Local...")

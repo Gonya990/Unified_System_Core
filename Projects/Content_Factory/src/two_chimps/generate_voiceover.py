@@ -13,7 +13,9 @@ from TTS.tts.models.xtts import XttsArgs, XttsAudioConfig
 
 # Fix for torch.load weights_only=True issue
 try:
-    torch.serialization.add_safe_globals([XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs])
+    torch.serialization.add_safe_globals(
+        [XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs]
+    )
 except AttributeError:
     pass  # Older torch versions don't need this
 
@@ -26,7 +28,9 @@ load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
-BIOMETRICS_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/secure_vault/biometrics")
+BIOMETRICS_DIR = Path(
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/secure_vault/biometrics"
+)
 
 if not AUDIO_DIR.exists():
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
@@ -120,7 +124,9 @@ def generate_voiceover_xtts(script_path):
             continue
 
         # Select Voice
-        speaker_wav = str(ref_rex) if (role == "Skeptic" or "Rex" in role) else str(ref_trike)
+        speaker_wav = (
+            str(ref_rex) if (role == "Skeptic" or "Rex" in role) else str(ref_trike)
+        )
 
         print(f"  🗣️ {role}: {text[:30]}...")
 
@@ -171,7 +177,9 @@ if __name__ == "__main__":
             print(f"❌ Scripts directory not found: {SCRIPTS_DIR}")
             sys.exit(1)
 
-        script_files = list(SCRIPTS_DIR.glob("*_script.md")) + list(SCRIPTS_DIR.glob("*.json"))
+        script_files = list(SCRIPTS_DIR.glob("*_script.md")) + list(
+            SCRIPTS_DIR.glob("*.json")
+        )
         if not script_files:
             print(f"❌ No script files found in {SCRIPTS_DIR}.")
 

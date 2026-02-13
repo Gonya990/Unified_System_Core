@@ -60,7 +60,9 @@ def get_key(provider, owner=None):
     return None
 
 
-PEXELS_API_KEY = get_key("pexels") or "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
+PEXELS_API_KEY = (
+    get_key("pexels") or "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
+)
 
 
 def get_client():
@@ -95,7 +97,9 @@ def get_latest_geo_news():
     url = f"https://news.google.com/rss/search?q={encoded_query}+when:1d&hl=en-US&gl=US&ceid=US:en"
     try:
         feed = feedparser.parse(url)
-        items = [{"title": entry.title, "link": entry.link} for entry in feed.entries[:5]]
+        items = [
+            {"title": entry.title, "link": entry.link} for entry in feed.entries[:5]
+        ]
         print(f"✅ Found {len(items)} news items.")
         return items
     except Exception as e:
@@ -143,9 +147,13 @@ def get_evergreen_topics():
     ]
 
 
-def run_daily_research(style="impact", deep=False, manual_topic=None, manual_outline=None):
+def run_daily_research(
+    style="impact", deep=False, manual_topic=None, manual_outline=None
+):
     """Deep research with Megaforma Style (Geopolitics/Mystery) or Manual Inspiration"""
-    print(f"🧠 Starting MEGAFORMA {'DEEP ' if deep else ''}RESEARCH (Style: {style.upper()})")
+    print(
+        f"🧠 Starting MEGAFORMA {'DEEP ' if deep else ''}RESEARCH (Style: {style.upper()})"
+    )
 
     context = ""
 
@@ -169,7 +177,9 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
         max_articles = 10 if deep else 2
         for item in news[:max_articles]:
             print(f"🔍 Browsing: {item['title']}...")
-            context += f"TOPIC: {item['title']}\nCONTENT: {get_page_content(item['link'])}\n\n"
+            context += (
+                f"TOPIC: {item['title']}\nCONTENT: {get_page_content(item['link'])}\n\n"
+            )
 
     # Style definitions
     if style == "cartoon":
@@ -184,9 +194,7 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
     else:
         # The "Megaforma" signature style (Peace & Tech Edition)
         tone = "Inspiring, Visionary, Optimistic, Deep Documentary, Unifying"
-        visuals = (
-            "cinematic documentary footage, solar punk, high tech city, bright future, digital connections, nebula"
-        )
+        visuals = "cinematic documentary footage, solar punk, high tech city, bright future, digital connections, nebula"
 
     prompt = f"""
     Context: {context}
@@ -229,11 +237,15 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
     # Strategy: Gemini (Primary for DEEP RESEARCH due to context window)
     if deep:
         try:
-            print(f"🌠 DEEP RESEARCH: Attempting via Gemini (Context size: {len(context)})")
+            print(
+                f"🌠 DEEP RESEARCH: Attempting via Gemini (Context size: {len(context)})"
+            )
             import google.generativeai as genai
 
             genai.configure(api_key=get_key("gemini"))
-            model = genai.GenerativeModel("models/gemini-1.5-pro")  # Using Pro for deep research
+            model = genai.GenerativeModel(
+                "models/gemini-1.5-pro"
+            )  # Using Pro for deep research
             res = model.generate_content(prompt)
             content = res.text
             if "```json" in content:
@@ -252,17 +264,23 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
                 res = client.responses.create(
                     model="gpt-4o",
                     input=prompt,
-                    instructions=("Return ONLY valid JSON. No markdown, no explanations."),
+                    instructions=(
+                        "Return ONLY valid JSON. No markdown, no explanations."
+                    ),
                 )
                 content = res.output_text
             except Exception as e:
-                print(f"⚠️ Responses API not available ({e}), trying standard Chat Completions...")
+                print(
+                    f"⚠️ Responses API not available ({e}), trying standard Chat Completions..."
+                )
                 res = client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
                         {
                             "role": "system",
-                            "content": ("Return ONLY valid JSON. No markdown, no explanations."),
+                            "content": (
+                                "Return ONLY valid JSON. No markdown, no explanations."
+                            ),
                         },
                         {"role": "user", "content": prompt},
                     ],
@@ -290,7 +308,9 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
                 content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
         except Exception as e:
-            print(f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)...")
+            print(
+                f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)..."
+            )
 
     # Strategy 3: Ollama
     if not data:
@@ -300,7 +320,9 @@ def run_daily_research(style="impact", deep=False, manual_topic=None, manual_out
                 "http://localhost:11434/api/generate",
                 json={
                     "model": "llama3",
-                    "prompt": (f"{prompt}\nReturn ONLY JSON. Do not include markdown or explanations."),
+                    "prompt": (
+                        f"{prompt}\nReturn ONLY JSON. Do not include markdown or explanations."
+                    ),
                     "stream": False,
                     "format": "json",
                 },
@@ -334,9 +356,7 @@ def get_style_prompt_prefix(style):
     if style == "cartoon":
         return "cartoon style, 3d animation, pixar quality, vibrant colors, vertical 9:16 format"
     elif style == "sketch":
-        return (
-            "black and white pencil sketch, charcoal drawing, rough lines, artistic, minimalist, vertical 9:16 format"
-        )
+        return "black and white pencil sketch, charcoal drawing, rough lines, artistic, minimalist, vertical 9:16 format"
     elif style == "painting":
         return "digital painting, oil painting style, brush strokes, artistic, vivid colors, vertical 9:16 format"
     else:  # impact/default
@@ -425,7 +445,9 @@ def generate_sdxl_images(scenes, output_dir: Path, style="impact"):
                     sdxl_url,
                     json={
                         "prompt": prompt,
-                        "negative_prompt": ("ugly, blurry, low quality, distorted, text, watermark"),
+                        "negative_prompt": (
+                            "ugly, blurry, low quality, distorted, text, watermark"
+                        ),
                         "width": 1080,
                         "height": 1920,
                         "steps": 25,
@@ -459,7 +481,9 @@ def generate_dalle_assets(scenes, output_dir: Path, style="impact"):
         time.sleep(2.0)  # User requested tactical pause
         try:
             prompt = f"{prefix}, VERTICAL 9:16, {s['keyword']}"
-            res = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1792", n=1)
+            res = client.images.generate(
+                model="dall-e-3", prompt=prompt, size="1024x1792", n=1
+            )
             img_data = requests.get(res.data[0].url).content
             path = output_dir / f"{s['image']}.jpg"
             with open(path, "wb") as f:
@@ -543,7 +567,11 @@ def check_local_context_files(scenes, output_dir: Path):
 
     # Simple keyword matching from filenames
     # Get all image/video files
-    candidates = list(context_dir.rglob("*.jpg")) + list(context_dir.rglob("*.png")) + list(context_dir.rglob("*.mp4"))
+    candidates = (
+        list(context_dir.rglob("*.jpg"))
+        + list(context_dir.rglob("*.png"))
+        + list(context_dir.rglob("*.mp4"))
+    )
 
     print(f"📂 Checking {len(candidates)} local context files for matches...")
 
@@ -571,8 +599,12 @@ def check_local_context_files(scenes, output_dir: Path):
 
 def generate_vision_assets(scenes, output_dir: Path, style="impact"):
     """💎 VIBRANIUM TRIPLE-THREAT: Local Context → Free → Paid Failover"""
-    print(f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})")
-    print("   Priority: Context → Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels")
+    print(
+        f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})"
+    )
+    print(
+        "   Priority: Context → Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels"
+    )
 
     # LEVEL 0: LOCAL CONTEXT (Highest Priority - Brand Assets)
     resolved = check_local_context_files(scenes, output_dir)
@@ -700,7 +732,9 @@ def main():
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     if len(resolved_scenes) < len(scenes):
-        print(f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated.")
+        print(
+            f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated."
+        )
 
     # 3. Handover to Orchestrator (Audio + Video Assembly)
     print("🤝 Handing over to Orchestrator v3 (No-Face)...")

@@ -86,7 +86,11 @@ class HAController:
             # Fuzzy match
             import difflib
 
-            candidates = [e for e in entity_ids if e.startswith("light.") or e.startswith("switch.")]
+            candidates = [
+                e
+                for e in entity_ids
+                if e.startswith("light.") or e.startswith("switch.")
+            ]
             # Try to match simple name (e.g. "corridor" against
             # "light.corridor_switch_1")
 
@@ -105,20 +109,28 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    logger.info(
+                        f"Friendly name match found: {entity_id} -> {fname} ({target})"
+                    )
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
+                    logger.info(
+                        f"Exact partial entity_id match found: {entity_id} -> {target}"
+                    )
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    matches = difflib.get_close_matches(
+                        target, candidates, n=1, cutoff=0.5
+                    )
                     if matches:
                         target = matches[0]
-                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                        logger.info(
+                            f"Fuzzy entity_id match found: {entity_id} -> {target}"
+                        )
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
@@ -137,7 +149,11 @@ class HAController:
             # Fuzzy match
             import difflib
 
-            candidates = [e for e in entity_ids if e.startswith("light.") or e.startswith("switch.")]
+            candidates = [
+                e
+                for e in entity_ids
+                if e.startswith("light.") or e.startswith("switch.")
+            ]
 
             # 1. Search by Friendly Name (Russian/Exact)
             # Create map of name -> entity_id
@@ -154,20 +170,28 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
+                    logger.info(
+                        f"Friendly name match found: {entity_id} -> {fname} ({target})"
+                    )
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
+                    logger.info(
+                        f"Exact partial entity_id match found: {entity_id} -> {target}"
+                    )
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
+                    matches = difflib.get_close_matches(
+                        target, candidates, n=1, cutoff=0.5
+                    )
                     if matches:
                         target = matches[0]
-                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
+                        logger.info(
+                            f"Fuzzy entity_id match found: {entity_id} -> {target}"
+                        )
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
@@ -271,7 +295,11 @@ class HAController:
             return None
         return self.client.reload_integration(entry_id)
 
-    async def speak_via_yandex(self, message: str, entity_id: str = "media_player.yandex_station_c00tc40000wq8k"):
+    async def speak_via_yandex(
+        self,
+        message: str,
+        entity_id: str = "media_player.yandex_station_c00tc40000wq8k",
+    ):
         """Send TTS message via Yandex Station."""
         if not self.client:
             return False
@@ -329,7 +357,9 @@ class HAController:
                     if state not in ["unknown", "unavailable"]:
                         item = f"{eid} ({fname}): {state}"
                         if domain == "sensor":
-                            unit = s.get("attributes", {}).get("unit_of_measurement", "")
+                            unit = s.get("attributes", {}).get(
+                                "unit_of_measurement", ""
+                            )
                             if unit:
                                 item += f" {unit}"
                         context.append(item)

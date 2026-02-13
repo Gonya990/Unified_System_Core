@@ -9,12 +9,14 @@ CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent.parent.parent.parent
 # /Users/igorgoncharenko/Documents/Unified_System_Core
 # Use absolute path for reliability
-AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+AI_CORE_SRC_PATH = (
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
+)
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
-import openai
-from token_broker import TokenBroker
+import openai  # noqa: E402
+from token_broker import TokenBroker  # noqa: E402
 
 # Logging
 logging.basicConfig(level=logging.INFO)
