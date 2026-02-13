@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-
 from typing import Optional
 
 try:
@@ -11,7 +10,7 @@ except ImportError:
     K8S_AVAILABLE = False
 
 try:
-    from github import Github, Auth
+    from github import Auth, Github
     GITHUB_AVAILABLE = True
 except ImportError:
     GITHUB_AVAILABLE = False
@@ -29,7 +28,7 @@ class SelfHealer:
         self.namespace = namespace
         self.github_token = github_token or os.getenv("GITHUB_TOKEN")
         self.is_active = False
-        
+
         if K8S_AVAILABLE:
             try:
                 # Try in-cluster first, then local kubeconfig
@@ -39,7 +38,7 @@ class SelfHealer:
                 except config.ConfigException:
                     config.load_kube_config()
                     logger.info("Loaded local Kubeconfig")
-                
+
                 self.v1 = client.CoreV1Api()
                 self.apps_v1 = client.AppsV1Api()
                 self.is_active = True
@@ -57,13 +56,13 @@ class SelfHealer:
             return
 
         logger.info(f"🛡 Self-Healing Watchdog started (Interval: {check_interval}s)")
-        
+
         while True:
             try:
                 await self.check_pods()
             except Exception as e:
                 logger.error(f"Error in self-healing loop: {e}")
-            
+
             await asyncio.sleep(check_interval)
 
     async def check_pods(self):
@@ -72,27 +71,27 @@ class SelfHealer:
         await asyncio.to_thread(self._check_pods_sync)
 
     def _check_pods_sync(self):
-        if not self.is_active: 
+        if not self.is_active:
             return
 
         pods = self.v1.list_namespaced_pod(self.namespace)
         for pod in pods.items:
             name = pod.metadata.name
             # status = pod.status.phase
-            
+
             # Check container statuses
             if pod.status.container_statuses:
                 for container in pod.status.container_statuses:
                     restart_count = container.restart_count
                     state = container.state
-                    
+
                     # Detection Logic
                     is_crashing = (
                         state.waiting and state.waiting.reason == "CrashLoopBackOff"
                     ) or (
                         state.terminated and state.terminated.exit_code != 0
                     )
-                    
+
                     if is_crashing or restart_count > 5:
                         logger.warning(
                             f"⚠️ Pod {name} container {container.name} is unstable! "
@@ -105,7 +104,7 @@ class SelfHealer:
         # 1. Check if we already have an issue open
         if GITHUB_AVAILABLE and self.github_token:
             self._create_github_issue(pod, container)
-        
+
         # 2. Add future auto-remediation (e.g., restart deployment if stuck)
         # For now, we just alert via logs (alerts handle the rest)
 
@@ -130,7 +129,7 @@ class SelfHealer:
                 f"**State:** `{container.state}`\n\n"
                 "Please investigate immediately via `kubectl logs`."
             )
-            
+
             # Check for existing open issues with same title
             issues = repo.get_issues(state="open", labels=["bug", "auto-heal"])
             for issue in issues:

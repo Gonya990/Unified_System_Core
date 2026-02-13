@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 import psycopg2
 from psycopg2.extras import Json
 
@@ -90,20 +91,20 @@ class KnowledgeBase:
                 )
                 params = []
                 where_clauses = []
-                
+
                 if agent_name:
                     where_clauses.append("agent_name = %s")
                     params.append(agent_name)
                 if memory_type:
                     where_clauses.append("memory_type = %s")
                     params.append(memory_type)
-                
+
                 if where_clauses:
                     query += " WHERE " + " AND ".join(where_clauses)
-                
+
                 query += " ORDER BY created_at DESC LIMIT %s"
                 params.append(limit)
-                
+
                 cur.execute(query, params)
                 return cur.fetchall()
         except Exception as e:
@@ -111,10 +112,10 @@ class KnowledgeBase:
             return []
 
     def update_project_status(
-        self, 
-        project_id, 
-        milestone, 
-        health='OK', 
+        self,
+        project_id,
+        milestone,
+        health='OK',
         meta=None
     ):
         """Update the status of a specific project."""
@@ -141,9 +142,9 @@ if __name__ == "__main__":
     try:
         kb.init_schema()
         kb.update_project_status(
-            "Unified_System_Core", 
-            "Knowledge Base Implementation", 
-            "OK", 
+            "Unified_System_Core",
+            "Knowledge Base Implementation",
+            "OK",
             {"version": "3.0"}
         )
         print("Knowledge Base initialized and tested.")

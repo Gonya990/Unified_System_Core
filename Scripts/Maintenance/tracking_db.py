@@ -11,7 +11,7 @@ def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
+
     # Task logging table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS agent_log (
@@ -23,7 +23,7 @@ def init_db():
             model TEXT
         )
     ''')
-    
+
     # State tracking
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS system_state (
@@ -32,7 +32,7 @@ def init_db():
             last_updated DATETIME
         )
     ''')
-    
+
     conn.commit()
     conn.close()
 
@@ -40,7 +40,7 @@ def log_task(task_name, status, details="", model="Antigravity-v1"):
     """Log a task execution."""
     if not DB_PATH.exists():
         init_db()
-    
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute(

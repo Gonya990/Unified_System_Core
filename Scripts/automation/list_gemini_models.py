@@ -1,6 +1,8 @@
 
 import os
+
 from google import genai
+
 
 def list_models():
     gemini_key = os.getenv("GEMINI_API_KEY")

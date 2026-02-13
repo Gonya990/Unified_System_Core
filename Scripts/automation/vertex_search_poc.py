@@ -1,6 +1,8 @@
 import os
+
 from google import genai
 from google.genai.types import GenerateContentConfig, GoogleSearch, Tool
+
 
 def run_vertex_search_poc():
     print("🔍 Starting Vertex AI Search (Grounding) POC...")

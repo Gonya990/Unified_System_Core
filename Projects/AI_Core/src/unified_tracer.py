@@ -1,7 +1,9 @@
 import os
 import random
+
 from google.cloud import trace_v2
 from google.protobuf.timestamp_pb2 import Timestamp
+
 
 class UnifiedTracer:
     """
@@ -31,7 +33,7 @@ class UnifiedTracer:
     def end_span(self, span, trace_id):
         span.end_time = Timestamp()
         span.end_time.GetCurrentTime()
-        
+
         try:
             self.client.batch_write_spans(
                 name=f"projects/{self.project_id}",

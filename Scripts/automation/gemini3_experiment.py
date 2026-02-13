@@ -1,6 +1,8 @@
 import os
+
 from google import genai
 from google.genai.types import GenerateContentConfig, GoogleSearch, Tool
+
 
 def test_gemini_3():
     print("🚀 Experimenting with Gemini 3 (The Future)...")

@@ -103,7 +103,7 @@ else:
     console.setLevel(logging.INFO)
     logging.getLogger("").addHandler(console)
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    
+
     logger = logging.getLogger(__name__)
     logger.info(f"Bot instance: {bot_instance}, logging to {log_filename} (Local Mode)")
 
@@ -335,15 +335,15 @@ except Exception as e:
 try:
     from unified_monitoring import get_monitor
     from unified_tracer import get_tracer
-    
+
     # Initialize singleton instances
     monitor = get_monitor(f"ai-telegram-bot-{bot_instance}")
     monitor.start_heartbeat(interval=60)
-    
+
     tracer = get_tracer(f"ai-telegram-bot-{bot_instance}")
     if tracer:
         logger.info("🔍 Unified Cloud Tracing Enabled")
-    
+
 except ImportError:
     logger.warning("⚠️ Unified Observability modules not found")
     monitor = None
@@ -2053,12 +2053,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 content = content or "Created via Gonya AI"
                 # Call notion client
                 url = await notion_client.create_page(title, content)
-                
+
                 # Construct tag for replacement
                 is_default = content == "Created via Gonya AI"
                 content_part = "" if is_default else f":{content}"
                 tag_re = f"[[NOTION:{title}{content_part}]]"
-                
+
                 if url:
                     ai_response = ai_response.replace(
                         tag_re,
@@ -5624,12 +5624,12 @@ def main():
     try:
         if AlertListener:
             project_id = os.getenv("GCP_PROJECT_ID", "my-home-435112")
-            
+
             # Start listener in a separate thread because we don't have easy access
-            # to the event loop here 
+            # to the event loop here
             # (application.run_polling manages its own loop usually)
             # Actually, run_polling blocks. We need to start this BEFORE run_polling.
-            
+
             # Define alert callback
             async def handle_gcp_alert_wrapper(data):
                 try:
@@ -5638,7 +5638,7 @@ def main():
                     summary = incident.get("summary", "No summary")
                     url = incident.get("url", "#")
                     state = incident.get("state", "UNKNOWN")
-                    
+
                     # Format message
                     emoji = "🚨" if state == "OPEN" else "✅"
                     msg = (
@@ -5647,7 +5647,7 @@ def main():
                         f"**Link:** [View Incident]({url})\n"
                         f"**Resource:** {incident.get('resource_name', 'N/A')}"
                     )
-                    
+
                     # Send to all admins
                     admins = db.list_admins()
                     for admin in admins:
@@ -5679,7 +5679,7 @@ def main():
                 # Pass the loop explicitly so listener can schedule callbacks on it
                 alert_listener.start(handle_gcp_alert_wrapper, loop)
                 logger.info("✅ GCP Alert Listener started (via post_init)")
-                
+
                 # Start Self-Healing Watchdog
                 if SelfHealer:
                     healer = SelfHealer(

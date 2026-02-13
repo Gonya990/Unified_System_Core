@@ -1,6 +1,8 @@
 import os
+
 from google import genai
 from google.genai.types import GenerateContentConfig
+
 
 def ask_gemini_3_for_ha_improvements():
     print("🧠 Asking Gemini 3 for Smart Home Architecture Improvements...")

@@ -10,11 +10,12 @@ Usage:
     python scan_release.py <directory_to_scan>
 """
 
-import sys
-import os
 import hashlib
+import os
 import shutil
+import sys
 import time
+
 
 def compute_sha256(file_path):
     sha256_hash = hashlib.sha256()
@@ -32,12 +33,12 @@ def package_and_scan(target_dir):
     timestamp = int(time.time())
     archive_name = f"{project_name}_release_{timestamp}"
     archive_path = shutil.make_archive(archive_name, 'zip', target_dir)
-    
+
     print(f"📦 Packaged: {archive_path}")
-    
+
     file_hash = compute_sha256(archive_path)
     print(f"🔑 SHA-256: {file_hash}")
-    
+
     vt_url = f"https://www.virustotal.com/gui/file/{file_hash}"
     print(f"🔍 VirusTotal Link: {vt_url}")
     print("\n✅ Steps for Release:")
