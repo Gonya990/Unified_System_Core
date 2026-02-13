@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: orchestrator
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory:latest
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory@sha256:45fb7a50f29684b160bba4112b49f42940c4b29bd927445edd0dcfd667c45b52
           resources:
             requests:
               cpu: "500m"
@@ -64,7 +64,7 @@ spec:
         spec:
           containers:
             - name: factory
-              image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory:latest
+              image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/content-factory@sha256:45fb7a50f29684b160bba4112b49f42940c4b29bd927445edd0dcfd667c45b52
               command: ["python", "src/researcher/daily_researcher.py"]
               resources:
                 requests:

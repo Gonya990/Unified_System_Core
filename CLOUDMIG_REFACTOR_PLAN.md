@@ -119,7 +119,7 @@ GitHub Models.
         (PROJECT_SINGLETON_POLICY).
     * [x] Configure Attestors and Policy (`policy.yaml` enforced).
     * [x] Требовать подписанные аттестации образов из CI; блокировать
-        неподписанные деплои в GKE.
+        неподписанные деплои в GKE (Все namespace: `trading`, `factory`, `telegram-bot`).
 4. **Secrets Hygiene / Гигиена секретов:**
     * [x] 90-day rotation policy; automated drift detection between Secret Manager
         and manifests (`Scripts/Security/audit_secrets.py`).

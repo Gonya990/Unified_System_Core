@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: alpha-agent
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-alpha:latest
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-alpha@sha256:04fffacba0b16415f692b4b17db313aa7aafda6ef729ad11da5de4d325ff4879
           resources:
             limits:
               cpu: "1000m"
