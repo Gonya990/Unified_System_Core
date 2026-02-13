@@ -121,9 +121,9 @@ GitHub Models.
     * [x] Требовать подписанные аттестации образов из CI; блокировать
         неподписанные деплои в GKE.
 4. **Secrets Hygiene / Гигиена секретов:**
-    * 90-day rotation policy; automated drift detection between Secret Manager
-        and manifests.
-    * Политика ротации каждые 90 дней; авто-детект дрейфа между Secret Manager
+    * [x] 90-day rotation policy; automated drift detection between Secret Manager
+        and manifests (`Scripts/Security/audit_secrets.py`).
+    * [x] Политика ротации каждые 90 дней; авто-детект дрейфа между Secret Manager
         и манифестами.
 
 ## Phase 5: Developer Experience & Runbooks / Фаза 5: Опыт разработчиков и инструкции
