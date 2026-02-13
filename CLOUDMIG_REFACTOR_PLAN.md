@@ -129,8 +129,8 @@ GitHub Models.
 ## Phase 5: Developer Experience & Runbooks / Фаза 5: Опыт разработчиков и инструкции
 
 1. **Golden Paths / Золотые пути:**
-   * [ ] Coordinate with Igor about secondary port allocations for new services
-     and extensions.
+   * [x] Coordinate with Igor about secondary port allocations for new services
+     and extensions (`docs/runbooks/service_ports.md`).
    * [x] Repo templates for new services (`templates/python-microservice`).
    * [x] Шаблоны репозитория для новых сервисов (`templates/python-microservice`).
 2. **Preview Environments / Превью окружения:**
