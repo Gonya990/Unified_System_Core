@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -12,10 +11,28 @@ app = FastAPI(title="Vibranium Mobile Proxy")
 _BOT_INSTANCE = None
 
 
-class CommandRequest(BaseModel):
-    user_id: int
-    command: str
-    audio_data: Optional[str] = None  # Future voice support
+class AlertRequest(BaseModel):
+    summary: str
+    description: str
+    severity: str  # e.g., "CRITICAL", "ERROR", "WARNING"
+
+
+@app.post("/v1/alert")
+async def receive_alert(request: AlertRequest):
+    """
+    Receive alerts from GCP Monitoring and forward to Telegram.
+    """
+    if not _BOT_INSTANCE:
+        raise HTTPException(status_code=503, detail="Bot core not initialized")
+
+    try:
+        alert_message = f"🚨 GCP Alert: {request.summary}\n\n{request.description}\n\nSeverity: {request.severity}"
+        # Assume _BOT_INSTANCE has a method to send alert to admin chat
+        await _BOT_INSTANCE.send_alert_to_admin(alert_message)
+        return {"status": "alert sent"}
+    except Exception as e:
+        logger.error(f"Alert forwarding error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def set_bot_instance(bot):

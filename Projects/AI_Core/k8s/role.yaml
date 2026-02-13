@@ -1,0 +1,20 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ai-telegram-bot-role
+  namespace: trading
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ai-telegram-bot-binding
+  namespace: trading
+subjects:
+- kind: ServiceAccount
+  name: ai-telegram-bot-sa
+  namespace: trading
+roleRef:
+  kind: Role
+  name: ai-telegram-bot-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice
+  template:
+    metadata:
+      labels:
+        app: microservice
+    spec:
+      serviceAccountName: microservice-sa
+      containers:
+      - name: app
+        image: gcr.io/project-id/microservice:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        envFrom:
+        - secretRef:
+            name: microservice-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice
+  namespace: default
+spec:
+  selector:
+    app: microservice
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP

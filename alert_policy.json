@@ -1,0 +1,26 @@
+{
+  "displayName": "High CPU Usage in Trading Namespace",
+  "combiner": "AND",
+  "conditions": [
+    {
+      "displayName": "CPU > 80% for 5 minutes",
+      "conditionThreshold": {
+        "filter": "resource.type=\"k8s_container\" AND resource.labels.namespace_name=\"trading\" AND metric.type=\"kubernetes.io/container/cpu/core_usage_time\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "60s",
+            "crossSeriesReducer": "REDUCE_MEAN",
+            "groupByFields": ["resource.labels.pod_name"],
+            "perSeriesAligner": "ALIGN_RATE"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "duration": "300s",
+        "thresholdValue": 0.8
+      }
+    }
+  ],
+  "notificationChannels": [
+    "projects/my-home-435112/notificationChannels/14497019583607250411"
+  ]
+}

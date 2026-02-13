@@ -5221,45 +5221,112 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-    # DYNAMIC PATH RESOLUTION FOR GKE vs CLOUD-DIRECT
-    # If in GKE, we can't run scripts directly unless mounted.
-    # We look for /app first (standard Docker path)
+    # Hybrid execution strategy:
+    # 1) Try local mounted scripts (local dev or monorepo mount in container)
+    # 2) If unavailable (common in GKE), trigger Cloud Server over SSH
 
-    root_dir = Path("/app")
-    if not (root_dir / "Projects").exists():
-        # Fallback to current file parent search
-        current_file = Path(__file__).resolve()
-        for parent in current_file.parents:
-            if (parent / "Projects").exists():
-                root_dir = parent
-                break
+    current_file = Path(__file__).resolve()
+    local_candidates = [
+        Path("/app/Projects/Content_Factory/src/pipeline/factory_scheduler.py"),
+        Path(
+            "/home/gonya/Unified_System_Core/Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+        ),
+        Path(
+            "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+        ),
+    ]
 
-    script_path = root_dir / (
-        "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
-    )
-
-    if not script_path.exists():
-        await update.message.reply_text(
-            "❌ **Error:** Content Factory scripts not found.\nBot is in **GKE**. Factory must run on **Cloud Server**."
+    # Also attempt parent-based resolution from current file location
+    for parent in current_file.parents:
+        local_candidates.append(
+            parent / "Projects/Content_Factory/src/pipeline/factory_scheduler.py"
         )
-        return
 
-    cmd = [sys.executable, str(script_path)]
+    script_path = next((p for p in local_candidates if p.exists()), None)
+
+    if script_path:
+        cmd = [sys.executable, str(script_path)]
+        if topic:
+            cmd.extend(["--inspiration-topic", topic])
+
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=str(script_path.parent),
+            )
+            msg = (
+                f"🚀 **Pipeline started (local execution)**\n"
+                f"PID: `{process.pid}`\n"
+                f"Script: `{script_path}`"
+            )
+            await update.message.reply_text(msg, parse_mode="Markdown")
+            return
+        except Exception as e:
+            await update.message.reply_text(
+                f"⚠️ Local запуск не удался: `{e}`\nПробую Cloud Server...",
+                parse_mode="Markdown",
+            )
+
+    # Cloud fallback (recommended for GKE bot)
+    remote_user = os.getenv("FACTORY_REMOTE_USER", "gonya")
+    remote_host = os.getenv("FACTORY_REMOTE_HOST", "unified-home-core-cloud")
+    remote_root = os.getenv("FACTORY_REMOTE_ROOT", "/home/gonya/Unified_System_Core")
+    remote_script = (
+        f"{remote_root}/Projects/Content_Factory/src/pipeline/factory_scheduler.py"
+    )
+    remote_cwd = f"{remote_root}/Projects/Content_Factory"
+
+    remote_cmd = f"cd {remote_cwd} && python3 {remote_script}"
     if topic:
-        cmd.extend(["--inspiration-topic", topic])
+        safe_topic = topic.replace('"', '\\"')
+        remote_cmd += f' --inspiration-topic "{safe_topic}"'
+
+    ssh_cmd = ["ssh", f"{remote_user}@{remote_host}", remote_cmd]
 
     try:
-        # Run detached-like or capture output
         process = await asyncio.create_subprocess_exec(
-            *cmd,
+            *ssh_cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            cwd=str(script_path.parent),
         )
-        msg = f"🚀 **Pipeline Started Locally!** PID: `{process.pid}`"
-        await update.message.reply_text(msg)
+        # Short wait to catch immediate SSH/auth/path failures
+        try:
+            await asyncio.wait_for(process.communicate(), timeout=4)
+        except asyncio.TimeoutError:
+            await update.message.reply_text(
+                "✅ **Factory trigger sent to Cloud Server**\n"
+                f"Node: `{remote_host}`\n"
+                f"Topic: `{topic or 'Auto-Trend'}`\n"
+                "Проверьте логи на сервере: `pm2 logs content-factory --lines 80`",
+                parse_mode="Markdown",
+            )
+            return
+
+        # If process already finished quickly - report status
+        if process.returncode == 0:
+            await update.message.reply_text(
+                "✅ **Factory completed quickly on Cloud Server**\n"
+                f"Node: `{remote_host}`",
+                parse_mode="Markdown",
+            )
+        else:
+            await update.message.reply_text(
+                "❌ **Cloud trigger failed**\n"
+                f"Host: `{remote_host}`\n"
+                "Проверь SSH ключи/доступ и наличие скрипта:\n"
+                f"`{remote_script}`",
+                parse_mode="Markdown",
+            )
     except Exception as e:
-        await update.message.reply_text(f"❌ **Failed to start factory:** {e}")
+        await update.message.reply_text(
+            "❌ **Error:** Content Factory scripts not found locally и Cloud-trigger не выполнен.\n"
+            f"Причина: `{e}`\n\n"
+            "Нужно настроить переменные окружения для бота:\n"
+            "`FACTORY_REMOTE_HOST`, `FACTORY_REMOTE_USER`, `FACTORY_REMOTE_ROOT`",
+            parse_mode="Markdown",
+        )
 
 
 async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -5281,35 +5348,55 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
     else:
         # Fetch latest balance and market info from logs
-        balance_info = "Loading..."
-        market_info = "Loading..."
-        try:
-            # Read last few lines of crypto-bot error log (where balance is logged)
-            log_cmd = "tail -n 20 /home/gonya/.pm2/logs/crypto-bot-error.log"
-            log_out = subprocess.check_output(log_cmd, shell=True).decode()
+        # Works both for local/dev and cloud setups via env override.
+        balance_info = "н/д"
+        market_info = "н/д"
+        source_info = ""
 
-            # Find last balance line
+        try:
             import re
 
-            balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
-            if balances:
-                balance_info = f"${balances[-1]} USDT"
+            log_candidates = [
+                os.getenv("CRYPTO_BOT_LOG_PATH", "").strip(),
+                "/home/gonya/.pm2/logs/crypto-bot-error.log",
+                "/home/gonya/.pm2/logs/crypto-bot-out.log",
+                str(Path.home() / ".pm2/logs/crypto-bot-error.log"),
+                str(Path.home() / ".pm2/logs/crypto-bot-out.log"),
+            ]
+            log_candidates = [p for p in log_candidates if p]
 
-            # Find last market info
-            markets = re.findall(
-                r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)", log_out
-            )
-            if markets:
-                market_info = markets[-1]
+            selected_log = next((p for p in log_candidates if Path(p).exists()), None)
+            if selected_log:
+                log_cmd = f"tail -n 120 {selected_log}"
+                log_out = subprocess.check_output(log_cmd, shell=True, text=True)
+                source_info = f"\n🧾 Источник: `{selected_log}`"
+
+                balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
+                if balances:
+                    balance_info = f"${balances[-1]} USDT"
+
+                markets = re.findall(
+                    r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)",
+                    log_out,
+                )
+                if markets:
+                    market_info = markets[-1]
+            else:
+                source_info = (
+                    "\nℹ️ Лог `crypto-bot` не найден локально. "
+                    "Если бот работает в Cloud Server, укажите `CRYPTO_BOT_LOG_PATH`."
+                )
         except Exception as e:
             logger.error(f"Failed to fetch crypto logs: {e}")
+            source_info = f"\n⚠️ Ошибка чтения логов: `{e}`"
 
         await update.message.reply_text(
             f"📈 **Крипто-трейдинг (ByBit)**\n\n"
             f"💰 **Баланс:** `{balance_info}`\n"
             f"📊 **Рынок:** `{market_info}`\n\n"
-            f"✅ Бот запущен и мониторит TON/USDT.\n"
-            "Стратегия: RSI < 35 (Buy), RSI > 65 (Sell).",
+            f"✅ Бот мониторит `TON/USDT`.\n"
+            "Стратегия: RSI < 35 (Buy), RSI > 65 (Sell)."
+            f"{source_info}",
             parse_mode="Markdown",
         )
 

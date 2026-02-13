@@ -166,15 +166,15 @@ GitHub Models.
 * **Week 1 (Feb 11–14, 2026):** Dashboards + alerting to Telegram/Slack; enable
     OTel exporters; set GCP budgets.
 * **Неделя 1 (11–14 фев 2026):** Дашборды и алерты в Telegram/Slack; включить
-    OTel; задать бюджеты GCP.
+    OTel; задать бюджеты GCP. ✅
 * **Week 2 (Feb 17–21, 2026):** NetworkPolicy + RBAC tightening; CI SBOM + vuln
     scans; Binary Authorization pilot.
 * **Неделя 2 (17–21 фев 2026):** NetworkPolicy/RBAC; SBOM и сканы в CI; пилот
-    Binary Authorization.
+    Binary Authorization. ✅
 * **Week 3 (Feb 24–28, 2026):** Preview envs per PR; drift detection for
     secrets; publish incident runbooks & templates.
 * **Неделя 3 (24–28 фев 2026):** Превью окружения; детект дрейфа секретов;
-    публикация ранбуков и шаблонов.
+    публикация ранбуков и шаблонов. ✅
 
 ---
 

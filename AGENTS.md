@@ -27,8 +27,8 @@ adapt their output based on the current user's preferences.
 | Content | `Projects/Content_Factory/` | Video generation pipeline with |
 | Factory | | Sora2 and Pexels integration |
 | ChatKit | `Projects/ChatKit/` | Web dashboard for management |
-| TokenBroker | `Scripts/Utilities/` | Encrypted API key management |
-| | `token_broker.py` | (AES-256-GCM + Argon2id) |
+| IdentityManager | `Scripts/Security/` | Secure identity & vault access |
+| | `identity_manager.py` | (Argon2id + RSA) |
 
 **Note**: The old `Windows_AI_Core` directory has been migrated to
 `Projects/AI_Core`.

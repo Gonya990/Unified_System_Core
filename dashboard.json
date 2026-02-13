@@ -1,0 +1,65 @@
+{
+  "displayName": "Unified System Core - AI Core Services",
+  "mosaicLayout": {
+    "columns": 48,
+    "tiles": [
+      {
+        "height": 16,
+        "widget": {
+          "title": "CPU Utilization by Pod",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "resource.type=\"k8s_container\" AND resource.labels.namespace_name=\"trading\" AND metric.type=\"kubernetes.io/container/cpu/core_usage_time\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "crossSeriesReducer": "REDUCE_MEAN",
+                      "groupByFields": [
+                        "resource.labels.pod_name"
+                      ],
+                      "perSeriesAligner": "ALIGN_RATE"
+                    }
+                  },
+                  "legendTemplate": "${resource.labels.pod_name}"
+                },
+                "plotType": "LINE"
+              }
+            ],
+            "chartOptions": {}
+          },
+          "width": 24,
+          "yPos": 0
+        },
+        {
+          "height": 16,
+          "widget": {
+            "title": "Memory Usage by Pod",
+            "xyChart": {
+              "dataSets": [
+                {
+                  "timeSeriesQuery": {
+                    "timeSeriesFilter": {
+                      "aggregation": {
+                        "alignmentPeriod": "60s",
+                        "groupByFields": [
+                          "resource.labels.pod_name"
+                        ],
+                      },
+                      "legendTemplate": "${resource.labels.pod_name}"
+                    },
+                    "plotType": "LINE"
+                  }
+                ],
+                "chartOptions": {
+                  "mode": "COLOR"
+                }
+              }
+            },
+            "width": 24,
+            "yPos": 0
+          }
+        ]
+      }
+    }

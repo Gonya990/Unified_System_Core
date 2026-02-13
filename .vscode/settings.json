@@ -3,6 +3,7 @@
     "gitlens.launchpad.indicator.enabled": true,
     "python.defaultInterpreterPath": "./Projects/AI_Core/.venv/bin/python",
     "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.useEnvFile": true,
     "files.exclude": {
         "**/__pycache__": true,
         "**/.DS_Store": true,
