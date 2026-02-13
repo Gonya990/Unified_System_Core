@@ -5625,7 +5625,8 @@ def main():
         if AlertListener:
             project_id = os.getenv("GCP_PROJECT_ID", "my-home-435112")
             
-            # Start listener in a separate thread because we don't have easy access to the event loop here 
+            # Start listener in a separate thread because we don't have easy access
+            # to the event loop here 
             # (application.run_polling manages its own loop usually)
             # Actually, run_polling blocks. We need to start this BEFORE run_polling.
             
@@ -5658,7 +5659,9 @@ def main():
                                 parse_mode="Markdown"
                             )
                         except Exception as e:
-                            logger.error(f"Failed to send alert to {admin['user_id']}: {e}")
+                            logger.error(
+                                f"Failed to send alert to {admin['user_id']}: {e}"
+                            )
 
                 except Exception as e:
                     logger.error(f"Error handling GCP alert payload: {e}")
@@ -5679,12 +5682,16 @@ def main():
                 
                 # Start Self-Healing Watchdog
                 if SelfHealer:
-                    healer = SelfHealer(namespace="default") # Assuming default namespace for now
+                    healer = SelfHealer(
+                        namespace="default"
+                    )  # Assuming default namespace
                     if healer.is_active:
                         asyncio.create_task(healer.run_loop())
                         logger.info("✅ Self-Healing Watchdog started")
                     else:
-                        logger.warning("⚠️ Self-Healing Watchdog inactive (missing k8s config)")
+                        logger.warning(
+                            "⚠️ Self-Healing Watchdog inactive (missing k8s config)"
+                        )
 
             application.post_init = post_init_wrapper
 

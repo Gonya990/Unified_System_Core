@@ -1,6 +1,7 @@
 import logging
 import sys
 from pathlib import Path
+import openai
 
 # Add AI_Core/src to path for TokenBroker BEFORE other internal imports
 AI_CORE_SRC_PATH = (
@@ -9,8 +10,7 @@ AI_CORE_SRC_PATH = (
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
-import openai
-from token_broker import TokenBroker
+from token_broker import TokenBroker  # noqa: E402
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -41,9 +41,12 @@ class DinoScriptEngine:
         system_prompt = (
             "You are a scriptwriter for 'Dino Talk', a high-end AI podcast. "
             "Characters:\n"
-            "1. Rex (T-Rex): A cynical, tech-skeptic dinosaur who doubts AI progress. He has a deep, raspy voice.\n"
-            "2. Trike (Triceratops): A hyper-enthusiastic, tech-optimist dinosaur who loves new gadgets.\n"
-            "Write a dynamic, witty debate. GPT-5.2 Reasoning: Focus on multi-step logic and emotional depth. "
+            "1. Rex (T-Rex): A cynical, tech-skeptic dinosaur who doubts AI progress. "
+            "He has a deep, raspy voice.\n"
+            "2. Trike (Triceratops): A hyper-enthusiastic, tech-optimist dinosaur "
+            "who loves new gadgets.\n"
+            "Write a dynamic, witty debate. GPT-5.2 Reasoning: Focus on multi-step "
+            "logic and emotional depth. "
             "Use natural fillers. ~12-15 exchanges with high character chemistry."
         )
 
@@ -59,14 +62,18 @@ class DinoScriptEngine:
 
     def director_pass(self, raw_debate: str):
         print(
-            "🎬 Stage 2: Director is adding cinematic cues, B-roll, and SORA-2 motion prompts..."
+            "🎬 Stage 2: Director is adding cinematic cues, B-roll, "
+            "and SORA-2 motion prompts..."
         )
 
         system_prompt = (
             "You are the Director. Transform the debate into a JSON list of segments.\n"
-            "Each segment: 'role', 'text', 'angle' (wide, medium, close), 'broll' (optional phrase).\n"
-            "NEW: Add 'motion_prompt' for Sora-2. Descriptive English prompt for how the dino should MOVE "
-            "(e.g., 'T-Rex scoffs and rolls eyes, nodding skeptically', 'Triceratops jumps with excitement').\n"
+            "Each segment: 'role', 'text', 'angle' (wide, medium, close), 'broll' "
+            "(optional phrase).\n"
+            "NEW: Add 'motion_prompt' for Sora-2. Descriptive English prompt for "
+            "how the dino should MOVE "
+            "(e.g., 'T-Rex scoffs and rolls eyes, nodding skeptically', "
+            "'Triceratops jumps with excitement').\n"
             "Fast, punchy 'Director's Cut' style."
         )
 
@@ -76,7 +83,10 @@ class DinoScriptEngine:
                 {"role": "system", "content": system_prompt},
                 {
                     "role": "user",
-                    "content": f"Format this debate into JSON with MOTION PROMPTS:\n\n{raw_debate}",
+                    "content": (
+                        "Format this debate into JSON with MOTION PROMPTS:\n\n"
+                        f"{raw_debate}"
+                    ),
                 },
             ],
             response_format={"type": "json_object"},
@@ -87,7 +97,8 @@ class DinoScriptEngine:
         print("🎭 Stage 3: Adding wit, fillers, and personality (GPT-5.2 Polish)...")
 
         system_prompt = (
-            "You are a Dialogue Polisher. Using GPT-5.2 advanced context, make it feel like a real podcast. "
+            "You are a Dialogue Polisher. Using GPT-5.2 advanced context, make it "
+            "feel like a real podcast. "
             "Add 'uhm', 'listen', 'look', sharp humor, and interruptions. "
             "Enhance the 'motion_prompt' fields to be more cinematic. "
             "Keep the same JSON structure."
@@ -99,7 +110,9 @@ class DinoScriptEngine:
                 {"role": "system", "content": system_prompt},
                 {
                     "role": "user",
-                    "content": f"Polish this JSON for max chemistry:\n\n{script_json}",
+                    "content": (
+                        f"Polish this JSON for max chemistry:\n\n{script_json}"
+                    ),
                 },
             ],
             response_format={"type": "json_object"},

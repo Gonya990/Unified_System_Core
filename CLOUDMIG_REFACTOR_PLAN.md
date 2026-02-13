@@ -44,13 +44,17 @@ GitHub Models.
     * [x] Connect GitHub Actions to GCP without long-lived keys (Pool: github-pool).
     * [x] Связать GitHub Actions с GCP без использования долгоживущих ключей.
 2. **GitHub Models Provider / Провайдер GitHub Models:**
-    * [x] Add GitHub Models (Llama 3, Phi-3, Claude) as a new AI backend in the bot.
+    * [x] Add GitHub Models (Llama 3, Phi-3, Claude) as a new AI backend in
+        the bot.
     * [x] Implement auto-failover (if Gemini is down -> use GitHub Models).
     * [x] Добавить GitHub Models как новый бэкенд AI в боте.
-    * [x] Реализовать авто-переключение (если Gemini лежит -> использовать GitHub Models).
+    * [x] Реализовать авто-переключение (если Gemini лежит -> использовать
+        GitHub Models).
 3. **Automated Self-Healing / Автоматическое восстановление:**
-    * [x] If a Pod fails in GKE, the bot reports the log to GitHub Issue automatically (`modules/self_healing.py`).
-    * [x] The Agent (Me) analyzes the Issue using GitHub Models and prepares a fix.
+    * [x] If a Pod fails in GKE, the bot reports the log to GitHub Issue
+        automatically (`modules/self_healing.py`).
+    * [x] The Agent (Me) analyzes the Issue using GitHub Models and prepares a
+        fix.
     * [x] Если Под в GKE падает, бот сам создает Issue в GitHub с логами.
     * [x] Агент (Я) анализирует Issue через GitHub Models и готовит фикс.
 
@@ -139,7 +143,8 @@ GitHub Models.
 ## Phase 6: Advanced Integrations & Security (H1 2026) / Фаза 6: Интеграции и Безопасность
 
 **Goal:** Leverage AI agents (Antigravity), Firebase MCP, and external security auditing.
-**Цель:** Использование AI агентов, Firebase MCP и внешнего аудита безопасности.
+**Цель:** Использование AI агентов, Firebase MCP и внешнего аудита
+безопасности.
 
 1. **Firebase MCP Server / Сервер Firebase MCP:**
     * [x] Implement `mcp_config.json` for seamless integration with AI agents.

@@ -114,12 +114,12 @@ def sync_context_folder():
         if not local_file.exists():
             print(f"⬇️ Downloading {file['name']}...")
             request = service.files().get_media(fileId=file["id"])
-            fh = io.FileIO(local_file, "wb")
-            downloader = MediaIoBaseDownload(fh, request)
-            done = False
-            while done is False:
-                status, done = downloader.next_chunk()
-                # print(f"Download {int(status.progress() * 100)}%.")
+            with io.open(local_file, "wb") as fh:
+                downloader = MediaIoBaseDownload(fh, request)
+                done = False
+                while done is False:
+                    status, done = downloader.next_chunk()
+                    # print(f"Download {int(status.progress() * 100)}%.")
 
     print("✅ Sync Complete!")
 

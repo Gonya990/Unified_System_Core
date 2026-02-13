@@ -47,7 +47,10 @@ class SoraVideoGenerator:
             # Note: API syntax based on 2025/2026 specs for Sora-2
             response = self.client.video.generations.create(
                 model="sora-2",
-                prompt=f"A cinematic {angle} shot of a {role} dinosaur in a podcast studio. {prompt}. High fidelity, 4k.",
+                prompt=(
+                    f"A cinematic {angle} shot of a {role} dinosaur in a podcast "
+                    f"studio. {prompt}. High fidelity, 4k."
+                ),
                 duration=5,
                 aspect_ratio="16:9",
             )

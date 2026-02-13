@@ -63,4 +63,6 @@ def setup_unified_logging(level=logging.INFO):
     logging.getLogger("googleapiclient").setLevel(logging.WARNING)
     
     # Test log
-    logging.info(f"✅ Unified JSON Logging Initialized for {os.getenv('SERVICE_NAME', 'ai-core')}")
+    logging.info(
+        f"✅ Unified JSON Logging Initialized for {os.getenv('SERVICE_NAME', 'ai-core')}"
+    )

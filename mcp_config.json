@@ -7,6 +7,31 @@
                 "firebase-tools@latest",
                 "mcp"
             ]
+        },
+        "markitdown": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "markitdown",
+                "--with",
+                "mcp[fastmcp]",
+                "python",
+                "markitdown_server.py"
+            ]
+        },
+        "chrome-devtools": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-chrome"
+            ]
+        },
+        "upstash": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/mcp"
+            ]
         }
     }
 }

@@ -2,11 +2,13 @@
 
 ## Overview
 
-This document outlines how to use the advanced AI integrations available in Unified System Core.
+This document outlines how to use the advanced AI integrations available in
+Unified System Core.
 
 ### 1. Firebase MCP (Model Context Protocol)
 
-We have enabled the Firebase MCP server to provide AI agents with direct access to Firebase projects.
+We have enabled the Firebase MCP server to provide AI agents with direct access
+to Firebase projects.
 
 **Setup in MCP Clients (e.g., Claude Desktop, Cursor):**
 The configuration is located in `mcp_config.json` at the root of the repository.
@@ -74,4 +76,5 @@ The `NotionClient` in `Projects/AI_Core/src/notion_service.py` allows the bot to
 The bot automatically logs complex tasks to Notion if configured.
 
 ---
-*Last Updated: 2026-02-12*
+
+### Last Updated: 2026-02-12

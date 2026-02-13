@@ -21,7 +21,8 @@ CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
 VIDEO_DIR = CONTEXT_DIR / "final_videos"
 CREDENTIALS_FILE = Path(
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/config/gmail_credentials.json"
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/"
+    "Projects/AI_Core/config/gmail_credentials.json"
 )
 TOKEN_FILE = ROOT / "youtube_token.json"
 
@@ -57,7 +58,8 @@ def get_authenticated_service():
             flow = InstalledAppFlow.from_client_secrets_file(
                 str(CREDENTIALS_FILE), SCOPES
             )
-            # Use a fixed port to avoid random port issues if specific redirect URIs are set
+            # Use a fixed port to avoid random port issues if
+            # specific redirect URIs are set
             creds = flow.run_local_server(port=8080)
 
         with open(TOKEN_FILE, "w") as token:
@@ -130,7 +132,9 @@ def make_video(audio_path):
         )
 
         # Layout
-        img_skeptic = img_skeptic.resize(height=450).set_position(("left", "bottom"))
+        img_skeptic = img_skeptic.resize(height=450).set_position(
+            ("left", "bottom")
+        )
         img_enthusiast = img_enthusiast.resize(height=450).set_position(
             ("right", "bottom")
         )
@@ -150,7 +154,10 @@ def make_video(audio_path):
 
         # Auto-Upload
         title = f"Dino Talk: {audio_path.stem.replace('_', ' ').title()}"
-        description = "AI-generated podcast hosted by T-Rex and Triceratops.\n\nCreated by Unified System Core."
+        description = (
+            "AI-generated podcast hosted by T-Rex and Triceratops.\n\n"
+            "Created by Unified System Core."
+        )
         upload_to_youtube(output_path, title, description)
 
     except Exception as e:

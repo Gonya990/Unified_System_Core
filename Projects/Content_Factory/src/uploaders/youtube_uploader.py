@@ -61,7 +61,8 @@ def get_authenticated_service(token_file=None):
                     f"❌ Error: Client secrets file not found at {CLIENT_SECRETS_FILE}"
                 )
                 print(
-                    "ℹ️  Please download 'client_secrets.json' from Google Cloud Console (OAuth 2.0 Client ID) and place it there."
+                    "ℹ️  Please download 'client_secrets.json' from Google Cloud "
+                    "Console (OAuth 2.0 Client ID) and place it there."
                 )
                 return None
 
@@ -94,7 +95,8 @@ def upload_video(
 ):
     """
     Uploads a video to YouTube.
-    category_id "28" is 'Science & Technology'. "22" is 'People & Blogs'. "25" is 'News & Politics'.
+    category_id "28" is 'Science & Technology'. "22" is 'People & Blogs'.
+    "25" is 'News & Politics'.
     """
     youtube = get_authenticated_service(token_file=token_file)
     if not youtube:
@@ -135,7 +137,10 @@ def upload_video(
                 print(f"📊 Uploaded {int(status.progress() * 100)}%")
         except HttpError as e:
             if e.resp.status in [500, 502, 503, 504]:
-                print(f"⚠️ Media upload failed with error {e}. Retrying in 5 seconds...")
+                print(
+                    f"⚠️ Media upload failed with error {e}. "
+                    "Retrying in 5 seconds..."
+                )
                 time.sleep(5)
                 continue
             else:

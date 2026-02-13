@@ -18,7 +18,9 @@ class UnifiedMonitoring:
         """
         try:
             series = monitoring_v3.TimeSeries()
-            series.metric.type = f"custom.googleapis.com/{self.service_name}/{metric_name}"
+            series.metric.type = (
+                f"custom.googleapis.com/{self.service_name}/{metric_name}"
+            )
             series.resource.type = "global"
             series.resource.labels["project_id"] = self.project_id
 

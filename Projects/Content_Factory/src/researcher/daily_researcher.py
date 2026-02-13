@@ -210,14 +210,16 @@ def run_daily_research(
     Theme: Future Tech, Human Progress, Global Unity.
 
     Target Audience: People looking for inspiration and "The Future" of humanity.
-    Tone: {tone} (But structured like a viral educational video - Maksim Nikolashin style).
+    Tone: {tone} (But structured like a viral educational video - 
+          Maksim Nikolashin style).
     Visual Style: {visuals}
 
     STRUCTURE (The 'Listicle' Format):
     - Scene 1-2: THE HOOK. Use a \"Negative/Warning\" or \"Secret\" framing.
       (e.g., \"You won't believe what AI can do...\", \"Stop ignoring this...\").
     - Scene 3: The Intro. "Here are 5 technologies changing everything."
-    - Scene 4-13: THE LIST. Rapid fire facts/technologies. (e.g. "Number 1...", "Number 2...").
+    - Scene 4-13: THE LIST. Rapid fire facts/technologies. (e.g. "Number 1...", 
+      "Number 2...").
     - Scene 14-15: THE CONCLUSION. Evaluation & Call for Unity.
 
     CRITICAL:
@@ -270,7 +272,9 @@ def run_daily_research(
                 res = client.responses.create(
                     model="gpt-4o",
                     input=prompt,
-                    instructions="Return ONLY valid JSON. No markdown, no explanations.",
+                    instructions=(
+                        "Return ONLY valid JSON. No markdown, no explanations."
+                    ),
                 )
                 content = res.output_text
             except Exception as e:
@@ -283,7 +287,9 @@ def run_daily_research(
                     messages=[
                         {
                             "role": "system",
-                            "content": "Return ONLY valid JSON. No markdown, no explanations.",
+                            "content": (
+                                "Return ONLY valid JSON. No markdown, no explanations."
+                            ),
                         },
                         {"role": "user", "content": prompt},
                     ],
@@ -312,7 +318,8 @@ def run_daily_research(
             data = json.loads(content)
         except Exception as e:
             print(
-                f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)..."
+                f"⚠️ Gemini Research failed: {e}. Falling back to Ollama "
+                "(Rock Solid)..."
             )
 
     # Strategy 3: Ollama
@@ -323,7 +330,10 @@ def run_daily_research(
                 "http://localhost:11434/api/generate",
                 json={
                     "model": "llama3",
-                    "prompt": f"{prompt}\nReturn ONLY JSON. Do not include markdown or explanations.",
+                    "prompt": (
+                        f"{prompt}\n"
+                        "Return ONLY JSON. Do not include markdown or explanations."
+                    ),
                     "stream": False,
                     "format": "json",
                 },
@@ -355,14 +365,20 @@ def run_daily_research(
 
 def get_style_prompt_prefix(style):
     if style == "cartoon":
-        return "cartoon style, 3d animation, pixar quality, vibrant colors, vertical 9:16 format"
+        return (
+            "cartoon style, 3d animation, pixar quality, vibrant colors, "
+            "vertical 9:16 format"
+        )
     elif style == "sketch":
         return (
             "black and white pencil sketch, charcoal drawing, "
             "rough lines, artistic, minimalist, vertical 9:16 format"
         )
     elif style == "painting":
-        return "digital painting, oil painting style, brush strokes, artistic, vivid colors, vertical 9:16 format"
+        return (
+            "digital painting, oil painting style, brush strokes, artistic, "
+            "vivid colors, vertical 9:16 format"
+        )
     else:  # impact/default
         return (
             "cinematic documentary footage, hyper-realistic, 8k, "
@@ -452,7 +468,9 @@ def generate_sdxl_images(scenes, output_dir: Path, style="impact"):
                     sdxl_url,
                     json={
                         "prompt": prompt,
-                        "negative_prompt": "ugly, blurry, low quality, distorted, text, watermark",
+                        "negative_prompt": (
+                            "ugly, blurry, low quality, distorted, text, watermark"
+                        ),
                         "width": 1080,
                         "height": 1920,
                         "steps": 25,
@@ -546,7 +564,10 @@ def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
             elif style == "painting":
                 kw = f"painting art {kw}"
 
-            url = f"https://api.pexels.com/v1/search?query={kw}&per_page=1&orientation=portrait"
+            url = (
+                f"https://api.pexels.com/v1/search?query={kw}"
+                "&per_page=1&orientation=portrait"
+            )
             res = requests.get(url, headers={"Authorization": PEXELS_API_KEY}).json()
             if res.get("photos"):
                 img_data = requests.get(res["photos"][0]["src"]["large2x"]).content
@@ -605,7 +626,8 @@ def check_local_context_files(scenes, output_dir: Path):
 def generate_vision_assets(scenes, output_dir: Path, style="impact"):
     """💎 VIBRANIUM TRIPLE-THREAT: Local Context → Free → Paid Failover"""
     print(
-        f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})"
+        f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover "
+        f"(Style: {style})"
     )
     print(
         "   Priority: Context → Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels"
@@ -737,7 +759,10 @@ def main():
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     if len(resolved_scenes) < len(scenes):
-        print(f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} images generated.")
+        print(
+            f"⚠️ Warning: Only {len(resolved_scenes)}/{len(scenes)} "
+            "images generated."
+        )
 
     # 3. Handover to Orchestrator (Audio + Video Assembly)
     print("🤝 Handing over to Orchestrator v3 (No-Face)...")

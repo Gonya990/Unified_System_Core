@@ -14,7 +14,11 @@ try:
     kb = KnowledgeBase()
     kb.connect()
     print("✅ Successfully connected to Knowledge Base from Content Factory context")
-    kb.add_memory("ContentFactoryTest", {"status": "Integration OK"}, memory_type="test")
+    kb.add_memory(
+        "ContentFactoryTest",
+        {"status": "Integration OK"},
+        memory_type="test"
+    )
     print("✅ Test memory added")
 except Exception as e:
     print(f"❌ Integration failed: {e}")
