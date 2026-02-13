@@ -1,6 +1,7 @@
 """
 Agent Mail Client Implementation
 """
+
 import json
 import os
 from dataclasses import dataclass
@@ -252,7 +253,6 @@ class AgentMailClient:
                 "paths": paths,
                 "exclusive": exclusive,
                 "reason": reason,
-
             },
         )
         return result.get("structuredContent", {})

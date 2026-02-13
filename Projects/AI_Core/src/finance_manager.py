@@ -4,6 +4,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 class FinanceManager:
     """
     Manages budget, expenses, and financial strategy.
@@ -20,23 +21,16 @@ class FinanceManager:
         """
         try:
             if not self.db.use_firestore:
-                logger.warning(
-                    "Firestore not available, logging expense to memories fallback."
-                )
+                logger.warning("Firestore not available, logging expense to memories fallback.")
                 self.db.add_memory(
                     user_id,
-                    f"Expense: {expense_data.get('amount')} "
-                    f"{expense_data.get('currency')}",
+                    f"Expense: {expense_data.get('amount')} {expense_data.get('currency')}",
                     str(expense_data),
                 )
                 return "logged_to_memory"
 
             # Create document in subcollection
-            expenses_ref = (
-                self.db.db.collection("users")
-                .document(str(user_id))
-                .collection("expenses")
-            )
+            expenses_ref = self.db.db.collection("users").document(str(user_id)).collection("expenses")
 
             # Ensure date is a timestamp or string
             if "date" not in expense_data or not expense_data["date"]:
@@ -45,9 +39,7 @@ class FinanceManager:
             expense_data["created_at"] = datetime.now()
 
             doc_ref = expenses_ref.add(expense_data)
-            logger.info(
-                f"Expense logged for user {user_id}: {expense_data.get('amount')}"
-            )
+            logger.info(f"Expense logged for user {user_id}: {expense_data.get('amount')}")
             return doc_ref[1].id
         except Exception as e:
             logger.error(f"Failed to log expense: {e}")
@@ -60,12 +52,16 @@ class FinanceManager:
 
         try:
             from datetime import timedelta
+
             cutoff = datetime.now() - timedelta(days=days)
 
-            expenses = self.db.db.collection("users").document(str(user_id))\
-                .collection("expenses")\
-                .where("created_at", ">=", cutoff)\
+            expenses = (
+                self.db.db.collection("users")
+                .document(str(user_id))
+                .collection("expenses")
+                .where("created_at", ">=", cutoff)
                 .stream()
+            )
 
             total = 0.0
             categories = {}
@@ -86,9 +82,7 @@ class FinanceManager:
             summary += f"Всего: `{total:,.2f}`\n"
             summary += f"Транзакций: `{count}`\n\n"
             summary += "**По категориям:**\n"
-            for cat, amt in sorted(
-                categories.items(), key=lambda x: x[1], reverse=True
-            ):
+            for cat, amt in sorted(categories.items(), key=lambda x: x[1], reverse=True):
                 summary += f"  • {cat}: `{amt:,.2f}`\n"
 
             return summary
@@ -106,12 +100,16 @@ class FinanceManager:
 
         try:
             from datetime import timedelta
+
             cutoff = datetime.now() - timedelta(days=60)
 
-            expenses = self.db.db.collection("users").document(str(user_id))\
-                .collection("expenses")\
-                .where("created_at", ">=", cutoff)\
+            expenses = (
+                self.db.db.collection("users")
+                .document(str(user_id))
+                .collection("expenses")
+                .where("created_at", ">=", cutoff)
                 .stream()
+            )
 
             item_counts = {}
             for exp in expenses:
@@ -130,15 +128,10 @@ class FinanceManager:
                             item_counts[name] = item_counts.get(name, 0) + 1
 
             # Filter items bought more than twice in 60 days
-            recurring = [
-                name for name, count in item_counts.items() if count >= 3
-            ]
+            recurring = [name for name, count in item_counts.items() if count >= 3]
 
             if not recurring:
-                return (
-                    "Недостаточно данных для формирования списка покупок. "
-                    "Продолжайте сканировать чеки! 🛒"
-                )
+                return "Недостаточно данных для формирования списка покупок. Продолжайте сканировать чеки! 🛒"
 
             summary = "🛒 **Рекомендации к покупке (частые товары):**\n"
             for item in sorted(recurring):

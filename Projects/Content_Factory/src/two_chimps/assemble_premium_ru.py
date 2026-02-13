@@ -96,9 +96,7 @@ def assemble_video(script_file):
     if clips:
         final_video = concatenate_videoclips(clips, method="compose")
         output_path = FINAL_VIDEO_DIR / f"{script_file.stem}_premium.mp4"
-        final_video.write_videofile(
-            str(output_path), fps=24, codec="libx264", audio_codec="aac"
-        )
+        final_video.write_videofile(str(output_path), fps=24, codec="libx264", audio_codec="aac")
         print(f"✅ Премиум Видео сохранено: {output_path.name}")
     else:
         print("❌ Клипы не собраны.")

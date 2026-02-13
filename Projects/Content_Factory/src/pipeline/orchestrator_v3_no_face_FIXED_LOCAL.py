@@ -16,9 +16,7 @@ except ImportError:
 # =============================================================================
 
 # Define Root Paths
-SRC_DIR = Path(
-    __file__
-).parent.parent.parent.resolve()  # src/pipeline/.. -> src -> Content_Factory
+SRC_DIR = Path(__file__).parent.parent.parent.resolve()  # src/pipeline/.. -> src -> Content_Factory
 ROOT_DIR = SRC_DIR.parent
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR_OVERRIDE", str(ROOT_DIR / "outputs")))
 INPUT_DIR = ROOT_DIR / "inputs"
@@ -262,7 +260,6 @@ def run_no_face_pipeline(
     scenes: list[dict] = None,
     style: str = "impact",
 ):
-
     print(f"\n🚀 Starting ENHANCED NO-FACE Pipeline (lang={lang}, style={style})")
     print(f"📂 Output Path: {OUTPUT_DIR / output_name}")
 
@@ -327,7 +324,7 @@ def run_no_face_pipeline(
     pexels_key = os.getenv("PEXELS_API_KEY")
 
     for i, scene in enumerate(scenes):
-        print(f"🎬 Processing Scene {i+1}/{num_scenes}...")
+        print(f"🎬 Processing Scene {i + 1}/{num_scenes}...")
 
         keyword = scene.get("keyword", "abstract")
         clip_name = f"{output_name}_seg_{i}.mp4"
@@ -343,9 +340,7 @@ def run_no_face_pipeline(
         # B) Try AI Image Gen (Static -> Video) if Pexels failed
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
-            if generate_image_imagen(
-                keyword + " cinematic, photorealistic, 8k", img_path
-            ):
+            if generate_image_imagen(keyword + " cinematic, photorealistic, 8k", img_path):
                 # Convert Image to Video
                 cmd = [
                     "ffmpeg",
@@ -438,9 +433,7 @@ def run_no_face_pipeline(
         str(video_no_audio),
     ]
     try:
-        subprocess.run(
-            cmd_concat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-        )
+        subprocess.run(cmd_concat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     except Exception as e:
         print(f"❌ Concat failed: {e}")
         return
@@ -475,9 +468,7 @@ def run_no_face_pipeline(
     ]
 
     try:
-        subprocess.run(
-            cmd_mix, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-        )
+        subprocess.run(cmd_mix, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         print(f"\n✨ DONE: {final_video}")
     except Exception as e:
         print(f"❌ Final mix failed: {e}")

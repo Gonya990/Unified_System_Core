@@ -4,16 +4,17 @@ from dotenv import load_dotenv
 from instagrapi import Client
 
 # Setup paths
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+ROOT_DIR = Path("/home/gonya/Unified_System_Core")
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+
 
 def test_session():
     print("🕵️ Testing Instagram Session Injection...")
 
     cl = Client()
     # Load settings from file (which we just wrote with user cookies)
-    session_path = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/insta_session.json')
+    session_path = Path("/home/gonya/Unified_System_Core/Projects/Content_Factory/insta_session.json")
 
     try:
         if session_path.exists():
@@ -28,5 +29,6 @@ def test_session():
     except Exception as e:
         print(f"❌ Session Failed: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_session()

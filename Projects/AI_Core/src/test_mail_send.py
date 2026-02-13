@@ -19,10 +19,10 @@ def main():
                 "sender_name": "OrangeStone",
                 "to": ["OrangeStone"],
                 "subject": "Self-Test",
-                "body_md": "Testing Agent Mail delivery on Windows server."
-            }
+                "body_md": "Testing Agent Mail delivery on Windows server.",
+            },
         },
-        "id": 1
+        "id": 1,
     }
 
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -32,6 +32,7 @@ def main():
         print(json.dumps(res.json(), indent=2))
     except Exception as e:
         print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ load_dotenv(dotenv_path)
 AGENT_MAIL_SERVER = os.getenv("AGENT_MAIL_SERVER", "http://igor-gaming-1:8765")
 AGENT_MAIL_TOKEN = os.getenv("AGENT_MAIL_TOKEN")
 
+
 def check_inbox(server_url):
     print(f"🔍 Checking inbox at {server_url}...")
     url = f"{server_url.rstrip('/')}/messages/inbox"
@@ -30,6 +31,7 @@ def check_inbox(server_url):
     except Exception as e:
         print(f"❌ Error at {server_url}: {e}")
         return False
+
 
 if __name__ == "__main__":
     if not check_inbox(AGENT_MAIL_SERVER):

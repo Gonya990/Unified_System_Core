@@ -169,18 +169,14 @@ else:
     db = UserContextDB(db_path=db_path)
     logger.info(f"Using SQLite database (local mode): {db_path}")
 
-auth_manager = GoogleAuthManager(
-    client_secrets_file=os.path.join("config", "gmail_credentials.json")
-)
+auth_manager = GoogleAuthManager(client_secrets_file=os.path.join("config", "gmail_credentials.json"))
 conv_manager = ConversationManager()
 tl_expert = TelegramSchemaExpert()
 agent_orchestrator = AgentOrchestrator(inference)
 
 # Initialize digest service (requires other services)
 if _DIGEST_AVAILABLE and usage_tracker and task_manager:
-    digest_service = DigestService(
-        usage_tracker, task_manager, linear_client, infra_manager
-    )
+    digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager)
     logger.info("Digest service initialized")
 else:
     digest_service = None
@@ -248,11 +244,7 @@ def get_settings_menu():
     current_provider = config.get("INFERENCE_PROVIDER", "ollama")
     current_model = config.get("MODEL_NAME", "unknown")
     keyboard = [
-        [
-            InlineKeyboardButton(
-                f"🤖 Модель: {current_model}", callback_data="settings_model"
-            )
-        ],
+        [InlineKeyboardButton(f"🤖 Модель: {current_model}", callback_data="settings_model")],
         [
             InlineKeyboardButton(
                 f"🔌 Провайдер: {current_provider.upper()}",
@@ -303,9 +295,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 2. Check Auth/Approval
     if not db.is_approved(user.id):
         # Auto-approve if in ALLOWED_IDS
-        logger.info(
-            f"[CMD] Checking if user {user.id} is in global ALLOWED_IDS: {ALLOWED_IDS}"
-        )
+        logger.info(f"[CMD] Checking if user {user.id} is in global ALLOWED_IDS: {ALLOWED_IDS}")
 
         if user.id in ALLOWED_IDS:
             db.approve_user(user.id, True)
@@ -324,12 +314,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 keyboard = InlineKeyboardMarkup(
                     [
                         [
-                            InlineKeyboardButton(
-                                "✅ Одобрить", callback_data=f"approve_user:{user.id}"
-                            ),
-                            InlineKeyboardButton(
-                                "❌ Отклонить", callback_data=f"deny_user:{user.id}"
-                            ),
+                            InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user:{user.id}"),
+                            InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_user:{user.id}"),
                         ]
                     ]
                 )
@@ -344,10 +330,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     parse_mode="Markdown",
                     reply_markup=keyboard,
                 )
-                logger.info(
-                    f"[CMD] Sent approval request to admin {ADMIN_ID} "
-                    f"for user {user.id}"
-                )
+                logger.info(f"[CMD] Sent approval request to admin {ADMIN_ID} for user {user.id}")
             except Exception as e:
                 logger.error(f"[CMD] Failed to notify admin about new user: {e}")
             return
@@ -357,11 +340,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user_data or not user_data["is_google_connected"]:
         # Show Connect Button
         keyboard = [
-            [
-                InlineKeyboardButton(
-                    "🔗 Connect Google Calendar", callback_data="connect_google"
-                )
-            ],
+            [InlineKeyboardButton("🔗 Connect Google Calendar", callback_data="connect_google")],
             [InlineKeyboardButton("❓ Help", callback_data="help_onboarding")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -402,8 +381,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         else:
             await query.edit_message_text(
-                "❌ Error: `client_secret.json` is missing on the server. "
-                "Please contact Admin."
+                "❌ Error: `client_secret.json` is missing on the server. Please contact Admin."
             )
 
     elif data == "help_onboarding":
@@ -417,28 +395,21 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         client = get_calendar_client(user_id)
         if not client:
-            await query.edit_message_text(
-                "❌ Календарь не подключен. Используйте /start."
-            )
+            await query.edit_message_text("❌ Календарь не подключен. Используйте /start.")
             return
 
         # Parse time
         try:
             start_time = datetime.fromisoformat(pending["time"].replace("Z", "+00:00"))
         except (ValueError, TypeError) as e:
-            logger.warning(
-                f"Failed to parse event time '{pending.get('time')}': {e}, "
-                "using default"
-            )
+            logger.warning(f"Failed to parse event time '{pending.get('time')}': {e}, using default")
             start_time = datetime.now() + timedelta(hours=1)
 
         # Conflict detection
         existing_events = client.get_upcoming_events(days=1)
         conflict = None
         for e in existing_events:
-            e_start_str = e.get("start", {}).get("dateTime") or e.get("start", {}).get(
-                "date"
-            )
+            e_start_str = e.get("start", {}).get("dateTime") or e.get("start", {}).get("date")
             if e_start_str:
                 # Simplistic check
                 if pending["time"] in e_start_str:
@@ -447,47 +418,31 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if conflict:
             await query.edit_message_text(
-                f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\n"
-                f"Всё равно добавить?",
+                f"⚠️ **Конфликт!** В это время уже запланировано: `{conflict}`.\nВсё равно добавить?",
                 parse_mode="Markdown",
                 reply_markup=InlineKeyboardMarkup(
                     [
-                        [
-                            InlineKeyboardButton(
-                                "✅ Да, добавить", callback_data="force_confirm_event"
-                            )
-                        ],
-                        [
-                            InlineKeyboardButton(
-                                "❌ Отмена", callback_data="cancel_event"
-                            )
-                        ],
+                        [InlineKeyboardButton("✅ Да, добавить", callback_data="force_confirm_event")],
+                        [InlineKeyboardButton("❌ Отмена", callback_data="cancel_event")],
                     ]
                 ),
             )
             return
 
-        await process_event_creation(
-            query, user_id, client, pending, start_time, context
-        )
+        await process_event_creation(query, user_id, client, pending, start_time, context)
 
     elif data == "force_confirm_event":
         pending = context.user_data.get("pending_event")
         client = get_calendar_client(user_id)
         start_time = datetime.fromisoformat(pending["time"].replace("Z", "+00:00"))
-        await process_event_creation(
-            query, user_id, client, pending, start_time, context
-        )
+        await process_event_creation(query, user_id, client, pending, start_time, context)
 
     elif data == "cancel_event":
         context.user_data.pop("pending_event", None)
         await query.edit_message_text("❌ Создание события отменено.")
 
     elif data == "edit_context":
-        await query.edit_message_text(
-            "Feature coming soon! For now, try adding the event again "
-            "with more details."
-        )
+        await query.edit_message_text("Feature coming soon! For now, try adding the event again with more details.")
 
     elif data == "clear_memory":
         db.clear_memories(user_id)
@@ -531,13 +486,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         buttons = []
         for model in models[:15]:  # Limit to 15 models
             indicator = "✅" if model == current_model else "🔄"
-            buttons.append(
-                [
-                    InlineKeyboardButton(
-                        f"{indicator} {model}", callback_data=f"model:{model}"
-                    )
-                ]
-            )
+            buttons.append([InlineKeyboardButton(f"{indicator} {model}", callback_data=f"model:{model}")])
         buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")])
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
@@ -564,18 +513,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for provider in providers:
             indicator = "✅" if provider == current else "🔄"
             info = provider_info.get(provider, provider)
-            buttons.append(
-                [
-                    InlineKeyboardButton(
-                        f"{indicator} {info}", callback_data=f"provider:{provider}"
-                    )
-                ]
-            )
+            buttons.append([InlineKeyboardButton(f"{indicator} {info}", callback_data=f"provider:{provider}")])
         buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")])
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
-            f"🔌 **Выбор провайдера**\n\nТекущий: `{current.upper()}`\n\n"
-            f"Нажмите для переключения:",
+            f"🔌 **Выбор провайдера**\n\nТекущий: `{current.upper()}`\n\nНажмите для переключения:",
             parse_mode="Markdown",
             reply_markup=keyboard,
         )
@@ -594,9 +536,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = "📊 Нет данных об использовании."
         else:
             msg = "📊 Трекер использования не настроен."
-        keyboard = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")]]
-        )
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Назад", callback_data="settings_cb")]])
         await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=keyboard)
 
     # Admin Handlers
@@ -649,9 +589,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "To set a key, use: `/set_key [NAME] [VALUE]`\n"
             "Example: `/set_key OPENAI_API_KEY sk-...`"
         )
-        await query.edit_message_text(
-            resp, parse_mode="Markdown", reply_markup=get_admin_menu()
-        )
+        await query.edit_message_text(resp, parse_mode="Markdown", reply_markup=get_admin_menu())
 
     elif data == "admin_users":
         if user_id not in ALLOWED_IDS:
@@ -682,25 +620,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         resp = f"⏳ **Заявки на доступ ({len(pending_users)}):**\n\n"
         buttons = []
         for u in pending_users[:10]:  # Limit to 10
-            resp += (
-                f"👤 {u['full_name']} (@{u['username']})\n   ID: `{u['user_id']}`\n\n"
-            )
+            resp += f"👤 {u['full_name']} (@{u['username']})\n   ID: `{u['user_id']}`\n\n"
             buttons.append(
                 [
                     InlineKeyboardButton(
                         f"✅ Одобрить {u['full_name']}",
                         callback_data=f"approve_user:{u['user_id']}",
                     ),
-                    InlineKeyboardButton(
-                        "❌", callback_data=f"deny_user:{u['user_id']}"
-                    ),
+                    InlineKeyboardButton("❌", callback_data=f"deny_user:{u['user_id']}"),
                 ]
             )
         buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="show_admin")])
         keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(
-            resp, parse_mode="Markdown", reply_markup=keyboard
-        )
+        await query.edit_message_text(resp, parse_mode="Markdown", reply_markup=keyboard)
 
     elif data.startswith("approve_user:"):
         # Approve user via inline button
@@ -709,9 +641,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         target_id = int(data.split(":")[1])
         db.approve_user(target_id, True)
-        logger.info(
-            f"[ADMIN] User {user_id} approved user {target_id} via inline button"
-        )
+        logger.info(f"[ADMIN] User {user_id} approved user {target_id} via inline button")
 
         # Notify the approved user
         try:
@@ -730,9 +660,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             f"✅ Пользователь `{target_id}` одобрен!",
             parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]]
-            ),
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]]),
         )
 
     elif data.startswith("deny_user:"):
@@ -755,9 +683,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             f"❌ Пользователь `{target_id}` отклонён.",
             parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]]
-            ),
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К заявкам", callback_data="admin_pending")]]),
         )
 
     elif data == "show_admin":
@@ -775,9 +701,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         config.set("MODEL_NAME", model_name)
         inference.model = model_name
         logger.info(f"[CALLBACK] User {user_id} switched model to: {model_name}")
-        await query.edit_message_text(
-            f"✅ Модель изменена на: `{model_name}`", parse_mode="Markdown"
-        )
+        await query.edit_message_text(f"✅ Модель изменена на: `{model_name}`", parse_mode="Markdown")
 
     # Provider selection callback
     elif data.startswith("provider:"):
@@ -799,17 +723,13 @@ async def process_event_creation(query, user_id, client, pending, start_time, co
     )
 
     if success:
-        db.add_event_context(
-            user_id, pending["summary"], pending.get("context", ""), start_time
-        )
+        db.add_event_context(user_id, pending["summary"], pending.get("context", ""), start_time)
         await query.edit_message_text(
-            f"✅ Запланировано: **{pending['summary']}**\n" f"Время: {pending['time']}",
+            f"✅ Запланировано: **{pending['summary']}**\nВремя: {pending['time']}",
             parse_mode="Markdown",
         )
     else:
-        await query.edit_message_text(
-            "❌ Не удалось создать событие в Google Calendar."
-        )
+        await query.edit_message_text("❌ Не удалось создать событие в Google Calendar.")
 
     context.user_data.pop("pending_event", None)
 
@@ -833,13 +753,9 @@ async def show_advanced_help(update_or_query, context, edit=False):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if edit:
-        await update_or_query.edit_message_text(
-            text, parse_mode="Markdown", reply_markup=reply_markup
-        )
+        await update_or_query.edit_message_text(text, parse_mode="Markdown", reply_markup=reply_markup)
     else:
-        await update_or_query.message.reply_text(
-            text, parse_mode="Markdown", reply_markup=reply_markup
-        )
+        await update_or_query.message.reply_text(text, parse_mode="Markdown", reply_markup=reply_markup)
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -853,9 +769,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Auto-approve if matches global allowed list
         if user_id in ALLOWED_IDS:
             db.approve_user(user_id, True)
-            logger.info(
-                f"[MESSAGE] Auto-approved user {user_id} via global ALLOWED_IDS"
-            )
+            logger.info(f"[MESSAGE] Auto-approved user {user_id} via global ALLOWED_IDS")
         else:
             logger.warning(f"[MESSAGE] User {user_id} not approved, ignoring message")
             return
@@ -923,8 +837,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 with sqlite3.connect("user_context.db") as conn:
                     cursor = conn.cursor()
                     cursor.execute(
-                        "UPDATE users SET google_creds = ?, is_google_connected = 1 "
-                        "WHERE user_id = ?",
+                        "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
                         (credentials.to_json(), user_id),
                     )
                     conn.commit()
@@ -935,27 +848,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
         else:
-            await update.message.reply_text(
-                "❌ Invalid code or connection failed. Try again."
-            )
+            await update.message.reply_text("❌ Invalid code or connection failed. Try again.")
             return
 
     if user_text == "📅 Обзор дня":
         await show_daily_brief(update, context)
         return
     elif user_text == "➕ Новая задача":
-        await update.message.reply_text(
-            "Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')"
-        )
+        await update.message.reply_text("Что мне запланировать? (например, 'Встреча с Сарой завтра в 10 утра')")
         return
     elif user_text == "🧠 Память/Контекст":
         await show_memory_context(update, context)
         return
     elif user_text == "🛠 Админ-панель":
         if user_id in ALLOWED_IDS:
-            await update.message.reply_text(
-                "🛠 **Центр управления админа**", reply_markup=get_admin_menu()
-            )
+            await update.message.reply_text("🛠 **Центр управления админа**", reply_markup=get_admin_menu())
         else:
             await update.message.reply_text("⛔️ Доступ запрещен.")
         return
@@ -964,9 +871,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # 3. AI Intent Parsing & Response
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     # Save to history
     conv_manager.add_message(user_id, "user", user_text)
@@ -1014,9 +919,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     # Check for "Add Event" intent
-    if any(k in lower_text for k in EVENT_KEYWORDS) and not any(
-        m in lower_text for m in MSG_START_KEYWORDS
-    ):
+    if any(k in lower_text for k in EVENT_KEYWORDS) and not any(m in lower_text for m in MSG_START_KEYWORDS):
         event_details = await parse_event_details(user_text)
         if event_details and "summary" in event_details:
             summary = event_details["summary"]
@@ -1024,11 +927,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context_desc = event_details.get("context", "No context provided")
 
             keyboard = [
-                [
-                    InlineKeyboardButton(
-                        "✅ Confirm", callback_data=f"confirm_event_{summary[:20]}"
-                    )
-                ],
+                [InlineKeyboardButton("✅ Confirm", callback_data=f"confirm_event_{summary[:20]}")],
                 [InlineKeyboardButton("✏️ Edit Context", callback_data="edit_context")],
                 [InlineKeyboardButton("❌ Cancel", callback_data="cancel_event")],
             ]
@@ -1085,9 +984,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Use regex to replace case-insensitively
                 import re
 
-                img_prompt = re.sub(
-                    re.escape(kw), "", img_prompt, flags=re.IGNORECASE
-                ).strip()
+                img_prompt = re.sub(re.escape(kw), "", img_prompt, flags=re.IGNORECASE).strip()
                 break
 
         if img_prompt:
@@ -1125,9 +1022,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(f"Email keywords detected in: {lower_text}")
         gmail = get_gmail_client(user_id)
         if gmail and gmail.is_valid():
-            await context.bot.send_chat_action(
-                chat_id=update.effective_chat.id, action=ChatAction.TYPING
-            )
+            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
             # Detect vacancy-related queries
             VACANCY_KEYWORDS = [
@@ -1165,13 +1060,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if is_vacancy_query:
                 # Search for job-related emails
-                query = (
-                    "(vacancy OR job OR вакансия OR предложение OR "
-                    "recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
-                )
-                logger.info(
-                    f"Searching vacancies with query: {query}, limit: {max_count}"
-                )
+                query = "(vacancy OR job OR вакансия OR предложение OR recruiter OR HR OR hh.ru OR LinkedIn OR hiring)"
+                logger.info(f"Searching vacancies with query: {query}, limit: {max_count}")
                 emails = gmail.search_emails(query, max_results=max_count)
                 if emails:
                     msg = (
@@ -1181,9 +1071,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Show only top 30 to avoid hitting limits
                     for i, email in enumerate(emails[:30], 1):
                         sender = (
-                            email["from"].split("<")[0].strip().strip('"')
-                            if "<" in email["from"]
-                            else email["from"]
+                            email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
                         )
                         subj = email["subject"][:60]
                         if len(email["subject"]) > 60:
@@ -1191,25 +1079,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         msg += f"{i}. **{sender}**\n   {subj}\n\n"
 
                     msg += "_Анализирую содержимое для подбора лучших..._"
-                    await update.message.reply_text(
-                        msg, parse_mode="Markdown", reply_markup=get_main_menu(user_id)
-                    )
+                    await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=get_main_menu(user_id))
 
                     # Store emails in context specifically for AI to analyze
                     email_context = "EMAILS_SNAPSHOT (Top 20 most recent):\n"
                     # Limit to top 20 and truncate content to fit context window
                     for email in emails[:20]:
-                        snippet = (email.get("snippet", "") or "")[:300].replace(
-                            "\n", " "
-                        )
+                        snippet = (email.get("snippet", "") or "")[:300].replace("\n", " ")
                         email_context += (
                             f"- ID: {email['id']}\n  From: {email['from']}\n  "
                             f"Subject: {email['subject']}\n  Summary: {snippet}\n\n"
                         )
 
-                    conv_manager.add_message(
-                        user_id, "user", f"[SYSTEM DATA]\n{email_context}"
-                    )
+                    conv_manager.add_message(user_id, "user", f"[SYSTEM DATA]\n{email_context}")
 
                     # Trigger analysis
                     analysis_prompt = (
@@ -1223,9 +1105,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     )
 
                     try:
-                        ai_response = await query_ollama_with_context(
-                            user_id, analysis_prompt
-                        )
+                        ai_response = await query_ollama_with_context(user_id, analysis_prompt)
                         if ai_response and ai_response.strip():
                             conv_manager.add_message(user_id, "assistant", ai_response)
                             await update.message.reply_text(
@@ -1255,9 +1135,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
 
             elif is_analysis_requested:
-                await context.bot.send_chat_action(
-                    chat_id=update.effective_chat.id, action=ChatAction.TYPING
-                )
+                await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                 emails = gmail.get_recent_emails(max_results=max_count)
                 if not emails:
                     await update.message.reply_text(
@@ -1274,16 +1152,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 email_context = "ПОСЛЕДНИЕ ПИСЬМА (ДЛЯ АНАЛИЗА):\n"
                 for i, email in enumerate(emails, 1):
-                    sender = (
-                        email["from"].split("<")[0].strip().strip('"')
-                        if "<" in email["from"]
-                        else email["from"]
-                    )
+                    sender = email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
                     snippet = (email.get("snippet", "") or "")[:200].replace("\n", " ")
-                    email_context += (
-                        f"{i}. От: {sender} | Тема: {email['subject']} | "
-                        f"Суть: {snippet}\n"
-                    )
+                    email_context += f"{i}. От: {sender} | Тема: {email['subject']} | Суть: {snippet}\n"
 
                 full_analysis_prompt = (
                     f"Проанализируй следующий список из {len(emails)} писем.\n"
@@ -1299,9 +1170,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
 
                 try:
-                    ai_response = await query_ollama_with_context(
-                        user_id, full_analysis_prompt
-                    )
+                    ai_response = await query_ollama_with_context(user_id, full_analysis_prompt)
                     if ai_response and ai_response.strip():
                         conv_manager.add_message(user_id, "assistant", ai_response)
                         await update.message.reply_text(
@@ -1323,9 +1192,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
 
             # Check if user wants to search
-            if any(
-                w in lower_text for w in ["найди", "поиск", "search", "find", "ищи"]
-            ):
+            if any(w in lower_text for w in ["найди", "поиск", "search", "find", "ищи"]):
                 # Extract search query (words after search keyword)
                 for kw in ["найди", "поиск", "search", "find", "ищи"]:
                     if kw in lower_text:
@@ -1340,9 +1207,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                         if "<" in email["from"]
                                         else email["from"]
                                     )
-                                    msg += (
-                                        f"• **{sender}**\n  {email['subject'][:50]}\n\n"
-                                    )
+                                    msg += f"• **{sender}**\n  {email['subject'][:50]}\n\n"
                                 await update.message.reply_text(
                                     msg,
                                     parse_mode="Markdown",
@@ -1357,9 +1222,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Default: show email summary
             summary = gmail.get_email_summary()
-            await update.message.reply_text(
-                summary, parse_mode="Markdown", reply_markup=get_main_menu(user_id)
-            )
+            await update.message.reply_text(summary, parse_mode="Markdown", reply_markup=get_main_menu(user_id))
             return
         else:
             await update.message.reply_text(
@@ -1373,10 +1236,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Validate response is not empty
     if not ai_response or not ai_response.strip():
-        ai_response = (
-            "🤔 Не удалось получить ответ от AI. "
-            "Попробуйте ещё раз или смените провайдер через /settings."
-        )
+        ai_response = "🤔 Не удалось получить ответ от AI. Попробуйте ещё раз или смените провайдер через /settings."
 
     # --- PROCESSS AI COMMANDS ([[TAG:args]]) ---
     import re
@@ -1387,9 +1247,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if ha_controller:
             await ha_controller.speak_via_yandex(text_to_say)
             logger.info(f"[HA] Alice spoke: {text_to_say}")
-        ai_response = ai_response.replace(
-            f"[[ALICE:{text_to_say}]]", f"🔊 _(Озвучено Алисой: {text_to_say})_"
-        )
+        ai_response = ai_response.replace(f"[[ALICE:{text_to_say}]]", f"🔊 _(Озвучено Алисой: {text_to_say})_")
 
     # 2. HA LIGHTS
     ha_matches = re.findall(r"\[\[HA:(.*?):(.*?)\]\]", ai_response)
@@ -1397,18 +1255,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if ha_controller:
             if action == "light_on":
                 await ha_controller.turn_on_light(entity_name)
-                ai_response = ai_response.replace(
-                    f"[[HA:{action}:{entity_name}]]", f"💡 _(Включаю: {entity_name})_"
-                )
+                ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"💡 _(Включаю: {entity_name})_")
             elif action == "light_off":
                 await ha_controller.turn_off_light(entity_name)
-                ai_response = ai_response.replace(
-                    f"[[HA:{action}:{entity_name}]]", f"🌑 _(Выключаю: {entity_name})_"
-                )
+                ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", f"🌑 _(Выключаю: {entity_name})_")
         else:
-            ai_response = ai_response.replace(
-                f"[[HA:{action}:{entity_name}]]", "❌ _(HA недоступен)_"
-            )
+            ai_response = ai_response.replace(f"[[HA:{action}:{entity_name}]]", "❌ _(HA недоступен)_")
 
     # 3. DIRECT MESSAGING (Telegram)
     msg_matches = re.findall(r"\[\[RUN:MSG:(.*?):(.*?)\]\]", ai_response)
@@ -1436,13 +1288,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if target_id:
             try:
                 # Get sender info
-                sender_name = (
-                    update.effective_user.username or update.effective_user.first_name
-                )
+                sender_name = update.effective_user.username or update.effective_user.first_name
                 await context.bot.send_message(
                     chat_id=target_id,
-                    text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n"
-                    f"{msg_text}",
+                    text=f"📩 **Сообщение от @{sender_name} (через Гоню):**\n\n{msg_text}",
                     parse_mode="Markdown",
                 )
                 ai_response = ai_response.replace(
@@ -1464,9 +1313,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.warning(f"[MSG] Could not resolve target: {target_name}")
 
     conv_manager.add_message(user_id, "assistant", ai_response)
-    await update.message.reply_text(
-        ai_response, reply_markup=get_main_menu(user_id), parse_mode="Markdown"
-    )
+    await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id), parse_mode="Markdown")
 
     # Trigger async digestion if history is long
     history = conv_manager.get_history(user_id)
@@ -1479,17 +1326,13 @@ async def show_memory_context(update: Update, context: ContextTypes.DEFAULT_TYPE
     memories = db.get_memories(user_id)
 
     if not memories:
-        await update.effective_message.reply_text(
-            "🧠 I haven't learned any key facts about you yet. Let's talk more!"
-        )
+        await update.effective_message.reply_text("🧠 I haven't learned any key facts about you yet. Let's talk more!")
     else:
         resp = "🧠 **My Long-term Memory:**\n\n"
         for m in memories:
             resp += f"• {m['fact_short']}\n"
 
-        keyboard = [
-            [InlineKeyboardButton("🗑 Clear Memory", callback_data="clear_memory")]
-        ]
+        keyboard = [[InlineKeyboardButton("🗑 Clear Memory", callback_data="clear_memory")]]
         await update.effective_message.reply_text(
             resp, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard)
         )
@@ -1503,9 +1346,7 @@ async def parse_event_details(text: str) -> Optional[dict[str, Any]]:
         "context (reason for event)."
     )
 
-    response = await query_ollama(
-        prompt, system="You are a data extractor. Return JSON only."
-    )
+    response = await query_ollama(prompt, system="You are a data extractor. Return JSON only.")
     try:
         start = response.find("{")
         end = response.rfind("}") + 1
@@ -1521,16 +1362,12 @@ async def show_daily_brief(update: Update, context: ContextTypes.DEFAULT_TYPE):
     client = get_calendar_client(user_id)
 
     if not client:
-        await update.effective_message.reply_text(
-            "❌ Календарь не подключен. Используйте /start."
-        )
+        await update.effective_message.reply_text("❌ Календарь не подключен. Используйте /start.")
         return
 
     events = client.get_upcoming_events(days=1)
     if not events:
-        await update.effective_message.reply_text(
-            "🗓 Совсем нет планов на сегодня! Можно заняться новыми делами."
-        )
+        await update.effective_message.reply_text("🗓 Совсем нет планов на сегодня! Можно заняться новыми делами.")
     else:
         # Get stored contexts using db abstraction
         contexts = db.get_event_contexts(user_id)
@@ -1563,9 +1400,7 @@ async def digest_chat_memory(user_id: int):
         "If no new facts found, return empty array [].\n\nHistory:\n" + history_text
     )
 
-    response = await query_ollama(
-        prompt, system="You are a knowledge extractor. Return JSON array ONLY."
-    )
+    response = await query_ollama(prompt, system="You are a knowledge extractor. Return JSON array ONLY.")
     try:
         start = response.find("[")
         end = response.rfind("]") + 1
@@ -1648,9 +1483,7 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
         response_text, _ = await inference.chat(
             history + [{"role": "user", "content": prompt}], system_prompt=system_prompt
         )
-        logger.info(
-            f"[AI] Got response for user {user_id}, length: {len(response_text)}"
-        )
+        logger.info(f"[AI] Got response for user {user_id}, length: {len(response_text)}")
         return response_text
     except Exception as e:
         logger.error(f"[AI] Error querying AI for user {user_id}: {e}")
@@ -1660,9 +1493,7 @@ async def query_ollama_with_context(user_id: int, prompt: str) -> str:
 async def query_ollama(prompt: str, system: str = None) -> str:
     """Legacy wrapper, now uses InferenceClient."""
     system_prompt = system or "You are a helpful assistant."
-    response, _ = await inference.chat(
-        [{"role": "user", "content": prompt}], system_prompt=system_prompt
-    )
+    response, _ = await inference.chat([{"role": "user", "content": prompt}], system_prompt=system_prompt)
     return response
 
 
@@ -1699,8 +1530,7 @@ async def post_init(application: Application) -> None:
                     None,
                     lambda: agent_mail.broadcast(
                         subject="Unified Bot Online",
-                        body_md="The AI Telegram Bot V2 has successfully started "
-                        "and is listening for commands.",
+                        body_md="The AI Telegram Bot V2 has successfully started and is listening for commands.",
                         importance="normal",
                     ),
                 )
@@ -1751,8 +1581,7 @@ async def newtask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     db.update_last_interaction(user_id)
     await update.message.reply_text(
-        "📝 What would you like to schedule?\n\n"
-        "Example: 'Meeting with Sara tomorrow at 10am'"
+        "📝 What would you like to schedule?\n\nExample: 'Meeting with Sara tomorrow at 10am'"
     )
 
 
@@ -1762,9 +1591,7 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args or len(context.args) < 2:
-        await update.message.reply_text(
-            "Usage: `/set_key NAME VALUE`", parse_mode="Markdown"
-        )
+        await update.message.reply_text("Usage: `/set_key NAME VALUE`", parse_mode="Markdown")
         return
 
     key_name = context.args[0].upper()
@@ -1777,9 +1604,7 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.debug(f"Could not delete message: {e}")
 
-    await update.message.reply_text(
-        f"✅ Key `{key_name}` updated and encrypted.", parse_mode="Markdown"
-    )
+    await update.message.reply_text(f"✅ Key `{key_name}` updated and encrypted.", parse_mode="Markdown")
 
 
 async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1859,8 +1684,7 @@ async def agent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not task:
         await update.message.reply_text(
-            f"❌ Укажите задачу для агента `{agent_name}`\n\n"
-            f"Пример: `/agent {agent_name} Опиши архитектуру проекта`",
+            f"❌ Укажите задачу для агента `{agent_name}`\n\nПример: `/agent {agent_name} Опиши архитектуру проекта`",
             parse_mode="Markdown",
         )
         return
@@ -1870,17 +1694,14 @@ async def agent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not agent:
         available = ", ".join(list(agent_orchestrator.agents.keys())[:10])
         await update.message.reply_text(
-            f"❌ Агент `{agent_name}` не найден.\n\nДоступные: `{available}...`\n\n"
-            "Используйте `/agent` для списка.",
+            f"❌ Агент `{agent_name}` не найден.\n\nДоступные: `{available}...`\n\nИспользуйте `/agent` для списка.",
             parse_mode="Markdown",
         )
         return
 
     logger.info(f"[AGENT] User {user_id} running {agent_name}: {task[:50]}...")
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     await update.message.reply_text(
         f"🤖 Запускаю агента `{agent_name}`...\n⏱ Это может занять 20-40 секунд.",
         parse_mode="Markdown",
@@ -1893,13 +1714,9 @@ async def agent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(result) > 4000:
             chunks = [result[i : i + 4000] for i in range(0, len(result), 4000)]
             for i, chunk in enumerate(chunks):
-                await update.message.reply_text(
-                    f"📄 Часть {i + 1}/{len(chunks)}:\n\n{chunk}", parse_mode="Markdown"
-                )
+                await update.message.reply_text(f"📄 Часть {i + 1}/{len(chunks)}:\n\n{chunk}", parse_mode="Markdown")
         else:
-            await update.message.reply_text(
-                f"✅ **{agent_name}** завершил:\n\n{result}", parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"✅ **{agent_name}** завершил:\n\n{result}", parse_mode="Markdown")
 
         logger.info(f"[AGENT] {agent_name} completed for user {user_id}")
 
@@ -1950,8 +1767,7 @@ async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not task:
         await update.message.reply_text(
-            f"❌ Укажите задачу для пайплайна `{pipeline_type}`\n\n"
-            f"Пример: `/pipeline {pipeline_type} Описание задачи`",
+            f"❌ Укажите задачу для пайплайна `{pipeline_type}`\n\nПример: `/pipeline {pipeline_type} Описание задачи`",
             parse_mode="Markdown",
         )
         return
@@ -1961,12 +1777,9 @@ async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pipeline_stages = PIPELINES[pipeline_type]
     stage_names = " → ".join([s[0] for s in pipeline_stages])
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     await update.message.reply_text(
-        f"🔄 Запускаю пайплайн `{pipeline_type}`\n\nЭтапы: {stage_names}\n\n"
-        "⏱ Это может занять 2-5 минут...",
+        f"🔄 Запускаю пайплайн `{pipeline_type}`\n\nЭтапы: {stage_names}\n\n⏱ Это может занять 2-5 минут...",
         parse_mode="Markdown",
     )
 
@@ -1988,9 +1801,7 @@ async def pipeline_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(response) > 4000:
             chunks = [response[i : i + 4000] for i in range(0, len(response), 4000)]
             for i, chunk in enumerate(chunks):
-                await update.message.reply_text(
-                    f"📄 Часть {i + 1}/{len(chunks)}:\n\n{chunk}", parse_mode="Markdown"
-                )
+                await update.message.reply_text(f"📄 Часть {i + 1}/{len(chunks)}:\n\n{chunk}", parse_mode="Markdown")
         else:
             await update.message.reply_text(response, parse_mode="Markdown")
 
@@ -2025,12 +1836,8 @@ async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = " ".join(context.args)
     logger.info(f"[IMG] User {user_id} requested image: {prompt[:50]}...")
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO
-    )
-    await update.message.reply_text(
-        "🎨 Генерирую изображение... (это может занять до 30 секунд)"
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO)
+    await update.message.reply_text("🎨 Генерирую изображение... (это может занять до 30 секунд)")
 
     try:
         image_url = await inference.generate_image(prompt)
@@ -2043,14 +1850,10 @@ async def img_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         image_data = await resp.read()
                         from io import BytesIO
 
-                        await update.message.reply_photo(
-                            photo=BytesIO(image_data), caption=f"🎨 {prompt[:200]}"
-                        )
+                        await update.message.reply_photo(photo=BytesIO(image_data), caption=f"🎨 {prompt[:200]}")
                         logger.info(f"[IMG] Successfully sent image to user {user_id}")
                     else:
-                        await update.message.reply_text(
-                            f"❌ Не удалось загрузить изображение. URL: {image_url}"
-                        )
+                        await update.message.reply_text(f"❌ Не удалось загрузить изображение. URL: {image_url}")
         else:
             await update.message.reply_text(
                 "❌ Не удалось сгенерировать изображение.\n\n"
@@ -2071,9 +1874,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     msg = await update.message.reply_text("🔍 Проверяю системы...")
 
     import time
@@ -2143,15 +1944,11 @@ async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /search <query>\nExample: /search latest AI news"
-        )
+        await update.message.reply_text("Usage: /search <query>\nExample: /search latest AI news")
         return
 
     query = " ".join(context.args)
-    await update.message.reply_text(
-        f'🔍 Searching: "{query[:50]}..."\n⏳ Please wait...'
-    )
+    await update.message.reply_text(f'🔍 Searching: "{query[:50]}..."\n⏳ Please wait...')
 
     try:
         result = await web_search.search(query)
@@ -2244,9 +2041,7 @@ async def models_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     models = await inference.list_models()
 
     if not models:
-        await update.message.reply_text(
-            "❌ Could not fetch models. Check endpoint configuration."
-        )
+        await update.message.reply_text("❌ Could not fetch models. Check endpoint configuration.")
         return
 
     current_model = inference.model
@@ -2254,19 +2049,12 @@ async def models_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buttons = []
     for model in models[:20]:
         indicator = "✅" if model == current_model else "🔄"
-        buttons.append(
-            [
-                InlineKeyboardButton(
-                    f"{indicator} {model}", callback_data=f"model:{model}"
-                )
-            ]
-        )
+        buttons.append([InlineKeyboardButton(f"{indicator} {model}", callback_data=f"model:{model}")])
 
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"📋 **Available Models** ({len(models)})\n\n"
-        f"Current: `{current_model}`\n\nClick to switch:",
+        f"📋 **Available Models** ({len(models)})\n\nCurrent: `{current_model}`\n\nClick to switch:",
         parse_mode="Markdown",
         reply_markup=keyboard,
     )
@@ -2280,9 +2068,7 @@ async def clear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     conv_manager.clear_history(user_id)
-    await update.message.reply_text(
-        "🧹 История диалога очищена!\n\nСледующее сообщение начнёт новый контекст."
-    )
+    await update.message.reply_text("🧹 История диалога очищена!\n\nСледующее сообщение начнёт новый контекст.")
 
 
 async def infra_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2296,9 +2082,7 @@ async def infra_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Infrastructure manager not configured.")
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     report = await infra_manager.check_nodes()
     await update.message.reply_text(report, parse_mode="Markdown")
 
@@ -2310,13 +2094,9 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     photo = update.message.photo[-1]
-    prompt = update.message.caption or (
-        "Что изображено на этой картинке? Опиши подробно."
-    )
+    prompt = update.message.caption or ("Что изображено на этой картинке? Опиши подробно.")
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     await update.message.reply_text("👀 Analyzing photo...")
 
     try:
@@ -2343,9 +2123,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not db.is_approved(user_id):
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     await update.message.reply_text("🎤 Transcribing...")
 
     try:
@@ -2364,15 +2142,11 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Could not transcribe: {transcript}")
             return
 
-        await update.message.reply_text(
-            f'🗣 Transcribed: "_{transcript}_"', parse_mode="Markdown"
-        )
+        await update.message.reply_text(f'🗣 Transcribed: "_{transcript}_"', parse_mode="Markdown")
 
         # Process as text
         ai_response = await query_ollama_with_context(user_id, transcript)
-        await update.message.reply_text(
-            ai_response, reply_markup=get_main_menu(user_id)
-        )
+        await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
 
     except Exception as e:
         logger.error(f"Error handling voice: {e}")
@@ -2388,9 +2162,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     document = update.message.document
     file_name = document.file_name
 
-    await update.message.reply_text(
-        f"📂 Получил файл: `{file_name}`.", parse_mode="Markdown"
-    )
+    await update.message.reply_text(f"📂 Получил файл: `{file_name}`.", parse_mode="Markdown")
 
     # Text-based files processing
     text_extensions = (
@@ -2408,9 +2180,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             # Check size (max 2MB for text)
             if document.file_size > 2 * 1024 * 1024:
-                await update.message.reply_text(
-                    "⚠️ Файл слишком большой для чтения текста (>2MB)."
-                )
+                await update.message.reply_text("⚠️ Файл слишком большой для чтения текста (>2MB).")
                 return
 
             new_file = await document.get_file()
@@ -2422,9 +2192,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 import re
 
                 text_content = re.sub(r"[{}\\]", "", text_content)  # Very basic cleanup
-                text_content = re.sub(
-                    r"\\[a-z]+\d*", " ", text_content
-                )  # Remove control words like \par
+                text_content = re.sub(r"\\[a-z]+\d*", " ", text_content)  # Remove control words like \par
 
             # Save to context
             conv_manager.add_message(
@@ -2433,18 +2201,14 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"[User uploaded file {file_name} content]:\n{text_content}",
             )
 
-            await update.message.reply_text(
-                "✅ Текст файла сохранен в контексте диалога."
-            )
+            await update.message.reply_text("✅ Текст файла сохранен в контексте диалога.")
 
             # Trigger AI analysis immediately with specific prompt
             prompt = f"Я отправил файл {file_name}. Проанализируй его содержимое."
             ai_response = await query_ollama_with_context(user_id, prompt)
 
             conv_manager.add_message(user_id, "assistant", ai_response)
-            await update.message.reply_text(
-                ai_response, reply_markup=get_main_menu(user_id)
-            )
+            await update.message.reply_text(ai_response, reply_markup=get_main_menu(user_id))
 
         except Exception as e:
             logger.error(f"Failed to read document {file_name}: {e}")
@@ -2452,8 +2216,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif file_name.lower().endswith((".pdf", ".docx", ".doc")):
         await update.message.reply_text(
-            "ℹ️ PDF/DOCX пока не поддерживаются для чтения. "
-            "Пожалуйста, скопируйте текст или сохраните как .txt"
+            "ℹ️ PDF/DOCX пока не поддерживаются для чтения. Пожалуйста, скопируйте текст или сохраните как .txt"
         )
     else:
         # Just notify about receipt for other types
@@ -2462,9 +2225,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "user",
             f"[User uploaded file {file_name}, type: {document.mime_type}]",
         )
-        await update.message.reply_text(
-            "📦 Файл получен. Я запомнил, что вы его прислали."
-        )
+        await update.message.reply_text("📦 Файл получен. Я запомнил, что вы его прислали.")
 
 
 async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2497,9 +2258,7 @@ async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE
         else:
             hint = "Make sure Ollama is running"
 
-        await update.message.reply_text(
-            f"✅ Provider set to: `{provider}`\n\n💡 {hint}", parse_mode="Markdown"
-        )
+        await update.message.reply_text(f"✅ Provider set to: `{provider}`\n\n💡 {hint}", parse_mode="Markdown")
         return
 
     buttons = []
@@ -2517,8 +2276,7 @@ async def setprovider_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"⚙️ **Select AI Provider**\n\nCurrent: `{current.upper()}`\n\n"
-        "Click to switch:",
+        f"⚙️ **Select AI Provider**\n\nCurrent: `{current.upper()}`\n\nClick to switch:",
         parse_mode="Markdown",
         reply_markup=keyboard,
     )
@@ -2538,9 +2296,7 @@ async def usage_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stats = usage_tracker.get_user_stats(user_id, days=30)
 
     if not stats:
-        await update.message.reply_text(
-            "📊 Нет данных об использовании за последние 30 дней."
-        )
+        await update.message.reply_text("📊 Нет данных об использовании за последние 30 дней.")
         return
 
     msg = (
@@ -2570,9 +2326,7 @@ async def costs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_stats = usage_tracker.get_user_stats(user_id, days=30)
 
     if not user_stats:
-        await update.message.reply_text(
-            "📊 Нет данных об использовании за последние 30 дней."
-        )
+        await update.message.reply_text("📊 Нет данных об использовании за последние 30 дней.")
         return
 
     msg = "💰 **Детальная статистика (30 дней)**\n\n"
@@ -2586,15 +2340,10 @@ async def costs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id == ADMIN_ID:
         msg += "\n🌐 **По провайдерам (все пользователи):**\n"
         providers = (
-            usage_tracker.get_provider_breakdown(days=30)
-            if hasattr(usage_tracker, "get_provider_breakdown")
-            else {}
+            usage_tracker.get_provider_breakdown(days=30) if hasattr(usage_tracker, "get_provider_breakdown") else {}
         )
         for provider, data in providers.items():
-            msg += (
-                f"  • {provider}: {data.get('tokens', 0):,} токенов "
-                f"({data.get('requests', 0)} запросов)\n"
-            )
+            msg += f"  • {provider}: {data.get('tokens', 0):,} токенов ({data.get('requests', 0)} запросов)\n"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -2611,13 +2360,9 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Access denied.")
         return
 
-    await update.message.reply_text(
-        "🕵️‍♂️ Запускаю поиск вакансий (Job Hunter/Analyzer)... ожидай отчета."
-    )
+    await update.message.reply_text("🕵️‍♂️ Запускаю поиск вакансий (Job Hunter/Analyzer)... ожидай отчета.")
 
-    script_path = (
-        "/home/gonya/Documents/Unified_System/Scripts/automation/job_hunter.py"
-    )
+    script_path = "/home/gonya/Documents/Unified_System/Scripts/automation/job_hunter.py"
     venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
 
     try:
@@ -2645,23 +2390,17 @@ async def say_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /say <текст>\nПример: /say Привет, я Гоня!"
-        )
+        await update.message.reply_text("Usage: /say <текст>\nПример: /say Привет, я Гоня!")
         return
 
     message = " ".join(context.args)
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     try:
         if await ha_controller.speak_via_yandex(message):
             await update.message.reply_text(f'🔊 Алиса скажет: "{message[:50]}..."')
         else:
-            await update.message.reply_text(
-                "❌ Не удалось отправить сообщение на Яндекс Станцию."
-            )
+            await update.message.reply_text("❌ Не удалось отправить сообщение на Яндекс Станцию.")
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -2674,24 +2413,18 @@ async def speak_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /speak <text>\nExample: /speak Hello world"
-        )
+        await update.message.reply_text("Usage: /speak <text>\nExample: /speak Hello world")
         return
 
     text = " ".join(context.args)
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.RECORD_VOICE
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.RECORD_VOICE)
 
     try:
         audio_data = await inference.generate_speech(text)
         if audio_data:
             await update.message.reply_voice(voice=audio_data, caption=text[:100])
         else:
-            await update.message.reply_text(
-                "❌ TTS generation failed (check logs/api key)."
-            )
+            await update.message.reply_text("❌ TTS generation failed (check logs/api key).")
     except Exception as e:
         logger.error(f"TTS command failed: {e}")
         await update.message.reply_text(f"❌ Error: {e}")
@@ -2716,18 +2449,14 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🔄 Checking Agent Mail...")
         try:
             loop = asyncio.get_running_loop()
-            messages = await loop.run_in_executor(
-                None, lambda: agent_mail.fetch_inbox(limit=5)
-            )
+            messages = await loop.run_in_executor(None, lambda: agent_mail.fetch_inbox(limit=5))
             if not messages:
                 await update.message.reply_text("📭 Agent Inbox empty.")
             else:
                 msg_text = f"📬 **Agent Inbox ({len(messages)}):**\n\n"
                 for m in messages:
                     status = "📖" if m.get("read") else "✉️"
-                    msg_text += (
-                        f"{status} From: `{m['from']}`\nSubject: {m['subject']}\n\n"
-                    )
+                    msg_text += f"{status} From: `{m['from']}`\nSubject: {m['subject']}\n\n"
                 await update.message.reply_text(msg_text, parse_mode="Markdown")
         except Exception as e:
             await update.message.reply_text(f"❌ Error fetching agent mail: {e}")
@@ -2742,27 +2471,21 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     if not context.args:
         summary = gmail.get_email_summary()
         await update.message.reply_text(summary, parse_mode="Markdown")
         # Also mention agent mail
         if agent_mail:
-            await update.message.reply_text(
-                "💡 Tip: Use `/mail agent` to check internal agent messages."
-            )
+            await update.message.reply_text("💡 Tip: Use `/mail agent` to check internal agent messages.")
         return
 
     cmd = context.args[0].lower()
 
     if cmd == "unread":
         count = gmail.get_unread_count()
-        await update.message.reply_text(
-            f"📬 Непрочитанных писем (Gmail): **{count}**", parse_mode="Markdown"
-        )
+        await update.message.reply_text(f"📬 Непрочитанных писем (Gmail): **{count}**", parse_mode="Markdown")
 
     elif cmd == "search":
         if len(context.args) < 2:
@@ -2771,17 +2494,11 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = " ".join(context.args[1:])
         emails = gmail.search_emails(query, max_results=5)
         if not emails:
-            await update.message.reply_text(
-                f'🔍 По запросу "{query}" ничего не найдено.'
-            )
+            await update.message.reply_text(f'🔍 По запросу "{query}" ничего не найдено.')
             return
         msg = f'🔍 **Результаты по: "{query}"**\n\n'
         for email in emails:
-            sender = (
-                email["from"].split("<")[0].strip().strip('"')
-                if "<" in email["from"]
-                else email["from"]
-            )
+            sender = email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
             subj = email["subject"][:40]
             if len(email["subject"]) > 40:
                 subj += "..."
@@ -2804,9 +2521,7 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_text = " ".join(context.args[1:])
         parts = full_text.split("|")
         if len(parts) < 3:
-            await update.message.reply_text(
-                "❌ Формат: `/mail send email | тема | текст`", parse_mode="Markdown"
-            )
+            await update.message.reply_text("❌ Формат: `/mail send email | тема | текст`", parse_mode="Markdown")
             return
 
         to_email = parts[0].strip()
@@ -2817,9 +2532,7 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if result:
             await update.message.reply_text(f"✅ Письмо отправлено на {to_email}")
         else:
-            await update.message.reply_text(
-                "❌ Ошибка отправки письма. Проверьте права OAuth."
-            )
+            await update.message.reply_text("❌ Ошибка отправки письма. Проверьте права OAuth.")
 
     elif cmd == "read":
         # /mail read <message_id> - read full email
@@ -2832,9 +2545,7 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Truncate if too long
             if len(body) > 3000:
                 body = body[:3000] + "\n\n... (обрезано)"
-            await update.message.reply_text(
-                f"📧 **Содержимое письма:**\n\n{body[:4000]}"
-            )
+            await update.message.reply_text(f"📧 **Содержимое письма:**\n\n{body[:4000]}")
             gmail.mark_as_read(msg_id)
         else:
             await update.message.reply_text("❌ Не удалось прочитать письмо.")
@@ -2856,11 +2567,7 @@ async def mail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = f"📬 **Последние {len(emails)} писем:**\n\n"
         for i, email in enumerate(emails, 1):
-            sender = (
-                email["from"].split("<")[0].strip().strip('"')
-                if "<" in email["from"]
-                else email["from"]
-            )
+            sender = email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
             status = "🔵" if email.get("unread") else "⚪"
             subj = email["subject"][:35]
             if len(email["subject"]) > 35:
@@ -2936,9 +2643,7 @@ async def notify_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if cmd == "status":
         quiet = notify_manager.is_quiet_hours()
-        await update.message.reply_text(
-            "🌙 Сейчас тихие часы" if quiet else "🔔 Сейчас активный режим"
-        )
+        await update.message.reply_text("🌙 Сейчас тихие часы" if quiet else "🔔 Сейчас активный режим")
 
     elif cmd == "quiet":
         if len(context.args) < 3:
@@ -2952,9 +2657,7 @@ async def notify_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             end = datetime.strptime(end_str, "%H:%M").time()
             notify_manager.quiet_start = start
             notify_manager.quiet_end = end
-            await update.message.reply_text(
-                f"✅ Тихие часы установлены: {start_str} - {end_str}"
-            )
+            await update.message.reply_text(f"✅ Тихие часы установлены: {start_str} - {end_str}")
         except Exception as e:
             await update.message.reply_text(f"❌ Ошибка формата времени: {e}")
 
@@ -2968,8 +2671,7 @@ async def remind_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(context.args) < 2:
         await update.message.reply_text(
-            "Usage: /remind <time> <text>\n"
-            "Example: /remind 10m Выключи духовку\nTime units: s, m, h, d"
+            "Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d"
         )
         return
 
@@ -3000,16 +2702,12 @@ async def remind_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Schedule reminder (simplified - stores in context for now)
     context.job_queue.run_once(
-        lambda ctx: ctx.bot.send_message(
-            chat_id=user_id, text=f"⏰ Напоминание: {text}"
-        ),
+        lambda ctx: ctx.bot.send_message(chat_id=user_id, text=f"⏰ Напоминание: {text}"),
         when=delta,
         name=f"remind_{user_id}_{run_date.timestamp()}",
     )
 
-    await update.message.reply_text(
-        f"✅ Напоминание установлено на {run_date.strftime('%H:%M:%S')}"
-    )
+    await update.message.reply_text(f"✅ Напоминание установлено на {run_date.strftime('%H:%M:%S')}")
 
 
 async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3025,8 +2723,7 @@ async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not context.args:
         await update.message.reply_text(
-            "Example: /note Meeting Notes | Discussed project X\n"
-            "Usage: /note <title> [| content]"
+            "Example: /note Meeting Notes | Discussed project X\nUsage: /note <title> [| content]"
         )
         return
 
@@ -3039,20 +2736,14 @@ async def note_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         title = full_text
         content = ""
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     try:
         url = await notion_client.create_page(title, content)
         if url:
-            await update.message.reply_text(
-                f"✅ Created Note: [{title}]({url})", parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"✅ Created Note: [{title}]({url})", parse_mode="Markdown")
         else:
-            await update.message.reply_text(
-                "❌ Failed to create note. Check logs/config."
-            )
+            await update.message.reply_text("❌ Failed to create note. Check logs/config.")
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -3070,9 +2761,7 @@ async def digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Digest service not initialized.")
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
     try:
         digest = await digest_service.generate_digest(user_id, username)
@@ -3089,9 +2778,7 @@ async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⛔️ Admin only command.")
         return
 
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_DOCUMENT
-    )
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_DOCUMENT)
 
     import zipfile
 
@@ -3116,9 +2803,7 @@ async def backup_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     found = True
 
             if not found:
-                await update.message.reply_text(
-                    "⚠️ Не найдено файлов баз данных для бэкапа."
-                )
+                await update.message.reply_text("⚠️ Не найдено файлов баз данных для бэкапа.")
                 os.remove(backup_name)
                 return
 
@@ -3137,22 +2822,16 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /update command - self-update via git and restart."""
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
-        await update.message.reply_text(
-            "❌ Только главный администратор может обновлять бота."
-        )
+        await update.message.reply_text("❌ Только главный администратор может обновлять бота.")
         return
 
-    await update.message.reply_text(
-        "🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)..."
-    )
+    await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)...")
 
     import subprocess
 
     try:
         project_dir = "/home/gonya/Documents/Unified_System"
-        git_command = (
-            f"cd {project_dir} && git fetch origin && git reset --hard origin/main"
-        )
+        git_command = f"cd {project_dir} && git fetch origin && git reset --hard origin/main"
 
         proc = await asyncio.create_subprocess_shell(
             git_command,
@@ -3166,13 +2845,10 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         await update.message.reply_text(
-            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n"
-            "2. Restarting service..."
+            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Restarting service..."
         )
 
-        await update.message.reply_text(
-            "♻️ Перезапускаю сервис (systemd)... Я вернусь через 5-10 секунд."
-        )
+        await update.message.reply_text("♻️ Перезапускаю сервис (systemd)... Я вернусь через 5-10 секунд.")
         subprocess.Popen(["sudo", "systemctl", "restart", "ai-bot"])
 
     except Exception as e:
@@ -3209,9 +2885,7 @@ async def health_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if cmd == "add":
         if len(context.args) < 3:
-            await update.message.reply_text(
-                "Usage: /health add <steps|weight|sleep> <value>"
-            )
+            await update.message.reply_text("Usage: /health add <steps|weight|sleep> <value>")
             return
 
         metric = context.args[1].lower()
@@ -3234,9 +2908,7 @@ async def health_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif cmd == "goal":
         if len(context.args) < 3:
-            await update.message.reply_text(
-                "Usage: /health goal <steps|weight|sleep> <value>"
-            )
+            await update.message.reply_text("Usage: /health goal <steps|weight|sleep> <value>")
             return
         metric = context.args[1].lower()
         try:
@@ -3256,15 +2928,12 @@ async def calendar_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     client = get_calendar_client(user_id)
     if not client:
-        await update.message.reply_text(
-            "❌ Google Calendar not configured.\n\nUse /start to connect."
-        )
+        await update.message.reply_text("❌ Google Calendar not configured.\n\nUse /start to connect.")
         return
 
     if not context.args:
         await update.message.reply_text(
-            "📅 **Calendar Commands:**\n\n"
-            "/calendar today - события сегодня\n/calendar week - на неделю",
+            "📅 **Calendar Commands:**\n\n/calendar today - события сегодня\n/calendar week - на неделю",
             parse_mode="Markdown",
         )
         return
@@ -3334,9 +3003,7 @@ async def linear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             emoji = priority_emoji.get(issue.get("priority", 0), "⚪")
             msg += f"{emoji} [{issue['identifier']}]({issue['url']}) {issue['title']}\n"
             msg += f"   └ {issue['state']['name']}\n\n"
-        await update.message.reply_text(
-            msg, parse_mode="Markdown", disable_web_page_preview=True
-        )
+        await update.message.reply_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
     elif cmd == "create":
         if len(context.args) < 2:
@@ -3348,8 +3015,7 @@ async def linear_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if issue:
             await update.message.reply_text(
-                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n"
-                f"{issue['title']}",
+                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}",
                 parse_mode="Markdown",
             )
         else:
@@ -3401,9 +3067,7 @@ async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         task_id = task_manager.add_task(user_id, text)
-        await update.message.reply_text(
-            f"✅ Задача добавлена! ID: `{task_id}`", parse_mode="Markdown"
-        )
+        await update.message.reply_text(f"✅ Задача добавлена! ID: `{task_id}`", parse_mode="Markdown")
 
     elif subcmd == "list":
         tasks = task_manager.list_tasks(user_id)
@@ -3423,13 +3087,9 @@ async def todo_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             task_id = int(context.args[1])
             if task_manager.complete_task(user_id, task_id):
-                await update.message.reply_text(
-                    f"✅ Задача `#{task_id}` выполнена!", parse_mode="Markdown"
-                )
+                await update.message.reply_text(f"✅ Задача `#{task_id}` выполнена!", parse_mode="Markdown")
             else:
-                await update.message.reply_text(
-                    f"❌ Не удалось найти или обновить задачу `#{task_id}`."
-                )
+                await update.message.reply_text(f"❌ Не удалось найти или обновить задачу `#{task_id}`.")
         except ValueError:
             await update.message.reply_text("❌ ID должен быть числом.")
 
@@ -3495,9 +3155,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif subcmd == "create":
             if len(context.args) < 2:
-                await update.message.reply_text(
-                    "Usage: `/beads create <title>`", parse_mode="Markdown"
-                )
+                await update.message.reply_text("Usage: `/beads create <title>`", parse_mode="Markdown")
                 return
 
             title = " ".join(context.args[1:])
@@ -3516,15 +3174,11 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
 
             output = stdout.decode().strip()
-            await update.message.reply_text(
-                f"✅ Задача создана!\n\n`{output}`", parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"✅ Задача создана!\n\n`{output}`", parse_mode="Markdown")
 
         elif subcmd == "show":
             if len(context.args) < 2:
-                await update.message.reply_text(
-                    "Usage: `/beads show <issue-id>`", parse_mode="Markdown"
-                )
+                await update.message.reply_text("Usage: `/beads show <issue-id>`", parse_mode="Markdown")
                 return
 
             issue_id = context.args[1]
@@ -3539,9 +3193,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Задача не найдена: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Задача не найдена: {stderr.decode()}")
                 return
 
             output = stdout.decode().strip()
@@ -3552,9 +3204,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif subcmd == "start":
             if len(context.args) < 2:
-                await update.message.reply_text(
-                    "Usage: `/beads start <issue-id>`", parse_mode="Markdown"
-                )
+                await update.message.reply_text("Usage: `/beads start <issue-id>`", parse_mode="Markdown")
                 return
 
             issue_id = context.args[1]
@@ -3574,15 +3224,11 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
-            await update.message.reply_text(
-                f"▶️ Задача `{issue_id}` в работе!", parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"▶️ Задача `{issue_id}` в работе!", parse_mode="Markdown")
 
         elif subcmd == "done":
             if len(context.args) < 2:
-                await update.message.reply_text(
-                    "Usage: `/beads done <issue-id>`", parse_mode="Markdown"
-                )
+                await update.message.reply_text("Usage: `/beads done <issue-id>`", parse_mode="Markdown")
                 return
 
             issue_id = context.args[1]
@@ -3602,9 +3248,7 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text(f"❌ Ошибка: {stderr.decode()}")
                 return
 
-            await update.message.reply_text(
-                f"✅ Задача `{issue_id}` завершена!", parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"✅ Задача `{issue_id}` завершена!", parse_mode="Markdown")
 
         elif subcmd == "sync":
             await update.message.reply_text("🔄 Синхронизирую...")
@@ -3618,17 +3262,14 @@ async def beads_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             stdout, stderr = await process.communicate()
 
             if process.returncode != 0:
-                await update.message.reply_text(
-                    f"❌ Ошибка синхронизации: {stderr.decode()}"
-                )
+                await update.message.reply_text(f"❌ Ошибка синхронизации: {stderr.decode()}")
                 return
 
             await update.message.reply_text("✅ Beads синхронизирован с репозиторием!")
 
         else:
             await update.message.reply_text(
-                f"❌ Неизвестная команда: `{subcmd}`\n\n"
-                "Используйте /beads для справки.",
+                f"❌ Неизвестная команда: `{subcmd}`\n\nИспользуйте /beads для справки.",
                 parse_mode="Markdown",
             )
 
@@ -3661,9 +3302,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     logger.error(f"[ERROR] Exception while handling an update: {context.error}")
     import traceback
 
-    tb_str = "".join(
-        traceback.format_exception(None, context.error, context.error.__traceback__)
-    )
+    tb_str = "".join(traceback.format_exception(None, context.error, context.error.__traceback__))
     logger.error(f"[ERROR] Traceback:\n{tb_str}")
 
     # Try to notify the user
@@ -3671,8 +3310,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text="❌ An error occurred while processing your request. "
-                "Please try again.",
+                text="❌ An error occurred while processing your request. Please try again.",
             )
         except Exception as e:
             logger.error(f"[ERROR] Failed to send error message to user: {e}")
@@ -3687,9 +3325,7 @@ async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args or len(context.args) < 2:
-        await update.message.reply_text(
-            "Usage: `/msg <id|username> <message>`", parse_mode="Markdown"
-        )
+        await update.message.reply_text("Usage: `/msg <id|username> <message>`", parse_mode="Markdown")
         return
 
     target = context.args[0]
@@ -3718,9 +3354,7 @@ async def msg_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await update.message.reply_text(f"✅ Отправлено пользователю `{target_id}`")
         except Exception as e:
-            await update.message.reply_text(
-                f"❌ Не удалось отправить (пользователь заблокировал бота?): {e}"
-            )
+            await update.message.reply_text(f"❌ Не удалось отправить (пользователь заблокировал бота?): {e}")
     else:
         await update.message.reply_text(f"❌ Пользователь `{target}` не найден.")
 

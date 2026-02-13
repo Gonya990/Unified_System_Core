@@ -9,6 +9,7 @@ from token_broker import TokenBroker
 
 logger = logging.getLogger("SessionStore")
 
+
 class SessionStore:
     """
     Unified SessionStore (Phase 2 - Vibranium)
@@ -35,10 +36,10 @@ class SessionStore:
             with open(self.store_path) as f:
                 data = yaml.safe_load(f)
 
-            if not data or 'encrypted_data' not in data:
+            if not data or "encrypted_data" not in data:
                 return
 
-            decrypted = self.broker.decrypt_value(data['encrypted_data'])
+            decrypted = self.broker.decrypt_value(data["encrypted_data"])
             if decrypted:
                 self.sessions = json.loads(decrypted)
                 logger.info(f"Sessions loaded and decrypted: {self.store_path}")
@@ -55,13 +56,10 @@ class SessionStore:
                 logger.error("Encryption failed. Cannot save sessions.")
                 return
 
-            data = {
-                'encrypted_data': encrypted,
-                'updated_at': time.strftime("%Y-%m-%d %H:%M:%S")
-            }
+            data = {"encrypted_data": encrypted, "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
             os.makedirs(os.path.dirname(self.store_path), exist_ok=True)
-            with open(self.store_path, 'w') as f:
+            with open(self.store_path, "w") as f:
                 yaml.dump(data, f)
         except Exception as e:
             logger.error(f"Failed to save sessions: {e}")

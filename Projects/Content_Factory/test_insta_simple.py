@@ -1,4 +1,3 @@
-
 from instagrapi import Client
 
 session_id = "3067810412%3AgGUbeJqEAlSX38%3A3%3AAYgICnRRIlDpFXEXsFjjFeZGWgKQuG7nARTbygsm_Q"
@@ -11,7 +10,9 @@ try:
     print(f"🎉 Account: {cl.username}")
 
     # Save properly for future use
-    cl.dump_settings('/home/gonya/Unified_System_Core/Projects/Content_Factory/src/uploaders/.credentials/insta_session.json')
+    cl.dump_settings(
+        "/home/gonya/Unified_System_Core/Projects/Content_Factory/src/uploaders/.credentials/insta_session.json"
+    )
     print("💾 Settings saved to .credentials/")
 
 except Exception as e:

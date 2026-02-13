@@ -6,6 +6,7 @@ import time
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
+
 class ProxmoxManager:
     """Orchestrates Proxmox VMs via direct SSH and qm commands."""
 
@@ -14,7 +15,7 @@ class ProxmoxManager:
         self.pve_user = os.environ.get("PVE_USER", "root")
 
     def _run_ssh_cmd(self, cmd):
-        ssh_cmd = f"ssh -o StrictHostKeyChecking=no {self.pve_user}@{self.pve_host} \"{cmd}\""
+        ssh_cmd = f'ssh -o StrictHostKeyChecking=no {self.pve_user}@{self.pve_host} "{cmd}"'
         try:
             result = subprocess.check_output(ssh_cmd, shell=True, stderr=subprocess.STDOUT)
             return result.decode().strip()
@@ -63,6 +64,7 @@ class ProxmoxManager:
         self.stop_vm(gaming_vmid)
         self.start_vm(ai_vmid)
         logger.info("✅ Mode: AI")
+
 
 if __name__ == "__main__":
     # Test script: check status of AI and Gaming VMs

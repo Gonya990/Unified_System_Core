@@ -3,6 +3,7 @@
 Music Generator for Content Factory
 Integrates Suno AI API + Royalty-free library fallback
 """
+
 import logging
 import os
 import random
@@ -52,15 +53,11 @@ class MusicGenerator:
             try:
                 return self._generate_suno(mood, duration, genre, output_path)
             except Exception as e:
-                logger.error(
-                    f"Suno generation failed: {e}. Falling back to local library."
-                )
+                logger.error(f"Suno generation failed: {e}. Falling back to local library.")
 
         return self._get_royalty_free(mood, duration, genre)
 
-    def _generate_suno(
-        self, mood: str, duration: int, genre: str, output_path: Optional[Path]
-    ) -> Path:
+    def _generate_suno(self, mood: str, duration: int, genre: str, output_path: Optional[Path]) -> Path:
         """Generate music using Suno AI API."""
         headers = {
             "Authorization": f"Bearer {SUNO_API_KEY}",
@@ -79,9 +76,7 @@ class MusicGenerator:
 
         logger.info(f"🎵 Generating Suno music: {prompt}")
 
-        response = requests.post(
-            f"{SUNO_BASE_URL}/generate", json=payload, headers=headers, timeout=60
-        )
+        response = requests.post(f"{SUNO_BASE_URL}/generate", json=payload, headers=headers, timeout=60)
         response.raise_for_status()
 
         result = response.json()
@@ -156,20 +151,13 @@ class MusicGenerator:
         text_lower = script_text.lower()
 
         # Keyword-based mood detection
-        if any(
-            word in text_lower
-            for word in ["breakthrough", "innovation", "future", "amazing"]
-        ):
+        if any(word in text_lower for word in ["breakthrough", "innovation", "future", "amazing"]):
             return "upbeat"
-        elif any(
-            word in text_lower for word in ["meditation", "calm", "peaceful", "nature"]
-        ):
+        elif any(word in text_lower for word in ["meditation", "calm", "peaceful", "nature"]):
             return "calm"
         elif any(word in text_lower for word in ["danger", "crisis", "war", "threat"]):
             return "dramatic"
-        elif any(
-            word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]
-        ):
+        elif any(word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]):
             return "mysterious"
 
         return "upbeat"  # Default

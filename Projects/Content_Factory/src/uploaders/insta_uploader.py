@@ -42,15 +42,9 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
 
     # 3. Last resort: Username/Password
     if not cl.user_id:
-        if (
-            not INSTAGRAM_USERNAME
-            or not INSTAGRAM_PASSWORD
-            or INSTAGRAM_USERNAME == "your_username"
-        ):
+        if not INSTAGRAM_USERNAME or not INSTAGRAM_PASSWORD or INSTAGRAM_USERNAME == "your_username":
             print("❌ Error: No valid session and no credentials in .env")
-            print(
-                "💡 TIP: Copy your 'sessionid' cookie from the browser and put it in .env as INSTAGRAM_SESSION_ID"
-            )
+            print("💡 TIP: Copy your 'sessionid' cookie from the browser and put it in .env as INSTAGRAM_SESSION_ID")
             return False
 
         try:
@@ -89,9 +83,7 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
 if __name__ == "__main__":
     # Test path
     test_video = Path(__file__).parent.parent.parent / "outputs/latest_video.mp4"
-    test_caption = (
-        "Будущее 2026: Эволюция Разума. #AI #Future #Technology #ImpactVision"
-    )
+    test_caption = "Будущее 2026: Эволюция Разума. #AI #Future #Technology #ImpactVision"
 
     if Path(test_video).exists():
         upload_reel(test_video, test_caption)

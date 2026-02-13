@@ -1,23 +1,26 @@
-
 import json
 import os
 from datetime import datetime
 
 # Configuration
-ARCHIVE_PATHS = [ "/mnt/g/VSCode/recovery_archive", "/mnt/g/OneDrive", "/mnt/h/RECOVERY_FULL_UNPACKED",
+ARCHIVE_PATHS = [
+    "/mnt/g/VSCode/recovery_archive",
+    "/mnt/g/OneDrive",
+    "/mnt/h/RECOVERY_FULL_UNPACKED",
     "/home/gonya/meta_archives",
     "/home/gonya/google_archives",
-    "/home/gonya/Documents/Unified_System" # Scan existing docs too
+    "/home/gonya/Documents/Unified_System",  # Scan existing docs too
 ]
 
 OUTPUT_FILE = "/home/gonya/Unified_System_Core/Projects/Content_Factory/config/knowledge_base_index.json"
 
 # Supported Types
-TEXT_TYPES = ['.txt', '.md', '.json', '.csv']
-DOC_TYPES = ['.pdf', '.docx', '.pptx', '.doc']
-MEDIA_TYPES = ['.mp4', '.mov', '.mp3', '.wav', '.jpg', '.png']
+TEXT_TYPES = [".txt", ".md", ".json", ".csv"]
+DOC_TYPES = [".pdf", ".docx", ".pptx", ".doc"]
+MEDIA_TYPES = [".mp4", ".mov", ".mp3", ".wav", ".jpg", ".png"]
 
-IGNORED_DIRS = {'.venv', '.git', 'node_modules', '__pycache__', 'venv', 'env', '.idea', '.vscode'}
+IGNORED_DIRS = {".venv", ".git", "node_modules", "__pycache__", "venv", "env", ".idea", ".vscode"}
+
 
 def scan_archives():
     print("🕵️‍♂️ Starting Archive Scan...")
@@ -25,11 +28,8 @@ def scan_archives():
     knowledge_index = {
         "documents": [],
         "media_assets": [],
-        "conversations": [], # From JSON dumps
-        "stats": {
-            "total_files": 0,
-            "total_size_mb": 0
-        }
+        "conversations": [],  # From JSON dumps
+        "stats": {"total_files": 0, "total_size_mb": 0},
     }
 
     for base_path in ARCHIVE_PATHS:
@@ -63,7 +63,7 @@ def scan_archives():
                         "filename": file,
                         "size_mb": round(size_mb, 2),
                         "source_root": base_path,
-                        "timestamp": datetime.fromtimestamp(os.path.getmtime(full_path)).isoformat()
+                        "timestamp": datetime.fromtimestamp(os.path.getmtime(full_path)).isoformat(),
                     }
 
                     if ext in DOC_TYPES or ext in TEXT_TYPES:
@@ -72,14 +72,14 @@ def scan_archives():
                         knowledge_index["media_assets"].append(item)
 
                     # Special handling for JSON exports (Messenger/Insta)
-                    if ext == '.json' and ('message' in file or 'chat' in file):
+                    if ext == ".json" and ("message" in file or "chat" in file):
                         knowledge_index["conversations"].append(item)
                 except Exception as e:
                     print(f"⚠️ Error processing {file}: {e}")
 
     # Save Index
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(knowledge_index, f, indent=2)
 
     print("\n✅ Indexing Complete!")
@@ -87,6 +87,7 @@ def scan_archives():
     print(f"🎬 Media Assets: {len(knowledge_index['media_assets'])}")
     print(f"💾 Total Size: {int(knowledge_index['stats']['total_size_mb'])} MB")
     print(f"📂 Stats saved to: {OUTPUT_FILE}")
+
 
 if __name__ == "__main__":
     scan_archives()

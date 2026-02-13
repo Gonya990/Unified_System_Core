@@ -1,6 +1,7 @@
 """
 Tests for Core Components (Usage Tracker, Task Manager).
 """
+
 import os
 
 import pytest
@@ -10,6 +11,7 @@ from src.usage_tracker import UsageTracker
 # Use in-memory DB or temp file
 TEST_DB = "test_core.db"
 
+
 @pytest.fixture
 def clean_db():
     if os.path.exists(TEST_DB):
@@ -17,6 +19,7 @@ def clean_db():
     yield TEST_DB
     if os.path.exists(TEST_DB):
         os.remove(TEST_DB)
+
 
 def test_usage_tracker(clean_db):
     tracker = UsageTracker(db_path=clean_db)
@@ -27,7 +30,7 @@ def test_usage_tracker(clean_db):
         username="test_user",
         provider="openai",
         model="gpt-4",
-        usage_stats={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30}
+        usage_stats={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
     )
 
     # Verify
@@ -36,6 +39,7 @@ def test_usage_tracker(clean_db):
     assert stats["requests"] == 1
     assert stats["total_tokens"] == 30
     assert stats["by_model"]["gpt-4"] == 30
+
 
 def test_task_manager(clean_db):
     tm = TaskManager(db_path=clean_db)
@@ -58,4 +62,3 @@ def test_task_manager(clean_db):
     # Verify list empty (pending)
     tasks = tm.list_tasks(user_id)
     assert len(tasks) == 0
-

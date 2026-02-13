@@ -3,7 +3,6 @@
 Демонстрирует загрузку и выполнение ONNX модели
 """
 
-
 import onnxruntime as ort
 
 
@@ -29,17 +28,17 @@ def main():
     # 3. Проверка устройств
     print_section("Информация об устройствах")
 
-    if 'CUDAExecutionProvider' in providers:
+    if "CUDAExecutionProvider" in providers:
         print("  ✓ CUDA доступна (NVIDIA GPU)")
         print("  Рекомендуется для максимальной производительности")
     else:
         print("  ⚠ CUDA не доступна, будет использован CPU")
 
-    if 'TensorrtExecutionProvider' in providers:
+    if "TensorrtExecutionProvider" in providers:
         print("  ✓ TensorRT доступен (оптимизация для RTX)")
         print("  Максимальная производительность на NVIDIA RTX GPU")
 
-    if 'DmlExecutionProvider' in providers:
+    if "DmlExecutionProvider" in providers:
         print("  ✓ DirectML доступен (универсальная GPU поддержка)")
 
     # 4. Создание простой тестовой модели
@@ -53,7 +52,7 @@ def main():
     print_section("Настройка Inference Session")
 
     # Выбираем провайдера по приоритету
-    if 'CUDAExecutionProvider' in providers:
+    if "CUDAExecutionProvider" in providers:
         print("  Используем: CUDA (GPU) с fallback на CPU")
     else:
         print("  Используем: CPU")

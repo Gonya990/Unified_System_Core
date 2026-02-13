@@ -1,4 +1,3 @@
-
 import subprocess
 import sys
 from pathlib import Path
@@ -17,6 +16,7 @@ INPUT_DIR.mkdir(exist_ok=True)
 sys.path.append(str(LIVE_PORTRAIT_DIR))
 sys.path.append(str(STYLETTS_DIR))
 
+
 def generate_audio(text, output_audio_path):
     print(f"🎤 Generating Audio for: '{text}'...")
     # --- Generate Audio (using Edge-TTS) ---
@@ -27,12 +27,7 @@ def generate_audio(text, output_audio_path):
 
     voice = "en-US-ChristopherNeural"
 
-    cmd_audio = [
-        "edge-tts",
-        "--text", text,
-        "--write-media", str(mp3_path),
-        "--voice", voice
-    ]
+    cmd_audio = ["edge-tts", "--text", text, "--write-media", str(mp3_path), "--voice", voice]
 
     try:
         subprocess.run(cmd_audio, check=True, cwd=str(ROOT_DIR))
@@ -46,11 +41,15 @@ def generate_audio(text, output_audio_path):
 
     # Convert to WAV just in case (and ensure correct sample rate/channels for LivePortrait consistency)
     cmd_convert = [
-        "ffmpeg", "-y",
-        "-i", str(mp3_path),
-        "-ar", "44100", # Standard sample rate
-        "-ac", "1",     # Mono channel
-        str(output_audio_path)
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(mp3_path),
+        "-ar",
+        "44100",  # Standard sample rate
+        "-ac",
+        "1",  # Mono channel
+        str(output_audio_path),
     ]
     try:
         subprocess.run(cmd_convert, check=True, capture_output=True)
@@ -63,10 +62,11 @@ def generate_audio(text, output_audio_path):
         return False
 
     if not output_audio_path.exists():
-         print("❌ Final WAV audio file not found after generation/conversion!")
-         return False
+        print("❌ Final WAV audio file not found after generation/conversion!")
+        return False
 
     return True
+
 
 def animate_face(image_path, audio_path, output_video_path):
     print(f"🎬 Animating Face: {image_path} with {audio_path}...")
@@ -102,9 +102,12 @@ def animate_face(image_path, audio_path, output_video_path):
     cmd = [
         sys.executable,
         str(LIVE_PORTRAIT_DIR / "inference.py"),
-        "--source", str(image_path),
-        "--driving", str(LIVE_PORTRAIT_DIR / "assets/examples/driving/d0.mp4"),
-        "--output-dir", str(OUTPUT_DIR)
+        "--source",
+        str(image_path),
+        "--driving",
+        str(LIVE_PORTRAIT_DIR / "assets/examples/driving/d0.mp4"),
+        "--output-dir",
+        str(OUTPUT_DIR),
     ]
 
     try:
@@ -114,6 +117,7 @@ def animate_face(image_path, audio_path, output_video_path):
         print(f"❌ Animation Failed: {e}")
 
     return str(OUTPUT_DIR / f"{image_path.stem}--{Path(LIVE_PORTRAIT_DIR / 'assets/examples/driving/d0.mp4').stem}.mp4")
+
 
 def animate_lip_sync(video_path, audio_path, output_video_path):
     print(f"👄 Running Lip Sync (Wav2Lip) on {video_path}...")
@@ -132,12 +136,21 @@ def animate_lip_sync(video_path, audio_path, output_video_path):
     cmd = [
         str(venv_python),
         str(inference_script),
-        "--checkpoint_path", str(checkpoint),
-        "--face", str(video_path),
-        "--audio", str(audio_path),
-        "--outfile", str(output_video_path),
-        "--resize_factor", "1", # full res if possible
-        "--pads", "0", "10", "0", "0" # Padding for face crop if needed
+        "--checkpoint_path",
+        str(checkpoint),
+        "--face",
+        str(video_path),
+        "--audio",
+        str(audio_path),
+        "--outfile",
+        str(output_video_path),
+        "--resize_factor",
+        "1",  # full res if possible
+        "--pads",
+        "0",
+        "10",
+        "0",
+        "0",  # Padding for face crop if needed
     ]
 
     try:
@@ -148,8 +161,11 @@ def animate_lip_sync(video_path, audio_path, output_video_path):
     except subprocess.CalledProcessError as e:
         print(f"❌ Lip Sync Failed: {e}")
 
+
 if __name__ == "__main__":
-    text = "Hello! I am a new AI blogger. I speak with a voice cloned from Gemini video, and I use your face with wings."
+    text = (
+        "Hello! I am a new AI blogger. I speak with a voice cloned from Gemini video, and I use your face with wings."
+    )
     image = LIVE_PORTRAIT_DIR / "assets/examples/source/igor_wings.png"
     audio_out = INPUT_DIR / "speech.wav"
 

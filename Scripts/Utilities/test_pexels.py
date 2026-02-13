@@ -1,4 +1,3 @@
-
 import os
 import sys
 
@@ -11,6 +10,7 @@ try:
 except ImportError:
     print("❌ Could not import TokenBroker")
     sys.exit(1)
+
 
 def test_pexels():
     print("🔍 Testing Pexels Key via TokenBroker...")
@@ -30,7 +30,7 @@ def test_pexels():
         response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:
             data = response.json()
-            if data.get('videos'):
+            if data.get("videos"):
                 print(f"✅ Success! Found video: {data['videos'][0]['url']}")
             else:
                 print("✅ Auth success, but no videos found (strange).")
@@ -38,6 +38,7 @@ def test_pexels():
             print(f"❌ API Error: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"❌ Connection failed: {e}")
+
 
 if __name__ == "__main__":
     test_pexels()

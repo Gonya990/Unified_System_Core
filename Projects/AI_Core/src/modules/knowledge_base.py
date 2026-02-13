@@ -6,16 +6,15 @@ from psycopg2.extras import Json
 
 logger = logging.getLogger(__name__)
 
+
 class KnowledgeBase:
     """
     Centralized Knowledge Base for AI Agents.
     Stores agent memories, project states, and architectural context.
     """
+
     def __init__(self, db_url=None):
-        default_url = (
-            "postgresql://trading_user:trading_pass"
-            "@timescaledb.trading:5432/trading"
-        )
+        default_url = "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
         self.db_url = db_url or os.getenv("DATABASE_URL", default_url)
         self.conn = None
 
@@ -56,26 +55,18 @@ class KnowledgeBase:
                 );
             """)
             # Create indexes for performance
-            cur.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memories_agent "
-                "ON agent_memories(agent_name);"
-            )
-            cur.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memories_type "
-                "ON agent_memories(memory_type);"
-            )
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_agent ON agent_memories(agent_name);")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_type ON agent_memories(memory_type);")
             logger.info("Knowledge Base schema initialized.")
 
-    def add_memory(self, agent_name, content, memory_type='general', importance=1):
+    def add_memory(self, agent_name, content, memory_type="general", importance=1):
         """Store a new piece of information."""
         self.connect()
         try:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO agent_memories "
-                    "(agent_name, memory_type, content, importance) "
-                    "VALUES (%s, %s, %s, %s)",
-                    (agent_name, memory_type, Json(content), importance)
+                    "INSERT INTO agent_memories (agent_name, memory_type, content, importance) VALUES (%s, %s, %s, %s)",
+                    (agent_name, memory_type, Json(content), importance),
                 )
         except Exception as e:
             logger.error(f"Failed to add memory: {e}")
@@ -85,10 +76,7 @@ class KnowledgeBase:
         self.connect()
         try:
             with self.conn.cursor() as cur:
-                query = (
-                    "SELECT agent_name, memory_type, content, importance, "
-                    "created_at FROM agent_memories"
-                )
+                query = "SELECT agent_name, memory_type, content, importance, created_at FROM agent_memories"
                 params = []
                 where_clauses = []
 
@@ -111,29 +99,27 @@ class KnowledgeBase:
             logger.error(f"Failed to retrieve memories: {e}")
             return []
 
-    def update_project_status(
-        self,
-        project_id,
-        milestone,
-        health='OK',
-        meta=None
-    ):
+    def update_project_status(self, project_id, milestone, health="OK", meta=None):
         """Update the status of a specific project."""
         self.connect()
         try:
             with self.conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO project_status 
+                cur.execute(
+                    """
+                    INSERT INTO project_status
                     (project_id, current_milestone, health_status, metadata)
                     VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (project_id) DO UPDATE SET 
+                    ON CONFLICT (project_id) DO UPDATE SET
                         current_milestone = EXCLUDED.current_milestone,
                         health_status = EXCLUDED.health_status,
                         metadata = EXCLUDED.metadata,
                         updated_at = CURRENT_TIMESTAMP
-                """, (project_id, milestone, health, Json(meta or {})))
+                """,
+                    (project_id, milestone, health, Json(meta or {})),
+                )
         except Exception as e:
             logger.error(f"Failed to update project status: {e}")
+
 
 if __name__ == "__main__":
     # Test/Initialize
@@ -141,12 +127,7 @@ if __name__ == "__main__":
     kb = KnowledgeBase()
     try:
         kb.init_schema()
-        kb.update_project_status(
-            "Unified_System_Core",
-            "Knowledge Base Implementation",
-            "OK",
-            {"version": "3.0"}
-        )
+        kb.update_project_status("Unified_System_Core", "Knowledge Base Implementation", "OK", {"version": "3.0"})
         print("Knowledge Base initialized and tested.")
     except Exception as e:
         print(f"Initialization failed: {e}")

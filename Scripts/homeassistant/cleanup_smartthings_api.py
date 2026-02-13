@@ -11,6 +11,7 @@ import requests
 # Configuration
 ST_API_BASE = "https://api.smartthings.com/v1"
 
+
 def get_token():
     """Get Personal Access Token from user"""
     print("=" * 70)
@@ -29,13 +30,11 @@ def get_token():
     token = input("Введите ваш PAT: ").strip()
     return token
 
+
 def api_request(method, endpoint, token, data=None):
     """Make API request to SmartThings"""
     url = f"{ST_API_BASE}/{endpoint}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
 
     if method == "GET":
         response = requests.get(url, headers=headers)
@@ -45,6 +44,7 @@ def api_request(method, endpoint, token, data=None):
         raise ValueError(f"Unsupported method: {method}")
 
     return response
+
 
 def list_installed_apps(token):
     """List all installed apps"""
@@ -63,10 +63,12 @@ def list_installed_apps(token):
     print(f"Найдено приложений: {len(apps)}")
     return apps
 
+
 def filter_ha_apps(apps):
     """Filter Home Assistant apps"""
     ha_apps = [app for app in apps if "Home Assistant" in app.get("displayName", "")]
     return ha_apps
+
 
 def display_apps(apps):
     """Display apps in a table"""
@@ -87,6 +89,7 @@ def display_apps(apps):
 
     print("=" * 70)
 
+
 def delete_app(app_id, token):
     """Delete an installed app"""
     print(f"\n🗑️  Удаляю {app_id}...")
@@ -100,6 +103,7 @@ def delete_app(app_id, token):
         print(f"   ❌ Ошибка: {response.status_code}")
         print(f"   {response.text}")
         return False
+
 
 def main():
     try:
@@ -193,8 +197,10 @@ def main():
     except Exception as e:
         print(f"\n❌ КРИТИЧЕСКАЯ ОШИБКА: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

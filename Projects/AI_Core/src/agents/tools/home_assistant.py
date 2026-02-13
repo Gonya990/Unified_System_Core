@@ -18,16 +18,9 @@ class HomeAssistantTool:
 
     def __init__(self):
         self.base_url = (
-            os.getenv("HA_URL")
-            or os.getenv("HA_API_URL")
-            or os.getenv("HASS_URL")
-            or "http://homeassistant.local:8123"
+            os.getenv("HA_URL") or os.getenv("HA_API_URL") or os.getenv("HASS_URL") or "http://homeassistant.local:8123"
         )
-        self.token = (
-            os.getenv("HA_TOKEN")
-            or os.getenv("HA_API_TOKEN")
-            or os.getenv("HASS_TOKEN")
-        )
+        self.token = os.getenv("HA_TOKEN") or os.getenv("HA_API_TOKEN") or os.getenv("HASS_TOKEN")
 
         if not self.token:
             logger.warning("HA_TOKEN not set - Home Assistant tool will not work")
@@ -42,34 +35,30 @@ class HomeAssistantTool:
                 "properties": {
                     "entity_id": {
                         "type": "string",
-                        "description": "Entity ID (e.g. 'light.living_room', 'switch.bedroom_fan')"
+                        "description": "Entity ID (e.g. 'light.living_room', 'switch.bedroom_fan')",
                     },
                     "action": {
                         "type": "string",
                         "enum": ["turn_on", "turn_off", "toggle", "get_state"],
-                        "description": "Action to perform on the device"
+                        "description": "Action to perform on the device",
                     },
                     "brightness": {
                         "type": "integer",
                         "description": "Brightness level 0-255 (optional, only for lights)",
                         "minimum": 0,
-                        "maximum": 255
+                        "maximum": 255,
                     },
                     "temperature": {
                         "type": "number",
-                        "description": "Temperature in Celsius (optional, only for climate devices)"
-                    }
+                        "description": "Temperature in Celsius (optional, only for climate devices)",
+                    },
                 },
-                "required": ["entity_id", "action"]
-            }
+                "required": ["entity_id", "action"],
+            },
         }
 
     async def handler(
-        self,
-        entity_id: str,
-        action: str,
-        brightness: Optional[int] = None,
-        temperature: Optional[float] = None
+        self, entity_id: str, action: str, brightness: Optional[int] = None, temperature: Optional[float] = None
     ) -> str:
         """
         Execute Home Assistant action.
@@ -88,32 +77,26 @@ class HomeAssistantTool:
 
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
-                headers = {
-                    "Authorization": f"Bearer {self.token}",
-                    "Content-Type": "application/json"
-                }
+                headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
 
                 # Get current state
                 if action == "get_state":
-                    response = await client.get(
-                        f"{self.base_url}/api/states/{entity_id}",
-                        headers=headers
-                    )
+                    response = await client.get(f"{self.base_url}/api/states/{entity_id}", headers=headers)
 
                     if response.status_code == 200:
                         state = response.json()
-                        attributes = state.get('attributes', {})
+                        attributes = state.get("attributes", {})
 
                         result = f"📊 **Device:** {entity_id}\n"
                         result += f"**State:** {state['state']}\n"
 
-                        if 'friendly_name' in attributes:
+                        if "friendly_name" in attributes:
                             result += f"**Name:** {attributes['friendly_name']}\n"
 
-                        if 'brightness' in attributes:
+                        if "brightness" in attributes:
                             result += f"**Brightness:** {attributes['brightness']}/255\n"
 
-                        if 'temperature' in attributes:
+                        if "temperature" in attributes:
                             result += f"**Temperature:** {attributes['temperature']}°C\n"
 
                         return result
@@ -125,7 +108,7 @@ class HomeAssistantTool:
 
                 # Control actions
                 else:
-                    domain = entity_id.split('.')[0]
+                    domain = entity_id.split(".")[0]
                     data = {"entity_id": entity_id}
 
                     if brightness is not None and domain == "light":
@@ -135,9 +118,7 @@ class HomeAssistantTool:
                         data["temperature"] = temperature
 
                     response = await client.post(
-                        f"{self.base_url}/api/services/{domain}/{action}",
-                        headers=headers,
-                        json=data
+                        f"{self.base_url}/api/services/{domain}/{action}", headers=headers, json=data
                     )
 
                     if response.status_code == 200:

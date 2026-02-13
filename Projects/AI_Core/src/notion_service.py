@@ -2,11 +2,13 @@
 Notion Client
 Integration with Notion API for creating notes and tasks.
 """
+
 import logging
 import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
 
 class NotionClient:
     """Client for Notion API."""
@@ -19,6 +21,7 @@ class NotionClient:
         if self.api_key:
             try:
                 from notion_client import AsyncClient
+
                 self.client = AsyncClient(auth=self.api_key)
                 logger.info("Notion client initialized")
             except ImportError:
@@ -45,20 +48,18 @@ class NotionClient:
             children = []
             if content:
                 # Split content by newlines for basic formatting
-                for line in content.split('\n'):
+                for line in content.split("\n"):
                     if line.strip():
-                        children.append({
-                            "object": "block",
-                            "type": "paragraph",
-                            "paragraph": {
-                                "rich_text": [{"type": "text", "text": {"content": line}}]
+                        children.append(
+                            {
+                                "object": "block",
+                                "type": "paragraph",
+                                "paragraph": {"rich_text": [{"type": "text", "text": {"content": line}}]},
                             }
-                        })
+                        )
 
             response = await self.client.pages.create(
-                parent={"database_id": self.database_id},
-                properties=properties,
-                children=children
+                parent={"database_id": self.database_id}, properties=properties, children=children
             )
 
             return response.get("url")
@@ -82,9 +83,9 @@ class NotionClient:
                     props = page.get("properties", {})
                     for _key, val in props.items():
                         if val["id"] == "title":
-                             if val["title"]:
-                                 title = val["title"][0]["text"]["content"]
-                                 break
+                            if val["title"]:
+                                title = val["title"][0]["text"]["content"]
+                                break
                     results.append({"title": title, "url": page["url"]})
             return results
         except Exception as e:

@@ -8,9 +8,7 @@ from dotenv import load_dotenv
 
 # Setup paths to include AI_Core and Content_Factory
 SCRIPT_DIR = Path(__file__).parent.resolve()
-ROOT_DIR = (
-    SCRIPT_DIR.parent.parent.parent.parent
-)  # researcher -> src -> Content_Factory -> Projects -> ROOT
+ROOT_DIR = SCRIPT_DIR.parent.parent.parent.parent  # researcher -> src -> Content_Factory -> Projects -> ROOT
 sys.path.append(str(ROOT_DIR / "Projects/AI_Core/src"))
 sys.path.append(str(ROOT_DIR / "Projects/Content_Factory/src/researcher"))
 
@@ -22,9 +20,7 @@ from inference_client import InferenceClient
 
 
 async def gather_consilium():
-    print(
-        "🛸 CONCILIUM GATHERING: Initiating Full Gas Content Factory (GitHub VIBRANIUM Engine)..."
-    )
+    print("🛸 CONCILIUM GATHERING: Initiating Full Gas Content Factory (GitHub VIBRANIUM Engine)...")
 
     config = ConfigManager()
     config._config["INFERENCE_PROVIDER"] = "github"
@@ -81,16 +77,14 @@ async def gather_consilium():
         ("dependency-mapper", "Mapping the Unified System ecosystem graph."),
     ]
 
-    print(
-        f"👥 Gathering {len(research_tasks)} agents. Using BATCHING to respect rate limits..."
-    )
+    print(f"👥 Gathering {len(research_tasks)} agents. Using BATCHING to respect rate limits...")
 
     results = {}
     batch_size = 2
     for i in range(0, len(research_tasks), batch_size):
         batch = research_tasks[i : i + batch_size]
         print(
-            f"📦 Processing Batch {i//batch_size + 1}/{len(research_tasks)//batch_size + 1}: {', '.join([a for a, _ in batch])}"
+            f"📦 Processing Batch {i // batch_size + 1}/{len(research_tasks) // batch_size + 1}: {', '.join([a for a, _ in batch])}"
         )
 
         batch_results = await orchestrator.run_parallel(
@@ -109,9 +103,7 @@ async def gather_consilium():
     consilium_report += orchestrator.format_results(results, mode="detailed")
 
     timestamp = datetime.now().strftime("%Y%n%d_%H%M%S")
-    report_path = (
-        ROOT_DIR / f"Projects/Content_Factory/outputs/consilium_report_{timestamp}.md"
-    )
+    report_path = ROOT_DIR / f"Projects/Content_Factory/outputs/consilium_report_{timestamp}.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(consilium_report)
 

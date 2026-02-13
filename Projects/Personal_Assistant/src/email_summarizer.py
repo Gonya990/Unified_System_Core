@@ -43,6 +43,7 @@ def get_gmail_client():
         print(f"❌ Database error: {e}")
         return None
 
+
 def main():
     client = get_gmail_client()
     if not client:
@@ -59,9 +60,9 @@ def main():
     print(f"📄 Processing: {email.get('subject', 'No Subject')}")
 
     # Fetch full body
-    body = client.get_email_body(email['id'])
+    body = client.get_email_body(email["id"])
     if not body:
-        body = email.get('snippet', '')
+        body = email.get("snippet", "")
 
     print("🤖 Sending to Apple Intelligence Bridge...")
 
@@ -70,11 +71,14 @@ def main():
 
     if "Error" in summary or "not found" in summary:
         print("\n⚠️ Apple Intelligence Shortcut 'Unified_Summarize' not found.")
-        print("ACTION REQUIRED: Create a Shortcut named 'Unified_Summarize' on your Mac that accepts text input and uses the 'Summarize' action.")
+        print(
+            "ACTION REQUIRED: Create a Shortcut named 'Unified_Summarize' on your Mac that accepts text input and uses the 'Summarize' action."
+        )
         print(f"Debug info: {summary}")
     else:
         print("\n✨ Summary:")
         print(summary)
+
 
 if __name__ == "__main__":
     main()

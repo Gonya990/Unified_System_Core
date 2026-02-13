@@ -21,6 +21,7 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 TOKEN_PATH = CREDS_DIR / "gmail_token.json"
 
+
 def get_gmail_service():
     if not TOKEN_PATH.exists():
         print("❌ Gmail token not found. Please run gmail_agent.py first.")
@@ -31,6 +32,7 @@ def get_gmail_service():
             creds.refresh(Request())
     return build("gmail", "v1", credentials=creds)
 
+
 def search_finance_emails(service):
     # Search for common AI subscription receipts
     queries = [
@@ -39,7 +41,7 @@ def search_finance_emails(service):
         "from:elevenlabs",
         "from:runway",
         "from:openai",
-        "from:luma"
+        "from:luma",
     ]
 
     found_emails = []
@@ -48,25 +50,34 @@ def search_finance_emails(service):
     q = f"({' OR '.join(queries)}) after:{int(since.timestamp())}"
 
     print(f"🔍 Searching Gmail with: {q}")
-    results = service.users().messages().list(userId='me', q=q).execute()
-    messages = results.get('messages', [])
+    results = service.users().messages().list(userId="me", q=q).execute()
+    messages = results.get("messages", [])
 
     for msg in messages:
-        msg_data = service.users().messages().get(userId='me', id=msg['id'], format='metadata', metadataHeaders=['From', 'Subject', 'Date']).execute()
-        headers = {h['name']: h['value'] for h in msg_data.get('payload', {}).get('headers', [])}
+        msg_data = (
+            service.users()
+            .messages()
+            .get(userId="me", id=msg["id"], format="metadata", metadataHeaders=["From", "Subject", "Date"])
+            .execute()
+        )
+        headers = {h["name"]: h["value"] for h in msg_data.get("payload", {}).get("headers", [])}
 
-        found_emails.append({
-            'from': headers.get('From'),
-            'subject': headers.get('Subject'),
-            'date': headers.get('Date'),
-            'snippet': msg_data.get('snippet')
-        })
+        found_emails.append(
+            {
+                "from": headers.get("From"),
+                "subject": headers.get("Subject"),
+                "date": headers.get("Date"),
+                "snippet": msg_data.get("snippet"),
+            }
+        )
 
     return found_emails
 
+
 def main():
     service = get_gmail_service()
-    if not service: return
+    if not service:
+        return
 
     emails = search_finance_emails(service)
     print(f"\n✅ Found {len(emails)} relevant financial emails:")
@@ -76,6 +87,7 @@ def main():
         print(f"👤 From: {email['from']}")
         print(f"📝 Subj: {email['subject']}")
         print(f"📄 Snippet: {email['snippet'][:100]}...")
+
 
 if __name__ == "__main__":
     main()

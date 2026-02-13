@@ -30,5 +30,6 @@ async def test_basic_sdk():
 
     print("✅ SDK test passed!")
 
+
 if __name__ == "__main__":
     asyncio.run(test_basic_sdk())

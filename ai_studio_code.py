@@ -22,8 +22,7 @@ def generate():
         ),
     ]
     tools = [
-        types.Tool(googleSearch=types.GoogleSearch(
-        )),
+        types.Tool(googleSearch=types.GoogleSearch()),
     ]
     generate_content_config = types.GenerateContentConfig(
         thinking_config=types.ThinkingConfig(
@@ -38,6 +37,7 @@ def generate():
         config=generate_content_config,
     ):
         print(chunk.text, end="")
+
 
 if __name__ == "__main__":
     generate()

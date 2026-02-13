@@ -5,6 +5,7 @@ from google.cloud import secretmanager
 
 logger = logging.getLogger(__name__)
 
+
 class SecretManager:
     """Helper class to fetch secrets from Google Cloud Secret Manager."""
 
@@ -41,7 +42,7 @@ class SecretManager:
             "linear-api-key",
             "ha-token",
             "github-token",
-            "allowed-users"
+            "allowed-users",
         ]
 
         results = {}

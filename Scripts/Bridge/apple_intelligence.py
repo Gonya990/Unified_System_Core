@@ -6,15 +6,11 @@ import sys
 def run_apple_script(script):
     """Run an AppleScript command."""
     try:
-        result = subprocess.run(
-            ['osascript', '-e', script],
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         return f"Error: {e.stderr}"
+
 
 def summarize_text(text):
     """Use macOS native text summarization service via AppleScript."""
@@ -31,9 +27,10 @@ def summarize_text(text):
     '''
     return run_apple_script(script)
 
+
 def trigger_shortcut(shortcut_name, input_data=None):
     """Trigger a macOS Shortcut."""
-    cmd = ['shortcuts', 'run', shortcut_name]
+    cmd = ["shortcuts", "run", shortcut_name]
 
     try:
         print(f"DEBUG: Running command: {cmd}")
@@ -43,6 +40,7 @@ def trigger_shortcut(shortcut_name, input_data=None):
     except FileNotFoundError:
         return "Error: 'shortcuts' CLI not found. maintain macOS Monterey or newer."
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(json.dumps({"error": "No command provided"}))
@@ -51,7 +49,7 @@ if __name__ == "__main__":
     command = sys.argv[1]
 
     if command == "list_shortcuts":
-        res = subprocess.run(['shortcuts', 'list'], capture_output=True, text=True)
+        res = subprocess.run(["shortcuts", "list"], capture_output=True, text=True)
         print(json.dumps({"shortcuts": res.stdout.splitlines()}))
 
     elif command == "summarize":

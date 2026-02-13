@@ -2,11 +2,13 @@
 Device Monitor Service
 Monitors critical Home Assistant entities and alerts on failure.
 """
+
 import logging
 
 from .ha_controller import HAController
 
 logger = logging.getLogger(__name__)
+
 
 class DeviceMonitor:
     """Monitors HA entities for availability."""
@@ -50,8 +52,8 @@ class DeviceMonitor:
             new_failures = []
 
             for state_obj in states:
-                entity_id = state_obj.get('entity_id')
-                state = state_obj.get('state')
+                entity_id = state_obj.get("entity_id")
+                state = state_obj.get("state")
 
                 # Check if we should monitor this entity
                 # Rule 1: Explicitly monitored
@@ -95,7 +97,7 @@ class DeviceMonitor:
             if integration_id and integration_id not in reloaded_integrations:
                 logger.info(f"Attempting recovery for {entity_id}: Reloading integration {integration_id}")
                 if self.notify_callback:
-                     await self.notify_callback(f"🔧 Пытаюсь восстановить `{entity_id}` (Reload Integration)...")
+                    await self.notify_callback(f"🔧 Пытаюсь восстановить `{entity_id}` (Reload Integration)...")
 
                 try:
                     await self.ha.reload_integration(integration_id)

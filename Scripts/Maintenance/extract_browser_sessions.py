@@ -2,6 +2,7 @@
 """
 Extract sessions and tokens from running Chrome browser
 """
+
 import json
 
 import requests
@@ -10,7 +11,8 @@ import websocket
 
 def get_tabs():
     resp = requests.get("http://localhost:9222/json")
-    return [t for t in resp.json() if t.get('type') == 'page']
+    return [t for t in resp.json() if t.get("type") == "page"]
+
 
 def extract_from_tab(ws_url, tab_url):
     """Extract cookies and localStorage from a tab"""
@@ -24,14 +26,18 @@ def extract_from_tab(ws_url, tab_url):
         cookie_result = json.loads(ws.recv())
 
         # Get localStorage via JS evaluation
-        ws.send(json.dumps({
-            "id": 3,
-            "method": "Runtime.evaluate",
-            "params": {
-                "expression": "JSON.stringify({localStorage: {...localStorage}, sessionStorage: {...sessionStorage}})",
-                "returnByValue": True
-            }
-        }))
+        ws.send(
+            json.dumps(
+                {
+                    "id": 3,
+                    "method": "Runtime.evaluate",
+                    "params": {
+                        "expression": "JSON.stringify({localStorage: {...localStorage}, sessionStorage: {...sessionStorage}})",
+                        "returnByValue": True,
+                    },
+                }
+            )
+        )
         storage_result = json.loads(ws.recv())
 
         ws.close()
@@ -43,10 +49,11 @@ def extract_from_tab(ws_url, tab_url):
         return {
             "cookies": cookies,
             "localStorage": storage.get("localStorage", {}),
-            "sessionStorage": storage.get("sessionStorage", {})
+            "sessionStorage": storage.get("sessionStorage", {}),
         }
     except Exception as e:
         return {"error": str(e)}
+
 
 def main():
     tabs = get_tabs()
@@ -58,7 +65,7 @@ def main():
         "nvidia": "nvidia.com",
         "mashov": "mashov.info",
         "google_cloud": "console.cloud.google.com",
-        "meta": "facebook.com"
+        "meta": "facebook.com",
     }
 
     results = {}
@@ -79,8 +86,7 @@ def main():
                 if "error" not in data:
                     # Filter relevant cookies
                     relevant_cookies = [
-                        c for c in data.get("cookies", [])
-                        if domain.split('.')[0] in c.get('domain', '')
+                        c for c in data.get("cookies", []) if domain.split(".")[0] in c.get("domain", "")
                     ]
 
                     if relevant_cookies or data.get("localStorage"):
@@ -91,26 +97,27 @@ def main():
                                 {"name": c["name"], "domain": c["domain"]}
                                 for c in relevant_cookies[:10]  # Just names
                             ],
-                            "localStorage_keys": list(data.get("localStorage", {}).keys())[:10]
+                            "localStorage_keys": list(data.get("localStorage", {}).keys())[:10],
                         }
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 SESSION EXTRACTION RESULTS")
-    print("="*60)
+    print("=" * 60)
 
     for name, info in results.items():
         print(f"\n🔑 {name.upper()}")
         print(f"   URL: {info['url'][:60]}...")
         print(f"   Cookies: {info['cookies_count']}")
-        for c in info['cookies'][:5]:
+        for c in info["cookies"][:5]:
             print(f"     - {c['name']} ({c['domain']})")
-        if info['localStorage_keys']:
+        if info["localStorage_keys"]:
             print(f"   LocalStorage keys: {info['localStorage_keys'][:5]}")
 
     # Save full results
     with open("browser_sessions.json", "w") as f:
         json.dump(results, f, indent=2)
     print("\n✅ Saved to browser_sessions.json")
+
 
 if __name__ == "__main__":
     main()

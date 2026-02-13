@@ -1,4 +1,3 @@
-
 import base64
 import json
 from email.mime.text import MIMEText
@@ -21,6 +20,7 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.compose"]
 # Load Env
 load_dotenv(BASE_DIR / "Projects" / "AI_Core" / ".env")
 
+
 def get_gmail_service():
     creds = None
     if TOKEN_PATH.exists():
@@ -32,15 +32,14 @@ def get_gmail_service():
         else:
             # If scopes changed or token missing, might need re-auth
             # But we try to rely on existing token first
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
 
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
 
     return build("gmail", "v1", credentials=creds)
+
 
 def create_draft(service, subject, body, placeholder_to):
     try:
@@ -59,7 +58,9 @@ def create_draft(service, subject, body, placeholder_to):
         print(f"❌ Error creating draft: {e}")
         return None
 
+
 ACTIONS_FILE = BASE_DIR / "Reports" / "email_actions.json"
+
 
 def send_email(service, to_email, subject, body_content):
     try:
@@ -75,6 +76,7 @@ def send_email(service, to_email, subject, body_content):
     except Exception as e:
         print(f"❌ Error sending to {to_email}: {e}")
         return None
+
 
 def process_actions_and_send():
     if not ACTIONS_FILE.exists():
@@ -118,7 +120,7 @@ def process_actions_and_send():
             context_header = f"""[AUTO-GENERATED DRAFT]
 Reason: {reason}
 Suggested Action: {action_type}
-Original Sender: {original.get('sender')}
+Original Sender: {original.get("sender")}
 --------------------------------------------------
 """
             create_draft(service, subject, context_header + body, "")
@@ -127,6 +129,7 @@ Original Sender: {original.get('sender')}
     print("\n🎉 Processing Complete.")
     print(f"   🚀 Sent: {sent_count}")
     print(f"   📝 Drafts: {draft_count}")
+
 
 if __name__ == "__main__":
     process_actions_and_send()

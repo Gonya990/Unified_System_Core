@@ -1,5 +1,3 @@
-
-
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
@@ -28,7 +26,7 @@ def create_resume():
     contacts.add_run("Email: gonya90.gg@gmail.com | Mobile: 053-XXX-XXXX | קרית ביאליק\n")
     contacts.add_run("LinkedIn: linkedin.com/in/igor-goncharenko | Telegram: @igoreha9")
 
-    document.add_paragraph() # Spacer
+    document.add_paragraph()  # Spacer
 
     # --- Helper function for Sections ---
     def add_section_header(text):
@@ -41,10 +39,12 @@ def create_resume():
 
     # --- PROFILE ---
     add_section_header("תמצית מנהלים (PROFILE)")
-    p = document.add_paragraph("מנהל תפעול ופרויקטים מנוסה, המתמחה בהובלת צוותים טכניים, ניהול לוגיסטיקה מורכבת ופיקוח על פרויקטי תשתיות (בנייה לגובה, מערכות אלקטרו-מכאניות, תקשורת).\n"
-                               "בעל יכולת מוכחת בפתרון בעיות בשטח בזמן אמת (Troubleshooting), ניהול משאבים ואינטגרציה בין מערכות טכנולוגיות.\n"
-                               "משלב רקע טכני חזק (Hands-on) עם ראייה ניהולית רחבה, תודעת שירות גבוהה ויכולות למידה עצמית (אוטודידקט) בתחומי האוטומציה וה-AI.\n"
-                               "מחפש תפקיד מאתגר בניהול תפעול / לוגיסטיקה / פרויקטים / פיקוח טכני.")
+    p = document.add_paragraph(
+        "מנהל תפעול ופרויקטים מנוסה, המתמחה בהובלת צוותים טכניים, ניהול לוגיסטיקה מורכבת ופיקוח על פרויקטי תשתיות (בנייה לגובה, מערכות אלקטרו-מכאניות, תקשורת).\n"
+        "בעל יכולת מוכחת בפתרון בעיות בשטח בזמן אמת (Troubleshooting), ניהול משאבים ואינטגרציה בין מערכות טכנולוגיות.\n"
+        "משלב רקע טכני חזק (Hands-on) עם ראייה ניהולית רחבה, תודעת שירות גבוהה ויכולות למידה עצמית (אוטודידקט) בתחומי האוטומציה וה-AI.\n"
+        "מחפש תפקיד מאתגר בניהול תפעול / לוגיסטיקה / פרויקטים / פיקוח טכני."
+    )
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # --- EXPERIENCE ---
@@ -61,10 +61,10 @@ def create_resume():
         "ניהול אופרטיבי של אתר העבודה: תיאום מול קבלנים, הנדסה, בטיחות ולוחות זמנים (Gantt).",
         "אחריות לוגיסטית: ניהול מלאי אתר, הזמנת ציוד, קבלת סחורה וניהול שרשרת אספקה.",
         "אינטגרציה: חיבור מערכות פיקוד ובקרה, פתרון תקלות טכניות מורכבות בשטח.",
-        "בטיחות ואיכות: הטמעת נהלי בטיחות גלובליים, בקרת איכות (QA/QC) והדרכת עובדים."
+        "בטיחות ואיכות: הטמעת נהלי בטיחות גלובליים, בקרת איכות (QA/QC) והדרכת עובדים.",
     ]
     for item in items:
-        p = document.add_paragraph(item, style='List Bullet')
+        p = document.add_paragraph(item, style="List Bullet")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # Partner
@@ -77,10 +77,10 @@ def create_resume():
         "ניהול והובלת צוותי טכנאים בפריסת תשתיות סיבים אופטיים (FTTH) ותקשורת.",
         "אחריות על עמידה ביעדי ביצוע (KPIs / SLA), איכות התקנה ושביעות רצון לקוחות.",
         "הדרכה וחניכה מקצועית של עובדים, הטמעת נהלי עבודה ושיפור תהליכים.",
-        "עבודה בסביבה דינמית תחת לחץ, מתן פתרונות טכניים לבעיות תשתית בבניינים ועסקים."
+        "עבודה בסביבה דינמית תחת לחץ, מתן פתרונות טכניים לבעיות תשתית בבניינים ועסקים.",
     ]
     for item in items:
-        p = document.add_paragraph(item, style='List Bullet')
+        p = document.add_paragraph(item, style="List Bullet")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # Vira
@@ -91,10 +91,10 @@ def create_resume():
 
     items = [
         "ביצוע התקנות מכאניות וחשמליות (Heavy Duty), קריאת שרטוטים הנדסיים.",
-        "עבודה בצוותים, הקפדה על דיוק ואיכות ביצוע ברמה גבוהה."
+        "עבודה בצוותים, הקפדה על דיוק ואיכות ביצוע ברמה גבוהה.",
     ]
     for item in items:
-        p = document.add_paragraph(item, style='List Bullet')
+        p = document.add_paragraph(item, style="List Bullet")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # --- EDUCATION ---
@@ -102,10 +102,10 @@ def create_resume():
     items = [
         "הנדסאי/טכנאי מכונות (לימודי תעודה, 3 שנים).",
         "רישיונות: רישיון נהיגה ב', רישיון מלגזה (20 טון), הסמכה לעבודה בגובה.",
-        "שירות צבאי: חיל האוויר, נהג מבצעי, דרגת סמ״ר."
+        "שירות צבאי: חיל האוויר, נהג מבצעי, דרגת סמ״ר.",
     ]
     for item in items:
-        p = document.add_paragraph(item, style='List Bullet')
+        p = document.add_paragraph(item, style="List Bullet")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # --- LANG & TECH ---
@@ -120,16 +120,17 @@ def create_resume():
     items = [
         "ניהול מחסן ולוגיסטיקה ממוחשב, ERP, Office (Excel/Outlook).",
         "טכנולוגיה מתקדמת: הקמת שרתי בית חכם (Home Assistant, MQTT), לינוקס (Linux), וירטואליזציה (Proxmox), שימוש בכלי AI לשיפור פרודוקטיביות.",
-        "תכונות: אמינות, דייקנות, יחסי אנוש מעולים, יכולת הנעת עובדים."
+        "תכונות: אמינות, דייקנות, יחסי אנוש מעולים, יכולת הנעת עובדים.",
     ]
     for item in items:
-        p = document.add_paragraph(item, style='List Bullet')
+        p = document.add_paragraph(item, style="List Bullet")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # Save
     output_path = "/Users/macbook/Desktop/Resume_Igor_Perfect_✅.docx"
     document.save(output_path)
     print(f"Resume saved to {output_path}")
+
 
 if __name__ == "__main__":
     create_resume()

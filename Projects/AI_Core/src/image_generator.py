@@ -16,11 +16,13 @@ PROJECT_ROOT = Path("/Users/igorgoncharenko/Documents/Unified_System_Core")
 
 logger = logging.getLogger(__name__)
 
+
 class ImageGenerator:
     """
     Handles image generation requests.
     Currently supports OpenAI DALL-E 3.
     """
+
     def __init__(self, config_manager: ConfigManager, provider="openai"):
         self.config = config_manager
         self._provider = provider
@@ -44,17 +46,12 @@ class ImageGenerator:
             raise ValueError(f"Unsupported image provider: {provider}")
 
     async def _openai_image(self, prompt: str, user_id: int) -> Path:
-        api_key = self.config.get(
-            "OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY")
-        )
+        api_key = self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY"))
         if not api_key:
             raise ValueError("OpenAI API key not set. Use /setapikey")
 
         url = "https://api.openai.com/v1/images/generations"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         payload = {
             "model": "dall-e-3",
             "prompt": prompt,
@@ -63,9 +60,7 @@ class ImageGenerator:
             "n": 1,
         }
 
-        logger.info(
-            f"Generating image via OpenAI for user {user_id}: {prompt[:50]}..."
-        )
+        logger.info(f"Generating image via OpenAI for user {user_id}: {prompt[:50]}...")
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=payload, headers=headers) as resp:
@@ -75,7 +70,7 @@ class ImageGenerator:
                     raise Exception(f"OpenAI Error: {text}")
 
                 data = await resp.json()
-                image_url = data['data'][0]['url']
+                image_url = data["data"][0]["url"]
 
                 # Download image
                 async with session.get(image_url) as img_resp:
@@ -94,31 +89,22 @@ class ImageGenerator:
                     output_path.write_bytes(img_data)
                     logger.info(f"Image saved to {output_path}")
                     return output_path
+
     async def _vertex_imagen(self, prompt: str, user_id: int) -> Path:
         """Generate high-quality cinematic image via Vertex AI Imagen 3."""
         try:
             from google import genai
             from google.genai import types
 
-            project = self.config.get(
-                "GCP_PROJECT_ID", "gen-lang-client-0982257437"
-            )
-            client = genai.Client(
-                vertexai=True, project=project, location="us-central1"
-            )
+            project = self.config.get("GCP_PROJECT_ID", "gen-lang-client-0982257437")
+            client = genai.Client(vertexai=True, project=project, location="us-central1")
 
-            logger.info(
-                f"Generating Imagen 3 (Vertex) for user {user_id}: "
-                f"{prompt[:50]}..."
-            )
+            logger.info(f"Generating Imagen 3 (Vertex) for user {user_id}: {prompt[:50]}...")
 
             response = client.models.generate_images(
-                model='imagen-3.0-generate-001',
+                model="imagen-3.0-generate-001",
                 prompt=prompt,
-                config=types.GenerateImagesConfig(
-                    number_of_images=1,
-                    output_mime_type='image/png'
-                )
+                config=types.GenerateImagesConfig(number_of_images=1, output_mime_type="image/png"),
             )
 
             img_data = response.generated_images[0].image.image_bytes

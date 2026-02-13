@@ -2,6 +2,7 @@
 Configuration Manager for AI Telegram Bot.
 Handles persistent storage with encryption for sensitive values.
 """
+
 import base64
 import json
 import os
@@ -22,7 +23,13 @@ class ConfigManager:
     """Manages bot configuration with persistence and encryption."""
 
     CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "config/bot_config.json"))
-    SENSITIVE_KEYS = {"INFERENCE_API_KEY", "TELEGRAM_BOT_TOKEN", "GEMINI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"}
+    SENSITIVE_KEYS = {
+        "INFERENCE_API_KEY",
+        "TELEGRAM_BOT_TOKEN",
+        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENROUTER_API_KEY",
+    }
 
     def __init__(self):
         self._config: dict = {}

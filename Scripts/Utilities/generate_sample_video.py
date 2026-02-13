@@ -1,4 +1,3 @@
-
 import asyncio
 import os
 import random
@@ -17,6 +16,7 @@ except ImportError:
     print("❌ edge-tts not installed. Run: pip install edge-tts")
     sys.exit(1)
 
+
 async def generate_sample():
     print("🚀 Starting 3-Language Sample Generation (FREE TIER MODE)...")
 
@@ -34,27 +34,28 @@ async def generate_sample():
             "lang": "en",
             "text": "Welcome to the Unified System. We are operating at 120 percent capacity.",
             "voice": "en-US-ChristopherNeural",
-            "query": "technology"
+            "query": "technology",
         },
         {
             "lang": "he",
             "text": "המערכת פועלת כעת באופן אוטונומי מלא. כל המערכות תקינות.",
             "voice": "he-IL-AvriNeural",
-            "query": "cyber"
+            "query": "cyber",
         },
         {
             "lang": "ru",
             "text": "Система синхронизирована. Мы готовы к запуску. Газ сто двадцать процентов.",
             "voice": "ru-RU-DmitryNeural",
-            "query": "future city"
-        }
+            "query": "future city",
+        },
     ]
 
     import tempfile
 
     import requests
     from PIL import Image
-    if not hasattr(Image, 'ANTIALIAS'):
+
+    if not hasattr(Image, "ANTIALIAS"):
         Image.ANTIALIAS = Image.LANCZOS
 
     try:
@@ -70,11 +71,11 @@ async def generate_sample():
         clips = []
 
         for i, seg in enumerate(segments):
-            print(f"🎬 Processing Segment {i+1} ({seg['lang']})...")
+            print(f"🎬 Processing Segment {i + 1} ({seg['lang']})...")
 
             # 1. Audio (Edge TTS)
             audio_path = temp_path / f"voice_{i}.mp3"
-            communicate = edge_tts.Communicate(seg['text'], seg['voice'])
+            communicate = edge_tts.Communicate(seg["text"], seg["voice"])
             await communicate.save(str(audio_path))
 
             # 2. Image (Pexels or Color)
@@ -89,10 +90,10 @@ async def generate_sample():
                     res = requests.get(url, headers=headers, timeout=5)
                     if res.status_code == 200:
                         data = res.json()
-                        if data['photos']:
-                            img_url = data['photos'][0]['src']['large']
+                        if data["photos"]:
+                            img_url = data["photos"][0]["src"]["large"]
                             img_data = requests.get(img_url).content
-                            with open(img_path, 'wb') as f:
+                            with open(img_path, "wb") as f:
                                 f.write(img_data)
                             found_image = True
                 except Exception as e:
@@ -106,7 +107,7 @@ async def generate_sample():
                 video_clip = ImageClip(str(img_path)).with_duration(duration)
             else:
                 # Fallback Color
-                color = (random.randint(0,50), random.randint(0,50), random.randint(50,150))
+                color = (random.randint(0, 50), random.randint(0, 50), random.randint(50, 150))
                 video_clip = ColorClip(size=(1280, 720), color=color).with_duration(duration)
 
             # Subtitles (simple logic)
@@ -121,7 +122,7 @@ async def generate_sample():
                 pass
 
             video_clip = video_clip.with_audio(audio_clip)
-            video_clip = video_clip.resized(width=1280) # Ensure size consistency
+            video_clip = video_clip.resized(width=1280)  # Ensure size consistency
             clips.append(video_clip)
 
         print("🎞️ Concatenating final video...")
@@ -129,6 +130,7 @@ async def generate_sample():
         final.write_videofile(str(output_file), fps=24)
 
     print(f"✅ Video saved to: {output_file}")
+
 
 if __name__ == "__main__":
     asyncio.run(generate_sample())

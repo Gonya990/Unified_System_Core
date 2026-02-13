@@ -2,6 +2,7 @@
 Agent Orchestrator - Manages specialized AI agents for code tasks.
 Integrates with .claude/agents/ definitions and InferenceClient.
 """
+
 import asyncio
 import logging
 import re
@@ -13,9 +14,11 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AgentConfig:
     """Configuration for a single agent."""
+
     name: str
     description: str
     system_prompt: str
@@ -28,7 +31,7 @@ class AgentConfig:
     @property
     def short_description(self) -> str:
         """First line of description."""
-        return self.description.split('\n')[0].strip()
+        return self.description.split("\n")[0].strip()
 
 
 class AgentOrchestrator:
@@ -85,10 +88,10 @@ class AgentOrchestrator:
 
     def _parse_agent_file(self, path: Path) -> Optional[AgentConfig]:
         """Parse agent markdown file with YAML frontmatter."""
-        content = path.read_text(encoding='utf-8')
+        content = path.read_text(encoding="utf-8")
 
         # Extract YAML frontmatter
-        frontmatter_match = re.match(r'^---\n(.*?)\n---\n(.*)$', content, re.DOTALL)
+        frontmatter_match = re.match(r"^---\n(.*?)\n---\n(.*)$", content, re.DOTALL)
         if not frontmatter_match:
             logger.warning(f"No frontmatter found in {path}")
             return None
@@ -110,11 +113,11 @@ class AgentOrchestrator:
         skills = self._extract_skills(system_prompt)
 
         return AgentConfig(
-            name=frontmatter.get('name', path.stem),
-            description=frontmatter.get('description', ''),
+            name=frontmatter.get("name", path.stem),
+            description=frontmatter.get("description", ""),
             system_prompt=system_prompt,
             category=category,
-            color=frontmatter.get('color', 'blue'),
+            color=frontmatter.get("color", "blue"),
             tools=tools,
             skills=skills,
         )
@@ -138,7 +141,7 @@ class AgentOrchestrator:
     def _extract_skills(self, prompt: str) -> list[str]:
         """Extract activated skills from agent prompt."""
         # Look for skill references
-        skill_pattern = r'\*\*`([a-z-]+)`\*\*'
+        skill_pattern = r"\*\*`([a-z-]+)`\*\*"
         matches = re.findall(skill_pattern, prompt)
         return list(set(matches))
 
@@ -147,10 +150,7 @@ class AgentOrchestrator:
         lines = ["**Available Agents:**\n"]
 
         for category, agent_names in self.CATEGORIES.items():
-            category_agents = [
-                self.agents[name] for name in agent_names
-                if name in self.agents
-            ]
+            category_agents = [self.agents[name] for name in agent_names if name in self.agents]
             if category_agents:
                 lines.append(f"\n**{category.title()}:**")
                 for agent in category_agents:
@@ -214,27 +214,20 @@ class AgentOrchestrator:
 ---
 CURRENT TASK: {task}
 
-{f'ADDITIONAL CONTEXT: {context}' if context else ''}
+{f"ADDITIONAL CONTEXT: {context}" if context else ""}
 
 Provide a focused, actionable response. Use code references (file:line) where applicable.
 """
 
         try:
-            response, _ = await self.inference.chat(
-                [{"role": "user", "content": task}],
-                system_prompt=system_prompt
-            )
+            response, _ = await self.inference.chat([{"role": "user", "content": task}], system_prompt=system_prompt)
             logger.info(f"[AGENT] {agent_name} completed, response length: {len(response)}")
             return response
         except Exception as e:
             logger.error(f"[AGENT] {agent_name} failed: {e}")
             return f"Agent execution failed: {str(e)}"
 
-    async def run_pipeline(
-        self,
-        tasks: list[tuple[str, str]],
-        initial_context: str = ""
-    ) -> dict[str, str]:
+    async def run_pipeline(self, tasks: list[tuple[str, str]], initial_context: str = "") -> dict[str, str]:
         """
         Run agents in sequence, passing context between them.
 
@@ -252,10 +245,7 @@ Provide a focused, actionable response. Use code references (file:line) where ap
 
             # Include previous results as context
             if results:
-                context_summary = "\n\n".join([
-                    f"[{name}]: {resp[:500]}..."
-                    for name, resp in results.items()
-                ])
+                context_summary = "\n\n".join([f"[{name}]: {resp[:500]}..." for name, resp in results.items()])
                 full_context = f"{initial_context}\n\nPrevious agent results:\n{context_summary}"
             else:
                 full_context = initial_context
@@ -265,11 +255,7 @@ Provide a focused, actionable response. Use code references (file:line) where ap
 
         return results
 
-    async def run_parallel(
-        self,
-        tasks: list[tuple[str, str]],
-        context: str = ""
-    ) -> dict[str, str]:
+    async def run_parallel(self, tasks: list[tuple[str, str]], context: str = "") -> dict[str, str]:
         """
         Run multiple agents in parallel.
 
@@ -304,7 +290,7 @@ Provide a focused, actionable response. Use code references (file:line) where ap
         if mode == "summary":
             lines = ["**Agent Results Summary:**\n"]
             for agent_name, result in results.items():
-                preview = result[:200].replace('\n', ' ')
+                preview = result[:200].replace("\n", " ")
                 lines.append(f"**{agent_name}**: {preview}...")
             return "\n".join(lines)
         else:

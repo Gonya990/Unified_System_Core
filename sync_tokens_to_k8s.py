@@ -36,15 +36,10 @@ def sync_tokens():
 
     # Apply to cluster
     apply_cmd = ["kubectl", "apply", "-f", "-"]
-    apply_result = subprocess.run(
-        apply_cmd, input=result.stdout, capture_output=True, text=True
-    )
+    apply_result = subprocess.run(apply_cmd, input=result.stdout, capture_output=True, text=True)
 
     if apply_result.returncode == 0:
-        print(
-            f"✅ Vault synced successfully to '{SECRET_NAME}' "
-            f"in namespace '{NAMESPACE}'."
-        )
+        print(f"✅ Vault synced successfully to '{SECRET_NAME}' in namespace '{NAMESPACE}'.")
     else:
         print(f"❌ Sync failed: {apply_result.stderr}")
 

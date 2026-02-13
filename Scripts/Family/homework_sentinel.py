@@ -1,4 +1,3 @@
-
 import json
 import logging
 import sys
@@ -18,13 +17,11 @@ LOG_DIR = ROOT_DIR / "logs/family"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_DIR / "fma.log"),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(LOG_DIR / "fma.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger("HomeworkSentinel")
+
 
 def get_gmail_service():
     """Load credentials and return service."""
@@ -37,10 +34,11 @@ def get_gmail_service():
         with open(creds_path) as f:
             info = json.load(f)
             creds = Credentials.from_authorized_user_info(info)
-        return build('gmail', 'v1', credentials=creds)
+        return build("gmail", "v1", credentials=creds)
     except Exception as e:
         logger.error(f"Failed to authenticate: {e}")
         return None
+
 
 def scan_mailbox(query="subject:(homework OR school OR due) after:2d"):
     """
@@ -54,29 +52,25 @@ def scan_mailbox(query="subject:(homework OR school OR due) after:2d"):
     results = []
 
     try:
-        response = service.users().messages().list(userId='me', q=query).execute()
-        messages = response.get('messages', [])
+        response = service.users().messages().list(userId="me", q=query).execute()
+        messages = response.get("messages", [])
 
         for msg in messages:
-            msg_data = service.users().messages().get(userId='me', id=msg['id']).execute()
-            payload = msg_data.get('payload', {})
-            headers = payload.get('headers', [])
+            msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
+            payload = msg_data.get("payload", {})
+            headers = payload.get("headers", [])
 
-            subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "No Subject")
-            from_addr = next((h['value'] for h in headers if h['name'] == 'From'), "Unknown")
-            snippet = msg_data.get('snippet', '')
+            subject = next((h["value"] for h in headers if h["name"] == "Subject"), "No Subject")
+            from_addr = next((h["value"] for h in headers if h["name"] == "From"), "Unknown")
+            snippet = msg_data.get("snippet", "")
 
-            results.append({
-                "id": msg['id'],
-                "subject": subject,
-                "from": from_addr,
-                "snippet": snippet
-            })
+            results.append({"id": msg["id"], "subject": subject, "from": from_addr, "snippet": snippet})
 
     except Exception as e:
         logger.error(f"Scan failed: {e}")
 
     return results
+
 
 def summarize_tasks(emails):
     """
@@ -87,6 +81,7 @@ def summarize_tasks(emails):
 
     try:
         from Scripts.Utilities.token_broker import TokenBroker
+
         broker = TokenBroker()
         # Try Gemini (Free) first, then others
         key = broker.get_key("gemini")
@@ -100,7 +95,9 @@ def summarize_tasks(emails):
         logger.info(f"Summarizing {len(emails)} emails...")
 
         # Simple concatenation for prompt
-        email_text = "\n".join([f"- From: {e['from']}, Subject: {e['subject']} ({e['snippet'][:100]}...)" for e in emails])
+        email_text = "\n".join(
+            [f"- From: {e['from']}, Subject: {e['subject']} ({e['snippet'][:100]}...)" for e in emails]
+        )
 
         # In a real scenario, we'd call the LLM API here.
         # For now, we return the structured list as the "Report" to ensure stability without burning tokens blindly.
@@ -109,6 +106,7 @@ def summarize_tasks(emails):
     except ImportError:
         logger.error("TokenBroker not found.")
         return "Internal Error: TokenBroker missing."
+
 
 if __name__ == "__main__":
     logger.info("Starting Homework Sentinel...")

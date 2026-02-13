@@ -56,9 +56,7 @@ async def task_youtube(video_path, title, description, tags, skip):
     print("📺 Shipping to YouTube...")
     try:
         # Run blocking upload in a thread
-        await asyncio.to_thread(
-            upload_video, Path(video_path), title, description, tags, "28", "public"
-        )
+        await asyncio.to_thread(upload_video, Path(video_path), title, description, tags, "28", "public")
     except Exception as e:
         print(f"⚠️ YouTube failed: {e}")
 
@@ -173,10 +171,7 @@ async def ship_production(
 
     # Add chapters to description for YouTube
     chapters = ""
-    chapters_path = (
-        Path(video_path).parent
-        / f"{Path(video_path).stem.replace('_final', '_chapters')}.txt"
-    )
+    chapters_path = Path(video_path).parent / f"{Path(video_path).stem.replace('_final', '_chapters')}.txt"
     if chapters_path.exists():
         with open(chapters_path) as f:
             chapters = "\n\nChapters:\n" + f.read()

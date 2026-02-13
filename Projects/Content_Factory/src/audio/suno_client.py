@@ -3,6 +3,7 @@
 Suno AI Unofficial API Client
 Uses your Pro subscription through cookies
 """
+
 import logging
 import os
 from pathlib import Path
@@ -61,9 +62,7 @@ class SunoAIClient:
         }
 
         # Construct prompt
-        full_prompt = (
-            f"{prompt}, {genre}, instrumental" if instrumental else f"{prompt}, {genre}"
-        )
+        full_prompt = f"{prompt}, {genre}, instrumental" if instrumental else f"{prompt}, {genre}"
 
         payload = {
             "prompt": full_prompt,

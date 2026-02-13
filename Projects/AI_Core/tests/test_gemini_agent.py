@@ -8,7 +8,7 @@ import asyncio
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from dotenv import load_dotenv
 
@@ -29,25 +29,31 @@ async def test_gemini_agent():
 
     # Register file tools
     file_list = FileListTool()
-    agent.register_tool(Tool(
-        name="file_list",
-        description=file_list.get_definition()["description"],
-        parameters=file_list.get_definition()["parameters"],
-        handler=file_list.handler
-    ))
+    agent.register_tool(
+        Tool(
+            name="file_list",
+            description=file_list.get_definition()["description"],
+            parameters=file_list.get_definition()["parameters"],
+            handler=file_list.handler,
+        )
+    )
 
     file_ops = FileOpsTool()
-    agent.register_tool(Tool(
-        name="file_read",
-        description=file_ops.get_definition()["description"],
-        parameters=file_ops.get_definition()["parameters"],
-        handler=file_ops.handler
-    ))
+    agent.register_tool(
+        Tool(
+            name="file_read",
+            description=file_ops.get_definition()["description"],
+            parameters=file_ops.get_definition()["parameters"],
+            handler=file_ops.handler,
+        )
+    )
 
     print(f"\n✅ Registered {len(agent.tools)} tools\n")
 
     # Test task
-    task = "List the files in /Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/agents/ directory"
+    task = (
+        "List the files in /Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/agents/ directory"
+    )
 
     print(f"📝 Task: {task}\n")
 
@@ -82,6 +88,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
 
 

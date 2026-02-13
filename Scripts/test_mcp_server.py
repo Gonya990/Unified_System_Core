@@ -3,16 +3,8 @@ import json
 import requests
 
 url = "https://web-to-mcp.com/mcp/6fb78109-5edd-4124-8df7-b6d168ef99da/"
-headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json, text/event-stream"
-}
-payload = {
-    "jsonrpc": "2.0",
-    "method": "tools/list",
-    "id": 1,
-    "params": {}
-}
+headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
+payload = {"jsonrpc": "2.0", "method": "tools/list", "id": 1, "params": {}}
 
 try:
     response = requests.post(url, headers=headers, json=payload, timeout=10)

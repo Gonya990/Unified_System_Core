@@ -1,7 +1,7 @@
-
 import os
 
 BASE_DIR = "/home/gonya/Unified_System_Core/Projects/AI_Core/src"
+
 
 def patch_bot_v2():
     path = os.path.join(BASE_DIR, "ai_telegram_bot_v2.py")
@@ -9,8 +9,8 @@ def patch_bot_v2():
         content = f.read()
 
     # Fix paths
-    old_path = '/home/gonya/Documents/Unified_System'
-    new_path = '/home/gonya/Unified_System_Core/Projects/AI_Core'
+    old_path = "/home/gonya/Documents/Unified_System"
+    new_path = "/home/gonya/Unified_System_Core/Projects/AI_Core"
 
     if old_path in content:
         content = content.replace(old_path, new_path)
@@ -21,23 +21,25 @@ def patch_bot_v2():
     with open(path, "w") as f:
         f.write(content)
 
+
 def patch_inference():
     path = os.path.join(BASE_DIR, "inference_client.py")
     with open(path) as f:
         content = f.read()
 
     # Fix default URL
-    old_url = 'http://localhost:11434'
-    new_url = 'http://host.docker.internal:11434'
+    old_url = "http://localhost:11434"
+    new_url = "http://host.docker.internal:11434"
 
     if old_url in content:
         content = content.replace(old_url, new_url)
         print("✅ Patched URL in inference_client.py")
     else:
-         print("⚠️ URL string not found in inference_client.py")
+        print("⚠️ URL string not found in inference_client.py")
 
     with open(path, "w") as f:
         f.write(content)
+
 
 def patch_ha_controller():
     path = os.path.join(BASE_DIR, "ha_controller.py")
@@ -67,6 +69,7 @@ except ImportError:
 
     with open(path, "w") as f:
         f.write(content)
+
 
 if __name__ == "__main__":
     patch_bot_v2()

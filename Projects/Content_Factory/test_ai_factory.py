@@ -3,6 +3,7 @@
 AI Content Factory - Quick Test
 Tests all 4 phases without requiring API keys (uses fallbacks)
 """
+
 import logging
 import sys
 from pathlib import Path
@@ -13,10 +14,8 @@ sys.path.insert(0, str(SRC_DIR / "pipeline"))
 
 from ai_content_factory import AIContentFactory
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
 
 def test_factory():
     """Test AI Content Factory with fallbacks."""
@@ -25,9 +24,9 @@ def test_factory():
 
     # Initialize (all AI disabled for testing)
     factory = AIContentFactory(
-        use_ai_music=False,   # Will use local library
-        use_ai_video=False,   # Not needed for test
-        use_ai_voice=False    # Will skip voice generation
+        use_ai_music=False,  # Will use local library
+        use_ai_video=False,  # Not needed for test
+        use_ai_voice=False,  # Will skip voice generation
     )
 
     # Test script
@@ -43,13 +42,7 @@ def test_factory():
     print(f"📂 Output: {output_dir}")
     print("\n🎬 Starting production pipeline...\n")
 
-    assets = factory.create_video_content(
-        script=script,
-        lang="ru",
-        style="impact",
-        duration=20,
-        output_dir=output_dir
-    )
+    assets = factory.create_video_content(script=script, lang="ru", style="impact", duration=20, output_dir=output_dir)
 
     print("\n" + "=" * 60)
     print("✅ PRODUCTION COMPLETE")
@@ -65,6 +58,7 @@ def test_factory():
     print("  2. Add to .env file")
     print("  3. Set USE_AI_MUSIC=true, USE_AI_VOICE=true, etc.")
     print("\n📚 See: .env.ai_template for configuration\n")
+
 
 if __name__ == "__main__":
     test_factory()

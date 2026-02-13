@@ -18,28 +18,26 @@ except ImportError as e:
 # Configuration
 CLIENT_SECRETS_FILE = "/home/gonya/Unified_System/Projects/AI_Core/client_secret.json"
 SCOPES = [
-    'https://www.googleapis.com/auth/youtube.upload',
-    'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/calendar',
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.settings.basic',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.modify',
-    'https://www.googleapis.com/auth/drive',
-    'openid'
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/gmail.settings.basic",
+    "https://www.googleapis.com/auth/gmail.compose",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/drive",
+    "openid",
 ]
-REDIRECT_URI = 'http://localhost'
+REDIRECT_URI = "http://localhost"
 ADMIN_ID = 708531393
 
+
 def generate_url():
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        redirect_uri=REDIRECT_URI
-    )
-    auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true')
+    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, redirect_uri=REDIRECT_URI)
+    auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline", include_granted_scopes="true")
     print(f"\n🔗 AUTHORIZATION URL:\n{auth_url}\n")
     print("👉 Click the link, authorize, and copy the 'code' parameter from the localhost URL.")
+
 
 def exchange_code(code):
     try:
@@ -49,11 +47,7 @@ def exchange_code(code):
         ConfigManager()
         # Mock auth manager for IdentityOrchestrator init if needed, or just use identity to save
         # Actually we need flow to exchange code
-        flow = Flow.from_client_secrets_file(
-            CLIENT_SECRETS_FILE,
-            scopes=SCOPES,
-            redirect_uri=REDIRECT_URI
-        )
+        flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, redirect_uri=REDIRECT_URI)
 
         print(f"🔄 Exchanging code: {code[:10]}...")
         flow.fetch_token(code=code)
@@ -66,7 +60,9 @@ def exchange_code(code):
         creds_json = creds.to_json()
 
         # 1. Update Content Factory Token (Immediate Fix)
-        target_path = Path("/home/gonya/Unified_System/Projects/Content_Factory/src/uploaders/.credentials/youtube_token.json")
+        target_path = Path(
+            "/home/gonya/Unified_System/Projects/Content_Factory/src/uploaders/.credentials/youtube_token.json"
+        )
         target_path.parent.mkdir(parents=True, exist_ok=True)
         with open(target_path, "w") as f:
             f.write(creds_json)
@@ -91,7 +87,9 @@ def exchange_code(code):
     except Exception as e:
         print(f"❌ Error exchanging code: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

@@ -18,7 +18,7 @@ def main():
         "/home/igorgoncharenko/Documents/Unified_System_Core",
         "/home/gonya/Unified_System",
         "Unified_System_Core",
-        "Gonya990/Documents"
+        "Gonya990/Documents",
     ]
 
     client = AgentMailClient()
@@ -41,6 +41,7 @@ def main():
 
         except Exception as e:
             print(f"❌ Failed for {key}: {e}")
+
 
 if __name__ == "__main__":
     main()

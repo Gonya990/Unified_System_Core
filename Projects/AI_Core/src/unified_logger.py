@@ -8,6 +8,7 @@ class UnifiedJSONFormatter(logging.Formatter):
     """
     Formatter that outputs JSON strings compatible with Google Cloud Logging.
     """
+
     def format(self, record):
         # Base log record
         log_entry = {
@@ -18,17 +19,15 @@ class UnifiedJSONFormatter(logging.Formatter):
             "location": f"{record.pathname}:{record.lineno}",
             "serviceContext": {
                 "service": os.getenv("SERVICE_NAME", "ai-core"),
-                "version": os.getenv("SERVICE_VERSION", "unknown")
-            }
+                "version": os.getenv("SERVICE_VERSION", "unknown"),
+            },
         }
 
         # Add Google Cloud Trace ID if available in record attributes
         if hasattr(record, "trace_id"):
             project_id = os.getenv("GCP_PROJECT_ID", "my-home-435112")
             trace_id = record.trace_id
-            log_entry["logging.googleapis.com/trace"] = (
-                f"projects/{project_id}/traces/{trace_id}"
-            )
+            log_entry["logging.googleapis.com/trace"] = f"projects/{project_id}/traces/{trace_id}"
 
         # Add span ID if available
         if hasattr(record, "span_id"):
@@ -42,6 +41,7 @@ class UnifiedJSONFormatter(logging.Formatter):
                 log_entry["message"] = str(record.exc_info[1])
 
         return json.dumps(log_entry)
+
 
 def setup_unified_logging(level=logging.INFO):
     """
@@ -64,6 +64,4 @@ def setup_unified_logging(level=logging.INFO):
     logging.getLogger("googleapiclient").setLevel(logging.WARNING)
 
     # Test log
-    logging.info(
-        f"✅ Unified JSON Logging Initialized for {os.getenv('SERVICE_NAME', 'ai-core')}"
-    )
+    logging.info(f"✅ Unified JSON Logging Initialized for {os.getenv('SERVICE_NAME', 'ai-core')}")

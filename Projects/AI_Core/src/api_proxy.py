@@ -11,18 +11,22 @@ app = FastAPI(title="Vibranium Mobile Proxy")
 # Global reference to the bot/orchestrator
 _BOT_INSTANCE = None
 
+
 class CommandRequest(BaseModel):
     user_id: int
     command: str
     audio_data: Optional[str] = None  # Future voice support
 
+
 def set_bot_instance(bot):
     global _BOT_INSTANCE
     _BOT_INSTANCE = bot
 
+
 @app.get("/v1/health")
 async def health_check():
     return {"status": "ok", "bot_connected": _BOT_INSTANCE is not None}
+
 
 @app.post("/v1/execute")
 async def execute_command(request: CommandRequest):
@@ -40,14 +44,14 @@ async def execute_command(request: CommandRequest):
         # For now, we reuse the query_ollama_with_context or agent_orchestrator
         # To avoid circular imports, we assume _BOT_INSTANCE has the necessary methods.
 
-        response = await _BOT_INSTANCE.process_api_command(
-            request.user_id, request.command
-        )
+        response = await _BOT_INSTANCE.process_api_command(request.user_id, request.command)
         return {"response": response}
     except Exception as e:
         logger.error(f"API Command execution error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 def run_proxy(port=8080):
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=port)

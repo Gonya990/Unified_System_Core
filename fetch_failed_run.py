@@ -5,13 +5,14 @@ from googleapiclient.discovery import build
 
 TOKEN_PATH = "Scripts/automation/.credentials/gmail_token.json"
 
+
 def main():
     creds = Credentials.from_authorized_user_file(TOKEN_PATH)
     service = build("gmail", "v1", credentials=creds)
 
     # 19bb6cf890f576eb is the ID from the tail output earlier?
     # Let me search by subject instead
-    query = "subject:\"Run failed: Build and Push Container\""
+    query = 'subject:"Run failed: Build and Push Container"'
     results = service.users().messages().list(userId="me", q=query, maxResults=1).execute()
     messages = results.get("messages", [])
 
@@ -26,11 +27,13 @@ def main():
             if "parts" in p:
                 for part in p["parts"]:
                     t = get_text(part)
-                    if t: return t
+                    if t:
+                        return t
             return ""
 
         body = get_text(payload)
         print(body)
+
 
 if __name__ == "__main__":
     main()

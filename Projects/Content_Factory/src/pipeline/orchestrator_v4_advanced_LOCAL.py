@@ -248,7 +248,7 @@ def run_advanced_pipeline(
     pexels_key = os.getenv("PEXELS_API_KEY")
 
     for i, scene in enumerate(scenes):
-        print(f"🎬 Processing Scene {i+1}/{len(scenes)}...")
+        print(f"🎬 Processing Scene {i + 1}/{len(scenes)}...")
         keyword = scene.get("keyword", "abstract futuristic")
         clip_final = OUTPUT_DIR / f"{output_name}_seg_{i}.mp4"
         clip_raw = OUTPUT_DIR / f"{output_name}_raw_seg_{i}.mp4"
@@ -262,9 +262,7 @@ def run_advanced_pipeline(
         # B) AI Image Gen (Imagen 4 -> DALL-E 3)
         if not success:
             img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
-            if generate_image_imagen4(
-                keyword + " cinematic, high detail, 8k", img_path
-            ):
+            if generate_image_imagen4(keyword + " cinematic, high detail, 8k", img_path):
                 # Animate (Zoom) - More robust version
                 print(f"🎬 Animating image for scene {i}...")
                 # Ensure the image is scaled to 1080x1920 first to avoid zoompan complexities

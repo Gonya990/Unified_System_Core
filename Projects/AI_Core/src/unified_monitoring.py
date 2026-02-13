@@ -20,9 +20,7 @@ class UnifiedMonitoring:
         """
         try:
             series = monitoring_v3.TimeSeries()
-            series.metric.type = (
-                f"custom.googleapis.com/{self.service_name}/{metric_name}"
-            )
+            series.metric.type = f"custom.googleapis.com/{self.service_name}/{metric_name}"
             series.resource.type = "global"
             series.resource.labels["project_id"] = self.project_id
 
@@ -41,6 +39,7 @@ class UnifiedMonitoring:
 
     def start_heartbeat(self, interval=60):
         """Starts a background thread to send heartbeat everywhere minute."""
+
         def _loop():
             while True:
                 self.send_metric("heartbeat", 1)
@@ -49,8 +48,10 @@ class UnifiedMonitoring:
         t = threading.Thread(target=_loop, daemon=True)
         t.start()
 
+
 # Global instance pattern
 _monitor = None
+
 
 def get_monitor(service_name=None):
     global _monitor

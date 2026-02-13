@@ -18,30 +18,26 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 # Global Context (inserted by main.py)
 bot_context = {}
 
+
 async def get_current_user(request: Request, session_token: Optional[str] = Cookie(None)):
     """Dependency to get the current authenticated user."""
     usage_tracker = bot_context.get("usage")
     if not session_token or not usage_tracker:
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": "/login-required"}
-        )
+        raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login-required"})
 
     user_id = usage_tracker.verify_session(session_token)
     if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": "/login-required"}
-        )
+        raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login-required"})
 
     # Get user data from bot's DB
-    bot_db = bot_context.get("db") # Assumes db is passed in context
+    bot_db = bot_context.get("db")  # Assumes db is passed in context
     user_data = bot_db.get_user(user_id) if bot_db else None
 
     if not user_data:
         raise HTTPException(status_code=403, detail="User data not found")
 
     return user_data
+
 
 @app.get("/auth")
 async def auth(token: str):
@@ -58,26 +54,28 @@ async def auth(token: str):
 
     return HTMLResponse("❌ Invalid or expired token. Please generate a new one via /login in the bot.")
 
+
 @app.get("/login-required", response_class=HTMLResponse)
 async def login_required(request: Request):
     return templates.TemplateResponse(request, "login.html")
 
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, user: dict = Depends(get_current_user)):
-    user_id = user.get('user_id')
-    branch_id = user.get('branch_id', 'HOME_HQ')
-    role = user.get('role', 'MEMBER')
+    user_id = user.get("user_id")
+    branch_id = user.get("branch_id", "HOME_HQ")
+    role = user.get("role", "MEMBER")
 
     # Get Infrastructure Data - Filtered by branch
     infra_mgr = bot_context.get("infra")
     all_nodes = infra_mgr.data.get("nodes", []) if infra_mgr else []
 
     # RBAC: Only HOME_HQ or Admins see full infra. Others see only their status.
-    if branch_id == 'HOME_HQ' or role == 'ADMIN':
+    if branch_id == "HOME_HQ" or role == "ADMIN":
         infra_data = all_nodes
     else:
         # Simple members only see their own usage/stats (placeholder filter)
-        infra_data = [n for n in all_nodes if n.get('branch_id') == branch_id]
+        infra_data = [n for n in all_nodes if n.get("branch_id") == branch_id]
 
     # Get Usage Data
     usage_tracker = bot_context.get("usage")
@@ -103,10 +101,11 @@ async def read_root(request: Request, user: dict = Depends(get_current_user)):
         swarm_count = inference.swarm.get_stats().get("gemini_keys_active", 0)
 
     # Get Kostik's Agent Status (MCP Mail)
-    kosta_status = "Working ⚡" # Default to active as it's part of the mesh
+    kosta_status = "Working ⚡"  # Default to active as it's part of the mesh
     try:
         # Quick check if MCP server is reachable locally
         import requests
+
         r = requests.get("http://localhost:8765", timeout=0.1)
         if r.status_code < 500:
             kosta_status = "Working ⚡"
@@ -115,29 +114,36 @@ async def read_root(request: Request, user: dict = Depends(get_current_user)):
     except Exception:
         kosta_status = "Busy ⚙️"
 
-    return templates.TemplateResponse(request, "index.html", {
-        "nodes": infra_data,
-        "bot_status": "Online 🟢",
-        "stats": stats,
-        "gpu_status": gpu_status,
-        "swarm_count": swarm_count,
-        "kosta_status": kosta_status
-    })
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "nodes": infra_data,
+            "bot_status": "Online 🟢",
+            "stats": stats,
+            "gpu_status": gpu_status,
+            "swarm_count": swarm_count,
+            "kosta_status": kosta_status,
+        },
+    )
+
 
 @app.get("/logs")
 async def get_logs():
     """Read last 50 lines of log file if exists."""
-    log_file = "bot.log" # Make sure check config where logs are
+    log_file = "bot.log"  # Make sure check config where logs are
     if os.path.exists(log_file):
         with open(log_file) as f:
             lines = f.readlines()
             return {"logs": lines[-50:]}
     return {"logs": ["Log file not found"]}
 
+
 @app.get("/stats")
 async def get_stats_redirect():
     """Redirect /stats to /api/stats/system for backward compatibility or ease."""
     return await get_system_stats()
+
 
 @app.get("/stats/tokens")
 async def get_token_stats():
@@ -147,6 +153,7 @@ async def get_token_stats():
         return {"dates": [], "tokens": []}
 
     return usage_tracker.get_daily_usage(days=7)
+
 
 @app.get("/api/stats/system")
 async def get_system_stats():
@@ -170,6 +177,7 @@ async def get_system_stats():
     kosta_ok = False
     try:
         import requests
+
         # Try local first, then remote
         try:
             r = requests.get("http://localhost:8765", timeout=0.1)
@@ -190,8 +198,9 @@ async def get_system_stats():
         "ram": ram_percent,
         "swarm_keys": active_keys,
         "kosta_status": "Online" if kosta_ok else "Offline",
-        "timestamp": time.time()
+        "timestamp": time.time(),
     }
+
 
 @app.get("/search/notes")
 async def search_notes(q: str):
@@ -203,6 +212,7 @@ async def search_notes(q: str):
     results = await notion.search_pages(q)
     return {"results": results}
 
+
 @app.post("/action/{action}")
 async def run_action(action: str):
     """Execute management actions."""
@@ -212,10 +222,12 @@ async def run_action(action: str):
 
     elif action == "restart":
         import subprocess
+
         subprocess.Popen(["sudo", "systemctl", "restart", "ai-bot"])
         return {"message": "Bot restarting..."}
 
     return {"message": f"Unknown action: {action}"}
+
 
 class DashboardService:
     def __init__(self, port=8096, context=None):

@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -12,17 +11,14 @@ from pipeline.orchestrator_v4_advanced import run_advanced_pipeline
 scenes = [
     {"keyword": "cyberpunk tokyo rainy night neon lights cinematic 8k"},
     {"keyword": "futuristic robotic hand typing on glass interface digital art"},
-    {"keyword": "flying car over futuristic city sunset cinematic high detail"}
+    {"keyword": "flying car over futuristic city sunset cinematic high detail"},
 ]
 
-text = ("In the year 2077, Tokyo has transformed into a bioluminescent "
-        "paradise. Technology and nature have finally merged, creating "
-        "a world of infinite possibilities.")
+text = (
+    "In the year 2077, Tokyo has transformed into a bioluminescent "
+    "paradise. Technology and nature have finally merged, creating "
+    "a world of infinite possibilities."
+)
 
 print("🚀 Starting PREMIUM Video Generation...")
-run_advanced_pipeline(
-    text=text, 
-    output_name="premium_tokyo_2077",
-    scenes=scenes,
-    style="impact"
-)
+run_advanced_pipeline(text=text, output_name="premium_tokyo_2077", scenes=scenes, style="impact")

@@ -20,11 +20,8 @@ from telegram_notify import send_telegram_message
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("job_hunter.log"),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("job_hunter.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger("JobHunter")
 
@@ -44,6 +41,7 @@ async def load_config():
         return None
     with open(CONFIG_PATH) as f:
         return json.load(f)
+
 
 def get_llm():
     """Configure LLM based on environment"""
@@ -74,6 +72,7 @@ def get_llm():
 
     logger.error("No valid API Key found (OPENAI_API_KEY or GEMINI_API_KEY)")
     return None
+
 
 # Job Hunter - Email Analysis Mode
 # Analyzes incoming Gmail vacancies against User CV
@@ -107,7 +106,7 @@ async def process_profile(profile, llm):
         return
 
     # 3. Filter Job Emails
-    job_emails = [e for e in emails if e['category'] in ['work', 'linkedin', 'urgent']]
+    job_emails = [e for e in emails if e["category"] in ["work", "linkedin", "urgent"]]
 
     if not job_emails:
         logger.info("No new job-related emails found.")
@@ -115,7 +114,9 @@ async def process_profile(profile, llm):
         return
 
     logger.info(f"Analyzing {len(job_emails)} job emails...")
-    send_telegram_message(f"🔎 Job Analyzer: Found {len(job_emails)} potential job emails. Analyzing with Priority Skills...")
+    send_telegram_message(
+        f"🔎 Job Analyzer: Found {len(job_emails)} potential job emails. Analyzing with Priority Skills..."
+    )
 
     # 4. Analyze each
     for email in job_emails:
@@ -141,18 +142,15 @@ async def process_profile(profile, llm):
             analysis = response.content
 
             # Send Report
-            msg = (
-                f"📧 **Анализ Вакансии**\n"
-                f"От: {email['sender']}\n"
-                f"{analysis}"
-            )
+            msg = f"📧 **Анализ Вакансии**\nОт: {email['sender']}\n{analysis}"
             send_telegram_message(msg)
 
         except Exception as e:
             logger.error(f"Analysis failed for {email['id']}: {e}")
 
+
 async def main():
-    await load_config() # Keep config loading just for structure
+    await load_config()  # Keep config loading just for structure
     llm = get_llm()
     if not llm:
         return
@@ -160,6 +158,7 @@ async def main():
     logger.info("Starting Job Analyzer (Email Mode)...")
     await process_profile({"name": "User"}, llm)
     logger.info("Analysis complete.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

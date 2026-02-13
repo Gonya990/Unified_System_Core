@@ -1,15 +1,15 @@
-
 import asyncio
 import logging
 import random
 
 # Setup basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Mock MCP/App interaction for "Ping-Pong" logic
 # In a real scenario, this would import the MCP client libs or use HTTP requests
 # Since we are running this as a one-off script to kickstart the system:
+
 
 async def ping_mcp_agent(agent_name="FuchsiaCat", info="Handshake check"):
     """
@@ -19,13 +19,14 @@ async def ping_mcp_agent(agent_name="FuchsiaCat", info="Handshake check"):
     # In reality, this would be an HTTP POST to localhost:8765/mcp
     # We will simulate a successful handshake for the purpose of this diagnosis script
     await asyncio.sleep(0.5)
-    success = random.choice([True, True, False]) # 66% chance of success for simulation
+    success = random.choice([True, True, False])  # 66% chance of success for simulation
     if success:
         logger.info(f"✅ PONG <- {agent_name}: online and ready.")
         return True
     else:
         logger.warning(f"❌ timeout <- {agent_name}: not responding.")
         return False
+
 
 async def check_bot_health(bot_container="ai_core-ai-bot-local-1"):
     """
@@ -35,6 +36,7 @@ async def check_bot_health(bot_container="ai_core-ai-bot-local-1"):
     # This script runs on the server, so we can check docker locally?
     # Or we assume we are outside. We'll simplify for the "Game".
     return True
+
 
 async def main():
     logger.info("🚀 Initiating Vibranium Ping-Pong Protocol (Continuous Mode)...")
@@ -55,7 +57,8 @@ async def main():
         else:
             logger.warning("⚠️ SYSTEM AMBER. Some agents are silent.")
 
-        await asyncio.sleep(30) # Check every 30 seconds
+        await asyncio.sleep(30)  # Check every 30 seconds
+
 
 if __name__ == "__main__":
     try:

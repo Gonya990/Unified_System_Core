@@ -5,8 +5,9 @@ import requests
 from dotenv import load_dotenv
 
 # Load environment variables from .env file (searching parent directories)
-env_path = Path(__file__).resolve().parents[3] / '.env'
+env_path = Path(__file__).resolve().parents[3] / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
+
 
 def test_gemini():
     api_key = os.getenv("GEMINI_API_KEY")
@@ -22,6 +23,7 @@ def test_gemini():
         print(res.json())
     except Exception as e:
         print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     test_gemini()

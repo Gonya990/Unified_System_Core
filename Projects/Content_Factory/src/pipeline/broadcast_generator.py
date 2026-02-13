@@ -71,9 +71,7 @@ def produce_broadcast(character_id="unit_x", text=None, output_filename=None):
     # 2. Generate Motion
     logger.info("🎬 Generating Motion (LivePortrait)...")
     lp_controller = LivePortraitController()
-    lp_video_path = lp_controller.animate(
-        str(avatar_path), output_filename=f"{character_id}_motion.mp4"
-    )
+    lp_video_path = lp_controller.animate(str(avatar_path), output_filename=f"{character_id}_motion.mp4")
 
     if not lp_video_path:
         return None

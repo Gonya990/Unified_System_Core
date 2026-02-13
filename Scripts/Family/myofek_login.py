@@ -1,4 +1,3 @@
-
 import logging
 import os
 import sys
@@ -13,12 +12,13 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(ROOT_DIR))
 
 # Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("MyOfekLogin")
 
 # MYOFEK CONFIG
-LOGIN_URL = "https://productplayer.cet.ac.il" # Based on search results
+LOGIN_URL = "https://productplayer.cet.ac.il"  # Based on search results
 # Alternative: https://myofek.cet.ac.il/
+
 
 def login_myofek_selenium(username, password):
     """
@@ -28,10 +28,12 @@ def login_myofek_selenium(username, password):
     logger.info(f"Attempting login to MyOfek for user {username}...")
 
     options = Options()
-    options.add_argument("--headless") # Run in background
+    options.add_argument("--headless")  # Run in background
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    )
 
     try:
         driver = webdriver.Chrome(options=options)
@@ -74,8 +76,10 @@ def login_myofek_selenium(username, password):
         logger.error(f"Selenium Error: {e}")
         try:
             driver.quit()
-        except: pass
+        except:
+            pass
         return False
+
 
 if __name__ == "__main__":
     user = os.getenv("MYOFEK_USER", "PLACEHOLDER")

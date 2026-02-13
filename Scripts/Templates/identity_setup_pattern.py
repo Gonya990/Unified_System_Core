@@ -29,6 +29,7 @@ import os
 SECRETS_DIR = "secrets"
 OUTPUT_FILE = os.path.join(SECRETS_DIR, "identity_map.json")
 
+
 def ensure_secrets_dir():
     if not os.path.exists(SECRETS_DIR):
         print(f"Creating {SECRETS_DIR} directory...")
@@ -36,8 +37,10 @@ def ensure_secrets_dir():
         # Verify it's ignored (suggested check)
         print(f"⚠️  IMPORTANT: Ensure '{SECRETS_DIR}/' is added to your .gitignore!")
 
+
 def get_input(prompt):
     return input(prompt).strip()
+
 
 def main():
     print("=== 🛡️  Secure Identity Setup (Local Context) 🛡️  ===")
@@ -48,10 +51,7 @@ def main():
     structure = {
         "manager": {},
         "members": [],
-        "meta_layer": {
-            "description": "Local Identity Map",
-            "security_policy": "LOCAL_ONLY"
-        }
+        "meta_layer": {"description": "Local Identity Map", "security_policy": "LOCAL_ONLY"},
     }
 
     print("\n--- 👑 Manager (You) ---")
@@ -62,7 +62,7 @@ def main():
     print("\n--- 👥 Members (Family/Team) ---")
     while True:
         choice = get_input("Add a member? (y/n): ").lower()
-        if choice != 'y':
+        if choice != "y":
             break
 
         print("adding member...")
@@ -70,21 +70,18 @@ def main():
         role = get_input("  Role (parent/member/child/ally): ")
         sys_id = get_input("  System ID (e.g., agent_arthur, trusted_ally_bob): ")
 
-        member = {
-            "name": name,
-            "role": role,
-            "system_id": sys_id
-        }
+        member = {"name": name, "role": role, "system_id": sys_id}
         structure["members"].append(member)
         print("  ✅ Member added.")
 
     # Save
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(structure, f, indent=2, ensure_ascii=False)
 
     print(f"\n🎉 Success! Identity Map saved to: {OUTPUT_FILE}")
     print("Your Agent now has local awareness of these identities without API calls.")
     print("DO NOT COMMIT THIS FILE.")
+
 
 if __name__ == "__main__":
     main()

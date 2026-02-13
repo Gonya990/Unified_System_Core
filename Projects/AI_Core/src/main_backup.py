@@ -2,6 +2,7 @@
 AI Telegram Bot - Main Entry Point.
 Handles Telegram commands and message routing.
 """
+
 import asyncio
 import logging
 import os
@@ -62,7 +63,7 @@ digest_service = None  # Will be initialized after other services
 calendar_client = CalendarClient()
 homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
-device_monitor = None # Will init in post_init or after ha_controller
+device_monitor = None  # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
 gmail_client = GmailClient()
 
@@ -105,6 +106,7 @@ AI: "Проверяю системы... [[RUN:STATUS]]
 Checking systems..."
 """
 
+
 # Authorized users are loaded dynamically from config/env
 # Expects comma-separated string in env var ALLOWED_USERS
 def get_allowed_users():
@@ -113,13 +115,16 @@ def get_allowed_users():
         return [int(uid.strip()) for uid in users_str.split(",") if uid.strip()]
     except ValueError:
         logger.error(f"Invalid ALLOWED_USERS format: {users_str}")
-        return [708531393] # Fallback to admin
+        return [708531393]  # Fallback to admin
+
 
 ALLOWED_USERS = get_allowed_users()
 ADMIN_ID = ALLOWED_USERS[0] if ALLOWED_USERS else 708531393
 
+
 def require_auth(func):
     """Decorator to check if user is authorized."""
+
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
         if user_id not in ALLOWED_USERS:
@@ -130,10 +135,11 @@ def require_auth(func):
 
             # Send approval request to admin
             from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
             keyboard = [
                 [
                     InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_{user_id}"),
-                    InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_{user_id}")
+                    InlineKeyboardButton("❌ Отклонить", callback_data=f"deny_{user_id}"),
                 ]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
@@ -142,22 +148,22 @@ def require_auth(func):
                 await context.bot.send_message(
                     chat_id=ADMIN_ID,
                     text=f"🔔 **Запрос на доступ**\n\n"
-                         f"👤 Имя: {user_name}\n"
-                         f"🆔 User ID: `{user_id}`\n"
-                         f"📱 Username: @{username}\n\n"
-                         f"Одобрить доступ?",
+                    f"👤 Имя: {user_name}\n"
+                    f"🆔 User ID: `{user_id}`\n"
+                    f"📱 Username: @{username}\n\n"
+                    f"Одобрить доступ?",
                     parse_mode="Markdown",
-                    reply_markup=reply_markup
+                    reply_markup=reply_markup,
                 )
             except Exception as e:
                 logger.error(f"Failed to send approval request: {e}")
 
             await update.message.reply_text(
-                "⏳ Запрос на доступ отправлен администратору.\n\n"
-                "Пожалуйста, ожидайте одобрения."
+                "⏳ Запрос на доступ отправлен администратору.\n\nПожалуйста, ожидайте одобрения."
             )
             return
         return await func(update, context)
+
     return wrapper
 
 
@@ -185,8 +191,6 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/infra - 🏗 Инфраструктура\n"
         "/update - 🔄 Обновить бота\n"
         "/ha <cmd> - 🏠 Управление умным домом\n"
-
-
         "/help - ❓ Помощь"
     )
 
@@ -240,8 +244,9 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     try:
         # Check if DB files exist
         import os
-        usage_db = config.get('USAGE_DB_PATH', 'usage.db')
-        tasks_db = config.get('TASKS_DB_PATH', 'tasks.db')
+
+        usage_db = config.get("USAGE_DB_PATH", "usage.db")
+        tasks_db = config.get("TASKS_DB_PATH", "tasks.db")
 
         usage_size = os.path.getsize(usage_db) / 1024 if os.path.exists(usage_db) else 0
         tasks_size = os.path.getsize(tasks_db) / 1024 if os.path.exists(tasks_db) else 0
@@ -257,18 +262,14 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         f"• CPU: `{cpu_usage}%`\n"
         f"• RAM: `{mem.percent}%` ({mem.used // 1024 // 1024}MB / {mem.total // 1024 // 1024}MB)\n"
         f"• Uptime: `{uptime_str}`\n\n"
-
         f"🧠 **AI Core**\n"
         f"• Provider: `{inference.provider}`\n"
         f"• Model: `{inference.model}`\n"
         f"• Status: {inf_status}\n\n"
-
         f"🏠 **Home Assistant**\n"
         f"• Status: {ha_status}\n\n"
-
         f"🗄 **Databases**\n"
         f"• {db_status}\n\n"
-
         f"🕒 Time: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
     )
 
@@ -278,10 +279,7 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 async def cmd_setendpoint(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setendpoint command - set inference base URL."""
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /setendpoint <url>\n"
-            "Example: /setendpoint http://100.127.194.111:11434"
-        )
+        await update.message.reply_text("Usage: /setendpoint <url>\nExample: /setendpoint http://100.127.194.111:11434")
         return
 
     url = context.args[0]
@@ -294,10 +292,7 @@ async def cmd_setendpoint(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def cmd_setapikey(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setapikey command - set API key."""
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /setapikey <key>\n"
-            "⚠️ Delete this message after setting the key!"
-        )
+        await update.message.reply_text("Usage: /setapikey <key>\n⚠️ Delete this message after setting the key!")
         return
 
     api_key = context.args[0]
@@ -324,10 +319,7 @@ async def cmd_setapikey(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /setmodel command - set model name."""
     if not context.args:
-        await update.message.reply_text(
-            "Usage: /setmodel <name>\n"
-            "Example: /setmodel llama3.2"
-        )
+        await update.message.reply_text("Usage: /setmodel <name>\nExample: /setmodel llama3.2")
         return
 
     model = context.args[0]
@@ -372,6 +364,8 @@ async def cmd_usage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         msg += f"- `{model}`: {tokens}\n"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
+
+
 @require_auth
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming photos."""
@@ -442,7 +436,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await update.message.reply_text(f"❌ Не удалось распознать речь: {transcript}")
             return
 
-        await update.message.reply_text(f"🗣 Распознано: \"_{transcript}_\"", parse_mode="Markdown")
+        await update.message.reply_text(f'🗣 Распознано: "_{transcript}_"', parse_mode="Markdown")
 
         # Process as text command
         response = await process_text_request(transcript, user_id)
@@ -450,7 +444,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # Split and send response
         if len(response) > 4000:
             for i in range(0, len(response), 4000):
-                await update.message.reply_text(response[i:i+4000])
+                await update.message.reply_text(response[i : i + 4000])
         else:
             await update.message.reply_text(response)
 
@@ -475,9 +469,7 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # Run asynchronously in background so we don't block the bot
         # But for simplicity here using subprocess.Popen or asyncio.create_subprocess_exec
         await asyncio.create_subprocess_exec(
-            venv_python, script_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            venv_python, script_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
 
         # We don't wait for full completion here as it communicates via Telegram itself
@@ -489,7 +481,6 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(f"❌ Ошибка запуска: {e}")
 
 
-
 @require_auth
 async def cmd_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /imagine command - generate image."""
@@ -499,12 +490,12 @@ async def cmd_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return
 
     prompt = " ".join(context.args)
-    await update.message.reply_text(f"🎨 Generating image for: \"{prompt[:50]}...\"\n⏳ Please wait...")
+    await update.message.reply_text(f'🎨 Generating image for: "{prompt[:50]}..."\n⏳ Please wait...')
 
     try:
         image_path = await image_gen.generate(prompt, user_id)
         if image_path:
-            await update.message.reply_photo(photo=open(image_path, 'rb'))
+            await update.message.reply_photo(photo=open(image_path, "rb"))
     except Exception as e:
         logger.error(f"Image generation failed: {e}")
         await update.message.reply_text(f"❌ Image generation failed: {e}")
@@ -538,9 +529,9 @@ async def post_init(application: Application) -> None:
     # Schedule Daily Digest for Admin/Allowed users
     # We iterate over allowed users to schedule individual digests
     for user_id in config.get("ALLOWED_USER_IDS", []):
-         # We need a username, default to "User" or fetch??
-         # For now, simplistic approach
-         scheduler.add_daily_digest_job(user_id, digest_service.generate_digest, user_id, "Master")
+        # We need a username, default to "User" or fetch??
+        # For now, simplistic approach
+        scheduler.add_daily_digest_job(user_id, digest_service.generate_digest, user_id, "Master")
 
     # Initialize Device Monitor
     global device_monitor
@@ -548,7 +539,7 @@ async def post_init(application: Application) -> None:
     # Callback for notifications
     async def monitor_notify(msg):
         for uid in config.get("ALLOWED_USER_IDS", []):
-             await application.bot.send_message(chat_id=uid, text=msg, parse_mode="Markdown")
+            await application.bot.send_message(chat_id=uid, text=msg, parse_mode="Markdown")
 
     device_monitor = DeviceMonitor(ha_controller, notify_callback=monitor_notify)
 
@@ -560,27 +551,25 @@ async def post_init(application: Application) -> None:
 
     # Schedule check every 10 minutes
     scheduler.scheduler.add_job(
-        device_monitor.run_check,
-        'interval',
-        minutes=10,
-        id='ha_monitor',
-        replace_existing=True,
-        jobstore='memory'
+        device_monitor.run_check, "interval", minutes=10, id="ha_monitor", replace_existing=True, jobstore="memory"
     )
     logger.info("Device Monitoring started (interval: 10m)")
 
     # Determine public URL (mock or real)
     logger.info("Alice Skill running on port 8090. Needs tunnel for public access.")
 
+
 @require_auth
 async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /ha subcommands."""
     if not ha_controller.HA_AVAILABLE:
-         await update.message.reply_text("❌ Home Assistant Integration not available.")
-         return
+        await update.message.reply_text("❌ Home Assistant Integration not available.")
+        return
 
     if not context.args:
-        await update.message.reply_text("Usage:\n/ha status\n/ha lights on/off\n/ha sensors\n/ha script <name>\n/ha scene <name>")
+        await update.message.reply_text(
+            "Usage:\n/ha status\n/ha lights on/off\n/ha sensors\n/ha script <name>\n/ha scene <name>"
+        )
         return
 
     cmd = context.args[0].lower()
@@ -595,22 +584,22 @@ async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     elif cmd == "lights":
         if len(context.args) < 2:
-             await update.message.reply_text("Usage: /ha lights on OR /ha lights off")
-             return
+            await update.message.reply_text("Usage: /ha lights on OR /ha lights off")
+            return
         action = context.args[1].lower()
         if action == "on":
-             # This is dangerous (turns on ALL lights), maybe specific entity?
-             # For safety let's ask for entity or just demo
-             await ha_controller.turn_on_light("all")
-             await update.message.reply_text("💡 Turning ON lights (mock/all)")
+            # This is dangerous (turns on ALL lights), maybe specific entity?
+            # For safety let's ask for entity or just demo
+            await ha_controller.turn_on_light("all")
+            await update.message.reply_text("💡 Turning ON lights (mock/all)")
         elif action == "off":
-             await ha_controller.turn_off_light("all")
-             await update.message.reply_text("🌑 Turning OFF lights")
+            await ha_controller.turn_off_light("all")
+            await update.message.reply_text("🌑 Turning OFF lights")
 
     elif cmd == "script":
         if len(context.args) < 2:
-             await update.message.reply_text("Usage: /ha script <script_name>")
-             return
+            await update.message.reply_text("Usage: /ha script <script_name>")
+            return
         script_name = context.args[1]
         if not script_name.startswith("script."):
             script_name = f"script.{script_name}"
@@ -619,8 +608,8 @@ async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     elif cmd == "scene":
         if len(context.args) < 2:
-             await update.message.reply_text("Usage: /ha scene <scene_name>")
-             return
+            await update.message.reply_text("Usage: /ha scene <scene_name>")
+            return
         scene_name = context.args[1]
         if not scene_name.startswith("scene."):
             scene_name = f"scene.{scene_name}"
@@ -630,23 +619,23 @@ async def cmd_ha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif cmd == "integrations":
         integrations = await ha_controller.get_integrations()
         if not integrations:
-             await update.message.reply_text("❌ No integrations found or not supported.")
-             return
+            await update.message.reply_text("❌ No integrations found or not supported.")
+            return
 
         msg = "🧩 **HA Integrations**:\n\n"
         for i in integrations:
-            title = i.get('title', 'Unknown')
-            domain = i.get('domain', 'unknown')
-            entry_id = i.get('entry_id', '')
-            state = i.get('state', 'unknown')
+            title = i.get("title", "Unknown")
+            domain = i.get("domain", "unknown")
+            entry_id = i.get("entry_id", "")
+            state = i.get("state", "unknown")
             msg += f"• **{title}** (`{domain}`)\n  Status: {state}, ID: `{entry_id}`\n"
 
         # Split message if too long
         if len(msg) > 4000:
-             await update.message.reply_text(msg[:4000], parse_mode="Markdown")
-             await update.message.reply_text(msg[4000:], parse_mode="Markdown")
+            await update.message.reply_text(msg[:4000], parse_mode="Markdown")
+            await update.message.reply_text(msg[4000:], parse_mode="Markdown")
         else:
-             await update.message.reply_text(msg, parse_mode="Markdown")
+            await update.message.reply_text(msg, parse_mode="Markdown")
 
     else:
         await update.message.reply_text(f"Unknown HA command: {cmd}")
@@ -658,15 +647,10 @@ async def cmd_clear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
 
     if conv_manager.clear_history(user_id):
-        await update.message.reply_text(
-            "🧹 История диалогов очищена!\n\n"
-            "Следующее сообщение начнёт новый контекст."
-        )
+        await update.message.reply_text("🧹 История диалогов очищена!\n\nСледующее сообщение начнёт новый контекст.")
         logger.info(f"Cleared conversation history for user {user_id}")
     else:
-        await update.message.reply_text(
-            "ℹ️ История диалогов уже пуста."
-        )
+        await update.message.reply_text("ℹ️ История диалогов уже пуста.")
 
 
 async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -679,9 +663,7 @@ async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         provider = context.args[0].lower()
         if provider not in providers:
             await update.message.reply_text(
-                f"❌ Unknown provider: `{provider}`\n"
-                f"Available: {', '.join(providers)}",
-                parse_mode="Markdown"
+                f"❌ Unknown provider: `{provider}`\nAvailable: {', '.join(providers)}", parse_mode="Markdown"
             )
             return
 
@@ -697,10 +679,7 @@ async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         else:
             hint = "Make sure Ollama is running"
 
-        await update.message.reply_text(
-            f"✅ Provider set to: `{provider}`\n\n💡 {hint}",
-            parse_mode="Markdown"
-        )
+        await update.message.reply_text(f"✅ Provider set to: `{provider}`\n\n💡 {hint}", parse_mode="Markdown")
         return
 
     # Interactive Mode
@@ -715,11 +694,9 @@ async def cmd_setprovider(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"⚙️ **Select AI Provider**\n\n"
-        f"Current: `{current.upper()}`\n\n"
-        f"Click to switch:",
+        f"⚙️ **Select AI Provider**\n\nCurrent: `{current.upper()}`\n\nClick to switch:",
         parse_mode="Markdown",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
 
 
@@ -732,9 +709,8 @@ async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if not models:
         base_url = config.get("INFERENCE_BASE_URL")
         await update.message.reply_text(
-            f"❌ Could not fetch models from `{base_url}`\n\n"
-            "Make sure the endpoint is accessible.",
-            parse_mode="Markdown"
+            f"❌ Could not fetch models from `{base_url}`\n\nMake sure the endpoint is accessible.",
+            parse_mode="Markdown",
         )
         return
 
@@ -753,11 +729,9 @@ async def cmd_models(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"📋 **Available Models** ({len(models)})\n\n"
-        f"Current: `{current_model}`\n\n"
-        f"Click to switch:",
+        f"📋 **Available Models** ({len(models)})\n\nCurrent: `{current_model}`\n\nClick to switch:",
         parse_mode="Markdown",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
 
 
@@ -769,7 +743,7 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
 
     query = " ".join(context.args)
-    await update.message.reply_text(f"🔍 Ищу: \"{query[:50]}...\"\n⏳ Пожалуйста, подождите...")
+    await update.message.reply_text(f'🔍 Ищу: "{query[:50]}..."\n⏳ Пожалуйста, подождите...')
 
     try:
         search_result = await web_search.search(query)
@@ -787,8 +761,7 @@ async def cmd_mail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /mail command - check Gmail."""
     if not gmail_client.authenticated:
         await update.message.reply_text(
-            "❌ Gmail не подключен.\n\n"
-            "Для подключения запусти бота локально для OAuth авторизации."
+            "❌ Gmail не подключен.\n\nДля подключения запусти бота локально для OAuth авторизации."
         )
         return
 
@@ -813,11 +786,11 @@ async def cmd_mail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = " ".join(context.args[1:])
         emails = gmail_client.search_emails(query, max_results=5)
         if not emails:
-            await update.message.reply_text(f"🔍 По запросу \"{query}\" ничего не найдено.")
+            await update.message.reply_text(f'🔍 По запросу "{query}" ничего не найдено.')
             return
-        msg = f"🔍 **Результаты по: \"{query}\"**\n\n"
+        msg = f'🔍 **Результаты по: "{query}"**\n\n'
         for email in emails:
-            sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+            sender = email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
             msg += f"• **{sender}**\n  {email['subject'][:40]}...\n\n"
         await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -827,8 +800,9 @@ async def cmd_mail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "`/mail` - сводка непрочитанных\n"
             "`/mail unread` - количество непрочитанных\n"
             "`/mail search <query>` - поиск",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
+
 
 @require_auth
 async def cmd_say(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -841,9 +815,10 @@ async def cmd_say(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.chat.send_action("typing")
 
     if await ha_controller.speak_via_yandex(message):
-        await update.message.reply_text(f"🔊 Алиса скажет: \"{message[:50]}...\"")
+        await update.message.reply_text(f'🔊 Алиса скажет: "{message[:50]}..."')
     else:
         await update.message.reply_text("❌ Не удалось отправить сообщение на Яндекс Станцию.")
+
 
 @require_auth
 async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -879,8 +854,10 @@ async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             return
 
         unit = "count"
-        if metric == "weight": unit = "kg"
-        elif metric == "sleep": unit = "hours"
+        if metric == "weight":
+            unit = "kg"
+        elif metric == "sleep":
+            unit = "hours"
 
         if health_integration.add_metric(user_id, metric, val, unit, "manual"):
             await update.message.reply_text(f"✅ Записано: {metric} = {val}")
@@ -888,22 +865,25 @@ async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             await update.message.reply_text("❌ Ошибка записи.")
 
     elif cmd == "goal":
-         if len(context.args) < 3:
+        if len(context.args) < 3:
             await update.message.reply_text("Usage: /health goal <steps|weight|sleep> <value>")
             return
-         metric = context.args[1].lower()
-         try:
+        metric = context.args[1].lower()
+        try:
             val = float(context.args[2])
             health_integration.set_goal(user_id, metric, val)
             await update.message.reply_text(f"🎯 Цель обновлена: {metric} = {val}")
-         except ValueError:
-             await update.message.reply_text("❌ Значение должно быть числом.")
+        except ValueError:
+            await update.message.reply_text("❌ Значение должно быть числом.")
+
 
 @require_auth
 async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /remind command."""
     if len(context.args) < 2:
-        await update.message.reply_text("Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d")
+        await update.message.reply_text(
+            "Usage: /remind <time> <text>\nExample: /remind 10m Выключи духовку\nTime units: s, m, h, d"
+        )
         return
 
     time_str = context.args[0].lower()
@@ -923,10 +903,14 @@ async def cmd_remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     unit = match.group(2)
 
     delta = timedelta()
-    if unit == 's': delta = timedelta(seconds=amount)
-    elif unit == 'm': delta = timedelta(minutes=amount)
-    elif unit == 'h': delta = timedelta(hours=amount)
-    elif unit == 'd': delta = timedelta(days=amount)
+    if unit == "s":
+        delta = timedelta(seconds=amount)
+    elif unit == "m":
+        delta = timedelta(minutes=amount)
+    elif unit == "h":
+        delta = timedelta(hours=amount)
+    elif unit == "d":
+        delta = timedelta(days=amount)
 
     run_date = datetime.now() + delta
 
@@ -965,7 +949,7 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     # We will search in current dir and known subdirs
 
     try:
-        with zipfile.ZipFile(backup_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(backup_name, "w", zipfile.ZIP_DEFLATED) as zipf:
             found = False
             for file in files:
                 # Try relative path
@@ -977,8 +961,8 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                     zipf.write(f"Projects/AI_Core/{file}", arcname=file)
                     found = True
                 elif os.path.exists(f"config/{file}"):
-                     zipf.write(f"config/{file}", arcname=file)
-                     found = True
+                    zipf.write(f"config/{file}", arcname=file)
+                    found = True
 
             if not found:
                 await update.message.reply_text("⚠️ Не найдено файлов баз данных для бэкапа.")
@@ -987,8 +971,7 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
         # Send file
         await update.message.reply_document(
-            document=open(backup_name, "rb"),
-            caption=f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"
+            document=open(backup_name, "rb"), caption=f"📦 Database Backup ({datetime.now().strftime('%Y-%m-%d')})"
         )
 
         # Cleanup
@@ -998,11 +981,14 @@ async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         logger.error(f"Backup failed: {e}")
         await update.message.reply_text(f"❌ Backup error: {e}")
 
+
 @require_auth
 async def cmd_note(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /note command - create a Notion page."""
     if not context.args:
-        await update.message.reply_text("Usage: /note <title> [| content]\nExample: /note Meeting Notes | Discussed project X")
+        await update.message.reply_text(
+            "Usage: /note <title> [| content]\nExample: /note Meeting Notes | Discussed project X"
+        )
         return
 
     full_text = " ".join(context.args)
@@ -1022,6 +1008,7 @@ async def cmd_note(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("❌ Failed to create note. Check logs/config.")
 
+
 @require_auth
 async def cmd_speak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /speak command - text to speech."""
@@ -1037,10 +1024,11 @@ async def cmd_speak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if audio_data:
             await update.message.reply_voice(voice=audio_data, caption=text[:100])
         else:
-             await update.message.reply_text("❌ TTS generation failed (check logs/api key).")
+            await update.message.reply_text("❌ TTS generation failed (check logs/api key).")
     except Exception as e:
         logger.error(f"TTS command failed: {e}")
         await update.message.reply_text(f"❌ Error: {e}")
+
 
 @require_auth
 async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1054,6 +1042,7 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text("🔄 Начинаю обновление...\n1. Git Fetch & Reset (Force Update)...")
 
     import subprocess
+
     try:
         # 1. Force Git Update
         project_dir = "/home/gonya/Documents/Unified_System"
@@ -1062,9 +1051,7 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         git_command = f"cd {project_dir} && git fetch origin && git reset --hard origin/main"
 
         proc = await asyncio.create_subprocess_shell(
-            git_command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            git_command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         stdout, stderr = await proc.communicate()
 
@@ -1072,14 +1059,16 @@ async def cmd_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             await update.message.reply_text(f"❌ Git Update Failed:\n{stderr.decode()}")
             return
 
-        await update.message.reply_text(f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Updating Dependencies...")
+        await update.message.reply_text(
+            f"✅ Code force-updated.\nOutput: {stdout.decode()[:200]}...\n\n2. Updating Dependencies..."
+        )
 
         # 2. Pip Install
         venv_pip = f"{project_dir}/venv/bin/pip"
         proc = await asyncio.create_subprocess_shell(
             f"{venv_pip} install -r {project_dir}/Projects/AI_Core/requirements.txt",
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await proc.communicate()
 
@@ -1116,7 +1105,7 @@ async def cmd_costs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     msg += f"📝 **Запросов**: {user_stats['requests']}\n\n"
 
     msg += "**По моделям:**\n"
-    for model, tokens in user_stats['by_model'].items():
+    for model, tokens in user_stats["by_model"].items():
         msg += f"  • {model}: {tokens:,} токенов\n"
 
     # Provider breakdown (all users, admin only)
@@ -1128,9 +1117,9 @@ async def cmd_costs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         # All users stats
         all_users = usage_tracker.get_all_users_stats(days=30)
-        if all_users['users']:
+        if all_users["users"]:
             msg += "\n👥 **По пользователям:**\n"
-            for u in all_users['users'][:5]:  # Top 5
+            for u in all_users["users"][:5]:  # Top 5
                 msg += f"  • {u['username']}: {u['total_tokens']:,} токенов\n"
 
     await update.message.reply_text(msg, parse_mode="Markdown")
@@ -1164,6 +1153,7 @@ async def cmd_notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
         try:
             from datetime import datetime
+
             start_str = context.args[1]
             end_str = context.args[2]
 
@@ -1210,7 +1200,7 @@ async def cmd_homekit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "/homekit start - запустить мост\n"
             "/homekit stop - остановить\n"
             "/homekit status - статус",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -1230,7 +1220,7 @@ async def cmd_homekit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 "➕ Нажмите '+' -> Добавить аксессуар\n"
                 "🔢 Код настройки: `123-45-678`\n\n"
                 "🏠 Устройства из Home Assistant будут добавлены автоматически.",
-                parse_mode="Markdown"
+                parse_mode="Markdown",
             )
         except Exception as e:
             await update.message.reply_text(f"❌ Ошибка запуска: {e}")
@@ -1247,10 +1237,7 @@ async def cmd_homekit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     elif cmd == "status":
         if homekit_bridge:
             await update.message.reply_text(
-                "🟢 **HomeKit Bridge активен**\n\n"
-                "🔌 Port: 51826\n"
-                "🔢 Setup Code: 123-45-678",
-                parse_mode="Markdown"
+                "🟢 **HomeKit Bridge активен**\n\n🔌 Port: 51826\n🔢 Setup Code: 123-45-678", parse_mode="Markdown"
             )
         else:
             await update.message.reply_text("🔴 HomeKit bridge не запущен.")
@@ -1268,10 +1255,8 @@ async def cmd_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     if not context.args:
         await update.message.reply_text(
-            "📅 **Calendar Commands:**\n\n"
-            "/calendar today - события сегодня\n"
-            "/calendar week - на неделю",
-            parse_mode="Markdown"
+            "📅 **Calendar Commands:**\n\n/calendar today - события сегодня\n/calendar week - на неделю",
+            parse_mode="Markdown",
         )
         return
 
@@ -1320,7 +1305,7 @@ async def cmd_linear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             "/linear me - мои задачи\n"
             "/linear create <title> - создать задачу\n"
             "/linear teams - список команд",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -1351,8 +1336,7 @@ async def cmd_linear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
         if issue:
             await update.message.reply_text(
-                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}",
-                parse_mode="Markdown"
+                f"✅ Задача создана: [{issue['identifier']}]({issue['url']})\n{issue['title']}", parse_mode="Markdown"
             )
         else:
             await update.message.reply_text("❌ Не удалось создать задачу.")
@@ -1385,7 +1369,7 @@ async def cmd_todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "`/todo add <text>` - Add task\n"
             "`/todo list` - List pending tasks\n"
             "`/todo done <id>` - Complete task",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -1472,7 +1456,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             username=update.effective_user.username or user_name,
             provider=inference.provider,
             model=inference.model,
-            usage_stats=usage
+            usage_stats=usage,
         )
 
     logger.info(f"AI response: {response[:50]}...", extra={"user_id": user_id})
@@ -1488,14 +1472,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         # Determine where the actual speech starts
         for word in ["скажи через алису", "скажи алисе", "скажи"]:
-             if word in lower_text:
-                 # Find index of word and cut everything before it and the word itself
-                 idx = lower_text.find(word)
-                 speech_text = message_text[idx + len(word):].strip()
-                 # Remove leading colon or space
-                 if speech_text.startswith(":") or speech_text.startswith("-"):
-                     speech_text = speech_text[1:].strip()
-                 break
+            if word in lower_text:
+                # Find index of word and cut everything before it and the word itself
+                idx = lower_text.find(word)
+                speech_text = message_text[idx + len(word) :].strip()
+                # Remove leading colon or space
+                if speech_text.startswith(":") or speech_text.startswith("-"):
+                    speech_text = speech_text[1:].strip()
+                break
 
         if speech_text and len(speech_text) > 1:
             logger.info(f"Forcing SAY trigger for verbatim text: {speech_text}")
@@ -1525,7 +1509,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     cmd_to_run = None
     if trigger_cmd:
         import re
-        match = re.search(r'\[\[RUN:CMD:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[RUN:CMD:(.+?)\]\]", response)
         if match:
             cmd_to_run = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:CMD:{cmd_to_run}]]", "")
@@ -1534,7 +1519,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     antigravity_question = None
     if trigger_antigravity:
         import re
-        match = re.search(r'\[\[ASK:ANTIGRAVITY:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[ASK:ANTIGRAVITY:(.+?)\]\]", response)
         if match:
             antigravity_question = match.group(1)
             clean_response = clean_response.replace(f"[[ASK:ANTIGRAVITY:{antigravity_question}]]", "")
@@ -1543,7 +1529,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     agent_kosta_question = None
     if trigger_agent_kosta:
         import re
-        match = re.search(r'\[\[ASK:AGENT_KOSTA:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[ASK:AGENT_KOSTA:(.+?)\]\]", response)
         if match:
             agent_kosta_question = match.group(1)
             clean_response = clean_response.replace(f"[[ASK:AGENT_KOSTA:{agent_kosta_question}]]", "")
@@ -1552,7 +1539,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     search_query = None
     if trigger_search:
         import re
-        match = re.search(r'\[\[RUN:SEARCH:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[RUN:SEARCH:(.+?)\]\]", response)
         if match:
             search_query = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:SEARCH:{search_query}]]", "")
@@ -1561,7 +1549,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     mail_search_query = None
     if trigger_mail_search:
         import re
-        match = re.search(r'\[\[RUN:MAIL_SEARCH:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[RUN:MAIL_SEARCH:(.+?)\]\]", response)
         if match:
             mail_search_query = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:MAIL_SEARCH:{mail_search_query}]]", "")
@@ -1570,7 +1559,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     say_message = None
     if trigger_say:
         import re
-        match = re.search(r'\[\[RUN:SAY:(.+?)\]\]', response)
+
+        match = re.search(r"\[\[RUN:SAY:(.+?)\]\]", response)
         if match:
             say_message = match.group(1)
             clean_response = clean_response.replace(f"[[RUN:SAY:{say_message}]]", "")
@@ -1581,7 +1571,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if clean_response:
         if len(clean_response) > 4000:
             for i in range(0, len(clean_response), 4000):
-                await update.message.reply_text(clean_response[i:i+4000])
+                await update.message.reply_text(clean_response[i : i + 4000])
         else:
             await update.message.reply_text(clean_response)
 
@@ -1598,19 +1588,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         logger.info(f"Executing Server Command: {cmd_to_run}")
         # Whitelist safe commands
         # Whitelist safe commands
-        safe_commands = ['free', 'df', 'uptime', 'ps', 'systemctl', 'journalctl', 'ls', 'cat', 'grep', 'tail', 'head', 'sysctl', 'top', 'htop']
+        safe_commands = [
+            "free",
+            "df",
+            "uptime",
+            "ps",
+            "systemctl",
+            "journalctl",
+            "ls",
+            "cat",
+            "grep",
+            "tail",
+            "head",
+            "sysctl",
+            "top",
+            "htop",
+        ]
 
         # Allow Admin to bypass whitelist or check against expanded list
         is_safe = (user_id == ADMIN_ID) or any(cmd_to_run.startswith(safe) for safe in safe_commands)
 
         if is_safe:
             import subprocess
+
             try:
                 result = subprocess.run(
-                    ['ssh', 'igor-gaming-1', cmd_to_run],
-                    capture_output=True,
-                    text=True,
-                    timeout=10
+                    ["ssh", "igor-gaming-1", cmd_to_run], capture_output=True, text=True, timeout=10
                 )
                 output = result.stdout[:1000] if result.stdout else result.stderr[:1000]
                 await update.message.reply_text(f"```\n{output}\n```", parse_mode="Markdown")
@@ -1624,7 +1627,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # TODO: Implement actual Antigravity API call
         # For now, just acknowledge
         await update.message.reply_text(
-            f"📨 Вопрос передан Antigravity Core:\n\"{antigravity_question}\"\n\n"
+            f'📨 Вопрос передан Antigravity Core:\n"{antigravity_question}"\n\n'
             f"💡 Пока эта функция в разработке. Antigravity ответит через основной интерфейс."
         )
 
@@ -1632,7 +1635,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         logger.info(f"Forwarding to Agent Kosta: {agent_kosta_question}")
         # Route to MCP Agent Mail if possible
         await update.message.reply_text(
-            f"📨 Передаю запрос Агенту Кости:\n\"{agent_kosta_question}\"\n\n"
+            f'📨 Передаю запрос Агенту Кости:\n"{agent_kosta_question}"\n\n'
             f"🔄 Коннект через MCP Agent Mail... (в процессе)"
         )
 
@@ -1653,11 +1656,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         logger.info(f"Executing Mail Search: {mail_search_query}")
         emails = gmail_client.search_emails(mail_search_query, max_results=5)
         if not emails:
-            await update.message.reply_text(f"🔍 По запросу \"{mail_search_query}\" ничего не найдено.")
+            await update.message.reply_text(f'🔍 По запросу "{mail_search_query}" ничего не найдено.')
         else:
-            msg = f"🔍 **Результаты: \"{mail_search_query}\"**\n\n"
+            msg = f'🔍 **Результаты: "{mail_search_query}"**\n\n'
             for email in emails:
-                sender = email['from'].split('<')[0].strip().strip('"') if '<' in email['from'] else email['from']
+                sender = email["from"].split("<")[0].strip().strip('"') if "<" in email["from"] else email["from"]
                 msg += f"• **{sender}**\n  {email['subject'][:50]}...\n\n"
             await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -1684,7 +1687,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if trigger_say and say_message:
         logger.info(f"Executing SAY: {say_message}")
         if await ha_controller.speak_via_yandex(say_message):
-            await update.message.reply_text(f"🔊 Сказано: \"{say_message}\"")
+            await update.message.reply_text(f'🔊 Сказано: "{say_message}"')
         else:
             await update.message.reply_text("❌ Не удалось произнести через колонку.")
 
@@ -1721,10 +1724,7 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
 
         config.set("MODEL_NAME", model)
 
-        await query.edit_message_text(
-            f"✅ **Model switched to:**\n\n`{model}`",
-            parse_mode="Markdown"
-        )
+        await query.edit_message_text(f"✅ **Model switched to:**\n\n`{model}`", parse_mode="Markdown")
         logger.info(f"User {query.from_user.id} switched to model: {model}")
         return
 
@@ -1753,8 +1753,7 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             hint = "Local Ollama"
 
         await query.edit_message_text(
-            f"✅ **Provider switched to:**\n\n`{provider.upper()}`\n\n💡 {hint}",
-            parse_mode="Markdown"
+            f"✅ **Provider switched to:**\n\n`{provider.upper()}`\n\n💡 {hint}", parse_mode="Markdown"
         )
         logger.info(f"User {query.from_user.id} switched to provider: {provider}")
         return
@@ -1785,7 +1784,7 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
                 f"🆔 User ID: `{user_id}`\n\n"
                 f"Пользователь может теперь использовать бота.\n"
                 f"⚠️ Ему нужно будет установить свой API ключ через `/setapikey`",
-                parse_mode="Markdown"
+                parse_mode="Markdown",
             )
 
             # Notify approved user
@@ -1793,11 +1792,11 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
                 await context.bot.send_message(
                     chat_id=user_id,
                     text="✅ **Доступ одобрен!**\n\n"
-                         "Вы можете использовать бота.\n\n"
-                         "⚠️ Для работы с AI моделями установите API ключ:\n"
-                         "`/setapikey ваш_ключ`\n\n"
-                         "Или используйте `/setprovider ollama` для локальной модели.",
-                    parse_mode="Markdown"
+                    "Вы можете использовать бота.\n\n"
+                    "⚠️ Для работы с AI моделями установите API ключ:\n"
+                    "`/setapikey ваш_ключ`\n\n"
+                    "Или используйте `/setprovider ollama` для локальной модели.",
+                    parse_mode="Markdown",
                 )
             except Exception as e:
                 logger.error(f"Failed to notify approved user: {e}")
@@ -1805,17 +1804,10 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             await query.edit_message_text(f"ℹ️ Пользователь {user_id} уже в whitelist.")
 
     elif action == "deny":
-        await query.edit_message_text(
-            f"❌ **Доступ отклонён**\n\n"
-            f"🆔 User ID: `{user_id}`",
-            parse_mode="Markdown"
-        )
+        await query.edit_message_text(f"❌ **Доступ отклонён**\n\n🆔 User ID: `{user_id}`", parse_mode="Markdown")
 
         try:
-            await context.bot.send_message(
-                chat_id=user_id,
-                text="❌ Доступ к боту отклонён администратором."
-            )
+            await context.bot.send_message(chat_id=user_id, text="❌ Доступ к боту отклонён администратором.")
         except Exception:
             pass
 
@@ -1842,7 +1834,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 async def process_text_request(text: str, user_id: int) -> str:
     """Process a text request from any source (Telegram, Alice) and return response string."""
     # 1. Get context
-    history = conv_manager.get_context_messages(user_id, limit=3) # Limit context for Alice
+    history = conv_manager.get_context_messages(user_id, limit=3)  # Limit context for Alice
     messages = history + [{"role": "user", "content": text}]
 
     # 2. Add to history
@@ -1871,9 +1863,9 @@ async def process_text_request(text: str, user_id: int) -> str:
         # So skips scanning implementation for Alice for now or mock it.
 
     if "[[RUN:STATUS]]" in response:
-         clean_response = clean_response.replace("[[RUN:STATUS]]", "").strip()
-         status = config.get_status()
-         clean_response += f"\nСтатус: {status}"
+        clean_response = clean_response.replace("[[RUN:STATUS]]", "").strip()
+        status = config.get_status()
+        clean_response += f"\nСтатус: {status}"
 
     # Handle HA commands via text intent if possible (not implemented fully via generic chat yet)
     # But if user says "vkluchi light", AI might output text description.
@@ -1916,24 +1908,10 @@ async def post_init(application: Application) -> None:
     digest_service = DigestService(usage_tracker, task_manager, linear_client, infra_manager, calendar_client)
 
     # Schedule Daily Digest (at 09:00 AM)
-    scheduler.scheduler.add_job(
-        send_daily_digest,
-        'cron',
-        hour=9,
-        minute=0,
-        args=[application],
-        jobstore='memory'
-    )
+    scheduler.scheduler.add_job(send_daily_digest, "cron", hour=9, minute=0, args=[application], jobstore="memory")
 
     # Schedule Daily Backup (at 03:00 AM)
-    scheduler.scheduler.add_job(
-        run_auto_backup,
-        'cron',
-        hour=3,
-        minute=0,
-        args=[application],
-        jobstore='memory'
-    )
+    scheduler.scheduler.add_job(run_auto_backup, "cron", hour=3, minute=0, args=[application], jobstore="memory")
 
     logger.info("Alice Skill & Scheduler started.")
 
@@ -1941,11 +1919,9 @@ async def post_init(application: Application) -> None:
     asyncio.create_task(run_periodic_scan(application))
 
     # Start Web Dashboard
-    dashboard = DashboardService(port=8096, context={
-        "infra": infra_manager,
-        "usage": usage_tracker,
-        "notion": notion_client
-    })
+    dashboard = DashboardService(
+        port=8096, context={"infra": infra_manager, "usage": usage_tracker, "notion": notion_client}
+    )
     dashboard.start()
     logger.info("Web Dashboard started on port 8096")
 
@@ -1960,11 +1936,7 @@ async def send_daily_digest(application: Application):
             digest = await digest_service.generate_digest(ADMIN_ID, username)
 
             await notify_manager.send(
-                application.bot,
-                ADMIN_ID,
-                digest,
-                priority=NotificationManager.NORMAL,
-                parse_mode="Markdown"
+                application.bot, ADMIN_ID, digest, priority=NotificationManager.NORMAL, parse_mode="Markdown"
             )
             logger.info("Daily digest sent")
     except Exception as e:
@@ -1986,25 +1958,22 @@ async def run_auto_backup(application: Application):
         files = ["tasks.db", "usage.db", "jobs.db"]
         backup_name = f"daily_backup_{datetime.now().strftime('%Y%m%d')}.zip"
 
-        with zipfile.ZipFile(backup_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(backup_name, "w", zipfile.ZIP_DEFLATED) as zipf:
             for file in files:
-                 if os.path.exists(file):
+                if os.path.exists(file):
                     zipf.write(file)
 
         # Send to Admin
         if ADMIN_ID:
-             await notify_manager.send(
-                 application.bot,
-                 ADMIN_ID,
-                 "📦 Автоматический ежедневный бэкап",
-                 priority=NotificationManager.NORMAL  # Don't wake up at 3am
-             )
-             # Attach file separately (send doesn't support document)
-             await application.bot.send_document(
-                chat_id=ADMIN_ID,
-                document=open(backup_name, "rb")
+            await notify_manager.send(
+                application.bot,
+                ADMIN_ID,
+                "📦 Автоматический ежедневный бэкап",
+                priority=NotificationManager.NORMAL,  # Don't wake up at 3am
             )
-             os.remove(backup_name)
+            # Attach file separately (send doesn't support document)
+            await application.bot.send_document(chat_id=ADMIN_ID, document=open(backup_name, "rb"))
+            os.remove(backup_name)
 
     except Exception as e:
         logger.error(f"Auto-backup failed: {e}")
@@ -2033,15 +2002,13 @@ async def run_periodic_scan(application: Application):
             venv_python = "/home/gonya/Documents/Unified_System/venv/bin/python"
 
             process = await asyncio.create_subprocess_exec(
-                venv_python, script_path,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                venv_python, script_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             logger.info(f"⏰ Job Hunter launched via Scheduler (PID: {process.pid})")
 
         except Exception as e:
             logger.error(f"Scheduler Error: {e}")
-            await asyncio.sleep(600) # Retry in 10 mins on error
+            await asyncio.sleep(600)  # Retry in 10 mins on error
 
 
 def get_health_info() -> dict:
@@ -2068,17 +2035,12 @@ def main() -> None:
         sys.exit(1)
 
     # Build application
-    application = (
-        Application.builder()
-        .token(token)
-        .post_init(post_init)
-        .build()
-    )
+    application = Application.builder().token(token).post_init(post_init).build()
 
     # Autonomous background tasks
     async def tailscale_heartbeat():
         """Keep the Tailscale tunnel hot between smart and server."""
-        target_ip = "100.81.133.25" # 'smart'
+        target_ip = "100.81.133.25"  # 'smart'
         # Log location
         log_dir = "/home/gonya/Documents/Unified_System/Reports"
         log_file = os.path.join(log_dir, "network_health.log")
@@ -2091,19 +2053,20 @@ def main() -> None:
                 proc = await asyncio.create_subprocess_shell(
                     f"/snap/bin/tailscale ping -c 1 {target_ip}",
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
                 )
                 stdout, stderr = await proc.communicate()
 
                 status = "DIRECT" if b"direct" in stdout else "RELAY"
                 latency = "unknown"
-                for line in stdout.decode().split('\n'):
-                     if "ms" in line:
-                         latency = line.split()[-1]
-                         break
+                for line in stdout.decode().split("\n"):
+                    if "ms" in line:
+                        latency = line.split()[-1]
+                        break
 
                 with open(log_file, "a") as f:
                     from datetime import datetime
+
                     f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {status} - {latency}\n")
 
                 # Truncate log if too big
@@ -2116,7 +2079,7 @@ def main() -> None:
             except Exception as e:
                 logger.error(f"Heartbeat task error: {e}")
 
-            await asyncio.sleep(30) # Tick every 30s
+            await asyncio.sleep(30)  # Tick every 30s
 
     # Register background task
     loop = asyncio.get_event_loop()
@@ -2164,6 +2127,7 @@ def main() -> None:
 
     # Add callback query handler for approval buttons
     from telegram.ext import CallbackQueryHandler
+
     application.add_handler(CallbackQueryHandler(handle_approval_callback))
 
     application.add_error_handler(error_handler)

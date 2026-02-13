@@ -27,6 +27,7 @@ from typing import Any, Optional
 # Optional .env loading (no hard dependency in committed code)
 try:
     import importlib
+
     dotenv = importlib.import_module("dotenv")
     # Try loading from standard locations first
     if not dotenv.load_dotenv():
@@ -59,23 +60,20 @@ except Exception as e:
 @dataclass
 class SyncResult:
     """Result of a sync operation"""
+
     success: bool
     component: str
     data: dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
 
     def to_dict(self) -> dict:
-        return {
-            'success': self.success,
-            'component': self.component,
-            'data': self.data,
-            'error': self.error
-        }
+        return {"success": self.success, "component": self.component, "data": self.data, "error": self.error}
 
 
 @dataclass
 class SyncReport:
     """Aggregated sync report"""
+
     timestamp: str
     agent_name: str
     results: list[SyncResult] = field(default_factory=list)
@@ -87,58 +85,57 @@ class SyncReport:
     @property
     def urgent_messages(self) -> list[dict]:
         for r in self.results:
-            if r.component == 'inbox' and r.success:
-                return [m for m in r.data.get('messages', [])
-                        if m.get('importance') in ('high', 'urgent')]
+            if r.component == "inbox" and r.success:
+                return [m for m in r.data.get("messages", []) if m.get("importance") in ("high", "urgent")]
         return []
 
     @property
     def ready_tasks(self) -> list[dict]:
         for r in self.results:
-            if r.component == 'beads' and r.success:
-                return r.data.get('ready', [])
+            if r.component == "beads" and r.success:
+                return r.data.get("ready", [])
         return []
 
     def to_dict(self) -> dict:
         return {
-            'timestamp': self.timestamp,
-            'agent_name': self.agent_name,
-            'success': self.all_success,
-            'results': [r.to_dict() for r in self.results],
-            'urgent_count': len(self.urgent_messages),
-            'ready_count': len(self.ready_tasks)
+            "timestamp": self.timestamp,
+            "agent_name": self.agent_name,
+            "success": self.all_success,
+            "results": [r.to_dict() for r in self.results],
+            "urgent_count": len(self.urgent_messages),
+            "ready_count": len(self.ready_tasks),
         }
 
     def print_summary(self):
         """Print human-readable summary"""
-        print(f"\n{'='*50}")
+        print(f"\n{'=' * 50}")
         print(f"SYNC REPORT - {self.agent_name}")
-        print(f"{'='*50}")
+        print(f"{'=' * 50}")
         print(f"Time: {self.timestamp}")
         print(f"Status: {'✅ OK' if self.all_success else '❌ ERRORS'}")
         print()
 
         for r in self.results:
-            icon = '✅' if r.success else '❌'
+            icon = "✅" if r.success else "❌"
             print(f"{icon} {r.component.upper()}")
             if r.error:
                 print(f"   Error: {r.error}")
-            elif r.component == 'inbox':
-                msgs = r.data.get('messages', [])
-                urgent = [m for m in msgs if m.get('importance') in ('high', 'urgent')]
+            elif r.component == "inbox":
+                msgs = r.data.get("messages", [])
+                urgent = [m for m in msgs if m.get("importance") in ("high", "urgent")]
                 print(f"   Messages: {len(msgs)} ({len(urgent)} urgent)")
                 for m in urgent[:3]:
                     print(f"   ⚠️  [{m.get('from')}] {m.get('subject')}")
-            elif r.component == 'beads':
-                ready = r.data.get('ready', [])
-                in_prog = r.data.get('in_progress', [])
+            elif r.component == "beads":
+                ready = r.data.get("ready", [])
+                in_prog = r.data.get("in_progress", [])
                 print(f"   Ready: {len(ready)} | In Progress: {len(in_prog)}")
                 for t in ready[:3]:
                     print(f"   📋 {t.get('id')}: {t.get('title', '')[:40]}")
-            elif r.component == 'health':
+            elif r.component == "health":
                 print(f"   Server: {'online' if r.data.get('healthy') else 'offline'}")
 
-        print(f"{'='*50}\n")
+        print(f"{'=' * 50}\n")
 
 
 class AgentSync:
@@ -153,7 +150,7 @@ class AgentSync:
     def _check_bd_availability(self) -> bool:
         """Check if bd CLI is installed and in path"""
         try:
-            subprocess.run(['bd', '--version'], capture_output=True, check=False)
+            subprocess.run(["bd", "--version"], capture_output=True, check=False)
             return True
         except FileNotFoundError:
             return False
@@ -162,43 +159,27 @@ class AgentSync:
         """Find project root (contains .beads/)"""
         current = Path.cwd()
         for parent in [current] + list(current.parents):
-            if (parent / '.beads').exists():
+            if (parent / ".beads").exists():
                 return parent
         return current
 
     def _run_bd(self, *args) -> subprocess.CompletedProcess:
         """Run beads CLI command"""
-        cmd = ['bd'] + list(args)
+        cmd = ["bd"] + list(args)
         try:
-            return subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                cwd=self.project_root
-            )
+            return subprocess.run(cmd, capture_output=True, text=True, cwd=self.project_root)
         except FileNotFoundError:
             return subprocess.CompletedProcess(
-                args=cmd,
-                returncode=127,
-                stdout="",
-                stderr="Beads (bd) command not found. Please install it."
+                args=cmd, returncode=127, stdout="", stderr="Beads (bd) command not found. Please install it."
             )
 
     def check_health(self) -> SyncResult:
         """Check Agent Mail server health"""
         try:
             healthy = self.mail_client.health_check()
-            return SyncResult(
-                success=True,
-                component='health',
-                data={'healthy': healthy}
-            )
+            return SyncResult(success=True, component="health", data={"healthy": healthy})
         except Exception as e:
-            return SyncResult(
-                success=False,
-                component='health',
-                error=str(e)
-            )
+            return SyncResult(success=False, component="health", error=str(e))
 
     def sync_inbox(self, limit: int = 20) -> SyncResult:
         """Fetch and process inbox"""
@@ -207,58 +188,54 @@ class AgentSync:
 
             # Auto-acknowledge urgent messages we've seen
             for msg in messages:
-                if msg.get('ack_required') and msg.get('importance') in ('high', 'urgent'):
+                if msg.get("ack_required") and msg.get("importance") in ("high", "urgent"):
                     try:
-                        self.mail_client.acknowledge_message(msg['id'])
+                        self.mail_client.acknowledge_message(msg["id"])
                     except Exception:
                         pass
 
             return SyncResult(
                 success=True,
-                component='inbox',
+                component="inbox",
                 data={
-                    'messages': messages,
-                    'count': len(messages),
-                    'unread': len([m for m in messages if not m.get('read')])
-                }
+                    "messages": messages,
+                    "count": len(messages),
+                    "unread": len([m for m in messages if not m.get("read")]),
+                },
             )
         except Exception as e:
-            return SyncResult(
-                success=False,
-                component='inbox',
-                error=str(e)
-            )
+            return SyncResult(success=False, component="inbox", error=str(e))
 
     def sync_beads(self) -> SyncResult:
         """Sync beads task board"""
         if not self.bd_available:
             return SyncResult(
                 success=True,
-                component='beads',
-                data={'ready': [], 'in_progress': [], 'synced': False, 'note': 'Beads CLI (bd) not found'}
+                component="beads",
+                data={"ready": [], "in_progress": [], "synced": False, "note": "Beads CLI (bd) not found"},
             )
         try:
             # Sync with remote
-            sync_result = self._run_bd('sync')
-            if sync_result.returncode != 0 and 'not initialized' in sync_result.stderr:
-                self._run_bd('init')
-                self._run_bd('sync', '--import-only')
+            sync_result = self._run_bd("sync")
+            if sync_result.returncode != 0 and "not initialized" in sync_result.stderr:
+                self._run_bd("init")
+                self._run_bd("sync", "--import-only")
 
             # Get ready tasks
-            ready_result = self._run_bd('ready', '--json')
+            ready_result = self._run_bd("ready", "--json")
             ready_tasks = []
             if ready_result.returncode == 0 and ready_result.stdout.strip():
                 try:
                     ready_tasks = json.loads(ready_result.stdout)
                 except json.JSONDecodeError:
                     # Parse text output
-                    for line in ready_result.stdout.strip().split('\n'):
-                        if line.startswith('US-') or line.startswith('BD-'):
+                    for line in ready_result.stdout.strip().split("\n"):
+                        if line.startswith("US-") or line.startswith("BD-"):
                             parts = line.split(None, 1)
-                            ready_tasks.append({'id': parts[0], 'title': parts[1] if len(parts) > 1 else ''})
+                            ready_tasks.append({"id": parts[0], "title": parts[1] if len(parts) > 1 else ""})
 
             # Get in-progress tasks
-            prog_result = self._run_bd('list', '--status=in_progress', '--json')
+            prog_result = self._run_bd("list", "--status=in_progress", "--json")
             in_progress = []
             if prog_result.returncode == 0 and prog_result.stdout.strip():
                 try:
@@ -267,113 +244,71 @@ class AgentSync:
                     pass
 
             return SyncResult(
-                success=True,
-                component='beads',
-                data={
-                    'ready': ready_tasks,
-                    'in_progress': in_progress,
-                    'synced': True
-                }
+                success=True, component="beads", data={"ready": ready_tasks, "in_progress": in_progress, "synced": True}
             )
         except Exception as e:
-            return SyncResult(
-                success=False,
-                component='beads',
-                error=str(e)
-            )
+            return SyncResult(success=False, component="beads", error=str(e))
 
-    def register_agent(self, task_description: str = 'Active session') -> SyncResult:
+    def register_agent(self, task_description: str = "Active session") -> SyncResult:
         """Register/update agent status"""
         try:
-            result = self.mail_client.register(
-                program='claude-code',
-                model='opus-4.5'
-            )
-            return SyncResult(
-                success=True,
-                component='registration',
-                data=result
-            )
+            result = self.mail_client.register(program="claude-code", model="opus-4.5")
+            return SyncResult(success=True, component="registration", data=result)
         except Exception as e:
-            return SyncResult(
-                success=False,
-                component='registration',
-                error=str(e)
-            )
+            return SyncResult(success=False, component="registration", error=str(e))
 
     def push_beads(self) -> SyncResult:
         """Commit and push beads changes to prevent sync conflicts"""
         try:
             # First do a full sync
-            self._run_bd('sync', '--import-only')
-            self._run_bd('sync')
+            self._run_bd("sync", "--import-only")
+            self._run_bd("sync")
 
             # Check if there are changes to commit
             status = subprocess.run(
-                ['git', 'status', '--porcelain', '.beads/'],
-                capture_output=True, text=True, cwd=self.project_root
+                ["git", "status", "--porcelain", ".beads/"], capture_output=True, text=True, cwd=self.project_root
             )
 
             if not status.stdout.strip():
                 return SyncResult(
-                    success=True,
-                    component='push',
-                    data={'pushed': False, 'reason': 'No changes to push'}
+                    success=True, component="push", data={"pushed": False, "reason": "No changes to push"}
                 )
 
             # Add, commit, pull --rebase, push
+            subprocess.run(["git", "add", ".beads/"], cwd=self.project_root, check=True)
             subprocess.run(
-                ['git', 'add', '.beads/'],
-                cwd=self.project_root, check=True
+                ["git", "commit", "-m", "chore: sync beads"], cwd=self.project_root, check=True, capture_output=True
             )
             subprocess.run(
-                ['git', 'commit', '-m', 'chore: sync beads'],
-                cwd=self.project_root, check=True,
-                capture_output=True
-            )
-            subprocess.run(
-                ['git', 'pull', '--rebase'],
-                cwd=self.project_root, check=True,
+                ["git", "pull", "--rebase"],
+                cwd=self.project_root,
+                check=True,
                 capture_output=True,
-                env={**os.environ, 'GIT_TERMINAL_PROMPT': '0'}
+                env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
             )
             subprocess.run(
-                ['git', 'push'],
-                cwd=self.project_root, check=True,
+                ["git", "push"],
+                cwd=self.project_root,
+                check=True,
                 capture_output=True,
-                env={**os.environ, 'GIT_TERMINAL_PROMPT': '0'}
+                env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
             )
 
-            return SyncResult(
-                success=True,
-                component='push',
-                data={'pushed': True}
-            )
+            return SyncResult(success=True, component="push", data={"pushed": True})
         except subprocess.CalledProcessError as e:
-            return SyncResult(
-                success=False,
-                component='push',
-                error=f"Git error: {e.stderr if e.stderr else str(e)}"
-            )
+            return SyncResult(success=False, component="push", error=f"Git error: {e.stderr if e.stderr else str(e)}")
         except Exception as e:
-            return SyncResult(
-                success=False,
-                component='push',
-                error=str(e)
-            )
+            return SyncResult(success=False, component="push", error=str(e))
 
-    def full_sync(self, task_description: str = 'Active session') -> SyncReport:
+    def full_sync(self, task_description: str = "Active session") -> SyncReport:
         """Perform full sync: health + register + inbox + beads"""
-        report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
-            agent_name=self.config.agent_name
-        )
+        report = SyncReport(timestamp=datetime.utcnow().isoformat() + "Z", agent_name=self.config.agent_name)
 
         # Health check
         report.results.append(self.check_health())
 
         # Only continue if healthy
-        if report.results[-1].data.get('healthy'):
+        if report.results[-1].data.get("healthy"):
             report.results.append(self.register_agent(task_description))
             report.results.append(self.sync_inbox())
 
@@ -384,10 +319,7 @@ class AgentSync:
 
     def quick_sync(self) -> SyncReport:
         """Quick sync: inbox + beads only"""
-        report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
-            agent_name=self.config.agent_name
-        )
+        report = SyncReport(timestamp=datetime.utcnow().isoformat() + "Z", agent_name=self.config.agent_name)
 
         report.results.append(self.sync_inbox())
         report.results.append(self.sync_beads())
@@ -397,7 +329,7 @@ class AgentSync:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Agent Sync - Unified Agent Mail + Beads workflow',
+        description="Agent Sync - Unified Agent Mail + Beads workflow",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -407,22 +339,21 @@ Examples:
   agent_sync.py beads           Beads only
   agent_sync.py status          Current status
   agent_sync.py --json          Output as JSON
-        """
+        """,
     )
 
-    parser.add_argument('action', nargs='?', default='full',
-                        choices=['full', 'quick', 'inbox', 'beads', 'health', 'status'],
-                        help='Sync action (default: full)')
-    parser.add_argument('--quick', '-q', action='store_true',
-                        help='Quick sync (inbox + beads only)')
-    parser.add_argument('--json', '-j', action='store_true',
-                        help='Output as JSON')
-    parser.add_argument('--task', '-t', default='Active session',
-                        help='Task description for registration')
-    parser.add_argument('--limit', '-l', type=int, default=20,
-                        help='Inbox message limit')
-    parser.add_argument('--push', '-p', action='store_true',
-                        help='Commit and push beads changes after sync')
+    parser.add_argument(
+        "action",
+        nargs="?",
+        default="full",
+        choices=["full", "quick", "inbox", "beads", "health", "status"],
+        help="Sync action (default: full)",
+    )
+    parser.add_argument("--quick", "-q", action="store_true", help="Quick sync (inbox + beads only)")
+    parser.add_argument("--json", "-j", action="store_true", help="Output as JSON")
+    parser.add_argument("--task", "-t", default="Active session", help="Task description for registration")
+    parser.add_argument("--limit", "-l", type=int, default=20, help="Inbox message limit")
+    parser.add_argument("--push", "-p", action="store_true", help="Commit and push beads changes after sync")
 
     args = parser.parse_args()
 
@@ -430,37 +361,31 @@ Examples:
 
     # Handle --quick flag
     if args.quick:
-        args.action = 'quick'
+        args.action = "quick"
 
     report: Optional[SyncReport] = None
 
     # Execute action
-    if args.action == 'full':
+    if args.action == "full":
         report = sync.full_sync(args.task)
-    elif args.action == 'quick':
+    elif args.action == "quick":
         report = sync.quick_sync()
-    elif args.action == 'inbox':
+    elif args.action == "inbox":
         result = sync.sync_inbox(args.limit)
         report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
-            agent_name=sync.config.agent_name,
-            results=[result]
+            timestamp=datetime.utcnow().isoformat() + "Z", agent_name=sync.config.agent_name, results=[result]
         )
-    elif args.action == 'beads':
+    elif args.action == "beads":
         result = sync.sync_beads()
         report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
-            agent_name=sync.config.agent_name,
-            results=[result]
+            timestamp=datetime.utcnow().isoformat() + "Z", agent_name=sync.config.agent_name, results=[result]
         )
-    elif args.action == 'health':
+    elif args.action == "health":
         result = sync.check_health()
         report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
-            agent_name=sync.config.agent_name,
-            results=[result]
+            timestamp=datetime.utcnow().isoformat() + "Z", agent_name=sync.config.agent_name, results=[result]
         )
-    elif args.action == 'status':
+    elif args.action == "status":
         report = sync.quick_sync()
 
     if report is None:
@@ -490,5 +415,5 @@ Examples:
     sys.exit(0 if report.all_success else 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

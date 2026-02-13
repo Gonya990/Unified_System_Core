@@ -26,5 +26,6 @@ def refresh():
     broker.save_vault(keys)
     print("✅ Vault refreshed and encrypted.")
 
+
 if __name__ == "__main__":
     refresh()

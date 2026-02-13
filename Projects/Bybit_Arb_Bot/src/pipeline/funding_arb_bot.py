@@ -1,7 +1,8 @@
-import logging
 import asyncio
-from .exchange_connector import BybitConnector, OrderRequest
+import logging
+
 from .compliance_logger import ComplianceLogger
+from .exchange_connector import BybitConnector, OrderRequest
 
 logger = logging.getLogger("FundingArbBot")
 
@@ -59,9 +60,7 @@ class FundingArbBot:
         if result.get("retCode") == 0:
             logger.info("✅ Arb Batch Order Executed")
             # Log for DAC8
-            await self.compliance.log_trade(
-                result.get("result", {}), 50000.0
-            )  # Example price
+            await self.compliance.log_trade(result.get("result", {}), 50000.0)  # Example price
         else:
             logger.error(f"❌ Arb Execution Failed: {result.get('retMsg')}")
 

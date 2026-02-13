@@ -2,6 +2,7 @@
 Unified Inference Client for AI Telegram Bot.
 Supports Ollama, OpenAI-compatible, Gemini, and custom endpoints.
 """
+
 import asyncio
 import logging
 from pathlib import Path
@@ -14,6 +15,7 @@ try:
     from .modules.swarm_manager import SwarmManager
 except ImportError:
     from config_manager import ConfigManager
+
     try:
         from modules.swarm_manager import SwarmManager
     except ImportError:
@@ -46,9 +48,7 @@ def _get_gemini_client(api_key: str, use_vertex: bool = False, project: str = No
 
         if not _gemini_client or _gemini_client_key != api_key:
             if use_vertex:
-                _gemini_client = genai.Client(
-                    vertexai=True, project=project, location="us-central1"
-                )
+                _gemini_client = genai.Client(vertexai=True, project=project, location="us-central1")
             else:
                 _gemini_client = genai.Client(api_key=api_key)
             _gemini_client_key = api_key
@@ -60,19 +60,15 @@ def _get_gemini_client(api_key: str, use_vertex: bool = False, project: str = No
         logger.error(f"Failed to configure Gemini: {e}")
         return None
 
+
 class InferenceClient:
     """Unified client for multiple AI inference providers."""
 
     def __init__(self, config: ConfigManager):
         self.config = config
         self.provider = config.get("INFERENCE_PROVIDER", "ollama")
-        self.model = config.get(
-            "OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2")
-        )
-        self.endpoint = config.get(
-            "OLLAMA_BASE_URL",
-            config.get("INFERENCE_BASE_URL", "http://localhost:11434")
-        )
+        self.model = config.get("OLLAMA_MODEL", config.get("MODEL_NAME", "llama3.2"))
+        self.endpoint = config.get("OLLAMA_BASE_URL", config.get("INFERENCE_BASE_URL", "http://localhost:11434"))
         self.api_key = config.get("INFERENCE_API_KEY", "")
 
         # Load resources for swarm
@@ -100,36 +96,22 @@ class InferenceClient:
         messages: list,
         system_prompt: Optional[str] = None,
         branch_id: str = "HOME_HQ",
-        project_context: str = "PERSONAL"
+        project_context: str = "PERSONAL",
     ):
         """Routed chat request with branch awareness and auto-failover."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
 
         # Primary attempt
-        response, usage = await self._dispatch_chat(
-            provider, messages, system_prompt, branch_id, project_context
-        )
+        response, usage = await self._dispatch_chat(provider, messages, system_prompt, branch_id, project_context)
 
         # Failover logic: If primary fails and it wasn't already GitHub Models
-        if (
-            isinstance(response, str)
-            and response.startswith("Error:")
-            and provider != "github"
-        ):
-            logger.warning(
-                f"Primary provider {provider} failed: {response}. "
-                "Attempting failover to GitHub Models..."
-            )
+        if isinstance(response, str) and response.startswith("Error:") and provider != "github":
+            logger.warning(f"Primary provider {provider} failed: {response}. Attempting failover to GitHub Models...")
 
             # Use GitHub Models as universal failover
-            fallback_response, fallback_usage = await self._chat_github_models(
-                messages, system_prompt
-            )
+            fallback_response, fallback_usage = await self._chat_github_models(messages, system_prompt)
 
-            if not (
-                isinstance(fallback_response, str)
-                and fallback_response.startswith("Error:")
-            ):
+            if not (isinstance(fallback_response, str) and fallback_response.startswith("Error:")):
                 return f"[FALLBACK] {fallback_response}", fallback_usage
 
         return response, usage
@@ -140,13 +122,11 @@ class InferenceClient:
         messages: list,
         system_prompt: Optional[str] = None,
         branch_id: str = "HOME_HQ",
-        project_context: str = "PERSONAL"
+        project_context: str = "PERSONAL",
     ):
         """Internal dispatcher for chat providers."""
         if provider == "gemini":
-            return await self._chat_gemini(
-                messages, system_prompt, branch_id, project_context
-            )
+            return await self._chat_gemini(messages, system_prompt, branch_id, project_context)
         elif provider == "openai":
             return await self._chat_openai(messages, system_prompt)
         elif provider == "github":
@@ -161,16 +141,14 @@ class InferenceClient:
         messages: list,
         system_prompt: Optional[str] = None,
         branch_id: str = "HOME_HQ",
-        project_context: str = "PERSONAL"
+        project_context: str = "PERSONAL",
     ):
         """Gemini SDK integration with Swarm support and branch isolation."""
         api_key = self.api_key
 
         # Priority: Swarm Key -> Config Key
         if self.swarm:
-            swarm_key = self.swarm.get_gemini_key(
-                branch_id=branch_id, project_context=project_context
-            )
+            swarm_key = self.swarm.get_gemini_key(branch_id=branch_id, project_context=project_context)
             if swarm_key:
                 api_key = swarm_key
 
@@ -189,10 +167,7 @@ class InferenceClient:
                 pass
 
             for m in messages:
-                contents.append({
-                    "role": "user" if m["role"] == "user" else "model",
-                    "parts": [{"text": m["content"]}]
-                })
+                contents.append({"role": "user" if m["role"] == "user" else "model", "parts": [{"text": m["content"]}]})
 
             # Call Gemini
             model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
@@ -204,30 +179,20 @@ class InferenceClient:
 
             def call_sdk():
                 from google.genai.types import GenerateContentConfig
+
                 return client.models.generate_content(
                     model=model_name,
                     contents=contents,
-                    config=GenerateContentConfig(
-                        system_instruction=system_prompt if system_prompt else None
-                    )
+                    config=GenerateContentConfig(system_instruction=system_prompt if system_prompt else None),
                 )
 
             response = await loop.run_in_executor(None, call_sdk)
 
             # Parse usage
             usage = {
-                "prompt_tokens": (
-                    response.usage_metadata.prompt_token_count
-                    if response.usage_metadata else 0
-                ),
-                "completion_tokens": (
-                    response.usage_metadata.candidates_token_count
-                    if response.usage_metadata else 0
-                ),
-                "total_tokens": (
-                    response.usage_metadata.total_token_count
-                    if response.usage_metadata else 0
-                )
+                "prompt_tokens": (response.usage_metadata.prompt_token_count if response.usage_metadata else 0),
+                "completion_tokens": (response.usage_metadata.candidates_token_count if response.usage_metadata else 0),
+                "total_tokens": (response.usage_metadata.total_token_count if response.usage_metadata else 0),
             }
 
             return response.text, usage
@@ -248,11 +213,7 @@ class InferenceClient:
         model = self.config.get("OLLAMA_MODEL", self.model)
 
         url = f"{endpoint}/api/chat"
-        payload = {
-            "model": model,
-            "messages": messages,
-            "stream": False
-        }
+        payload = {"model": model, "messages": messages, "stream": False}
         if system_prompt:
             payload["messages"].insert(0, {"role": "system", "content": system_prompt})
 
@@ -262,10 +223,7 @@ class InferenceClient:
                     if resp.status == 200:
                         data = await resp.json()
                         return data.get("message", {}).get("content", ""), {
-                            "total_tokens": (
-                                data.get("prompt_eval_count", 0)
-                                + data.get("eval_count", 0)
-                            )
+                            "total_tokens": (data.get("prompt_eval_count", 0) + data.get("eval_count", 0))
                         }
                     return f"Error: Ollama status {resp.status}", {}
         except Exception as e:
@@ -288,39 +246,25 @@ class InferenceClient:
             payload_messages.append({"role": "system", "content": system_prompt})
         payload_messages.extend(messages)
 
-        payload = {
-            "model": model,
-            "messages": payload_messages,
-            "stream": False
-        }
+        payload = {"model": model, "messages": payload_messages, "stream": False}
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = (
-                            data.get("choices", [{}])[0]
-                            .get("message", {})
-                            .get("content", "")
-                        )
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
                         usage = data.get("usage", {})
                         return content, usage
                     return f"Error: OpenAI status {resp.status}", {}
         except Exception as e:
             return f"OpenAI Connection Error: {e}", {}
 
-    async def _chat_openrouter(
-        self, messages: list, system_prompt: Optional[str] = None
-    ):
+    async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""
         api_key = self.config.get("OPENROUTER_API_KEY")
-        base_url = self.config.get(
-            "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
-        )
-        model = self.config.get(
-            "OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"
-        )
+        base_url = self.config.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        model = self.config.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
 
         if not api_key:
             return "Error: OpenRouter API key not set.", {}
@@ -329,7 +273,7 @@ class InferenceClient:
         headers = {
             "Authorization": f"Bearer {api_key}",
             "HTTP-Referer": "https://github.com/Unified-system-Core/AI_Core",
-            "X-Title": "Unified AI Bot"
+            "X-Title": "Unified AI Bot",
         }
 
         payload_messages = []
@@ -347,70 +291,43 @@ class InferenceClient:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = (
-                            data.get("choices", [{}])[0]
-                            .get("message", {})
-                            .get("content", "")
-                        )
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
                         usage = data.get("usage", {})
                         return content, usage
                     err_msg = await resp.text()
-                    return (
-                        f"Error: OpenRouter status {resp.status} - {err_msg}",
-                        {}
-                    )
+                    return (f"Error: OpenRouter status {resp.status} - {err_msg}", {})
         except Exception as e:
             return f"OpenRouter Connection Error: {e}", {}
 
-    async def _chat_github_models(
-        self, messages: list, system_prompt: Optional[str] = None
-    ):
+    async def _chat_github_models(self, messages: list, system_prompt: Optional[str] = None):
         """GitHub Models API request (OpenAI-compatible)."""
-        api_key = self.config.get(
-            "GITHUB_TOKEN", self.config.get("GITHUB_MODELS_API_KEY")
-        )
-        base_url = self.config.get(
-            "GITHUB_MODELS_BASE_URL", "https://models.inference.ai.azure.com"
-        )
+        api_key = self.config.get("GITHUB_TOKEN", self.config.get("GITHUB_MODELS_API_KEY"))
+        base_url = self.config.get("GITHUB_MODELS_BASE_URL", "https://models.inference.ai.azure.com")
         model = self.config.get("GITHUB_MODELS_DEFAULT_MODEL", "gpt-4o")
 
         if not api_key:
             return "Error: GitHub Token for Models not set.", {}
 
         url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
         payload_messages = []
         if system_prompt:
             payload_messages.append({"role": "system", "content": system_prompt})
         payload_messages.extend(messages)
 
-        payload = {
-            "model": model,
-            "messages": payload_messages,
-            "stream": False
-        }
+        payload = {"model": model, "messages": payload_messages, "stream": False}
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, headers=headers, json=payload) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        content = (
-                            data.get("choices", [{}])[0]
-                            .get("message", {})
-                            .get("content", "")
-                        )
+                        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
                         usage = data.get("usage", {})
                         return content, usage
                     err_msg = await resp.text()
-                    return (
-                        f"Error: GitHub Models status {resp.status} - {err_msg}",
-                        {}
-                    )
+                    return (f"Error: GitHub Models status {resp.status} - {err_msg}", {})
         except Exception as e:
             logger.error(f"GitHub Models Connection Error: {e}")
             return f"GitHub Models Connection Error: {e}", {}
@@ -429,33 +346,22 @@ class InferenceClient:
                             return [m["name"] for m in data.get("models", [])]
             except Exception as e:
                 logger.error(f"Failed to list Ollama models: {e}")
-            return ["llama3.2", "mistral", "gemma"] # Fallbacks
+            return ["llama3.2", "mistral", "gemma"]  # Fallbacks
 
         elif provider == "gemini":
             # Return standard Gemini models
-            return [
-                "gemini-2.0-flash-exp",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro"
-            ]
+            return ["gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-1.5-pro"]
 
         return [self.model]
 
-    async def analyze_multimodal(
-        self,
-        file_path: str,
-        prompt: str,
-        mime_type: str = "image/jpeg"
-    ):
+    async def analyze_multimodal(self, file_path: str, prompt: str, mime_type: str = "image/jpeg"):
         """Analyze image or audio using vision/audio-capable models."""
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
 
         if provider == "gemini":
             api_key = self.api_key
             if self.swarm:
-                swarm_key = self.swarm.get_gemini_key(
-                    branch_id="HOME_HQ", project_context="PERSONAL"
-                )
+                swarm_key = self.swarm.get_gemini_key(branch_id="HOME_HQ", project_context="PERSONAL")
                 if swarm_key:
                     api_key = swarm_key
 
@@ -470,18 +376,12 @@ class InferenceClient:
                     file_data = f.read()
 
                 def call_sdk():
-                    model_name = self.config.get(
-                        "GEMINI_MODEL", "gemini-2.0-flash-exp"
-                    )
+                    model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
                     if not model_name.startswith("models/"):
                         model_name = f"models/{model_name}"
 
                     return client.models.generate_content(
-                        model=model_name,
-                        contents=[
-                            Part.from_bytes(data=file_data, mime_type=mime_type),
-                            prompt
-                        ]
+                        model=model_name, contents=[Part.from_bytes(data=file_data, mime_type=mime_type), prompt]
                     )
 
                 loop = asyncio.get_event_loop()
@@ -516,16 +416,15 @@ class InferenceClient:
         provider = self.config.get("INFERENCE_PROVIDER", self.provider)
         if provider == "gemini":
             # Detect mime type based on extension
-            mime_type = "audio/ogg" # Default for Telegram
-            if audio_path.endswith(".mp3"): mime_type = "audio/mpeg"
-            elif audio_path.endswith(".wav"): mime_type = "audio/wav"
-            elif audio_path.endswith(".m4a"): mime_type = "audio/mp4"
+            mime_type = "audio/ogg"  # Default for Telegram
+            if audio_path.endswith(".mp3"):
+                mime_type = "audio/mpeg"
+            elif audio_path.endswith(".wav"):
+                mime_type = "audio/wav"
+            elif audio_path.endswith(".m4a"):
+                mime_type = "audio/mp4"
 
-            return await self.analyze_multimodal(
-                audio_path,
-                "Transcribe this audio exactly.",
-                mime_type=mime_type
-            )
+            return await self.analyze_multimodal(audio_path, "Transcribe this audio exactly.", mime_type=mime_type)
 
         return "Audio transcription not available (configure VAPI or Gemini provider)."
 
@@ -540,13 +439,9 @@ class InferenceClient:
                         return resp.status == 200
             except Exception:
                 return False
-        return True # Assume others are OK if configured
+        return True  # Assume others are OK if configured
 
-    async def generate_speech(
-        self,
-        text: str,
-        voice_id: Optional[str] = None
-    ) -> Optional[bytes]:
+    async def generate_speech(self, text: str, voice_id: Optional[str] = None) -> Optional[bytes]:
         """
         Generate speech from text using VAPI TTS.
 

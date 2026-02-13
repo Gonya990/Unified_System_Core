@@ -5,10 +5,12 @@ import redis.asyncio as redis
 
 logger = logging.getLogger("Messaging")
 
+
 class RedisStreamManager:
     """
     Абстракция над Redis Streams для асинхронного обмена сообщениями.
     """
+
     def __init__(self, redis_url):
         self.redis = redis.from_url(redis_url)
 
@@ -28,18 +30,15 @@ class RedisStreamManager:
             try:
                 await self.redis.xgroup_create(stream_name, group_name, mkstream=True)
             except Exception:
-                pass # Already exists or stream not ready
+                pass  # Already exists or stream not ready
 
             while True:
                 # Читаем новые сообщения
                 streams_dict = {stream_name: ">"}
-                messages = await self.redis.xreadgroup(
-                    group_name, consumer_name, streams_dict,
-                    count=1, block=5000
-                )
-                for stream, msg_list in messages:
+                messages = await self.redis.xreadgroup(group_name, consumer_name, streams_dict, count=1, block=5000)
+                for _stream, msg_list in messages:
                     for msg_id, payload in msg_list:
-                        data = json.loads(payload[b'data'])
+                        data = json.loads(payload[b"data"])
                         yield msg_id, data
                         # Подтверждаем получение
                         await self.redis.xack(stream_name, group_name, msg_id)

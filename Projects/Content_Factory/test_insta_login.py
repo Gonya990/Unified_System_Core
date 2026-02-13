@@ -1,4 +1,3 @@
-
 import os
 import urllib.parse
 from pathlib import Path
@@ -9,6 +8,7 @@ from instagrapi import Client
 # Load env from Root
 ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
 load_dotenv(ROOT_DIR / ".env")
+
 
 def test_login():
     session_id = os.getenv("INSTAGRAM_SESSION_ID")
@@ -28,7 +28,9 @@ def test_login():
     except Exception as e:
         print(f"❌ Login FAILED: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     test_login()

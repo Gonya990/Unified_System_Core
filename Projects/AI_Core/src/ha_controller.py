@@ -1,4 +1,3 @@
-
 import logging
 import sys
 from pathlib import Path
@@ -24,11 +23,13 @@ HomeAssistantClient = None
 try:
     # 1. Direct import (same directory)
     from ha_client import HomeAssistantClient
+
     HA_AVAILABLE = True
 except ImportError:
     try:
         # 2. Package import (from src)
         from src.ha_client import HomeAssistantClient
+
         HA_AVAILABLE = True
     except ImportError as e:
         logger.error(f"Failed to import ha_client: {e}")
@@ -39,11 +40,13 @@ except ImportError:
         except Exception:
             pass
 
+
 class HAController:
     """
     Controller for Home Assistant integration.
     Wraps the ha_client.py with bot-specific logic.
     """
+
     HA_AVAILABLE = HA_AVAILABLE  # Class-level attribute
 
     def __init__(self):
@@ -76,17 +79,14 @@ class HAController:
         # Try exact match first
         # If entity_id not found in states, try fuzzy match
         states = self.client.get_states()
-        entity_ids = [s['entity_id'] for s in states]
+        entity_ids = [s["entity_id"] for s in states]
 
         target = entity_id
         if target not in entity_ids:
             # Fuzzy match
             import difflib
-            candidates = [
-                e
-                for e in entity_ids
-                if e.startswith("light.") or e.startswith("switch.")
-            ]
+
+            candidates = [e for e in entity_ids if e.startswith("light.") or e.startswith("switch.")]
             # Try to match simple name (e.g. "corridor" against
             # "light.corridor_switch_1")
 
@@ -96,9 +96,7 @@ class HAController:
             for s in states:
                 eid = s["entity_id"]
                 if eid.startswith("light.") or eid.startswith("switch."):
-                    fname = (
-                        s.get("attributes", {}).get("friendly_name", "").lower()
-                    )
+                    fname = s.get("attributes", {}).get("friendly_name", "").lower()
                     if fname:
                         name_map[fname] = eid
 
@@ -107,31 +105,20 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(
-                        f"Friendly name match found: {entity_id} "
-                        f"-> {fname} ({target})"
-                    )
+                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(
-                        f"Exact partial entity_id match found: "
-                        f"{entity_id} -> {target}"
-                    )
+                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(
-                        target, candidates, n=1, cutoff=0.5
-                    )
+                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
                     if matches:
                         target = matches[0]
-                        logger.info(
-                            f"Fuzzy entity_id match found: "
-                            f"{entity_id} -> {target}"
-                        )
+                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
@@ -143,18 +130,14 @@ class HAController:
 
         # Try exact match first
         states = self.client.get_states()
-        entity_ids = [s['entity_id'] for s in states]
+        entity_ids = [s["entity_id"] for s in states]
 
         target = entity_id
         if target not in entity_ids:
             # Fuzzy match
             import difflib
 
-            candidates = [
-                e
-                for e in entity_ids
-                if e.startswith("light.") or e.startswith("switch.")
-            ]
+            candidates = [e for e in entity_ids if e.startswith("light.") or e.startswith("switch.")]
 
             # 1. Search by Friendly Name (Russian/Exact)
             # Create map of name -> entity_id
@@ -162,9 +145,7 @@ class HAController:
             for s in states:
                 eid = s["entity_id"]
                 if eid.startswith("light.") or eid.startswith("switch."):
-                    fname = (
-                        s.get("attributes", {}).get("friendly_name", "").lower()
-                    )
+                    fname = s.get("attributes", {}).get("friendly_name", "").lower()
                     if fname:
                         name_map[fname] = eid
 
@@ -173,29 +154,20 @@ class HAController:
             for fname, eid in name_map.items():
                 if target_lower in fname:
                     target = eid
-                    logger.info(
-                        f"Friendly name match found: {entity_id} -> {fname} ({target})"
-                    )
+                    logger.info(f"Friendly name match found: {entity_id} -> {fname} ({target})")
                     break
             else:
                 # 2. Check if 'target' is part of entity_id
                 simple_matches = [e for e in candidates if target_lower in e.lower()]
                 if simple_matches:
                     target = simple_matches[0]
-                    logger.info(
-                        f"Exact partial entity_id match found: "
-                        f"{entity_id} -> {target}"
-                    )
+                    logger.info(f"Exact partial entity_id match found: {entity_id} -> {target}")
                 else:
                     # 3. Difflib match on entity_ids
-                    matches = difflib.get_close_matches(
-                        target, candidates, n=1, cutoff=0.5
-                    )
+                    matches = difflib.get_close_matches(target, candidates, n=1, cutoff=0.5)
                     if matches:
                         target = matches[0]
-                        logger.info(
-                            f"Fuzzy entity_id match found: {entity_id} -> {target}"
-                        )
+                        logger.info(f"Fuzzy entity_id match found: {entity_id} -> {target}")
                     else:
                         logger.warning(f"No match found for {entity_id}")
 
@@ -299,11 +271,7 @@ class HAController:
             return None
         return self.client.reload_integration(entry_id)
 
-    async def speak_via_yandex(
-        self,
-        message: str,
-        entity_id: str = "media_player.yandex_station_c00tc40000wq8k"
-    ):
+    async def speak_via_yandex(self, message: str, entity_id: str = "media_player.yandex_station_c00tc40000wq8k"):
         """Send TTS message via Yandex Station."""
         if not self.client:
             return False
@@ -341,9 +309,9 @@ class HAController:
             context = []
 
             for s in states:
-                eid = s.get('entity_id', '')
-                state = s.get('state', '')
-                fname = s.get('attributes', {}).get('friendly_name', '')
+                eid = s.get("entity_id", "")
+                state = s.get("state", "")
+                fname = s.get("attributes", {}).get("friendly_name", "")
 
                 # Filter for relevant domains
                 domain = eid.split(".")[0]
@@ -361,9 +329,7 @@ class HAController:
                     if state not in ["unknown", "unavailable"]:
                         item = f"{eid} ({fname}): {state}"
                         if domain == "sensor":
-                            unit = s.get("attributes", {}).get(
-                                "unit_of_measurement", ""
-                            )
+                            unit = s.get("attributes", {}).get("unit_of_measurement", "")
                             if unit:
                                 item += f" {unit}"
                         context.append(item)
@@ -375,4 +341,3 @@ class HAController:
         except Exception as e:
             logger.error(f"Failed to get full context: {e}")
             return f"Error retrieving home state: {e}"
-

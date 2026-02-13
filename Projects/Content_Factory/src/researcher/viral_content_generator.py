@@ -64,9 +64,7 @@ SCRIPT_TEMPLATES = {
 }
 
 
-def generate_script(
-    topic: str, template_type: str = "secret_reveal", lang: str = "ru"
-) -> dict:
+def generate_script(topic: str, template_type: str = "secret_reveal", lang: str = "ru") -> dict:
     """
     Generate viral script for given topic
 
@@ -128,9 +126,7 @@ def generate_script(
     return script
 
 
-def find_untranslated_viral_content(
-    source_lang: str = "en", target_langs: list = None
-) -> list:
+def find_untranslated_viral_content(source_lang: str = "en", target_langs: list = None) -> list:
     """
     Find viral videos without translations to target languages
 

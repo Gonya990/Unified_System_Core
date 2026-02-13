@@ -5,6 +5,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 class TelegramSchemaExpert:
     def __init__(self, schema_path: str = "data/telegram_schema.json"):
         root_dir = Path(__file__).parent
@@ -43,7 +44,9 @@ class TelegramSchemaExpert:
             if c["type"].lower() == query:
                 by_type.append(f"• `{c['predicate']}`")
         if by_type:
-            return f"Type `{query}` has constructors:\n" + "\n".join(by_type[:15]) + ("\n..." if len(by_type) > 15 else "")
+            return (
+                f"Type `{query}` has constructors:\n" + "\n".join(by_type[:15]) + ("\n..." if len(by_type) > 15 else "")
+            )
 
         return f"🔍 Nothing found for `{query}` in TL Schema."
 

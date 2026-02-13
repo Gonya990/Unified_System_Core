@@ -12,17 +12,19 @@ def set_rtl(paragraph):
         # Fallback if property doesn't exist (unlikely in 1.2.0)
         pPr = paragraph._p.get_or_add_pPr()
         from docx.oxml import OxmlElement
-        bidi = OxmlElement('w:bidi')
-        bidi.set(qn('w:val'), '1')
+
+        bidi = OxmlElement("w:bidi")
+        bidi.set(qn("w:val"), "1")
         pPr.append(bidi)
+
 
 def create_resume():
     document = Document()
 
     # Define Styles
-    style = document.styles['Normal']
+    style = document.styles["Normal"]
     font = style.font
-    font.name = 'Arial'
+    font.name = "Arial"
     font.size = Pt(11)
 
     # ---------------- Header ----------------
@@ -33,7 +35,7 @@ def create_resume():
     run = name_paragraph.add_run("איגור גונצ׳רנקו")
     run.bold = True
     run.font.size = Pt(24)
-    run.font.color.rgb = RGBColor(44, 62, 80) # Dark Blue
+    run.font.color.rgb = RGBColor(44, 62, 80)  # Dark Blue
 
     # Subtitle
     title_paragraph = document.add_paragraph()
@@ -50,15 +52,17 @@ def create_resume():
     contact_paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     contact_paragraph.add_run("[Email] | [Phone] | מרטין בובר 7, קרית ביאליק")
 
-    document.add_heading('תמצית מקצועית', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    document.add_heading("תמצית מקצועית", level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     summary_p = document.add_paragraph()
     set_rtl(summary_p)
     summary_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    summary_p.add_run("מנהל טכני ומנהל עבודה בעל ניסיון עשיר בהקמה ותחזוקת תשתיות מורכבות בתחומי המכאניקה, החשמל והתקשורת. בעל יכולת מוכחת בהובלת צוותים טכניים וביצוע פרויקטים מורכבים בסביבות עבודה תובעניות, תוך הקפדה יתרה על נהלי בטיחות ואיכות. משלב רקע טכני \"Hands-on\" עם יכולות למידה עצמית גבוהות ויוזמה, הבאות לידי ביטוי בשליטה בטכנולוגיות מתקדמות, אוטומציה ופתרונות אינטגרציה.")
+    summary_p.add_run(
+        'מנהל טכני ומנהל עבודה בעל ניסיון עשיר בהקמה ותחזוקת תשתיות מורכבות בתחומי המכאניקה, החשמל והתקשורת. בעל יכולת מוכחת בהובלת צוותים טכניים וביצוע פרויקטים מורכבים בסביבות עבודה תובעניות, תוך הקפדה יתרה על נהלי בטיחות ואיכות. משלב רקע טכני "Hands-on" עם יכולות למידה עצמית גבוהות ויוזמה, הבאות לידי ביטוי בשליטה בטכנולוגיות מתקדמות, אוטומציה ופתרונות אינטגרציה.'
+    )
 
     # ---------------- Experience ----------------
-    document.add_heading('ניסיון תעסוקתי', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    document.add_heading("ניסיון תעסוקתי", level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # Job 1
     job1_header = document.add_paragraph()
@@ -75,26 +79,28 @@ def create_resume():
     run.italic = True
     run.font.color.rgb = RGBColor(127, 140, 141)
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("פיקוח טכני: ").bold = True
-    p.add_run("ניהול והובלת התקנת מערכות מעליות מהירות בפרויקטי דגל רבי-קומות. אחריות כוללת על פתרון בעיות מכאניות ולוגיסטיות בשטח בזמן אמת.")
+    p.add_run(
+        "ניהול והובלת התקנת מערכות מעליות מהירות בפרויקטי דגל רבי-קומות. אחריות כוללת על פתרון בעיות מכאניות ולוגיסטיות בשטח בזמן אמת."
+    )
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("בטיחות ותקינה: ").bold = True
     p.add_run("יישום והטמעה של נהלי בטיחות מחמירים בעבודה בגובה ועמידה בסטנדרטים בינלאומיים של איכות.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("ניהול ודיווח: ").bold = True
     p.add_run("מעקב שוטף אחר התקדמות הפרויקט, ניהול יומני עבודה ודיווח להנהלת הפרויקט באמצעות מערכות דיגיטליות.")
 
     # Job 2
-    document.add_paragraph() # Spacer
+    document.add_paragraph()  # Spacer
     job2_header = document.add_paragraph()
     set_rtl(job2_header)
     job2_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -109,20 +115,24 @@ def create_resume():
     run.italic = True
     run.font.color.rgb = RGBColor(127, 140, 141)
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("תשתיות רשת: ").bold = True
-    p.add_run("התמחות בפריסת תשתיות נתונים רחבות פס (FTTx), ביצוע ריתוכי סיבים מדויקים ובדיקות תשתית (OTDR). ניהול תהליך ההתקנה מקצה לקצה.")
+    p.add_run(
+        "התמחות בפריסת תשתיות נתונים רחבות פס (FTTx), ביצוע ריתוכי סיבים מדויקים ובדיקות תשתית (OTDR). ניהול תהליך ההתקנה מקצה לקצה."
+    )
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("הובלה טכנית: ").bold = True
-    p.add_run("הדרכה וחניכה של צוותי שטח, הטמעת שיטות עבודה לניהול כבילה יעיל ופתרון תקלות רשת מורכבות בבית הלקוח ובתשתיות הבניין.")
+    p.add_run(
+        "הדרכה וחניכה של צוותי שטח, הטמעת שיטות עבודה לניהול כבילה יעיל ופתרון תקלות רשת מורכבות בבית הלקוח ובתשתיות הבניין."
+    )
 
     # Job 3
-    document.add_paragraph() # Spacer
+    document.add_paragraph()  # Spacer
     job3_header = document.add_paragraph()
     set_rtl(job3_header)
     job3_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -137,21 +147,20 @@ def create_resume():
     run.italic = True
     run.font.color.rgb = RGBColor(127, 140, 141)
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("התקנה והרכבה: ").bold = True
     p.add_run("ביצוע עבודות מכאניות מורכבות הכוללות הרכבת מסילות, מנועים ורכיבי תא.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("קריאת שרטוטים: ").bold = True
     p.add_run("עבודה צמודה עם שרטוטים טכניים והוראות יצרן לביצוע התקנות מדויקות.")
 
-
     # ---------------- Skills ----------------
-    document.add_heading('כישורים טכניים ופרויקטים', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    document.add_heading("כישורים טכניים ופרויקטים", level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     # Skills Sub-header
     sk_h = document.add_paragraph()
@@ -159,19 +168,19 @@ def create_resume():
     sk_h.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     sk_h.add_run("מיומנויות מקצועיות").bold = True
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("עבודת שטח: ").bold = True
     p.add_run("התקנות מכאניות, חיווט מתח נמוך, סיבים אופטיים, ניהול לוגיסטי בשטח.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("כלים ותוכנות: ").bold = True
     p.add_run("שליטה מלאה ביישומי Office, מערכות לניהול פרויקטים, ויכולת קריאה והבנה של שרטוטים טכניים.")
 
-    document.add_paragraph() # Spacer
+    document.add_paragraph()  # Spacer
 
     # Project Sub-header
     pr_h = document.add_paragraph()
@@ -185,68 +194,69 @@ def create_resume():
     pr_desc.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     pr_desc.add_run("תכנון, הקמה ותחזוקה של מעבדה ביתית מתקדמת, המדגימה יכולות אינטגרציה ולמידה טכנולוגית:")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("בית חכם ו-IoT: ").bold = True
     p.add_run("אינטגרציה של פרוטוקולים שונים מול שרת Home Assistant מרכזי לאוטומציה מלאה.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("מערכות הפעלה ו-AI: ").bold = True
     p.add_run("ניהול שרתי Linux וסביבות וירטואליות (Proxmox/Docker) להרצת מודלי AI מקומיים.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("פתרון בעיות: ").bold = True
     p.add_run("שימוש מתקדם בכלי AI לכתיבת סקריפטים ופתרונות ניטור מותאמים אישית.")
 
     # ---------------- Education ----------------
-    document.add_heading('השכלה ורישיונות', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    document.add_heading("השכלה ורישיונות", level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("הכשרה במכונאות ").bold = True
     p.add_run("(לימודים בהיקף 3 שנים)")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("רישיונות והסמכות: ").bold = True
     p.add_run("מלגזה (20 טון), רישיון נהיגה ב', אישור לעבודה בגובה.")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("שירות צבאי: ").bold = True
     p.add_run("חיל האוויר, תפקיד נהג, דרגת סמ״ר (2013-2015).")
 
     # ---------------- Languages ----------------
-    document.add_heading('שפות', level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    document.add_heading("שפות", level=1).alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("עברית: ").bold = True
     p.add_run("שליטה טובה מאוד")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("רוסית: ").bold = True
     p.add_run("שפת אם")
 
-    p = document.add_paragraph(style='List Bullet')
+    p = document.add_paragraph(style="List Bullet")
     set_rtl(p)
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.add_run("אנגלית: ").bold = True
     p.add_run("טכנית בסיסית")
 
     # Save
-    document.save('Resume_Igor_Refined_✅.docx')
+    document.save("Resume_Igor_Refined_✅.docx")
+
 
 if __name__ == "__main__":
     create_resume()

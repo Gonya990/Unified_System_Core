@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Tool:
     """Tool definition for function calling"""
+
     name: str
     description: str
     parameters: dict[str, Any]
@@ -69,11 +70,7 @@ Be concise and direct in your responses."""
             gemini_params = self._convert_schema_to_gemini(tool.parameters)
 
             function_declarations.append(
-                genai.protos.FunctionDeclaration(
-                    name=tool.name,
-                    description=tool.description,
-                    parameters=gemini_params
-                )
+                genai.protos.FunctionDeclaration(name=tool.name, description=tool.description, parameters=gemini_params)
             )
 
         return [genai.protos.Tool(function_declarations=function_declarations)]
@@ -93,21 +90,14 @@ Be concise and direct in your responses."""
                 "number": genai.protos.Type.NUMBER,
                 "boolean": genai.protos.Type.BOOLEAN,
                 "array": genai.protos.Type.ARRAY,
-                "object": genai.protos.Type.OBJECT
+                "object": genai.protos.Type.OBJECT,
             }
 
             gemini_type = type_mapping.get(prop_type, genai.protos.Type.STRING)
 
-            properties[prop_name] = genai.protos.Schema(
-                type=gemini_type,
-                description=prop_def.get("description", "")
-            )
+            properties[prop_name] = genai.protos.Schema(type=gemini_type, description=prop_def.get("description", ""))
 
-        return genai.protos.Schema(
-            type=genai.protos.Type.OBJECT,
-            properties=properties,
-            required=required
-        )
+        return genai.protos.Schema(type=genai.protos.Type.OBJECT, properties=properties, required=required)
 
     async def execute_tool(self, tool_name: str, arguments: dict) -> str:
         """Execute a tool"""
@@ -129,10 +119,7 @@ Be concise and direct in your responses."""
             return f"Error executing {tool_name}: {str(e)}"
 
     async def run(
-        self,
-        user_message: str,
-        on_progress: Optional[Callable[[str], None]] = None,
-        max_iterations: int = 10
+        self, user_message: str, on_progress: Optional[Callable[[str], None]] = None, max_iterations: int = 10
     ) -> str:
         """Run agent with Gemini"""
 
@@ -140,7 +127,7 @@ Be concise and direct in your responses."""
             model = genai.GenerativeModel(
                 model_name=self.model_name,
                 tools=self._build_gemini_tools() if self.tools else None,
-                system_instruction=self.SYSTEM_PROMPT
+                system_instruction=self.SYSTEM_PROMPT,
             )
 
             iterations = 0
@@ -156,14 +143,11 @@ Be concise and direct in your responses."""
                     response = chat.send_message("Continue")
 
                 # Check for function calls
-                if hasattr(response, 'candidates') and response.candidates:
+                if hasattr(response, "candidates") and response.candidates:
                     candidate = response.candidates[0]
 
-                    if hasattr(candidate.content, 'parts'):
-                        function_calls = [
-                            part for part in candidate.content.parts
-                            if hasattr(part, 'function_call')
-                        ]
+                    if hasattr(candidate.content, "parts"):
+                        function_calls = [part for part in candidate.content.parts if hasattr(part, "function_call")]
 
                         if function_calls:
                             # Execute function calls
@@ -179,14 +163,15 @@ Be concise and direct in your responses."""
 
                                 # Send result back
                                 response = chat.send_message(
-                                    genai.protos.Content(parts=[
-                                        genai.protos.Part(
-                                            function_response=genai.protos.FunctionResponse(
-                                                name=tool_name,
-                                                response={"result": result}
+                                    genai.protos.Content(
+                                        parts=[
+                                            genai.protos.Part(
+                                                function_response=genai.protos.FunctionResponse(
+                                                    name=tool_name, response={"result": result}
+                                                )
                                             )
-                                        )
-                                    ])
+                                        ]
+                                    )
                                 )
                             continue
 

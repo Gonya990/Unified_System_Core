@@ -73,9 +73,7 @@ class ThreadsBrowser:
         try:
             # Look for compose button or "New thread" area
             # Wait for the main feed to load
-            await self.page.wait_for_selector(
-                '[data-pressable-container="true"]', timeout=10000
-            )
+            await self.page.wait_for_selector('[data-pressable-container="true"]', timeout=10000)
 
             # Find and click "Start a thread" or compose button
             compose_selectors = [
@@ -119,17 +117,13 @@ class ThreadsBrowser:
             if image_path:
                 try:
                     # Convert single string to list
-                    files_to_upload = (
-                        [image_path] if isinstance(image_path, str) else image_path
-                    )
+                    files_to_upload = [image_path] if isinstance(image_path, str) else image_path
 
                     # Validate files exist
                     valid_files = [f for f in files_to_upload if Path(f).exists()]
 
                     if valid_files:
-                        file_input = await self.page.query_selector(
-                            'input[type="file"]'
-                        )
+                        file_input = await self.page.query_selector('input[type="file"]')
                         if file_input:
                             await file_input.set_input_files(valid_files)
                             await self.page.wait_for_timeout(2000)

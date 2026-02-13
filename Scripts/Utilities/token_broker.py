@@ -109,9 +109,7 @@ class TokenBroker:
         )
         return kdf.derive(self.master_key)
 
-    def get_key(
-        self, provider: str, tier: str = None, session_id: str = None
-    ) -> Optional[str]:
+    def get_key(self, provider: str, tier: str = None, session_id: str = None) -> Optional[str]:
         """
         Get a valid API Key for the provider using Round-Robin and Health Checks.
         Supports session stickiness.
@@ -121,15 +119,10 @@ class TokenBroker:
         # 1. Sticky Session Check
         if session_id and session_id in self._session_sticky_keys:
             sticky_key = self._session_sticky_keys[session_id]
-            if sticky_key not in self._blacklist or (
-                time.time() - self._blacklist[sticky_key] > self._blacklist_ttl
-            ):
+            if sticky_key not in self._blacklist or (time.time() - self._blacklist[sticky_key] > self._blacklist_ttl):
                 return sticky_key
             else:
-                logger.warning(
-                    f"TokenBroker: Sticky key for session '{session_id}' "
-                    "is blacklisted. Falling back."
-                )
+                logger.warning(f"TokenBroker: Sticky key for session '{session_id}' is blacklisted. Falling back.")
                 del self._session_sticky_keys[session_id]
 
         pool = self.key_store.get(provider, [])
@@ -146,10 +139,7 @@ class TokenBroker:
             k
             for k in pool
             if k.get("key")
-            and (
-                k["key"] not in self._blacklist
-                or (now - self._blacklist[k["key"]] > self._blacklist_ttl)
-            )
+            and (k["key"] not in self._blacklist or (now - self._blacklist[k["key"]] > self._blacklist_ttl))
         ]
 
         if not valid_pool:
@@ -208,9 +198,7 @@ class TokenBroker:
                 aesgcm = AESGCM(key)
                 decrypted = aesgcm.decrypt(nonce, encrypted_data, None)
                 self.key_store = yaml.safe_load(decrypted)
-                logger.info(
-                    f"Vault loaded and decrypted ({kdf_type}): {self.vault_path}"
-                )
+                logger.info(f"Vault loaded and decrypted ({kdf_type}): {self.vault_path}")
         except Exception as e:
             logger.error(f"TokenBroker: Failed to load vault: {e}")
 
@@ -260,18 +248,14 @@ class TokenBroker:
 
     def _try_legacy_import(self):
         """Attempts to import from old keys.json if vault is missing."""
-        base_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         legacy_path = os.path.join(base_dir, "secrets", "keys.json")
 
         if os.path.exists(legacy_path):
             try:
                 with open(legacy_path) as f:
                     self.key_store = json.load(f)
-                logger.info(
-                    f"Imported legacy keys from {legacy_path}. Encrypting now..."
-                )
+                logger.info(f"Imported legacy keys from {legacy_path}. Encrypting now...")
                 self.save_vault()
             except Exception as e:
                 logger.error(f"TokenBroker: Legacy import failed: {e}")
@@ -298,9 +282,7 @@ class TokenBroker:
         logger.warning(f"Key failure for {provider}. Cooldown initiated.")
         self._blacklist[key] = time.time()
 
-    def encrypt_value(
-        self, plaintext: str, salt: bytes = b"unified-system-vibranium-salt"
-    ) -> Optional[str]:
+    def encrypt_value(self, plaintext: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
         """Encrypt a single value with AES-256-GCM (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
@@ -314,9 +296,7 @@ class TokenBroker:
         ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
         return base64.b64encode(nonce + ciphertext).decode()
 
-    def decrypt_value(
-        self, encrypted: str, salt: bytes = b"unified-system-vibranium-salt"
-    ) -> Optional[str]:
+    def decrypt_value(self, encrypted: str, salt: bytes = b"unified-system-vibranium-salt") -> Optional[str]:
         """Decrypt a single AES-256-GCM encrypted value (unified standard)."""
         if not HAS_CRYPTO or AESGCM is None:
             return None
@@ -343,10 +323,7 @@ class TokenBroker:
                 1
                 for k in pool
                 if k.get("key")
-                and (
-                    k["key"] not in self._blacklist
-                    or (now - self._blacklist.get(k["key"], 0) > self._blacklist_ttl)
-                )
+                and (k["key"] not in self._blacklist or (now - self._blacklist.get(k["key"], 0) > self._blacklist_ttl))
             )
             result[provider] = {"total": len(pool), "active": active}
         return result
@@ -394,17 +371,13 @@ class TokenBroker:
             logger.error(f"TokenBroker: Failed to reload keys: {e}")
             return False
 
-    def check_permission(
-        self, agent_name: str, provider: str, tier: str = None
-    ) -> bool:
+    def check_permission(self, agent_name: str, provider: str, tier: str = None) -> bool:
         """
         RBAC Check: Does this agent have access to this resource?
         Loads from config/rbac_policy.yaml or falls back to runtime.
         """
         # 1. Try Canonical Config Folder (Unified_System/config/rbac_policy.yaml)
-        root_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         canonical_path = os.path.join(root_dir, "config", "rbac_policy.yaml")
         runtime_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
 
@@ -467,6 +440,7 @@ if __name__ == "__main__":
             print("✅ Done. Vault is now secured with Argon2id.")
         elif cmd == "status":
             import pprint
+
             pprint.pprint(broker.health_check())
         else:
             print(f"Unknown command: {cmd}")

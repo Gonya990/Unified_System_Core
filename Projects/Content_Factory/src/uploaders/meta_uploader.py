@@ -22,9 +22,7 @@ INSTAGRAM_USERNAME = os.getenv("INSTAGRAM_USERNAME", "")
 INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD", "")
 
 
-def upload_reel_instagram(
-    video_path: Path, caption: str, thumbnail_path: Optional[Path] = None
-) -> bool:
+def upload_reel_instagram(video_path: Path, caption: str, thumbnail_path: Optional[Path] = None) -> bool:
     """
     Upload Reel to Instagram using Instagrapi
 
@@ -57,9 +55,7 @@ def upload_reel_instagram(
         print("✅ Instagram login successful")
 
         # Upload as Reel
-        media = client.clip_upload(
-            video_path, caption=caption, thumbnail=thumbnail_path
-        )
+        media = client.clip_upload(video_path, caption=caption, thumbnail=thumbnail_path)
 
         print(f"✅ Reel uploaded! Media ID: {media.pk}")
         return True

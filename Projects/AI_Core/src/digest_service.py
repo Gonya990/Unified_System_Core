@@ -2,10 +2,12 @@
 Daily Digest Service
 Generates and sends daily summary reports to users.
 """
+
 import logging
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
 
 class DigestService:
     """Generates daily digest reports."""
@@ -44,7 +46,7 @@ class DigestService:
             "Thursday": "Четверг",
             "Friday": "Пятница",
             "Saturday": "Суббота",
-            "Sunday": "Воскресенье"
+            "Sunday": "Воскресенье",
         }
         day_ru = days_ru.get(day_name, day_name)
 
@@ -54,7 +56,7 @@ class DigestService:
 
         # 1. Yesterday's Stats
         stats = self.usage_tracker.get_user_stats(user_id, days=1)
-        if stats and stats.get('total_tokens', 0) > 0:
+        if stats and stats.get("total_tokens", 0) > 0:
             digest += "📊 **Вчера:**\n"
             digest += f"  • Токенов: {stats['total_tokens']:,}\n"
             digest += f"  • Запросов: {stats['requests']}\n\n"
@@ -77,9 +79,7 @@ class DigestService:
                     digest += f"📋 **Linear ({len(issues)}):**\n"
                     for issue in issues[:3]:
                         title_trunc = issue["title"][:40]
-                        digest += (
-                            f"  • {issue['identifier']}: {title_trunc}...\n"
-                        )
+                        digest += f"  • {issue['identifier']}: {title_trunc}...\n"
                     if len(issues) > 3:
                         digest += f"  ... и ещё {len(issues) - 3}\n"
                     digest += "\n"
@@ -114,9 +114,7 @@ class DigestService:
         # Let's assume finance_manager is passed in __init__
         if hasattr(self, "finance_manager") and self.finance_manager:
             try:
-                shop_report = (
-                    await self.finance_manager.get_shopping_recommendations(user_id)
-                )
+                shop_report = await self.finance_manager.get_shopping_recommendations(user_id)
                 if shop_report and "не найдено" not in shop_report:
                     digest += shop_report + "\n\n"
             except Exception as e:
@@ -143,9 +141,10 @@ class DigestService:
             "🚀 Начни день с главной задачи!",
             "⭐ Маленькие шаги ведут к большим целям!",
             "🎯 Фокус на важном, а не срочном!",
-            "🌟 Ты можешь больше, чем думаешь!"
+            "🌟 Ты можешь больше, чем думаешь!",
         ]
         import random
+
         digest += quotes[random.randint(0, len(quotes) - 1)] + "\n\n"
 
         digest += "━━━━━━━━━━━━━━━━━━━━\n"

@@ -2,6 +2,7 @@
 HomeKit Bridge Service - Full Implementation
 Creates a virtual HomeKit bridge to expose Home Assistant devices to Apple Home.
 """
+
 import asyncio
 import logging
 
@@ -23,8 +24,8 @@ class HALightAccessory(Accessory):
         self.entity_id = entity_id
 
         # Add Lightbulb service
-        serv_light = self.add_preload_service('Lightbulb')
-        self.char_on = serv_light.configure_char('On', setter_callback=self.set_state)
+        serv_light = self.add_preload_service("Lightbulb")
+        self.char_on = serv_light.configure_char("On", setter_callback=self.set_state)
 
     def set_state(self, value):
         """Called when HomeKit changes the light state."""
@@ -43,8 +44,8 @@ class HALightAccessory(Accessory):
         try:
             states = await self.ha_controller.get_states()
             for state in states:
-                if state.get('entity_id') == self.entity_id:
-                    is_on = state.get('state') == 'on'
+                if state.get("entity_id") == self.entity_id:
+                    is_on = state.get("state") == "on"
                     self.char_on.set_value(is_on)
                     break
         except Exception as e:
@@ -61,8 +62,8 @@ class HASwitchAccessory(Accessory):
         self.ha_controller = ha_controller
         self.entity_id = entity_id
 
-        serv_switch = self.add_preload_service('Switch')
-        self.char_on = serv_switch.configure_char('On', setter_callback=self.set_state)
+        serv_switch = self.add_preload_service("Switch")
+        self.char_on = serv_switch.configure_char("On", setter_callback=self.set_state)
 
     def set_state(self, value):
         """Called when HomeKit changes the switch state."""
@@ -81,8 +82,8 @@ class HASwitchAccessory(Accessory):
         try:
             states = await self.ha_controller.get_states()
             for state in states:
-                if state.get('entity_id') == self.entity_id:
-                    is_on = state.get('state') == 'on'
+                if state.get("entity_id") == self.entity_id:
+                    is_on = state.get("state") == "on"
                     self.char_on.set_value(is_on)
                     break
         except Exception as e:
@@ -99,8 +100,8 @@ class HATemperatureSensor(Accessory):
         self.ha_controller = ha_controller
         self.entity_id = entity_id
 
-        serv_temp = self.add_preload_service('TemperatureSensor')
-        self.char_temp = serv_temp.configure_char('CurrentTemperature')
+        serv_temp = self.add_preload_service("TemperatureSensor")
+        self.char_temp = serv_temp.configure_char("CurrentTemperature")
 
     @Accessory.run_at_interval(10)
     async def run(self):
@@ -108,9 +109,9 @@ class HATemperatureSensor(Accessory):
         try:
             states = await self.ha_controller.get_states()
             for state in states:
-                if state.get('entity_id') == self.entity_id:
+                if state.get("entity_id") == self.entity_id:
                     try:
-                        temp = float(state.get('state', 0))
+                        temp = float(state.get("state", 0))
                         self.char_temp.set_value(temp)
                     except ValueError:
                         pass
@@ -141,38 +142,26 @@ class HomeKitBridge:
             states = await self.ha_controller.get_states()
 
             for state in states:
-                entity_id = state.get('entity_id', '')
-                friendly_name = state.get('attributes', {}).get('friendly_name', entity_id)
+                entity_id = state.get("entity_id", "")
+                friendly_name = state.get("attributes", {}).get("friendly_name", entity_id)
 
                 # Add lights
-                if entity_id.startswith('light.'):
-                    accessory = HALightAccessory(
-                        self.ha_controller,
-                        entity_id,
-                        display_name=friendly_name
-                    )
+                if entity_id.startswith("light."):
+                    accessory = HALightAccessory(self.ha_controller, entity_id, display_name=friendly_name)
                     self.bridge.add_accessory(accessory)
                     logger.info(f"Added light: {friendly_name}")
 
                 # Add switches
-                elif entity_id.startswith('switch.'):
-                    accessory = HASwitchAccessory(
-                        self.ha_controller,
-                        entity_id,
-                        display_name=friendly_name
-                    )
+                elif entity_id.startswith("switch."):
+                    accessory = HASwitchAccessory(self.ha_controller, entity_id, display_name=friendly_name)
                     self.bridge.add_accessory(accessory)
                     logger.info(f"Added switch: {friendly_name}")
 
                 # Add temperature sensors
-                elif entity_id.startswith('sensor.') and 'temperature' in entity_id.lower():
-                    unit = state.get('attributes', {}).get('unit_of_measurement', '')
-                    if unit in ['°C', '°F']:
-                        accessory = HATemperatureSensor(
-                            self.ha_controller,
-                            entity_id,
-                            display_name=friendly_name
-                        )
+                elif entity_id.startswith("sensor.") and "temperature" in entity_id.lower():
+                    unit = state.get("attributes", {}).get("unit_of_measurement", "")
+                    if unit in ["°C", "°F"]:
+                        accessory = HATemperatureSensor(self.ha_controller, entity_id, display_name=friendly_name)
                         self.bridge.add_accessory(accessory)
                         logger.info(f"Added temperature sensor: {friendly_name}")
 
@@ -189,11 +178,7 @@ class HomeKitBridge:
             asyncio.create_task(self.discover_and_add_devices())
 
             # Create driver
-            self.driver = AccessoryDriver(
-                self.bridge,
-                port=self.port,
-                persist_file='homekit_state.json'
-            )
+            self.driver = AccessoryDriver(self.bridge, port=self.port, persist_file="homekit_state.json")
 
             logger.info(f"HomeKit Bridge starting on port {self.port}")
             logger.info("Setup code: 123-45-678")
@@ -201,6 +186,7 @@ class HomeKitBridge:
 
             # Start in background thread
             import threading
+
             thread = threading.Thread(target=self._run_driver, daemon=True)
             thread.start()
 

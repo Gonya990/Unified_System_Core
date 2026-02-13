@@ -13,6 +13,7 @@ import requests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("SerpAPI")
 
+
 class SerpAPIClient:
     """
     Client for SerpAPI - Google Search Results API
@@ -38,7 +39,7 @@ class SerpAPIClient:
         num_results: int = 10,
         location: str = None,
         language: str = "en",
-        country: str = None
+        country: str = None,
     ) -> dict:
         """
         Search the web using SerpAPI
@@ -57,13 +58,7 @@ class SerpAPIClient:
         if not self.api_key:
             return {"error": "SERPAPI_KEY not configured"}
 
-        params = {
-            "api_key": self.api_key,
-            "engine": engine,
-            "q": query,
-            "num": num_results,
-            "hl": language
-        }
+        params = {"api_key": self.api_key, "engine": engine, "q": query, "num": num_results, "hl": language}
 
         if location:
             params["location"] = location
@@ -84,17 +79,19 @@ class SerpAPIClient:
                 "organic_results": [],
                 "knowledge_graph": data.get("knowledge_graph"),
                 "answer_box": data.get("answer_box"),
-                "total_results": data.get("search_information", {}).get("total_results")
+                "total_results": data.get("search_information", {}).get("total_results"),
             }
 
             # Parse organic results
             for item in data.get("organic_results", [])[:num_results]:
-                result["organic_results"].append({
-                    "title": item.get("title"),
-                    "link": item.get("link"),
-                    "snippet": item.get("snippet"),
-                    "position": item.get("position")
-                })
+                result["organic_results"].append(
+                    {
+                        "title": item.get("title"),
+                        "link": item.get("link"),
+                        "snippet": item.get("snippet"),
+                        "position": item.get("position"),
+                    }
+                )
 
             return result
 
@@ -104,12 +101,7 @@ class SerpAPIClient:
 
     def search_images(self, query: str, num_results: int = 10) -> list:
         """Search for images"""
-        params = {
-            "api_key": self.api_key,
-            "engine": "google_images",
-            "q": query,
-            "num": num_results
-        }
+        params = {"api_key": self.api_key, "engine": "google_images", "q": query, "num": num_results}
 
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
@@ -120,7 +112,7 @@ class SerpAPIClient:
                     "title": img.get("title"),
                     "original": img.get("original"),
                     "thumbnail": img.get("thumbnail"),
-                    "source": img.get("source")
+                    "source": img.get("source"),
                 }
                 for img in data.get("images_results", [])[:num_results]
             ]
@@ -129,12 +121,7 @@ class SerpAPIClient:
 
     def search_news(self, query: str, num_results: int = 10) -> list:
         """Search for news articles"""
-        params = {
-            "api_key": self.api_key,
-            "engine": "google_news",
-            "q": query,
-            "num": num_results
-        }
+        params = {"api_key": self.api_key, "engine": "google_news", "q": query, "num": num_results}
 
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
@@ -146,7 +133,7 @@ class SerpAPIClient:
                     "link": news.get("link"),
                     "source": news.get("source", {}).get("name"),
                     "date": news.get("date"),
-                    "snippet": news.get("snippet")
+                    "snippet": news.get("snippet"),
                 }
                 for news in data.get("news_results", [])[:num_results]
             ]

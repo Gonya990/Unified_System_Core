@@ -13,16 +13,14 @@ try:
     from inference_client import InferenceClient
 except ImportError:
     import sys
+
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from agent_orchestrator import AgentOrchestrator
     from config_manager import ConfigManager
     from inference_client import InferenceClient
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("BridgeServer")
 
 app = FastAPI(title="Unified Core Bridge", version="1.0.0")
@@ -33,6 +31,7 @@ orchestrator = AgentOrchestrator(inference)
 # Security: Simple token-based auth for Make.com
 BRIDGE_TOKEN = os.getenv("BRIDGE_TOKEN", "unified-secret-2026")
 
+
 class LeadData(BaseModel):
     name: str
     phone: str
@@ -41,17 +40,21 @@ class LeadData(BaseModel):
     message_id: Optional[str] = None
     source: str = "WhatsApp"
 
+
 class CommandRequest(BaseModel):
     command: str
     payload: dict[str, Any] = {}
+
 
 async def verify_token(authorization: Optional[str] = Header(None)):
     if not authorization or authorization != f"Bearer {BRIDGE_TOKEN}":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+
 @app.get("/health")
 async def health():
     return {"status": "online", "system": "Unified Core Bridge"}
+
 
 @app.post("/webhook/lead")
 async def handle_lead(lead: LeadData, authorization: Optional[str] = Header(None)):
@@ -69,11 +72,8 @@ async def handle_lead(lead: LeadData, authorization: Optional[str] = Header(None
     analysis = await inference.complete(prompt)
 
     # Here we could record to Google Sheets or notify Telegram
-    return {
-        "status": "received",
-        "analysis": analysis,
-        "message_id": lead.message_id
-    }
+    return {"status": "received", "analysis": analysis, "message_id": lead.message_id}
+
 
 @app.post("/command")
 async def execute_command(req: CommandRequest, authorization: Optional[str] = Header(None)):
@@ -85,6 +85,7 @@ async def execute_command(req: CommandRequest, authorization: Optional[str] = He
         return {"status": "sync_triggered"}
 
     return {"status": "unknown_command"}
+
 
 if __name__ == "__main__":
     port = int(config.get("BRIDGE_PORT", "8090"))

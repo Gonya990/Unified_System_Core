@@ -1,5 +1,3 @@
-
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -19,8 +17,8 @@ JOBS = [
         "vacancy": "Operations / Project Manager / Technical Supervisor",
         "contact_type": "Direct Email",
         "location": "North / Center",
-        "contact": "jobs.il@schindler.com", # High confidence
-        "note": "Прямой HR. Идеально по профилю (лифты/эскалаторы). Укажите опыт управления."
+        "contact": "jobs.il@schindler.com",  # High confidence
+        "note": "Прямой HR. Идеально по профилю (лифты/эскалаторы). Укажите опыт управления.",
     },
     {
         "company": "INSIGHTEC",
@@ -28,7 +26,7 @@ JOBS = [
         "contact_type": "Careers Page",
         "location": "Haifa (Tirat Carmel)",
         "contact": "https://www.insightec.com/careers/",
-        "note": "Медицинские технологии. Офис в Тират Кармель. Нужен опыт склада."
+        "note": "Медицинские технологии. Офис в Тират Кармель. Нужен опыт склада.",
     },
     {
         "company": "Utron",
@@ -36,7 +34,7 @@ JOBS = [
         "contact_type": "HR Form / LinkedIn",
         "location": "Israel (Projects based)",
         "contact": "https://www.utron.com/contact-us/",
-        "note": "Автоматические парковки. Очень релевантно опыту монтажа/механики. Писать через 'Contact Us'."
+        "note": "Автоматические парковки. Очень релевантно опыту монтажа/механики. Писать через 'Contact Us'.",
     },
     {
         "company": "Fives Intralogistics",
@@ -44,51 +42,49 @@ JOBS = [
         "contact_type": "LinkedIn / Corporate",
         "location": "North (Binyamina/Caesarea)",
         "contact": "https://www.fivesgroup.com/careers",
-        "note": "Логистическая автоматизация. Искать через карьеру или LinkedIn рекрутеров."
+        "note": "Логистическая автоматизация. Искать через карьеру или LinkedIn рекрутеров.",
     },
     {
         "company": "Airwayz",
         "vacancy": "Operations Director / Manager",
         "contact_type": "Direct Email",
         "location": "Tel Aviv / Hybrid",
-        "contact": "contact@airwayz.co", # Verified
-        "note": "Дроны/Управление трафиком. Высокая позиция, но можно пробовать."
+        "contact": "contact@airwayz.co",  # Verified
+        "note": "Дроны/Управление трафиком. Высокая позиция, но можно пробовать.",
     },
     {
         "company": "Galilee Culinary Institute (GCI)",
         "vacancy": "Manager of Operations",
         "contact_type": "Direct Apply",
         "location": "North (Kibbutz Gonen)",
-        "contact": "https://www.jpro.org/jobs/manager-of-operations-at-galilee-culinary-institute-2/", # Found in search
-        "note": "Управление объектом в Кибуц Гонен (Север). Логистика, обслуживание, закупки."
+        "contact": "https://www.jpro.org/jobs/manager-of-operations-at-galilee-culinary-institute-2/",  # Found in search
+        "note": "Управление объектом в Кибуц Гонен (Север). Логистика, обслуживание, закупки.",
     },
-
     # --- RECRUITMENT AGENCIES (Construction / Infrastructure) ---
     {
         "company": "Project Pro",
         "vacancy": "Construction / Project Managers",
         "contact_type": "Recruiter Email",
         "location": "Nationwide",
-        "contact": "info@projectpro.co.il", # Verified
-        "note": "Агентство №1 по стройке/инфраструктуре. Отправлять смело."
+        "contact": "info@projectpro.co.il",  # Verified
+        "note": "Агентство №1 по стройке/инфраструктуре. Отправлять смело.",
     },
     {
         "company": "Cohen Employment Group",
         "vacancy": "Construction Management",
         "contact_type": "Recruiter Email",
         "location": "North (Akko)",
-        "contact": "info@cohengroup.li", # Verified
-        "note": "Базируются в Акко. Специализация на стройке."
+        "contact": "info@cohengroup.li",  # Verified
+        "note": "Базируются в Акко. Специализация на стройке.",
     },
     {
         "company": "Nisha Group (Cleantech/Bio)",
         "vacancy": "Operations & Logistics Roles",
         "contact_type": "Recruiter Email",
         "location": "North / Center",
-        "contact": "cv@nisha.co.il", # General CV inbox
-        "note": "Крупное агентство. У них много клиентов на Севере (промзоны Хайфа/Йокнеам)."
+        "contact": "cv@nisha.co.il",  # General CV inbox
+        "note": "Крупное агентство. У них много клиентов на Севере (промзоны Хайфа/Йокнеам).",
     },
-
     # --- JOB BOARDS (Actionable Links) ---
     {
         "company": "AllJobs (North Operations)",
@@ -96,7 +92,7 @@ JOBS = [
         "contact_type": "Job Board Search",
         "location": "North",
         "contact": "https://www.alljobs.co.il/SearchResultsGuest.aspx?page=1&position=1086&region=3&type=&freetxt=",
-        "note": "Прямая ссылка на поиск 'Менеджер по операциям' на Севере. Обновляется ежедневно."
+        "note": "Прямая ссылка на поиск 'Менеджер по операциям' на Севере. Обновляется ежедневно.",
     },
     {
         "company": "Drushim (Work Manager)",
@@ -104,7 +100,7 @@ JOBS = [
         "contact_type": "Job Board Search",
         "location": "North",
         "contact": "https://www.drushim.co.il/jobs/search/%D7%9E%D7%A0%D7%94%D7%9C-%D7%A2%D7%91%D7%95%D7%93%D7%94/?area=3",
-        "note": "Прямая ссылка на вакансии 'Прораб/Менеджер работ' на Севере."
+        "note": "Прямая ссылка на вакансии 'Прораб/Менеджер работ' на Севере.",
     },
     {
         "company": "Nefesh B'Nefesh Job Board",
@@ -112,25 +108,37 @@ JOBS = [
         "contact_type": "Job Board",
         "location": "North",
         "contact": "https://www.nbn.org.il/life-in-israel/employment/job-board/?_job_region=north",
-        "note": "Доска вакансий для репатриантов. Фильтр 'North' уже включен."
-    }
+        "note": "Доска вакансий для репатриантов. Фильтр 'North' уже включен.",
+    },
 ]
+
 
 def create_pdf():
     try:
-        pdfmetrics.registerFont(TTFont('Arial', FONT_PATH))
-        font_name = 'Arial'
+        pdfmetrics.registerFont(TTFont("Arial", FONT_PATH))
+        font_name = "Arial"
     except Exception:
-        font_name = 'Helvetica'
+        font_name = "Helvetica"
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
 
     # Custom Styles
-    style_title = ParagraphStyle(name='Title', parent=styles['Heading1'], fontName=font_name, fontSize=18, spaceAfter=20, textColor=colors.darkblue)
-    style_h2 = ParagraphStyle(name='H2', parent=styles['Heading2'], fontName=font_name, fontSize=14, spaceBefore=10, textColor=colors.black)
-    style_normal = ParagraphStyle(name='Normal', parent=styles['Normal'], fontName=font_name, fontSize=11, leading=14)
-    style_link = ParagraphStyle(name='Link', parent=styles['Normal'], fontName=font_name, fontSize=11, textColor=colors.blue)
+    style_title = ParagraphStyle(
+        name="Title",
+        parent=styles["Heading1"],
+        fontName=font_name,
+        fontSize=18,
+        spaceAfter=20,
+        textColor=colors.darkblue,
+    )
+    style_h2 = ParagraphStyle(
+        name="H2", parent=styles["Heading2"], fontName=font_name, fontSize=14, spaceBefore=10, textColor=colors.black
+    )
+    style_normal = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName=font_name, fontSize=11, leading=14)
+    style_link = ParagraphStyle(
+        name="Link", parent=styles["Normal"], fontName=font_name, fontSize=11, textColor=colors.blue
+    )
 
     story = []
 
@@ -151,7 +159,7 @@ def create_pdf():
         story.append(Paragraph(f"📍 <b>Локация:</b> {job['location']}", style_normal))
 
         # Contact Link
-        contact = job['contact']
+        contact = job["contact"]
         if "@" in contact and "http" not in contact:
             link_html = f"<a href='mailto:{contact}'>{contact}</a>"
             story.append(Paragraph(f"📧 <b>Отправить резюме:</b> {link_html}", style_link))
@@ -169,6 +177,7 @@ def create_pdf():
 
     doc.build(story)
     print(f"PDF generated: {OUTPUT_PDF}")
+
 
 if __name__ == "__main__":
     create_pdf()

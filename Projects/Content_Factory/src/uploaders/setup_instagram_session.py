@@ -24,9 +24,7 @@ def setup_session():
         cl.login(username, password)
         print("LOGIN_SUCCESS")
 
-        session_path = Path(
-            "/home/gonya/Unified_System_Core/Projects/Content_Factory/insta_session.json"
-        )
+        session_path = Path("/home/gonya/Unified_System_Core/Projects/Content_Factory/insta_session.json")
         cl.dump_settings(session_path)
         print(f"SESSION_SAVED: {session_path}")
 

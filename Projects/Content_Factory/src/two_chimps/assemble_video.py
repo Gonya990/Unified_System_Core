@@ -21,8 +21,7 @@ CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
 VIDEO_DIR = CONTEXT_DIR / "final_videos"
 CREDENTIALS_FILE = Path(
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/"
-    "Projects/AI_Core/config/gmail_credentials.json"
+    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/config/gmail_credentials.json"
 )
 TOKEN_FILE = ROOT / "youtube_token.json"
 
@@ -55,9 +54,7 @@ def get_authenticated_service():
                 return None
 
             print(f"🔐 Initiating Login using: {CREDENTIALS_FILE.name}")
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_FILE), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
             # Use a fixed port to avoid random port issues if
             # specific redirect URIs are set
             creds = flow.run_local_server(port=8080)
@@ -88,13 +85,9 @@ def upload_to_youtube(video_path, title, description):
         },
     }
 
-    media = MediaFileUpload(
-        str(video_path), chunksize=4 * 1024 * 1024, resumable=True, mimetype="video/mp4"
-    )
+    media = MediaFileUpload(str(video_path), chunksize=4 * 1024 * 1024, resumable=True, mimetype="video/mp4")
 
-    request = youtube.videos().insert(
-        part=",".join(body.keys()), body=body, media_body=media
-    )
+    request = youtube.videos().insert(part=",".join(body.keys()), body=body, media_body=media)
 
     response = None
     while response is None:
@@ -121,43 +114,26 @@ def make_video(audio_path):
         duration = audio.duration
 
         # Load Dino Assets
-        img_skeptic = ImageClip(str(ASSETS_DIR / "dino_skeptic.png")).set_duration(
-            duration
-        )
-        img_enthusiast = ImageClip(
-            str(ASSETS_DIR / "dino_enthusiast.png")
-        ).set_duration(duration)
-        bg = ImageClip(str(ASSETS_DIR / "dino_studio_background.png")).set_duration(
-            duration
-        )
+        img_skeptic = ImageClip(str(ASSETS_DIR / "dino_skeptic.png")).set_duration(duration)
+        img_enthusiast = ImageClip(str(ASSETS_DIR / "dino_enthusiast.png")).set_duration(duration)
+        bg = ImageClip(str(ASSETS_DIR / "dino_studio_background.png")).set_duration(duration)
 
         # Layout
-        img_skeptic = img_skeptic.resize(height=450).set_position(
-            ("left", "bottom")
-        )
-        img_enthusiast = img_enthusiast.resize(height=450).set_position(
-            ("right", "bottom")
-        )
+        img_skeptic = img_skeptic.resize(height=450).set_position(("left", "bottom"))
+        img_enthusiast = img_enthusiast.resize(height=450).set_position(("right", "bottom"))
 
-        final_video = CompositeVideoClip(
-            [bg, img_skeptic, img_enthusiast], size=bg.size
-        )
+        final_video = CompositeVideoClip([bg, img_skeptic, img_enthusiast], size=bg.size)
 
         final_video = final_video.set_audio(audio)
 
         output_path = VIDEO_DIR / f"{audio_path.stem}.mp4"
-        final_video.write_videofile(
-            str(output_path), fps=24, codec="libx264", audio_codec="aac"
-        )
+        final_video.write_videofile(str(output_path), fps=24, codec="libx264", audio_codec="aac")
 
         print(f"✅ Video saved: {output_path.name}")
 
         # Auto-Upload
         title = f"Dino Talk: {audio_path.stem.replace('_', ' ').title()}"
-        description = (
-            "AI-generated podcast hosted by T-Rex and Triceratops.\n\n"
-            "Created by Unified System Core."
-        )
+        description = "AI-generated podcast hosted by T-Rex and Triceratops.\n\nCreated by Unified System Core."
         upload_to_youtube(output_path, title, description)
 
     except Exception as e:

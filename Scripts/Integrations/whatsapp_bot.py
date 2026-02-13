@@ -48,10 +48,7 @@ class WhatsAppClient:
 
     def _make_request(self, payload: dict) -> dict:
         """Make API request to WhatsApp"""
-        headers = {
-            "Authorization": f"Bearer {self.token}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
 
         try:
             response = requests.post(self.api_url, headers=headers, json=payload, timeout=30)
@@ -80,10 +77,7 @@ class WhatsAppClient:
             "recipient_type": "individual",
             "to": to,
             "type": "text",
-            "text": {
-                "preview_url": preview_url,
-                "body": message
-            }
+            "text": {"preview_url": preview_url, "body": message},
         }
         return self._make_request(payload)
 
@@ -101,10 +95,7 @@ class WhatsAppClient:
             "messaging_product": "whatsapp",
             "to": to,
             "type": "template",
-            "template": {
-                "name": template_name,
-                "language": {"code": language}
-            }
+            "template": {"name": template_name, "language": {"code": language}},
         }
 
         if components:
@@ -114,14 +105,7 @@ class WhatsAppClient:
 
     def send_image(self, to: str, image_url: str, caption: str = None) -> dict:
         """Send an image message"""
-        payload = {
-            "messaging_product": "whatsapp",
-            "to": to,
-            "type": "image",
-            "image": {
-                "link": image_url
-            }
-        }
+        payload = {"messaging_product": "whatsapp", "to": to, "type": "image", "image": {"link": image_url}}
         if caption:
             payload["image"]["caption"] = caption
 
@@ -133,10 +117,7 @@ class WhatsAppClient:
             "messaging_product": "whatsapp",
             "to": to,
             "type": "document",
-            "document": {
-                "link": document_url,
-                "filename": filename
-            }
+            "document": {"link": document_url, "filename": filename},
         }
         if caption:
             payload["document"]["caption"] = caption
@@ -162,7 +143,7 @@ class WhatsAppClient:
                     {"type": "reply", "reply": {"id": b["id"], "title": b["title"]}}
                     for b in buttons[:3]  # Max 3 buttons
                 ]
-            }
+            },
         }
 
         if header:
@@ -170,22 +151,13 @@ class WhatsAppClient:
         if footer:
             interactive["footer"] = {"text": footer}
 
-        payload = {
-            "messaging_product": "whatsapp",
-            "to": to,
-            "type": "interactive",
-            "interactive": interactive
-        }
+        payload = {"messaging_product": "whatsapp", "to": to, "type": "interactive", "interactive": interactive}
 
         return self._make_request(payload)
 
     def mark_as_read(self, message_id: str) -> dict:
         """Mark a message as read"""
-        payload = {
-            "messaging_product": "whatsapp",
-            "status": "read",
-            "message_id": message_id
-        }
+        payload = {"messaging_product": "whatsapp", "status": "read", "message_id": message_id}
         return self._make_request(payload)
 
 
@@ -264,15 +236,17 @@ def handle_text_message(from_number: str, text: str):
             buttons=[
                 {"id": "status", "title": "📊 System Status"},
                 {"id": "help", "title": "❓ Help"},
-                {"id": "contact", "title": "📞 Contact"}
-            ]
+                {"id": "contact", "title": "📞 Contact"},
+            ],
         )
 
     elif text_lower == "status":
         client.send_text(from_number, "✅ All systems operational!\n\n📡 Uptime: 99.9%\n🔋 Load: Normal")
 
     elif text_lower == "help":
-        client.send_text(from_number, """
+        client.send_text(
+            from_number,
+            """
 *Available Commands:*
 • status - Check system status
 • help - Show this message
@@ -280,7 +254,8 @@ def handle_text_message(from_number: str, text: str):
 • notify - Set up notifications
 
 Type any question to get AI assistance!
-""")
+""",
+        )
 
     else:
         # Default: AI response (integrate with your AI system)

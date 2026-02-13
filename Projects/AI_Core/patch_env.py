@@ -1,6 +1,5 @@
-
-
 ENV_FILE = "/home/gonya/Unified_System_Core/Projects/AI_Core/.env"
+
 
 def patch_env():
     # Read existing env
@@ -16,7 +15,7 @@ def patch_env():
     updates = {
         "OLLAMA_BASE_URL": "http://host.docker.internal:11434",
         "INFERENCE_BASE_URL": "http://host.docker.internal:11434",
-        "HA_URL": "http://100.118.179.47:8123" # Tailscale IP
+        "HA_URL": "http://100.118.179.47:8123",  # Tailscale IP
     }
 
     updated_keys = set()
@@ -41,6 +40,7 @@ def patch_env():
         f.writelines(new_lines)
 
     print("✅ .env patched successfully!")
+
 
 if __name__ == "__main__":
     patch_env()

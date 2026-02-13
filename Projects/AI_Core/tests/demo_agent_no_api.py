@@ -8,7 +8,7 @@ import asyncio
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from agents.tools.file_ops import FileListTool, FileOpsTool
 from agents.tools.home_assistant import HomeAssistantTool
@@ -63,7 +63,7 @@ async def demo_agent_concept():
     """Демо концепции агента"""
     print("\n" + "=" * 70)
     print("🤖 DEMO: Agent Concept (Function Calling)")
-    print("=" *70)
+    print("=" * 70)
 
     print("""
 ┌─────────────────────────────────────────────────────────────────┐
@@ -131,6 +131,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

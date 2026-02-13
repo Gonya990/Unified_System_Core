@@ -3,6 +3,7 @@ VAPI.ai Voice Interface Client
 Provides voice transcription, synthesis, and phone call capabilities.
 Integrates with VAPI.ai platform for real-time voice conversations.
 """
+
 import asyncio
 import logging
 import os
@@ -79,9 +80,7 @@ class VAPIClient:
         try:
             # Run VAPI transcription in executor to avoid blocking async loop
             loop = asyncio.get_event_loop()
-            transcript = await loop.run_in_executor(
-                None, self._transcribe_sync, audio_path
-            )
+            transcript = await loop.run_in_executor(None, self._transcribe_sync, audio_path)
             if transcript:
                 logger.debug(f"VAPI transcription successful ({len(transcript)} chars)")
             return transcript
@@ -117,9 +116,7 @@ class VAPIClient:
             logger.error(f"Transcription error: {e}")
             return None
 
-    async def generate_speech(
-        self, text: str, voice_id: Optional[str] = None
-    ) -> Optional[bytes]:
+    async def generate_speech(self, text: str, voice_id: Optional[str] = None) -> Optional[bytes]:
         """
         Generate speech from text using VAPI TTS.
 
@@ -143,9 +140,7 @@ class VAPIClient:
         try:
             # Run VAPI TTS in executor to avoid blocking async loop
             loop = asyncio.get_event_loop()
-            audio_data = await loop.run_in_executor(
-                None, self._synthesize_sync, text, voice
-            )
+            audio_data = await loop.run_in_executor(None, self._synthesize_sync, text, voice)
             if audio_data:
                 logger.debug(f"VAPI TTS successful ({len(audio_data)} bytes)")
             return audio_data

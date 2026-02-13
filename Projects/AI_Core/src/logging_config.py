@@ -2,6 +2,7 @@
 Logging Configuration for AI Telegram Bot.
 Provides structured JSON logging for container environments.
 """
+
 import json
 import logging
 import os
@@ -42,9 +43,7 @@ def setup_logging() -> None:
 
     # Use JSON format in production, readable format in debug
     if log_level == "DEBUG":
-        formatter = logging.Formatter(
-            "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
     else:
         formatter = JSONFormatter()
 

@@ -23,18 +23,15 @@ class FileOpsTool:
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "Absolute path to file to read"
-                    },
+                    "path": {"type": "string", "description": "Absolute path to file to read"},
                     "max_chars": {
                         "type": "integer",
                         "description": "Maximum characters to return (default: 5000)",
-                        "default": 5000
-                    }
+                        "default": 5000,
+                    },
                 },
-                "required": ["path"]
-            }
+                "required": ["path"],
+            },
         }
 
     @staticmethod
@@ -59,7 +56,7 @@ class FileOpsTool:
                 return f"❌ Error: Path is not a file: {path}"
 
             # Read file
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             total_size = len(content)
@@ -101,18 +98,15 @@ class FileListTool:
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "Absolute path to directory"
-                    },
+                    "path": {"type": "string", "description": "Absolute path to directory"},
                     "pattern": {
                         "type": "string",
                         "description": "Optional glob pattern (e.g., '*.py')",
-                        "default": "*"
-                    }
+                        "default": "*",
+                    },
                 },
-                "required": ["path"]
-            }
+                "required": ["path"],
+            },
         }
 
     @staticmethod
@@ -159,7 +153,7 @@ class FileListTool:
                 result += "**Files:**\n"
                 for f in files[:50]:  # Limit to 50
                     size = f.stat().st_size
-                    size_str = f"{size:,} bytes" if size < 1024 else f"{size/1024:.1f} KB"
+                    size_str = f"{size:,} bytes" if size < 1024 else f"{size / 1024:.1f} KB"
                     result += f"  📄 {f.name} ({size_str})\n"
                 if len(files) > 50:
                     result += f"  ... and {len(files) - 50} more files\n"

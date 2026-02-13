@@ -153,12 +153,7 @@ def main():
     print(f"🔍 Searching emails with query: {query}")
 
     try:
-        results = (
-            service.users()
-            .messages()
-            .list(userId="me", q=query, maxResults=50)
-            .execute()
-        )
+        results = service.users().messages().list(userId="me", q=query, maxResults=50).execute()
         messages = results.get("messages", [])
 
         candidates = []
@@ -168,20 +163,11 @@ def main():
         seen_senders = set()
 
         for msg in messages:
-            msg_data = (
-                service.users()
-                .messages()
-                .get(userId="me", id=msg["id"], format="metadata")
-                .execute()
-            )
+            msg_data = service.users().messages().get(userId="me", id=msg["id"], format="metadata").execute()
             headers = msg_data["payload"]["headers"]
 
-            sender = next(
-                (h["value"] for h in headers if h["name"] == "From"), "Unknown"
-            )
-            subject = next(
-                (h["value"] for h in headers if h["name"] == "Subject"), "No Subject"
-            )
+            sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown")
+            subject = next((h["value"] for h in headers if h["name"] == "Subject"), "No Subject")
 
             email_addr = sender
             if "<" in sender:
@@ -225,9 +211,7 @@ def main():
         for c in candidates:
             print(f"📤 Sending to {c['email']}...")
             try:
-                msg = create_message_with_attachment(
-                    "me", c["email"], EMAIL_SUBJECT, EMAIL_BODY, str(RESUME_PATH)
-                )
+                msg = create_message_with_attachment("me", c["email"], EMAIL_SUBJECT, EMAIL_BODY, str(RESUME_PATH))
                 service.users().messages().send(userId="me", body=msg).execute()
                 print("✅ Sent.")
             except Exception as e:

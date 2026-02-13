@@ -18,18 +18,11 @@ class OpenAIProvider(BaseProvider):
     name = "openai"
 
     def __init__(
-        self,
-        api_key: str,
-        model: str = "gpt-4o",
-        base_url: str = "https://api.openai.com/v1",
-        store: bool = False
+        self, api_key: str, model: str = "gpt-4o", base_url: str = "https://api.openai.com/v1", store: bool = False
     ):
         super().__init__(api_key, model, base_url)
         self.store = store
-        self._client = AsyncOpenAI(
-            api_key=api_key,
-            base_url=base_url
-        )
+        self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
         """Generate response using OpenAI Chat Completions API."""
@@ -66,7 +59,7 @@ class OpenAIProvider(BaseProvider):
                     metadata={
                         "completion_id": response.id,
                         "finish_reason": response.choices[0].finish_reason,
-                    }
+                    },
                 )
 
             except Exception as e:
@@ -75,8 +68,8 @@ class OpenAIProvider(BaseProvider):
                     provider_name=self.name,
                     model=self.model,
                     content="",
-                    latency_ms=getattr(timer, 'elapsed_ms', 0),
-                    error=str(e)
+                    latency_ms=getattr(timer, "elapsed_ms", 0),
+                    error=str(e),
                 )
 
     async def health_check(self) -> bool:

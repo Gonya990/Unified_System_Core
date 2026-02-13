@@ -1,6 +1,6 @@
-import os
-import json
 import logging
+import os
+
 import psycopg2
 from psycopg2.extras import Json
 
@@ -14,9 +14,7 @@ class KnowledgeBase:
     """
 
     def __init__(self, db_url=None):
-        default_url = (
-            "postgresql://trading_user:trading_pass" "@timescaledb.trading:5432/trading"
-        )
+        default_url = "postgresql://trading_user:trading_pass@timescaledb.trading:5432/trading"
         self.db_url = db_url or os.getenv("DATABASE_URL", default_url)
         self.conn = None
 
@@ -61,14 +59,8 @@ class KnowledgeBase:
             """
             )
             # Create indexes for performance
-            cur.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memories_agent "
-                "ON agent_memories(agent_name);"
-            )
-            cur.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memories_type "
-                "ON agent_memories(memory_type);"
-            )
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_agent ON agent_memories(agent_name);")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_memories_type ON agent_memories(memory_type);")
             logger.info("Knowledge Base schema initialized.")
 
     def add_memory(self, agent_name, content, memory_type="general", importance=1):
@@ -77,9 +69,7 @@ class KnowledgeBase:
         try:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO agent_memories "
-                    "(agent_name, memory_type, content, importance) "
-                    "VALUES (%s, %s, %s, %s)",
+                    "INSERT INTO agent_memories (agent_name, memory_type, content, importance) VALUES (%s, %s, %s, %s)",
                     (agent_name, memory_type, Json(content), importance),
                 )
         except Exception as e:
@@ -90,10 +80,7 @@ class KnowledgeBase:
         self.connect()
         try:
             with self.conn.cursor() as cur:
-                query = (
-                    "SELECT agent_name, memory_type, content, importance, "
-                    "created_at FROM agent_memories"
-                )
+                query = "SELECT agent_name, memory_type, content, importance, created_at FROM agent_memories"
                 params = []
                 where_clauses = []
 
@@ -123,10 +110,10 @@ class KnowledgeBase:
             with self.conn.cursor() as cur:
                 cur.execute(
                     """
-                    INSERT INTO project_status 
+                    INSERT INTO project_status
                     (project_id, current_milestone, health_status, metadata)
                     VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (project_id) DO UPDATE SET 
+                    ON CONFLICT (project_id) DO UPDATE SET
                         current_milestone = EXCLUDED.current_milestone,
                         health_status = EXCLUDED.health_status,
                         metadata = EXCLUDED.metadata,

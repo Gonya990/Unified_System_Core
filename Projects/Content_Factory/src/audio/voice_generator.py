@@ -2,6 +2,7 @@
 """
 Voice Cloning and Emotional TTS using ElevenLabs
 """
+
 import logging
 import os
 from pathlib import Path
@@ -67,9 +68,7 @@ class VoiceGenerator:
                 "voice_settings": voice_settings,
             }
 
-            logger.info(
-                f"🎤 ElevenLabs: Generating {len(text)} chars with {emotion} emotion..."
-            )
+            logger.info(f"🎤 ElevenLabs: Generating {len(text)} chars with {emotion} emotion...")
 
             response = requests.post(
                 f"{ELEVENLABS_BASE_URL}/text-to-speech/{voice_id}",
@@ -102,9 +101,7 @@ class VoiceGenerator:
 
         headers = {"xi-api-key": self.api_key}
 
-        response = requests.get(
-            f"{ELEVENLABS_BASE_URL}/voices", headers=headers, timeout=10
-        )
+        response = requests.get(f"{ELEVENLABS_BASE_URL}/voices", headers=headers, timeout=10)
         response.raise_for_status()
 
         voices = response.json().get("voices", [])
@@ -146,9 +143,7 @@ class VoiceGenerator:
 
         return settings
 
-    def clone_voice(
-        self, name: str, audio_files: list[Path], description: str = ""
-    ) -> Optional[str]:
+    def clone_voice(self, name: str, audio_files: list[Path], description: str = "") -> Optional[str]:
         """
         Clone a voice from audio samples.
 
@@ -172,9 +167,7 @@ class VoiceGenerator:
                 logger.warning(f"Audio file not found: {audio_path}")
                 continue
 
-            files.append(
-                ("files", (audio_path.name, open(audio_path, "rb"), "audio/mpeg"))
-            )
+            files.append(("files", (audio_path.name, open(audio_path, "rb"), "audio/mpeg")))
 
         if not files:
             logger.error("No valid audio files for voice cloning")

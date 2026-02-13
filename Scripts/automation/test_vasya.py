@@ -14,23 +14,22 @@ tools = [
             "description": "Query Vasya research assistant for structured results",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "prompt": {
-                        "type": "string",
-                        "description": "The research query"
-                    }
-                },
-                "required": ["prompt"]
-            }
-        }
+                "properties": {"prompt": {"type": "string", "description": "The research query"}},
+                "required": ["prompt"],
+            },
+        },
     }
 ]
 
-result = client.query("test_agent", "llm", {
-    "messages": [
-        {"role": "user", "content": "Use the vasya_query tool to find resources about Docker containers."}
-    ],
-    "llms": [{"name": "gemini-2.0-flash-exp", "provider": "gemini"}],
-    "tools": tools
-})
+result = client.query(
+    "test_agent",
+    "llm",
+    {
+        "messages": [
+            {"role": "user", "content": "Use the vasya_query tool to find resources about Docker containers."}
+        ],
+        "llms": [{"name": "gemini-2.0-flash-exp", "provider": "gemini"}],
+        "tools": tools,
+    },
+)
 print(json.dumps(result, indent=2))

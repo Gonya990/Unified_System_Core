@@ -2,10 +2,12 @@
 Simple Task Manager for AI Telegram Bot.
 Stores tasks in SQLite database.
 """
+
 import logging
 import sqlite3
 
 logger = logging.getLogger(__name__)
+
 
 class TaskManager:
     def __init__(self, db_path: str = "tasks.db"):
@@ -36,10 +38,7 @@ class TaskManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute(
-                    "INSERT INTO tasks (user_id, text) VALUES (?, ?)",
-                    (user_id, text)
-                )
+                cursor.execute("INSERT INTO tasks (user_id, text) VALUES (?, ?)", (user_id, text))
                 conn.commit()
                 return cursor.lastrowid
         except Exception as e:
@@ -53,8 +52,7 @@ class TaskManager:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 cursor.execute(
-                    "SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY id DESC",
-                    (user_id, status)
+                    "SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY id DESC", (user_id, status)
                 )
                 return [dict(row) for row in cursor.fetchall()]
         except Exception as e:
@@ -66,10 +64,7 @@ class TaskManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute(
-                    "UPDATE tasks SET status = 'completed' WHERE id = ? AND user_id = ?",
-                    (task_id, user_id)
-                )
+                cursor.execute("UPDATE tasks SET status = 'completed' WHERE id = ? AND user_id = ?", (task_id, user_id))
                 conn.commit()
                 return cursor.rowcount > 0
         except Exception as e:

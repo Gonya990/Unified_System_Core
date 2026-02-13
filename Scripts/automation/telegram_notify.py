@@ -1,4 +1,3 @@
-
 import logging
 import os
 
@@ -9,6 +8,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger("TelegramNotify")
+
 
 def send_telegram_message(message, token=None, chat_id=None):
     """
@@ -48,16 +48,18 @@ def send_telegram_message(message, token=None, chat_id=None):
         logger.error(f"Failed to send Telegram message: {e}")
         # Try sending without payload text if it failed (maybe invalid chars)
         if "Bad Request" in str(e):
-             try:
-                 payload["text"] = "⚠️ Notification failed to render. Check server logs."
-                 requests.post(url, json=payload, timeout=10)
-             except Exception:
-                 pass
+            try:
+                payload["text"] = "⚠️ Notification failed to render. Check server logs."
+                requests.post(url, json=payload, timeout=10)
+            except Exception:
+                pass
         return False
+
 
 if __name__ == "__main__":
     # Test run
     from dotenv import find_dotenv, load_dotenv
+
     # Try to find .env in parent or specific locations
     load_dotenv(find_dotenv(usecwd=True))
     # Also look in Projects/AI_Core for dev setup

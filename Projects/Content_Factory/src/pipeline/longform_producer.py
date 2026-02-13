@@ -64,9 +64,7 @@ LONGFORM_CONFIG = {
 
 # Each segment is ~5 minutes = ~650 words
 WORDS_PER_SEGMENT = (
-    LONGFORM_CONFIG["target_duration_minutes"]
-    * LONGFORM_CONFIG["words_per_minute"]
-    // LONGFORM_CONFIG["segments"]
+    LONGFORM_CONFIG["target_duration_minutes"] * LONGFORM_CONFIG["words_per_minute"] // LONGFORM_CONFIG["segments"]
 )
 
 # =============================================================================
@@ -91,9 +89,7 @@ class TokenTracker:
 
         # Rough cost estimate (OpenAI GPT-4o pricing)
         if provider == "openai":
-            self.usage["total_cost_estimate"] += (
-                input_tokens * 2.5 + output_tokens * 10
-            ) / 1_000_000
+            self.usage["total_cost_estimate"] += (input_tokens * 2.5 + output_tokens * 10) / 1_000_000
         print(
             f"📊 Token Usage [{provider}]: +{input_tokens} in, +{output_tokens} out | Total est: ${self.usage['total_cost_estimate']:.4f}"
         )
@@ -174,9 +170,7 @@ def get_documentary_structure(topic: str) -> Optional[dict]:
         return None
 
 
-def generate_segment_script(
-    topic: str, segment_info: dict, context_summary: str = ""
-) -> Optional[dict]:
+def generate_segment_script(topic: str, segment_info: dict, context_summary: str = "") -> Optional[dict]:
     """Phase 2: Generate full-length script for a single segment using LLMCouncil"""
     seg_name = segment_info.get("name", "Unknown")
     print(f"📝 Phase 2: Writing Script for '{seg_name}' (Target 650+ words)")
@@ -193,7 +187,7 @@ def generate_segment_script(
         Write a FULL DOCUMENTARY SCRIPT for one segment of a documentary about: {topic}
 
         SEGMENT: {seg_name}
-        FOCUS POINTS: {segment_info.get('focus_points')}
+        FOCUS POINTS: {segment_info.get("focus_points")}
         CONTEXT: {context_summary}
 
         REQUIREMENTS:
@@ -251,9 +245,7 @@ def deep_research_with_council(topic: str) -> dict:
 
     cumulative_script = ""
     for i, seg_info in enumerate(structure.get("segments", [])):
-        seg_script_data = generate_segment_script(
-            topic, seg_info, context_summary=cumulative_script[-2000:]
-        )
+        seg_script_data = generate_segment_script(topic, seg_info, context_summary=cumulative_script[-2000:])
         if seg_script_data:
             segment_data = {
                 "name": seg_info.get("name"),
@@ -263,7 +255,7 @@ def deep_research_with_council(topic: str) -> dict:
             full_data["segments"].append(segment_data)
             cumulative_script += " " + segment_data["script"]
         else:
-            print(f"❌ Failed to generate script for segment {i+1}")
+            print(f"❌ Failed to generate script for segment {i + 1}")
             full_data["segments"].append(
                 {
                     "name": seg_info.get("name"),
@@ -279,7 +271,7 @@ def deep_research_with_council(topic: str) -> dict:
         words = len(seg.get("script", "").split())
         current_seconds += (words / 130) * 60
         m, s = divmod(int(current_seconds), 60)
-        chapters.append(f"{m}:{s:02d} {full_data['segments'][i+1]['name']}")
+        chapters.append(f"{m}:{s:02d} {full_data['segments'][i + 1]['name']}")
 
     full_data["youtube_chapters"] = chapters
     full_data["total_word_count"] = len(cumulative_script.split())
@@ -322,9 +314,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     segment_videos = []
 
     for i, segment in enumerate(segments):
-        print(
-            f"\n📹 Processing Segment {i+1}/{len(segments)}: {segment.get('name', 'Unknown')}"
-        )
+        print(f"\n📹 Processing Segment {i + 1}/{len(segments)}: {segment.get('name', 'Unknown')}")
 
         # Rate limiting / token awareness
         time.sleep(3)  # Strategic pause between segments
@@ -333,7 +323,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         scenes = segment.get("scenes", [])
 
         if not script:
-            print(f"⚠️ Empty script for segment {i+1}, skipping")
+            print(f"⚠️ Empty script for segment {i + 1}, skipping")
             continue
 
         segment_name = f"longform_seg_{i}_{timestamp}"
@@ -341,7 +331,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         # 1. Generate audio for this segment
         audio_path = output_dir / f"{segment_name}_audio.wav"
         if not generate_audio(script, audio_path, lang="ru"):
-            print(f"❌ Audio failed for segment {i+1}")
+            print(f"❌ Audio failed for segment {i + 1}")
             continue
 
         # 2. Fetch visual assets
@@ -356,15 +346,13 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
 
         # Alternating styles: Every second segment uses AI Generation (cartoon style)
         current_style = "cartoon" if i % 2 == 1 else "impact"
-        print(f"🎨 Using Style: {current_style} for Segment {i+1}")
+        print(f"🎨 Using Style: {current_style} for Segment {i + 1}")
 
-        resolved_scenes = generate_vision_assets(
-            scene_list, assets_dir, style=current_style
-        )
+        resolved_scenes = generate_vision_assets(scene_list, assets_dir, style=current_style)
 
         if not resolved_scenes:
             # Use B-roll as backup
-            print(f"⚠️ Using B-roll for segment {i+1}")
+            print(f"⚠️ Using B-roll for segment {i + 1}")
             clips = semantic_search_broll(script[:100], BROLL_DIR, num_clips=5)
             for j, clip in enumerate(clips):
                 resolved_scenes.append(
@@ -389,7 +377,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         else:
             segment_videos.append(raw_video)
 
-        print(f"✅ Segment {i+1} complete: {segment_videos[-1]}")
+        print(f"✅ Segment {i + 1} complete: {segment_videos[-1]}")
 
         # Local Preview: Copy first segment to Desktop immediately
         if i == 0:
@@ -414,9 +402,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
             # Use absolute path or relative to output_dir
             f.write(f"file '{video.name}'\n")
 
-    final_output = (
-        output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_final.mp4"
-    )
+    final_output = output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_final.mp4"
 
     import subprocess
 
@@ -448,9 +434,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     # 6. Generate chapter file for YouTube
     chapters = data.get("youtube_chapters", [])
     if chapters:
-        chapters_file = (
-            output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_chapters.txt"
-        )
+        chapters_file = output_dir / f"{LONGFORM_CONFIG['output_prefix']}_{timestamp}_chapters.txt"
         with open(chapters_file, "w") as f:
             f.write("\n".join(chapters))
         print(f"📝 YouTube chapters saved: {chapters_file}")
@@ -545,12 +529,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Long-Form Documentary Producer")
-    parser.add_argument(
-        "--topic", type=str, help="Documentary topic (auto-generated if not provided)"
-    )
-    parser.add_argument(
-        "--test", action="store_true", help="Test mode - research only, no video"
-    )
+    parser.add_argument("--topic", type=str, help="Documentary topic (auto-generated if not provided)")
+    parser.add_argument("--test", action="store_true", help="Test mode - research only, no video")
 
     args = parser.parse_args()
 

@@ -15,6 +15,7 @@ import requests
 @dataclass
 class HAConfig:
     """Home Assistant configuration - loads from environment variables"""
+
     url: str = field(default_factory=lambda: os.environ.get("HA_URL", "http://100.81.133.25:8123"))
     token: str = field(default_factory=lambda: os.environ.get("HA_TOKEN", ""))
     timeout: int = 30
@@ -25,16 +26,13 @@ class HomeAssistantClient:
 
     def __init__(self, config: Optional[HAConfig] = None):
         self.config = config or HAConfig()
-        self.headers = {
-            "Authorization": f"Bearer {self.config.token}",
-            "Content-Type": "application/json"
-        }
+        self.headers = {"Authorization": f"Bearer {self.config.token}", "Content-Type": "application/json"}
 
     def _request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
         """Make HTTP request to HA API"""
         url = f"{self.config.url}/api/{endpoint}"
-        kwargs.setdefault('headers', self.headers)
-        kwargs.setdefault('timeout', self.config.timeout)
+        kwargs.setdefault("headers", self.headers)
+        kwargs.setdefault("timeout", self.config.timeout)
 
         response = requests.request(method, url, **kwargs)
         response.raise_for_status()
@@ -42,36 +40,36 @@ class HomeAssistantClient:
 
     def get(self, endpoint: str) -> Any:
         """GET request"""
-        return self._request('GET', endpoint).json()
+        return self._request("GET", endpoint).json()
 
     def post(self, endpoint: str, data: Optional[dict] = None) -> Any:
         """POST request"""
-        return self._request('POST', endpoint, json=data).json()
+        return self._request("POST", endpoint, json=data).json()
 
     # ========== General API ==========
 
     def get_config(self) -> dict:
         """Get HA configuration"""
-        return self.get('config')
+        return self.get("config")
 
     def get_states(self) -> list[dict]:
         """Get all entity states"""
-        return self.get('states')
+        return self.get("states")
 
     def get_entity_state(self, entity_id: str) -> dict:
         """Get specific entity state"""
-        return self.get(f'states/{entity_id}')
+        return self.get(f"states/{entity_id}")
 
     def get_services(self) -> list[dict]:
         """Get all available services"""
-        return self.get('services')
+        return self.get("services")
 
     def call_service(self, domain: str, service: str, entity_id: Optional[str] = None, **kwargs) -> list[dict]:
         """Call a service"""
         data = kwargs
         if entity_id:
-            data['entity_id'] = entity_id
-        return self.post(f'services/{domain}/{service}', data)
+            data["entity_id"] = entity_id
+        return self.post(f"services/{domain}/{service}", data)
 
     # ========== Integrations ==========
 
@@ -80,7 +78,7 @@ class HomeAssistantClient:
         # Note: This endpoint may not be available in all HA versions
         # Alternative: parse .storage/core.config_entries directly
         try:
-            return self.get('config_entries/entry')
+            return self.get("config_entries/entry")
         except Exception:
             # Fallback: try to get from states
             return []
@@ -89,13 +87,13 @@ class HomeAssistantClient:
         """Get HomeKit Bridge integration details"""
         integrations = self.get_integrations()
         for integration in integrations:
-            if integration.get('domain') == 'homekit':
+            if integration.get("domain") == "homekit":
                 return integration
         return None
 
     def reload_integration(self, entry_id: str) -> dict:
         """Reload a config entry"""
-        return self.post(f'config/config_entries/{entry_id}/reload')
+        return self.post(f"config/config_entries/{entry_id}/reload")
 
     # ========== HomeKit Specific ==========
 
@@ -107,12 +105,12 @@ class HomeAssistantClient:
 
         return {
             "status": "configured",
-            "entry_id": hk.get('entry_id'),
-            "title": hk.get('title'),
-            "domain": hk.get('domain'),
-            "state": hk.get('state'),
-            "options": hk.get('options', {}),
-            "data": hk.get('data', {})
+            "entry_id": hk.get("entry_id"),
+            "title": hk.get("title"),
+            "domain": hk.get("domain"),
+            "state": hk.get("state"),
+            "options": hk.get("options", {}),
+            "data": hk.get("data", {}),
         }
 
     def restart_homekit(self) -> dict:
@@ -121,33 +119,33 @@ class HomeAssistantClient:
         if not hk:
             return {"error": "HomeKit not configured"}
 
-        return self.reload_integration(hk['entry_id'])
+        return self.reload_integration(hk["entry_id"])
 
     # ========== Lights ==========
 
     def turn_on_light(self, entity_id: str, **kwargs) -> list[dict]:
         """Turn on a light with optional parameters"""
-        return self.call_service('light', 'turn_on', entity_id, **kwargs)
+        return self.call_service("light", "turn_on", entity_id, **kwargs)
 
     def turn_off_light(self, entity_id: str) -> list[dict]:
         """Turn off a light"""
-        return self.call_service('light', 'turn_off', entity_id)
+        return self.call_service("light", "turn_off", entity_id)
 
     # ========== Switches ==========
 
     def turn_on_switch(self, entity_id: str) -> list[dict]:
         """Turn on a switch"""
-        return self.call_service('switch', 'turn_on', entity_id)
+        return self.call_service("switch", "turn_on", entity_id)
 
     def turn_off_switch(self, entity_id: str) -> list[dict]:
         """Turn off a switch"""
-        return self.call_service('switch', 'turn_off', entity_id)
+        return self.call_service("switch", "turn_off", entity_id)
 
     # ========== Climate ==========
 
     def set_temperature(self, entity_id: str, temperature: float) -> list[dict]:
         """Set climate temperature"""
-        return self.call_service('climate', 'set_temperature', entity_id, temperature=temperature)
+        return self.call_service("climate", "set_temperature", entity_id, temperature=temperature)
 
     # ========== Diagnostics ==========
 
@@ -161,21 +159,17 @@ class HomeAssistantClient:
             return {
                 "status": "ok",
                 "healthy": True,
-                "version": config.get('version'),
-                "location_name": config.get('location_name'),
+                "version": config.get("version"),
+                "location_name": config.get("location_name"),
                 "entities_count": states_count,
-                "homekit_status": hk_status
+                "homekit_status": hk_status,
             }
         except Exception as e:
-            return {
-                "status": "error",
-                "healthy": False,
-                "message": str(e),
-                "error": str(e)
-            }
+            return {"status": "error", "healthy": False, "message": str(e), "error": str(e)}
 
 
 # ========== CLI Usage ==========
+
 
 def main():
     """CLI interface for testing"""
@@ -194,25 +188,25 @@ def main():
 
     command = sys.argv[1]
 
-    if command == 'health':
+    if command == "health":
         result = client.check_health()
         print(json.dumps(result, indent=2, ensure_ascii=False))
 
-    elif command == 'homekit':
+    elif command == "homekit":
         result = client.get_homekit_status()
         print(json.dumps(result, indent=2, ensure_ascii=False))
 
-    elif command == 'restart_homekit':
+    elif command == "restart_homekit":
         result = client.restart_homekit()
         print(json.dumps(result, indent=2, ensure_ascii=False))
 
-    elif command == 'states':
+    elif command == "states":
         result = client.get_states()
         print(f"Total entities: {len(result)}")
         for state in result:  # Show all
             print(f"  {state['entity_id']}: {state['state']}")
 
-    elif command == 'integrations':
+    elif command == "integrations":
         result = client.get_integrations()
         print(f"Total integrations: {len(result)}")
         for integration in result:
@@ -222,5 +216,5 @@ def main():
         print(f"Unknown command: {command}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

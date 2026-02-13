@@ -11,14 +11,17 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 try:
     import transformers as _transformers
+
     TF_VER = _transformers.__version__
 except Exception:
     TF_VER = "(transformers not available)"
 try:
     import accelerate as _accelerate
+
     ACC_VER = _accelerate.__version__
 except Exception:
     ACC_VER = "(accelerate not available)"
+
 
 def main():
     print("=" * 70)
@@ -41,10 +44,7 @@ def main():
     print("Loading tokenizer...")
     print(f"transformers version: {TF_VER}; accelerate version: {ACC_VER}")
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name,
-        trust_remote_code=True
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -53,10 +53,7 @@ def main():
     print("This may take 1-2 minutes for first download...")
 
     model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16,
-        device_map="cuda",
-        trust_remote_code=True
+        model_name, torch_dtype=torch.float16, device_map="cuda", trust_remote_code=True
     )
 
     model.eval()
@@ -96,16 +93,16 @@ def main():
             if not user_input:
                 continue
 
-            if user_input.lower() in ['/exit', '/quit']:
+            if user_input.lower() in ["/exit", "/quit"]:
                 print("\n👋 Goodbye!")
                 break
 
-            if user_input.lower() == '/clear':
+            if user_input.lower() == "/clear":
                 conversation_history = []
                 print("🗑️  History cleared")
                 continue
 
-            if user_input.lower() == '/help':
+            if user_input.lower() == "/help":
                 print("\n📖 HELP:")
                 print("  This model follows instructions and answers questions")
                 print("  You can ask it to:")
@@ -121,19 +118,12 @@ def main():
             if conversation_history:
                 # Include last 3 exchanges for context
                 context = "\n".join(conversation_history[-6:])
-                full_prompt = (
-                    f"{instruction_prefix}\n\n{context}\n\nUser: {user_input}\nAssistant:"
-                )
+                full_prompt = f"{instruction_prefix}\n\n{context}\n\nUser: {user_input}\nAssistant:"
             else:
                 full_prompt = f"{instruction_prefix}\n\nUser: {user_input}\nAssistant:"
 
             # Tokenize
-            inputs = tokenizer(
-                full_prompt,
-                return_tensors="pt",
-                max_length=1024,
-                truncation=True
-            ).to("cuda")
+            inputs = tokenizer(full_prompt, return_tensors="pt", max_length=1024, truncation=True).to("cuda")
 
             print("\n🤖 Assistant: ", end="", flush=True)
 
@@ -150,12 +140,14 @@ def main():
                         pad_token_id=tokenizer.pad_token_id,
                         repetition_penalty=1.15,
                         no_repeat_ngram_size=3,
-                        use_cache=False  # avoid provider DynamicCache issues
+                        use_cache=False,  # avoid provider DynamicCache issues
                     )
             except Exception as e:
                 # Log full traceback for diagnostics
                 tb = traceback.format_exc()
-                print(f"\n❌ Generation failed: {e}\nTraceback:\n{tb}\nAttempting safe fallback generation...", flush=True)
+                print(
+                    f"\n❌ Generation failed: {e}\nTraceback:\n{tb}\nAttempting safe fallback generation...", flush=True
+                )
                 # If it's a known DynamicCache/seen_tokens issue or any other, retry with safe params
                 try:
                     with torch.no_grad():
@@ -166,14 +158,16 @@ def main():
                             do_sample=False,
                             pad_token_id=tokenizer.pad_token_id,
                             repetition_penalty=1.0,
-                            use_cache=False
+                            use_cache=False,
                         )
                     print("\n✅ Fallback generation succeeded.", flush=True)
                 except Exception as e2:
                     tb2 = traceback.format_exc()
                     print(f"\n❌ Fallback generation failed: {e2}\nTraceback:\n{tb2}")
                     # Give user hint and continue loop
-                    print("Попробуйте перезапустить скрипт или использовать более простую модель (меньше параметров).\n")
+                    print(
+                        "Попробуйте перезапустить скрипт или использовать более простую модель (меньше параметров).\n"
+                    )
                     continue
 
             # Decode response
@@ -183,7 +177,7 @@ def main():
             if "Assistant:" in full_response:
                 response = full_response.split("Assistant:")[-1].strip()
             else:
-                response = full_response[len(full_prompt):].strip()
+                response = full_response[len(full_prompt) :].strip()
 
             # Clean up response - take first complete sentence/paragraph
             if "\n\n" in response:
@@ -214,6 +208,7 @@ def main():
         except Exception as e:
             print(f"\n❌ Error: {e}")
             print("Try again or type /help")
+
 
 if __name__ == "__main__":
     try:

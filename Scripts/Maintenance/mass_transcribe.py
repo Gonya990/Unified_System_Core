@@ -15,6 +15,7 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
+
 def transcribe_file(file_path):
     print(f"Processing: {file_path}")
     try:
@@ -32,10 +33,12 @@ def transcribe_file(file_path):
 
         # Use the Gemini model to transcribe
         model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content([
-            "Please transcribe this audio/video file accurately and completely in its original language. If there are multiple speakers, label them if possible. Output ONLY the transcription text.",
-            uploaded_file
-        ])
+        response = model.generate_content(
+            [
+                "Please transcribe this audio/video file accurately and completely in its original language. If there are multiple speakers, label them if possible. Output ONLY the transcription text.",
+                uploaded_file,
+            ]
+        )
 
         # Delete the file from Gemini storage
         genai.delete_file(uploaded_file.name)
@@ -44,6 +47,7 @@ def transcribe_file(file_path):
     except Exception as e:
         print(f"Error transcribing {file_path.name}: {e}")
         return None
+
 
 def main():
     root_dir = Path(".")
@@ -74,7 +78,7 @@ def main():
     print(f"Found {len(to_process)} new files to transcribe.")
 
     for i, file_path in enumerate(to_process):
-        print(f"[{i+1}/{len(to_process)}] {file_path}")
+        print(f"[{i + 1}/{len(to_process)}] {file_path}")
         transcript = transcribe_file(file_path)
 
         if transcript:
@@ -85,6 +89,7 @@ def main():
 
         # Avoid rate limits
         time.sleep(5)
+
 
 if __name__ == "__main__":
     main()

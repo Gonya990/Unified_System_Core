@@ -1,4 +1,3 @@
-
 import base64
 import re
 from email.mime.text import MIMEText
@@ -21,6 +20,7 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.compose"]
 # Load Env
 load_dotenv(BASE_DIR / "Projects" / "AI_Core" / ".env")
 
+
 def get_gmail_service():
     creds = None
     if TOKEN_PATH.exists():
@@ -32,15 +32,14 @@ def get_gmail_service():
         else:
             # If scopes changed or token missing, might need re-auth
             # But we try to rely on existing token first
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
 
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
 
     return build("gmail", "v1", credentials=creds)
+
 
 def create_draft(service, subject, body, placeholder_to):
     try:
@@ -58,6 +57,7 @@ def create_draft(service, subject, body, placeholder_to):
     except Exception as e:
         print(f"❌ Error creating draft: {e}")
         return None
+
 
 def parse_report_and_create_drafts():
     if not REPORT_PATH.exists():
@@ -79,11 +79,11 @@ def parse_report_and_create_drafts():
         try:
             # Extract Subject
             # Look for **Subject:** ...
-            subj_match = re.search(r'\*\*Subject:\*\*\s*(.*)', section)
+            subj_match = re.search(r"\*\*Subject:\*\*\s*(.*)", section)
             orig_subject = subj_match.group(1).strip() if subj_match else "Business Proposal"
 
             # Extract Relevance/Company for better Subject line
-            rel_match = re.search(r'\*\*Relevance:\*\*\s*(.*)', section)
+            rel_match = re.search(r"\*\*Relevance:\*\*\s*(.*)", section)
             relevance = rel_match.group(1).strip() if rel_match else ""
 
             # Smart Subject Line
@@ -97,7 +97,7 @@ def parse_report_and_create_drafts():
 
             # Extract Body (Draft Reply)
             # Find content between ```text and ```
-            body_match = re.search(r'```text\n(.*?)\n```', section, re.DOTALL)
+            body_match = re.search(r"```text\n(.*?)\n```", section, re.DOTALL)
             if body_match:
                 email_body = body_match.group(1).strip()
             else:
@@ -124,6 +124,7 @@ def parse_report_and_create_drafts():
             print(f"Error processing section: {e}")
 
     print(f"\n🎉 Successfully created {count} drafts.")
+
 
 if __name__ == "__main__":
     parse_report_and_create_drafts()

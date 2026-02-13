@@ -1,4 +1,3 @@
-
 import datetime
 import os
 import subprocess
@@ -9,18 +8,14 @@ PROJECT_ROOT = "/Users/macbook/Documents/Unified_System"
 AI_CORE_PATH = os.path.join(PROJECT_ROOT, "Projects/AI_Core")
 REPORT_PATH = os.path.join(PROJECT_ROOT, "Reports/system_audit_report.html")
 
+
 def run_command(command, cwd):
     try:
-        result = subprocess.run(
-            command,
-            cwd=cwd,
-            shell=True,
-            capture_output=True,
-            text=True
-        )
+        result = subprocess.run(command, cwd=cwd, shell=True, capture_output=True, text=True)
         return result.returncode == 0, result.stdout + result.stderr
     except Exception as e:
         return False, str(e)
+
 
 def generate_report():
     print(f"Starting System Audit at {datetime.datetime.now()}...")
@@ -78,24 +73,26 @@ def generate_report():
     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Calculate stats
-    total_checks = len(structure_results) + 3 + len(func_results) # +3 for dashboard, notion, search + func tests
-    passed_checks = sum(1 for r in structure_results if "Found" in r['status']) + \
-                   (1 if "Operational" in dashboard_status else 0) + \
-                   (1 if "Configured" in notion_status else 0) + \
-                   1 + \
-                   sum(1 for r in func_results if "Passed" in r['status'])
+    total_checks = len(structure_results) + 3 + len(func_results)  # +3 for dashboard, notion, search + func tests
+    passed_checks = (
+        sum(1 for r in structure_results if "Found" in r["status"])
+        + (1 if "Operational" in dashboard_status else 0)
+        + (1 if "Configured" in notion_status else 0)
+        + 1
+        + sum(1 for r in func_results if "Passed" in r["status"])
+    )
 
     success_rate = int((passed_checks / total_checks) * 100)
 
     # Generate Functionality Rows
     func_rows = ""
     for res in func_results:
-        badge = "badge-success" if "Passed" in res['status'] else "badge-danger"
-        status_text = "✅ Успешно" if "Passed" in res['status'] else "❌ Ошибка"
-        error_text = f"<br><small style='color:#ef4444'>{res['error']}</small>" if res['error'] else ""
+        badge = "badge-success" if "Passed" in res["status"] else "badge-danger"
+        status_text = "✅ Успешно" if "Passed" in res["status"] else "❌ Ошибка"
+        error_text = f"<br><small style='color:#ef4444'>{res['error']}</small>" if res["error"] else ""
         func_rows += f"""
         <tr class="status-item">
-            <td><strong>{res['name']}</strong></td>
+            <td><strong>{res["name"]}</strong></td>
             <td class="path-text">Тест инициализации и импорта</td>
             <td><span class="badge {badge}">{status_text}</span>{error_text}</td>
         </tr>
@@ -104,12 +101,12 @@ def generate_report():
     # Translate Structure Results
     structure_rows = ""
     for r in structure_results:
-        status_icon = "✅ Найден" if "Found" in r['status'] else "❌ Отсутствует"
-        badge_cls = "badge-success" if "Found" in r['status'] else "badge-danger"
+        status_icon = "✅ Найден" if "Found" in r["status"] else "❌ Отсутствует"
+        badge_cls = "badge-success" if "Found" in r["status"] else "badge-danger"
         structure_rows += f"""
         <tr class="status-item">
-            <td><strong>{r['name']}</strong></td>
-            <td class="path-text">{r['path']}</td>
+            <td><strong>{r["name"]}</strong></td>
+            <td class="path-text">{r["path"]}</td>
             <td><span class="badge {badge_cls}">{status_icon}</span></td>
         </tr>
         """
@@ -299,13 +296,13 @@ def generate_report():
                 <div class="stat-label">Здоровье Системы</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: {'var(--success)' if tests_passed else 'var(--danger)'}">
+                <div class="stat-value" style="color: {"var(--success)" if tests_passed else "var(--danger)"}">
                     {system_status_text}
                 </div>
                 <div class="stat-label">Статус</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{'8/8' if tests_passed else 'FAILED'}</div>
+                <div class="stat-value">{"8/8" if tests_passed else "FAILED"}</div>
                 <div class="stat-label">Тестов Пройдено</div>
             </div>
         </div>
@@ -323,12 +320,12 @@ def generate_report():
                 <tr class="status-item">
                     <td><strong>Dashboard UI (Веб)</strong></td>
                     <td class="path-text">Функция поиска заметок</td>
-                    <td><span class="badge { 'badge-success' if 'Operational' in dashboard_status else 'badge-warning' }">{'✅ Работает' if 'Operational' in dashboard_status else dashboard_status}</span></td>
+                    <td><span class="badge {"badge-success" if "Operational" in dashboard_status else "badge-warning"}">{"✅ Работает" if "Operational" in dashboard_status else dashboard_status}</span></td>
                 </tr>
                 <tr class="status-item">
                     <td><strong>Интеграция Notion</strong></td>
                     <td class="path-text">Конфигурация среды и кода</td>
-                    <td><span class="badge {notion_badge}">{ '✅ Настроено' if 'Configured' in notion_status else '❌ Ошибка' }</span></td>
+                    <td><span class="badge {notion_badge}">{"✅ Настроено" if "Configured" in notion_status else "❌ Ошибка"}</span></td>
                 </tr>
                 <tr class="status-item">
                     <td><strong>Модуль Поиска</strong></td>
@@ -354,7 +351,7 @@ def generate_report():
             <h2>🔬 Журнал Выполнения Тестов</h2>
             <div class="terminal-window">
                 <div class="test-output">
-                    {tests_output.replace(chr(10), '<br>')}
+                    {tests_output.replace(chr(10), "<br>")}
                 </div>
             </div>
         </div>
@@ -371,6 +368,7 @@ def generate_report():
     # Open on Mac
     subprocess.run(f"open {REPORT_PATH}", shell=True)
 
+
 def run_functionality_tests():
     """Run smoke tests (import & init) for key modules."""
     print("Running Functionality Smoke Tests...")
@@ -382,13 +380,16 @@ def run_functionality_tests():
         error = ""
         try:
             # Mock env for safety
-            with patch.dict(os.environ, {
-                "TELEGRAM_BOT_TOKEN": "test_token",
-                "OPENAI_API_KEY": "test_key",
-                "GEMINI_API_KEY": "test_key",
-                "NOTION_API_KEY": "test",
-                "NOTION_DATABASE_ID": "test"
-            }):
+            with patch.dict(
+                os.environ,
+                {
+                    "TELEGRAM_BOT_TOKEN": "test_token",
+                    "OPENAI_API_KEY": "test_key",
+                    "GEMINI_API_KEY": "test_key",
+                    "NOTION_API_KEY": "test",
+                    "NOTION_DATABASE_ID": "test",
+                },
+            ):
                 # Dynamic import
                 spec = importlib.util.spec_from_file_location("module", os.path.join(AI_CORE_PATH, module_path))
                 module = importlib.util.module_from_spec(spec)
@@ -423,6 +424,7 @@ def run_functionality_tests():
         results.append(test_init(name, path, cls))
 
     return results
+
 
 if __name__ == "__main__":
     generate_report()

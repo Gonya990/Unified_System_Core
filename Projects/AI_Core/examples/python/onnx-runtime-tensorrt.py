@@ -22,10 +22,10 @@ def setup_tensorrt_options():
 
     # Переменные окружения для TensorRT
     tensorrt_env = {
-        'ORT_TENSORRT_FP16_ENABLE': '1',  # Включить FP16 для ускорения
-        'ORT_TENSORRT_ENGINE_CACHE_ENABLE': '1',  # Кэширование движков
-        'ORT_TENSORRT_CACHE_PATH': './tensorrt_cache',  # Путь к кэшу
-        'ORT_TENSORRT_MAX_WORKSPACE_SIZE': '4294967296',  # 4GB workspace
+        "ORT_TENSORRT_FP16_ENABLE": "1",  # Включить FP16 для ускорения
+        "ORT_TENSORRT_ENGINE_CACHE_ENABLE": "1",  # Кэширование движков
+        "ORT_TENSORRT_CACHE_PATH": "./tensorrt_cache",  # Путь к кэшу
+        "ORT_TENSORRT_MAX_WORKSPACE_SIZE": "4294967296",  # 4GB workspace
     }
 
     for key, value in tensorrt_env.items():
@@ -54,42 +54,43 @@ def create_inference_session(model_path, use_tensorrt=True):
     providers = []
     provider_options = []
 
-    if use_tensorrt and 'TensorrtExecutionProvider' in ort.get_available_providers():
+    if use_tensorrt and "TensorrtExecutionProvider" in ort.get_available_providers():
         # TensorRT провайдер с настройками
-        providers.append('TensorrtExecutionProvider')
-        provider_options.append({
-            'trt_fp16_enable': True,  # FP16 precision
-            'trt_engine_cache_enable': True,  # Кэширование движков
-            'trt_engine_cache_path': './tensorrt_cache',
-            'trt_max_workspace_size': 4 * 1024 * 1024 * 1024,  # 4GB
-            'trt_max_partition_iterations': 1000,
-        })
+        providers.append("TensorrtExecutionProvider")
+        provider_options.append(
+            {
+                "trt_fp16_enable": True,  # FP16 precision
+                "trt_engine_cache_enable": True,  # Кэширование движков
+                "trt_engine_cache_path": "./tensorrt_cache",
+                "trt_max_workspace_size": 4 * 1024 * 1024 * 1024,  # 4GB
+                "trt_max_partition_iterations": 1000,
+            }
+        )
         print("  ✓ Используется TensorRT провайдер")
 
-    if 'CUDAExecutionProvider' in ort.get_available_providers():
+    if "CUDAExecutionProvider" in ort.get_available_providers():
         # CUDA провайдер (fallback если TensorRT не подходит)
-        providers.append('CUDAExecutionProvider')
-        provider_options.append({
-            'device_id': 0,  # GPU ID
-            'arena_extend_strategy': 'kNextPowerOfTwo',  # Стратегия расширения памяти
-            'gpu_mem_limit': 4 * 1024 * 1024 * 1024,  # 4GB лимит
-            'cudnn_conv_algo_search': 'EXHAUSTIVE',  # Поиск оптимального алгоритма
-            'do_copy_in_default_stream': True,
-        })
+        providers.append("CUDAExecutionProvider")
+        provider_options.append(
+            {
+                "device_id": 0,  # GPU ID
+                "arena_extend_strategy": "kNextPowerOfTwo",  # Стратегия расширения памяти
+                "gpu_mem_limit": 4 * 1024 * 1024 * 1024,  # 4GB лимит
+                "cudnn_conv_algo_search": "EXHAUSTIVE",  # Поиск оптимального алгоритма
+                "do_copy_in_default_stream": True,
+            }
+        )
         print("  ✓ Добавлен CUDA провайдер (fallback)")
 
     # CPU провайдер (последний fallback)
-    providers.append('CPUExecutionProvider')
+    providers.append("CPUExecutionProvider")
     provider_options.append({})
     print("  ✓ Добавлен CPU провайдер (fallback)")
 
     # Создание сессии
     try:
         session = ort.InferenceSession(
-            model_path,
-            sess_options=sess_options,
-            providers=providers,
-            provider_options=provider_options
+            model_path, sess_options=sess_options, providers=providers, provider_options=provider_options
         )
 
         print(f"\n  Активный провайдер: {session.get_providers()[0]}")
@@ -153,42 +154,34 @@ def compare_providers(model_path, input_shape):
     results = {}
 
     # Тест TensorRT
-    if 'TensorrtExecutionProvider' in ort.get_available_providers():
+    if "TensorrtExecutionProvider" in ort.get_available_providers():
         print("\n[1] TensorRT провайдер:")
         session = create_inference_session(model_path, use_tensorrt=True)
         if session:
             latencies = benchmark_model(session, input_data)
-            results['TensorRT'] = np.mean(latencies)
+            results["TensorRT"] = np.mean(latencies)
 
     # Тест CUDA
-    if 'CUDAExecutionProvider' in ort.get_available_providers():
+    if "CUDAExecutionProvider" in ort.get_available_providers():
         print("\n[2] CUDA провайдер:")
         sess_options = ort.SessionOptions()
         sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        session = ort.InferenceSession(
-            model_path,
-            providers=['CUDAExecutionProvider'],
-            sess_options=sess_options
-        )
+        session = ort.InferenceSession(model_path, providers=["CUDAExecutionProvider"], sess_options=sess_options)
         latencies = benchmark_model(session, input_data)
-        results['CUDA'] = np.mean(latencies)
+        results["CUDA"] = np.mean(latencies)
 
     # Тест CPU
     print("\n[3] CPU провайдер (baseline):")
     sess_options = ort.SessionOptions()
     sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-    session = ort.InferenceSession(
-        model_path,
-        providers=['CPUExecutionProvider'],
-        sess_options=sess_options
-    )
+    session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"], sess_options=sess_options)
     latencies = benchmark_model(session, input_data)
-    results['CPU'] = np.mean(latencies)
+    results["CPU"] = np.mean(latencies)
 
     # Итоговое сравнение
     print_section("Итоговое сравнение")
 
-    baseline = results.get('CPU', 0)
+    baseline = results.get("CPU", 0)
     for provider, latency in sorted(results.items(), key=lambda x: x[1]):
         speedup = baseline / latency if latency > 0 else 0
         print(f"  {provider:15s}: {latency:7.2f} ms (ускорение {speedup:.2f}x)")
@@ -204,7 +197,7 @@ def main():
         print(f"  • {provider}")
 
     # Настройка TensorRT
-    if 'TensorrtExecutionProvider' in providers:
+    if "TensorrtExecutionProvider" in providers:
         print_section("Настройка TensorRT")
         tensorrt_env = setup_tensorrt_options()
         for key, value in tensorrt_env.items():

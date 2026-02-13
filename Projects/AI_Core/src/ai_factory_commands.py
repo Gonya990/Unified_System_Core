@@ -4,6 +4,7 @@ AI Factory Bot Commands - Telegram integration
 Add these commands to ai_telegram_bot_v2.py
 """
 
+
 async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Generate background music using Suno AI."""
     user_id = update.effective_user.id
@@ -18,7 +19,7 @@ async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "**Genres:** electronic, ambient, cinematic\n"
             "**Duration:** 30-180 seconds (default: 60)\n\n"
             "Example: `/aimusic upbeat electronic 45`",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -31,6 +32,7 @@ async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         import sys
         from pathlib import Path
+
         # Detect Unified_System_Core root
         CURRENT_FILE = Path(__file__).resolve()
         # ai_factory_commands.py is in Projects/AI_Core/src/
@@ -41,18 +43,12 @@ async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         from music_generator import MusicGenerator
 
         gen = MusicGenerator(use_ai=True)
-        music_path = gen.generate_music(
-            mood=mood,
-            duration=duration,
-            genre=genre
-        )
+        music_path = gen.generate_music(mood=mood, duration=duration, genre=genre)
 
         if music_path and music_path.exists():
             with open(music_path, "rb") as audio_file:
                 await update.message.reply_audio(
-                    audio=audio_file,
-                    title=f"{mood.capitalize()} {genre}",
-                    performer="Suno AI"
+                    audio=audio_file, title=f"{mood.capitalize()} {genre}", performer="Suno AI"
                 )
             await update.message.reply_text(f"✅ Music generated: {music_path.name}")
         else:
@@ -75,7 +71,7 @@ async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Usage: `/aivoice <emotion> <text>`\n\n"
             "**Emotions:** excited, dramatic, mysterious, sad, calm, neutral\n\n"
             "Example: `/aivoice excited Welcome to the future of AI!`",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -91,6 +87,7 @@ async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         import sys
         from pathlib import Path
+
         # Detect Unified_System_Core root
         CURRENT_FILE = Path(__file__).resolve()
         UNIFIED_ROOT = CURRENT_FILE.parent.parent.parent.parent
@@ -100,11 +97,7 @@ async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         from voice_generator import VoiceGenerator
 
         gen = VoiceGenerator()
-        voice_path = gen.generate_speech(
-            text=text,
-            voice_name="Antoni",
-            emotion=emotion
-        )
+        voice_path = gen.generate_speech(text=text, voice_name="Antoni", emotion=emotion)
 
         if voice_path and voice_path.exists():
             with open(voice_path, "rb") as audio_file:
@@ -130,7 +123,7 @@ async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE
             "Usage: `/aisub <style> <text>`\n\n"
             "**Styles:** impact, karaoke, cartoon, minimal\n\n"
             "Example: `/aisub impact AI is changing the world`",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
         )
         return
 
@@ -146,6 +139,7 @@ async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     try:
         import sys
         from pathlib import Path
+
         # Detect Unified_System_Core root
         CURRENT_FILE = Path(__file__).resolve()
         UNIFIED_ROOT = CURRENT_FILE.parent.parent.parent.parent
@@ -157,12 +151,7 @@ async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE
         gen = AdvancedSubtitles(style=style)
 
         # Create simple segment
-        segment = SubtitleSegment(
-            text=text,
-            start=0.0,
-            end=5.0,
-            words=[]
-        )
+        segment = SubtitleSegment(text=text, start=0.0, end=5.0, words=[])
 
         output_dir = Path("/tmp/subs")
         output_dir.mkdir(exist_ok=True)
@@ -175,21 +164,12 @@ async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         # Send both files
         with open(srt_path, "rb") as srt_file:
-            await update.message.reply_document(
-                document=srt_file,
-                filename=f"{style}_subtitle.srt"
-            )
+            await update.message.reply_document(document=srt_file, filename=f"{style}_subtitle.srt")
 
         with open(ass_path, "rb") as ass_file:
-            await update.message.reply_document(
-                document=ass_file,
-                filename=f"{style}_subtitle.ass"
-            )
+            await update.message.reply_document(document=ass_file, filename=f"{style}_subtitle.ass")
 
-        await update.message.reply_text(
-            f"✅ Generated subtitles in {style} style\n"
-            f"Files: SRT (simple) + ASS (styled)"
-        )
+        await update.message.reply_text(f"✅ Generated subtitles in {style} style\nFiles: SRT (simple) + ASS (styled)")
 
     except Exception as e:
         logger.error(f"Subtitle generation error: {e}")

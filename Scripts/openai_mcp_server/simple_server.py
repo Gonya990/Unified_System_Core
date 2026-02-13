@@ -15,73 +15,68 @@ from openai import OpenAI
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
 class MCPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        content_length = int(self.headers.get('Content-Length', 0))
+        content_length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(content_length)
 
         try:
-            request = json.loads(body.decode('utf-8'))
+            request = json.loads(body.decode("utf-8"))
         except Exception:
             request = {}
 
-        method = request.get('method', 'unknown')
+        method = request.get("method", "unknown")
 
-        if method == 'chat':
-            response = self.handle_chat(request.get('params', {}))
-        elif method == 'models':
+        if method == "chat":
+            response = self.handle_chat(request.get("params", {}))
+        elif method == "models":
             response = self.handle_models()
-        elif method == 'test':
-            response = {'status': 'success', 'message': 'Server is running'}
+        elif method == "test":
+            response = {"status": "success", "message": "Server is running"}
         else:
-            response = {'error': f'Unknown method: {method}'}
+            response = {"error": f"Unknown method: {method}"}
 
         self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(json.dumps(response, ensure_ascii=False).encode('utf-8'))
+        self.wfile.write(json.dumps(response, ensure_ascii=False).encode("utf-8"))
 
     def handle_chat(self, params):
         try:
-            message = params.get('message', '')
-            model = params.get('model', 'gpt-4o-mini')
+            message = params.get("message", "")
+            model = params.get("model", "gpt-4o-mini")
 
-            completion = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": message}]
-            )
+            completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": message}])
 
             return {
-                'status': 'success',
-                'response': completion.choices[0].message.content,
-                'model': completion.model,
-                'tokens': {
-                    'prompt': completion.usage.prompt_tokens,
-                    'completion': completion.usage.completion_tokens,
-                    'total': completion.usage.total_tokens
-                }
+                "status": "success",
+                "response": completion.choices[0].message.content,
+                "model": completion.model,
+                "tokens": {
+                    "prompt": completion.usage.prompt_tokens,
+                    "completion": completion.usage.completion_tokens,
+                    "total": completion.usage.total_tokens,
+                },
             }
         except Exception as e:
-            return {'status': 'error', 'error': str(e)}
+            return {"status": "error", "error": str(e)}
 
     def handle_models(self):
         try:
             models = client.models.list()
             model_list = [model.id for model in models.data]
-            return {
-                'status': 'success',
-                'models': model_list,
-                'count': len(model_list)
-            }
+            return {"status": "success", "models": model_list, "count": len(model_list)}
         except Exception as e:
-            return {'status': 'error', 'error': str(e)}
+            return {"status": "error", "error": str(e)}
 
     def log_message(self, format, *args):
         # Suppress default logging
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("╔══════════════════════════════════════════════════════════════╗")
     print("║   OpenAI MCP Server v2 | MCP Сервер OpenAI v2               ║")
     print("╚══════════════════════════════════════════════════════════════╝")
@@ -117,7 +112,7 @@ if __name__ == '__main__':
     print("Press Ctrl+C to stop | Нажмите Ctrl+C для остановки")
     print()
 
-    server = HTTPServer(('127.0.0.1', 8766), MCPHandler)
+    server = HTTPServer(("127.0.0.1", 8766), MCPHandler)
 
     try:
         server.serve_forever()

@@ -18,12 +18,11 @@ from fastmcp import FastMCP
 load_dotenv()
 
 # Initialize FastMCP server
-mcp = FastMCP("openai-gateway",
-              host="127.0.0.1",
-              port=8766)
+mcp = FastMCP("openai-gateway", host="127.0.0.1", port=8766)
 
 # Configure OpenAI client
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 @mcp.tool()
 def list_conversations(limit: int = 20, offset: int = 0) -> list[dict[str, Any]]:
@@ -49,18 +48,14 @@ def list_conversations(limit: int = 20, offset: int = 0) -> list[dict[str, Any]]
             "status": "note",
             "message": "OpenAI API doesn't yet expose conversation history directly. Use export method or wait for official API support.",
             "alternative": "Consider using the manual export method from ChatGPT UI → Settings → Data Controls → Export",
-            "conversations": []
+            "conversations": [],
         }
     except Exception as e:
-        return {
-            "error": str(e),
-            "status": "error"
-        }
+        return {"error": str(e), "status": "error"}
 
 
 @mcp.tool()
-def send_message(message: str, conversation_id: Optional[str] = None,
-                model: str = "gpt-4") -> dict[str, Any]:
+def send_message(message: str, conversation_id: Optional[str] = None, model: str = "gpt-4") -> dict[str, Any]:
     """
     Send a message to ChatGPT and get response.
 
@@ -76,25 +71,17 @@ def send_message(message: str, conversation_id: Optional[str] = None,
         Response from ChatGPT
     """
     try:
-        response = openai.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "user", "content": message}
-            ]
-        )
+        response = openai.chat.completions.create(model=model, messages=[{"role": "user", "content": message}])
 
         return {
             "status": "success",
             "response": response.choices[0].message.content,
             "model": model,
             "tokens_used": response.usage.total_tokens,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+        return {"status": "error", "error": str(e)}
 
 
 @mcp.tool()
@@ -110,15 +97,9 @@ def get_models() -> list[str]:
     """
     try:
         models = openai.models.list()
-        return {
-            "status": "success",
-            "models": [model.id for model in models.data]
-        }
+        return {"status": "success", "models": [model.id for model in models.data]}
     except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+        return {"status": "error", "error": str(e)}
 
 
 @mcp.tool()
@@ -140,21 +121,16 @@ def get_account_info() -> dict[str, Any]:
             "status": "success",
             "api_key_valid": True,
             "models_accessible": len(models.data),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e),
-            "api_key_valid": False
-        }
+        return {"status": "error", "error": str(e), "api_key_valid": False}
 
 
 @mcp.tool()
-def chat_with_context(messages: list[dict[str, str]],
-                     model: str = "gpt-4",
-                     temperature: float = 0.7,
-                     max_tokens: int = 4000) -> dict[str, Any]:
+def chat_with_context(
+    messages: list[dict[str, str]], model: str = "gpt-4", temperature: float = 0.7, max_tokens: int = 4000
+) -> dict[str, Any]:
     """
     Send messages with full conversation context to ChatGPT.
 
@@ -172,10 +148,7 @@ def chat_with_context(messages: list[dict[str, str]],
     """
     try:
         response = openai.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens
+            model=model, messages=messages, temperature=temperature, max_tokens=max_tokens
         )
 
         return {
@@ -185,16 +158,13 @@ def chat_with_context(messages: list[dict[str, str]],
             "tokens_used": {
                 "prompt": response.usage.prompt_tokens,
                 "completion": response.usage.completion_tokens,
-                "total": response.usage.total_tokens
+                "total": response.usage.total_tokens,
             },
             "finish_reason": response.choices[0].finish_reason,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+        return {"status": "error", "error": str(e)}
 
 
 @mcp.resource("openai://status")
@@ -223,8 +193,8 @@ def get_server_status() -> str:
             "send_message": "Send individual messages",
             "chat_with_context": "Multi-turn conversations",
             "get_models": "List available models",
-            "get_account_info": "Account information"
-        }
+            "get_account_info": "Account information",
+        },
     }
 
     return json.dumps(status, indent=2)

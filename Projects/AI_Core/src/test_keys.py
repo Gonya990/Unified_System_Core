@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
+
 def test_openai():
     print("Testing OpenAI...")
     key = os.getenv("OPENAI_API_KEY")
@@ -16,13 +17,12 @@ def test_openai():
     client = openai.OpenAI(api_key=key)
     try:
         res = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": "ping"}],
-            max_tokens=5
+            model="gpt-4o-mini", messages=[{"role": "user", "content": "ping"}], max_tokens=5
         )
         print(f"✅ OpenAI works: {res.choices[0].message.content}")
     except Exception as e:
         print(f"❌ OpenAI failed: {e}")
+
 
 def test_gemini():
     print("\nTesting Gemini...")
@@ -40,6 +40,7 @@ def test_gemini():
         print(f"✅ Gemini works: {res.text}")
     except Exception as e:
         print(f"❌ Gemini failed: {e}")
+
 
 if __name__ == "__main__":
     test_openai()

@@ -1,4 +1,3 @@
-
 import argparse
 import sys
 from pathlib import Path
@@ -11,10 +10,8 @@ CREDS_DIR = BASE_DIR / "Scripts" / "automation" / ".credentials"
 CREDENTIALS_PATH = CREDS_DIR / "gmail_credentials.json"
 TOKEN_PATH = CREDS_DIR / "gmail_token.json"
 
-SCOPES = [
-    "https://www.googleapis.com/auth/gmail.readonly",
-    "https://www.googleapis.com/auth/gmail.compose"
-]
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.compose"]
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -23,9 +20,7 @@ def main():
 
     try:
         flow = Flow.from_client_secrets_file(
-            str(CREDENTIALS_PATH),
-            scopes=SCOPES,
-            redirect_uri='urn:ietf:wg:oauth:2.0:oob'
+            str(CREDENTIALS_PATH), scopes=SCOPES, redirect_uri="urn:ietf:wg:oauth:2.0:oob"
         )
 
         # Exchange code for token
@@ -42,6 +37,7 @@ def main():
     except Exception as e:
         print(f"❌ Error completing auth: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@
 Multi-platform upload for Sora 2 video
 Upload to: Instagram, YouTube, TikTok (via Threads as alternative)
 """
+
 import json
 import sys
 from pathlib import Path
@@ -81,8 +82,19 @@ YT_DESCRIPTION = """🚀 Безлимитный доступ к Sora 2 от Open
 #Sora2 #AI #Free #Tutorial #OpenAI #VideoGeneration #AITools #Tech #ContentCreation
 """
 
-YT_TAGS = ["Sora 2", "AI", "Free", "OpenAI", "Tutorial", "Video Generation",
-           "AI Tools", "Tech", "Content Creation", "Sora 2 Free", "AI Video"]
+YT_TAGS = [
+    "Sora 2",
+    "AI",
+    "Free",
+    "OpenAI",
+    "Tutorial",
+    "Video Generation",
+    "AI Tools",
+    "Tech",
+    "Content Creation",
+    "Sora 2 Free",
+    "AI Video",
+]
 
 # PHASE 1: Instagram Reels
 print("📱 PHASE 1: INSTAGRAM REELS")
@@ -99,18 +111,15 @@ try:
         print("⚠️ No Instagram accounts configured")
     else:
         for acc in insta_accounts:
-            username = acc.get('username', 'Account')
+            username = acc.get("username", "Account")
             print(f"\n📤 Uploading to Instagram: {username}")
 
             try:
                 import time
+
                 time.sleep(5)  # Rate limiting
 
-                success = upload_reel(
-                    str(VIDEO_PATH),
-                    CAPTION_RU,
-                    session_id=acc.get("session_id")
-                )
+                success = upload_reel(str(VIDEO_PATH), CAPTION_RU, session_id=acc.get("session_id"))
 
                 if success:
                     print(f"✅ Instagram ({username}): SUCCESS!")
@@ -140,7 +149,7 @@ try:
         print("⚠️ No YouTube accounts configured")
     else:
         for acc in yt_accounts:
-            channel = acc.get('name', 'Channel')
+            channel = acc.get("name", "Channel")
             print(f"\n📤 Uploading to YouTube: {channel}")
 
             try:
@@ -151,7 +160,7 @@ try:
                     tags=YT_TAGS,
                     privacy_status="public",
                     token_file=acc.get("token_file"),
-                    category_id="28"  # Science & Technology
+                    category_id="28",  # Science & Technology
                 )
 
                 if success:
@@ -178,9 +187,9 @@ try:
 
     print("\n📤 Uploading to Threads...")
 
-    threads_text = f"""{config['script_idea']['Title']}
+    threads_text = f"""{config["script_idea"]["Title"]}
 
-{config['script_idea']['Hook'][:200]}...
+{config["script_idea"]["Hook"][:200]}...
 
 Метод проверен 1,730+ людьми!
 

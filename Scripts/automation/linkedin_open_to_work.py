@@ -18,9 +18,9 @@ RESULTS_FILE = Path(__file__).parent / "linkedin_easy_apply_results.json"
 
 
 async def main():
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🚀 LINKEDIN: OPEN TO WORK + EASY APPLY")
-    print("="*60)
+    print("=" * 60)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
     try:
@@ -33,16 +33,13 @@ async def main():
         "timestamp": datetime.now().isoformat(),
         "open_to_work_enabled": False,
         "jobs_found": [],
-        "applications_sent": []
+        "applications_sent": [],
     }
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=False,
-            slow_mo=400
-        )
+        browser = await p.chromium.launch(headless=False, slow_mo=400)
 
-        context = await browser.new_context(viewport={'width': 1400, 'height': 900})
+        context = await browser.new_context(viewport={"width": 1400, "height": 900})
         page = await context.new_page()
 
         # === LOGIN CHECK ===
@@ -58,9 +55,9 @@ async def main():
         print("✅ Авторизация OK")
 
         # === STEP 1: ENABLE OPEN TO WORK ===
-        print("\n" + "-"*40)
+        print("\n" + "-" * 40)
         print("📍 ШАГ 1: Включение Open to Work")
-        print("-"*40)
+        print("-" * 40)
 
         await page.goto(PROFILE_URL, timeout=30000)
         await asyncio.sleep(3)
@@ -69,8 +66,7 @@ async def main():
         try:
             # Click on "Open to" button in profile header
             open_to_btn = await page.wait_for_selector(
-                'button:has-text("Open to"), a:has-text("Open to")',
-                timeout=5000
+                'button:has-text("Open to"), a:has-text("Open to")', timeout=5000
             )
             if open_to_btn:
                 await open_to_btn.click()
@@ -99,22 +95,24 @@ async def main():
             print("   Попробуйте вручную: Профиль → Open to → Finding a new job")
 
         # === STEP 2: SEARCH EASY APPLY JOBS ===
-        print("\n" + "-"*40)
+        print("\n" + "-" * 40)
         print("📍 ШАГ 2: Поиск вакансий с Easy Apply")
-        print("-"*40)
+        print("-" * 40)
 
         print(f"   URL: {JOBS_EASY_APPLY_URL[:60]}...")
         await page.goto(JOBS_EASY_APPLY_URL, timeout=30000)
         await asyncio.sleep(4)
 
         # Get job cards
-        job_cards = await page.query_selector_all('.jobs-search-results__list-item, .job-card-container, [data-job-id]')
+        job_cards = await page.query_selector_all(".jobs-search-results__list-item, .job-card-container, [data-job-id]")
         print(f"   Найдено карточек: {len(job_cards)}")
 
         jobs = []
         for i, card in enumerate(job_cards[:15]):
             try:
-                title_el = await card.query_selector('a strong, .job-card-list__title strong, [class*="job-card"] strong')
+                title_el = await card.query_selector(
+                    'a strong, .job-card-list__title strong, [class*="job-card"] strong'
+                )
                 company_el = await card.query_selector('[class*="company"], [class*="primary-description"]')
 
                 title = await title_el.inner_text() if title_el else "Unknown"
@@ -122,7 +120,7 @@ async def main():
 
                 job = {"title": title.strip(), "company": company.strip()[:30]}
                 jobs.append(job)
-                print(f"   {i+1}. {job['title'][:45]} @ {job['company']}")
+                print(f"   {i + 1}. {job['title'][:45]} @ {job['company']}")
             except Exception:
                 continue
 
@@ -130,9 +128,9 @@ async def main():
 
         # === STEP 3: APPLY TO JOBS ===
         if jobs:
-            print("\n" + "-"*40)
+            print("\n" + "-" * 40)
             print("📍 ШАГ 3: Отклики на вакансии")
-            print("-"*40)
+            print("-" * 40)
 
             for i, card in enumerate(job_cards[:5]):  # First 5 jobs
                 try:
@@ -141,11 +139,11 @@ async def main():
                     await asyncio.sleep(2)
 
                     # Find Easy Apply button
-                    easy_apply_btn = await page.query_selector('button.jobs-apply-button')
+                    easy_apply_btn = await page.query_selector("button.jobs-apply-button")
                     if easy_apply_btn:
                         btn_text = await easy_apply_btn.inner_text()
                         if "Easy Apply" in btn_text:
-                            print(f"\n   📝 Вакансия {i+1}: Найдена кнопка Easy Apply")
+                            print(f"\n   📝 Вакансия {i + 1}: Найдена кнопка Easy Apply")
 
                             await easy_apply_btn.click()
                             await asyncio.sleep(2)
@@ -159,13 +157,21 @@ async def main():
                                 await asyncio.sleep(1)
 
                             # Look for Submit or Next button
-                            submit_btn = await page.query_selector('button[aria-label*="Submit"], button:has-text("Submit application")')
-                            next_btn = await page.query_selector('button[aria-label*="Continue"], button:has-text("Next")')
+                            submit_btn = await page.query_selector(
+                                'button[aria-label*="Submit"], button:has-text("Submit application")'
+                            )
+                            next_btn = await page.query_selector(
+                                'button[aria-label*="Continue"], button:has-text("Next")'
+                            )
 
                             if submit_btn:
                                 # Direct submit available
-                                choice = input(f"      >>> Отправить заявку на '{jobs[i]['title'][:30]}'? (y/n): ").strip().lower()
-                                if choice == 'y':
+                                choice = (
+                                    input(f"      >>> Отправить заявку на '{jobs[i]['title'][:30]}'? (y/n): ")
+                                    .strip()
+                                    .lower()
+                                )
+                                if choice == "y":
                                     await submit_btn.click()
                                     await asyncio.sleep(2)
                                     print("      ✅ Заявка отправлена!")
@@ -187,18 +193,18 @@ async def main():
                     continue
 
         # === SAVE RESULTS ===
-        print("\n" + "-"*40)
+        print("\n" + "-" * 40)
         print("📍 Сохранение результатов")
-        print("-"*40)
+        print("-" * 40)
 
-        with open(RESULTS_FILE, 'w', encoding='utf-8') as f:
+        with open(RESULTS_FILE, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         print(f"   💾 {RESULTS_FILE}")
 
         # Summary
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📊 ИТОГО")
-        print("="*60)
+        print("=" * 60)
         print(f"   Open to Work: {'✅ Включён' if results['open_to_work_enabled'] else '⚠️ Проверьте вручную'}")
         print(f"   Вакансий найдено: {len(jobs)}")
         print(f"   Заявок отправлено: {len(results['applications_sent'])}")

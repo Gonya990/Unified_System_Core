@@ -43,7 +43,7 @@ class PeerReview:
 
     reviewer: str  # Who reviewed
     reviewee: str  # Whose response was reviewed
-    score: float   # 1-10
+    score: float  # 1-10
     strengths: list[str] = field(default_factory=list)
     weaknesses: list[str] = field(default_factory=list)
     commentary: str = ""
@@ -71,10 +71,7 @@ class BaseProvider(ABC):
         pass
 
     async def peer_review(
-        self,
-        original_query: str,
-        response_to_review: ProviderResponse,
-        other_responses: list[ProviderResponse]
+        self, original_query: str, response_to_review: ProviderResponse, other_responses: list[ProviderResponse]
     ) -> PeerReview:
         """
         Review another LLM's response.
@@ -120,11 +117,12 @@ COMMENTARY: [your assessment]
             reviewer=self.name,
             reviewee=response_to_review.provider_name,
             score=7.0,  # Default score
-            commentary=result.content
+            commentary=result.content,
         )
 
         # Try to extract score
         import re
+
         score_match = re.search(r"SCORE:\s*(\d+(?:\.\d+)?)", result.content)
         if score_match:
             review.score = float(score_match.group(1))
@@ -132,12 +130,16 @@ COMMENTARY: [your assessment]
         # Extract strengths
         strengths_match = re.search(r"STRENGTHS:(.*?)(?:WEAKNESSES:|$)", result.content, re.DOTALL)
         if strengths_match:
-            review.strengths = [s.strip().lstrip("- ") for s in strengths_match.group(1).strip().split("\n") if s.strip()]
+            review.strengths = [
+                s.strip().lstrip("- ") for s in strengths_match.group(1).strip().split("\n") if s.strip()
+            ]
 
         # Extract weaknesses
         weaknesses_match = re.search(r"WEAKNESSES:(.*?)(?:COMMENTARY:|$)", result.content, re.DOTALL)
         if weaknesses_match:
-            review.weaknesses = [w.strip().lstrip("- ") for w in weaknesses_match.group(1).strip().split("\n") if w.strip()]
+            review.weaknesses = [
+                w.strip().lstrip("- ") for w in weaknesses_match.group(1).strip().split("\n") if w.strip()
+            ]
 
         return review
 
@@ -147,7 +149,7 @@ COMMENTARY: [your assessment]
 
     async def close(self):
         """Cleanup resources."""
-        if hasattr(self._client, 'close'):
+        if hasattr(self._client, "close"):
             await self._client.close()
 
 

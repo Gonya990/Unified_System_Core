@@ -1,11 +1,12 @@
-import hmac
 import hashlib
-import time
-import uuid
+import hmac
 import json
 import logging
+import time
+import uuid
+from typing import Any
+
 import aiohttp
-from typing import Dict, Any, List
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger("BybitConnector")
@@ -29,21 +30,15 @@ class BybitConnector:
     def __init__(self, api_key: str, api_secret: str, testnet: bool = False):
         self.api_key = api_key
         self.api_secret = api_secret
-        self.base_url = (
-            "https://api-testnet.bybit.com" if testnet else "https://api.bybit.com"
-        )
-        self.rate_limit_status: Dict[str, int] = {}
+        self.base_url = "https://api-testnet.bybit.com" if testnet else "https://api.bybit.com"
+        self.rate_limit_status: dict[str, int] = {}
 
     def _generate_signature(self, timestamp: str, payload: str) -> str:
         recv_window = "5000"
         param_str = timestamp + self.api_key + recv_window + payload
-        return hmac.new(
-            self.api_secret.encode("utf-8"), param_str.encode("utf-8"), hashlib.sha256
-        ).hexdigest()
+        return hmac.new(self.api_secret.encode("utf-8"), param_str.encode("utf-8"), hashlib.sha256).hexdigest()
 
-    async def _request(
-        self, method: str, path: str, params: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+    async def _request(self, method: str, path: str, params: dict[str, Any] = None) -> dict[str, Any]:
         timestamp = str(int(time.time() * 1000))
         payload = json.dumps(params) if params else ""
         signature = self._generate_signature(timestamp, payload)
@@ -57,9 +52,7 @@ class BybitConnector:
         }
 
         async with aiohttp.ClientSession() as session:
-            async with session.request(
-                method, self.base_url + path, data=payload, headers=headers
-            ) as resp:
+            async with session.request(method, self.base_url + path, data=payload, headers=headers) as resp:
                 # Dynamic Rate Limiting handling
                 limit = resp.headers.get("X-Bapi-Limit-Status")
                 if limit:
@@ -72,9 +65,7 @@ class BybitConnector:
                     logger.error(f"Bybit Error {path}: {data}")
                 return data
 
-    async def create_batch_orders(
-        self, category: str, orders: List[OrderRequest]
-    ) -> Dict[str, Any]:
+    async def create_batch_orders(self, category: str, orders: list[OrderRequest]) -> dict[str, Any]:
         """
         Send Batch Orders using /v5/order/create-batch
         """
@@ -82,13 +73,11 @@ class BybitConnector:
         payload = {"category": category, "request": [order.dict() for order in orders]}
         return await self._request("POST", path, payload)
 
-    async def get_wallet_balance(self, accountType: str = "UNIFIED") -> Dict[str, Any]:
+    async def get_wallet_balance(self, accountType: str = "UNIFIED") -> dict[str, Any]:
         path = f"/v5/account/wallet-balance?accountType={accountType}"
         return await self._request("GET", path)
 
-    async def get_positions(
-        self, category: str = "linear", symbol: str = None
-    ) -> Dict[str, Any]:
+    async def get_positions(self, category: str = "linear", symbol: str = None) -> dict[str, Any]:
         path = f"/v5/position/list?category={category}"
         if symbol:
             path += f"&symbol={symbol}"

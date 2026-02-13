@@ -21,11 +21,7 @@ from typing import Any
 
 # Load environment from .env file
 def load_env():
-    env_paths = [
-        Path.home() / ".nodriver.env",
-        Path(__file__).parent / ".env",
-        Path.cwd() / ".env"
-    ]
+    env_paths = [Path.home() / ".nodriver.env", Path(__file__).parent / ".env", Path.cwd() / ".env"]
 
     for env_path in env_paths:
         if env_path.exists():
@@ -38,13 +34,13 @@ def load_env():
             print(f"✓ Loaded config from {env_path}")
             break
 
+
 load_env()
 
 # Configuration from environment
 CONFIG = {
     "chrome_debug_port": int(os.getenv("CHROME_DEBUG_PORT", "9222")),
-    "chrome_executable": os.getenv("CHROME_EXECUTABLE",
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+    "chrome_executable": os.getenv("CHROME_EXECUTABLE", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
     "socket_path": os.getenv("SOCKET_PATH", "/tmp/nodriver.sock"),
     "screenshot_path": os.getenv("SCREENSHOT_PATH", "/tmp/nodriver_screen.png"),
     "auto_start_chrome": os.getenv("AUTO_START_CHROME", "false").lower() == "true",
@@ -57,6 +53,7 @@ CONFIG = {
 # Try to import nodriver
 try:
     import nodriver as uc
+
     NODRIVER_AVAILABLE = True
 except ImportError:
     NODRIVER_AVAILABLE = False
@@ -81,10 +78,7 @@ class BrowserDaemon:
         try:
             # Connect to existing Chrome with remote debugging
             self.browser = await uc.start(
-                headless=False,
-                browser_args=[
-                    f"--remote-debugging-port={CONFIG['chrome_debug_port']}"
-                ]
+                headless=False, browser_args=[f"--remote-debugging-port={CONFIG['chrome_debug_port']}"]
             )
 
             # Get first tab or create one
@@ -398,10 +392,7 @@ class BrowserDaemon:
                     "status": "running",
                     "tabs": len(self.tabs),
                     "current_url": url,
-                    "config": {
-                        "chrome_port": CONFIG["chrome_debug_port"],
-                        "socket": self.socket_path
-                    }
+                    "config": {"chrome_port": CONFIG["chrome_debug_port"], "socket": self.socket_path},
                 }
 
             # Stop daemon
@@ -440,10 +431,7 @@ class BrowserDaemon:
             try:
                 # Accept connection with timeout
                 try:
-                    conn, _ = await asyncio.wait_for(
-                        loop.sock_accept(server),
-                        timeout=1.0
-                    )
+                    conn, _ = await asyncio.wait_for(loop.sock_accept(server), timeout=1.0)
                 except asyncio.TimeoutError:
                     continue
 

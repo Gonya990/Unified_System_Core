@@ -20,6 +20,6 @@ except ImportError as e:
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--daily":
-         run_factory_production(mode="daily")
+        run_factory_production(mode="daily")
     else:
-         start_scheduler()
+        start_scheduler()

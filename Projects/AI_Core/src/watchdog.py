@@ -5,11 +5,12 @@ import time
 import requests
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 FAIL_THRESHOLD = 5
 CHECK_INTERVAL = 60
+
 
 def send_alert(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -19,15 +20,12 @@ def send_alert(message):
         return
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "Markdown"
-    }
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
     try:
         requests.post(url, json=payload, timeout=10)
     except Exception as e:
         logger.error(f"Failed to send telegram alert: {e}")
+
 
 def check_health():
     try:
@@ -36,6 +34,7 @@ def check_health():
         return response.status_code == 200
     except:
         return False
+
 
 class BudgetMonitor:
     def __init__(self):
@@ -51,6 +50,7 @@ class BudgetMonitor:
         try:
             # Lazy import to avoid circular dependency issues at module level
             from src.gmail_client import GmailClient
+
             client = GmailClient()
             if not client.authenticated:
                 return
@@ -60,8 +60,8 @@ class BudgetMonitor:
             messages = client.search_emails(query, max_results=3)
 
             for msg in messages:
-                msg.get('snippet', '')
-                subject = msg.get('subject', '')
+                msg.get("snippet", "")
+                subject = msg.get("subject", "")
 
                 # Check for high percentages
                 if "100%" in subject or "150%" in subject or "90%" in subject:
@@ -101,7 +101,7 @@ class BudgetMonitor:
                     new_lines.append(line)
 
             if changed:
-                with open(env_path, 'w') as f:
+                with open(env_path, "w") as f:
                     f.writelines(new_lines)
                 logger.info("Switched INFERENCE_PROVIDER to ollama.")
 
@@ -114,6 +114,7 @@ class BudgetMonitor:
         except Exception as e:
             logger.error(f"Failed to enforce Ollama: {e}")
             send_alert(f"❌ Не удалось переключить на Ollama автоматически: {e}")
+
 
 def main():
     logger.info("Watchdog started.")
@@ -144,6 +145,7 @@ def main():
         budget_monitor.check_budget_alerts()
 
         time.sleep(CHECK_INTERVAL)
+
 
 if __name__ == "__main__":
     main()

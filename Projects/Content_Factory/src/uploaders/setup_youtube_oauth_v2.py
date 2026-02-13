@@ -30,9 +30,7 @@ def setup_oauth():
     print("--------------------------------------------------")
     print(f"1. CLICK THIS URL: {auth_url}")
     print("2. Authorize the app.")
-    print(
-        "3. You will be redirected to http://localhost/?code=... (Site can not be reached)"
-    )
+    print("3. You will be redirected to http://localhost/?code=... (Site can not be reached)")
     print("4. COPY the code value from the address bar.")
     print("--------------------------------------------------")
     print("Waiting for code in youtube_code.txt...")

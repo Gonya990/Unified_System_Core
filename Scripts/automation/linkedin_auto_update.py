@@ -21,9 +21,9 @@ PROFILE_URL = "https://www.linkedin.com/in/igor-goncharenko"
 
 
 async def main():
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔗 LINKEDIN AUTO-UPDATER")
-    print("="*60)
+    print("=" * 60)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
     try:
@@ -36,12 +36,10 @@ async def main():
         # Launch visible browser
         browser = await p.chromium.launch(
             headless=False,
-            slow_mo=500  # Slow down for visibility
+            slow_mo=500,  # Slow down for visibility
         )
 
-        context = await browser.new_context(
-            viewport={'width': 1400, 'height': 900}
-        )
+        context = await browser.new_context(viewport={"width": 1400, "height": 900})
 
         page = await context.new_page()
 
@@ -69,8 +67,7 @@ async def main():
         try:
             # Look for headline input
             headline_input = await page.wait_for_selector(
-                'input[id*="headline"], input[name*="headline"], input[aria-label*="Headline"]',
-                timeout=10000
+                'input[id*="headline"], input[name*="headline"], input[aria-label*="Headline"]', timeout=10000
             )
             if headline_input:
                 await headline_input.click()
@@ -85,8 +82,7 @@ async def main():
         print("\n📍 Шаг 4: Сохраняю изменения...")
         try:
             save_btn = await page.wait_for_selector(
-                'button[type="submit"], button:has-text("Save"), button:has-text("Сохранить")',
-                timeout=5000
+                'button[type="submit"], button:has-text("Save"), button:has-text("Сохранить")', timeout=5000
             )
             if save_btn:
                 await save_btn.click()
@@ -101,10 +97,7 @@ async def main():
         await asyncio.sleep(2)
 
         try:
-            about_textarea = await page.wait_for_selector(
-                'textarea, [contenteditable="true"]',
-                timeout=10000
-            )
+            about_textarea = await page.wait_for_selector('textarea, [contenteditable="true"]', timeout=10000)
             if about_textarea:
                 await about_textarea.click()
                 await page.keyboard.press("Control+A")
@@ -126,16 +119,16 @@ async def main():
 
         # Get current headline
         try:
-            headline_el = await page.query_selector('div.text-body-medium')
+            headline_el = await page.query_selector("div.text-body-medium")
             if headline_el:
                 current = await headline_el.inner_text()
                 print(f"   Текущий headline: {current[:50]}...")
         except Exception:
             pass
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✅ ГОТОВО!")
-        print("="*60)
+        print("=" * 60)
         print("\nПроверьте профиль в браузере.")
         print("Нажмите Enter для закрытия...")
 

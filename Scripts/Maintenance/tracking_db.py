@@ -1,10 +1,8 @@
-
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/Context/tracking.db"
-)
+DB_PATH = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context/tracking.db")
+
 
 def init_db():
     """Initialize the tracking database."""
@@ -13,7 +11,7 @@ def init_db():
     cursor = conn.cursor()
 
     # Task logging table
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS agent_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -22,19 +20,20 @@ def init_db():
             details TEXT,
             model TEXT
         )
-    ''')
+    """)
 
     # State tracking
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS system_state (
             key TEXT PRIMARY KEY,
             value TEXT,
             last_updated DATETIME
         )
-    ''')
+    """)
 
     conn.commit()
     conn.close()
+
 
 def log_task(task_name, status, details="", model="Antigravity-v1"):
     """Log a task execution."""
@@ -45,11 +44,12 @@ def log_task(task_name, status, details="", model="Antigravity-v1"):
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO agent_log (task_name, status, details, model) VALUES (?, ?, ?, ?)",
-        (task_name, status, details, model)
+        (task_name, status, details, model),
     )
     conn.commit()
     conn.close()
     print(f"📊 [DATABASE LOG] Task '{task_name}' status: {status}")
+
 
 if __name__ == "__main__":
     init_db()

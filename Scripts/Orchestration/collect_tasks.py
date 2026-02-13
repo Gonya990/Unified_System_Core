@@ -1,8 +1,8 @@
-
 import os
 
 BRAIN_DIR = "/Users/macbook/.gemini/antigravity/brain"
 OUTPUT_FILE = "/Users/macbook/Documents/Unified_System/TODO_CONSOLIDATED.md"
+
 
 def collect_tasks():
     all_tasks = {}
@@ -45,6 +45,7 @@ def collect_tasks():
             out.write("\n")
 
     print(f"Successfully collected tasks from {len(all_tasks)} files into {OUTPUT_FILE}")
+
 
 if __name__ == "__main__":
     collect_tasks()

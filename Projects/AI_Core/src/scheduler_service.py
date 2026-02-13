@@ -2,6 +2,7 @@
 Scheduler Service for AI Telegram Bot.
 Handles scheduled tasks and reminders using APScheduler.
 """
+
 import logging
 from datetime import datetime
 
@@ -12,12 +13,10 @@ from telegram.ext import Application
 
 logger = logging.getLogger(__name__)
 
+
 class SchedulerService:
     def __init__(self, db_path: str = "sqlite:///jobs.db"):
-        self.jobstores = {
-            'default': SQLAlchemyJobStore(url=db_path),
-            'memory': MemoryJobStore()
-        }
+        self.jobstores = {"default": SQLAlchemyJobStore(url=db_path), "memory": MemoryJobStore()}
         self.scheduler = AsyncIOScheduler(jobstores=self.jobstores)
         self.application = None  # Will hold Telegram Application instance
 
@@ -39,7 +38,9 @@ class SchedulerService:
             return
 
         try:
-            await self.application.bot.send_message(chat_id=chat_id, text=f"⏰ **Напоминание!**\n\n{text}", parse_mode="Markdown")
+            await self.application.bot.send_message(
+                chat_id=chat_id, text=f"⏰ **Напоминание!**\n\n{text}", parse_mode="Markdown"
+            )
         except Exception as e:
             logger.error(f"Failed to send reminder to {chat_id}: {e}")
 
@@ -47,16 +48,13 @@ class SchedulerService:
         """Schedule a one-time reminder."""
         try:
             self.scheduler.add_job(
-                self.send_reminder,
-                'date',
-                run_date=run_date,
-                args=[chat_id, text],
-                misfire_grace_time=3600
+                self.send_reminder, "date", run_date=run_date, args=[chat_id, text], misfire_grace_time=3600
             )
             return True
         except Exception as e:
             logger.error(f"Failed to add reminder: {e}")
             return False
+
     def add_daily_digest_job(self, chat_id: int, digest_callback, user_id: int, username: str):
         """Schedule daily digest at 09:00."""
         try:
@@ -74,13 +72,13 @@ class SchedulerService:
 
             self.scheduler.add_job(
                 send_digest,
-                'cron',
+                "cron",
                 hour=9,
                 minute=0,
                 id=job_id,
                 replace_existing=True,
                 misfire_grace_time=3600,
-                jobstore='memory'
+                jobstore="memory",
             )
             logger.info(f"Scheduled daily digest for {username} at 09:00")
             return True

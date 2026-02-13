@@ -44,9 +44,7 @@ def get_gmail_service():
                 print(f"❌ Missing credentials file: {CREDENTIALS_PATH}")
                 print("Please run gmail_agent.py first to set up OAuth.")
                 sys.exit(1)
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
 
         # Save refreshed/new credentials
@@ -61,16 +59,12 @@ def get_gmail_service():
 def get_email_body(payload):
     body = ""
     if "body" in payload and payload["body"].get("data"):
-        return base64.urlsafe_b64decode(payload["body"]["data"]).decode(
-            "utf-8", errors="ignore"
-        )
+        return base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="ignore")
     if "parts" in payload:
         for part in payload["parts"]:
             if part["mimeType"] == "text/plain":
                 if part["body"].get("data"):
-                    return base64.urlsafe_b64decode(part["body"]["data"]).decode(
-                        "utf-8", errors="ignore"
-                    )
+                    return base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="ignore")
             elif part["mimeType"].startswith("multipart/"):
                 found = get_email_body(part)
                 if found:
@@ -94,12 +88,7 @@ def main():
     next_page_token = None
 
     while True:
-        results = (
-            service.users()
-            .messages()
-            .list(userId="me", q=query, pageToken=next_page_token)
-            .execute()
-        )
+        results = service.users().messages().list(userId="me", q=query, pageToken=next_page_token).execute()
         new_messages = results.get("messages", [])
         messages.extend(new_messages)
         next_page_token = results.get("nextPageToken")
@@ -111,21 +100,12 @@ def main():
     email_data = []
     for i, msg in enumerate(messages):
         try:
-            full_msg = (
-                service.users()
-                .messages()
-                .get(userId="me", id=msg["id"], format="full")
-                .execute()
-            )
+            full_msg = service.users().messages().get(userId="me", id=msg["id"], format="full").execute()
             payload = full_msg.get("payload", {})
             headers = payload.get("headers", [])
 
-            subject = next(
-                (h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)"
-            )
-            sender = next(
-                (h["value"] for h in headers if h["name"] == "From"), "(Unknown)"
-            )
+            subject = next((h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)")
+            sender = next((h["value"] for h in headers if h["name"] == "From"), "(Unknown)")
             date = next((h["value"] for h in headers if h["name"] == "Date"), "")
             content = get_email_body(payload)
 

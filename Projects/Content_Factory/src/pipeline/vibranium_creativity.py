@@ -15,10 +15,10 @@ def generate_dynamic_content():
     CONTEXT: Unified_Core is an advanced AI system for strategic domination.
     IMPORTANT: DO NOT mention any other companies like IAI, Google, etc.
     Focus ONLY on Unified_Core.
-    
+
     TONE: Elite, Aggressive, Professional.
     VOICE: Onyx. Use '...' for dramatic pauses.
-    
+
     Format: Valid JSON with fields: title, script_ru, scenes (text, keyword),
     instagram_caption.
     Include the word 'json' in your thinking.
@@ -29,9 +29,7 @@ def generate_dynamic_content():
         try:
             from openai import OpenAI
 
-            client = OpenAI(
-                base_url="https://models.inference.ai.azure.com", api_key=gh_token
-            )
+            client = OpenAI(base_url="https://models.inference.ai.azure.com", api_key=gh_token)
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model="gpt-4o",

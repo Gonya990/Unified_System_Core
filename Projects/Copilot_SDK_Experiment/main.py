@@ -10,9 +10,11 @@ import asyncio
 # based on the README snippets I saw.
 # Once the network is up, run: pip install -r requirements.txt
 
+
 async def main():
     print("GitHub Copilot SDK Demo Agent")
     print("Waiting for network connection to install dependencies...")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

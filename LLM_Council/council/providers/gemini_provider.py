@@ -13,17 +13,13 @@ from .base import BaseProvider, ProviderResponse
 
 logger = logging.getLogger(__name__)
 
+
 class GeminiProvider(BaseProvider):
     """Google Gemini API provider (Gemini 2.0 Flash, Pro)."""
 
     name = "gemini"
 
-    def __init__(
-        self,
-        api_key: str,
-        model: str = "models/gemini-2.0-flash",
-        base_url: Optional[str] = None
-    ):
+    def __init__(self, api_key: str, model: str = "models/gemini-2.0-flash", base_url: Optional[str] = None):
         super().__init__(api_key, model, base_url)
         genai.configure(api_key=api_key)
         self._model_name = model
@@ -42,7 +38,7 @@ class GeminiProvider(BaseProvider):
             "models/gemini-2.5-flash",
             "models/gemini-2.0-flash",
             "models/gemini-flash-latest",
-            "models/gemini-pro-latest"
+            "models/gemini-pro-latest",
         ]
 
         last_error = None
@@ -57,10 +53,7 @@ class GeminiProvider(BaseProvider):
                         full_prompt = f"SYSTEM: {system_prompt}\n\nUSER: {prompt}"
 
                     loop = asyncio.get_event_loop()
-                    response = await loop.run_in_executor(
-                        None,
-                        lambda: model.generate_content(full_prompt)
-                    )
+                    response = await loop.run_in_executor(None, lambda: model.generate_content(full_prompt))
 
                     if not response.text:
                         raise ValueError("Empty response from Gemini")
@@ -72,10 +65,12 @@ class GeminiProvider(BaseProvider):
                         latency_ms=timer.elapsed_ms,
                         tokens_used=0,
                         metadata={
-                            "finish_reason": str(response.candidates[0].finish_reason) if response.candidates else "unknown",
+                            "finish_reason": str(response.candidates[0].finish_reason)
+                            if response.candidates
+                            else "unknown",
                             "requested_model": self._model_name,
-                            "actual_model": m_name
-                        }
+                            "actual_model": m_name,
+                        },
                     )
                 except Exception as e:
                     last_error = e
@@ -93,7 +88,7 @@ class GeminiProvider(BaseProvider):
             model=self.model,
             content="",
             latency_ms=0,
-            error=str(last_error) or "All Gemini models failed"
+            error=str(last_error) or "All Gemini models failed",
         )
 
     async def health_check(self) -> bool:
@@ -101,8 +96,7 @@ class GeminiProvider(BaseProvider):
         try:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                None,
-                lambda: self._model.generate_content("ping", generation_config={"max_output_tokens": 1})
+                None, lambda: self._model.generate_content("ping", generation_config={"max_output_tokens": 1})
             )
             return True
         except Exception as e:

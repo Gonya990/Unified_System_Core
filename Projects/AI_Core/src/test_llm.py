@@ -30,7 +30,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_name,
     torch_dtype=torch.float16,  # FP16 for memory efficiency
     device_map="cuda",  # Use GPU
-    trust_remote_code=True
+    trust_remote_code=True,
 )
 
 print("Model loaded successfully!")
@@ -39,7 +39,7 @@ print("Model loaded successfully!")
 prompts = [
     "What is artificial intelligence?",
     "Explain machine learning in simple terms:",
-    "Write a Python function to calculate fibonacci:"
+    "Write a Python function to calculate fibonacci:",
 ]
 
 print("\n" + "=" * 70)
@@ -55,13 +55,7 @@ for i, prompt in enumerate(prompts, 1):
 
     # Generate
     with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_length=150,
-            temperature=0.7,
-            do_sample=True,
-            top_p=0.9
-        )
+        outputs = model.generate(**inputs, max_length=150, temperature=0.7, do_sample=True, top_p=0.9)
 
     # Decode
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)

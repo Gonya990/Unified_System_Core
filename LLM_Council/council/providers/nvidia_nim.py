@@ -32,19 +32,11 @@ class NVIDIANIMProvider(BaseProvider):
         "google/gemma-2-27b-it",
     ]
 
-    def __init__(
-        self,
-        api_key: str,
-        model: str = "meta/llama-3.1-70b-instruct",
-        base_url: Optional[str] = None
-    ):
+    def __init__(self, api_key: str, model: str = "meta/llama-3.1-70b-instruct", base_url: Optional[str] = None):
         super().__init__(api_key, model, base_url or self.DEFAULT_BASE_URL)
 
         # Use OpenAI client since NVIDIA NIM is OpenAI-compatible
-        self._client = AsyncOpenAI(
-            api_key=api_key,
-            base_url=self.base_url
-        )
+        self._client = AsyncOpenAI(api_key=api_key, base_url=self.base_url)
 
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
         """Generate response using NVIDIA NIM API."""
@@ -74,7 +66,7 @@ class NVIDIANIMProvider(BaseProvider):
                     metadata={
                         "completion_id": response.id,
                         "finish_reason": response.choices[0].finish_reason,
-                    }
+                    },
                 )
 
             except Exception as e:
@@ -83,8 +75,8 @@ class NVIDIANIMProvider(BaseProvider):
                     provider_name=self.name,
                     model=self.model,
                     content="",
-                    latency_ms=getattr(timer, 'elapsed_ms', 0),
-                    error=str(e)
+                    latency_ms=getattr(timer, "elapsed_ms", 0),
+                    error=str(e),
                 )
 
     async def health_check(self) -> bool:
@@ -92,9 +84,7 @@ class NVIDIANIMProvider(BaseProvider):
         try:
             # Test with a simple completion
             await self._client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": "Hi"}],
-                max_tokens=5
+                model=self.model, messages=[{"role": "user", "content": "Hi"}], max_tokens=5
             )
             return True
         except Exception as e:

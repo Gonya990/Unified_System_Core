@@ -22,9 +22,7 @@ try:
     from utils import *
     from Utils.PLBERT.util import load_plbert
 except ImportError:
-    print(
-        "Error importing StyleTTS modules. Ensure you execute this script from StyleTTS2 root or set PYTHONPATH."
-    )
+    print("Error importing StyleTTS modules. Ensure you execute this script from StyleTTS2 root or set PYTHONPATH.")
     sys.exit(1)
 
 # Initialize cleaner
@@ -49,14 +47,10 @@ def load_model_checkpoint(model_path, config_path):
     BERT_path = config.get("PLBERT_dir", False)
     plbert = load_plbert(BERT_path)
 
-    model_params = munchify(
-        config["model_params"]
-    )  # Use munchify instead of recursive_munch if simple dict
+    model_params = munchify(config["model_params"])  # Use munchify instead of recursive_munch if simple dict
     model = build_model(model_params, text_aligner, pitch_extractor, plbert)
     _ = [model[key].eval() for key in model]
-    _ = [
-        model[key].to("cuda:0" if torch.cuda.is_available() else "cpu") for key in model
-    ]
+    _ = [model[key].to("cuda:0" if torch.cuda.is_available() else "cpu") for key in model]
 
     params = torch.load(model_path, map_location="cpu")
     params = params["net"]
@@ -79,9 +73,7 @@ def load_model_checkpoint(model_path, config_path):
 
 
 # Audio Preprocessing
-to_mel = torchaudio.transforms.MelSpectrogram(
-    n_mels=80, n_fft=2048, win_length=1200, hop_length=300
-)
+to_mel = torchaudio.transforms.MelSpectrogram(n_mels=80, n_fft=2048, win_length=1200, hop_length=300)
 mean, std = -4, 4
 
 
@@ -109,9 +101,7 @@ def compute_style(path, model, config):
     return ref
 
 
-def inference(
-    model, text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1
-):
+def inference(model, text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1):
     text = text.strip()
     ps = phonemize(
         [text],

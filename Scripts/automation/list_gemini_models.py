@@ -1,4 +1,3 @@
-
 import os
 
 from google import genai
@@ -14,6 +13,7 @@ def list_models():
     for model in client.models.list():
         if "gemini-2.0-flash" in model.name:
             print(f"- {model.name}: {model.supported_actions}")
+
 
 if __name__ == "__main__":
     list_models()

@@ -1,4 +1,3 @@
-
 import os
 
 import yaml
@@ -11,13 +10,16 @@ PROJECTS_FILE = os.path.join(NAV_DIR, "PROJECTS.yaml")
 # Load Projects
 with open(PROJECTS_FILE) as f:
     config = yaml.safe_load(f)
-    PROJECTS = {p['id']: p for p in config['projects']}
+    PROJECTS = {p["id"]: p for p in config["projects"]}
 
 # Regex helpers (simplified/duplicated from inventory but applied to Top Level items)
 import re
 
 PATTERNS = [
-    ("PRJ-001", r"^(ha_|hass|homeassistant|dashboard_|secrets\.yaml|verify_config|energy_|backup_|hubs_|paradox_|zigbee|wyoming|\.homeassistant)"),
+    (
+        "PRJ-001",
+        r"^(ha_|hass|homeassistant|dashboard_|secrets\.yaml|verify_config|energy_|backup_|hubs_|paradox_|zigbee|wyoming|\.homeassistant)",
+    ),
     ("PRJ-002", r"^(tuya|tinytuya|scan_|broadlink|monitor_|find_|sonoff|tasmota|smartthings|get_tuya|matter-data)"),
     ("PRJ-003", r"^(n8n|nodered|node_red|workflow|flow_|\.node-red)"),
     ("PRJ-004", r"^(llm-council|ollama|codex|copilot|browser_agent)"),
@@ -27,17 +29,60 @@ PATTERNS = [
 
 # Items to ignore (System)
 IGNORE_NAMES = {
-    "00_NAV", "01_Projects", "02_Shared", "03_Operations",
-    "90_Inbox_ToSort", "99_Archive_Original", "node_modules",
-    ".git", ".vscode", ".vscode-server", ".cache", ".local",
-    ".config", ".ssh", ".npm", ".nvm", "miniconda3", "snap",
-    ".venv", ".gemini", ".bashrc", ".profile", ".bash_history",
-    ".bash_logout", ".wget-hsts", ".sudo_as_admin_successful",
-    ".pki", ".fluxbox", ".lesshst", ".conda", ".docker", ".docker-temp",
-    ".dotnet", ".factory", ".iec_diag", ".kube", ".landscape", ".minikube",
-    ".motd_shown", ".nv", ".redhat", ".che", ".antigravity-server",
-    ".aws", ".azure", ".bun", ".codex", ".copilot", ".fehbg", ".ollama", "bin", "lib"
+    "00_NAV",
+    "01_Projects",
+    "02_Shared",
+    "03_Operations",
+    "90_Inbox_ToSort",
+    "99_Archive_Original",
+    "node_modules",
+    ".git",
+    ".vscode",
+    ".vscode-server",
+    ".cache",
+    ".local",
+    ".config",
+    ".ssh",
+    ".npm",
+    ".nvm",
+    "miniconda3",
+    "snap",
+    ".venv",
+    ".gemini",
+    ".bashrc",
+    ".profile",
+    ".bash_history",
+    ".bash_logout",
+    ".wget-hsts",
+    ".sudo_as_admin_successful",
+    ".pki",
+    ".fluxbox",
+    ".lesshst",
+    ".conda",
+    ".docker",
+    ".docker-temp",
+    ".dotnet",
+    ".factory",
+    ".iec_diag",
+    ".kube",
+    ".landscape",
+    ".minikube",
+    ".motd_shown",
+    ".nv",
+    ".redhat",
+    ".che",
+    ".antigravity-server",
+    ".aws",
+    ".azure",
+    ".bun",
+    ".codex",
+    ".copilot",
+    ".fehbg",
+    ".ollama",
+    "bin",
+    "lib",
 }
+
 
 def guess(name):
     name_lower = name.lower()
@@ -50,6 +95,7 @@ def guess(name):
     if name.endswith(".log"):
         return "LOGS"
     return "UNKNOWN"
+
 
 def main():
     migration_steps = []
@@ -77,7 +123,7 @@ def main():
 
         if pid in PROJECTS:
             prj = PROJECTS[pid]
-            base = prj['path']
+            base = prj["path"]
 
             # Determine subfolder
             if is_dir:
@@ -92,14 +138,14 @@ def main():
             else:
                 # File
                 ext = os.path.splitext(item)[1].lower()
-                if ext in ['.md', '.txt', '.pdf', '.csv', '.doc', '.docx', '.odt']:
-                     target = f"{base}/01_Docs/{item}"
-                elif ext in ['.yaml', '.json', '.py', '.js', '.sh', '.ini', '.cfg', '.db', '.log']:
-                     target = f"{base}/02_Dev/{item}"
-                elif ext in ['.jpg', '.png', '.svg']:
-                     target = f"{base}/03_Design/{item}"
+                if ext in [".md", ".txt", ".pdf", ".csv", ".doc", ".docx", ".odt"]:
+                    target = f"{base}/01_Docs/{item}"
+                elif ext in [".yaml", ".json", ".py", ".js", ".sh", ".ini", ".cfg", ".db", ".log"]:
+                    target = f"{base}/02_Dev/{item}"
+                elif ext in [".jpg", ".png", ".svg"]:
+                    target = f"{base}/03_Design/{item}"
                 else:
-                     target = f"{base}/02_Dev/{item}" # Fallback to dev
+                    target = f"{base}/02_Dev/{item}"  # Fallback to dev
 
             reason = f"Matched Project {pid}"
 
@@ -116,15 +162,10 @@ def main():
             target = f"90_Inbox_ToSort/NEEDS_REVIEW/{item}"
             reason = "Low confidence / Unknown"
 
-        migration_steps.append({
-            "source": source,
-            "target": target,
-            "reason": reason,
-            "project": pid
-        })
+        migration_steps.append({"source": source, "target": target, "reason": reason, "project": pid})
 
     # Generate Markdown Plan
-    with open(PLAN_FILE, 'w') as f:
+    with open(PLAN_FILE, "w") as f:
         f.write("# Migration Plan\n\n")
         f.write("| Source (Root Relative) | Target | Reason | Project |\n")
         f.write("|---|---|---|---|\n")
@@ -133,6 +174,7 @@ def main():
             f.write(f"| `{step['source']}` | `{step['target']}` | {step['reason']} | {step['project']} |\n")
 
     print(f"Plan generated at {PLAN_FILE}")
+
 
 if __name__ == "__main__":
     main()

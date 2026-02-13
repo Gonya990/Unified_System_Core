@@ -15,16 +15,17 @@ def search_social_takeouts():
         "from:meta.com subject:download",
         "from:instagram.com subject:download",
         "from:yandex.ru subject:архив",
-        "from:mail.ru subject:архив"
+        "from:mail.ru subject:архив",
     ]
 
     for query in queries:
         print(f"\n🔍 Searching for: {query}")
-        emails = gmail_agent.get_recent_emails(service, hours=24*365, max_results=5, query=query)
+        emails = gmail_agent.get_recent_emails(service, hours=24 * 365, max_results=5, query=query)
 
         for email in emails:
             print(f"📧 Found: {email['subject']} ({email['date']})")
             # We skip full fetching for now to avoid overhead, just listing titles.
+
 
 if __name__ == "__main__":
     search_social_takeouts()

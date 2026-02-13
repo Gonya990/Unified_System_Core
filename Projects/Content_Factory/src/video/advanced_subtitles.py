@@ -2,6 +2,7 @@
 """
 Advanced Subtitle Styling - Impact/Karaoke effects like SeTka Project
 """
+
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -84,9 +85,7 @@ class AdvancedSubtitles:
         self.style_name = style
         self.style = self.STYLES.get(style, self.STYLES["impact"])
 
-    def generate_srt(
-        self, segments: list[SubtitleSegment], output_path: Path, add_emoji: bool = True
-    ) -> Path:
+    def generate_srt(self, segments: list[SubtitleSegment], output_path: Path, add_emoji: bool = True) -> Path:
         """
         Generate SRT subtitle file.
 
@@ -150,9 +149,7 @@ class AdvancedSubtitles:
 
         # Events
         ass_content.append("[Events]")
-        ass_content.append(
-            "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"
-        )
+        ass_content.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text")
 
         for segment in segments:
             start_time = self._format_ass_timestamp(segment.start)
@@ -171,9 +168,7 @@ class AdvancedSubtitles:
             elif self.style.get("animation") == "scale_bounce":
                 effect = "Bounce"
 
-            ass_content.append(
-                f"Dialogue: 0,{start_time},{end_time},Default,,0,0,0,{effect},{text}"
-            )
+            ass_content.append(f"Dialogue: 0,{start_time},{end_time},Default,,0,0,0,{effect},{text}")
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text("\n".join(ass_content), encoding="utf-8")

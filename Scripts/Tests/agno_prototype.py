@@ -1,4 +1,3 @@
-
 from agno.agent import Agent
 from agno.models.google import Gemini
 from agno.models.openai import OpenAIChat
@@ -8,15 +7,14 @@ from dotenv import load_dotenv
 # Load keys from .env
 load_dotenv()
 
+
 def test_agno_providers():
     print("🚀 Testing Agno Multi-Provider Abstraction\n")
 
     # 1. OpenAI Agent
     print("--- 🤖 Provider: OpenAI ---")
     openai_agent = Agent(
-        model=OpenAIChat(id="gpt-4o"),
-        description="You are a helpful assistant powered by OpenAI.",
-        markdown=True
+        model=OpenAIChat(id="gpt-4o"), description="You are a helpful assistant powered by OpenAI.", markdown=True
     )
     openai_agent.print_response("What is the capital of France?", stream=False)
     print("\n")
@@ -26,7 +24,7 @@ def test_agno_providers():
     gemini_agent = Agent(
         model=Gemini(id="gemini-1.5-flash"),
         description="You are a helpful assistant powered by Google Gemini.",
-        markdown=True
+        markdown=True,
     )
     gemini_agent.print_response("What is the capital of Israel?", stream=False)
     print("\n")
@@ -38,9 +36,10 @@ def test_agno_providers():
         tools=[DuckDuckGo()],
         description="You are a research agent.",
         show_tool_calls=True,
-        markdown=True
+        markdown=True,
     )
     search_agent.print_response("Latest news about NVIDIA NIM and VS Code integration", stream=False)
+
 
 if __name__ == "__main__":
     test_agno_providers()

@@ -14,7 +14,6 @@ def get_daily_production_plan():
     """
     now = datetime.datetime.now()
     weekday = now.weekday()  # 0 = Mon, 6 = Sun
-    hour = now.hour
 
     tasks = []
 

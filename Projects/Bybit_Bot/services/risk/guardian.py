@@ -4,11 +4,11 @@ import os
 import sys
 
 # Ensure common is in path
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
+from common.messaging import RedisStreamManager  # noqa: E402
 from common.unified_logger import setup_unified_logging  # noqa: E402
 from common.unified_monitoring import get_monitor  # noqa: E402
-from common.messaging import RedisStreamManager  # noqa: E402
 
 # Configure Unified Logging
 os.environ["SERVICE_NAME"] = "bybit-risk-guard"
@@ -18,6 +18,7 @@ logger = logging.getLogger("RiskGuard")
 # Configure Monitoring
 monitor = get_monitor("bybit-risk-guard")
 monitor.start_heartbeat()
+
 
 class RiskGuard:
     def __init__(self, max_leverage=3, max_pos_size=1000, daily_loss_limit=500):
@@ -30,13 +31,13 @@ class RiskGuard:
 
     def validate_order(self, order_data):
         # 1. Проверка плеча
-        lev = order_data.get('leverage', 1)
+        lev = order_data.get("leverage", 1)
         if lev > self.max_leverage:
             logger.error(f"❌ Плечо {lev} > {self.max_leverage}")
             return False
 
         # 2. Проверка размера (Notional)
-        nv = order_data['amount'] * order_data['price']
+        nv = order_data["amount"] * order_data["price"]
         if nv > self.max_pos_size:
             logger.error(f"❌ Позиция ${nv} > ${self.max_pos_size}")
             monitor.send_metric("risk_check_failed", 1, unit="count")
@@ -61,6 +62,7 @@ class RiskGuard:
             else:
                 logger.warning(f"⚠️ Signal {msg_id} rejected by risk.")
                 monitor.send_metric("orders_rejected", 1, unit="count")
+
 
 if __name__ == "__main__":
     guard = RiskGuard()

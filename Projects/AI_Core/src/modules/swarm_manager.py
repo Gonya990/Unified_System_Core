@@ -11,9 +11,7 @@ logger = logging.getLogger(__name__)
 try:
     sys.path.insert(
         0,
-        str(
-            Path(__file__).parent.parent.parent.parent.parent / "Scripts" / "Utilities"
-        ),
+        str(Path(__file__).parent.parent.parent.parent.parent / "Scripts" / "Utilities"),
     )
     from token_broker import TokenBroker
 
@@ -62,21 +60,13 @@ class SwarmManager:
                 self.openai_pool = data.get("openai_pool", [])
 
                 # Filter out inactive or empty keys
-                self.gemini_pool = [
-                    k
-                    for k in self.gemini_pool
-                    if k.get("status") == "active" and k.get("api_key")
-                ]
+                self.gemini_pool = [k for k in self.gemini_pool if k.get("status") == "active" and k.get("api_key")]
 
-                logger.info(
-                    f"Swarm loaded: {len(self.gemini_pool)} Gemini keys, {len(self.openai_pool)} OpenAI keys."
-                )
+                logger.info(f"Swarm loaded: {len(self.gemini_pool)} Gemini keys, {len(self.openai_pool)} OpenAI keys.")
         except Exception as e:
             logger.error(f"Failed to load swarm resources: {e}")
 
-    def get_gemini_key(
-        self, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL"
-    ) -> Optional[str]:
+    def get_gemini_key(self, branch_id: str = "HOME_HQ", project_context: str = "PERSONAL") -> Optional[str]:
         """Get the next available Gemini API key with branch awareness."""
         if self._token_broker:
             key = self._token_broker.get_key("gemini")
@@ -87,11 +77,7 @@ class SwarmManager:
         pool = self.gemini_pool
 
         if project_context != "UNIFIED_CORE":
-            pool = [
-                k
-                for k in self.gemini_pool
-                if k.get("branch_id", "HOME_HQ") == branch_id
-            ]
+            pool = [k for k in self.gemini_pool if k.get("branch_id", "HOME_HQ") == branch_id]
 
         if not pool:
             return None

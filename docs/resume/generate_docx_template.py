@@ -6,6 +6,7 @@ from docx.shared import Cm, Pt, RGBColor
 
 # --- Helpers ---
 
+
 def set_rtl(paragraph):
     """Sets the paragraph direction to RTL."""
     try:
@@ -14,23 +15,25 @@ def set_rtl(paragraph):
         pass
     # OXML fallback for robustness
     pPr = paragraph._p.get_or_add_pPr()
-    if pPr.find(qn('w:bidi')) is None:
-        bidi = OxmlElement('w:bidi')
-        bidi.set(qn('w:val'), '1')
+    if pPr.find(qn("w:bidi")) is None:
+        bidi = OxmlElement("w:bidi")
+        bidi.set(qn("w:val"), "1")
         pPr.append(bidi)
+
 
 def set_cell_background(cell, color_hex):
     """Set background shading for a table cell."""
     tcPr = cell._tc.get_or_add_tcPr()
     # Check if shd already exists to avoid duplication errors (simplified)
     # Ideally remove existing, but for new doc it's fine.
-    shd = OxmlElement('w:shd')
-    shd.set(qn('w:val'), 'clear')
-    shd.set(qn('w:color'), 'auto')
-    shd.set(qn('w:fill'), color_hex)
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), color_hex)
     tcPr.append(shd)
 
-def create_header_bar(paragraph, text, bg_color="1B4D3E"): # Dark Green
+
+def create_header_bar(paragraph, text, bg_color="1B4D3E"):  # Dark Green
     """Creates a text block with a background color (shading) for headers."""
     run = paragraph.add_run(text)
     run.bold = True
@@ -40,15 +43,16 @@ def create_header_bar(paragraph, text, bg_color="1B4D3E"): # Dark Green
     # But python-docx paragraph shading limits. We will simulate with paragraph border or shading.
     # Actually, let's use the paragraph shading OXML.
     pPr = paragraph._p.get_or_add_pPr()
-    shd = OxmlElement('w:shd')
-    shd.set(qn('w:val'), 'clear')
-    shd.set(qn('w:color'), 'auto')
-    shd.set(qn('w:fill'), bg_color)
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), bg_color)
     pPr.append(shd)
 
     # Add some spacing
     paragraph.paragraph_format.space_before = Pt(12)
     paragraph.paragraph_format.space_after = Pt(6)
+
 
 def create_resume_template():
     document = Document()
@@ -62,9 +66,9 @@ def create_resume_template():
         section.right_margin = Cm(1.5)
 
     # 2. Styles
-    style = document.styles['Normal']
+    style = document.styles["Normal"]
     font = style.font
-    font.name = 'Arial'
+    font.name = "Arial"
     font.size = Pt(10)
 
     # 3. Create Main Layout Table (1 Row, 2 Cols)
@@ -74,9 +78,9 @@ def create_resume_template():
     # Set Table Direction to RTL
     tblPr = table._tbl.tblPr
     if tblPr is None:
-        tblPr = OxmlElement('w:tblPr')
+        tblPr = OxmlElement("w:tblPr")
         table._tbl.insert(0, tblPr)
-    bidiViz = OxmlElement('w:bidiVisual')
+    bidiViz = OxmlElement("w:bidiVisual")
     tblPr.append(bidiViz)
 
     # Column Widths
@@ -92,7 +96,7 @@ def create_resume_template():
     main_cell.width = Cm(12.5)
 
     # ---------------- SIDEBAR (Right) ----------------
-    set_cell_background(sidebar_cell, "89CFF0") # Baby Blue / Light Blue
+    set_cell_background(sidebar_cell, "89CFF0")  # Baby Blue / Light Blue
 
     # Placeholder for Photo (Circle text)
     p_photo = sidebar_cell.paragraphs[0]
@@ -118,7 +122,9 @@ def create_resume_template():
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run_title = p_title.add_run("מנהל תפעול שטח\nאינטגרטור טכני")
     run_title.font.size = Pt(14)
-    run_title.font.color.rgb = RGBColor(255, 255, 255) # White text for contrast often looks good on blue, or dark gray? Template has dark text.
+    run_title.font.color.rgb = RGBColor(
+        255, 255, 255
+    )  # White text for contrast often looks good on blue, or dark gray? Template has dark text.
     run_title.font.color.rgb = RGBColor(60, 60, 60)
     p_title.paragraph_format.space_after = Pt(30)
 
@@ -132,7 +138,7 @@ def create_resume_template():
     run_ch = p_contact_head.add_run("פרטי קשר")
     run_ch.bold = True
     run_ch.font.size = Pt(14)
-    run_ch.font.color.rgb = RGBColor(255, 255, 255) # White headers in sidebar often pop
+    run_ch.font.color.rgb = RGBColor(255, 255, 255)  # White headers in sidebar often pop
 
     p_contact = sidebar_cell.add_paragraph()
     set_rtl(p_contact)
@@ -172,13 +178,12 @@ def create_resume_template():
     p_skills = sidebar_cell.add_paragraph()
     set_rtl(p_skills)
     p_skills.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    skills_text = "ניהול צוותים\nפיקוח טכני\nסיבים אופטיים\nמערכות מעליות\nבטיחות וגה\"צ\nOffice & ERP"
+    skills_text = 'ניהול צוותים\nפיקוח טכני\nסיבים אופטיים\nמערכות מעליות\nבטיחות וגה"צ\nOffice & ERP'
     run_s = p_skills.add_run(skills_text)
     run_s.font.color.rgb = RGBColor(50, 50, 50)
 
-
     # ---------------- MAIN CONTENT (Left) ----------------
-    set_cell_background(main_cell, "FAF9F6") # Off White / Ivory
+    set_cell_background(main_cell, "FAF9F6")  # Off White / Ivory
 
     # Summary Section
     p_sum_head = main_cell.paragraphs[0]
@@ -188,7 +193,9 @@ def create_resume_template():
     p_summary = main_cell.add_paragraph()
     set_rtl(p_summary)
     p_summary.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p_summary.add_run("מנהל טכני ומנהל עבודה בעל ניסיון עשיר בהקמה ותחזוקת תשתיות מורכבות בתחומי המכאניקה, החשמל והתקשורת. בעל יכולת מוכחת בהובלת צוותים טכניים וביצוע פרויקטים מורכבים בסביבות עבודה תובעניות, תוך הקפדה יתרה על נהלי בטיחות ואיכות. משלב רקע טכני \"Hands-on\" עם יכולות למידה עצמית גבוהות ויוזמה.")
+    p_summary.add_run(
+        'מנהל טכני ומנהל עבודה בעל ניסיון עשיר בהקמה ותחזוקת תשתיות מורכבות בתחומי המכאניקה, החשמל והתקשורת. בעל יכולת מוכחת בהובלת צוותים טכניים וביצוע פרויקטים מורכבים בסביבות עבודה תובעניות, תוך הקפדה יתרה על נהלי בטיחות ואיכות. משלב רקע טכני "Hands-on" עם יכולות למידה עצמית גבוהות ויוזמה.'
+    )
     p_summary.paragraph_format.space_after = Pt(15)
 
     # Experience Section
@@ -207,7 +214,7 @@ def create_resume_template():
     p_job1.add_run("\n")
     r_role1 = p_job1.add_run("סופרוויזור (BEYOND Tower)")
     r_role1.bold = True
-    r_role1.font.color.rgb = RGBColor(0, 100, 200) # Blueish title like in template
+    r_role1.font.color.rgb = RGBColor(0, 100, 200)  # Blueish title like in template
     r_role1.font.size = Pt(12)
     p_job1.add_run(" | ")
     r_comp1 = p_job1.add_run("Schindler Group")
@@ -216,7 +223,9 @@ def create_resume_template():
 
     p_desc1 = main_cell.add_paragraph()
     set_rtl(p_desc1)
-    p_desc1.add_run("• ניהול והובלת התקנת מערכות מעליות מהירות בפרויקטי דגל רבי-קומות.\n• אחריות כוללת על פתרון בעיות מכאניות ולוגיסטיות בשטח בזמן אמת.\n• יישום נהלי בטיחות ומעקב אחר התקדמות הפרויקט.")
+    p_desc1.add_run(
+        "• ניהול והובלת התקנת מערכות מעליות מהירות בפרויקטי דגל רבי-קומות.\n• אחריות כוללת על פתרון בעיות מכאניות ולוגיסטיות בשטח בזמן אמת.\n• יישום נהלי בטיחות ומעקב אחר התקדמות הפרויקט."
+    )
     p_desc1.paragraph_format.space_after = Pt(12)
 
     # Job 2
@@ -236,7 +245,9 @@ def create_resume_template():
 
     p_desc2 = main_cell.add_paragraph()
     set_rtl(p_desc2)
-    p_desc2.add_run("• התמחות בפריסת תשתיות FTTx וביצוע ריתוכי סיבים.\n• ניהול תהליך ההתקנה מקצה לקצה והדרכת צוותי שטח.")
+    p_desc2.add_run(
+        "• התמחות בפריסת תשתיות FTTx וביצוע ריתוכי סיבים.\n• ניהול תהליך ההתקנה מקצה לקצה והדרכת צוותי שטח."
+    )
     p_desc2.paragraph_format.space_after = Pt(12)
 
     # Job 3
@@ -292,9 +303,9 @@ def create_resume_template():
     p_proj.add_run("תשתיות חכמות ואוטומציה: ").bold = True
     p_proj.add_run("הקמת מעבדה ביתית (Home Assistant, Linux, AI) - מדגים יכולת למידה עצמית ואינטגרציה.")
 
-
     # Save
-    document.save('Resume_Igor_Refined_Template_✅.docx')
+    document.save("Resume_Igor_Refined_Template_✅.docx")
+
 
 if __name__ == "__main__":
     create_resume_template()

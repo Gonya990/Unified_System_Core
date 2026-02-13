@@ -177,10 +177,7 @@ def fetch_pexels_video(keyword, output_path, api_key):
         if not api_key:
             return False
         headers = {"Authorization": api_key}
-        url = (
-            "https://api.pexels.com/videos/search?"
-            f"query={keyword}&per_page=1&orientation=portrait&size=medium"
-        )
+        url = f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
         resp = requests.get(url, headers=headers, timeout=10)
         if resp.status_code == 200:
             data = resp.json()
@@ -259,7 +256,7 @@ def run_advanced_pipeline(
     FPS = 30
 
     for i, scene in enumerate(scenes):
-        print(f"🎬 Processing Scene {i+1}/{len(scenes)}...")
+        print(f"🎬 Processing Scene {i + 1}/{len(scenes)}...")
         keyword = scene.get("keyword", "abstract futuristic")
         clip_final = OUTPUT_DIR / f"{output_name}_seg_{i}.mp4"
         clip_raw = OUTPUT_DIR / f"{output_name}_raw_seg_{i}.mp4"
@@ -325,10 +322,7 @@ def run_advanced_pipeline(
             "-t",
             str(scene_duration),
             "-vf",
-            (
-                "scale=1080:1920:force_original_aspect_ratio=increase,"
-                "crop=1080:1920,fps=30"
-            ),
+            ("scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30"),
             "-c:v",
             "libx264",
             "-pix_fmt",

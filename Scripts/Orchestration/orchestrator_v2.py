@@ -22,9 +22,10 @@ INPUT_DIR.mkdir(exist_ok=True)
 VOICES = {
     "en": "en-US-ChristopherNeural",  # English male
     "en_female": "en-US-JennyNeural",  # English female
-    "ru": "ru-RU-DmitryNeural",         # Russian male
-    "ru_female": "ru-RU-SvetlanaNeural" # Russian female
+    "ru": "ru-RU-DmitryNeural",  # Russian male
+    "ru_female": "ru-RU-SvetlanaNeural",  # Russian female
 }
+
 
 def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     """Generate audio using Edge-TTS"""
@@ -38,25 +39,31 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     try:
         subprocess.run(cmd, check=True, cwd=str(ROOT_DIR))
         # Convert to WAV
-        subprocess.run([
-            "ffmpeg", "-y", "-i", str(mp3_path),
-            "-ar", "16000", "-ac", "1", str(output_path)
-        ], check=True, capture_output=True)
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", str(mp3_path), "-ar", "16000", "-ac", "1", str(output_path)],
+            check=True,
+            capture_output=True,
+        )
         print(f"✅ Audio: {output_path}")
         return True
     except Exception as e:
         print(f"❌ Audio failed: {e}")
         return False
 
+
 def animate_face(image_path: Path, driver_path: Path) -> Path:
     """Animate face using LivePortrait"""
     print("🎬 Animating face...")
 
     cmd = [
-        sys.executable, str(LIVE_PORTRAIT_DIR / "inference.py"),
-        "--source", str(image_path),
-        "--driving", str(driver_path),
-        "--output-dir", str(OUTPUT_DIR)
+        sys.executable,
+        str(LIVE_PORTRAIT_DIR / "inference.py"),
+        "--source",
+        str(image_path),
+        "--driving",
+        str(driver_path),
+        "--output-dir",
+        str(OUTPUT_DIR),
     ]
 
     try:
@@ -68,6 +75,7 @@ def animate_face(image_path: Path, driver_path: Path) -> Path:
         print(f"❌ Animation failed: {e}")
         return None
 
+
 def lip_sync(video_path: Path, audio_path: Path, output_path: Path) -> bool:
     """Apply lip sync using Wav2Lip"""
     print("👄 Applying lip sync...")
@@ -75,11 +83,16 @@ def lip_sync(video_path: Path, audio_path: Path, output_path: Path) -> bool:
     venv_python = ROOT_DIR / "venv_wav2lip/bin/python3"
 
     cmd = [
-        str(venv_python), str(WAV2LIP_DIR / "inference.py"),
-        "--checkpoint_path", str(WAV2LIP_DIR / "checkpoints/wav2lip.pth"),
-        "--face", str(video_path),
-        "--audio", str(audio_path),
-        "--outfile", str(output_path)
+        str(venv_python),
+        str(WAV2LIP_DIR / "inference.py"),
+        "--checkpoint_path",
+        str(WAV2LIP_DIR / "checkpoints/wav2lip.pth"),
+        "--face",
+        str(video_path),
+        "--audio",
+        str(audio_path),
+        "--outfile",
+        str(output_path),
     ]
 
     try:
@@ -90,18 +103,26 @@ def lip_sync(video_path: Path, audio_path: Path, output_path: Path) -> bool:
         print(f"❌ Lip sync failed: {e}")
         return False
 
+
 def add_subtitles(video_path: Path, output_path: Path, lang: str = "en") -> bool:
     """Add dynamic subtitles using PyCaps"""
     print("📝 Adding subtitles...")
 
     cmd = [
-        "pycaps", "render",
-        "--input", str(video_path),
-        "--output", str(output_path),
-        "--lang", lang[:2],
-        "--layout-align", "bottom",
-        "--video-quality", "high",
-        "--whisper-model", "base"
+        "pycaps",
+        "render",
+        "--input",
+        str(video_path),
+        "--output",
+        str(output_path),
+        "--lang",
+        lang[:2],
+        "--layout-align",
+        "bottom",
+        "--video-quality",
+        "high",
+        "--whisper-model",
+        "base",
     ]
 
     try:
@@ -111,6 +132,7 @@ def add_subtitles(video_path: Path, output_path: Path, lang: str = "en") -> bool
     except Exception as e:
         print(f"❌ Subtitles failed: {e}")
         return False
+
 
 def run_pipeline(text: str, image_path: Path, lang: str = "en", output_name: str = "final"):
     """Run complete pipeline"""
@@ -141,6 +163,7 @@ def run_pipeline(text: str, image_path: Path, lang: str = "en", output_name: str
 
     print(f"\n✅ Pipeline complete: {final_path}")
     return final_path
+
 
 if __name__ == "__main__":
     # Russian text demo

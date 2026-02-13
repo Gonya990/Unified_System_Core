@@ -1,7 +1,9 @@
-import time
 import os
 import threading
+import time
+
 from google.cloud import monitoring_v3
+
 
 class UnifiedMonitoring:
     def __init__(self, service_name):
@@ -26,7 +28,7 @@ class UnifiedMonitoring:
             point.value.double_value = float(value)
             now = time.time()
             point.interval.end_time.seconds = int(now)
-            
+
             series.points = [point]
             self.client.create_time_series(name=self.project_name, time_series=[series])
             return True
@@ -37,16 +39,19 @@ class UnifiedMonitoring:
 
     def start_heartbeat(self, interval=60):
         """Starts a background thread to send heartbeat everywhere minute."""
+
         def _loop():
             while True:
                 self.send_metric("heartbeat", 1)
                 time.sleep(interval)
-        
+
         t = threading.Thread(target=_loop, daemon=True)
         t.start()
 
+
 # Global instance pattern
 _monitor = None
+
 
 def get_monitor(service_name=None):
     global _monitor

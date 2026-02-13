@@ -10,10 +10,7 @@ import subprocess
 import time
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 try:
@@ -40,11 +37,11 @@ def get_gpu_metrics() -> dict:
             [
                 "nvidia-smi",
                 "--query-gpu=temperature.gpu,utilization.gpu,memory.used,memory.total",
-                "--format=csv,noheader,nounits"
+                "--format=csv,noheader,nounits",
             ],
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=10,
         )
         if result.returncode == 0:
             parts = result.stdout.strip().split(", ")
@@ -58,7 +55,7 @@ def get_gpu_metrics() -> dict:
                     "gpu_utilization": gpu_util,
                     "gpu_memory_used_mb": mem_used,
                     "gpu_memory_total_mb": mem_total,
-                    "gpu_memory_percent": (mem_used / mem_total) * 100 if mem_total > 0 else 0
+                    "gpu_memory_percent": (mem_used / mem_total) * 100 if mem_total > 0 else 0,
                 }
     except Exception as e:
         logger.warning(f"Failed to get GPU metrics: {e}")
@@ -71,8 +68,8 @@ def get_system_metrics() -> dict:
         "cpu_percent": psutil.cpu_percent(interval=1),
         "memory_percent": psutil.virtual_memory().percent,
         "memory_used_gb": psutil.virtual_memory().used / (1024**3),
-        "disk_percent": psutil.disk_usage('/').percent,
-        "load_average_1m": os.getloadavg()[0] if hasattr(os, 'getloadavg') else 0
+        "disk_percent": psutil.disk_usage("/").percent,
+        "load_average_1m": os.getloadavg()[0] if hasattr(os, "getloadavg") else 0,
     }
 
 
@@ -84,27 +81,17 @@ def create_time_series(client, project_name: str, metric_type: str, value: float
 
     # Use dict-style initialization compatible with proto-plus
     series = {
-        "metric": {
-            "type": metric_type,
-            "labels": labels
-        },
+        "metric": {"type": metric_type, "labels": labels},
         "resource": {
             "type": "generic_node",
             "labels": {
                 "project_id": PROJECT_ID,
                 "location": "global",
                 "namespace": "igor-home",
-                "node_id": INSTANCE_ID
-            }
+                "node_id": INSTANCE_ID,
+            },
         },
-        "points": [
-            {
-                "interval": {
-                    "end_time": {"seconds": seconds, "nanos": nanos}
-                },
-                "value": {"double_value": value}
-            }
-        ]
+        "points": [{"interval": {"end_time": {"seconds": seconds, "nanos": nanos}}, "value": {"double_value": value}}],
     }
     return series
 
@@ -125,10 +112,7 @@ def push_metrics(metrics: dict):
 
     if time_series_list:
         try:
-            client.create_time_series(
-                name=project_name,
-                time_series=time_series_list
-            )
+            client.create_time_series(name=project_name, time_series=time_series_list)
             logger.info(f"Pushed {len(time_series_list)} metrics to GCP Monitoring")
         except Exception as e:
             logger.error(f"Failed to push metrics: {e}")
@@ -146,10 +130,12 @@ def main():
             metrics.update(get_system_metrics())
             metrics.update(get_gpu_metrics())
 
-            logger.info(f"Collected metrics: CPU={metrics.get('cpu_percent', 'N/A')}%, "
-                       f"RAM={metrics.get('memory_percent', 'N/A')}%, "
-                       f"GPU={metrics.get('gpu_utilization', 'N/A')}%, "
-                       f"GPU Temp={metrics.get('gpu_temperature', 'N/A')}°C")
+            logger.info(
+                f"Collected metrics: CPU={metrics.get('cpu_percent', 'N/A')}%, "
+                f"RAM={metrics.get('memory_percent', 'N/A')}%, "
+                f"GPU={metrics.get('gpu_utilization', 'N/A')}%, "
+                f"GPU Temp={metrics.get('gpu_temperature', 'N/A')}°C"
+            )
 
             # Push to GCP
             push_metrics(metrics)

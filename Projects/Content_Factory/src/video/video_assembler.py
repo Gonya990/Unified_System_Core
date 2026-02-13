@@ -42,7 +42,9 @@ FFMPEG_BIN = get_binary_path("ffmpeg", COMMON_FFMPEG_PATHS)
 FFPROBE_BIN = get_binary_path("ffprobe", COMMON_FFPROBE_PATHS)
 
 if not FFMPEG_BIN or not FFPROBE_BIN:
-    error_msg = f"ffmpeg or ffprobe not found. FFMPEG: {FFMPEG_BIN}, FFPROBE: {FFPROBE_BIN}. Checked PATH and common locations."
+    error_msg = (
+        f"ffmpeg or ffprobe not found. FFMPEG: {FFMPEG_BIN}, FFPROBE: {FFPROBE_BIN}. Checked PATH and common locations."
+    )
     print(f"❌ {error_msg}")
     raise FileNotFoundError(error_msg)
 
@@ -184,9 +186,7 @@ def trim_video(input_path: Path, output_path: Path, duration: float) -> bool:
         return False
 
 
-def extract_segment(
-    input_path: Path, output_path: Path, start: float, end: float
-) -> bool:
+def extract_segment(input_path: Path, output_path: Path, start: float, end: float) -> bool:
     """Extract segment from video"""
     try:
         # nosec B603: Using absolute path and list args

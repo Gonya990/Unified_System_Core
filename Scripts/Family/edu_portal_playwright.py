@@ -8,6 +8,7 @@ from playwright.async_api import async_playwright
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(ROOT_DIR / ".env")
 
+
 async def login_edu_portal():
     user = os.getenv("MASHOV_USER")
     pwd = os.getenv("MASHOV_PASS")
@@ -81,6 +82,7 @@ async def login_edu_portal():
             await page.screenshot(path="edu_portal_other.png")
 
         await browser.close()
+
 
 if __name__ == "__main__":
     asyncio.run(login_edu_portal())

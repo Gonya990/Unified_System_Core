@@ -14,6 +14,7 @@ def check_port(ip, port):
     except Exception as e:
         print(f"Error checking {ip}:{port}: {e}")
 
+
 print("Checking connectivity...")
 check_port("100.115.17.68", 8765)  # igor-gaming-1
-check_port("100.110.209.49", 8765) # unified-home-core-cloud
+check_port("100.110.209.49", 8765)  # unified-home-core-cloud

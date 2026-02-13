@@ -30,6 +30,7 @@ def check_ai_core_dependencies() -> tuple[bool, str]:
     missing = []
 
     import importlib.util
+
     for dep in dependencies:
         if importlib.util.find_spec(dep) is None:
             missing.append(dep)
@@ -58,14 +59,9 @@ def check_env_files() -> tuple[bool, str]:
 def check_git_status() -> tuple[bool, str]:
     """Check git repository status"""
     try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True)
         if result.stdout.strip():
-            lines = len(result.stdout.strip().split('\n'))
+            lines = len(result.stdout.strip().split("\n"))
             return True, f"⚠ {lines} uncommitted changes"
         return True, "✓ Working tree clean"
     except subprocess.CalledProcessError:

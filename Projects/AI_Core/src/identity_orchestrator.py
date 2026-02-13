@@ -10,6 +10,7 @@ try:
     from calendar_client import CalendarClient
     from gmail_client import GmailClient
     from google_auth import GoogleAuthManager
+
     ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
     UTILS_DIR = ROOT_DIR / "Scripts" / "Utilities"
     if str(UTILS_DIR) not in sys.path:
@@ -41,7 +42,7 @@ class IdentityOrchestrator:
         else:
             self.token_broker = None
             if hasattr(logging.getLogger("IdentityOrchestrator"), "warning"):
-                 logging.getLogger("IdentityOrchestrator").warning("TokenBroker not available")
+                logging.getLogger("IdentityOrchestrator").warning("TokenBroker not available")
 
         # Load Admin Config
         self.allowed_users = self._load_allowed_users()
@@ -75,9 +76,7 @@ class IdentityOrchestrator:
         if not self.db.is_approved(user_id):
             if user_id in self.allowed_users:
                 self.db.approve_user(user_id, True)
-                logger.info(
-                    f"IdentityOrchestrator: Auto-approved whitelisted user {user_id}"
-                )
+                logger.info(f"IdentityOrchestrator: Auto-approved whitelisted user {user_id}")
                 return True
             return False
         return True
@@ -89,11 +88,7 @@ class IdentityOrchestrator:
         services: dict[str, Any] = {"calendar": None, "gmail": None}
 
         user_data = self.db.get_user(user_id)
-        if (
-            not user_data
-            or not user_data.get("is_google_connected")
-            or not user_data.get("google_creds")
-        ):
+        if not user_data or not user_data.get("is_google_connected") or not user_data.get("google_creds"):
             return services
 
         try:
@@ -110,13 +105,9 @@ class IdentityOrchestrator:
                     try:
                         creds_dict = json.loads(decrypted)
                     except json.JSONDecodeError:
-                        logger.error(
-                            f"IdentityOrchestrator: Decrypted data for {user_id} is not valid JSON."
-                        )
+                        logger.error(f"IdentityOrchestrator: Decrypted data for {user_id} is not valid JSON.")
                 else:
-                    logger.error(
-                        f"IdentityOrchestrator: Failed to decrypt credentials for {user_id}."
-                    )
+                    logger.error(f"IdentityOrchestrator: Failed to decrypt credentials for {user_id}.")
 
             if not creds_dict:
                 return services
@@ -128,9 +119,7 @@ class IdentityOrchestrator:
                 services["gmail"] = GmailClient(credentials_dict=creds_dict)
 
         except Exception as e:
-            logger.error(
-                f"IdentityOrchestrator: Failed to init services for {user_id}: {e}"
-            )
+            logger.error(f"IdentityOrchestrator: Failed to init services for {user_id}: {e}")
 
         return services
 
@@ -140,15 +129,11 @@ class IdentityOrchestrator:
         if encrypted:
             self.db.set_google_creds(user_id, encrypted)
             self.db.set_google_connected(user_id, True)
-            logger.info(
-                f"IdentityOrchestrator: Encrypted credentials saved for user {user_id}"
-            )
+            logger.info(f"IdentityOrchestrator: Encrypted credentials saved for user {user_id}")
         else:
             # Fallback to plaintext if encryption fails (unsafe but preserves functionality)
             # In a real production system, we might want to raise an error instead
-            logger.warning(
-                f"IdentityOrchestrator: Encryption failed for user {user_id}. Saving plaintext."
-            )
+            logger.warning(f"IdentityOrchestrator: Encryption failed for user {user_id}. Saving plaintext.")
             self.db.set_google_creds(user_id, credentials_json)
             self.db.set_google_connected(user_id, True)
 

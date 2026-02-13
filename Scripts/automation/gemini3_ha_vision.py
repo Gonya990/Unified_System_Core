@@ -29,11 +29,7 @@ def ask_gemini_3_for_ha_improvements():
 
     try:
         response = client.models.generate_content(
-            model="gemini-3-flash-preview",
-            contents=query,
-            config=GenerateContentConfig(
-                system_instruction=context
-            )
+            model="gemini-3-flash-preview", contents=query, config=GenerateContentConfig(system_instruction=context)
         )
 
         print("\n✨ Gemini 3 " + "Vision" if False else "Brain" + " Suggestions:")
@@ -41,6 +37,7 @@ def ask_gemini_3_for_ha_improvements():
 
     except Exception as e:
         print(f"❌ Error: {e}")
+
 
 if __name__ == "__main__":
     ask_gemini_3_for_ha_improvements()

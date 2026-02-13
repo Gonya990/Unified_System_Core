@@ -26,5 +26,6 @@ def migrate_from_raw():
     broker.save_vault(tokens=tokens, force_kdf="argon2id")
     print("✅ Vault updated successfully.")
 
+
 if __name__ == "__main__":
     migrate_from_raw()

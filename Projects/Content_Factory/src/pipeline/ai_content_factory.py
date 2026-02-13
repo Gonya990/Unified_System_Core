@@ -3,6 +3,7 @@
 AI Content Factory Integration Layer
 Combines Music, Video, Voice, and Subtitles into production pipeline
 """
+
 import logging
 import sys
 from pathlib import Path
@@ -39,9 +40,7 @@ class AIContentFactory:
         """
         self.music_gen = MusicGenerator(use_ai=use_ai_music)
         self.voice_gen = VoiceGenerator() if use_ai_voice else None
-        self.video_gen = (
-            VideoGenerator(provider=video_provider) if use_ai_video else None
-        )
+        self.video_gen = VideoGenerator(provider=video_provider) if use_ai_video else None
         self.subtitle_gen = AdvancedSubtitles(style="impact")
 
     def create_video_content(
@@ -68,9 +67,7 @@ class AIContentFactory:
         output_dir.mkdir(parents=True, exist_ok=True)
         assets = {}
 
-        logger.info(
-            f"🎬 Starting AI Content Factory pipeline ({style} style, {duration}s)"
-        )
+        logger.info(f"🎬 Starting AI Content Factory pipeline ({style} style, {duration}s)")
 
         # 1. Generate voiceover (with emotion detection)
         emotion = self._detect_emotion(script)
@@ -108,11 +105,11 @@ class AIContentFactory:
                     prompt=scene["description"],
                     duration=min(scene["duration"], 10),
                     style=style,
-                    output_path=output_dir / f"broll_{i+1}.mp4",
+                    output_path=output_dir / f"broll_{i + 1}.mp4",
                 )
                 if clip_path:
                     video_clips.append(clip_path)
-                    logger.info(f"✅ B-roll {i+1}: {clip_path}")
+                    logger.info(f"✅ B-roll {i + 1}: {clip_path}")
 
             if video_clips:
                 assets["broll_clips"] = video_clips
@@ -139,24 +136,15 @@ class AIContentFactory:
         """Detect emotion from script text."""
         text_lower = text.lower()
 
-        if any(
-            word in text_lower
-            for word in ["breakthrough", "amazing", "incredible", "wow"]
-        ):
+        if any(word in text_lower for word in ["breakthrough", "amazing", "incredible", "wow"]):
             return "excited"
-        elif any(
-            word in text_lower for word in ["danger", "crisis", "warning", "threat"]
-        ):
+        elif any(word in text_lower for word in ["danger", "crisis", "warning", "threat"]):
             return "dramatic"
-        elif any(
-            word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]
-        ):
+        elif any(word in text_lower for word in ["mystery", "secret", "unknown", "hidden"]):
             return "mysterious"
         elif any(word in text_lower for word in ["sad", "tragedy", "loss", "death"]):
             return "sad"
-        elif any(
-            word in text_lower for word in ["calm", "peaceful", "meditation", "nature"]
-        ):
+        elif any(word in text_lower for word in ["calm", "peaceful", "meditation", "nature"]):
             return "calm"
 
         return "neutral"
@@ -200,9 +188,7 @@ class AIContentFactory:
 
         return scenes
 
-    def _script_to_segments(
-        self, script: str, total_duration: int
-    ) -> list[SubtitleSegment]:
+    def _script_to_segments(self, script: str, total_duration: int) -> list[SubtitleSegment]:
         """Convert script to subtitle segments with timing."""
         sentences = [s.strip() + "." for s in script.split(".") if s.strip()]
 
@@ -222,11 +208,7 @@ class AIContentFactory:
             words = []
             word_time = current_time
             for word in words_list:
-                words.append(
-                    SubtitleWord(
-                        text=word, start=word_time, end=word_time + word_duration
-                    )
-                )
+                words.append(SubtitleWord(text=word, start=word_time, end=word_time + word_duration))
                 word_time += word_duration
 
             segments.append(
@@ -258,9 +240,7 @@ if __name__ == "__main__":
     Будущее уже здесь, и оно удивительно.
     """
 
-    assets = factory.create_video_content(
-        script=test_script, lang="ru", style="impact", duration=15
-    )
+    assets = factory.create_video_content(script=test_script, lang="ru", style="impact", duration=15)
 
     print("\n✅ Generated assets:")
     for key, path in assets.items():

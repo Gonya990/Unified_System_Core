@@ -1,4 +1,3 @@
-
 import logging
 import os
 import time
@@ -13,8 +12,9 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(ROOT_DIR / ".env")
 
 # Setup Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("EduPortalLogin")
+
 
 def setup_driver(headless=True):
     options = uc.ChromeOptions()
@@ -31,6 +31,7 @@ def setup_driver(headless=True):
 
     return driver
 
+
 def login_edu_portal(username, password):
     driver = None
     try:
@@ -42,7 +43,7 @@ def login_edu_portal(username, password):
         logger.info(f"Navigating to {url}...")
         driver.get(url)
 
-        time.sleep(10) # Wait for redirects
+        time.sleep(10)  # Wait for redirects
 
         logger.info(f"Current URL: {driver.current_url}")
         driver.save_screenshot("debug_edu_portal_step1.png")
@@ -89,7 +90,7 @@ def login_edu_portal(username, password):
                         pwd_tab.click()
                         time.sleep(2)
                     except Exception:
-                        pass # Maybe already on password tab
+                        pass  # Maybe already on password tab
 
                     pwd_input = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
                     pwd_input.clear()
@@ -101,7 +102,7 @@ def login_edu_portal(username, password):
                     submit_btn.click()
                     logger.info("Clicked Submit.")
 
-                    time.sleep(15) # Wait for login processing
+                    time.sleep(15)  # Wait for login processing
 
                     logger.info(f"Post-Login URL: {driver.current_url}")
                     driver.save_screenshot("debug_edu_portal_success.png")
@@ -113,7 +114,7 @@ def login_edu_portal(username, password):
                 logger.error(f"Interaction Error: {e}")
 
         elif "parents.education.gov.il" in driver.current_url:
-             logger.info("Seem to be on Portal page (already logged in or public?)")
+            logger.info("Seem to be on Portal page (already logged in or public?)")
 
         return False
 
@@ -125,6 +126,7 @@ def login_edu_portal(username, password):
     finally:
         if driver:
             driver.quit()
+
 
 if __name__ == "__main__":
     user = os.getenv("MASHOV_USER")

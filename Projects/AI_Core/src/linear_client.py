@@ -2,6 +2,7 @@
 Linear API Client for Task Management
 Integrates with Linear.app for professional issue tracking.
 """
+
 import logging
 import os
 from typing import Optional
@@ -10,26 +11,21 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 class LinearClient:
     """Client for Linear GraphQL API."""
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("LINEAR_API_KEY")
         self.endpoint = "https://api.linear.app/graphql"
-        self.headers = {
-            "Authorization": self.api_key,
-            "Content-Type": "application/json"
-        }
+        self.headers = {"Authorization": self.api_key, "Content-Type": "application/json"}
         self.team_id = None  # Will be fetched on first use
 
     def _query(self, query: str, variables: Optional[dict] = None) -> dict:
         """Execute GraphQL query."""
         try:
             response = requests.post(
-                self.endpoint,
-                json={"query": query, "variables": variables or {}},
-                headers=self.headers,
-                timeout=10
+                self.endpoint, json={"query": query, "variables": variables or {}}, headers=self.headers, timeout=10
             )
             response.raise_for_status()
             data = response.json()
@@ -113,12 +109,7 @@ class LinearClient:
         """
 
         variables = {
-            "input": {
-                "teamId": self.team_id,
-                "title": title,
-                "description": description,
-                "priority": priority
-            }
+            "input": {"teamId": self.team_id, "title": title, "description": description, "priority": priority}
         }
 
         result = self._query(query, variables)
@@ -128,7 +119,8 @@ class LinearClient:
 
     def get_my_issues(self, limit: int = 10) -> list[dict]:
         """Get issues assigned to current user."""
-        query = """
+        query = (
+            """
         query {
             viewer {
                 assignedIssues(first: %d, filter: { state: { type: { nin: ["completed", "canceled"] } } }) {
@@ -145,7 +137,9 @@ class LinearClient:
                 }
             }
         }
-        """ % limit
+        """
+            % limit
+        )
 
         result = self._query(query)
         if result and "viewer" in result:

@@ -2,6 +2,7 @@
 Unit tests for VAPI client integration.
 Tests VAPIClient initialization, configuration, and basic methods.
 """
+
 import os
 import sys
 from pathlib import Path
@@ -15,7 +16,7 @@ sys.path.insert(0, str(src_path))
 
 # Check if vapi_python can be imported (it requires pyaudio which may not be available)
 try:
-    __import__('vapi_python')
+    __import__("vapi_python")
     VAPI_AVAILABLE = True
 except ImportError:
     VAPI_AVAILABLE = False
@@ -137,9 +138,7 @@ class TestVAPIClientPhoneCalls:
         """Test create_phone_call fails without VAPI_PHONE_NUMBER_ID."""
         vapi_client_with_mock.phone_number_id = None
 
-        result = await vapi_client_with_mock.create_phone_call(
-            "+972541234567", "Test message"
-        )
+        result = await vapi_client_with_mock.create_phone_call("+972541234567", "Test message")
         assert result is None
 
     async def test_phone_call_validates_phone_number_format(self, vapi_client_with_mock):
@@ -147,21 +146,15 @@ class TestVAPIClientPhoneCalls:
         vapi_client_with_mock.phone_number_id = "phone_id"
 
         # Invalid format (doesn't start with +)
-        result = await vapi_client_with_mock.create_phone_call(
-            "972541234567", "Test"
-        )
+        result = await vapi_client_with_mock.create_phone_call("972541234567", "Test")
         assert result is None
 
     async def test_phone_call_with_valid_number(self, vapi_client_with_mock):
         """Test create_phone_call with valid phone number."""
         vapi_client_with_mock.phone_number_id = "phone_id"
-        vapi_client_with_mock._create_call_sync = Mock(
-            return_value={"id": "call_123"}
-        )
+        vapi_client_with_mock._create_call_sync = Mock(return_value={"id": "call_123"})
 
-        result = await vapi_client_with_mock.create_phone_call(
-            "+972541234567", "Test message"
-        )
+        result = await vapi_client_with_mock.create_phone_call("+972541234567", "Test message")
         # Our mock returns a dict from _create_call_sync
         assert result is not None or result is None  # Depends on executor behavior
 
@@ -175,20 +168,14 @@ class TestVAPIClientAssistant:
         from src.vapi_client import VAPIClient
 
         client = VAPIClient(api_key="")  # Invalid
-        result = await client.create_assistant(
-            "Test", "Test prompt"
-        )
+        result = await client.create_assistant("Test", "Test prompt")
         assert result is None
 
     async def test_create_assistant_uses_defaults(self, vapi_client_with_mock):
         """Test create_assistant uses sensible defaults."""
-        vapi_client_with_mock._create_assistant_sync = Mock(
-            return_value={"id": "asst_123"}
-        )
+        vapi_client_with_mock._create_assistant_sync = Mock(return_value={"id": "asst_123"})
 
-        await vapi_client_with_mock.create_assistant(
-            "Test Assistant", "Test system prompt"
-        )
+        await vapi_client_with_mock.create_assistant("Test Assistant", "Test system prompt")
         # Would call with defaults for model, voice provider, voice_id
 
 

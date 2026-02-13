@@ -1,12 +1,11 @@
 import logging
 import sys
 from pathlib import Path
+
 import openai
 
 # Add AI_Core/src to path for TokenBroker BEFORE other internal imports
-AI_CORE_SRC_PATH = (
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
-)
+AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
@@ -61,10 +60,7 @@ class DinoScriptEngine:
         return response.choices[0].message.content
 
     def director_pass(self, raw_debate: str):
-        print(
-            "🎬 Stage 2: Director is adding cinematic cues, B-roll, "
-            "and SORA-2 motion prompts..."
-        )
+        print("🎬 Stage 2: Director is adding cinematic cues, B-roll, and SORA-2 motion prompts...")
 
         system_prompt = (
             "You are the Director. Transform the debate into a JSON list of segments.\n"
@@ -83,10 +79,7 @@ class DinoScriptEngine:
                 {"role": "system", "content": system_prompt},
                 {
                     "role": "user",
-                    "content": (
-                        "Format this debate into JSON with MOTION PROMPTS:\n\n"
-                        f"{raw_debate}"
-                    ),
+                    "content": (f"Format this debate into JSON with MOTION PROMPTS:\n\n{raw_debate}"),
                 },
             ],
             response_format={"type": "json_object"},
@@ -110,9 +103,7 @@ class DinoScriptEngine:
                 {"role": "system", "content": system_prompt},
                 {
                     "role": "user",
-                    "content": (
-                        f"Polish this JSON for max chemistry:\n\n{script_json}"
-                    ),
+                    "content": (f"Polish this JSON for max chemistry:\n\n{script_json}"),
                 },
             ],
             response_format={"type": "json_object"},

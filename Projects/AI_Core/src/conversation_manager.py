@@ -41,7 +41,7 @@ class ConversationManager:
             return []
 
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             # Return last N messages
@@ -61,11 +61,7 @@ class ConversationManager:
         """
         history = self.get_full_history(user_id)
 
-        message = {
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now().isoformat()
-        }
+        message = {"role": role, "content": content, "timestamp": datetime.now().isoformat()}
 
         history.append(message)
 
@@ -76,7 +72,7 @@ class ConversationManager:
         file_path = self._get_file_path(user_id)
 
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(history, f, indent=2, ensure_ascii=False)
             logger.debug(f"Added {role} message for user {user_id}")
         except Exception as e:
@@ -90,7 +86,7 @@ class ConversationManager:
             return []
 
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
             logger.error(f"Failed to load full history for user {user_id}: {e}")
@@ -125,10 +121,7 @@ class ConversationManager:
         history = self.get_history(user_id, limit=limit)
 
         # Strip timestamps, keep only role and content
-        return [
-            {"role": msg["role"], "content": msg["content"]}
-            for msg in history
-        ]
+        return [{"role": msg["role"], "content": msg["content"]} for msg in history]
 
     def get_stats(self) -> dict:
         """Get statistics about conversation storage."""
@@ -147,7 +140,7 @@ class ConversationManager:
         return {
             "total_users": total_users,
             "total_messages": total_messages,
-            "avg_messages_per_user": total_messages / total_users if total_users > 0 else 0
+            "avg_messages_per_user": total_messages / total_users if total_users > 0 else 0,
         }
 
 

@@ -3,11 +3,13 @@ Health Integration Module
 Receives health data (steps, weight, sleep) via Webhook.
 Intended to be used with iOS Shortcuts or Android Automation.
 """
+
 import logging
 import sqlite3
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
 
 class HealthIntegration:
     """Manages health data storage and retrieval."""
@@ -22,7 +24,7 @@ class HealthIntegration:
         c = conn.cursor()
 
         # Metrics table
-        c.execute('''
+        c.execute("""
             CREATE TABLE IF NOT EXISTS metrics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
@@ -32,17 +34,17 @@ class HealthIntegration:
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                 source TEXT        -- ios, android, manual
             )
-        ''')
+        """)
 
         # User goals table
-        c.execute('''
+        c.execute("""
             CREATE TABLE IF NOT EXISTS goals (
                 user_id INTEGER PRIMARY KEY,
                 steps_goal INTEGER DEFAULT 10000,
                 weight_goal REAL,
                 sleep_goal REAL DEFAULT 8.0
             )
-        ''')
+        """)
 
         conn.commit()
         conn.close()
@@ -54,7 +56,7 @@ class HealthIntegration:
             c = conn.cursor()
             c.execute(
                 "INSERT INTO metrics (user_id, metric_type, value, unit, source) VALUES (?, ?, ?, ?, ?)",
-                (user_id, metric_type, value, unit, source)
+                (user_id, metric_type, value, unit, source),
             )
             conn.commit()
             conn.close()
@@ -73,19 +75,28 @@ class HealthIntegration:
         today_start = datetime.now().strftime("%Y-%m-%d 00:00:00")
 
         # Steps (Sum)
-        c.execute("SELECT SUM(value) FROM metrics WHERE user_id=? AND metric_type='steps' AND timestamp >= ?", (user_id, today_start))
+        c.execute(
+            "SELECT SUM(value) FROM metrics WHERE user_id=? AND metric_type='steps' AND timestamp >= ?",
+            (user_id, today_start),
+        )
         res = c.fetchone()
-        stats['steps'] = res[0] if res[0] else 0
+        stats["steps"] = res[0] if res[0] else 0
 
         # Sleep (Last entry or Sum? Usually Sum if multiple naps, but let's assume Sum)
-        c.execute("SELECT SUM(value) FROM metrics WHERE user_id=? AND metric_type='sleep_hours' AND timestamp >= ?", (user_id, today_start))
+        c.execute(
+            "SELECT SUM(value) FROM metrics WHERE user_id=? AND metric_type='sleep_hours' AND timestamp >= ?",
+            (user_id, today_start),
+        )
         res = c.fetchone()
-        stats['sleep'] = res[0] if res[0] else 0
+        stats["sleep"] = res[0] if res[0] else 0
 
         # Weight (Last entry)
-        c.execute("SELECT value FROM metrics WHERE user_id=? AND metric_type='weight' ORDER BY timestamp DESC LIMIT 1", (user_id,))
+        c.execute(
+            "SELECT value FROM metrics WHERE user_id=? AND metric_type='weight' ORDER BY timestamp DESC LIMIT 1",
+            (user_id,),
+        )
         res = c.fetchone()
-        stats['weight'] = res[0] if res else 0
+        stats["weight"] = res[0] if res else 0
 
         conn.close()
         return stats
@@ -96,12 +107,15 @@ class HealthIntegration:
         c = conn.cursor()
 
         stats = {}
-        datetime.now().strftime("%Y-%m-%d 00:00:00") # Simplified, actually needs -7 days logic, handled below
+        datetime.now().strftime("%Y-%m-%d 00:00:00")  # Simplified, actually needs -7 days logic, handled below
 
         # Avg Steps
-        c.execute("SELECT AVG(daily_steps) FROM (SELECT SUM(value) as daily_steps FROM metrics WHERE user_id=? AND metric_type='steps' AND timestamp >= date('now', '-7 days') GROUP BY date(timestamp))", (user_id,))
+        c.execute(
+            "SELECT AVG(daily_steps) FROM (SELECT SUM(value) as daily_steps FROM metrics WHERE user_id=? AND metric_type='steps' AND timestamp >= date('now', '-7 days') GROUP BY date(timestamp))",
+            (user_id,),
+        )
         res = c.fetchone()
-        stats['avg_steps'] = res[0] if res[0] else 0
+        stats["avg_steps"] = res[0] if res[0] else 0
 
         conn.close()
         return stats
@@ -116,11 +130,11 @@ class HealthIntegration:
         if not c.fetchone():
             c.execute("INSERT INTO goals (user_id) VALUES (?)", (user_id,))
 
-        if metric == 'steps':
+        if metric == "steps":
             c.execute("UPDATE goals SET steps_goal=? WHERE user_id=?", (value, user_id))
-        elif metric == 'weight':
+        elif metric == "weight":
             c.execute("UPDATE goals SET weight_goal=? WHERE user_id=?", (value, user_id))
-        elif metric == 'sleep':
+        elif metric == "sleep":
             c.execute("UPDATE goals SET sleep_goal=? WHERE user_id=?", (value, user_id))
 
         conn.commit()

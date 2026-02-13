@@ -2,6 +2,7 @@
 Unified Inference Client for AI Telegram Bot.
 Supports Ollama, OpenAI-compatible, Gemini, and custom endpoints.
 """
+
 import logging
 from typing import Optional
 
@@ -257,7 +258,7 @@ class InferenceClient:
             headers = {
                 "Authorization": f"Bearer {self.config.get('OPENROUTER_API_KEY')}",
                 "HTTP-Referer": "https://github.com/Gonya990/Unified_System_Core",
-                "X-Title": "Unified System Bot"
+                "X-Title": "Unified System Bot",
             }
             payload = {
                 "model": model,
@@ -266,7 +267,7 @@ class InferenceClient:
                 "max_tokens": 1000,
             }
 
-        else: # ollama
+        else:  # ollama
             base_url = self.config.get("OLLAMA_BASE_URL", "http://localhost:11434")
             # ... existing ollama code ...
             url = f"{base_url.rstrip('/')}/api/chat"
@@ -300,9 +301,9 @@ class InferenceClient:
                 elif "message" in data:
                     text = data["message"]["content"]
                     if "prompt_eval_count" in data:
-                         usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
-                         usage["completion_tokens"] = data.get("eval_count", 0)
-                         usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
+                        usage["prompt_tokens"] = data.get("prompt_eval_count", 0)
+                        usage["completion_tokens"] = data.get("eval_count", 0)
+                        usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
                     return text, usage
                 else:
                     return str(data), usage
@@ -347,10 +348,7 @@ class InferenceClient:
                     # For now, simplistic handling:
                     continue
 
-                gemini_contents.append({
-                    "role": role,
-                    "parts": [{"text": content}]
-                })
+                gemini_contents.append({"role": role, "parts": [{"text": content}]})
 
             logger.info(f"[{self.provider}] Sending request to Gemini with model {self.model}")
 
@@ -359,11 +357,11 @@ class InferenceClient:
 
             from google.genai.types import GenerateContentConfig
 
-            config = GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=0.7,
-                max_output_tokens=1000
-            ) if system_prompt else GenerateContentConfig(temperature=0.7, max_output_tokens=1000)
+            config = (
+                GenerateContentConfig(system_instruction=system_prompt, temperature=0.7, max_output_tokens=1000)
+                if system_prompt
+                else GenerateContentConfig(temperature=0.7, max_output_tokens=1000)
+            )
 
             loop = asyncio.get_event_loop()
 
@@ -371,11 +369,7 @@ class InferenceClient:
                 try:
                     # Determine model name explicitly
                     model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
-                    return client.models.generate_content(
-                        model=model_name,
-                        contents=gemini_contents,
-                        config=config
-                    )
+                    return client.models.generate_content(model=model_name, contents=gemini_contents, config=config)
                 except Exception as inner_e:
                     logger.error(f"Error inside call_gemini: {inner_e}")
                     raise
@@ -441,11 +435,7 @@ class InferenceClient:
 
         url = "https://api.openai.com/v1/audio/speech"
         headers = {"Authorization": f"Bearer {api_key}"}
-        payload = {
-            "model": "tts-1",
-            "input": text,
-            "voice": voice
-        }
+        payload = {"model": "tts-1", "input": text, "voice": voice}
 
         try:
             async with aiohttp.ClientSession(headers=headers) as session:
@@ -471,21 +461,14 @@ class InferenceClient:
             return None
 
         url = "https://api.openai.com/v1/images/generations"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "model": "dall-e-3",
-            "prompt": prompt,
-            "n": 1,
-            "size": size,
-            "quality": quality
-        }
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        payload = {"model": "dall-e-3", "prompt": prompt, "n": 1, "size": size, "quality": quality}
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=120)) as response:
+                async with session.post(
+                    url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=120)
+                ) as response:
                     if response.status == 200:
                         data = await response.json()
                         image_url = data.get("data", [{}])[0].get("url")
@@ -506,13 +489,11 @@ class InferenceClient:
 
         try:
             from PIL import Image
+
             img = Image.open(image_path)
 
             client = await self._get_gemini_client()
-            response = client.models.generate_content(
-                model=self.model,
-                contents=[prompt, img]
-            )
+            response = client.models.generate_content(model=self.model, contents=[prompt, img])
             return response.text
         except Exception as e:
             logger.error(f"Image analysis failed: {e}")

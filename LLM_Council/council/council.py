@@ -101,29 +101,29 @@ class LLMCouncil:
         # OpenAI
         openai_key = os.getenv("OPENAI_API_KEY")
         if openai_key and openai_key != "sk-your-key-here":
-            providers.append(OpenAIProvider(
-                api_key=openai_key,
-                model=os.getenv("OPENAI_MODEL", "gpt-4o"),
-                store=os.getenv("OPENAI_STORE", "false").lower() == "true"
-            ))
+            providers.append(
+                OpenAIProvider(
+                    api_key=openai_key,
+                    model=os.getenv("OPENAI_MODEL", "gpt-4o"),
+                    store=os.getenv("OPENAI_STORE", "false").lower() == "true",
+                )
+            )
             logger.info("✓ OpenAI provider initialized")
 
         # GitHub Copilot
         github_token = os.getenv("GITHUB_TOKEN")
         if github_token and github_token != "ghp_your-token-here":
-            providers.append(GitHubCopilotProvider(
-                api_key=github_token,
-                model=os.getenv("GITHUB_COPILOT_MODEL", "gpt-4o")
-            ))
+            providers.append(
+                GitHubCopilotProvider(api_key=github_token, model=os.getenv("GITHUB_COPILOT_MODEL", "gpt-4o"))
+            )
             logger.info("✓ GitHub Copilot provider initialized")
 
         # NVIDIA NIM
         nvidia_key = os.getenv("NVIDIA_API_KEY")
         if nvidia_key and nvidia_key != "nvapi-your-key-here":
-            providers.append(NVIDIANIMProvider(
-                api_key=nvidia_key,
-                model=os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct")
-            ))
+            providers.append(
+                NVIDIANIMProvider(api_key=nvidia_key, model=os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct"))
+            )
             logger.info("✓ NVIDIA NIM provider initialized")
 
         if not providers:
@@ -152,11 +152,13 @@ class LLMCouncil:
         # OpenAI
         openai_key = broker.get_key("openai", tier=tier)
         if openai_key:
-            providers.append(OpenAIProvider(
-                api_key=openai_key,
-                model="gpt-4o", # Default high quality
-                store=False
-            ))
+            providers.append(
+                OpenAIProvider(
+                    api_key=openai_key,
+                    model="gpt-4o",  # Default high quality
+                    store=False,
+                )
+            )
             logger.info(f"✓ OpenAI provider initialized via TokenBroker (Tier: {tier})")
         else:
             logger.warning(f"TokenBroker returned no key for OpenAI (Tier: {tier})")
@@ -164,10 +166,12 @@ class LLMCouncil:
         # Gemini
         gemini_key = broker.get_key("gemini", tier=tier)
         if gemini_key:
-            providers.append(GeminiProvider(
-                api_key=gemini_key,
-                model="models/nano-banana-pro-preview" # Priority: Nana Banana
-            ))
+            providers.append(
+                GeminiProvider(
+                    api_key=gemini_key,
+                    model="models/nano-banana-pro-preview",  # Priority: Nana Banana
+                )
+            )
             logger.info(f"✓ Gemini provider initialized via TokenBroker (Tier: {tier})")
         else:
             logger.warning(f"TokenBroker returned no key for Gemini (Tier: {tier})")
@@ -175,18 +179,9 @@ class LLMCouncil:
         if not providers:
             raise ValueError("TokenBroker returned no valid keys for supported providers.")
 
-        return cls(
-            providers=providers,
-            chairman=providers[0] if providers else None,
-            enable_peer_review=True
-        )
+        return cls(providers=providers, chairman=providers[0] if providers else None, enable_peer_review=True)
 
-    async def deliberate(
-        self,
-        query: str,
-        system_prompt: str = "",
-        verbose: bool = False
-    ) -> CouncilSession:
+    async def deliberate(self, query: str, system_prompt: str = "", verbose: bool = False) -> CouncilSession:
         """
         Run full council deliberation on a query.
 
@@ -199,35 +194,29 @@ class LLMCouncil:
         )
 
         if verbose:
-            logger.info(f"\n{'='*60}")
+            logger.info(f"\n{'=' * 60}")
             logger.info(f"🏛️ COUNCIL SESSION: {session.session_id}")
             logger.info(f"📝 Query: {query[:100]}...")
-            logger.info(f"{'='*60}\n")
+            logger.info(f"{'=' * 60}\n")
 
         # ===== STAGE 1: Individual Responses =====
         if verbose:
             logger.info("📊 STAGE 1: Gathering individual responses...")
 
-        session.stage1_responses = await self._stage1_individual_responses(
-            query, system_prompt, verbose
-        )
+        session.stage1_responses = await self._stage1_individual_responses(query, system_prompt, verbose)
 
         # ===== STAGE 2: Peer Review =====
         if self.enable_peer_review and len(session.stage1_responses) > 1:
             if verbose:
                 logger.info("\n🔍 STAGE 2: Peer review in progress...")
 
-            session.stage2_reviews = await self._stage2_peer_review(
-                query, session.stage1_responses, verbose
-            )
+            session.stage2_reviews = await self._stage2_peer_review(query, session.stage1_responses, verbose)
 
         # ===== STAGE 3: Chairman Consensus =====
         if verbose:
             logger.info("\n👑 STAGE 3: Chairman synthesizing consensus...")
 
-        session.stage3_consensus = await self._stage3_consensus(
-            query, session, verbose
-        )
+        session.stage3_consensus = await self._stage3_consensus(query, session, verbose)
         session.chairman_provider = self.chairman.name if self.chairman else "none"
 
         # Save history
@@ -237,10 +226,7 @@ class LLMCouncil:
         return session
 
     async def _stage1_individual_responses(
-        self,
-        query: str,
-        system_prompt: str,
-        verbose: bool
+        self, query: str, system_prompt: str, verbose: bool
     ) -> list[ProviderResponse]:
         """Stage 1: Get independent responses from all providers."""
 
@@ -268,10 +254,7 @@ class LLMCouncil:
         return valid_responses
 
     async def _stage2_peer_review(
-        self,
-        query: str,
-        responses: list[ProviderResponse],
-        verbose: bool
+        self, query: str, responses: list[ProviderResponse], verbose: bool
     ) -> list[PeerReview]:
         """Stage 2: Each provider reviews the others' responses."""
         reviews = []
@@ -283,11 +266,7 @@ class LLMCouncil:
                         logger.info(f"  → {reviewer.name} reviewing {response.provider_name}...")
 
                     try:
-                        review = await reviewer.peer_review(
-                            query,
-                            response,
-                            [r for r in responses if r != response]
-                        )
+                        review = await reviewer.peer_review(query, response, [r for r in responses if r != response])
                         reviews.append(review)
                         if verbose:
                             logger.info(f"    Score: {review.score}/10")
@@ -296,12 +275,7 @@ class LLMCouncil:
 
         return reviews
 
-    async def _stage3_consensus(
-        self,
-        query: str,
-        session: CouncilSession,
-        verbose: bool
-    ) -> str:
+    async def _stage3_consensus(self, query: str, session: CouncilSession, verbose: bool) -> str:
         """Stage 3: Chairman synthesizes consensus from all responses and reviews."""
         if not self.chairman:
             # Fallback: return best-scored response
@@ -309,7 +283,7 @@ class LLMCouncil:
                 scores = {}
                 for review in session.stage2_reviews:
                     scores[review.reviewee] = scores.get(review.reviewee, []) + [review.score]
-                avg_scores = {k: sum(v)/len(v) for k, v in scores.items()}
+                avg_scores = {k: sum(v) / len(v) for k, v in scores.items()}
                 best = max(avg_scores, key=avg_scores.get)
                 for r in session.stage1_responses:
                     if r.provider_name == best:
@@ -331,7 +305,7 @@ class LLMCouncil:
 4. Resolve any conflicts or contradictions
 5. Provide a clear, well-structured final response
 
-Output ONLY the final synthesized answer, not meta-commentary about the process."""
+Output ONLY the final synthesized answer, not meta-commentary about the process.""",
         )
 
         return response.content

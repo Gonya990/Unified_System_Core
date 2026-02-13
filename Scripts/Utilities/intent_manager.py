@@ -12,15 +12,18 @@ import yaml
 
 LEDGER_PATH = Path(__file__).resolve().parent.parent.parent / "INTENT_LEDGER.yaml"
 
+
 def load_ledger():
     if not LEDGER_PATH.exists():
         return {"intents": [], "constraints": []}
     with open(LEDGER_PATH) as f:
         return yaml.safe_load(f) or {"intents": [], "constraints": []}
 
+
 def save_ledger(data):
-    with open(LEDGER_PATH, 'w') as f:
+    with open(LEDGER_PATH, "w") as f:
         yaml.dump(data, f, sort_keys=False, allow_unicode=True)
+
 
 def claim_intent(intent_id, agent_id, human_owner, ttl_minutes=60):
     ledger = load_ledger()
@@ -47,6 +50,7 @@ def claim_intent(intent_id, agent_id, human_owner, ttl_minutes=60):
             return True, f"Intent {intent_id} claimed by {agent_id}"
 
     return False, f"Intent {intent_id} not found"
+
 
 if __name__ == "__main__":
     # Internal test/example

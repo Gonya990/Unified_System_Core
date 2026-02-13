@@ -61,9 +61,7 @@ def get_analytics_service():
                 return None, None
 
             print("🔐 Initiating OAuth 2.0 login flow...")
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CLIENT_SECRETS_FILE), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS_FILE), SCOPES)
             creds = flow.run_local_server(port=0)
 
         with open(TOKEN_FILE, "w") as token:
@@ -156,9 +154,7 @@ def get_shorts_analytics(days=30):
         # Для Shorts (60 сек макс), если avg > 3 сек, считаем engaged
         SHORTS_ENGAGED_THRESHOLD = 3  # seconds
         engaged_rate = (
-            min(1.0, totals["avg_view_duration"] / SHORTS_ENGAGED_THRESHOLD)
-            if totals["avg_view_duration"] > 0
-            else 0.5
+            min(1.0, totals["avg_view_duration"] / SHORTS_ENGAGED_THRESHOLD) if totals["avg_view_duration"] > 0 else 0.5
         )
         estimated_engaged_views = int(totals["views"] * engaged_rate)
 
@@ -166,12 +162,8 @@ def get_shorts_analytics(days=30):
         print("-" * 50)
         print(f"  👁️  Просмотры (Views):           {totals['views']:,}")
         print(f"  ✅ Engaged Views (оценка):       {estimated_engaged_views:,}")
-        print(
-            f"  ⏱️  Время просмотра:             {totals['watch_time_minutes']:,.0f} мин"
-        )
-        print(
-            f"  📏 Средняя длит. просмотра:     {totals['avg_view_duration']:.1f} сек"
-        )
+        print(f"  ⏱️  Время просмотра:             {totals['watch_time_minutes']:,.0f} мин")
+        print(f"  📏 Средняя длит. просмотра:     {totals['avg_view_duration']:.1f} сек")
         print(f"  👥 Новых подписчиков:           +{totals['subscribers_gained']:,}")
         print(f"  ❤️  Лайков:                      {totals['likes']:,}")
         print("-" * 50)
@@ -216,11 +208,7 @@ def get_video_performance(video_id):
 
     try:
         # Get video info
-        video_response = (
-            youtube.videos()
-            .list(part="snippet,statistics,contentDetails", id=video_id)
-            .execute()
-        )
+        video_response = youtube.videos().list(part="snippet,statistics,contentDetails", id=video_id).execute()
 
         if not video_response.get("items"):
             print(f"❌ Video {video_id} not found")
@@ -235,10 +223,7 @@ def get_video_performance(video_id):
         is_short = "PT" in duration and (
             "S" in duration
             or duration.count("M") == 0
-            or (
-                duration.count("M") == 1
-                and int(duration.split("M")[0].replace("PT", "")) <= 1
-            )
+            or (duration.count("M") == 1 and int(duration.split("M")[0].replace("PT", "")) <= 1)
         )
 
         print(f"\n📹 VIDEO: {snippet.get('title', 'Unknown')[:50]}...")

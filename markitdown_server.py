@@ -1,11 +1,12 @@
-import sys
 import os
+
 from markitdown import MarkItDown
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
 mcp = FastMCP("MarkItDown")
 markitdown = MarkItDown()
+
 
 @mcp.tool()
 def convert_to_markdown(file_path: str) -> str:
@@ -17,6 +18,7 @@ def convert_to_markdown(file_path: str) -> str:
         return result.text_content
     except Exception as e:
         return f"Error converting file: {str(e)}"
+
 
 if __name__ == "__main__":
     mcp.run()

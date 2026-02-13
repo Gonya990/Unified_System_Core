@@ -7,6 +7,7 @@ from pyicloud import PyiCloudService
 SESSION_DIR = os.path.expanduser("~/.icloud_session")
 os.makedirs(SESSION_DIR, exist_ok=True)
 
+
 def authenticate(username, password):
     print(f"🍏 Attempting login for {username}...")
     try:
@@ -38,6 +39,7 @@ def authenticate(username, password):
         print(f"❌ iCloud Login Error: {e}")
         return None
 
+
 def validate_2fa(username, password, code):
     print(f"🔐 Validating 2FA code for {username}...")
     try:
@@ -57,6 +59,7 @@ def validate_2fa(username, password, code):
     except Exception as e:
         print(f"❌ 2FA Validation Error: {e}")
         return False
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

@@ -15,9 +15,7 @@ import schedule
 sys.path.insert(0, str(Path(__file__).parent))
 from token_broker import TokenBroker
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 ROTATION_INTERVAL_HOURS = int(os.getenv("TOKEN_ROTATION_HOURS", "24"))

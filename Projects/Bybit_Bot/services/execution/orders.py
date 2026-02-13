@@ -11,6 +11,7 @@ from kubernetes import client, config
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BybitExecution")
 
+
 class BybitExecutionEngine:
     def __init__(self, provider="bybit"):
         self.broker = TokenBroker()
@@ -39,11 +40,11 @@ class BybitExecutionEngine:
         # Compliance Log
         log_entry = {
             "timestamp": datetime.now().isoformat(),
-            "symbol": signal['symbol'],
-            "action": signal['action'],
-            "price": signal['price'],
-            "amount": signal['amount'],
-            "status": "FILLED"
+            "symbol": signal["symbol"],
+            "action": signal["action"],
+            "price": signal["price"],
+            "amount": signal["amount"],
+            "status": "FILLED",
         }
         await self.messenger.produce("compliance_logs", log_entry)
 
@@ -57,10 +58,7 @@ class BybitExecutionEngine:
         namespace = os.getenv("K8S_NAMESPACE", "trading")
         api = client.CoordinationV1Api()
 
-        le = LeaderElection(
-            api, namespace, "bybit-execution-lock",
-            self.on_start, self.on_stop
-        )
+        le = LeaderElection(api, namespace, "bybit-execution-lock", self.on_start, self.on_stop)
 
         # Run leader election in background
         asyncio.create_task(asyncio.to_thread(le.run))
@@ -69,11 +67,12 @@ class BybitExecutionEngine:
 
         stream = "signals"
         group = "execution-group"
-        async for msg_id, signal in self.messenger.consume(stream, group, "exec-1"):
+        async for _msg_id, signal in self.messenger.consume(stream, group, "exec-1"):
             if self.is_leader:
                 await self.execute_order(signal)
             else:
                 logger.debug("Ignoring signal (not leader)")
+
 
 if __name__ == "__main__":
     engine = BybitExecutionEngine()

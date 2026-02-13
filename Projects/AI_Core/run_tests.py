@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Simple test runner that captures output."""
+
 import os
 import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 
 def run_tests():
     print("=" * 60)
@@ -18,6 +20,7 @@ def run_tests():
         from src.health import start_health_server
         from src.inference_client import InferenceClient
         from src.logging_config import setup_logging
+
         print("✅ All imports successful")
     except ImportError as e:
         print(f"❌ Import failed: {e}")
@@ -54,6 +57,7 @@ def run_tests():
     print("\n[4/4] Testing Health server...")
     try:
         from src.health import HealthHandler
+
         assert HealthHandler is not None
         print("✅ Health module tests passed")
     except Exception as e:
@@ -64,6 +68,7 @@ def run_tests():
     print("🎉 ALL TESTS PASSED!")
     print("=" * 60)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(run_tests())

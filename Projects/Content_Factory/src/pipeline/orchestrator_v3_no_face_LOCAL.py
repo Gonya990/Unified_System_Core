@@ -126,9 +126,7 @@ def run_no_face_pipeline(
     if not audio_generated:
         print("⚠️ Falling back to OpenAI/Edge-TTS...")
         # Try OpenAI
-        if not generate_audio_openai(
-            text, audio_path, voice="onyx" if lang == "en" else "alloy"
-        ):
+        if not generate_audio_openai(text, audio_path, voice="onyx" if lang == "en" else "alloy"):
             # Fallback to Edge
             voice = VOICE_RU if lang == "ru" else VOICE_EN
             if not generate_audio_edge(text, audio_path, voice):
@@ -201,9 +199,7 @@ def run_no_face_pipeline(
                 str(clip_out),
             ]
             try:
-                subprocess.run(
-                    cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-                )
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 clips.append(clip_out)
                 continue
             except Exception as e:
@@ -218,7 +214,9 @@ def run_no_face_pipeline(
 
                 headers = {"Authorization": pexels_key}
                 # Request 1 video, portrait, medium size
-                url = f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
+                url = (
+                    f"https://api.pexels.com/videos/search?query={keyword}&per_page=1&orientation=portrait&size=medium"
+                )
                 resp = requests.get(url, headers=headers)
 
                 if resp.status_code == 200 and resp.json().get("videos"):
@@ -282,9 +280,7 @@ def run_no_face_pipeline(
             str(clip_out),
         ]
         try:
-            subprocess.run(
-                cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-            )
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             clips.append(clip_out)
         except Exception as e:
             print(f"❌ Fallback generation failed: {e}")
@@ -314,9 +310,7 @@ def run_no_face_pipeline(
         str(raw_video),
     ]
     try:
-        subprocess.run(
-            cmd_concat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-        )
+        subprocess.run(cmd_concat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     except Exception:
         print("❌ Concat failed.")
         return
@@ -344,9 +338,7 @@ def run_no_face_pipeline(
         str(final_video),
     ]
     try:
-        subprocess.run(
-            cmd_mix, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-        )
+        subprocess.run(cmd_mix, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         print(f"\n✨ DONE: {final_video}")
     except Exception:
         print("❌ Final mix failed.")

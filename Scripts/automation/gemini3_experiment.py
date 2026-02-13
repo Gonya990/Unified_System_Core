@@ -22,11 +22,7 @@ def test_gemini_3():
 
     try:
         response = client.models.generate_content(
-            model=model_id,
-            contents=query,
-            config=GenerateContentConfig(
-                tools=[Tool(google_search=GoogleSearch())]
-            )
+            model=model_id, contents=query, config=GenerateContentConfig(tools=[Tool(google_search=GoogleSearch())])
         )
 
         print("\n✅ Gemini 3 Response:")
@@ -37,7 +33,10 @@ def test_gemini_3():
 
     except Exception as e:
         print(f"❌ Error with Gemini 3: {e}")
-        print("💡 Suggestion: The model might be restricted to specific regions or require internal whitelisting despite appearing in the list.")
+        print(
+            "💡 Suggestion: The model might be restricted to specific regions or require internal whitelisting despite appearing in the list."
+        )
+
 
 if __name__ == "__main__":
     test_gemini_3()

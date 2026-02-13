@@ -14,7 +14,7 @@ def test_inference_client_ollama_format():
             "INFERENCE_API_KEY": "",
             "MODEL_NAME": "llama3.2",
             "OLLAMA_BASE_URL": "http://localhost:11434",
-            "OLLAMA_MODEL": "llama3.2"
+            "OLLAMA_MODEL": "llama3.2",
         }.get(k, d)
 
         client = InferenceClient(cm)
@@ -28,14 +28,17 @@ def test_inference_client_ollama_format():
         class PostContextManager:
             async def __aenter__(self):
                 return mock_response
+
             async def __aexit__(self, *args):
                 return None
 
         class SessionContextManager:
             async def __aenter__(self):
                 return self
+
             async def __aexit__(self, *args):
                 return None
+
             def post(self, *args, **kwargs):
                 return PostContextManager()
 

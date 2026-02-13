@@ -2,6 +2,7 @@
 Infrastructure Manager for AI Bot.
 Reads infrastructure.yaml and provides information about the network.
 """
+
 import asyncio
 import logging
 from pathlib import Path
@@ -9,6 +10,7 @@ from pathlib import Path
 import yaml
 
 logger = logging.getLogger(__name__)
+
 
 class InfrastructureManager:
     def __init__(self, config_path: str = "config/infrastructure.yaml"):
@@ -63,9 +65,7 @@ class InfrastructureManager:
             # Also try to get Tailscale IP (may fail in WSL2)
             try:
                 proc = await asyncio.create_subprocess_exec(
-                    "/snap/bin/tailscale", "ip", "-4",
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.DEVNULL
+                    "/snap/bin/tailscale", "ip", "-4", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL
                 )
                 stdout, _ = await proc.communicate()
                 if proc.returncode == 0:
@@ -90,8 +90,8 @@ class InfrastructureManager:
             is_self = ip in local_ips
             # Also check if node id matches hostname pattern (e.g., igor-gaming-1 matches Igor-Gaming)
             if local_hostname and (
-                local_hostname in node_id or
-                node_id.replace("-1", "").replace("-", "") in local_hostname.replace("-", "")
+                local_hostname in node_id
+                or node_id.replace("-1", "").replace("-", "") in local_hostname.replace("-", "")
             ):
                 is_self = True
 
@@ -103,11 +103,15 @@ class InfrastructureManager:
                 # Try Tailscale ping first (more reliable for mesh VPN)
                 proc = await asyncio.wait_for(
                     asyncio.create_subprocess_exec(
-                        "/snap/bin/tailscale", "ping", "-c", "1", str(ip),
+                        "/snap/bin/tailscale",
+                        "ping",
+                        "-c",
+                        "1",
+                        str(ip),
                         stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.DEVNULL
+                        stderr=asyncio.subprocess.DEVNULL,
                     ),
-                    timeout=5.0
+                    timeout=5.0,
                 )
                 stdout, _ = await proc.communicate()
 
@@ -121,11 +125,14 @@ class InfrastructureManager:
                     param = "-c" if platform.system().lower() != "windows" else "-n"
                     proc2 = await asyncio.wait_for(
                         asyncio.create_subprocess_exec(
-                            "ping", param, "1", str(ip),
+                            "ping",
+                            param,
+                            "1",
+                            str(ip),
                             stdout=asyncio.subprocess.DEVNULL,
-                            stderr=asyncio.subprocess.DEVNULL
+                            stderr=asyncio.subprocess.DEVNULL,
                         ),
-                        timeout=3.0
+                        timeout=3.0,
                     )
                     await proc2.wait()
 
@@ -142,11 +149,14 @@ class InfrastructureManager:
                     param = "-c" if platform.system().lower() != "windows" else "-n"
                     proc = await asyncio.wait_for(
                         asyncio.create_subprocess_exec(
-                            "ping", param, "1", str(ip),
+                            "ping",
+                            param,
+                            "1",
+                            str(ip),
                             stdout=asyncio.subprocess.DEVNULL,
-                            stderr=asyncio.subprocess.DEVNULL
+                            stderr=asyncio.subprocess.DEVNULL,
                         ),
-                        timeout=3.0
+                        timeout=3.0,
                     )
                     await proc.wait()
                     status = "🟢 Online" if proc.returncode == 0 else "🔴 Offline"

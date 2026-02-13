@@ -12,9 +12,7 @@ from TTS.tts.models.xtts import XttsArgs, XttsAudioConfig
 
 # Fix for torch.load weights_only=True issue
 try:
-    torch.serialization.add_safe_globals(
-        [XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs]
-    )
+    torch.serialization.add_safe_globals([XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs])
 except AttributeError:
     pass  # Older torch versions don't need this
 
@@ -27,9 +25,7 @@ load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
 CONTEXT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Context")
 AUDIO_DIR = CONTEXT_DIR / "audio_output"
-BIOMETRICS_DIR = Path(
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/secure_vault/biometrics"
-)
+BIOMETRICS_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/secure_vault/biometrics")
 
 if not AUDIO_DIR.exists():
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
@@ -76,12 +72,7 @@ def parse_script(lines):
         if "Skeptic" in text or "Host 1" in text or "Rex" in text or "T-Rex" in text:
             role = "Skeptic"
             text = re.sub(r"^(Host 1|Skeptic|Rex|T-Rex):", "", text).strip()
-        elif (
-            "Enthusiast" in text
-            or "Host 2" in text
-            or "Trike" in text
-            or "Triceratops" in text
-        ):
+        elif "Enthusiast" in text or "Host 2" in text or "Trike" in text or "Triceratops" in text:
             role = "Enthusiast"
             text = re.sub(r"^(Host 2|Enthusiast|Trike|Triceratops):", "", text).strip()
 

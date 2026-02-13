@@ -44,10 +44,5 @@ class EliteContentOrchestrator:
 
 if __name__ == "__main__":
     orch = EliteContentOrchestrator()
-    test_data = {
-        "script_ru": (
-            "Система 'Вибраниум' активирована на Титане. "
-            "Это начало новой эры автономии."
-        )
-    }
+    test_data = {"script_ru": ("Система 'Вибраниум' активирована на Титане. Это начало новой эры автономии.")}
     orch.run_elite_pipeline(test_data)

@@ -19,10 +19,7 @@ if sdk_path not in sys.path:
 try:
     from agent_mail import AgentMailClient, AgentMailConfig
 except ImportError:
-    warn_msg = (
-        f"⚠️ Warning: Could not import 'agent_mail' SDK from {sdk_path}. "
-        "Continuing in degraded mode."
-    )
+    warn_msg = f"⚠️ Warning: Could not import 'agent_mail' SDK from {sdk_path}. Continuing in degraded mode."
     print(warn_msg)
     AgentMailClient = None
     AgentMailConfig = None
@@ -120,7 +117,7 @@ def main():
             body_md=args.body,
             importance=args.importance,
         )
-        msg_id = result['deliveries'][0]['payload']['id']
+        msg_id = result["deliveries"][0]["payload"]["id"]
         print(f"✅ Message sent (ID: {msg_id})")
 
     elif args.action == "read":

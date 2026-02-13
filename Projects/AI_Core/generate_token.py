@@ -3,21 +3,23 @@
 Run this script locally to generate Google OAuth token.
 The token will be saved and can be uploaded to the server.
 """
+
 import json
 import os
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-SCOPES = ['https://www.googleapis.com/auth/calendar']
-CLIENT_SECRET_FILE = 'client_secret.json'
-TOKEN_FILE = 'google_token.json'
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
+CLIENT_SECRET_FILE = "client_secret.json"
+TOKEN_FILE = "google_token.json"
+
 
 def main():
     # Check for client_secret.json
     if not os.path.exists(CLIENT_SECRET_FILE):
         # Try config folder
-        if os.path.exists(f'config/{CLIENT_SECRET_FILE}'):
-            client_file = f'config/{CLIENT_SECRET_FILE}'
+        if os.path.exists(f"config/{CLIENT_SECRET_FILE}"):
+            client_file = f"config/{CLIENT_SECRET_FILE}"
         else:
             print(f"Error: {CLIENT_SECRET_FILE} not found!")
             print("Please place your Google OAuth client_secret.json in current directory")
@@ -33,19 +35,20 @@ def main():
 
     # Save credentials to file
     token_data = {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
+        "token": credentials.token,
+        "refresh_token": credentials.refresh_token,
+        "token_uri": credentials.token_uri,
+        "client_id": credentials.client_id,
+        "client_secret": credentials.client_secret,
+        "scopes": credentials.scopes,
     }
 
-    with open(TOKEN_FILE, 'w') as f:
+    with open(TOKEN_FILE, "w") as f:
         json.dump(token_data, f, indent=2)
 
     print(f"\n✅ Token saved to {TOKEN_FILE}")
     print("Now upload this token to the server for user authentication.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

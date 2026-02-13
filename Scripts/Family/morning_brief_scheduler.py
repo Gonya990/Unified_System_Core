@@ -4,6 +4,7 @@ Morning Brief Scheduler
 Runs morning_brief.py at scheduled time daily (default 7:00 AM).
 Maintains a persistent loop checking for the scheduled time.
 """
+
 import asyncio
 import logging
 import os
@@ -48,18 +49,13 @@ async def run_at_scheduled_time():
     Run brief at scheduled time every day.
     Sleeps until the next scheduled time, then executes the brief.
     """
-    logger.info(
-        f"Morning Brief Scheduler started. "
-        f"Brief will run at {SCHEDULE_HOUR:02d}:{SCHEDULE_MINUTE:02d} daily"
-    )
+    logger.info(f"Morning Brief Scheduler started. Brief will run at {SCHEDULE_HOUR:02d}:{SCHEDULE_MINUTE:02d} daily")
 
     while True:
         now = datetime.now()
 
         # Create target time for today
-        target_time = now.replace(
-            hour=SCHEDULE_HOUR, minute=SCHEDULE_MINUTE, second=0, microsecond=0
-        )
+        target_time = now.replace(hour=SCHEDULE_HOUR, minute=SCHEDULE_MINUTE, second=0, microsecond=0)
 
         # If target time passed today, schedule for tomorrow
         if now > target_time:
@@ -68,9 +64,7 @@ async def run_at_scheduled_time():
         # Calculate sleep time in seconds
         sleep_seconds = (target_time - now).total_seconds()
         hours_until = sleep_seconds / 3600
-        logger.info(
-            f"Next brief in {hours_until:.1f} hours at {target_time.strftime('%Y-%m-%d %H:%M:%S')}"
-        )
+        logger.info(f"Next brief in {hours_until:.1f} hours at {target_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
         # Sleep until target time
         await asyncio.sleep(sleep_seconds)

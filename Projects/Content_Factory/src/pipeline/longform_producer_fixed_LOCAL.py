@@ -92,7 +92,7 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
         "Conclusion: What lies ahead",
     ]
 
-    for i, sub in enumerate(subtopics):
+    for _i, sub in enumerate(subtopics):
         structure["segments"].append(
             {
                 "name": sub,
@@ -102,9 +102,7 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
                     "Statistics",
                 ],
                 "visual_theme": "documentary",
-                "script": generate_script_direct(
-                    topic, sub
-                ),  # Generate script immediately
+                "script": generate_script_direct(topic, sub),  # Generate script immediately
             }
         )
 
@@ -127,7 +125,7 @@ def generate_script_direct(topic, subtopic):
         prompt = f"""
         Write a 3-minute documentary narration script (Russian language) about: {topic}
         Focus specifically on: {subtopic}
-        
+
         Style: Professional, Engaging, Discovery Channel style.
         Length: Approx 400-500 words.
         Format: Just the text for Voiceover. No scene directions in text.
@@ -156,7 +154,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
     segment_videos = []
 
     for i, seg in enumerate(segments):
-        print(f"\n📹 Processing Segment {i+1}: {seg['name']}")
+        print(f"\n📹 Processing Segment {i + 1}: {seg['name']}")
 
         script = seg.get("script", "")
         if len(script) < 100:
@@ -187,9 +185,9 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         expected_path = FACTORY_DIR / f"outputs/{seg_name}_final.mp4"
         if expected_path.exists():
             segment_videos.append(expected_path)
-            print(f"✅ Segment {i+1} Ready: {expected_path}")
+            print(f"✅ Segment {i + 1} Ready: {expected_path}")
         else:
-            print(f"❌ Segment {i+1} Failed to produce video")
+            print(f"❌ Segment {i + 1} Failed to produce video")
 
     if not segment_videos:
         print("❌ No segments produced.")
@@ -218,9 +216,7 @@ def assemble_longform_video(data: dict, output_dir: Path) -> Optional[Path]:
         str(final_output),
     ]
     try:
-        subprocess.run(
-            cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-        )
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         print(f"✅ FULL MOVIE SAVED: {final_output}")
         return final_output
     except Exception as e:

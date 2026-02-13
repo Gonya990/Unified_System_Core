@@ -24,6 +24,7 @@ def compute_sha256(file_path):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
+
 def package_and_scan(target_dir):
     if not os.path.isdir(target_dir):
         print(f"❌ Error: {target_dir} is not a directory.")
@@ -32,7 +33,7 @@ def package_and_scan(target_dir):
     project_name = os.path.basename(os.path.abspath(target_dir))
     timestamp = int(time.time())
     archive_name = f"{project_name}_release_{timestamp}"
-    archive_path = shutil.make_archive(archive_name, 'zip', target_dir)
+    archive_path = shutil.make_archive(archive_name, "zip", target_dir)
 
     print(f"📦 Packaged: {archive_path}")
 
@@ -45,6 +46,7 @@ def package_and_scan(target_dir):
     print("1. Upload this ZIP to VirusTotal if 'File not found'.")
     print("2. Verify 'Code Insight' report.")
     print("3. If benign, proceed with deployment.")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

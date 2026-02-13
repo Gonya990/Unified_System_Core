@@ -5,6 +5,7 @@ from pyicloud import PyiCloudService
 
 SESSION_DIR = os.path.expanduser("~/.icloud_session")
 
+
 def check_status(username, password):
     print(f"🍏 Checking iCloud status for {username}...")
     try:
@@ -19,14 +20,15 @@ def check_status(username, password):
         # Try to list devices to prove access
         devices = api.devices
         print(f"📱 Devices found: {len(devices)}")
-        for dev in list(devices.keys())[:3]: # Show first 3 IDs keys
-             print(f" - {dev}")
+        for dev in list(devices.keys())[:3]:  # Show first 3 IDs keys
+            print(f" - {dev}")
 
         return True
 
     except Exception as e:
         print(f"❌ Check Error: {e}")
         return False
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

@@ -1,11 +1,16 @@
 [tool.ruff]
-# Target version for the project
 target-version = "py39"
-
-# Line length (matching your preference)
 line-length = 120
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+    "*.ipynb",
+]
 
-# Enable rules
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -16,21 +21,11 @@ select = [
     "UP",  # pyupgrade
 ]
 
-# Rule exclusions
 ignore = [
-    "E501", # line too long (handled by line-length and formatter)
+    "E501", # line too long
     "B008", # function call in argument defaults
     "C901", # function too complex
 ]
 
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    "venv",
-    "*.ipynb",
-]
-
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["Scripts", "Projects", "Utilities"]

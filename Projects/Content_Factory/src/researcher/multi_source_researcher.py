@@ -107,9 +107,7 @@ class MultiSourceResearcher:
             messages = data.get("messages", [])
 
             # Sort by views (top trending)
-            trending = sorted(messages, key=lambda m: m.get("views", 0), reverse=True)[
-                :10
-            ]
+            trending = sorted(messages, key=lambda m: m.get("views", 0), reverse=True)[:10]
 
             insights = []
             for msg in trending:
@@ -174,9 +172,7 @@ class MultiSourceResearcher:
                         "priority": link.get("priority", "medium"),
                         "notes": link.get("notes", ""),
                         "content": content[:500] if content else "",
-                        "score": {"high": 100, "medium": 50, "low": 10}.get(
-                            link.get("priority"), 50
-                        ),
+                        "score": {"high": 100, "medium": 50, "low": 10}.get(link.get("priority"), 50),
                     }
                 )
 
@@ -276,16 +272,12 @@ class MultiSourceResearcher:
 
         try:
             # Get top story IDs
-            response = requests.get(
-                "https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10
-            )
+            response = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json", timeout=10)
             story_ids = response.json()[:10]
 
             insights = []
             for sid in story_ids:
-                story_response = requests.get(
-                    f"https://hacker-news.firebaseio.com/v0/item/{sid}.json", timeout=5
-                )
+                story_response = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{sid}.json", timeout=5)
                 story = story_response.json()
 
                 if story and story.get("type") == "story":
@@ -293,9 +285,7 @@ class MultiSourceResearcher:
                         {
                             "source": "hackernews",
                             "title": story.get("title"),
-                            "url": story.get(
-                                "url", f"https://news.ycombinator.com/item?id={sid}"
-                            ),
+                            "url": story.get("url", f"https://news.ycombinator.com/item?id={sid}"),
                             "score": min(story.get("score", 0) / 10, 100),
                         }
                     )
@@ -326,9 +316,7 @@ class MultiSourceResearcher:
 
             for article in articles[:10]:
                 # Skip meta pages
-                if article["article"].startswith("Main_Page") or article[
-                    "article"
-                ].startswith("Special:"):
+                if article["article"].startswith("Main_Page") or article["article"].startswith("Special:"):
                     continue
 
                 insights.append(
@@ -496,18 +484,18 @@ Output as JSON array."""
 **Timestamp**: {datetime.now().isoformat()}
 
 ## Sources Analyzed:
-- Telegram: {len(self.sources_data['telegram'])} posts
-- User Links: {len(self.sources_data['user_links'])} URLs
-- Google News: {len(self.sources_data['google_news'])} articles
-- Reddit: {len(self.sources_data['reddit'])} posts
-- Hacker News: {len(self.sources_data['hackernews'])} stories
-- Wikipedia: {len(self.sources_data['wikipedia'])} trending topics
+- Telegram: {len(self.sources_data["telegram"])} posts
+- User Links: {len(self.sources_data["user_links"])} URLs
+- Google News: {len(self.sources_data["google_news"])} articles
+- Reddit: {len(self.sources_data["reddit"])} posts
+- Hacker News: {len(self.sources_data["hackernews"])} stories
+- Wikipedia: {len(self.sources_data["wikipedia"])} trending topics
 
 **Total Insights**: {len(insights)}
 **Script Ideas Generated**: {len(ideas)}
 
 **Top 3 Ideas**:
-{chr(10).join([f"{i+1}. {idea.get('title', 'N/A')}" for i, idea in enumerate(ideas[:3])])}
+{chr(10).join([f"{i + 1}. {idea.get('title', 'N/A')}" for i, idea in enumerate(ideas[:3])])}
 
 **Report**: `Reports/{report_file.name}`
 """

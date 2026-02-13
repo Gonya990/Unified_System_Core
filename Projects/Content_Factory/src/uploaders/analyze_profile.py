@@ -35,9 +35,7 @@ def analyze_profile():
     print("🔍 Analyzing User Profile (@gonya90gg)...")
 
     # 1. Get Channel Details
-    request = youtube.channels().list(
-        mine=True, part="snippet,contentDetails,statistics"
-    )
+    request = youtube.channels().list(mine=True, part="snippet,contentDetails,statistics")
     response = request.execute()
 
     if not response["items"]:
@@ -58,9 +56,7 @@ def analyze_profile():
 
     # 2. Analyze Liked Videos (Strongest Preference Signal)
     print("\n👍 Analyzing LIKED Videos (Last 20):")
-    liked_req = youtube.playlistItems().list(
-        playlistId=likes_playlist_id, part="snippet", maxResults=20
-    )
+    liked_req = youtube.playlistItems().list(playlistId=likes_playlist_id, part="snippet", maxResults=20)
     liked_res = liked_req.execute()
 
     liked_keywords = []
@@ -72,9 +68,7 @@ def analyze_profile():
 
     # 3. Analyze Playlists (Saved Content)
     print("\nDj Analyzing Playlists (Saved Collections):")
-    pl_req = youtube.playlists().list(
-        mine=True, part="snippet,contentDetails", maxResults=10
-    )
+    pl_req = youtube.playlists().list(mine=True, part="snippet,contentDetails", maxResults=10)
     pl_res = pl_req.execute()
 
     for item in pl_res["items"]:
@@ -84,9 +78,7 @@ def analyze_profile():
 
     # 4. Generate Strategy
     print("\n🧠 AI STRATEGY INSIGHTS:")
-    print(
-        "   Based on your 'Likes' and 'Playlists', the system detects these core interests:"
-    )
+    print("   Based on your 'Likes' and 'Playlists', the system detects these core interests:")
     # Simple keyword extraction
     all_text = " ".join(liked_keywords).lower()
 

@@ -5,8 +5,9 @@ import requests
 from dotenv import load_dotenv
 
 # Load environment variables from .env file (searching parent directories)
-env_path = Path(__file__).resolve().parents[3] / '.env'
+env_path = Path(__file__).resolve().parents[3] / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
+
 
 def test_hass():
     token = os.getenv("HASS_TOKEN")
@@ -16,10 +17,7 @@ def test_hass():
         print("❌ HASS_TOKEN or HASS_URL not set in environment")
         return
 
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     try:
         res = requests.get(f"{url}/api/config", headers=headers, timeout=10)
@@ -33,6 +31,7 @@ def test_hass():
             print(f"Error: {res.text}")
     except Exception as e:
         print(f"Connection Error: {e}")
+
 
 if __name__ == "__main__":
     test_hass()

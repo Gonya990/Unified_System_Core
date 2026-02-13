@@ -23,10 +23,7 @@ def main():
     print(f"\nМодель: {model_name}")
     print("Загрузка токенизатора...")
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name,
-        trust_remote_code=True
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     # Устанавливаем pad_token если его нет
     if tokenizer.pad_token is None:
@@ -36,8 +33,8 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.float16,  # FP16 для экономии памяти
-        device_map="cuda",           # Автоматически на GPU
-        trust_remote_code=True
+        device_map="cuda",  # Автоматически на GPU
+        trust_remote_code=True,
     )
 
     model.eval()  # Режим inference
@@ -71,16 +68,16 @@ def main():
                 continue
 
             # Обработка команд
-            if user_input.lower() in ['/exit', '/quit', '/выход']:
+            if user_input.lower() in ["/exit", "/quit", "/выход"]:
                 print("\n👋 До свидания!")
                 break
 
-            if user_input.lower() in ['/clear', '/очистить']:
+            if user_input.lower() in ["/clear", "/очистить"]:
                 conversation_history = []
                 print("🗑️  История очищена")
                 continue
 
-            if user_input.lower() in ['/help', '/помощь']:
+            if user_input.lower() in ["/help", "/помощь"]:
                 print("\n📖 СПРАВКА:")
                 print("  - Пишите вопросы на русском или английском")
                 print("  - Модель генерирует ответы используя RTX 3080")
@@ -98,13 +95,7 @@ def main():
                 prompt = f"Вопрос: {user_input}\nОтвет:"
 
             # Токенизация
-            inputs = tokenizer(
-                prompt,
-                return_tensors="pt",
-                padding=True,
-                truncation=True,
-                max_length=512
-            ).to("cuda")
+            inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True, max_length=512).to("cuda")
 
             print("\n🤖 Модель: ", end="", flush=True)
 
@@ -112,14 +103,14 @@ def main():
             with torch.no_grad():
                 outputs = model.generate(
                     **inputs,
-                    max_new_tokens=150,          # Максимум новых токенов
-                    temperature=0.7,              # Креативность (0.1-1.0)
-                    top_p=0.9,                    # Nucleus sampling
-                    top_k=50,                     # Top-K sampling
-                    do_sample=True,               # Включить sampling
+                    max_new_tokens=150,  # Максимум новых токенов
+                    temperature=0.7,  # Креативность (0.1-1.0)
+                    top_p=0.9,  # Nucleus sampling
+                    top_k=50,  # Top-K sampling
+                    do_sample=True,  # Включить sampling
                     pad_token_id=tokenizer.pad_token_id,
                     eos_token_id=tokenizer.eos_token_id,
-                    repetition_penalty=1.2        # Штраф за повторы
+                    repetition_penalty=1.2,  # Штраф за повторы
                 )
 
             # Декодируем ответ
@@ -129,7 +120,7 @@ def main():
             if "Ответ:" in generated_text:
                 response = generated_text.split("Ответ:")[-1].strip()
             else:
-                response = generated_text[len(prompt):].strip()
+                response = generated_text[len(prompt) :].strip()
 
             # Очистка ответа от лишних символов
             response = response.split("\n")[0] if "\n" in response else response
@@ -147,6 +138,7 @@ def main():
         except Exception as e:
             print(f"\n❌ Ошибка: {e}")
             print("Попробуйте еще раз или введите /help для справки")
+
 
 if __name__ == "__main__":
     try:

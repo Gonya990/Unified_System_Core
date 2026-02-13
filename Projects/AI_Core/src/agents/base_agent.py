@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Tool:
     """Tool definition for OpenAI function calling"""
+
     name: str
     description: str
     parameters: dict[str, Any]
@@ -63,9 +64,7 @@ Be concise and direct in your responses."""
         self.client = AsyncOpenAI(api_key=api_key)
         self.model = model
         self.tools: dict[str, Tool] = {}
-        self.conversation_history: list[dict] = [
-            {"role": "system", "content": self.SYSTEM_PROMPT}
-        ]
+        self.conversation_history: list[dict] = [{"role": "system", "content": self.SYSTEM_PROMPT}]
 
     def register_tool(self, tool: Tool):
         """
@@ -82,11 +81,7 @@ Be concise and direct in your responses."""
         return [
             {
                 "type": "function",
-                "function": {
-                    "name": tool.name,
-                    "description": tool.description,
-                    "parameters": tool.parameters
-                }
+                "function": {"name": tool.name, "description": tool.description, "parameters": tool.parameters},
             }
             for tool in self.tools.values()
         ]
@@ -124,10 +119,7 @@ Be concise and direct in your responses."""
             return error_msg
 
     async def run(
-        self,
-        user_message: str,
-        on_progress: Optional[Callable[[str], None]] = None,
-        max_iterations: int = 10
+        self, user_message: str, on_progress: Optional[Callable[[str], None]] = None, max_iterations: int = 10
     ) -> str:
         """
         Run agent with user message, allowing multiple tool calls.
@@ -142,10 +134,7 @@ Be concise and direct in your responses."""
         """
 
         # Add user message to history
-        self.conversation_history.append({
-            "role": "user",
-            "content": user_message
-        })
+        self.conversation_history.append({"role": "user", "content": user_message})
 
         iterations = 0
 
@@ -159,7 +148,7 @@ Be concise and direct in your responses."""
                     model=self.model,
                     messages=self.conversation_history,
                     tools=self._build_tool_definitions() if self.tools else None,
-                    tool_choice="auto" if self.tools else None
+                    tool_choice="auto" if self.tools else None,
                 )
             except Exception as e:
                 error_msg = f"OpenAI API error: {str(e)}"
@@ -171,10 +160,7 @@ Be concise and direct in your responses."""
             # If no tool calls, we're done
             if not message.tool_calls:
                 final_response = message.content or "No response generated"
-                self.conversation_history.append({
-                    "role": "assistant",
-                    "content": final_response
-                })
+                self.conversation_history.append({"role": "assistant", "content": final_response})
                 logger.info(f"Agent completed in {iterations} iterations")
                 return final_response
 
@@ -183,19 +169,14 @@ Be concise and direct in your responses."""
                 {
                     "id": tc.id,
                     "type": "function",
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
-                    }
+                    "function": {"name": tc.function.name, "arguments": tc.function.arguments},
                 }
                 for tc in message.tool_calls
             ]
 
-            self.conversation_history.append({
-                "role": "assistant",
-                "content": message.content,
-                "tool_calls": tool_calls_data
-            })
+            self.conversation_history.append(
+                {"role": "assistant", "content": message.content, "tool_calls": tool_calls_data}
+            )
 
             # Execute each tool call
             for tool_call in message.tool_calls:
@@ -212,12 +193,9 @@ Be concise and direct in your responses."""
                 result = await self.execute_tool(tool_name, arguments)
 
                 # Add tool result to history
-                self.conversation_history.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "name": tool_name,
-                    "content": result
-                })
+                self.conversation_history.append(
+                    {"role": "tool", "tool_call_id": tool_call.id, "name": tool_name, "content": result}
+                )
 
         warning_msg = f"⚠️ Max iterations ({max_iterations}) reached. Task may be too complex."
         logger.warning(warning_msg)
@@ -225,9 +203,7 @@ Be concise and direct in your responses."""
 
     def reset_conversation(self):
         """Clear conversation history (except system prompt)"""
-        self.conversation_history = [
-            {"role": "system", "content": self.SYSTEM_PROMPT}
-        ]
+        self.conversation_history = [{"role": "system", "content": self.SYSTEM_PROMPT}]
         logger.info("Conversation history reset")
 
     def get_conversation_history(self) -> list[dict]:

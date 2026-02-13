@@ -25,7 +25,7 @@ class GitHubCopilotProvider(BaseProvider):
         self,
         api_key: str,  # GitHub token (ghp_...)
         model: str = "gpt-4o",
-        base_url: Optional[str] = None
+        base_url: Optional[str] = None,
     ):
         super().__init__(api_key, model, base_url or self.DEFAULT_BASE_URL)
         self._client = httpx.AsyncClient(
@@ -36,7 +36,7 @@ class GitHubCopilotProvider(BaseProvider):
                 "Editor-Version": "vscode/1.85.0",
                 "Editor-Plugin-Version": "copilot/1.0.0",
             },
-            timeout=60.0
+            timeout=60.0,
         )
 
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
@@ -55,7 +55,7 @@ class GitHubCopilotProvider(BaseProvider):
                         "messages": messages,
                         "temperature": 0.7,
                         "max_tokens": 2000,
-                    }
+                    },
                 )
                 response.raise_for_status()
                 data = response.json()
@@ -69,7 +69,7 @@ class GitHubCopilotProvider(BaseProvider):
                     content=content,
                     latency_ms=timer.elapsed_ms,
                     tokens_used=tokens,
-                    metadata={"source": "github_copilot"}
+                    metadata={"source": "github_copilot"},
                 )
 
             except httpx.HTTPStatusError as e:
@@ -78,8 +78,8 @@ class GitHubCopilotProvider(BaseProvider):
                     provider_name=self.name,
                     model=self.model,
                     content="",
-                    latency_ms=getattr(timer, 'elapsed_ms', 0),
-                    error=f"HTTP {e.response.status_code}: {e.response.text}"
+                    latency_ms=getattr(timer, "elapsed_ms", 0),
+                    error=f"HTTP {e.response.status_code}: {e.response.text}",
                 )
             except Exception as e:
                 logger.error(f"GitHub Copilot error: {e}")
@@ -87,8 +87,8 @@ class GitHubCopilotProvider(BaseProvider):
                     provider_name=self.name,
                     model=self.model,
                     content="",
-                    latency_ms=getattr(timer, 'elapsed_ms', 0),
-                    error=str(e)
+                    latency_ms=getattr(timer, "elapsed_ms", 0),
+                    error=str(e),
                 )
 
     async def health_check(self) -> bool:

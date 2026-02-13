@@ -25,9 +25,9 @@ PROFILE_URL = "https://www.linkedin.com/in/igor-goncharenko"
 
 
 async def main():
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔗 LINKEDIN PROFILE UPDATER v2")
-    print("="*60)
+    print("=" * 60)
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
     try:
@@ -37,25 +37,24 @@ async def main():
         sys.exit(1)
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=False,
-            slow_mo=300
-        )
+        browser = await p.chromium.launch(headless=False, slow_mo=300)
 
-        context = await browser.new_context(
-            viewport={'width': 1400, 'height': 900}
-        )
+        context = await browser.new_context(viewport={"width": 1400, "height": 900})
 
         # Set LinkedIn session cookie
         print("\n🍪 Устанавливаю session cookie...")
-        await context.add_cookies([{
-            'name': 'li_at',
-            'value': LI_AT_COOKIE,
-            'domain': '.linkedin.com',
-            'path': '/',
-            'httpOnly': True,
-            'secure': True
-        }])
+        await context.add_cookies(
+            [
+                {
+                    "name": "li_at",
+                    "value": LI_AT_COOKIE,
+                    "domain": ".linkedin.com",
+                    "path": "/",
+                    "httpOnly": True,
+                    "secure": True,
+                }
+            ]
+        )
 
         page = await context.new_page()
 
@@ -84,8 +83,7 @@ async def main():
         try:
             # Look for edit intro section specifically
             intro_edit = await page.wait_for_selector(
-                '[data-view-name="profile-card"] button[aria-label*="Edit intro"]',
-                timeout=5000
+                '[data-view-name="profile-card"] button[aria-label*="Edit intro"]', timeout=5000
             )
             if intro_edit:
                 await intro_edit.click()
@@ -94,7 +92,9 @@ async def main():
         except Exception:
             # Alternative: look for first pencil button
             try:
-                first_edit = await page.query_selector('button[class*="profile-topcard"] svg, section button[aria-label*="Edit"]')
+                first_edit = await page.query_selector(
+                    'button[class*="profile-topcard"] svg, section button[aria-label*="Edit"]'
+                )
                 if first_edit:
                     await first_edit.click()
                     await asyncio.sleep(2)
@@ -113,7 +113,7 @@ async def main():
             'input[name*="headline"]',
             '[aria-label*="Headline"] input',
             'input[placeholder*="headline"]',
-            'form input[type="text"]'
+            'form input[type="text"]',
         ]
 
         headline_found = False
@@ -127,7 +127,7 @@ async def main():
 
                     # Clear and type new
                     await el.click()
-                    await el.fill('')
+                    await el.fill("")
                     await el.type(NEW_HEADLINE, delay=50)
                     print(f"   ✅ Новый headline: {NEW_HEADLINE}")
                     headline_found = True
@@ -154,9 +154,9 @@ async def main():
         except Exception:
             pass
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📋 РЕЗУЛЬТАТ")
-        print("="*60)
+        print("=" * 60)
         print(f"\nПрофиль: {PROFILE_URL}")
         print(f"Скриншот: {screenshot_path}")
         print("\n🔍 Проверьте браузер и скриншот")

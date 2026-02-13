@@ -23,10 +23,7 @@ try:
     from googleapiclient.discovery import build
 except ImportError:
     print("❌ Gmail API libraries not installed!")
-    msg = (
-        "Install with: pip3 install --upgrade google-api-python-client "
-        "google-auth-httplib2 google-auth-oauthlib"
-    )
+    msg = "Install with: pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
     print(msg)
     sys.exit(1)
 
@@ -90,9 +87,7 @@ def get_gmail_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
@@ -126,6 +121,7 @@ def send_telegram_alert(category, subject, sender, preview):
     if category not in priority_map:
         return
     import html
+
     msg = (
         f"{priority_map[category]}\n\n"
         f"<b>From:</b> {html.escape(sender)}\n"
@@ -159,9 +155,7 @@ def get_emails(service, hours=24, unread_only=False):
             sender = next((h["value"] for h in headers if h["name"] == "From"), "")
             body = ""
             cat = categorize_email(subject, body, sender)
-            emails.append(
-                {"id": msg["id"], "subject": subject, "sender": sender, "cat": cat}
-            )
+            emails.append({"id": msg["id"], "subject": subject, "sender": sender, "cat": cat})
             send_telegram_alert(cat, subject, sender, "")
         except Exception:
             continue

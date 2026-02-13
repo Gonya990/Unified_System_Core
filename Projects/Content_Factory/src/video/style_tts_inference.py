@@ -32,9 +32,7 @@ def load_model(model_path, config_path):
     model_params = recursive_munch(config["model_params"])
     model = build_model(model_params, text_aligner, pitch_extractor, plbert)
     _ = [model[key].eval() for key in model]
-    _ = [
-        model[key].to("cuda:0" if torch.cuda.is_available() else "cpu") for key in model
-    ]
+    _ = [model[key].to("cuda:0" if torch.cuda.is_available() else "cpu") for key in model]
 
     params = torch.load(model_path, map_location="cpu")
     params = params["net"]
@@ -56,9 +54,7 @@ def load_model(model_path, config_path):
     return model, config
 
 
-def inference(
-    model, text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1
-):
+def inference(model, text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1):
     text = text.strip()
     ps = global_phonemizer.phonemize([text])
     tokens = text_to_sequence(ps[0])
@@ -112,34 +108,26 @@ def inference(
 
         out = model.decoder(en, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
-    return (
-        out.squeeze().cpu().numpy()[..., :-50]
-    )  # weird pulse at the end of the model, need to be fixed
+    return out.squeeze().cpu().numpy()[..., :-50]  # weird pulse at the end of the model, need to be fixed
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--text", type=str, required=True)
     parser.add_argument("--output", type=str, default="output.wav")
-    parser.add_argument(
-        "--ref_audio", type=str, help="Path to reference audio for cloning"
-    )
+    parser.add_argument("--ref_audio", type=str, help="Path to reference audio for cloning")
     args = parser.parse_args()
 
     print("Loading model...")
     # These paths assume standard StyleTTS2 LibriTTS structure
-    model, config = load_model(
-        "Models/LibriTTS/epochs_2nd_00020.pth", "Models/LibriTTS/config.yml"
-    )
+    model, config = load_model("Models/LibriTTS/epochs_2nd_00020.pth", "Models/LibriTTS/config.yml")
 
     # Needs reference audio processing strictly speaking, but simpler:
     # We can load a random reference from the dataset or use a preset one
     # For now, let's assuming we use a default reference style vector if none provided
     # ... (Code requires computing style vector from audio) ...
 
-    print(
-        "Inference not fully implemented in this stub yet - complex dependencies (phonemizer, etc)"
-    )
+    print("Inference not fully implemented in this stub yet - complex dependencies (phonemizer, etc)")
     # StyleTTS2 requires 'espeak-ng' and 'phonemizer' python package.
     # We installed espeak-ng.
 

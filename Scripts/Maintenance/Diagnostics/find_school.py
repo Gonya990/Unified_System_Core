@@ -1,4 +1,3 @@
-
 import json
 
 import requests
@@ -16,8 +15,8 @@ def find_school(query):
             # Search in all string values
             found_key = False
             for _k, v in s.items():
-                 if isinstance(v, str) and query in v:
-                     found_key = True
+                if isinstance(v, str) and query in v:
+                    found_key = True
             if found_key:
                 matches.append(s)
 
@@ -26,8 +25,9 @@ def find_school(query):
         print(e)
         return []
 
+
 if __name__ == "__main__":
-    q = "ביאליק" # Kiryat Bialik
+    q = "ביאליק"  # Kiryat Bialik
     print(f"--- Searching for {q} ---")
     found = find_school(q)
     for f in found:
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     # Also Check Psagot specifically to see structure
     print("--- Psagot Structure ---")
     for s in find_school("פסגות"):
-         if "316" in str(s['semel']): # Random guess or just first one
-             pass # just print first
+        if "316" in str(s["semel"]):  # Random guess or just first one
+            pass  # just print first
     # Just print first Psagot found match
     psagots = find_school("פסגות")
     if psagots:

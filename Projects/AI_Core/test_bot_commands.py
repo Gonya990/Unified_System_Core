@@ -3,6 +3,7 @@
 Bot Commands Test Report
 Checks all handlers and quick buttons
 """
+
 import re
 
 BOT_FILE = "/home/gonya/Unified_System_Core/Projects/AI_Core/src/ai_telegram_bot_v2.py"
@@ -15,7 +16,7 @@ with open(BOT_FILE) as f:
 
 # 1. Check registered commands
 print("\n✅ REGISTERED COMMANDS:")
-commands_block = re.search(r'commands_to_register = \{(.+?)\}', content, re.DOTALL)
+commands_block = re.search(r"commands_to_register = \{(.+?)\}", content, re.DOTALL)
 if commands_block:
     commands = re.findall(r'"(\w+)":\s*(\w+)', commands_block.group(1))
     for cmd, handler in commands:

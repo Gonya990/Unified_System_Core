@@ -2,6 +2,7 @@
 Notification Manager for Smart Alerts
 Handles quiet hours, priority levels, and user preferences.
 """
+
 import logging
 from datetime import datetime, time
 from typing import Optional
@@ -11,14 +12,15 @@ from telegram.constants import ParseMode
 
 logger = logging.getLogger(__name__)
 
+
 class NotificationManager:
     """Manages bot notifications with priority and quiet hours."""
 
     # Priority Levels
     CRITICAL = "critical"  # Always send (errors, security)
-    HIGH = "high"         # Send except during quiet hours
-    NORMAL = "normal"     # Send only during active hours
-    LOW = "low"          # Batched, send once per day
+    HIGH = "high"  # Send except during quiet hours
+    NORMAL = "normal"  # Send only during active hours
+    LOW = "low"  # Batched, send once per day
 
     def __init__(self, quiet_start: time = time(23, 0), quiet_end: time = time(8, 0)):
         """
@@ -43,13 +45,7 @@ class NotificationManager:
             return self.quiet_start <= now < self.quiet_end
 
     async def send(
-        self,
-        bot: Bot,
-        chat_id: int,
-        text: str,
-        priority: str = NORMAL,
-        parse_mode: Optional[str] = None,
-        **kwargs
+        self, bot: Bot, chat_id: int, text: str, priority: str = NORMAL, parse_mode: Optional[str] = None, **kwargs
     ) -> bool:
         """
         Send notification respecting quiet hours and priority.
@@ -92,12 +88,9 @@ class NotificationManager:
 
         # LOW: Queue for batch delivery
         if priority == self.LOW:
-            self.low_priority_queue.append({
-                "chat_id": chat_id,
-                "text": text,
-                "parse_mode": parse_mode,
-                "kwargs": kwargs
-            })
+            self.low_priority_queue.append(
+                {"chat_id": chat_id, "text": text, "parse_mode": parse_mode, "kwargs": kwargs}
+            )
             logger.info(f"LOW priority message queued: {text[:50]}")
             return False
 

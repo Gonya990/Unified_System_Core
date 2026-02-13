@@ -24,11 +24,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     print("Загрузка модели на GPU...")
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16,
-        device_map="cuda"
-    )
+    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cuda")
 
     model.eval()
 
@@ -55,23 +51,18 @@ def main():
             if not user_input:
                 continue
 
-            if user_input.lower() in ['/exit', '/quit', '/выход']:
+            if user_input.lower() in ["/exit", "/quit", "/выход"]:
                 print("\n👋 До свидания!")
                 break
 
-            if user_input.lower() in ['/clear', '/очистить']:
+            if user_input.lower() in ["/clear", "/очистить"]:
                 print("🗑️  История очищена")
                 continue
 
             # Простой промпт для лучших ответов
             prompt = f"{user_input}\n\nОтвет:"
 
-            inputs = tokenizer(
-                prompt,
-                return_tensors="pt",
-                max_length=256,
-                truncation=True
-            ).to("cuda")
+            inputs = tokenizer(prompt, return_tensors="pt", max_length=256, truncation=True).to("cuda")
 
             print("\n🤖 Модель: ", end="", flush=True)
 
@@ -83,7 +74,7 @@ def main():
                     top_p=0.95,
                     do_sample=True,
                     pad_token_id=tokenizer.eos_token_id,
-                    repetition_penalty=1.3
+                    repetition_penalty=1.3,
                 )
 
             response = tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -92,7 +83,7 @@ def main():
             if "Ответ:" in response:
                 answer = response.split("Ответ:")[-1].strip()
             else:
-                answer = response[len(prompt):].strip()
+                answer = response[len(prompt) :].strip()
 
             # Берем первое предложение для краткости
             if ". " in answer:
@@ -105,6 +96,7 @@ def main():
             break
         except Exception as e:
             print(f"\n❌ Ошибка: {e}")
+
 
 if __name__ == "__main__":
     try:

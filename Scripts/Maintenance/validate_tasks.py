@@ -15,10 +15,20 @@ BILLBOARD_DIR = ROOT_DIR / "billboard/tasks"
 
 # Expanded valid statuses
 VALID_STATUSES = {
-    "Claimed", "In-Progress", "Completed", "Paused", "Open", "Done",
-    "InPrg", "Blocked", "Proposed", "Merged", "Rejected"
+    "Claimed",
+    "In-Progress",
+    "Completed",
+    "Paused",
+    "Open",
+    "Done",
+    "InPrg",
+    "Blocked",
+    "Proposed",
+    "Merged",
+    "Rejected",
 }
 MANDATORY_FIELDS = ["Task-Id", "Status", "Context", "Task-Semantic"]
+
 
 def validate_tasks():
     print(f"{BLUE}📋 Enhanced Billboard Task Validation...{RESET}")
@@ -114,6 +124,7 @@ def validate_tasks():
 
     print(f"{GREEN}✨ All tasks are valid and consistency checks passed!{RESET}")
     return True
+
 
 if __name__ == "__main__":
     success = validate_tasks()

@@ -1,5 +1,3 @@
-
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -17,70 +15,77 @@ JOBS = [
         "company": "Schindler Israel",
         "vacancy": "Operations / Elevators / Technical",
         "contact_type": "Direct Email",
-        "contact": "jobs.il@schindler.com", # Verified
-        "note": "Прямой email HR отдела. Отправляйте резюме сюда с пометкой Technical Operations."
+        "contact": "jobs.il@schindler.com",  # Verified
+        "note": "Прямой email HR отдела. Отправляйте резюме сюда с пометкой Technical Operations.",
     },
     {
         "company": "Airwayz",
         "vacancy": "Director of Operations",
         "contact_type": "Direct Email",
-        "contact": "contact@airwayz.co", # Verified
-        "note": "Общий контакт, но резюме рассматриваются. Укажите 'Attn: HR Manager' в теме."
+        "contact": "contact@airwayz.co",  # Verified
+        "note": "Общий контакт, но резюме рассматриваются. Укажите 'Attn: HR Manager' в теме.",
     },
     {
         "company": "Utron",
         "vacancy": "Site Manager",
         "contact_type": "Contact info / HR",
         "contact": "https://www.utron.com/contact-us/",
-        "note": "Прямого email нет, но можно найти HR 'Keren Bar-Lev' в LinkedIn или писать в форму. "
+        "note": "Прямого email нет, но можно найти HR 'Keren Bar-Lev' в LinkedIn или писать в форму. ",
     },
     {
         "company": "Fives Intralogistics",
         "vacancy": "Deployment Manager",
         "contact_type": "Corporate Format",
         "contact": "First.Last@fivesgroup.com (Format)",
-        "note": "Попробуйте найти рекрутера в LinkedIn и подставить имя."
+        "note": "Попробуйте найти рекрутера в LinkedIn и подставить имя.",
     },
     {
         "company": "INSIGHTEC",
         "vacancy": "Warehouse Manager",
         "contact_type": "Careers Page",
         "contact": "https://www.insightec.com/careers/",
-        "note": "Заявки только через сайт. Главный офис: Tirat Carmel. Tel: +972-4-8131313."
+        "note": "Заявки только через сайт. Главный офис: Tirat Carmel. Tel: +972-4-8131313.",
     },
     {
         "company": "Project Pro",
         "vacancy": "Construction / Infrastructure Recruitment",
         "contact_type": "Recruiter Email",
-        "contact": "info@projectpro.co.il", # Verified
-        "note": "Крупное агентство по найму в строительстве. Обязательно напишите им."
+        "contact": "info@projectpro.co.il",  # Verified
+        "note": "Крупное агентство по найму в строительстве. Обязательно напишите им.",
     },
     {
         "company": "Cohen Employment Group",
         "vacancy": "Construction (North)",
         "contact_type": "Recruiter Email",
-        "contact": "info@cohengroup.li", # Verified
-        "note": "Рекрутеры в Акко (Север). Специализация - строительство."
-    }
+        "contact": "info@cohengroup.li",  # Verified
+        "note": "Рекрутеры в Акко (Север). Специализация - строительство.",
+    },
 ]
+
 
 def create_pdf():
     # Register readable font (Arial supports Cyrillic usually)
     try:
-        pdfmetrics.registerFont(TTFont('Arial', FONT_PATH))
-        font_name = 'Arial'
+        pdfmetrics.registerFont(TTFont("Arial", FONT_PATH))
+        font_name = "Arial"
     except Exception:
         print("Arial font not found in System. Using Helvetica (No Cyrillic support!).")
-        font_name = 'Helvetica' # Fallback, will fail for Russian text display
+        font_name = "Helvetica"  # Fallback, will fail for Russian text display
 
     doc = SimpleDocTemplate(OUTPUT_PDF, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
 
     # Custom Styles
-    style_h1 = ParagraphStyle(name='H1', parent=styles['Heading1'], fontName=font_name, fontSize=16, spaceAfter=20, textColor=colors.darkblue)
-    style_normal = ParagraphStyle(name='Normal', parent=styles['Normal'], fontName=font_name, fontSize=11, leading=14)
-    style_bold = ParagraphStyle(name='Bold', parent=styles['Normal'], fontName=font_name, fontSize=11, leading=14, textColor=colors.black)
-    style_link = ParagraphStyle(name='Link', parent=styles['Normal'], fontName=font_name, fontSize=11, textColor=colors.blue)
+    style_h1 = ParagraphStyle(
+        name="H1", parent=styles["Heading1"], fontName=font_name, fontSize=16, spaceAfter=20, textColor=colors.darkblue
+    )
+    style_normal = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName=font_name, fontSize=11, leading=14)
+    style_bold = ParagraphStyle(
+        name="Bold", parent=styles["Normal"], fontName=font_name, fontSize=11, leading=14, textColor=colors.black
+    )
+    style_link = ParagraphStyle(
+        name="Link", parent=styles["Normal"], fontName=font_name, fontSize=11, textColor=colors.blue
+    )
 
     story = []
 
@@ -91,7 +96,7 @@ def create_pdf():
 
     for job in JOBS:
         # Check validity
-        contact = job['contact']
+        contact = job["contact"]
 
         # Company & Vacancy
         story.append(Paragraph(f"<b>Компания:</b> {job['company']}", style_bold))
@@ -111,6 +116,7 @@ def create_pdf():
 
     doc.build(story)
     print(f"PDF generated: {OUTPUT_PDF}")
+
 
 if __name__ == "__main__":
     create_pdf()

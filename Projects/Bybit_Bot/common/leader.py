@@ -1,4 +1,3 @@
-
 import logging
 import time
 import uuid
@@ -8,11 +7,13 @@ from kubernetes.client.rest import ApiException
 
 logger = logging.getLogger("LeaderElection")
 
+
 class LeaderElection:
     """
     Simple Leader Election using Kubernetes Leases API.
     Replaces defunct or missing 'k8s-leaderelection' package.
     """
+
     def __init__(
         self,
         api_instance,
@@ -22,7 +23,7 @@ class LeaderElection:
         on_stopped_leading,
         duration=15,
         renew_deadline=10,
-        retry_period=2
+        retry_period=2,
     ):
         self.api = api_instance
         self.namespace = namespace
@@ -65,25 +66,22 @@ class LeaderElection:
                 raise e
 
     def _create_lease(self):
-        now = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         body = client.V1Lease(
             metadata=client.V1ObjectMeta(name=self.name),
             spec=client.V1LeaseSpec(
-                holder_identity=self.identity,
-                lease_duration_seconds=self.duration,
-                acquire_time=now,
-                renew_time=now
-            )
+                holder_identity=self.identity, lease_duration_seconds=self.duration, acquire_time=now, renew_time=now
+            ),
         )
         try:
             self.api.create_namespaced_lease(self.namespace, body)
             self._set_leader(True)
         except ApiException as e:
-            if e.status != 409: # Conflict
+            if e.status != 409:  # Conflict
                 raise e
 
     def _renew_lease(self, lease):
-        lease.spec.renew_time = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        lease.spec.renew_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         try:
             self.api.replace_namespaced_lease(self.name, self.namespace, lease)
             self._set_leader(True)

@@ -37,15 +37,11 @@ class UserContextDB:
 
             if "branch_id" not in columns:
                 logger.info("Migrating: Adding branch_id column to users table")
-                cursor.execute(
-                    "ALTER TABLE users ADD COLUMN branch_id TEXT DEFAULT 'HOME_HQ'"
-                )
+                cursor.execute("ALTER TABLE users ADD COLUMN branch_id TEXT DEFAULT 'HOME_HQ'")
 
             if "role" not in columns:
                 logger.info("Migrating: Adding role column to users table")
-                cursor.execute(
-                    "ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MEMBER'"
-                )
+                cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MEMBER'")
 
             conn.commit()
             # Events context table
@@ -283,9 +279,7 @@ class UserContextDB:
             return False
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE users SET role = ? WHERE user_id = ?", (role, user_id)
-            )
+            cursor.execute("UPDATE users SET role = ? WHERE user_id = ?", (role, user_id))
             conn.commit()
             return cursor.rowcount > 0
 
@@ -331,14 +325,13 @@ class UserContextDB:
         """
         try:
             import json
+
             homework_json = json.dumps(homework_data, ensure_ascii=False)
 
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 # Delete old cache for this user
-                cursor.execute(
-                    "DELETE FROM mashov_homework WHERE user_id = ?", (user_id,)
-                )
+                cursor.execute("DELETE FROM mashov_homework WHERE user_id = ?", (user_id,))
                 # Insert new cache
                 cursor.execute(
                     """
@@ -348,20 +341,13 @@ class UserContextDB:
                     (user_id, homework_json, datetime.now()),
                 )
                 conn.commit()
-                logger.debug(
-
-                        "[MASHOV] Cached "
-                        f"{len(homework_data)} homework items for user {user_id}"
-
-                )
+                logger.debug(f"[MASHOV] Cached {len(homework_data)} homework items for user {user_id}")
                 return True
         except Exception as e:
             logger.error(f"[MASHOV] Failed to cache homework: {e}")
             return False
 
-    def get_cached_homework(
-        self, user_id: int, max_age_hours: int = 24
-    ) -> Optional[list]:
+    def get_cached_homework(self, user_id: int, max_age_hours: int = 24) -> Optional[list]:
         """
         Get cached homework data if it's recent enough.
 
@@ -374,6 +360,7 @@ class UserContextDB:
         """
         try:
             import json
+
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
@@ -389,10 +376,7 @@ class UserContextDB:
                 if row:
                     homework_json, fetched_at = row
                     homework_data = json.loads(homework_json)
-                    logger.debug(
-                        f"[MASHOV] Retrieved cached homework for user {user_id} "
-                        f"(fetched: {fetched_at})"
-                    )
+                    logger.debug(f"[MASHOV] Retrieved cached homework for user {user_id} (fetched: {fetched_at})")
                     return homework_data
                 else:
                     logger.debug(f"[MASHOV] No valid cache for user {user_id}")

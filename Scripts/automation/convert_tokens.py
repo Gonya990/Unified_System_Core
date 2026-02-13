@@ -1,4 +1,3 @@
-
 import os
 import pickle
 
@@ -11,7 +10,7 @@ json_path = "Scripts/automation/.credentials/gmail_token.json"
 os.makedirs(os.path.dirname(json_path), exist_ok=True)
 
 try:
-    with open(pickle_path, 'rb') as token:
+    with open(pickle_path, "rb") as token:
         creds = pickle.load(token)
 
     if not creds:
@@ -33,7 +32,7 @@ try:
                 # Still try to save, maybe refresh works later or partial
 
     # Save as JSON
-    with open(json_path, 'w') as f:
+    with open(json_path, "w") as f:
         f.write(creds.to_json())
     print(f"Saved credentials to {json_path}")
 

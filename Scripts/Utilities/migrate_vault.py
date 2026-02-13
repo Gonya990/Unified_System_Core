@@ -21,9 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import yaml
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("VaultMigration")
 
 
@@ -45,9 +43,7 @@ def detect_vault_kdf(vault_path: str) -> str:
         return "error"
 
 
-def migrate_vault(
-    vault_path: str = None, dry_run: bool = False, backup: bool = True
-) -> bool:
+def migrate_vault(vault_path: str = None, dry_run: bool = False, backup: bool = True) -> bool:
     """
     Migrate a PBKDF2 vault to Argon2id.
 
@@ -109,9 +105,7 @@ def migrate_vault(
             return True
 
         # Count keys
-        total_keys = sum(
-            len(pool) for pool in broker.key_store.values() if isinstance(pool, list)
-        )
+        total_keys = sum(len(pool) for pool in broker.key_store.values() if isinstance(pool, list))
         logger.info(f"Found {total_keys} keys across {len(broker.key_store)} providers")
 
         # Save with Argon2id
@@ -133,9 +127,7 @@ def migrate_vault(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Migrate TokenBroker vault from PBKDF2 to Argon2id"
-    )
+    parser = argparse.ArgumentParser(description="Migrate TokenBroker vault from PBKDF2 to Argon2id")
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -161,9 +153,7 @@ def main():
     args = parser.parse_args()
 
     if args.check:
-        vault_path = args.vault_path or os.path.expanduser(
-            "~/.config/unified-system/tokens.yaml"
-        )
+        vault_path = args.vault_path or os.path.expanduser("~/.config/unified-system/tokens.yaml")
         kdf = detect_vault_kdf(vault_path)
         print(f"Vault: {vault_path}")
         print(f"KDF type: {kdf}")

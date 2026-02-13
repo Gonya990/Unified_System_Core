@@ -2,11 +2,13 @@
 Web Search Module for AI Telegram Bot.
 Uses SerpApi (Google) if configured, else DuckDuckGo Search fallback.
 """
+
 import asyncio
 import logging
 import os
 
 logger = logging.getLogger(__name__)
+
 
 class WebSearch:
     def __init__(self):
@@ -16,11 +18,13 @@ class WebSearch:
 
         try:
             from ddgs import DDGS  # preferred (new package)
+
             self.ddgs = DDGS()
             self.available = True
         except ImportError:
             try:
                 from duckduckgo_search import DDGS  # legacy fallback
+
                 self.ddgs = DDGS()
                 self.available = True
             except ImportError:
@@ -43,13 +47,14 @@ class WebSearch:
         if self.serp_api_key:
             try:
                 from serpapi import GoogleSearch
+
                 params = {
                     "engine": "google",
                     "q": query,
                     "api_key": self.serp_api_key,
                     "num": max_results,
-                    "hl": "ru", # Russian language preference
-                    "gl": "ru"  # Location preference
+                    "hl": "ru",  # Russian language preference
+                    "gl": "ru",  # Location preference
                 }
                 search = GoogleSearch(params)
                 results = search.get_dict()
@@ -89,9 +94,9 @@ class WebSearch:
 
             formatted_results = []
             for i, r in enumerate(results, 1):
-                title = r.get('title', 'No Title')
-                link = r.get('href', '#')
-                body = r.get('body', '')
+                title = r.get("title", "No Title")
+                link = r.get("href", "#")
+                body = r.get("body", "")
                 formatted_results.append(f"{i}. [{title}]({link})\n_{body}_")
 
             return "\n\n".join(formatted_results)

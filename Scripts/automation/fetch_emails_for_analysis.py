@@ -37,9 +37,7 @@ def get_gmail_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CREDENTIALS_PATH), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
@@ -50,17 +48,13 @@ def get_gmail_service():
 def get_email_body(payload):
     body = ""
     if "body" in payload and payload["body"].get("data"):
-        return base64.urlsafe_b64decode(payload["body"]["data"]).decode(
-            "utf-8", errors="ignore"
-        )
+        return base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="ignore")
 
     if "parts" in payload:
         for part in payload["parts"]:
             if part["mimeType"] == "text/plain":
                 if part["body"].get("data"):
-                    return base64.urlsafe_b64decode(part["body"]["data"]).decode(
-                        "utf-8", errors="ignore"
-                    )
+                    return base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="ignore")
             elif part["mimeType"] == "text/html":
                 # Skip HTML for now if plain text exists, or use it if needed
                 pass
@@ -83,21 +77,12 @@ def main():
 
     for i, msg in enumerate(messages):
         try:
-            full_msg = (
-                service.users()
-                .messages()
-                .get(userId="me", id=msg["id"], format="full")
-                .execute()
-            )
+            full_msg = service.users().messages().get(userId="me", id=msg["id"], format="full").execute()
             payload = full_msg.get("payload", {})
             headers = payload.get("headers", [])
 
-            subject = next(
-                (h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)"
-            )
-            sender = next(
-                (h["value"] for h in headers if h["name"] == "From"), "(Unknown)"
-            )
+            subject = next((h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)")
+            sender = next((h["value"] for h in headers if h["name"] == "From"), "(Unknown)")
             date = next((h["value"] for h in headers if h["name"] == "Date"), "")
 
             body = get_email_body(payload)
@@ -115,9 +100,7 @@ def main():
                     "subject": subject,
                     "sender": sender,
                     "date": date,
-                    "content_preview": content[
-                        :1000
-                    ],  # Limit content size for LLM context
+                    "content_preview": content[:1000],  # Limit content size for LLM context
                 }
             )
         except Exception as e:

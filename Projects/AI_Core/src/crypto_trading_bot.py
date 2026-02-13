@@ -3,6 +3,7 @@
 Telegram Crypto Trading Bot - CONSERVATIVE STRATEGY
 Безопасная торговля с защитой от потерь
 """
+
 import asyncio
 import logging
 import os
@@ -10,6 +11,7 @@ from typing import Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class TelegramCryptoBot:
     """
@@ -40,12 +42,9 @@ class TelegramCryptoBot:
         """Send Telegram notification."""
         try:
             import aiohttp
+
             url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
-            payload = {
-                'chat_id': self.chat_id,
-                'text': f"🤖 Crypto Bot:\n{message}",
-                'parse_mode': 'Markdown'
-            }
+            payload = {"chat_id": self.chat_id, "text": f"🤖 Crypto Bot:\n{message}", "parse_mode": "Markdown"}
 
             async with aiohttp.ClientSession() as session:
                 await session.post(url, json=payload)
@@ -67,6 +66,7 @@ class TelegramCryptoBot:
         """Get current price from exchange."""
         try:
             import aiohttp
+
             # Using Binance API for price
             url = "https://api.binance.com/api/v3/ticker/price?symbol=TONUSDT"
 
@@ -74,7 +74,7 @@ class TelegramCryptoBot:
                 async with session.get(url) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        return float(data['price'])
+                        return float(data["price"])
 
             return 0.0
         except Exception as e:
@@ -89,6 +89,7 @@ class TelegramCryptoBot:
         try:
             # Get historical prices (last 10 data points)
             import aiohttp
+
             url = "https://api.binance.com/api/v3/klines?symbol=TONUSDT&interval=5m&limit=10"
 
             async with aiohttp.ClientSession() as session:
@@ -102,9 +103,9 @@ class TelegramCryptoBot:
                         current = prices[-1]
 
                         if current < avg * 0.98:  # 2% below average
-                            return 'BUY'
+                            return "BUY"
                         elif current > avg * 1.02:  # 2% above average
-                            return 'SELL'
+                            return "SELL"
 
             return None
         except Exception as e:
@@ -118,12 +119,12 @@ class TelegramCryptoBot:
         """
         price = await self.get_price()
 
-        if action == 'BUY':
-            self.positions['TON'] = {
-                'amount': amount,
-                'entry_price': price,
-                'stop_loss': price * (1 - self.stop_loss_percent),
-                'take_profit': price * (1 + self.take_profit_percent)
+        if action == "BUY":
+            self.positions["TON"] = {
+                "amount": amount,
+                "entry_price": price,
+                "stop_loss": price * (1 - self.stop_loss_percent),
+                "take_profit": price * (1 + self.take_profit_percent),
             }
 
             await self.notify(
@@ -134,44 +135,39 @@ class TelegramCryptoBot:
                 f"Take-Profit: ${self.positions['TON']['take_profit']:.4f}"
             )
 
-        elif action == 'SELL' and 'TON' in self.positions:
-            entry = self.positions['TON']['entry_price']
+        elif action == "SELL" and "TON" in self.positions:
+            entry = self.positions["TON"]["entry_price"]
             profit = (price - entry) / entry * 100
 
-            await self.notify(
-                f"💰 **SOLD TON**\n"
-                f"Entry: ${entry:.4f}\n"
-                f"Exit: ${price:.4f}\n"
-                f"Profit: {profit:+.2f}%"
-            )
+            await self.notify(f"💰 **SOLD TON**\nEntry: ${entry:.4f}\nExit: ${price:.4f}\nProfit: {profit:+.2f}%")
 
-            del self.positions['TON']
+            del self.positions["TON"]
 
     async def check_stop_loss(self):
         """Check if stop-loss or take-profit hit."""
-        if 'TON' not in self.positions:
+        if "TON" not in self.positions:
             return
 
         price = await self.get_price()
-        pos = self.positions['TON']
+        pos = self.positions["TON"]
 
         # Stop-loss hit
-        if price <= pos['stop_loss']:
+        if price <= pos["stop_loss"]:
             await self.notify(f"🛑 **STOP-LOSS HIT** at ${price:.4f}")
-            await self.execute_trade('SELL', 0)
+            await self.execute_trade("SELL", 0)
 
         # Take-profit hit
-        elif price >= pos['take_profit']:
+        elif price >= pos["take_profit"]:
             await self.notify(f"🎯 **TAKE-PROFIT HIT** at ${price:.4f}")
-            await self.execute_trade('SELL', 0)
+            await self.execute_trade("SELL", 0)
 
     async def run(self):
         """Main trading loop."""
         await self.notify(
             "🚀 **Crypto Bot Started**\n"
-            f"Max trade: {self.max_trade_percent*100}% of balance\n"
-            f"Stop-loss: {self.stop_loss_percent*100}%\n"
-            f"Take-profit: {self.take_profit_percent*100}%\n"
+            f"Max trade: {self.max_trade_percent * 100}% of balance\n"
+            f"Stop-loss: {self.stop_loss_percent * 100}%\n"
+            f"Take-profit: {self.take_profit_percent * 100}%\n"
             "Strategy: Conservative Moving Average"
         )
 
@@ -193,12 +189,12 @@ class TelegramCryptoBot:
                 # Check for trading signal
                 signal = await self.check_signal()
 
-                if signal == 'BUY' and 'TON' not in self.positions:
+                if signal == "BUY" and "TON" not in self.positions:
                     trade_amount = self.balance * self.max_trade_percent
-                    await self.execute_trade('BUY', trade_amount)
+                    await self.execute_trade("BUY", trade_amount)
 
-                elif signal == 'SELL' and 'TON' in self.positions:
-                    await self.execute_trade('SELL', 0)
+                elif signal == "SELL" and "TON" in self.positions:
+                    await self.execute_trade("SELL", 0)
 
                 # Wait 5 minutes before next check
                 await asyncio.sleep(300)
@@ -217,8 +213,8 @@ class TelegramCryptoBot:
 async def main():
     """Run the bot."""
     # Get credentials from environment
-    token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = os.getenv('ADMIN_CHAT_ID')
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("ADMIN_CHAT_ID")
 
     if not token or not chat_id:
         print("❌ Set TELEGRAM_BOT_TOKEN and ADMIN_CHAT_ID env vars")

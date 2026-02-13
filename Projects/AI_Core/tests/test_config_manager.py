@@ -17,7 +17,7 @@ def temp_config_file(tmp_path):
     ConfigManager.CONFIG_FILE = config_file
     os.environ["TELEGRAM_BOT_TOKEN"] = "test_token_123456789"
     os.environ["MODEL_NAME"] = "llama3.2"
-    os.environ["INFERENCE_PROVIDER"] = "ollama" # Force provider for consistency
+    os.environ["INFERENCE_PROVIDER"] = "ollama"  # Force provider for consistency
 
     # Clear interfering keys
     for key in ["INFERENCE_API_KEY", "GEMINI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"]:
@@ -31,10 +31,12 @@ def temp_config_file(tmp_path):
     os.environ.clear()
     os.environ.update(original_env)
 
+
 def test_config_manager_init(temp_config_file):
     cm = ConfigManager()
     assert cm.get("TELEGRAM_BOT_TOKEN") == "test_token_123456789"
     assert cm.get("MODEL_NAME") == "llama3.2"
+
 
 def test_config_manager_set_get(temp_config_file):
     cm = ConfigManager()
@@ -44,6 +46,7 @@ def test_config_manager_set_get(temp_config_file):
     # Reload to verify persistence
     cm2 = ConfigManager()
     assert cm2.get("MODEL_NAME") == "phi3"
+
 
 def test_config_manager_encryption(temp_config_file):
     cm = ConfigManager()
@@ -59,6 +62,7 @@ def test_config_manager_encryption(temp_config_file):
     # Reload to verify decryption
     cm2 = ConfigManager()
     assert cm2.get("INFERENCE_API_KEY") == test_key
+
 
 def test_config_manager_status(temp_config_file):
     cm = ConfigManager()

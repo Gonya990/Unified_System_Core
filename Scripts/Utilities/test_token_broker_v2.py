@@ -41,14 +41,10 @@ class TestTokenBrokerUpgraded(unittest.TestCase):
     def test_rbac_loading(self):
         """Verify RBAC loading from file."""
         rbac_data = {
-            "agents": {
-                "AdminAgent": "admin",
-                "TestAgent": "pro_agent",
-                "BasicAgent": "worker"
-            },
-            "default_role": "worker"
+            "agents": {"AdminAgent": "admin", "TestAgent": "pro_agent", "BasicAgent": "worker"},
+            "default_role": "worker",
         }
-        with open(self.test_rbac, 'w') as f:
+        with open(self.test_rbac, "w") as f:
             yaml.dump(rbac_data, f)
 
         # Mocking canonical path by creating it in a temp location if needed,
@@ -56,14 +52,17 @@ class TestTokenBrokerUpgraded(unittest.TestCase):
         # However, check_permission hardcodes the paths. I'll mock os.path.exists.
 
         from unittest.mock import patch
-        with patch('os.path.exists') as mock_exists:
+
+        with patch("os.path.exists") as mock_exists:
+
             def side_effect(path):
                 if "rbac.yaml" in path or "rbac_policy.yaml" in path:
                     return True
                 return False
+
             mock_exists.side_effect = side_effect
 
-            with patch('builtins.open', unittest.mock.mock_open(read_data=yaml.dump(rbac_data))):
+            with patch("builtins.open", unittest.mock.mock_open(read_data=yaml.dump(rbac_data))):
                 # Admin always has access
                 self.assertTrue(self.broker.check_permission("AdminAgent", "openai", "pro"))
 
@@ -75,6 +74,7 @@ class TestTokenBrokerUpgraded(unittest.TestCase):
 
                 # Worker HAS access to standard tier
                 self.assertTrue(self.broker.check_permission("BasicAgent", "openai", "standard"))
+
 
 if __name__ == "__main__":
     unittest.main()

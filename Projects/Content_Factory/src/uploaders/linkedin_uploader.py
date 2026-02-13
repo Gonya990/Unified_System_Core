@@ -41,9 +41,7 @@ def login_linkedin(driver: webdriver.Chrome) -> bool:
         time.sleep(2)
 
         # Enter email
-        email_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "username"))
-        )
+        email_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "username")))
         email_input.send_keys(LINKEDIN_EMAIL)
 
         # Enter password
@@ -69,9 +67,7 @@ def login_linkedin(driver: webdriver.Chrome) -> bool:
         return False
 
 
-def upload_video_linkedin(
-    video_path: Path, caption: str, headless: bool = True
-) -> bool:
+def upload_video_linkedin(video_path: Path, caption: str, headless: bool = True) -> bool:
     """
     Upload video to LinkedIn
 
@@ -107,18 +103,14 @@ def upload_video_linkedin(
 
         # Click "Start a post"
         start_post = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "button.share-box-feed-entry__trigger")
-            )
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.share-box-feed-entry__trigger"))
         )
         start_post.click()
         time.sleep(2)
 
         # Click media button
         media_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'button[aria-label*="Add media"]')
-            )
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[aria-label*="Add media"]'))
         )
         media_button.click()
         time.sleep(2)
@@ -137,9 +129,7 @@ def upload_video_linkedin(
         time.sleep(1)
 
         # Click Post button
-        post_button = driver.find_element(
-            By.CSS_SELECTOR, "button.share-actions__primary-action"
-        )
+        post_button = driver.find_element(By.CSS_SELECTOR, "button.share-actions__primary-action")
         post_button.click()
 
         print("✅ LinkedIn video posted successfully!")

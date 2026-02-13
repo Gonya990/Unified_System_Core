@@ -18,24 +18,25 @@ INSTANCE_NAME = "igor-gaming-1"
 COLLECTION_INTERVAL = 60  # seconds
 
 # Thresholds for alerts
-THRESHOLDS = {
-    "cpu_usage": 90,
-    "memory_usage": 85,
-    "disk_usage": 90,
-    "gpu_temp": 80
-}
+THRESHOLDS = {"cpu_usage": 90, "memory_usage": 85, "disk_usage": 90, "gpu_temp": 80}
 
 # Telegram config
 TELEGRAM_BOT_TOKEN = "8518131338:AAFzuwI6PJ7ftiZVe3u8cWtjYz1pSU_QIqQ"
 TELEGRAM_CHAT_IDS = [708531393, 1881720235]
 
+
 def get_gpu_info():
     """Get GPU temperature and memory usage via nvidia-smi."""
     try:
         result = subprocess.run(
-            ["nvidia-smi", "--query-gpu=temperature.gpu,memory.used,memory.total,utilization.gpu",
-             "--format=csv,noheader,nounits"],
-            capture_output=True, text=True, timeout=10
+            [
+                "nvidia-smi",
+                "--query-gpu=temperature.gpu,memory.used,memory.total,utilization.gpu",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         if result.returncode == 0:
             parts = result.stdout.strip().split(", ")
@@ -43,11 +44,12 @@ def get_gpu_info():
                 "temp": int(parts[0]),
                 "memory_used": int(parts[1]),
                 "memory_total": int(parts[2]),
-                "utilization": int(parts[3])
+                "utilization": int(parts[3]),
             }
     except Exception as e:
         print(f"GPU info error: {e}")
     return None
+
 
 def collect_metrics():
     """Collect all system metrics."""
@@ -55,7 +57,7 @@ def collect_metrics():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "cpu_usage": psutil.cpu_percent(interval=1),
         "memory_usage": psutil.virtual_memory().percent,
-        "disk_usage": psutil.disk_usage('/').percent,
+        "disk_usage": psutil.disk_usage("/").percent,
     }
 
     gpu = get_gpu_info()
@@ -66,18 +68,24 @@ def collect_metrics():
 
     return metrics
 
+
 def send_telegram_alert(message: str):
     """Send alert to Telegram."""
     for chat_id in TELEGRAM_CHAT_IDS:
         try:
             url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-            requests.post(url, json={
-                "chat_id": chat_id,
-                "text": f"🚨 *ALERT* от {INSTANCE_NAME}\n\n{message}",
-                "parse_mode": "Markdown"
-            }, timeout=10)
+            requests.post(
+                url,
+                json={
+                    "chat_id": chat_id,
+                    "text": f"🚨 *ALERT* от {INSTANCE_NAME}\n\n{message}",
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
         except Exception as e:
             print(f"Telegram error: {e}")
+
 
 def check_thresholds(metrics: dict):
     """Check if any metrics exceed thresholds and send alerts."""
@@ -90,6 +98,7 @@ def check_thresholds(metrics: dict):
         send_telegram_alert("\n".join(alerts))
         return True
     return False
+
 
 def send_to_gcp(metrics: dict):
     """Send metrics to GCP Cloud Monitoring."""
@@ -123,6 +132,7 @@ def send_to_gcp(metrics: dict):
         print(f"GCP error: {e}")
         return False
 
+
 def main():
     print(f"Starting metrics collector for {INSTANCE_NAME}")
     print(f"Collection interval: {COLLECTION_INTERVAL}s")
@@ -148,6 +158,7 @@ def main():
             print(f"Error: {e}")
 
         time.sleep(COLLECTION_INTERVAL)
+
 
 if __name__ == "__main__":
     main()

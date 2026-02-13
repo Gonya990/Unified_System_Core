@@ -4,29 +4,29 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Setup paths
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-SRC_DIR = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/src')
+ROOT_DIR = Path("/home/gonya/Unified_System_Core")
+SRC_DIR = Path("/home/gonya/Unified_System_Core/Projects/Content_Factory/src")
 
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
-sys.path.insert(0, str(SRC_DIR / 'researcher'))
+sys.path.insert(0, str(SRC_DIR / "researcher"))
 from daily_researcher import generate_dalle_assets
 
 
 def recover():
     print("🚑 RECOVERY MODE: Checking for missing V3 assets...")
 
-    day_str = datetime.now().strftime('%Y-%m-%d')
+    day_str = datetime.now().strftime("%Y-%m-%d")
     assets_dir = ROOT_DIR / "Local_Dev" / "Media" / "legacy_wealth_v3" / day_str
 
     all_scenes = [
-        {'image': 'scene_1_hook', 'keyword': 'business man laptop city office cinematic handheld'},
-        {'image': 'scene_2_trump_kiyosaki', 'keyword': 'luxury wealth gold coins assets success'},
-        {'image': 'scene_3_ai_core', 'keyword': 'tech server room blue light data abstract'},
-        {'image': 'scene_4_orchestrator', 'keyword': 'epic orchestra conductor silhouette stage lighting'},
-        {'image': 'scene_5_sovereign_living', 'keyword': 'modern luxury mansion pool aerial cinematic'},
-        {'image': 'scene_6_cta', 'keyword': 'mountain peak sunrise triumph success'}
+        {"image": "scene_1_hook", "keyword": "business man laptop city office cinematic handheld"},
+        {"image": "scene_2_trump_kiyosaki", "keyword": "luxury wealth gold coins assets success"},
+        {"image": "scene_3_ai_core", "keyword": "tech server room blue light data abstract"},
+        {"image": "scene_4_orchestrator", "keyword": "epic orchestra conductor silhouette stage lighting"},
+        {"image": "scene_5_sovereign_living", "keyword": "modern luxury mansion pool aerial cinematic"},
+        {"image": "scene_6_cta", "keyword": "mountain peak sunrise triumph success"},
     ]
 
     missing = []
@@ -48,6 +48,8 @@ def recover():
     else:
         print("🎉 All assets present.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     from datetime import datetime
+
     recover()

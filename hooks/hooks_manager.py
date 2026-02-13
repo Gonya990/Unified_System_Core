@@ -38,9 +38,11 @@ HOOKS_DIR = Path(__file__).parent
 HOOKS_CONFIG = HOOKS_DIR / "hooks.json"
 SCRIPTS_DIR = HOOKS_DIR / "scripts"
 
+
 @dataclass
 class HookDefinition:
     """Represents a single hook definition."""
+
     hook_type: str
     matcher: str
     command: Optional[str] = None
@@ -52,9 +54,11 @@ class HookDefinition:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+
 @dataclass
 class HookResult:
     """Result of hook execution."""
+
     hook_type: str
     command: str
     success: bool
@@ -90,25 +94,24 @@ class HooksManager:
                 for entry in hook_list:
                     matcher = entry.get("matcher", "*")
                     for hook_def in entry.get("hooks", []):
-                        self.hooks[hook_type].append(HookDefinition(
-                            hook_type=hook_type,
-                            matcher=matcher,
-                            command=hook_def.get("command"),
-                            script=hook_def.get("script"),
-                            timeout=hook_def.get("timeout", 30),
-                            enabled=hook_def.get("enabled", True),
-                            description=hook_def.get("description", "")
-                        ))
+                        self.hooks[hook_type].append(
+                            HookDefinition(
+                                hook_type=hook_type,
+                                matcher=matcher,
+                                command=hook_def.get("command"),
+                                script=hook_def.get("script"),
+                                timeout=hook_def.get("timeout", 30),
+                                enabled=hook_def.get("enabled", True),
+                                description=hook_def.get("description", ""),
+                            )
+                        )
         except json.JSONDecodeError as e:
             print(f"Error parsing hooks.json: {e}", file=sys.stderr)
             self.hooks = {}
 
     def get_all_hooks(self) -> dict[str, list[dict]]:
         """Get all registered hooks."""
-        return {
-            hook_type: [h.to_dict() for h in hooks]
-            for hook_type, hooks in self.hooks.items()
-        }
+        return {hook_type: [h.to_dict() for h in hooks] for hook_type, hooks in self.hooks.items()}
 
     def get_hooks_by_type(self, hook_type: str) -> list[dict]:
         """Get hooks of a specific type."""
@@ -157,39 +160,45 @@ class HooksManager:
                     text=True,
                     timeout=hook.timeout,
                     env=env,
-                    cwd=str(HOOKS_DIR.parent)
+                    cwd=str(HOOKS_DIR.parent),
                 )
                 duration = (datetime.now() - start_time).total_seconds() * 1000
 
-                results.append(HookResult(
-                    hook_type=hook_type,
-                    command=expanded_cmd,
-                    success=result.returncode == 0,
-                    output=result.stdout,
-                    error=result.stderr,
-                    duration_ms=int(duration),
-                    timestamp=datetime.now().isoformat()
-                ))
+                results.append(
+                    HookResult(
+                        hook_type=hook_type,
+                        command=expanded_cmd,
+                        success=result.returncode == 0,
+                        output=result.stdout,
+                        error=result.stderr,
+                        duration_ms=int(duration),
+                        timestamp=datetime.now().isoformat(),
+                    )
+                )
             except subprocess.TimeoutExpired:
-                results.append(HookResult(
-                    hook_type=hook_type,
-                    command=expanded_cmd,
-                    success=False,
-                    output="",
-                    error=f"Timeout after {hook.timeout}s",
-                    duration_ms=hook.timeout * 1000,
-                    timestamp=datetime.now().isoformat()
-                ))
+                results.append(
+                    HookResult(
+                        hook_type=hook_type,
+                        command=expanded_cmd,
+                        success=False,
+                        output="",
+                        error=f"Timeout after {hook.timeout}s",
+                        duration_ms=hook.timeout * 1000,
+                        timestamp=datetime.now().isoformat(),
+                    )
+                )
             except Exception as e:
-                results.append(HookResult(
-                    hook_type=hook_type,
-                    command=expanded_cmd,
-                    success=False,
-                    output="",
-                    error=str(e),
-                    duration_ms=0,
-                    timestamp=datetime.now().isoformat()
-                ))
+                results.append(
+                    HookResult(
+                        hook_type=hook_type,
+                        command=expanded_cmd,
+                        success=False,
+                        output="",
+                        error=str(e),
+                        duration_ms=0,
+                        timestamp=datetime.now().isoformat(),
+                    )
+                )
 
         return results
 
@@ -203,7 +212,7 @@ class HooksManager:
             "hook_types": list(self.hooks.keys()),
             "total_hooks": sum(len(h) for h in self.hooks.values()),
             "hooks_by_type": {k: len(v) for k, v in self.hooks.items()},
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
 
@@ -231,47 +240,37 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
         urllib.parse.parse_qs(parsed.query)
 
         if path == "/hooks/all" or path == "/hooks":
-            self._send_json({
-                "status": "ok",
-                "hooks": self.manager.get_all_hooks()
-            })
+            self._send_json({"status": "ok", "hooks": self.manager.get_all_hooks()})
 
         elif path == "/hooks/status":
-            self._send_json({
-                "status": "ok",
-                **self.manager.get_status()
-            })
+            self._send_json({"status": "ok", **self.manager.get_status()})
 
         elif path == "/hooks/scripts":
-            self._send_json({
-                "status": "ok",
-                "scripts": self.manager.list_scripts()
-            })
+            self._send_json({"status": "ok", "scripts": self.manager.list_scripts()})
 
         elif path.startswith("/hooks/type/"):
             hook_type = path.split("/")[-1]
             hooks = self.manager.get_hooks_by_type(hook_type)
-            self._send_json({
-                "status": "ok",
-                "hook_type": hook_type,
-                "hooks": hooks
-            })
+            self._send_json({"status": "ok", "hook_type": hook_type, "hooks": hooks})
 
         elif path == "/health" or path == "/health/liveness":
             self._send_json({"status": "ok", "service": "hooks-manager"})
 
         else:
-            self._send_json({
-                "status": "error",
-                "message": "Not found",
-                "available_endpoints": [
-                    "GET /hooks/all - List all hooks",
-                    "GET /hooks/status - Get system status",
-                    "GET /hooks/scripts - List available scripts",
-                    "GET /hooks/type/<type> - Get hooks by type",
-                    "POST /hooks/run/<type> - Execute hooks of type"
-                ]
-            }, status=404)
+            self._send_json(
+                {
+                    "status": "error",
+                    "message": "Not found",
+                    "available_endpoints": [
+                        "GET /hooks/all - List all hooks",
+                        "GET /hooks/status - Get system status",
+                        "GET /hooks/scripts - List available scripts",
+                        "GET /hooks/type/<type> - Get hooks by type",
+                        "POST /hooks/run/<type> - Execute hooks of type",
+                    ],
+                },
+                status=404,
+            )
 
     def do_POST(self):
         """Handle POST requests."""
@@ -282,7 +281,7 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
             hook_type = path.split("/")[-1]
 
             # Read body for context
-            content_length = int(self.headers.get('Content-Length', 0))
+            content_length = int(self.headers.get("Content-Length", 0))
             context = {}
             if content_length > 0:
                 body = self.rfile.read(content_length)
@@ -292,18 +291,17 @@ class HooksHTTPHandler(http.server.BaseHTTPRequestHandler):
                     pass
 
             results = self.manager.execute_hooks(hook_type, context)
-            self._send_json({
-                "status": "ok",
-                "hook_type": hook_type,
-                "executed": len(results),
-                "results": [asdict(r) for r in results]
-            })
+            self._send_json(
+                {
+                    "status": "ok",
+                    "hook_type": hook_type,
+                    "executed": len(results),
+                    "results": [asdict(r) for r in results],
+                }
+            )
 
         else:
-            self._send_json({
-                "status": "error",
-                "message": "Method not allowed"
-            }, status=405)
+            self._send_json({"status": "error", "message": "Method not allowed"}, status=405)
 
 
 def serve(port: int = 8765):
@@ -345,8 +343,8 @@ def main():
             for hook_type, hook_list in hooks.items():
                 print(f"\n{hook_type}:")
                 for h in hook_list:
-                    cmd = h.get('command') or h.get('script', 'N/A')
-                    status = "✓" if h.get('enabled', True) else "✗"
+                    cmd = h.get("command") or h.get("script", "N/A")
+                    status = "✓" if h.get("enabled", True) else "✗"
                     print(f"  {status} [{h['matcher']}] {cmd[:60]}...")
 
     elif args.get:

@@ -24,11 +24,7 @@ def run_vertex_search_poc():
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=query,
-            config=GenerateContentConfig(
-                tools=tools
-            )
+            model="gemini-2.0-flash", contents=query, config=GenerateContentConfig(tools=tools)
         )
 
         print("\n✅ Response:")
@@ -40,6 +36,7 @@ def run_vertex_search_poc():
 
     except Exception as e:
         print(f"❌ Error during generation: {e}")
+
 
 if __name__ == "__main__":
     run_vertex_search_poc()

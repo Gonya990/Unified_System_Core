@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -9,8 +8,8 @@ from token_broker import TokenBroker
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-class TestTokenBroker(unittest.TestCase):
 
+class TestTokenBroker(unittest.TestCase):
     def setUp(self):
         # Create a dummy keys.json
         self.test_keys_path = "test_keys_vault.json"
@@ -19,11 +18,11 @@ class TestTokenBroker(unittest.TestCase):
             "gemini": [
                 {"alias": "Key_A", "key": "gemini-key-A", "tier": "free", "owner": "UserA"},
                 {"alias": "Key_B", "key": "gemini-key-B", "tier": "free", "owner": "UserB"},
-                {"alias": "Key_C", "key": "gemini-key-C", "tier": "pro", "owner": "UserC"}
+                {"alias": "Key_C", "key": "gemini-key-C", "tier": "pro", "owner": "UserC"},
             ]
         }
 
-        with open(self.test_keys_path, 'w') as f:
+        with open(self.test_keys_path, "w") as f:
             json.dump(self.dummy_data, f)
 
         # Initialize Broker
@@ -37,7 +36,7 @@ class TestTokenBroker(unittest.TestCase):
 
     def test_load_keys(self):
         pools = self.broker.list_available_pools()
-        self.assertEqual(pools['gemini']['total'], 3)
+        self.assertEqual(pools["gemini"]["total"], 3)
         print("\n[Test] Keys loaded successfully.")
 
     def test_round_robin(self):
@@ -75,5 +74,6 @@ class TestTokenBroker(unittest.TestCase):
         k_pro = self.broker.get_key("gemini", tier="pro")
         self.assertEqual(k_pro, "gemini-key-C")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

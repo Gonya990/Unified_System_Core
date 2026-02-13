@@ -1,11 +1,13 @@
-import os
 import asyncio
 import logging
+import os
+
 from dotenv import load_dotenv
+
+from src.pipeline.compliance_logger import ComplianceLogger
 
 # Import components
 from src.pipeline.exchange_connector import BybitConnector
-from src.pipeline.compliance_logger import ComplianceLogger
 from src.pipeline.funding_arb_bot import FundingArbBot
 
 # K8s components
@@ -16,9 +18,7 @@ try:
 except ImportError:
     K8S_AVAILABLE = False
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(name)s | %(levelname)s | %(message)s")
 logger = logging.getLogger("MainOrchestrator")
 
 
@@ -28,9 +28,7 @@ async def k8s_leader_election(pod_name: str, namespace: str):
     Ensures only one instance sends orders to Bybit.
     """
     if not K8S_AVAILABLE:
-        logger.warning(
-            "K8s Client not found. Skipping Leader Election (Local Dev Mode)."
-        )
+        logger.warning("K8s Client not found. Skipping Leader Election (Local Dev Mode).")
         return True
 
     try:

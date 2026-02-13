@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -32,20 +32,24 @@ async def test_file_ops():
 
     # Register file tools
     file_ops = FileOpsTool()
-    agent.register_tool(Tool(
-        name="file_read",
-        description=file_ops.get_definition()["description"],
-        parameters=file_ops.get_definition()["parameters"],
-        handler=file_ops.handler
-    ))
+    agent.register_tool(
+        Tool(
+            name="file_read",
+            description=file_ops.get_definition()["description"],
+            parameters=file_ops.get_definition()["parameters"],
+            handler=file_ops.handler,
+        )
+    )
 
     file_list = FileListTool()
-    agent.register_tool(Tool(
-        name="file_list",
-        description=file_list.get_definition()["description"],
-        parameters=file_list.get_definition()["parameters"],
-        handler=file_list.handler
-    ))
+    agent.register_tool(
+        Tool(
+            name="file_list",
+            description=file_list.get_definition()["description"],
+            parameters=file_list.get_definition()["parameters"],
+            handler=file_list.handler,
+        )
+    )
 
     print(f"\n✅ Registered {len(agent.tools)} tools")
 
@@ -75,17 +79,20 @@ async def test_home_assistant():
 
     # Register HA tool
     ha_tool = HomeAssistantTool()
-    agent.register_tool(Tool(
-        name="control_device",
-        description=ha_tool.get_definition()["description"],
-        parameters=ha_tool.get_definition()["parameters"],
-        handler=ha_tool.handler
-    ))
+    agent.register_tool(
+        Tool(
+            name="control_device",
+            description=ha_tool.get_definition()["description"],
+            parameters=ha_tool.get_definition()["parameters"],
+            handler=ha_tool.handler,
+        )
+    )
 
     print("\n✅ Registered Home Assistant tool")
 
     # Skip test if HA not configured
     import os
+
     if not os.getenv("HA_TOKEN"):
         print("\n⚠️  Skipping - HA_TOKEN not set")
         return
@@ -110,6 +117,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
 
 

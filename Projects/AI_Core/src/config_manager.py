@@ -66,33 +66,21 @@ class ConfigManager:
             # Provider selection
             "INFERENCE_PROVIDER": os.environ.get("INFERENCE_PROVIDER", "gemini"),
             # Ollama settings
-            "OLLAMA_BASE_URL": os.environ.get(
-                "OLLAMA_BASE_URL", "http://localhost:11434"
-            ),
+            "OLLAMA_BASE_URL": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
             "OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.2"),
             # OpenAI settings
-            "OPENAI_BASE_URL": os.environ.get(
-                "OPENAI_BASE_URL", "https://api.openai.com"
-            ),
+            "OPENAI_BASE_URL": os.environ.get("OPENAI_BASE_URL", "https://api.openai.com"),
             "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
             "OPENAI_MODEL": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
             # Gemini settings
-            "GEMINI_API_KEY": os.environ.get(
-                "GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", "")
-            ),
+            "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", "")),
             "GEMINI_MODEL": os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
             # OpenRouter settings
             "OPENROUTER_API_KEY": os.environ.get("OPENROUTER_API_KEY", ""),
-            "OPENROUTER_BASE_URL": os.environ.get(
-                "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
-            ),
-            "OPENROUTER_MODEL": os.environ.get(
-                "OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"
-            ),
+            "OPENROUTER_BASE_URL": os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            "OPENROUTER_MODEL": os.environ.get("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"),
             # Legacy settings (backwards compatibility)
-            "INFERENCE_BASE_URL": os.environ.get(
-                "INFERENCE_BASE_URL", "http://localhost:11434"
-            ),
+            "INFERENCE_BASE_URL": os.environ.get("INFERENCE_BASE_URL", "http://localhost:11434"),
             "INFERENCE_API_KEY": os.environ.get("INFERENCE_API_KEY", ""),
             "MODEL_NAME": os.environ.get("MODEL_NAME", "llama3.2"),
             "LOG_LEVEL": os.environ.get("LOG_LEVEL", "INFO"),
@@ -118,6 +106,7 @@ class ConfigManager:
         if project_id:
             try:
                 from secret_manager import SecretManager
+
                 sm = SecretManager(project_id)
                 gcp_secrets = sm.load_all_secrets()
                 for key, val in gcp_secrets.items():
@@ -125,13 +114,9 @@ class ConfigManager:
                         self._config[key] = val
                         # Also set in env for other modules that might use it
                         os.environ[key] = val
-                logger.info(
-                    f"Loaded {len(gcp_secrets)} secrets from GCP Secret Manager"
-                )
+                logger.info(f"Loaded {len(gcp_secrets)} secrets from GCP Secret Manager")
             except Exception as e:
-                logger.warning(
-                    f"Could not load secrets from GCP Secret Manager: {e}"
-                )
+                logger.warning(f"Could not load secrets from GCP Secret Manager: {e}")
 
         # Override with persisted config if exists
         if self.CONFIG_FILE.exists():
@@ -147,9 +132,7 @@ class ConfigManager:
                             # Decrypt sensitive values
                             if self._fernet:
                                 try:
-                                    value = self._fernet.decrypt(
-                                        value.encode()
-                                    ).decode()
+                                    value = self._fernet.decrypt(value.encode()).decode()
                                 except Exception:
                                     pass  # Use as-is if decryption fails
 

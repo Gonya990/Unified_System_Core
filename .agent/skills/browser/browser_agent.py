@@ -5,6 +5,7 @@ import sys
 
 SOCKET_PATH = "/tmp/nodriver.sock"
 
+
 def send_command(cmd):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
@@ -13,13 +14,15 @@ def send_command(cmd):
         response = b""
         while True:
             chunk = sock.recv(65536)
-            if not chunk: break
+            if not chunk:
+                break
             response += chunk
         return json.loads(response.decode())
     except Exception as e:
         return {"ok": False, "error": str(e)}
     finally:
         sock.close()
+
 
 def analyze():
     status = send_command({"action": "status"})
@@ -39,6 +42,7 @@ def analyze():
     else:
         print(f"Error: {elements.get('error')}")
     print("-" * 50)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "analyze":

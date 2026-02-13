@@ -61,11 +61,7 @@ Output format: Provide ONLY the final synthesized answer. Do not include meta-co
         self.name = f"Chairman ({provider.name})"
 
     async def synthesize(
-        self,
-        query: str,
-        responses: list[ProviderResponse],
-        reviews: Optional[list] = None,
-        detailed: bool = False
+        self, query: str, responses: list[ProviderResponse], reviews: Optional[list] = None, detailed: bool = False
     ) -> ConsensusResult:
         """
         Synthesize final consensus from council responses.
@@ -85,10 +81,7 @@ Output format: Provide ONLY the final synthesized answer. Do not include meta-co
         logger.info(f"👑 {self.name} synthesizing consensus...")
 
         # Generate synthesis
-        result = await self.provider.generate(
-            prompt,
-            system_prompt=self.SYNTHESIS_SYSTEM_PROMPT
-        )
+        result = await self.provider.generate(prompt, system_prompt=self.SYNTHESIS_SYSTEM_PROMPT)
 
         if not result.success:
             logger.error(f"Chairman synthesis failed: {result.error}")
@@ -98,7 +91,7 @@ Output format: Provide ONLY the final synthesized answer. Do not include meta-co
                 confidence_score=0.5,
                 key_insights=[],
                 resolved_conflicts=[],
-                sources_used=[responses[0].provider_name] if responses else []
+                sources_used=[responses[0].provider_name] if responses else [],
             )
 
         # Extract insights if detailed mode
@@ -112,15 +105,11 @@ Output format: Provide ONLY the final synthesized answer. Do not include meta-co
             confidence_score=self._calculate_confidence(responses, reviews),
             key_insights=insights,
             resolved_conflicts=conflicts,
-            sources_used=[r.provider_name for r in responses if r.success]
+            sources_used=[r.provider_name for r in responses if r.success],
         )
 
     def _build_prompt(
-        self,
-        query: str,
-        responses: list[ProviderResponse],
-        reviews: Optional[list],
-        detailed: bool
+        self, query: str, responses: list[ProviderResponse], reviews: Optional[list], detailed: bool
     ) -> str:
         """Build the synthesis prompt."""
 
@@ -165,11 +154,7 @@ In your synthesis, please also briefly note:
 
         return prompt
 
-    def _fallback_response(
-        self,
-        responses: list[ProviderResponse],
-        reviews: Optional[list]
-    ) -> str:
+    def _fallback_response(self, responses: list[ProviderResponse], reviews: Optional[list]) -> str:
         """Get best response as fallback when synthesis fails."""
         successful = [r for r in responses if r.success]
         if not successful:
@@ -183,7 +168,7 @@ In your synthesis, please also briefly note:
                     scores[r.reviewee] = []
                 scores[r.reviewee].append(r.score)
 
-            avg_scores = {k: sum(v)/len(v) for k, v in scores.items()}
+            avg_scores = {k: sum(v) / len(v) for k, v in scores.items()}
             best_provider = max(avg_scores, key=avg_scores.get)
 
             for resp in successful:
@@ -192,11 +177,7 @@ In your synthesis, please also briefly note:
 
         return successful[0].content
 
-    def _calculate_confidence(
-        self,
-        responses: list[ProviderResponse],
-        reviews: Optional[list]
-    ) -> float:
+    def _calculate_confidence(self, responses: list[ProviderResponse], reviews: Optional[list]) -> float:
         """Calculate confidence score for the consensus."""
         if not responses:
             return 0.0

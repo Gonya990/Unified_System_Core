@@ -19,6 +19,7 @@ try:
     from rich.panel import Panel
     from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.table import Table
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -27,10 +28,7 @@ except ImportError:
 from council import LLMCouncil
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 if RICH_AVAILABLE:
@@ -40,16 +38,16 @@ if RICH_AVAILABLE:
 def print_header():
     """Print welcome header."""
     if RICH_AVAILABLE:
-        console.print(Panel.fit(
-            "[bold cyan]🏛️ LLM COUNCIL[/bold cyan]\n"
-            "[dim]Multi-model deliberation system[/dim]",
-            border_style="cyan"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold cyan]🏛️ LLM COUNCIL[/bold cyan]\n[dim]Multi-model deliberation system[/dim]", border_style="cyan"
+            )
+        )
     else:
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("🏛️ LLM COUNCIL")
         print("Multi-model deliberation system")
-        print("="*50 + "\n")
+        print("=" * 50 + "\n")
 
 
 def print_stage(stage_num: int, title: str):
@@ -57,7 +55,7 @@ def print_stage(stage_num: int, title: str):
     if RICH_AVAILABLE:
         console.print(f"\n[bold yellow]━━━ STAGE {stage_num}: {title} ━━━[/bold yellow]\n")
     else:
-        print(f"\n{'='*10} STAGE {stage_num}: {title} {'='*10}\n")
+        print(f"\n{'=' * 10} STAGE {stage_num}: {title} {'=' * 10}\n")
 
 
 async def run_health_check():
@@ -127,12 +125,14 @@ async def run_query(query: str):
         if RICH_AVAILABLE:
             for resp in session.stage1_responses:
                 status = "[green]✓[/green]" if resp.success else "[red]✗[/red]"
-                console.print(Panel(
-                    resp.content[:500] + ("..." if len(resp.content) > 500 else ""),
-                    title=f"{status} {resp.provider_name} ({resp.model})",
-                    subtitle=f"⏱️ {resp.latency_ms:.0f}ms | 🔤 {resp.tokens_used} tokens",
-                    border_style="blue" if resp.success else "red"
-                ))
+                console.print(
+                    Panel(
+                        resp.content[:500] + ("..." if len(resp.content) > 500 else ""),
+                        title=f"{status} {resp.provider_name} ({resp.model})",
+                        subtitle=f"⏱️ {resp.latency_ms:.0f}ms | 🔤 {resp.tokens_used} tokens",
+                        border_style="blue" if resp.success else "red",
+                    )
+                )
         else:
             for resp in session.stage1_responses:
                 status = "✓" if resp.success else "✗"
@@ -152,11 +152,7 @@ async def run_query(query: str):
 
                 for review in session.stage2_reviews:
                     score_color = "green" if review.score >= 7 else "yellow" if review.score >= 5 else "red"
-                    table.add_row(
-                        review.reviewer,
-                        review.reviewee,
-                        f"[{score_color}]{review.score}/10[/{score_color}]"
-                    )
+                    table.add_row(review.reviewer, review.reviewee, f"[{score_color}]{review.score}/10[/{score_color}]")
 
                 console.print(table)
             else:
@@ -167,12 +163,14 @@ async def run_query(query: str):
         print_stage(3, "CHAIRMAN CONSENSUS")
 
         if RICH_AVAILABLE:
-            console.print(Panel(
-                Markdown(session.stage3_consensus),
-                title=f"👑 Final Answer (by {session.chairman_provider})",
-                border_style="green",
-                padding=(1, 2)
-            ))
+            console.print(
+                Panel(
+                    Markdown(session.stage3_consensus),
+                    title=f"👑 Final Answer (by {session.chairman_provider})",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
         else:
             print(f"\n👑 Final Answer (by {session.chairman_provider}):\n")
             print(session.stage3_consensus)
@@ -202,7 +200,7 @@ async def run_interactive():
             try:
                 query = input("\n🏛️ You: ").strip()
 
-                if query.lower() in ('quit', 'exit', 'q'):
+                if query.lower() in ("quit", "exit", "q"):
                     print("\nGoodbye! 👋")
                     break
 
@@ -212,11 +210,7 @@ async def run_interactive():
                 session = await council.deliberate(query, verbose=False)
 
                 if RICH_AVAILABLE:
-                    console.print(Panel(
-                        Markdown(session.stage3_consensus),
-                        title="👑 Council",
-                        border_style="green"
-                    ))
+                    console.print(Panel(Markdown(session.stage3_consensus), title="👑 Council", border_style="green"))
                 else:
                     print(f"\n👑 Council: {session.stage3_consensus}")
 
@@ -235,8 +229,8 @@ def main():
     if len(sys.argv) < 2:
         print("Usage:")
         print('  python council_demo.py "Your question here"')
-        print('  python council_demo.py --interactive')
-        print('  python council_demo.py --health-check')
+        print("  python council_demo.py --interactive")
+        print("  python council_demo.py --health-check")
         sys.exit(1)
 
     arg = sys.argv[1]

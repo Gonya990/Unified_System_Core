@@ -9,9 +9,7 @@ CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent.parent.parent.parent
 # /Users/igorgoncharenko/Documents/Unified_System_Core
 # Use absolute path for reliability
-AI_CORE_SRC_PATH = (
-    "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
-)
+AI_CORE_SRC_PATH = "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src"
 if AI_CORE_SRC_PATH not in sys.path:
     sys.path.append(AI_CORE_SRC_PATH)
 
@@ -48,8 +46,7 @@ class SoraVideoGenerator:
             response = self.client.video.generations.create(
                 model="sora-2",
                 prompt=(
-                    f"A cinematic {angle} shot of a {role} dinosaur in a podcast "
-                    f"studio. {prompt}. High fidelity, 4k."
+                    f"A cinematic {angle} shot of a {role} dinosaur in a podcast studio. {prompt}. High fidelity, 4k."
                 ),
                 duration=5,
                 aspect_ratio="16:9",

@@ -8,9 +8,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # CONFIGURATION
-CORE_URL = "http://100.110.209.49:8080/webhook/reclaim" # Example endpoint
+CORE_URL = "http://100.110.209.49:8080/webhook/reclaim"  # Example endpoint
 IDLE_THRESHOLD_MINS = 30
 CHECK_INTERVAL_SECS = 60
+
 
 def is_gaming_active():
     """
@@ -19,17 +20,19 @@ def is_gaming_active():
     """
     active_processes = ["Sunshine.exe", "Moonlight.exe", "Steam.exe"]
 
-    for proc in psutil.process_iter(['name']):
-        if proc.info['name'] in active_processes:
+    for proc in psutil.process_iter(["name"]):
+        if proc.info["name"] in active_processes:
             # You could add further checks here, like network connection count for Sunshine
             return True
     return False
+
 
 def get_idle_time():
     """Returns the time in seconds since the last user input (keyboard/mouse)."""
     # Note: On Windows this requires ctypes and GetLastInputInfo
     try:
         import ctypes
+
         class LASTINPUTINFO(ctypes.Structure):
             _fields_ = [
                 ("cbSize", ctypes.c_uint),
@@ -42,7 +45,8 @@ def get_idle_time():
         millis = ctypes.windll.kernel32.GetTickCount() - lii.dwTime
         return millis / 1000.0
     except Exception:
-        return 0 # Fallback if not on Windows or error
+        return 0  # Fallback if not on Windows or error
+
 
 def main():
     logger.info("Sentinel started. Monitoring for idle gaming session...")
@@ -72,6 +76,7 @@ def main():
             idle_start = None
 
         time.sleep(CHECK_INTERVAL_SECS)
+
 
 if __name__ == "__main__":
     main()

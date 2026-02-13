@@ -1,4 +1,3 @@
-
 import base64
 import json
 import os
@@ -31,6 +30,7 @@ REPORT_FILE = BASE_DIR / "Reports" / "BUSINESS_EMAIL_RESPONSE_PLAN.md"
 
 # --- Gmail Helpers ---
 
+
 def get_gmail_service():
     creds = None
     if TOKEN_PATH.exists():
@@ -58,6 +58,7 @@ def get_gmail_service():
 
     return build("gmail", "v1", credentials=creds)
 
+
 def get_email_content(payload) -> str:
     body = ""
     if "parts" in payload:
@@ -69,7 +70,9 @@ def get_email_content(payload) -> str:
         body = base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="ignore")
     return body
 
+
 # --- AI Analysis ---
+
 
 def analyze_and_draft_responses(emails: list[dict]):
     client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -79,14 +82,14 @@ def analyze_and_draft_responses(emails: list[dict]):
     print(f"🧠 Analyzing {len(emails)} emails with {OPENAI_MODEL}...")
 
     for i, email in enumerate(emails):
-        print(f"[{i+1}/{len(emails)}] Processing: {email['subject'][:40]}...")
+        print(f"[{i + 1}/{len(emails)}] Processing: {email['subject'][:40]}...")
 
         prompt = f"""
         You are a strategic business development AI.
 
-        SENDER: {email['sender']}
-        SUBJECT: {email['subject']}
-        BODY_SNIPPET: {email['body'][:4000]}
+        SENDER: {email["sender"]}
+        SUBJECT: {email["subject"]}
+        BODY_SNIPPET: {email["body"][:4000]}
 
         Task:
         1. Identify if this is a **LEAD** (job alert, direct email, inquiry).
@@ -121,16 +124,13 @@ def analyze_and_draft_responses(emails: list[dict]):
             response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=[{"role": "user", "content": prompt}],
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"},
             )
             content = response.choices[0].message.content
             analysis = json.loads(content)
 
             if analysis.get("is_relevant"):
-                analyzed_data.append({
-                    "original": email,
-                    "analysis": analysis
-                })
+                analyzed_data.append({"original": email, "analysis": analysis})
         except Exception as e:
             print(f"⚠️ Analysis error: {e}")
 
@@ -143,7 +143,9 @@ def analyze_and_draft_responses(emails: list[dict]):
 
     return analyzed_data
 
+
 # --- Main Flow ---
+
 
 def main():
     print("🚀 Starting Business Email Analysis...")
@@ -164,12 +166,12 @@ def main():
     target_count = 450
 
     while len(messages) < target_count:
-        results = service.users().messages().list(
-            userId="me",
-            q=query,
-            maxResults=min(100, target_count - len(messages)),
-            pageToken=next_page_token
-        ).execute()
+        results = (
+            service.users()
+            .messages()
+            .list(userId="me", q=query, maxResults=min(100, target_count - len(messages)), pageToken=next_page_token)
+            .execute()
+        )
 
         batch = results.get("messages", [])
         messages.extend(batch)
@@ -197,13 +199,7 @@ def main():
             body = get_email_content(payload)
 
             if body:
-                email_list.append({
-                    "id": msg["id"],
-                    "subject": subject,
-                    "sender": sender,
-                    "date": date,
-                    "body": body
-                })
+                email_list.append({"id": msg["id"], "subject": subject, "sender": sender, "date": date, "body": body})
         except Exception as e:
             print(f"Error fetching msg {msg['id']}: {e}")
 
@@ -242,6 +238,6 @@ def main():
 
     print(f"✅ Report saved to: {REPORT_FILE}")
 
+
 if __name__ == "__main__":
     main()
-

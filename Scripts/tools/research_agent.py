@@ -13,6 +13,7 @@ from src.web_search import WebSearch
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ResearchAgent")
 
+
 async def conduct_research():
     logger.info("🕵️ Starting OpenCloud/Router & GPT-5.2 Research...")
 
@@ -29,7 +30,7 @@ async def conduct_research():
     queries = [
         "OpenRouter API python integration example github",
         "OpenAI GPT-5.2 release date capabilities",
-        "OpenCloud AI model aggregator features"
+        "OpenCloud AI model aggregator features",
     ]
 
     compiled_knowledge = ""
@@ -73,6 +74,7 @@ async def conduct_research():
         f.write(response)
 
     print(response)
+
 
 if __name__ == "__main__":
     asyncio.run(conduct_research())

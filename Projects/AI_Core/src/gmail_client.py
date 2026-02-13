@@ -3,6 +3,7 @@ Gmail Integration Client
 Provides read and compose access to Gmail for the AI Bot.
 Uses unified OAuth credentials from Firestore (same as Calendar).
 """
+
 import base64
 import logging
 from email.mime.multipart import MIMEMultipart
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 try:
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
+
     GMAIL_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Gmail dependencies not installed: {e}")
@@ -40,11 +42,11 @@ class GmailClient:
         try:
             if credentials_dict:
                 self.creds = Credentials.from_authorized_user_info(credentials_dict)
-                self.service = build('gmail', 'v1', credentials=self.creds)
+                self.service = build("gmail", "v1", credentials=self.creds)
                 self.authenticated = True
                 # Get user's email address
-                profile = self.service.users().getProfile(userId='me').execute()
-                self.user_email = profile.get('emailAddress')
+                profile = self.service.users().getProfile(userId="me").execute()
+                self.user_email = profile.get("emailAddress")
                 logger.debug(f"Gmail service initialized for {self.user_email}")
             else:
                 logger.warning("No credentials provided to GmailClient")
@@ -60,12 +62,10 @@ class GmailClient:
             return -1
 
         try:
-            results = self.service.users().messages().list(
-                userId='me',
-                labelIds=['INBOX', 'UNREAD'],
-                maxResults=1
-            ).execute()
-            return results.get('resultSizeEstimate', 0)
+            results = (
+                self.service.users().messages().list(userId="me", labelIds=["INBOX", "UNREAD"], maxResults=1).execute()
+            )
+            return results.get("resultSizeEstimate", 0)
         except Exception as e:
             logger.error(f"Failed to get unread count: {e}")
             return -1
@@ -76,39 +76,41 @@ class GmailClient:
             return []
 
         try:
-            labels = ['INBOX']
+            labels = ["INBOX"]
             if unread_only:
-                labels.append('UNREAD')
+                labels.append("UNREAD")
 
-            results = self.service.users().messages().list(
-                userId='me',
-                labelIds=labels,
-                maxResults=max_results
-            ).execute()
+            results = (
+                self.service.users().messages().list(userId="me", labelIds=labels, maxResults=max_results).execute()
+            )
 
-            messages = results.get('messages', [])
+            messages = results.get("messages", [])
             emails = []
 
             for msg in messages:
-                msg_data = self.service.users().messages().get(
-                    userId='me',
-                    id=msg['id'],
-                    format='metadata',
-                    metadataHeaders=['From', 'Subject', 'Date', 'To']
-                ).execute()
+                msg_data = (
+                    self.service.users()
+                    .messages()
+                    .get(
+                        userId="me", id=msg["id"], format="metadata", metadataHeaders=["From", "Subject", "Date", "To"]
+                    )
+                    .execute()
+                )
 
-                headers = {h['name']: h['value'] for h in msg_data.get('payload', {}).get('headers', [])}
+                headers = {h["name"]: h["value"] for h in msg_data.get("payload", {}).get("headers", [])}
 
-                emails.append({
-                    'id': msg['id'],
-                    'thread_id': msg_data.get('threadId'),
-                    'from': headers.get('From', 'Unknown'),
-                    'to': headers.get('To', ''),
-                    'subject': headers.get('Subject', 'No Subject'),
-                    'date': headers.get('Date', ''),
-                    'snippet': msg_data.get('snippet', '')[:100],
-                    'unread': 'UNREAD' in msg_data.get('labelIds', [])
-                })
+                emails.append(
+                    {
+                        "id": msg["id"],
+                        "thread_id": msg_data.get("threadId"),
+                        "from": headers.get("From", "Unknown"),
+                        "to": headers.get("To", ""),
+                        "subject": headers.get("Subject", "No Subject"),
+                        "date": headers.get("Date", ""),
+                        "snippet": msg_data.get("snippet", "")[:100],
+                        "unread": "UNREAD" in msg_data.get("labelIds", []),
+                    }
+                )
 
             return emails
 
@@ -122,13 +124,9 @@ class GmailClient:
             return None
 
         try:
-            msg = self.service.users().messages().get(
-                userId='me',
-                id=message_id,
-                format='full'
-            ).execute()
+            msg = self.service.users().messages().get(userId="me", id=message_id, format="full").execute()
 
-            payload = msg.get('payload', {})
+            payload = msg.get("payload", {})
             body = self._extract_body(payload)
             return body
         except Exception as e:
@@ -139,17 +137,17 @@ class GmailClient:
         """Extract text body from email payload."""
         body = ""
 
-        if 'body' in payload and payload['body'].get('data'):
-            body = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8', errors='ignore')
+        if "body" in payload and payload["body"].get("data"):
+            body = base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="ignore")
 
-        if 'parts' in payload:
-            for part in payload['parts']:
-                mime_type = part.get('mimeType', '')
-                if mime_type == 'text/plain':
-                    if part['body'].get('data'):
-                        body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
+        if "parts" in payload:
+            for part in payload["parts"]:
+                mime_type = part.get("mimeType", "")
+                if mime_type == "text/plain":
+                    if part["body"].get("data"):
+                        body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="ignore")
                         break
-                elif mime_type.startswith('multipart/'):
+                elif mime_type.startswith("multipart/"):
                     body = self._extract_body(part)
                     if body:
                         break
@@ -171,13 +169,13 @@ class GmailClient:
 
         for email in emails:
             # Parse sender name
-            sender = email['from']
-            if '<' in sender:
-                sender = sender.split('<')[0].strip().strip('"')
+            sender = email["from"]
+            if "<" in sender:
+                sender = sender.split("<")[0].strip().strip('"')
 
-            status = "🔵" if email['unread'] else "⚪"
-            subject = email['subject'][:50]
-            if len(email['subject']) > 50:
+            status = "🔵" if email["unread"] else "⚪"
+            subject = email["subject"][:50]
+            if len(email["subject"]) > 50:
                 subject += "..."
             summary += f"{status} **{sender}**\n"
             summary += f"   {subject}\n\n"
@@ -190,32 +188,30 @@ class GmailClient:
             return []
 
         try:
-            results = self.service.users().messages().list(
-                userId='me',
-                q=query,
-                maxResults=max_results
-            ).execute()
+            results = self.service.users().messages().list(userId="me", q=query, maxResults=max_results).execute()
 
-            messages = results.get('messages', [])
+            messages = results.get("messages", [])
             emails = []
 
             for msg in messages:
-                msg_data = self.service.users().messages().get(
-                    userId='me',
-                    id=msg['id'],
-                    format='metadata',
-                    metadataHeaders=['From', 'Subject', 'Date']
-                ).execute()
+                msg_data = (
+                    self.service.users()
+                    .messages()
+                    .get(userId="me", id=msg["id"], format="metadata", metadataHeaders=["From", "Subject", "Date"])
+                    .execute()
+                )
 
-                headers = {h['name']: h['value'] for h in msg_data.get('payload', {}).get('headers', [])}
+                headers = {h["name"]: h["value"] for h in msg_data.get("payload", {}).get("headers", [])}
 
-                emails.append({
-                    'id': msg['id'],
-                    'from': headers.get('From', 'Unknown'),
-                    'subject': headers.get('Subject', 'No Subject'),
-                    'date': headers.get('Date', ''),
-                    'snippet': msg_data.get('snippet', '')[:100]
-                })
+                emails.append(
+                    {
+                        "id": msg["id"],
+                        "from": headers.get("From", "Unknown"),
+                        "subject": headers.get("Subject", "No Subject"),
+                        "date": headers.get("Date", ""),
+                        "snippet": msg_data.get("snippet", "")[:100],
+                    }
+                )
 
             return emails
 
@@ -238,21 +234,18 @@ class GmailClient:
 
         try:
             if html:
-                message = MIMEMultipart('alternative')
-                message.attach(MIMEText(body, 'html'))
+                message = MIMEMultipart("alternative")
+                message.attach(MIMEText(body, "html"))
             else:
                 message = MIMEText(body)
 
-            message['to'] = to
-            message['subject'] = subject
+            message["to"] = to
+            message["subject"] = subject
 
             # Encode the message
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-            sent = self.service.users().messages().send(
-                userId='me',
-                body={'raw': raw}
-            ).execute()
+            sent = self.service.users().messages().send(userId="me", body={"raw": raw}).execute()
 
             logger.info(f"Email sent to {to}, message ID: {sent.get('id')}")
             return sent
@@ -273,46 +266,45 @@ class GmailClient:
 
         try:
             # Get original message for headers
-            original = self.service.users().messages().get(
-                userId='me',
-                id=message_id,
-                format='metadata',
-                metadataHeaders=['From', 'Subject', 'Message-ID']
-            ).execute()
+            original = (
+                self.service.users()
+                .messages()
+                .get(userId="me", id=message_id, format="metadata", metadataHeaders=["From", "Subject", "Message-ID"])
+                .execute()
+            )
 
-            headers = {h['name']: h['value'] for h in original.get('payload', {}).get('headers', [])}
+            headers = {h["name"]: h["value"] for h in original.get("payload", {}).get("headers", [])}
 
             # Build reply
             if html:
-                message = MIMEMultipart('alternative')
-                message.attach(MIMEText(body, 'html'))
+                message = MIMEMultipart("alternative")
+                message.attach(MIMEText(body, "html"))
             else:
                 message = MIMEText(body)
 
             # Extract email from "Name <email>" format
-            from_header = headers.get('From', '')
-            if '<' in from_header and '>' in from_header:
-                to_email = from_header[from_header.find('<')+1:from_header.find('>')]
+            from_header = headers.get("From", "")
+            if "<" in from_header and ">" in from_header:
+                to_email = from_header[from_header.find("<") + 1 : from_header.find(">")]
             else:
                 to_email = from_header
 
-            message['to'] = to_email
-            subject = headers.get('Subject', '')
-            if not subject.lower().startswith('re:'):
+            message["to"] = to_email
+            subject = headers.get("Subject", "")
+            if not subject.lower().startswith("re:"):
                 subject = f"Re: {subject}"
-            message['subject'] = subject
-            message['In-Reply-To'] = headers.get('Message-ID', '')
-            message['References'] = headers.get('Message-ID', '')
+            message["subject"] = subject
+            message["In-Reply-To"] = headers.get("Message-ID", "")
+            message["References"] = headers.get("Message-ID", "")
 
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-            sent = self.service.users().messages().send(
-                userId='me',
-                body={
-                    'raw': raw,
-                    'threadId': original.get('threadId')
-                }
-            ).execute()
+            sent = (
+                self.service.users()
+                .messages()
+                .send(userId="me", body={"raw": raw, "threadId": original.get("threadId")})
+                .execute()
+            )
 
             logger.info(f"Reply sent to {to_email}, message ID: {sent.get('id')}")
             return sent
@@ -327,9 +319,7 @@ class GmailClient:
 
         try:
             self.service.users().messages().modify(
-                userId='me',
-                id=message_id,
-                body={'removeLabelIds': ['UNREAD']}
+                userId="me", id=message_id, body={"removeLabelIds": ["UNREAD"]}
             ).execute()
             return True
         except Exception as e:
@@ -343,9 +333,7 @@ class GmailClient:
 
         try:
             self.service.users().messages().modify(
-                userId='me',
-                id=message_id,
-                body={'addLabelIds': ['UNREAD']}
+                userId="me", id=message_id, body={"addLabelIds": ["UNREAD"]}
             ).execute()
             return True
         except Exception as e:
@@ -359,9 +347,7 @@ class GmailClient:
 
         try:
             self.service.users().messages().modify(
-                userId='me',
-                id=message_id,
-                body={'removeLabelIds': ['INBOX']}
+                userId="me", id=message_id, body={"removeLabelIds": ["INBOX"]}
             ).execute()
             return True
         except Exception as e:
@@ -374,10 +360,7 @@ class GmailClient:
             return False
 
         try:
-            self.service.users().messages().trash(
-                userId='me',
-                id=message_id
-            ).execute()
+            self.service.users().messages().trash(userId="me", id=message_id).execute()
             return True
         except Exception as e:
             logger.error(f"Failed to trash email: {e}")
@@ -389,8 +372,8 @@ class GmailClient:
             return []
 
         try:
-            results = self.service.users().labels().list(userId='me').execute()
-            return results.get('labels', [])
+            results = self.service.users().labels().list(userId="me").execute()
+            return results.get("labels", [])
         except Exception as e:
             logger.error(f"Failed to get labels: {e}")
             return []

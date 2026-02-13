@@ -5,17 +5,20 @@ from typing import Optional
 
 try:
     from kubernetes import client, config
+
     K8S_AVAILABLE = True
 except ImportError:
     K8S_AVAILABLE = False
 
 try:
     from github import Auth, Github
+
     GITHUB_AVAILABLE = True
 except ImportError:
     GITHUB_AVAILABLE = False
 
 logger = logging.getLogger("SelfHealing")
+
 
 class SelfHealer:
     """
@@ -24,6 +27,7 @@ class SelfHealer:
     - Detects restart loops (CrashLoopBackOff)
     - Auto-creates GitHub issues for investigation
     """
+
     def __init__(self, github_token: Optional[str] = None, namespace: str = "default"):
         self.namespace = namespace
         self.github_token = github_token or os.getenv("GITHUB_TOKEN")
@@ -43,9 +47,7 @@ class SelfHealer:
                 self.apps_v1 = client.AppsV1Api()
                 self.is_active = True
             except Exception as e:
-                logger.warning(
-                    f"Failed to load K8s config ({e}). Self-healing disabled."
-                )
+                logger.warning(f"Failed to load K8s config ({e}). Self-healing disabled.")
                 self.is_active = False
         else:
             logger.warning("kubernetes library not installed. Self-healing disabled.")
@@ -86,9 +88,7 @@ class SelfHealer:
                     state = container.state
 
                     # Detection Logic
-                    is_crashing = (
-                        state.waiting and state.waiting.reason == "CrashLoopBackOff"
-                    ) or (
+                    is_crashing = (state.waiting and state.waiting.reason == "CrashLoopBackOff") or (
                         state.terminated and state.terminated.exit_code != 0
                     )
 
@@ -115,12 +115,9 @@ class SelfHealer:
             try:
                 repo = gh.get_repo("Unified-system-Core/Unified_System_Core")
             except Exception:
-                 repo = gh.get_repo("Unified-system-Core/AI_Core")
+                repo = gh.get_repo("Unified-system-Core/AI_Core")
 
-            title = (
-                f"[AUTO-HEAL] Pod {pod.metadata.name} crashing "
-                f"({container.restart_count} restarts)"
-            )
+            title = f"[AUTO-HEAL] Pod {pod.metadata.name} crashing ({container.restart_count} restarts)"
             body = (
                 f"**Pod:** `{pod.metadata.name}`\n"
                 f"**Namespace:** `{self.namespace}`\n"
@@ -134,21 +131,12 @@ class SelfHealer:
             issues = repo.get_issues(state="open", labels=["bug", "auto-heal"])
             for issue in issues:
                 if f"Pod {pod.metadata.name}" in issue.title:
-                    logger.info(
-                        f"Issue #{issue.number} already exists for {pod.metadata.name}"
-                    )
+                    logger.info(f"Issue #{issue.number} already exists for {pod.metadata.name}")
                     return
 
             # Create new
-            issue = repo.create_issue(
-                title=title,
-                body=body,
-                labels=["bug", "auto-heal", "sev-2"]
-            )
-            logger.info(
-                f"Created GitHub Issue #{issue.number} for crashing pod "
-                f"{pod.metadata.name}"
-            )
+            issue = repo.create_issue(title=title, body=body, labels=["bug", "auto-heal", "sev-2"])
+            logger.info(f"Created GitHub Issue #{issue.number} for crashing pod {pod.metadata.name}")
 
         except Exception as e:
             logger.error(f"Failed to create GitHub issue: {e}")

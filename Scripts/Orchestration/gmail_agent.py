@@ -31,9 +31,7 @@ except ImportError as e:
     sys.exit(1)
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("GmailAgent")
 
 
@@ -55,9 +53,7 @@ class GmailIntelligenceAgent:
         """Initialize Gmail client using Admin's credentials."""
         admin_user = self.db.get_user(self.admin_id)
         if not admin_user or not admin_user.get("google_creds"):
-            logger.error(
-                f"Admin user {self.admin_id} " "not found or has no Google credentials."
-            )
+            logger.error(f"Admin user {self.admin_id} not found or has no Google credentials.")
             return False
 
         creds_dict = json.loads(admin_user["google_creds"])
@@ -98,10 +94,7 @@ class GmailIntelligenceAgent:
         logger.info(f"Processing email: {subject} from {sender}")
 
         # Skip bot-generated "Bug" notifications that we've already handled
-        if (
-            "[BOT ERROR] Conflict" in subject
-            or "terminated by other getUpdates" in snippet
-        ):
+        if "[BOT ERROR] Conflict" in subject or "terminated by other getUpdates" in snippet:
             logger.info("Skipping known bot conflict notification.")
             return
 
@@ -127,9 +120,7 @@ Response format (JSON):
         try:
             response_text, _ = await self.inference.chat(
                 [{"role": "user", "content": prompt}],
-                system_prompt=(
-                    "You are a Mail Intelligence Agent. Analyze and categorize."
-                ),
+                system_prompt=("You are a Mail Intelligence Agent. Analyze and categorize."),
             )
 
             # Extract JSON from response
@@ -156,18 +147,13 @@ Response format (JSON):
             return
 
         # 2. Execute Action
-        if (
-            analysis.get("category")
-            and analysis["category"] in self.orchestrator.CATEGORIES
-        ):
+        if analysis.get("category") and analysis["category"] in self.orchestrator.CATEGORIES:
             # Dispatch to agent
             instruction = analysis.get("agent_instruction") or subject
             agent_name = self.orchestrator.find_agent_for_task(instruction)
             logger.info(f"Dispatching to agent {agent_name}: {analysis.get('summary')}")
 
-            result = await self.orchestrator.run(
-                agent_name, analysis.get("agent_instruction") or subject
-            )
+            result = await self.orchestrator.run(agent_name, analysis.get("agent_instruction") or subject)
 
             # Notify user of agent action
             msg = (

@@ -18,8 +18,20 @@ def scan_bills():
 
     # Keywords to search
     keywords = [
-        "invoice", "bill", "receipt", "payment", "счет", "квитанция", "оплата",
-        "Bezeq", "Partner", "Electric", "Arnona", "Water", "GCP", "Google Cloud"
+        "invoice",
+        "bill",
+        "receipt",
+        "payment",
+        "счет",
+        "квитанция",
+        "оплата",
+        "Bezeq",
+        "Partner",
+        "Electric",
+        "Arnona",
+        "Water",
+        "GCP",
+        "Google Cloud",
     ]
 
     # Search last 30 days
@@ -35,12 +47,13 @@ def scan_bills():
 
     print("\n📄 **Found Documents:**")
     for msg in messages:
-        subject = msg.get('subject', 'No Subject')
-        sender = msg.get('from', 'Unknown')
-        date = msg.get('date', '')
+        subject = msg.get("subject", "No Subject")
+        sender = msg.get("from", "Unknown")
+        date = msg.get("date", "")
 
         # Simple extraction (naive)
         print(f"- **{date[:10]}** | {sender}: {subject}")
+
 
 if __name__ == "__main__":
     scan_bills()

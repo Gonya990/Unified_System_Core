@@ -1,4 +1,3 @@
-
 import json
 import os
 import sqlite3
@@ -8,9 +7,10 @@ import requests
 
 # Configuration
 INDEX_FILE = "/home/gonya/Unified_System_Core/Projects/Content_Factory/config/knowledge_base_index.json"
-DB_PATH = "/home/gonya/storage.sqlite3" # The one we imported Facebook messages into
+DB_PATH = "/home/gonya/storage.sqlite3"  # The one we imported Facebook messages into
 OLLAMA_URL = "http://host.docker.internal:11434/api/generate"
-MODEL = "llama3.2" # Or gemini if configured
+MODEL = "llama3.2"  # Or gemini if configured
+
 
 def get_recent_topics(db_path, limit=50):
     """Extract potential topics from recent messages."""
@@ -27,69 +27,84 @@ def get_recent_topics(db_path, limit=50):
         print(f"⚠️ Could not read DB: {e}")
         return []
 
+
 def analyze_index(index_path):
     """Analyze file structure to guess content themes."""
     with open(index_path) as f:
         data = json.load(f)
 
-    docs = data.get('documents', [])
-    media = data.get('media_assets', [])
+    docs = data.get("documents", [])
+    media = data.get("media_assets", [])
 
     # Extract keywords from filenames
     keywords = []
     for item in docs + media:
-        name = item['filename'].lower()
+        name = item["filename"].lower()
         # Simple cleanup
-        name = os.path.splitext(name)[0].replace('_', ' ').replace('-', ' ')
+        name = os.path.splitext(name)[0].replace("_", " ").replace("-", " ")
         keywords.extend(name.split())
 
     # Filter common stop words (very basic)
-    stop_words = {'video', 'image', 'photo', 'chat', 'message', 'copy', 'of', 'the', 'and', 'json', 'html', 'txt', 'jpg', 'mp4'}
+    stop_words = {
+        "video",
+        "image",
+        "photo",
+        "chat",
+        "message",
+        "copy",
+        "of",
+        "the",
+        "and",
+        "json",
+        "html",
+        "txt",
+        "jpg",
+        "mp4",
+    }
     keywords = [w for w in keywords if w not in stop_words and len(w) > 3]
 
     common = Counter(keywords).most_common(20)
     return common, len(docs), len(media)
 
+
 def generate_prompt(topics, file_stats, message_samples):
     prompt = f"""
     You are 'Consilium', the AI Creative Director of the 'Unified System'.
-    
+
     **Objective:** Create a content plan for a video series (YouTube/Instagram/TikTok) based on the user's digital footprint.
-    
+
     **Data Analysis:**
     - **Total Documents:** {file_stats[1]}
     - **Total Media Assets:** {file_stats[2]} (Footage available for B-roll)
-    - **Top File Keywords:** {', '.join([t[0] for t in file_stats[0]])}
-    
+    - **Top File Keywords:** {", ".join([t[0] for t in file_stats[0]])}
+
     **Recent Context (User Messages):**
-    "{' ... '.join(message_samples[:10]).replace('\n', ' ')}"
-    
+    "{" ... ".join(message_samples[:10]).replace("\n", " ")}"
+
     **Task:**
     1. Identify 3 main "Content Pillars" based on this data (e.g., Tech/Coding, Personal Archive/Memories, Gaming/Lifestyle).
     2. Suggest **5 specific video episode ideas** for the coming week.
     3. For each episode, write a catchy title and a 1-sentence hook.
-    
+
     **Format:** Markdown. Be creative, bold, and energetic.
     """
     return prompt
 
+
 def query_llm(prompt):
-    payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
+    payload = {"model": MODEL, "prompt": prompt, "stream": False}
     try:
         # Try local Ollama (via host.docker.internal if inside docker, or localhost if undefined)
         # Since we run this script on the HOST (igor-gaming-1), use localhost
         url = "http://localhost:11434/api/generate"
         response = requests.post(url, json=payload)
         if response.status_code == 200:
-            return response.json().get('response', '')
+            return response.json().get("response", "")
         else:
             return f"Error from LLM: {response.text}"
     except Exception as e:
         return f"LLM Connection Failed: {e}"
+
 
 def main():
     print("🧠 Consilium: Analyzing data footprint...")
@@ -112,9 +127,9 @@ def main():
 
     plan = query_llm(prompt)
 
-    print("\n" + "="*40)
+    print("\n" + "=" * 40)
     print("🎬 CONSILIUM: CONTENT SERIES PLAN")
-    print("="*40 + "\n")
+    print("=" * 40 + "\n")
     print(plan)
 
     # Save plan
@@ -123,6 +138,7 @@ def main():
     with open(report_path, "w") as f:
         f.write(plan)
     print(f"\n✅ Plan saved to: {report_path}")
+
 
 if __name__ == "__main__":
     main()

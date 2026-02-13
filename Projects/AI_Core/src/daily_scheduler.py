@@ -7,6 +7,7 @@ from user_context_db import UserContextDB
 
 logger = logging.getLogger(__name__)
 
+
 class DailyScheduler:
     def __init__(self, application: Application, db: UserContextDB, inference=None):
         self.application = application
@@ -43,7 +44,7 @@ class DailyScheduler:
         inactive_users = self.db.get_inactive_users(hours=72)
         for user in inactive_users:
             try:
-                user_id = user['user_id']
+                user_id = user["user_id"]
 
                 # Get some context for a better nudge
                 memories = self.db.get_memories(user_id, limit=3)
@@ -56,7 +57,9 @@ class DailyScheduler:
                         "Generate a short, friendly nudge (1-2 sentences) to re-engage them, "
                         "referencing one of the facts if possible. Be professional yet warm."
                     )
-                    nudge_text, _ = await self.inference.chat([{"role": "user", "content": prompt}], system_prompt="You are a helpful assistant.")
+                    nudge_text, _ = await self.inference.chat(
+                        [{"role": "user", "content": prompt}], system_prompt="You are a helpful assistant."
+                    )
                 else:
                     nudge_text = (
                         f"Hi {user['full_name']}! 👋 We haven't spoken in a few days. "
@@ -82,9 +85,9 @@ class DailyScheduler:
         # Ideally, use user's timezone.
         if now.hour == 7 and now.minute == 0:
             logger.info("Seven AM! Sending daily briefs.")
-            users = self.db.list_users() # Assuming this exists or we fetch from config
+            users = self.db.list_users()  # Assuming this exists or we fetch from config
             for user in users:
-                await self.send_daily_brief(user['user_id'])
+                await self.send_daily_brief(user["user_id"])
 
     async def send_daily_brief(self, user_id):
         # Implementation to be connected to /brief logic

@@ -16,11 +16,7 @@ def print_section(title):
 
 
 def create_optimization_config(
-    model_path,
-    output_dir="optimized_model",
-    target_device="gpu",
-    enable_fp16=True,
-    enable_quantization=False
+    model_path, output_dir="optimized_model", target_device="gpu", enable_fp16=True, enable_quantization=False
 ):
     """
     Создание конфигурации оптимизации для Olive
@@ -34,16 +30,8 @@ def create_optimization_config(
     """
 
     config = {
-        "input_model": {
-            "type": "OnnxModel",
-            "model_path": str(model_path)
-        },
-        "systems": {
-            "local_system": {
-                "type": "LocalSystem",
-                "accelerators": []
-            }
-        },
+        "input_model": {"type": "OnnxModel", "model_path": str(model_path)},
+        "systems": {"local_system": {"type": "LocalSystem", "accelerators": []}},
         "evaluators": {
             "common_evaluator": {
                 "metrics": [
@@ -53,73 +41,50 @@ def create_optimization_config(
                         "sub_types": [
                             {"name": "avg", "priority": 1},
                             {"name": "max", "priority": 2},
-                            {"name": "min", "priority": 3}
+                            {"name": "min", "priority": 3},
                         ],
-                        "user_config": {
-                            "io_bind": True
-                        }
+                        "user_config": {"io_bind": True},
                     }
                 ]
             }
         },
         "passes": {},
         "engine": {
-            "search_strategy": {
-                "execution_order": "joint",
-                "search_algorithm": "exhaustive"
-            },
+            "search_strategy": {"execution_order": "joint", "search_algorithm": "exhaustive"},
             "evaluator": "common_evaluator",
             "target": "local_system",
             "cache_dir": "cache",
-            "output_dir": output_dir
-        }
+            "output_dir": output_dir,
+        },
     }
 
     # Настройка для GPU
     if target_device == "gpu":
-        config["systems"]["local_system"]["accelerators"].append({
-            "device": "gpu",
-            "execution_providers": [
-                "TensorrtExecutionProvider",
-                "CUDAExecutionProvider"
-            ]
-        })
+        config["systems"]["local_system"]["accelerators"].append(
+            {"device": "gpu", "execution_providers": ["TensorrtExecutionProvider", "CUDAExecutionProvider"]}
+        )
 
         # Оптимизация графа для GPU
-        config["passes"]["optimize"] = {
-            "type": "OrtTransformersOptimization",
-            "disable_search": True
-        }
+        config["passes"]["optimize"] = {"type": "OrtTransformersOptimization", "disable_search": True}
 
         # FP16 конверсия
         if enable_fp16:
-            config["passes"]["convert_to_fp16"] = {
-                "type": "OnnxFloatToFloat16"
-            }
+            config["passes"]["convert_to_fp16"] = {"type": "OnnxFloatToFloat16"}
 
         # Квантование (опционально)
         if enable_quantization:
-            config["passes"]["quantization"] = {
-                "type": "OnnxDynamicQuantization",
-                "weight_type": "QUInt8"
-            }
+            config["passes"]["quantization"] = {"type": "OnnxDynamicQuantization", "weight_type": "QUInt8"}
 
     # Настройка для CPU
     elif target_device == "cpu":
-        config["systems"]["local_system"]["accelerators"].append({
-            "device": "cpu",
-            "execution_providers": ["CPUExecutionProvider"]
-        })
+        config["systems"]["local_system"]["accelerators"].append(
+            {"device": "cpu", "execution_providers": ["CPUExecutionProvider"]}
+        )
 
-        config["passes"]["optimize"] = {
-            "type": "OrtTransformersOptimization"
-        }
+        config["passes"]["optimize"] = {"type": "OrtTransformersOptimization"}
 
         # Динамическое квантование для CPU
-        config["passes"]["quantization"] = {
-            "type": "OnnxDynamicQuantization",
-            "weight_type": "QInt8"
-        }
+        config["passes"]["quantization"] = {"type": "OnnxDynamicQuantization", "weight_type": "QInt8"}
 
     return config
 
@@ -149,11 +114,11 @@ def optimize_model(model_path, config_path=None, output_dir="optimized_model"):
             output_dir=output_dir,
             target_device="gpu",
             enable_fp16=True,
-            enable_quantization=False
+            enable_quantization=False,
         )
 
         config_path = "temp_olive_config.json"
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             json.dump(config, f, indent=2)
 
         print(f"  ✓ Конфигурация сохранена: {config_path}")
@@ -211,13 +176,11 @@ def compare_models(original_path, optimized_path):
         # Загружаем обе модели
         print("  Загрузка моделей...")
         original_session = ort.InferenceSession(
-            original_path,
-            providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
+            original_path, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
         )
 
         optimized_session = ort.InferenceSession(
-            optimized_path,
-            providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
+            optimized_path, providers=["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider"]
         )
 
         # Получаем информацию о входе
@@ -268,11 +231,11 @@ def compare_models(original_path, optimized_path):
         print_section("Результаты сравнения")
         print("  Оригинальная модель:")
         print(f"    Среднее время: {original_avg:.2f} ms")
-        print(f"    Throughput: {1000/original_avg:.2f} inferences/sec")
+        print(f"    Throughput: {1000 / original_avg:.2f} inferences/sec")
 
         print("\n  Оптимизированная модель:")
         print(f"    Среднее время: {optimized_avg:.2f} ms")
-        print(f"    Throughput: {1000/optimized_avg:.2f} inferences/sec")
+        print(f"    Throughput: {1000 / optimized_avg:.2f} inferences/sec")
 
         print(f"\n  Ускорение: {speedup:.2f}x")
 
@@ -291,49 +254,14 @@ def compare_models(original_path, optimized_path):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Оптимизация ONNX модели с помощью Olive"
-    )
-    parser.add_argument(
-        "--model",
-        type=str,
-        help="Путь к ONNX модели для оптимизации"
-    )
-    parser.add_argument(
-        "--config",
-        type=str,
-        default=None,
-        help="Путь к конфигурации Olive (опционально)"
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default="optimized_model",
-        help="Папка для сохранения результатов"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="gpu",
-        choices=["gpu", "cpu", "npu"],
-        help="Целевое устройство"
-    )
-    parser.add_argument(
-        "--fp16",
-        action="store_true",
-        help="Использовать FP16 precision"
-    )
-    parser.add_argument(
-        "--quantize",
-        action="store_true",
-        help="Применить квантование"
-    )
-    parser.add_argument(
-        "--compare",
-        type=str,
-        default=None,
-        help="Путь к оптимизированной модели для сравнения"
-    )
+    parser = argparse.ArgumentParser(description="Оптимизация ONNX модели с помощью Olive")
+    parser.add_argument("--model", type=str, help="Путь к ONNX модели для оптимизации")
+    parser.add_argument("--config", type=str, default=None, help="Путь к конфигурации Olive (опционально)")
+    parser.add_argument("--output", type=str, default="optimized_model", help="Папка для сохранения результатов")
+    parser.add_argument("--device", type=str, default="gpu", choices=["gpu", "cpu", "npu"], help="Целевое устройство")
+    parser.add_argument("--fp16", action="store_true", help="Использовать FP16 precision")
+    parser.add_argument("--quantize", action="store_true", help="Применить квантование")
+    parser.add_argument("--compare", type=str, default=None, help="Путь к оптимизированной модели для сравнения")
 
     args = parser.parse_args()
 
@@ -366,11 +294,7 @@ def main():
 
     # Оптимизация модели
     if args.compare is None:
-        success = optimize_model(
-            model_path=args.model,
-            config_path=args.config,
-            output_dir=args.output
-        )
+        success = optimize_model(model_path=args.model, config_path=args.config, output_dir=args.output)
 
         if success:
             print("\n  Следующие шаги:")

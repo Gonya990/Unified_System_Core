@@ -2,6 +2,7 @@
 Yandex Alice Skill Handler for AI Telegram Bot.
 Handles incoming webhook requests from Yandex Dialogs.
 """
+
 import logging
 from collections.abc import Awaitable
 from typing import Callable
@@ -9,6 +10,7 @@ from typing import Callable
 from aiohttp import web
 
 logger = logging.getLogger(__name__)
+
 
 class AliceSkill:
     def __init__(self, port: int = 8090):
@@ -44,13 +46,7 @@ class AliceSkill:
             data = await request.json()
             logger.info(f"Alice request: {data}")
 
-            response = {
-                "version": data["version"],
-                "session": data["session"],
-                "response": {
-                    "end_session": False
-                }
-            }
+            response = {"version": data["version"], "session": data["session"], "response": {"end_session": False}}
 
             req = data.get("request", {})
             command = req.get("command", "")
@@ -63,8 +59,8 @@ class AliceSkill:
                 return web.json_response(response)
 
             if not command:
-                 response["response"]["text"] = "Привет! Я Гоня. Что нужно сделать?"
-                 return web.json_response(response)
+                response["response"]["text"] = "Привет! Я Гоня. Что нужно сделать?"
+                return web.json_response(response)
 
             # Delegate to main handler
             if self.command_handler:
@@ -73,8 +69,8 @@ class AliceSkill:
                     # For now using a fixed ID or similar logic
 
                     # Execute command
-                    result_text = await self.command_handler(command, 0) # 0 = system/alice user
-                    response["response"]["text"] = result_text[:1024] # Alice limit
+                    result_text = await self.command_handler(command, 0)  # 0 = system/alice user
+                    response["response"]["text"] = result_text[:1024]  # Alice limit
                 except Exception as e:
                     logger.error(f"Alice handler error: {e}")
                     response["response"]["text"] = "Произошла ошибка при выполнении команды."

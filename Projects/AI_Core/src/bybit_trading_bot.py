@@ -3,6 +3,7 @@
 ByBit + Telegram Crypto Trading Bot
 Реальная торговля с ОЧЕНЬ консервативной стратегией
 """
+
 import argparse
 import asyncio
 import logging
@@ -28,9 +29,7 @@ if os.path.exists(args.env):
 else:
     load_dotenv()
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -111,9 +110,7 @@ class ByBitTradingBot:
             logger.error("pybit not installed")
             return 0.0
         try:
-            session = HTTP(
-                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
-            )
+            session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
 
             result = session.get_wallet_balance(accountType="UNIFIED", coin="USDT")
 
@@ -161,9 +158,7 @@ class ByBitTradingBot:
             session = HTTP(testnet=self.testnet)
 
             # Get kline data (1 hour candles, last 50)
-            result = session.get_kline(
-                category="spot", symbol=symbol, interval="60", limit=50
-            )
+            result = session.get_kline(category="spot", symbol=symbol, interval="60", limit=50)
 
             if result["retCode"] != 0:
                 return None
@@ -179,10 +174,7 @@ class ByBitTradingBot:
             sma_long = sum(closes[-30:]) / 30
             current_price = closes[-1]
 
-            logger.info(
-                f"Market: RSI={rsi:.1f}, SMA_short={sma_short:.4f}, "
-                f"SMA_long={sma_long:.4f}"
-            )
+            logger.info(f"Market: RSI={rsi:.1f}, SMA_short={sma_short:.4f}, SMA_long={sma_long:.4f}")
 
             # Trading signals
             if rsi < 35 and current_price < sma_long * 0.98:
@@ -229,9 +221,7 @@ class ByBitTradingBot:
         # Ensure quantity is rounded (Spot TONUSDT usually 2 decimal places)
         formatted_qty = f"{quantity:.2f}"
         try:
-            session = HTTP(
-                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
-            )
+            session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
 
             kwargs = {
                 "category": "spot",
@@ -253,20 +243,12 @@ class ByBitTradingBot:
                 order_id = result["result"]["orderId"]
                 logger.info(f"Order placed: {side} {quantity} {symbol}, ID: {order_id}")
 
-                action_name = (
-                    "RECOMMENDATION" if self.monitor_only else "Order Executed"
-                )
+                action_name = "RECOMMENDATION" if self.monitor_only else "Order Executed"
                 notif_suffix = (
-                    "Recommendation only - no real trade placed."
-                    if self.monitor_only
-                    else f"Order ID: {order_id}"
+                    "Recommendation only - no real trade placed." if self.monitor_only else f"Order ID: {order_id}"
                 )
                 await self.notify(
-                    f"✅ **{action_name}**\n"
-                    f"Action: {side}\n"
-                    f"Symbol: {symbol}\n"
-                    f"Quantity: {quantity}\n"
-                    f"{notif_suffix}"
+                    f"✅ **{action_name}**\nAction: {side}\nSymbol: {symbol}\nQuantity: {quantity}\n{notif_suffix}"
                 )
 
                 return True
@@ -295,17 +277,11 @@ class ByBitTradingBot:
 
                 # Check against exchange minimum (5 USDT)
                 if trade_amount < self.min_order_value:
-                    logger.warning(
-                        f"Trade amount ${trade_amount:.2f} too low. "
-                        f"Using minimum ${self.min_order_value}"
-                    )
+                    logger.warning(f"Trade amount ${trade_amount:.2f} too low. Using minimum ${self.min_order_value}")
                     trade_amount = self.min_order_value
 
                 if trade_amount > self.balance:
-                    logger.error(
-                        f"Balance ${self.balance:.2f} too low for "
-                        f"minimum order ${trade_amount:.2f}"
-                    )
+                    logger.error(f"Balance ${self.balance:.2f} too low for minimum order ${trade_amount:.2f}")
                     return
 
                 quantity = round(trade_amount / price, 2)
@@ -399,9 +375,9 @@ class ByBitTradingBot:
         await self.notify(
             "🚀 **Trading Bot Started**\n\n"
             f"Mode: {'TESTNET' if self.testnet else 'LIVE'}\n"
-            f"Max trade: {self.max_trade_percent*100}%\n"
-            f"Stop-loss: {self.stop_loss_percent*100}%\n"
-            f"Take-profit: {self.take_profit_percent*100}%\n"
+            f"Max trade: {self.max_trade_percent * 100}%\n"
+            f"Stop-loss: {self.stop_loss_percent * 100}%\n"
+            f"Take-profit: {self.take_profit_percent * 100}%\n"
             f"Max trades/day: {self.max_trades_per_day}\n"
             "Strategy: RSI + Moving Average"
         )
@@ -423,10 +399,7 @@ class ByBitTradingBot:
                     # Only notify once every 24 hours
                     should_notify = (
                         self.last_notified_low_balance is None
-                        or (
-                            now - self.last_notified_low_balance
-                        ).total_seconds()
-                        > 86400
+                        or (now - self.last_notified_low_balance).total_seconds() > 86400
                     )
 
                     if should_notify:
@@ -472,7 +445,7 @@ class ByBitTradingBot:
             "🛑 **Bot Stopped**\n\n"
             f"Total trades: {self.total_trades}\n"
             f"Winning: {self.winning_trades}\n"
-            f"Win rate: {self.winning_trades/max(1,self.total_trades)*100:.1f}%\n"
+            f"Win rate: {self.winning_trades / max(1, self.total_trades) * 100:.1f}%\n"
             f"Total profit: ${self.total_profit:+.2f}"
         )
 

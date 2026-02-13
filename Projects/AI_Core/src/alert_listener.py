@@ -11,14 +11,15 @@ from google.cloud import pubsub_v1  # noqa: E402
 
 logger = logging.getLogger("AlertListener")
 
+
 class AlertListener:
     def __init__(self, project_id, subscription_id):
         self.project_id = project_id
         # Use full path if provided, else construct it
         if "/" in subscription_id:
-             self.subscription_path = subscription_id
+            self.subscription_path = subscription_id
         else:
-             self.subscription_path = f"projects/{project_id}/subscriptions/{subscription_id}"
+            self.subscription_path = f"projects/{project_id}/subscriptions/{subscription_id}"
         self.subscriber = None
         self.streaming_pull_future = None
 
@@ -47,9 +48,7 @@ class AlertListener:
                     logger.error(f"Error processing alert: {e}")
                     message.nack()
 
-            self.streaming_pull_future = self.subscriber.subscribe(
-                self.subscription_path, callback=sync_callback
-            )
+            self.streaming_pull_future = self.subscriber.subscribe(self.subscription_path, callback=sync_callback)
         except Exception as e:
             logger.error(f"Failed to start AlertListener: {e}")
 
@@ -58,4 +57,3 @@ class AlertListener:
             self.streaming_pull_future.cancel()
         if self.subscriber:
             self.subscriber.close()
-

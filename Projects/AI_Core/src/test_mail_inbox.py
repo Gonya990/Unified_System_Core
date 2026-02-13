@@ -14,13 +14,9 @@ def main():
         "method": "tools/call",
         "params": {
             "name": "fetch_inbox",
-            "arguments": {
-                "project_key": project_key,
-                "agent_name": agent_name,
-                "limit": 10
-            }
+            "arguments": {"project_key": project_key, "agent_name": agent_name, "limit": 10},
         },
-        "id": 1
+        "id": 1,
     }
 
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -30,6 +26,7 @@ def main():
         print(json.dumps(res.json(), indent=2))
     except Exception as e:
         print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     main()

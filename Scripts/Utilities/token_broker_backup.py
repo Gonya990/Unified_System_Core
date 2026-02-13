@@ -49,9 +49,7 @@ class TokenBroker:
         # Master Key from ENV or provided
         self.master_key = (
             master_key
-            or os.getenv(
-                "AGENT_MAIL_TOKEN", "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb"
-            )
+            or os.getenv("AGENT_MAIL_TOKEN", "c2bb2cf043ec2ae56a0dec69024e6129eb5cde36a22bddb93afcfa2e71e72afb")
         ).encode()
 
         self.key_store: dict[str, list[dict]] = {}
@@ -75,9 +73,7 @@ class TokenBroker:
         )
         return kdf.derive(self.master_key)
 
-    def get_key(
-        self, provider: str, tier: str = None, session_id: str = None
-    ) -> Optional[str]:
+    def get_key(self, provider: str, tier: str = None, session_id: str = None) -> Optional[str]:
         """
         Get a valid API Key for the provider using Round-Robin and Health Checks.
         Supports session stickiness.
@@ -87,14 +83,10 @@ class TokenBroker:
         # 1. Sticky Session Check
         if session_id and session_id in self._session_sticky_keys:
             sticky_key = self._session_sticky_keys[session_id]
-            if sticky_key not in self._blacklist or (
-                time.time() - self._blacklist[sticky_key] > self._blacklist_ttl
-            ):
+            if sticky_key not in self._blacklist or (time.time() - self._blacklist[sticky_key] > self._blacklist_ttl):
                 return sticky_key
             else:
-                logger.warning(
-                    f"TokenBroker: Sticky key for session '{session_id}' is blacklisted. Falling back."
-                )
+                logger.warning(f"TokenBroker: Sticky key for session '{session_id}' is blacklisted. Falling back.")
                 del self._session_sticky_keys[session_id]
 
         pool = self.key_store.get(provider, [])
@@ -111,10 +103,7 @@ class TokenBroker:
             k
             for k in pool
             if k.get("key")
-            and (
-                k["key"] not in self._blacklist
-                or (now - self._blacklist[k["key"]] > self._blacklist_ttl)
-            )
+            and (k["key"] not in self._blacklist or (now - self._blacklist[k["key"]] > self._blacklist_ttl))
         ]
 
         if not valid_pool:
@@ -288,10 +277,7 @@ class TokenBroker:
                 1
                 for k in pool
                 if k.get("key")
-                and (
-                    k["key"] not in self._blacklist
-                    or (now - self._blacklist.get(k["key"], 0) > self._blacklist_ttl)
-                )
+                and (k["key"] not in self._blacklist or (now - self._blacklist.get(k["key"], 0) > self._blacklist_ttl))
             )
             result[provider] = {"total": len(pool), "active": active}
         return result
@@ -347,11 +333,11 @@ class TokenBroker:
         rbac_path = os.path.expanduser("~/.config/unified-system/rbac.yaml")
         policy = {}
         if os.path.exists(rbac_path):
-             try:
-                 with open(rbac_path) as f:
-                     policy = yaml.safe_load(f) or {}
-             except Exception:
-                 pass
+            try:
+                with open(rbac_path) as f:
+                    policy = yaml.safe_load(f) or {}
+            except Exception:
+                pass
 
         agent_role = policy.get("agents", {}).get(agent_name, "worker")
 
@@ -361,7 +347,7 @@ class TokenBroker:
         if tier == "pro" or tier == "tier1":
             return agent_role in ["admin", "pro_agent"]
 
-        return True # Default access for free/standard
+        return True  # Default access for free/standard
 
 
 if __name__ == "__main__":

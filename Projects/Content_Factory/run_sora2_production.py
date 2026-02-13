@@ -3,6 +3,7 @@
 Quick production run using multi-source research
 Based on Sora 2 script idea (Viral Potential: 9/10)
 """
+
 import json
 import sys
 from datetime import datetime
@@ -20,7 +21,7 @@ from daily_researcher import generate_vision_assets
 
 # Load latest multi-source research
 reports_dir = ROOT_DIR / "Reports"
-report_files = sorted(reports_dir.glob('multi_source_research_*.json'))
+report_files = sorted(reports_dir.glob("multi_source_research_*.json"))
 if not report_files:
     print("❌ No research reports found")
     sys.exit(1)
@@ -32,7 +33,7 @@ with open(latest_report) as f:
     research_data = json.load(f)
 
 # Get Sora 2 script idea (index 1, Viral Potential: 9/10)
-script_idea = research_data['script_ideas'][1]
+script_idea = research_data["script_ideas"][1]
 
 print("\n🎬 SELECTED SCRIPT IDEA:")
 print(f"Title: {script_idea['Title']}")
@@ -41,9 +42,9 @@ print()
 
 # Prepare content for production
 content_data = {
-    'selected_topic': script_idea['Title'],
-    'description': script_idea['Hook'],
-    'script_ru': '''
+    "selected_topic": script_idea["Title"],
+    "description": script_idea["Hook"],
+    "script_ru": """
 Стоп! Собираешься платить 200 долларов за Sora 2?
 
 Есть способ получить безлимитный доступ... абсолютно бесплатно.
@@ -77,18 +78,18 @@ Sora 2 от OpenAI - революция в генерации видео. Кач
 Будь адекватен. Это момент истины... для всего сообщества.
 
 Творцы новой реальности... это мы.
-''',
-    'scenes': [
-        {'image': 'sora2_scene1', 'keyword': 'futuristic ai video generation sora 2 interface glowing'},
-        {'image': 'sora2_scene2', 'keyword': 'expensive subscription money cash dollars price tag'},
-        {'image': 'sora2_scene3', 'keyword': 'free unlimited access digital freedom liberation light'},
-        {'image': 'sora2_scene4', 'keyword': 'temporary email service web browser interface'},
-        {'image': 'sora2_scene5', 'keyword': 'ai neural network video creation technology'},
-        {'image': 'sora2_scene6', 'keyword': 'youtube shorts viral content success engagement'},
-        {'image': 'sora2_scene7', 'keyword': 'quality enhancement upscale 4k crystal clear'},
-        {'image': 'sora2_scene8', 'keyword': 'responsibility ethics digital citizenship'},
-        {'image': 'sora2_scene9', 'keyword': 'creative innovation future technology vision'}
-    ]
+""",
+    "scenes": [
+        {"image": "sora2_scene1", "keyword": "futuristic ai video generation sora 2 interface glowing"},
+        {"image": "sora2_scene2", "keyword": "expensive subscription money cash dollars price tag"},
+        {"image": "sora2_scene3", "keyword": "free unlimited access digital freedom liberation light"},
+        {"image": "sora2_scene4", "keyword": "temporary email service web browser interface"},
+        {"image": "sora2_scene5", "keyword": "ai neural network video creation technology"},
+        {"image": "sora2_scene6", "keyword": "youtube shorts viral content success engagement"},
+        {"image": "sora2_scene7", "keyword": "quality enhancement upscale 4k crystal clear"},
+        {"image": "sora2_scene8", "keyword": "responsibility ethics digital citizenship"},
+        {"image": "sora2_scene9", "keyword": "creative innovation future technology vision"},
+    ],
 }
 
 print(f"📝 Script: {len(content_data['script_ru'].split())} words")
@@ -96,7 +97,7 @@ print(f"🎨 Scenes: {len(content_data['scenes'])} visuals")
 print()
 
 # Generate visual assets
-day_str = datetime.now().strftime('%Y-%m-%d')
+day_str = datetime.now().strftime("%Y-%m-%d")
 assets_dir = ROOT_DIR / "Local_Dev" / "Media" / "sora2_production" / day_str
 assets_dir.mkdir(parents=True, exist_ok=True)
 
@@ -104,12 +105,12 @@ print(f"🎨 Generating visual assets in {assets_dir}...")
 print()
 
 try:
-    assets = generate_vision_assets(content_data['scenes'], assets_dir, style="impact")
+    assets = generate_vision_assets(content_data["scenes"], assets_dir, style="impact")
 
     final_scenes = []
     for a in assets:
-        if a.get('resolved_path'):
-            final_scenes.append({"image": a['resolved_path'], "keyword": a['keyword']})
+        if a.get("resolved_path"):
+            final_scenes.append({"image": a["resolved_path"], "keyword": a["keyword"]})
 
     print(f"\n✅ Assets ready: {len(final_scenes)}/{len(content_data['scenes'])} scenes downloaded")
 
@@ -119,16 +120,16 @@ try:
 
     # Save production config
     production_config = {
-        'timestamp': datetime.now().isoformat(),
-        'research_source': latest_report.name,
-        'script_idea': script_idea,
-        'content': content_data,
-        'assets': final_scenes,
-        'status': 'assets_ready'
+        "timestamp": datetime.now().isoformat(),
+        "research_source": latest_report.name,
+        "script_idea": script_idea,
+        "content": content_data,
+        "assets": final_scenes,
+        "status": "assets_ready",
     }
 
     config_path = assets_dir / "production_config.json"
-    with open(config_path, 'w') as f:
+    with open(config_path, "w") as f:
         json.dump(production_config, f, indent=2, ensure_ascii=False)
 
     print(f"\n💾 Production config saved: {config_path}")
@@ -144,4 +145,5 @@ try:
 except Exception as e:
     print(f"❌ Error: {e}")
     import traceback
+
     traceback.print_exc()

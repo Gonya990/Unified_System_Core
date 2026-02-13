@@ -2,6 +2,7 @@
 Health Check Server for AI Telegram Bot.
 Provides /health endpoint for container orchestration.
 """
+
 import json
 import logging
 import threading
@@ -55,6 +56,7 @@ class HealthHandler(BaseHTTPRequestHandler):
 
 class ReuseAddrHTTPServer(HTTPServer):
     """HTTPServer with SO_REUSEADDR to allow quick restarts."""
+
     allow_reuse_address = True
 
 
@@ -77,8 +79,10 @@ def start_health_server(port: int = 8080, health_callback: Optional[Callable[[],
         if "Address already in use" in str(e):
             logger.warning(f"Port {port} in use, trying to kill existing process...")
             import subprocess
+
             subprocess.run(["fuser", "-k", f"{port}/tcp"], capture_output=True)
             import time
+
             time.sleep(1)
             server = ReuseAddrHTTPServer(("0.0.0.0", port), HealthHandler)
         else:

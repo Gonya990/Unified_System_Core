@@ -7,11 +7,11 @@ import telebot
 from dotenv import load_dotenv
 
 # Setup paths
-ROOT_DIR = Path('/home/gonya/Unified_System_Core')
-SRC_DIR = Path('/home/gonya/Unified_System_Core/Projects/Content_Factory/src')
+ROOT_DIR = Path("/home/gonya/Unified_System_Core")
+SRC_DIR = Path("/home/gonya/Unified_System_Core/Projects/Content_Factory/src")
 sys.path.insert(0, str(SRC_DIR))
-sys.path.insert(0, str(SRC_DIR / 'pipeline'))
-sys.path.insert(0, str(SRC_DIR / 'uploaders'))
+sys.path.insert(0, str(SRC_DIR / "pipeline"))
+sys.path.insert(0, str(SRC_DIR / "uploaders"))
 
 import orchestrator_v3_no_face as orchestrator
 
@@ -22,12 +22,13 @@ try:
 except ImportError as e:
     print(f"⚠️ Warning: Could not import uploaders: {e}")
 
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR / 'Projects/AI_Core/.env', override=True)
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
+
 
 def upload_telegram(video_path, caption):
-    token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = os.getenv('TELEGRAM_ADMIN_CHAT_ID')
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_ADMIN_CHAT_ID")
     if not token or not chat_id:
         print("❌ Telegram credentials missing")
         return
@@ -35,17 +36,18 @@ def upload_telegram(video_path, caption):
     print(f"📤 Posting to Telegram {chat_id}...")
     try:
         bot = telebot.TeleBot(token)
-        with open(video_path, 'rb') as v:
-            bot.send_video(chat_id, v, caption=caption, parse_mode='Markdown')
+        with open(video_path, "rb") as v:
+            bot.send_video(chat_id, v, caption=caption, parse_mode="Markdown")
         print("✅ Posted to Telegram")
     except Exception as e:
         print(f"❌ Telegram Upload Error: {e}")
 
+
 def run():
     print("🏭 CONTENT FACTORY V5: FULL ASSAULT MODE")
 
-    day_str = datetime.datetime.now().strftime('%Y-%m-%d')
-    assets_dir = ROOT_DIR / 'Local_Dev' / 'Media' / 'daily_auto' / day_str
+    day_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    assets_dir = ROOT_DIR / "Local_Dev" / "Media" / "daily_auto" / day_str
     assets_dir.mkdir(parents=True, exist_ok=True)
 
     # Script: The Infinite Game
@@ -74,34 +76,31 @@ Unified System Core. Архитектура вашего бессмертия.
 #Business2026 #AI #UnifiedSystem #Strategy #Wealth"""
 
     scenes = [
-         {'image': 'scene_infinite_1', 'keyword': 'marathon runner silhouette sunrise epic slow motion'},
-         {'image': 'scene_infinite_2', 'keyword': 'futuristic server room data stream endless'},
-         {'image': 'scene_infinite_3', 'keyword': 'simon sinek style lecture ted talk silhouette'},
-         {'image': 'scene_infinite_4', 'keyword': 'digital brain neural network glowing infinite loop'},
-         {'image': 'scene_infinite_5', 'keyword': 'business man looking at horizon city future timeline'},
-         {'image': 'scene_infinite_6', 'keyword': 'immortal digital construct geometric abstract'}
+        {"image": "scene_infinite_1", "keyword": "marathon runner silhouette sunrise epic slow motion"},
+        {"image": "scene_infinite_2", "keyword": "futuristic server room data stream endless"},
+        {"image": "scene_infinite_3", "keyword": "simon sinek style lecture ted talk silhouette"},
+        {"image": "scene_infinite_4", "keyword": "digital brain neural network glowing infinite loop"},
+        {"image": "scene_infinite_5", "keyword": "business man looking at horizon city future timeline"},
+        {"image": "scene_infinite_6", "keyword": "immortal digital construct geometric abstract"},
     ]
 
     orchestrator.INPUT_DIR = assets_dir
     orchestrator.OUTPUT_DIR = assets_dir
-    orchestrator.BROLL_DIR = ROOT_DIR / 'broll'
+    orchestrator.BROLL_DIR = ROOT_DIR / "broll"
 
     # Force Pexels Key
-    os.environ['PEXELS_API_KEY'] = "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
+    os.environ["PEXELS_API_KEY"] = "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
 
     print("🚀 Generating Daily Content: 'The Infinite Game'...")
 
     # Generate Assets
     from daily_researcher import generate_vision_assets
+
     generate_vision_assets(scenes, assets_dir, style="cinematic_impact")
 
     # Pipeline
     final_video = orchestrator.run_no_face_pipeline(
-        text=script_ru,
-        lang="ru",
-        scenes=scenes,
-        output_name="daily_infinite_game",
-        style="impact"
+        text=script_ru, lang="ru", scenes=scenes, output_name="daily_infinite_game", style="impact"
     )
 
     if final_video and os.path.exists(final_video):
@@ -109,25 +108,25 @@ Unified System Core. Архитектура вашего бессмертия.
         print(f"✅ Video Ready: {final_video_path}")
 
         # 1. Telegram
-        if os.getenv('AUTO_POST_TELEGRAM') == 'True':
+        if os.getenv("AUTO_POST_TELEGRAM") == "True":
             upload_telegram(final_video_path, caption_full)
 
         # 2. YouTube
-        if os.getenv('AUTO_POST_YOUTUBE') == 'True':
+        if os.getenv("AUTO_POST_YOUTUBE") == "True":
             print("")
             try:
                 youtube_uploader.upload_video(
                     final_video_path,
                     title="Бесконечная Игра: Бизнес Стратегия 2026 ♾️",
                     description=caption_full + "\n\nGenerated by AI Content Factory.",
-                    tags=['Business', 'AI', 'Strategy', '2026', 'Success'],
-                    privacy_status='public'
+                    tags=["Business", "AI", "Strategy", "2026", "Success"],
+                    privacy_status="public",
                 )
             except Exception as e:
                 print(f"❌ YouTube Error: {e}")
 
         # 3. Instagram
-        if os.getenv('AUTO_POST_INSTAGRAM') == 'True':
+        if os.getenv("AUTO_POST_INSTAGRAM") == "True":
             print("")
             try:
                 insta_uploader_v2.upload_reel(final_video_path, caption_full)
@@ -137,5 +136,6 @@ Unified System Core. Архитектура вашего бессмертия.
     else:
         print("❌ Generation Failed")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

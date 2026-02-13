@@ -1,4 +1,3 @@
-
 import sys
 
 
@@ -6,6 +5,7 @@ def test_factory():
     print("Checking dependencies...")
     try:
         import torch
+
         print(f"✅ PyTorch: {torch.__version__} (CUDA: {torch.cuda.is_available()})")
     except ImportError:
         print("❌ PyTorch missing")
@@ -13,6 +13,7 @@ def test_factory():
 
     try:
         from TTS.api import TTS
+
         print("✅ Coqui TTS imported")
     except ImportError as e:
         print(f"❌ Coqui TTS missing: {e}")
@@ -20,6 +21,7 @@ def test_factory():
 
     try:
         import moviepy
+
         print("✅ MoviePy imported")
     except ImportError:
         print("❌ MoviePy missing")
@@ -39,6 +41,7 @@ def test_factory():
         sys.exit(1)
 
     print("\n🚀 FACTORY READY FOR PRODUCTION")
+
 
 if __name__ == "__main__":
     test_factory()

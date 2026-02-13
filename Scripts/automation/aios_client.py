@@ -1,4 +1,3 @@
-
 import requests
 
 
@@ -18,11 +17,7 @@ class AIOSClient:
         query_type: "llm", "tool", "storage", "memory"
         query_data: dictionary containing parameters for the specific query type
         """
-        payload = {
-            "agent_name": agent_name,
-            "query_type": query_type,
-            "query_data": query_data
-        }
+        payload = {"agent_name": agent_name, "query_type": query_type, "query_data": query_data}
         try:
             response = requests.post(f"{self.base_url}/query", json=payload)
             return response.json()
@@ -38,6 +33,7 @@ class AIOSClient:
             return response.json()
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
 
 if __name__ == "__main__":
     client = AIOSClient()

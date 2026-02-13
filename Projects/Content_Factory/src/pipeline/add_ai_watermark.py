@@ -53,9 +53,7 @@ def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
     ]
 
     try:
-        result = subprocess.run(
-            cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        result = subprocess.run(cmd, check=True, capture_output=True)
         print(f"✅ Watermark added (bitrate: {bitrate_k}k): {output_video}")
         return True
     except subprocess.CalledProcessError as e:

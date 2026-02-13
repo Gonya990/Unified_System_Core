@@ -32,7 +32,7 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
         "company": "Schindler",
         "description": "BEYOND Tower Project - Leading elevator installation in one of Israel's tallest buildings (+370m)",
         "start_date": "August 2023",
-        "current": True
+        "current": True,
     },
     "experience": [
         {
@@ -45,7 +45,7 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
 • Lead field operations for smart elevator installation
 • Coordinate 10+ subcontractors and technical teams
 • Client and management interface
-• Quality, safety, and manufacturer specs compliance"""
+• Quality, safety, and manufacturer specs compliance""",
         },
         {
             "title": "Team Lead – Fiber Optics",
@@ -55,7 +55,7 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
             "end_date": "2023",
             "description": """• Led fiber optic network deployment (FTTx) across Central Israel
 • Managed regional teams, schedules, and quality targets
-• Complex troubleshooting at central offices and field sites"""
+• Complex troubleshooting at central offices and field sites""",
         },
         {
             "title": "Installation Technician",
@@ -64,8 +64,8 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
             "start_date": "2020",
             "end_date": "2022",
             "description": """• Elevator installation and testing
-• Work per test documentation and safety procedures"""
-        }
+• Work per test documentation and safety procedures""",
+        },
     ],
     "skills": [
         "Project Coordination",
@@ -78,19 +78,15 @@ My strengths: Coordinating complex operations, managing teams under pressure, an
         "Elevator Systems",
         "Technical Documentation",
         "Subcontractor Management",
-        "Scheduling & Reporting"
+        "Scheduling & Reporting",
     ],
     "languages": [
         {"name": "Hebrew", "proficiency": "Professional working"},
         {"name": "Russian", "proficiency": "Native"},
         {"name": "Ukrainian", "proficiency": "Native"},
-        {"name": "English", "proficiency": "Elementary"}
+        {"name": "English", "proficiency": "Elementary"},
     ],
-    "certifications": [
-        "Driver's License B",
-        "Forklift License (20T)",
-        "Height Work Certified"
-    ]
+    "certifications": ["Driver's License B", "Forklift License (20T)", "Height Work Certified"],
 }
 
 
@@ -122,9 +118,9 @@ async def check_login_status(page):
 
 async def manual_login(page):
     """Открыть страницу логина для ручного входа"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔐 ТРЕБУЕТСЯ ВХОД В LINKEDIN")
-    print("="*60)
+    print("=" * 60)
     print("\nОткрываю страницу входа в LinkedIn...")
     print("Пожалуйста, войдите вручную в браузере.")
     print("\n⚠️  После входа нажмите Enter в терминале для продолжения...")
@@ -154,29 +150,29 @@ async def get_profile_info(page):
 
     try:
         # Get name
-        name_el = await page.query_selector('h1.text-heading-xlarge')
+        name_el = await page.query_selector("h1.text-heading-xlarge")
         if name_el:
-            profile_info['name'] = await name_el.inner_text()
+            profile_info["name"] = await name_el.inner_text()
 
         # Get headline
-        headline_el = await page.query_selector('div.text-body-medium')
+        headline_el = await page.query_selector("div.text-body-medium")
         if headline_el:
-            profile_info['headline'] = await headline_el.inner_text()
+            profile_info["headline"] = await headline_el.inner_text()
 
         # Get location
-        location_el = await page.query_selector('span.text-body-small.inline')
+        location_el = await page.query_selector("span.text-body-small.inline")
         if location_el:
-            profile_info['location'] = await location_el.inner_text()
+            profile_info["location"] = await location_el.inner_text()
 
         # Get connections count
         connections_el = await page.query_selector('[href*="/connections/"]')
         if connections_el:
-            profile_info['connections'] = await connections_el.inner_text()
+            profile_info["connections"] = await connections_el.inner_text()
 
         # Get about section
         about_section = await page.query_selector('#about ~ div.display-flex span[aria-hidden="true"]')
         if about_section:
-            profile_info['about'] = await about_section.inner_text()
+            profile_info["about"] = await about_section.inner_text()
 
     except Exception as e:
         print(f"Ошибка при получении данных: {e}")
@@ -186,23 +182,23 @@ async def get_profile_info(page):
 
 async def compare_profiles(current, target):
     """Сравнить текущий профиль с целевым"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📋 СРАВНЕНИЕ ПРОФИЛЕЙ")
-    print("="*60)
+    print("=" * 60)
 
     differences = []
 
-    if current.get('name') != target.get('name'):
-        differences.append(('name', current.get('name'), target.get('name')))
+    if current.get("name") != target.get("name"):
+        differences.append(("name", current.get("name"), target.get("name")))
 
-    if current.get('headline') != target.get('headline'):
-        differences.append(('headline', current.get('headline'), target.get('headline')))
+    if current.get("headline") != target.get("headline"):
+        differences.append(("headline", current.get("headline"), target.get("headline")))
 
     # About section comparison (partial match)
-    current_about = current.get('about', '')
-    target_about = target.get('about', '')
+    current_about = current.get("about", "")
+    target_about = target.get("about", "")
     if target_about and target_about[:50] not in current_about:
-        differences.append(('about', current_about[:100] + '...', target_about[:100] + '...'))
+        differences.append(("about", current_about[:100] + "...", target_about[:100] + "..."))
 
     if differences:
         print("\n⚠️  Найдены различия:\n")
@@ -219,9 +215,9 @@ async def compare_profiles(current, target):
 
 async def main():
     """Основная функция"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔗 LINKEDIN PROFILE MANAGER")
-    print("="*60)
+    print("=" * 60)
     print(f"\n📅 Дата: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print(f"🔗 Профиль: {LINKEDIN_PROFILE_URL}")
 
@@ -234,14 +230,11 @@ async def main():
 
     async with async_playwright() as p:
         # Launch browser (visible for manual login)
-        browser = await p.chromium.launch(
-            headless=False,
-            args=['--start-maximized']
-        )
+        browser = await p.chromium.launch(headless=False, args=["--start-maximized"])
 
         context = await browser.new_context(
-            viewport={'width': 1280, 'height': 800},
-            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            viewport={"width": 1280, "height": 800},
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         )
 
         page = await context.new_page()
@@ -275,21 +268,21 @@ async def main():
             "target_profile": {
                 "name": PROFILE_DATA["name"],
                 "headline": PROFILE_DATA["headline"],
-                "about": PROFILE_DATA["about"][:200] + "..."
+                "about": PROFILE_DATA["about"][:200] + "...",
             },
-            "differences_found": len(differences)
+            "differences_found": len(differences),
         }
 
-        with open(PROFILE_DATA_FILE, 'w', encoding='utf-8') as f:
+        with open(PROFILE_DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
 
         print(f"\n💾 Данные сохранены в: {PROFILE_DATA_FILE}")
 
         # Ask about next steps
         if differences:
-            print("\n" + "="*60)
+            print("\n" + "=" * 60)
             print("📝 ДОСТУПНЫЕ ДЕЙСТВИЯ:")
-            print("="*60)
+            print("=" * 60)
             print("1. Обновить профиль вручную (откроется редактирование)")
             print("2. Экспортировать целевые данные в текстовый файл")
             print("3. Завершить")
@@ -304,15 +297,15 @@ async def main():
 
             elif choice == "2":
                 export_file = Path(__file__).parent / "linkedin_update_text.txt"
-                with open(export_file, 'w', encoding='utf-8') as f:
-                    f.write("="*60 + "\n")
+                with open(export_file, "w", encoding="utf-8") as f:
+                    f.write("=" * 60 + "\n")
                     f.write("LINKEDIN PROFILE UPDATE DATA\n")
-                    f.write("="*60 + "\n\n")
+                    f.write("=" * 60 + "\n\n")
                     f.write(f"Name: {PROFILE_DATA['name']}\n\n")
                     f.write(f"Headline:\n{PROFILE_DATA['headline']}\n\n")
                     f.write(f"About:\n{PROFILE_DATA['about']}\n\n")
                     f.write("Skills:\n")
-                    for skill in PROFILE_DATA['skills']:
+                    for skill in PROFILE_DATA["skills"]:
                         f.write(f"  • {skill}\n")
                 print(f"\n💾 Данные экспортированы в: {export_file}")
 
