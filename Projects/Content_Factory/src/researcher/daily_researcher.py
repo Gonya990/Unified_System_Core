@@ -13,6 +13,25 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from openai import OpenAI
+import requests
+
+def notify_admin(message):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    admin_id = os.getenv("ADMIN_ID", "708531393")
+    if not token:
+        print("⚠️ No TELEGRAM_BOT_TOKEN found for notification")
+        return
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        requests.post(url, json={
+            "chat_id": admin_id,
+            "text": message,
+            "parse_mode": "Markdown"
+        })
+    except Exception as e:
+        print(f"⚠️ Failed to send Telegram notification: {e}")
+
 
 # Setup paths
 SRC_DIR = Path(__file__).parent.parent.resolve()  # Projects/Content_Factory/src
@@ -778,8 +797,10 @@ def main():
             )
             if final_video_ru:
                 print(f"🎉 SUCCESS! Video Ready: {final_video_ru}")
+                notify_admin(f"🏭 **Content Factory Update**\n✅ Video generated successfully!\n📍 Path: `{final_video_ru}`")
             else:
                 print("❌ RU Video Assembly failed.")
+                notify_admin("🏭 **Content Factory ERROR**\n❌ RU Video Assembly failed.")
 
     except ImportError as e:
         print(f"❌ Failed to import orchestrator: {e}")
