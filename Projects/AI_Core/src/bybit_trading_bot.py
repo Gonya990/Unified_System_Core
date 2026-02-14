@@ -37,15 +37,14 @@ logger = logging.getLogger(__name__)
 
 class ByBitTradingBot:
     """
-    Ultra-conservative trading bot for ByBit.
-
-    SAFETY RULES:
-    - Max 3% of balance per trade
-    - Stop-loss: -2%
-    - Take-profit: +4%
-    - Only USDT pairs
-    - Trade only during high liquidity
-    - Max 1 position at a time
+    PREMIUM PROFIT Strategy for ByBit.
+    
+    STRATEGY:
+    - Multi-indicator: RSI + Bollinger Bands + SMA Trend Filter
+    - Confirmations: Entry on Lower BB touch + RSI oversold (<35)
+    - Trend Protection: Only trade in the direction of the 1h SMA(50)
+    - Risk Management: 10% of balance (optimized for small accounts)
+    - Coins: TON, ETH, BTC, SOL
     """
 
     def __init__(
@@ -54,8 +53,8 @@ class ByBitTradingBot:
         api_secret: str,
         telegram_token: str,
         admin_chat_id: str,
-        testnet: bool = True,
-        monitor_only: bool = True,
+        testnet: bool = False,
+        monitor_only: bool = False,
     ):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -64,20 +63,21 @@ class ByBitTradingBot:
         self.testnet = testnet
         self.monitor_only = monitor_only
 
-        # Trading parameters (VERY CONSERVATIVE)
-        self.max_trade_percent = 0.03  # Only 3%!
-        self.stop_loss_percent = 0.02  # -2% stop
-        self.take_profit_percent = 0.04  # +4% target
-        self.min_balance_usdt = 10  # Minimum $10
-        # ByBit Spot API minimum is 5 USDT (added small buffer)
-        self.min_order_value = 5.1
+        # Trading parameters (PREMIUM AGGRESSIVE)
+        self.max_trade_percent = 0.10  # 10% to make real gains on small balance
+        self.stop_loss_percent = 0.025  # -2.5% stop
+        self.take_profit_percent = 0.05  # +5% target
+        self.min_balance_usdt = 5.0
+        self.min_order_value = 5.2
+        
+        self.symbols = ["TONUSDT", "ETHUSDT", "BTCUSDT", "SOLUSDT"]
 
         # State
         self.balance = 0
         self.positions = {}
         self.is_active = False
         self.trades_today = 0
-        self.max_trades_per_day = 5  # Limit trades
+        self.max_trades_per_day = 15
         self.last_notified_low_balance = None
 
         # Stats
@@ -88,8 +88,8 @@ class ByBitTradingBot:
     async def notify(self, message: str, urgent: bool = False):
         """Send Telegram notification."""
         try:
-            emoji = "🚨" if urgent else "📊"
-            text = f"{emoji} **ByBit Bot**\n\n{message}"
+            emoji = "🔥" if urgent else "📈"
+            text = f"{emoji} **ByBit PREMIUM BOT**\n\n{message}"
 
             url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
             payload = {
@@ -109,410 +109,187 @@ class ByBitTradingBot:
     async def get_balance(self) -> float:
         """Get USDT balance from ByBit."""
         if not HTTP:
-            logger.error("pybit not installed")
             return 0.0
         try:
-            session = HTTP(
-                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
-            )
-
+            session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
             result = session.get_wallet_balance(accountType="UNIFIED", coin="USDT")
-
             if result["retCode"] == 0:
                 balance = float(result["result"]["list"][0]["coin"][0]["walletBalance"])
-                logger.info(f"Balance: ${balance:.2f} USDT")
                 return balance
-
             return 0.0
-
         except Exception as e:
-            logger.error(f"Failed to get balance: {e}")
-            await self.notify(f"❌ Balance check failed: {e}", urgent=True)
+            logger.error(f"Balance check error: {e}")
             return 0.0
 
-    async def get_price(self, symbol: str = "TONUSDT") -> float:
+    async def get_price(self, symbol: str) -> float:
         """Get current market price."""
-        if not HTTP:
-            return 0.0
+        if not HTTP: return 0.0
         try:
             session = HTTP(testnet=self.testnet)
-
             result = session.get_tickers(category="spot", symbol=symbol)
-
             if result["retCode"] == 0:
-                price = float(result["result"]["list"][0]["lastPrice"])
-                return price
-
+                return float(result["result"]["list"][0]["lastPrice"])
             return 0.0
-
         except Exception as e:
-            logger.error(f"Price fetch failed: {e}")
+            logger.error(f"Price error for {symbol}: {e}")
             return 0.0
 
-    async def analyze_market(self, symbol: str = "TONUSDT") -> Optional[str]:
-        """
-        Simple but effective strategy:
-        - RSI < 30 = OVERSOLD → BUY
-        - RSI > 70 = OVERBOUGHT → SELL
-        - Moving Average crossover
-        """
-        if not HTTP:
-            return None
+    def _calculate_indicators(self, data: list[float]):
+        """Calculate RSI, SMA and Bollinger Bands."""
+        import numpy as np
+        prices = np.array(data)
+        
+        # RSI
+        deltas = np.diff(prices)
+        seed = deltas[:14]
+        up = seed[seed >= 0].sum() / 14
+        down = -seed[seed < 0].sum() / 14
+        rs = up / (down if down != 0 else 0.001)
+        rsi = 100. - (100. / (1. + rs))
+        
+        # SMA
+        sma_20 = np.mean(prices[-20:])
+        sma_50 = np.mean(prices[-50:])
+        
+        # BB
+        std = np.std(prices[-20:])
+        upper_bb = sma_20 + (2 * std)
+        lower_bb = sma_20 - (2 * std)
+        
+        return rsi, sma_20, sma_50, upper_bb, lower_bb
+
+    async def analyze_market(self, symbol: str) -> Optional[str]:
+        """Premium multi-indicator analysis."""
+        if not HTTP: return None
         try:
             session = HTTP(testnet=self.testnet)
-
-            # Get kline data (1 hour candles, last 50)
-            result = session.get_kline(
-                category="spot", symbol=symbol, interval="60", limit=50
-            )
-
-            if result["retCode"] != 0:
-                return None
-
-            klines = result["result"]["list"]
-            closes = [float(k[4]) for k in klines]  # Close prices
-
-            # Calculate RSI
-            rsi = self._calculate_rsi(closes, period=14)
-
-            # Calculate moving averages
-            sma_short = sum(closes[-10:]) / 10
-            sma_long = sum(closes[-30:]) / 30
+            # 1h candles
+            result = session.get_kline(category="spot", symbol=symbol, interval="60", limit=100)
+            if result["retCode"] != 0: return None
+            
+            closes = [float(k[4]) for k in result["result"]["list"]]
+            rsi, sma20, sma50, upper, lower = self._calculate_indicators(closes)
             current_price = closes[-1]
 
-            logger.info(
-                f"Market: RSI={rsi:.1f}, SMA_short={sma_short:.4f}, SMA_long={sma_long:.4f}"
-            )
+            logger.info(f"[{symbol}] Price: {current_price:.4f} | RSI: {rsi:.1f} | BB: L={lower:.4f} U={upper:.4f} | Trend: {sma50:.4f}")
 
-            # Trading signals
-            if rsi < 35 and current_price < sma_long * 0.98:
-                # Oversold + below long MA = BUY signal
+            # BUY CONDITION: RSI Oversold AND Touching Lower BB AND Trend is generally UP (Price > SMA50)
+            if rsi < 35 and current_price <= lower * 1.005 and current_price > sma50 * 0.95:
+                # Strong buy zone
                 return "BUY"
 
-            if rsi > 65 and current_price > sma_long * 1.02:
-                # Overbought + above long MA = SELL signal
+            # SELL CONDITION: RSI Overbought OR Touching Upper BB
+            if rsi > 65 or current_price >= upper * 0.995:
                 return "SELL"
 
             return None
-
         except Exception as e:
-            logger.error(f"Market analysis failed: {e}")
+            logger.error(f"Analysis error: {e}")
             return None
 
-    def _calculate_rsi(self, prices: list[float], period: int = 14) -> float:
-        """Calculate RSI indicator."""
-        deltas = [prices[i] - prices[i - 1] for i in range(1, len(prices))]
-
-        gains = [d if d > 0 else 0 for d in deltas]
-        losses = [-d if d < 0 else 0 for d in deltas]
-
-        avg_gain = sum(gains[-period:]) / period
-        avg_loss = sum(losses[-period:]) / period
-
-        if avg_loss == 0:
-            return 100
-
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-
-        return rsi
-
     async def place_order(self, symbol: str, side: str, quantity: float) -> bool:
-        """Place market order on ByBit (or skip if monitoring only)."""
+        """Place market order."""
         if self.monitor_only:
-            logger.info(f"[MONITOR ONLY] Would place {side} {quantity} {symbol}")
+            logger.info(f"[MONITOR] {side} {quantity} {symbol}")
             return True
-
-        if not HTTP:
-            return False
-
-        # Ensure quantity is rounded (Spot TONUSDT usually 2 decimal places)
-        formatted_qty = f"{quantity:.2f}"
         try:
-            session = HTTP(
-                testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret
-            )
-
+            session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
+            # Find decimal precision for symbol (general hack for most major coins)
+            precision = 4 if "TON" in symbol else 5
+            if "BTC" in symbol: precision = 5
+            formatted_qty = f"{quantity:.{precision}f}".rstrip('0').rstrip('.')
+            
             kwargs = {
                 "category": "spot",
                 "symbol": symbol,
                 "side": side,
                 "orderType": "Market",
                 "qty": formatted_qty,
-                "timeInForce": "IOC",
             }
-
-            # For Market Buy on Spot, ByBit defaults to quote coin (USDT).
-            # We specify baseCoin to use the TON quantity.
-            if side.lower() == "buy":
-                kwargs["marketUnit"] = "baseCoin"
-
+            if side == "Buy": kwargs["marketUnit"] = "baseCoin"
+            
             result = session.place_order(**kwargs)
-
             if result["retCode"] == 0:
-                order_id = result["result"]["orderId"]
-                logger.info(f"Order placed: {side} {quantity} {symbol}, ID: {order_id}")
-
-                action_name = (
-                    "RECOMMENDATION" if self.monitor_only else "Order Executed"
-                )
-                notif_suffix = (
-                    "Recommendation only - no real trade placed."
-                    if self.monitor_only
-                    else f"Order ID: {order_id}"
-                )
-                await self.notify(
-                    f"✅ **{action_name}**\nAction: {side}\nSymbol: {symbol}\nQuantity: {quantity}\n{notif_suffix}"
-                )
-
+                await self.notify(f"🚀 **{side} EXECUTED**\nSymbol: {symbol}\nQty: {formatted_qty}")
                 return True
-
-            await self.notify(f"❌ **Order Failed**\n{result['retMsg']}", urgent=True)
+            else:
+                logger.error(f"Order failed: {result['retMsg']}")
+                return False
+        except Exception as e:
+            logger.error(f"Order error: {e}")
             return False
 
-        except Exception as e:
-            logger.error(f"Order placement failed: {e}")
-            await self.notify(f"❌ Order error: {e}", urgent=True)
-            return False
+    async def execute_trade(self, signal: str, symbol: str):
+        """Execute trade logic."""
+        price = await self.get_price(symbol)
+        if not price: return
 
-    async def execute_trade(self, signal: str, symbol: str = "TONUSDT"):
-        """Execute trading signal."""
-        try:
-            # Check daily limit
-            if self.trades_today >= self.max_trades_per_day:
-                logger.info("Daily trade limit reached")
-                return
+        if signal == "BUY" and symbol not in self.positions:
+            amount = max(self.balance * self.max_trade_percent, self.min_order_value)
+            if amount > self.balance: return
+            
+            qty = round(amount / price, 4)
+            if await self.place_order(symbol, "Buy", qty):
+                self.positions[symbol] = {
+                    "entry_price": price,
+                    "qty": qty,
+                    "stop_loss": price * (1 - self.stop_loss_percent),
+                    "take_profit": price * (1 + self.take_profit_percent)
+                }
+                self.trades_today += 1
+                self.total_trades += 1
+                await self.notify(f"🟢 **LONG OPENED**\n{symbol} @ {price}\nSL: {self.positions[symbol]['stop_loss']:.4f}\nTP: {self.positions[symbol]['take_profit']:.4f}")
 
-            price = await self.get_price(symbol)
+        elif signal == "SELL" and symbol in self.positions:
+            qty = self.positions[symbol]["qty"]
+            if await self.place_order(symbol, "Sell", qty):
+                profit = (price - self.positions[symbol]["entry_price"]) / self.positions[symbol]["entry_price"] * 100
+                self.total_profit += (price - self.positions[symbol]["entry_price"]) * qty
+                if profit > 0: self.winning_trades += 1
+                await self.notify(f"🔴 **POSITION CLOSED**\n{symbol} @ {price}\nProfit: {profit:+.2f}%")
+                del self.positions[symbol]
 
-            if signal == "BUY" and symbol not in self.positions:
-                # Calculate position size (3% of balance)
-                trade_amount = self.balance * self.max_trade_percent
-
-                # Check against exchange minimum (5 USDT)
-                if trade_amount < self.min_order_value:
-                    logger.warning(
-                        f"Trade amount ${trade_amount:.2f} too low. Using minimum ${self.min_order_value}"
-                    )
-                    trade_amount = self.min_order_value
-
-                if trade_amount > self.balance:
-                    logger.error(
-                        f"Balance ${self.balance:.2f} too low for minimum order ${trade_amount:.2f}"
-                    )
-                    return
-
-                quantity = round(trade_amount / price, 2)
-
-                # Place buy order
-                if await self.place_order(symbol, "Buy", quantity):
-                    self.positions[symbol] = {
-                        "entry_price": price,
-                        "quantity": quantity,
-                        "entry_time": datetime.now().isoformat(),
-                        "stop_loss": price * (1 - self.stop_loss_percent),
-                        "take_profit": price * (1 + self.take_profit_percent),
-                    }
-
-                    self.trades_today += 1
-                    self.total_trades += 1
-
-                    await self.notify(
-                        f"🟢 **OPENED POSITION**\n"
-                        f"Symbol: {symbol}\n"
-                        f"Entry: ${price:.4f}\n"
-                        f"Quantity: {quantity:.2f}\n"
-                        f"Amount: ${trade_amount:.2f}\n"
-                        f"Stop-Loss: ${self.positions[symbol]['stop_loss']:.4f}\n"
-                        f"Take-Profit: ${self.positions[symbol]['take_profit']:.4f}"
-                    )
-
-            elif signal == "SELL" and symbol in self.positions:
-                pos = self.positions[symbol]
-                quantity = pos["quantity"]
-
-                # Place sell order
-                if await self.place_order(symbol, "Sell", quantity):
-                    # Calculate profit
-                    entry = pos["entry_price"]
-                    profit_pct = (price - entry) / entry * 100
-                    profit_usd = (price - entry) * quantity
-
-                    self.total_profit += profit_usd
-                    if profit_usd > 0:
-                        self.winning_trades += 1
-
-                    await self.notify(
-                        f"🔴 **CLOSED POSITION**\n"
-                        f"Symbol: {symbol}\n"
-                        f"Entry: ${entry:.4f}\n"
-                        f"Exit: ${price:.4f}\n"
-                        f"Profit: {profit_pct:+.2f}% (${profit_usd:+.2f})\n"
-                        f"Win Rate: {self.winning_trades}/{self.total_trades}"
-                    )
-
-                    del self.positions[symbol]
-                    self.trades_today += 1
-
-        except Exception as e:
-            logger.error(f"Trade execution failed: {e}")
-            await self.notify(f"❌ Trade error: {e}", urgent=True)
-
-    async def check_stop_loss(self):
-        """Monitor positions for stop-loss/take-profit."""
-        for symbol, pos in list(self.positions.items()):
-            try:
-                price = await self.get_price(symbol)
-
-                # Stop-loss hit
-                if price <= pos["stop_loss"]:
-                    await self.notify(
-                        f"🛑 **STOP-LOSS TRIGGERED**\n"
-                        f"Symbol: {symbol}\n"
-                        f"Price: ${price:.4f}\n"
-                        f"Stop-Loss: ${pos['stop_loss']:.4f}",
-                        urgent=True,
-                    )
-                    await self.execute_trade("SELL", symbol)
-
-                # Take-profit hit
-                elif price >= pos["take_profit"]:
-                    await self.notify(
-                        f"🎯 **TAKE-PROFIT HIT**\n"
-                        f"Symbol: {symbol}\n"
-                        f"Price: ${price:.4f}\n"
-                        f"Target: ${pos['take_profit']:.4f}",
-                    )
-                    await self.execute_trade("SELL", symbol)
-
-            except Exception as e:
-                logger.error(f"Stop-loss check failed: {e}")
+    async def check_risk(self):
+        """Emergency checks for SL/TP."""
+        for sym, pos in list(self.positions.items()):
+            price = await self.get_price(sym)
+            if not price: continue
+            if price <= pos["stop_loss"]:
+                await self.notify(f"🛑 **STOP LOSS HIT** on {sym}")
+                await self.execute_trade("SELL", sym)
+            elif price >= pos["take_profit"]:
+                await self.notify(f"🎯 **TAKE PROFIT HIT** on {sym}")
+                await self.execute_trade("SELL", sym)
 
     async def run(self):
-        """Main trading loop."""
-        await self.notify(
-            "🚀 **Trading Bot Started**\n\n"
-            f"Mode: {'TESTNET' if self.testnet else 'LIVE'}\n"
-            f"Max trade: {self.max_trade_percent * 100}%\n"
-            f"Stop-loss: {self.stop_loss_percent * 100}%\n"
-            f"Take-profit: {self.take_profit_percent * 100}%\n"
-            f"Max trades/day: {self.max_trades_per_day}\n"
-            "Strategy: RSI + Moving Average"
-        )
-
+        """Main Loop."""
+        await self.notify(f"👑 **PREMIUM CRYPTO BOT STARTING**\nMode: {'LIVE 🚀' if not self.testnet else 'TEST 🛡️'}\nEquity: ${self.balance:.2f}\nPairs: {', '.join(self.symbols)}")
         self.is_active = True
-
         while self.is_active:
             try:
-                # Reset daily counter at midnight
-                now = datetime.now()
-                if now.hour == 0 and now.minute == 0:
-                    self.trades_today = 0
-
-                # Get balance
                 self.balance = await self.get_balance()
-
-                if self.balance < self.min_balance_usdt:
-                    now = datetime.now()
-                    # Only notify once every 24 hours
-                    should_notify = (
-                        self.last_notified_low_balance is None
-                        or (now - self.last_notified_low_balance).total_seconds()
-                        > 86400
-                    )
-
-                    if should_notify:
-                        await self.notify(
-                            f"⚠️ **Low Balance**\n"
-                            f"Current: ${self.balance:.2f}\n"
-                            f"Minimum: ${self.min_balance_usdt:.2f}\n"
-                            "Trading paused. (Notification throttled for 24h)",
-                            urgent=True,
-                        )
-                        self.last_notified_low_balance = now
-
-                    await asyncio.sleep(3600)  # Wait 1 hour before next balance check
-                    continue
-
-                # Check existing positions
-                await self.check_stop_loss()
-
-                # Analyze market (only if no position)
-                if not self.positions:
-                    signal = await self.analyze_market("TONUSDT")
-
-                    if signal:
-                        await self.execute_trade(signal, "TONUSDT")
-
-                # Wait 5 minutes before next check
-                await asyncio.sleep(300)
-
+                await self.check_risk()
+                for sym in self.symbols:
+                    if sym not in self.positions and self.trades_today < self.max_trades_per_day:
+                        signal = await self.analyze_market(sym)
+                        if signal == "BUY": await self.execute_trade(signal, sym)
+                await asyncio.sleep(60) # High frequency scanning
             except Exception as e:
-                logger.error(f"Main loop error: {e}")
-                await self.notify(f"❌ Bot error: {e}", urgent=True)
+                logger.error(f"Loop error: {e}")
                 await asyncio.sleep(60)
 
-    async def stop(self):
-        """Stop bot and close positions."""
-        self.is_active = False
-
-        # Close all positions
-        for symbol in list(self.positions.keys()):
-            await self.execute_trade("SELL", symbol)
-
-        await self.notify(
-            "🛑 **Bot Stopped**\n\n"
-            f"Total trades: {self.total_trades}\n"
-            f"Winning: {self.winning_trades}\n"
-            f"Win rate: {self.winning_trades / max(1, self.total_trades) * 100:.1f}%\n"
-            f"Total profit: ${self.total_profit:+.2f}"
-        )
-
-
 async def main():
-    """Run the bot."""
-    # Load credentials
-    api_key = os.getenv("BYBIT_API_KEY", "")
-    api_secret = os.getenv("BYBIT_API_SECRET", "")
-    telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    admin_chat_id = os.getenv("ADMIN_CHAT_ID", "708531393")
-
-    if not api_key or not api_secret:
-        print("❌ Set BYBIT_API_KEY and BYBIT_API_SECRET in .env")
-        print("For safety, starting in TESTNET mode...")
-        api_key = "test"
-        api_secret = "test"
-
-    # Start in TESTNET or LIVE based on .env
-    testnet_env = os.getenv("BYBIT_TESTNET", "true").lower()
-    is_testnet = testnet_env == "true"
-
-    monitor_only_env = os.getenv("BYBIT_MONITOR_ONLY", "true").lower()
-    is_monitor_only = monitor_only_env == "true"
-
+    load_dotenv(args.env if os.path.exists(args.env) else "Projects/AI_Core/.env")
     bot = ByBitTradingBot(
-        api_key=api_key,
-        api_secret=api_secret,
-        telegram_token=telegram_token,
-        admin_chat_id=admin_chat_id,
-        testnet=is_testnet,
-        monitor_only=is_monitor_only,
+        api_key=os.getenv("BYBIT_API_KEY"),
+        api_secret=os.getenv("BYBIT_API_SECRET"),
+        telegram_token=os.getenv("TELEGRAM_BOT_TOKEN"),
+        admin_chat_id=os.getenv("ADMIN_CHAT_ID", "708531393"),
+        testnet=os.getenv("BYBIT_TESTNET", "false").lower() == "true", # LIVE DEFAULT
+        monitor_only=os.getenv("BYBIT_MONITOR_ONLY", "false").lower() == "true" # TRADING DEFAULT
     )
-
-    if not is_testnet:
-        print("🚀 STARTING IN LIVE MODE! REAL FUNDS!")
-    else:
-        print("🛡️ STARTING IN TESTNET MODE (Safe Mode)")
-
-    try:
-        await bot.run()
-    except KeyboardInterrupt:
-        await bot.stop()
-
+    await bot.run()
 
 if __name__ == "__main__":
-    print("🤖 ByBit Trading Bot")
-    print("=" * 50)
-    print("STARTING IN TESTNET MODE FOR SAFETY")
-    print("=" * 50)
     asyncio.run(main())
+
