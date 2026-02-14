@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from typing import List, Optional, Any
@@ -12,6 +13,60 @@ app = FastAPI(title="Vibranium AI Gateway (OpenAI Compatible)")
 # Global reference to the bot/orchestrator/inference
 _BOT_INSTANCE = None
 _INFERENCE_CLIENT = None
+
+
+def _summarize_chat_payload(payload: dict) -> dict[str, Any]:
+    """Return a safe summary of a chat request without user content."""
+    model = payload.get("model")
+    messages = payload.get("messages", [])
+    msg_count = len(messages) if isinstance(messages, list) else 0
+    total_chars = 0
+
+    if isinstance(messages, list):
+        for msg in messages:
+            if isinstance(msg, dict):
+                content = msg.get("content")
+                if isinstance(content, str):
+                    total_chars += len(content)
+
+    return {
+        "model": model,
+        "messages": msg_count,
+        "chars": total_chars,
+        "stream": payload.get("stream"),
+        "temperature": payload.get("temperature"),
+    }
+
+
+@app.middleware("http")
+async def log_request_middleware(request: Request, call_next):
+    """Log sanitized request info for debugging without leaking content."""
+    body = b""
+    if request.method in {"POST", "PUT", "PATCH"}:
+        try:
+            body = await request.body()
+        except Exception:
+            body = b""
+
+    if body:
+        # Recreate the request so downstream can read the body
+        async def receive():
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        request = Request(request.scope, receive)
+
+        if request.url.path == "/v1/chat/completions":
+            try:
+                payload = json.loads(body.decode("utf-8"))
+                summary = _summarize_chat_payload(payload)
+                logger.info(f"[api_proxy] chat_completions request: {summary}")
+            except Exception:
+                logger.info(f"[api_proxy] chat_completions request: unreadable_json bytes={len(body)}")
+        else:
+            logger.info(f"[api_proxy] {request.method} {request.url.path} bytes={len(body)}")
+
+    response = await call_next(request)
+    return response
 
 
 class AlertRequest(BaseModel):
@@ -129,9 +184,17 @@ def set_context(bot=None, inference=None):
         _INFERENCE_CLIENT = inference
 
 
+# Backward-compatible aliases used by older callers/logged errors
+def set_bot_instance(bot=None):
+    set_context(bot=bot)
+
+
+def set_inference_client(inference=None):
+    set_context(inference=inference)
+
+
 def run_proxy(port=3030):
     import uvicorn
 
     logger.info(f"🚀 Starting Vibranium Gateway on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
-

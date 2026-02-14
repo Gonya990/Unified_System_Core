@@ -16,12 +16,13 @@ spec:
       serviceAccountName: ai-telegram-bot-sa
       containers:
         - name: bot
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:v2-ssh-proxy
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:latest
           imagePullPolicy: Always
+          command: ["python", "-m", "src.ai_telegram_bot_v2"]
           resources:
             requests:
-              cpu: "200m"
-              memory: "512Mi"
+              cpu: "500m"
+              memory: "1Gi"
             limits:
               cpu: "1000m"
               memory: "2Gi"

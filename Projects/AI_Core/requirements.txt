@@ -32,3 +32,6 @@ google-cloud-trace>=1.0.0
 kubernetes>=28.1.0
 PyGithub>=2.1.1
 google-cloud-pubsub>=2.19.0
+numpy>=1.26.0
+pandas>=2.1.0
+pybit>=5.8.0

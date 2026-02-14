@@ -18,7 +18,7 @@ import pytz
 
 # Local imports (must be after sys.path adjustment if needed)
 from agent_orchestrator import PIPELINES, AgentOrchestrator
-from api_proxy import run_proxy, set_bot_instance
+from api_proxy import run_proxy, set_context
 from calendar_client import CalendarClient
 from config_manager import ConfigManager
 from conversation_manager import ConversationManager
