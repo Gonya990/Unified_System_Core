@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ingestion
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-ingestion@sha256:4aad3833865106cf5f2363e79ea1b4c3127e5c468db24e71c966a23f0684a939
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-ingestion@sha256:c42aaa9898446691e68f670ae8936786247fbd8ead9e239d923c13399f2b5ca9
           env:
             - name: REDIS_URL
               valueFrom:

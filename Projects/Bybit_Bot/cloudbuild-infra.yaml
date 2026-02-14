@@ -1,0 +1,36 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["pull", "redis:7-alpine"]
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "tag",
+        "redis:7-alpine",
+        "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/redis:7-alpine",
+      ]
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/redis:7-alpine",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["pull", "timescale/timescaledb:latest-pg15"]
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "tag",
+        "timescale/timescaledb:latest-pg15",
+        "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/timescaledb:latest-pg15",
+      ]
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/timescaledb:latest-pg15",
+      ]
+
+images:
+  - "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/redis:7-alpine"
+  - "us-central1-docker.pkg.dev/my-home-435112/unified-core-images/timescaledb:latest-pg15"

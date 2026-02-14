@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: risk-guard
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-risk@sha256:19912d086047fad30a3cf2166b6f2b18d796f99fc2b4199f83e87de65fed1f5d
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-risk@sha256:bd5f0786ace56ade2dc375f55ac9eb581fb40f742e5fdab46c4ac9706282f2a6
           env:
             - name: REDIS_URL
               valueFrom:

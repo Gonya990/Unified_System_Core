@@ -143,12 +143,14 @@ class FundingArbStrategy:
             if len(self.history) > 100:
                 self.history.pop(0)
 
-            metrics = self.calculate_metrics(state)
-
-            logger.debug(
-                f"📊 {self.symbol} | FR: {state['funding_rate']:.4%} | "
-                f"APR: {metrics['apr']:.2%} | ML: {metrics['ml_score']:.2f}"
-            )
+            # Log periodically to show heartbeat
+            if not hasattr(self, '_msg_count'): self._msg_count = 0
+            self._msg_count += 1
+            if self._msg_count % 10 == 0:
+                logger.info(
+                    f"💹 {self.symbol} Update | FR: {state['funding_rate']:.4%} | "
+                    f"APR: {metrics['apr']:.2%} | Healthy: {'✅' if metrics['is_profitable'] else '⏳'}"
+                )
 
             if metrics["is_profitable"] and not self.is_active:
                 logger.info("🚀 SIGNAL: Opening position.")

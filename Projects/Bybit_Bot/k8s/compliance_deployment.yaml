@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: compliance
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-compliance@sha256:176371c1d8d05c7b48c27c5bea54d4f31f026486d7d69d827a4782b43f1f82a4
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/bybit-compliance@sha256:dd976d6155f09f6c82744b0c17f563718ba64bcb79e65f23e004b19f9f21df73
           env:
             - name: REDIS_URL
               valueFrom:

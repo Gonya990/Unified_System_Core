@@ -393,6 +393,7 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
     except Exception as e:
         print(f"❌ Factory Crash: {e}")
         agent_sync(f"Критическая ошибка фабрики: {e}")
+        time.sleep(60)  # Prevent rapid restart loop
 
 
 def start_scheduler():

@@ -17,10 +17,12 @@ logger = logging.getLogger(__name__)
 RUNWAY_API_KEY = os.getenv("RUNWAY_API_KEY")
 LUMA_API_KEY = os.getenv("LUMA_API_KEY")
 KLING_API_KEY = os.getenv("KLING_API_KEY")
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
 
 RUNWAY_BASE_URL = "https://api.runwayml.com/v1"
 LUMA_BASE_URL = "https://api.lumalabs.ai/dream-machine/v1"
 KLING_BASE_URL = "https://api.kling.ai/v1"
+PEXELS_BASE_URL = "https://api.pexels.com/videos"
 
 
 class VideoGenerator:
@@ -29,7 +31,7 @@ class VideoGenerator:
     def __init__(self, provider: str = "runway"):
         """
         Args:
-            provider: 'runway', 'luma', or 'kling'
+            provider: 'runway', 'luma', 'kling', or 'pexels'
         """
         self.provider = provider.lower()
         self.api_key = None
@@ -44,7 +46,12 @@ class VideoGenerator:
         elif self.provider == "kling" and KLING_API_KEY:
             self.api_key = KLING_API_KEY
             self.base_url = KLING_BASE_URL
+        elif self.provider == "pexels" and PEXELS_API_KEY:
+            self.api_key = PEXELS_API_KEY
+            self.base_url = PEXELS_BASE_URL
         else:
+            if self.provider == "pexels" and not PEXELS_API_KEY:
+                logger.error("Pexels API key missing.")
             logger.warning(f"Provider '{provider}' not configured. Video generation disabled.")
 
     def generate_video(
@@ -77,9 +84,53 @@ class VideoGenerator:
                 return self._generate_luma(prompt, duration, style, output_path)
             elif self.provider == "kling":
                 return self._generate_kling(prompt, duration, style, output_path)
+            elif self.provider == "pexels":
+                return self._generate_pexels(prompt, duration, style, output_path)
         except Exception as e:
             logger.error(f"Video generation failed ({self.provider}): {e}")
             return None
+
+    def _generate_pexels(self, prompt: str, duration: int, style: str, output_path: Optional[Path]) -> Path:
+        """Fetch high-quality stock video from Pexels."""
+        headers = {"Authorization": self.api_key}
+        # Extract keywords for better search
+        keywords = prompt.split(",")[0]
+        
+        url = f"{self.base_url}/search?query={keywords}&per_page=1&orientation=portrait&size=medium"
+        
+        logger.info(f"🎞️ Pexels Search: {keywords}")
+        response = requests.get(url, headers=headers, timeout=20)
+        response.raise_for_status()
+        
+        data = response.json()
+        videos = data.get("videos", [])
+        
+        if not videos:
+            logger.warning(f"No Pexels videos found for: {keywords}")
+            # Fallback to general nature/business search
+            response = requests.get(f"{self.base_url}/search?query=cinematic&per_page=1", headers=headers)
+            videos = response.json().get("videos", [])
+            if not videos: raise ValueError("Pexels returned zero results even for fallback")
+
+        # Pick the best file (highest resolution but within limits)
+        video = videos[0]
+        video_files = video.get("video_files", [])
+        # Preferred: 1080p or 720p
+        best_file = next((f for f in video_files if f.get("width") == 1080), video_files[0])
+        video_url = best_file.get("link")
+
+        logger.info(f"⬇️ Downloading Pexels video: {video_url}")
+        video_response = requests.get(video_url, timeout=60)
+        video_response.raise_for_status()
+
+        if not output_path:
+            output_path = Path(f"/tmp/pexels_{video['id']}.mp4")
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(video_response.content)
+        
+        logger.info(f"✅ Pexels video saved: {output_path}")
+        return output_path
 
     def _generate_runway(self, prompt: str, duration: int, style: str, output_path: Optional[Path]) -> Path:
         """Generate video using Runway ML Gen-3."""

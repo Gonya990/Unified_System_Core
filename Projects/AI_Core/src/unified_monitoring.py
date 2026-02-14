@@ -24,10 +24,17 @@ class UnifiedMonitoring:
             series.resource.type = "global"
             series.resource.labels["project_id"] = self.project_id
 
-            point = monitoring_v3.Point()
-            point.value.double_value = float(value)
             now = time.time()
-            point.interval.end_time.seconds = int(now)
+            seconds = int(now)
+            nanos = int((now - seconds) * 10**9)
+
+            interval = monitoring_v3.TimeInterval(
+                {"end_time": {"seconds": seconds, "nanos": nanos}}
+            )
+
+            point = monitoring_v3.Point(
+                {"value": {"double_value": float(value)}, "interval": interval}
+            )
 
             series.points = [point]
             self.client.create_time_series(name=self.project_name, time_series=[series])

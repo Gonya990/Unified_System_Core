@@ -332,23 +332,38 @@ def run_daily_research(
             if resp_json and isinstance(resp_json, dict):
                 data = resp_json.get("response")
                 if isinstance(data, str):
-                    data = json.loads(data)
-                print("✅ Ollama Research successful!")
+                    try:
+                        data = json.loads(data)
+                    except json.JSONDecodeError:
+                        print("⚠️ Ollama response not valid JSON")
+                        data = None
+                
+                if data and isinstance(data, dict):
+                    print("✅ Ollama Research successful!")
+                else:
+                    print("⚠️ Ollama response empty or invalid format")
+                    data = None
             else:
                 print("⚠️ Ollama empty response")
         except Exception as e:
             msg = f"❌ Ollama failed: {e}"
             print(msg)
-            return None
+            # Do not return None here, just let it fall through
+            data = None
+
+    if not data:
+        # Final safety check before attribute access to prevent crash
+        return None
 
     # Strict Scene Label Cleanup
     script = data.get("script_ru", "")
-    script = re.sub(
-        r"(?i)(сцена|scene|кадр|shot|narrator|диктор|voiceover)\s*\d*[:.-]*\s*",
-        "",
-        script,
-    )
-    data["script_ru"] = script.strip()
+    if script:
+        script = re.sub(
+            r"(?i)(сцена|scene|кадр|shot|narrator|диктор|voiceover)\s*\d*[:.-]*\s*",
+            "",
+            script,
+        )
+        data["script_ru"] = script.strip()
     return data
 
 
