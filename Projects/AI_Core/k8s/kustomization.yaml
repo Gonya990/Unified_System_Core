@@ -11,6 +11,6 @@ resources:
 
 images:
   - name: ghcr.io/unified-system-core/unified_system_core/ai-telegram-bot
-    newTag: 1b8e12a
+    newTag: eac034d
 
 
