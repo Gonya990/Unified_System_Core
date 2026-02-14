@@ -47,7 +47,7 @@ except ImportError:
     INSTA_ENABLED = False
     print("⚠️ Instagram uploader not available")
 
-from orchestrator_v3_no_face import run_no_face_pipeline  # noqa: E402
+from orchestrator_v4_advanced import run_advanced_pipeline as run_no_face_pipeline  # noqa: E402
 from threads_browser import ThreadsBrowser  # noqa: E402
 
 # Long-form documentary producer

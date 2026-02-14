@@ -15,55 +15,63 @@ spec:
     spec:
       serviceAccountName: ai-telegram-bot-sa
       containers:
-      - name: bot
-        image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:8389d764840146cda117b6a4fc2444b5b72d1f68
-        imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "512Mi"
-          limits:
-            cpu: "1000m"
-            memory: "2Gi"
-        env:
-        - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: /app/gcp-service-account.json
-        - name: GOOGLE_CLIENT_SECRETS
-          value: /app/config/gmail_credentials.json
-        - name: PROJECT_ID
-          value: "my-home-435112"
-        - name: BOT_INSTANCE
-          value: "igor"
-        - name: GITHUB_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: ai-core-secrets
-              key: GITHUB_TOKEN
-              optional: true
-        envFrom:
-        - secretRef:
-            name: ai-core-secrets
-        volumeMounts:
-        - name: google-creds
-          mountPath: /app/config/credentials.json
-          subPath: credentials.json
-          readOnly: true
-        - name: google-creds
-          mountPath: /app/gcp-service-account.json
-          subPath: gcp-service-account.json
-        - name: gmail-creds
-          mountPath: /app/config/gmail_credentials.json
-          subPath: gmail_credentials.json
-        - name: vibranium-vault
-          mountPath: /root/.config/unified-system/tokens.yaml
-          subPath: tokens.yaml
+        - name: bot
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:v2-ssh-proxy
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/gcp-service-account.json
+            - name: GOOGLE_CLIENT_SECRETS
+              value: /app/config/gmail_credentials.json
+            - name: PROJECT_ID
+              value: "my-home-435112"
+            - name: BOT_INSTANCE
+              value: "igor"
+            - name: FACTORY_REMOTE_HOST
+              value: "unified-home-core-cloud"
+            - name: FACTORY_REMOTE_USER
+              value: "gonya"
+            - name: FACTORY_REMOTE_ROOT
+              value: "/home/gonya/Unified_System_Core"
+            - name: CRYPTO_BOT_LOG_PATH
+              value: "/home/gonya/.pm2/logs/crypto-bot-error.log"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ai-core-secrets
+                  key: GITHUB_TOKEN
+                  optional: true
+          envFrom:
+            - secretRef:
+                name: ai-core-secrets
+          volumeMounts:
+            - name: google-creds
+              mountPath: /app/config/credentials.json
+              subPath: credentials.json
+              readOnly: true
+            - name: google-creds
+              mountPath: /app/gcp-service-account.json
+              subPath: gcp-service-account.json
+            - name: gmail-creds
+              mountPath: /app/config/gmail_credentials.json
+              subPath: gmail_credentials.json
+            - name: vibranium-vault
+              mountPath: /root/.config/unified-system/tokens.yaml
+              subPath: tokens.yaml
       volumes:
-      - name: google-creds
-        configMap:
-          name: bot-google-credentials
-      - name: gmail-creds
-        configMap:
-          name: bot-gmail-credentials
-      - name: vibranium-vault
-        secret:
-          secretName: vibranium-tokens
+        - name: google-creds
+          configMap:
+            name: bot-google-credentials
+        - name: gmail-creds
+          configMap:
+            name: bot-gmail-credentials
+        - name: vibranium-vault
+          secret:
+            secretName: vibranium-tokens

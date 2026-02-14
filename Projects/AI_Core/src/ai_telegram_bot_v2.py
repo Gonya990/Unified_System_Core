@@ -5366,26 +5366,33 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             log_candidates = [p for p in log_candidates if p]
 
             selected_log = next((p for p in log_candidates if Path(p).exists()), None)
+            log_out = ""
             if selected_log:
                 log_cmd = f"tail -n 120 {selected_log}"
                 log_out = subprocess.check_output(log_cmd, shell=True, text=True)
                 source_info = f"\n🧾 Источник: `{selected_log}`"
-
-                balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
-                if balances:
-                    balance_info = f"${balances[-1]} USDT"
-
-                markets = re.findall(
-                    r"Market: (RSI=[\d.]+, SMA_short=[\d.]+, SMA_long=[\d.]+)",
-                    log_out,
-                )
-                if markets:
-                    market_info = markets[-1]
             else:
-                source_info = (
-                    "\nℹ️ Лог `crypto-bot` не найден локально. "
-                    "Если бот работает в Cloud Server, укажите `CRYPTO_BOT_LOG_PATH`."
-                )
+                # Fallback: Try to fetch from remote host if configured
+                remote_host = os.getenv("FACTORY_REMOTE_HOST")
+                remote_user = os.getenv("FACTORY_REMOTE_USER", "gonya")
+                if remote_host:
+                    try:
+                        # Use the first candidate or explicit path
+                        log_path = os.getenv("CRYPTO_BOT_LOG_PATH", "/home/gonya/.pm2/logs/crypto-bot-error.log")
+                        ssh_cmd = f'ssh -o StrictHostKeyChecking=no {remote_user}@{remote_host} "tail -n 120 {log_path}"'
+                        log_out = subprocess.check_output(ssh_cmd, shell=True, text=True, timeout=5)
+                        source_info = f"\n🧾 Источник (Remote @ {remote_host}): `{log_path}`"
+                    except Exception as e:
+                        logger.error(f"Failed to fetch remote crypto logs: {e}")
+                        source_info = f"\n⚠️ Не удалось получить удаленные логи: `{e}`"
+                else:
+                    source_info = (
+                        "\nℹ️ Лог `crypto-bot` не найден локально. "
+                        "Если бот работает в Cloud Server, укажите `FACTORY_REMOTE_HOST` и `CRYPTO_BOT_LOG_PATH`."
+                    )
+
+            if log_out:
+                balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
         except Exception as e:
             logger.error(f"Failed to fetch crypto logs: {e}")
             source_info = f"\n⚠️ Ошибка чтения логов: `{e}`"
@@ -5625,14 +5632,19 @@ def main():
     logger.info(f"[STARTUP] Health server started on port {health_port}")
 
     # Start Mobile Proxy API (FastAPI)
-    api_port = int(config.get("API_PORT", 8080))
+    api_port = int(config.get("API_PORT", 3030))
 
     # We use a simple class/object bridge for the proxy
     class BotBridge:
         async def process_api_command(self, user_id, command):
             return await process_api_command(user_id, command)
+        
+        async def send_alert_to_admin(self, message):
+            await application.bot.send_message(chat_id=ADMIN_ID, text=message)
 
-    set_bot_instance(BotBridge())
+    # Inject BOTH bot bridge and inference client into the proxy
+    from api_proxy import set_context
+    set_context(bot=BotBridge(), inference=inference)
 
     def start_api():
         logger.info(f"[STARTUP] Mobile Proxy API starting on port {api_port}")
@@ -5706,8 +5718,8 @@ def main():
                 # Start Self-Healing Watchdog
                 if SelfHealer:
                     healer = SelfHealer(
-                        namespace="default"
-                    )  # Assuming default namespace
+                        namespace="trading"
+                    )  # Monitor trading namespace
                     if healer.is_active:
                         asyncio.create_task(healer.run_loop())
                         logger.info("✅ Self-Healing Watchdog started")

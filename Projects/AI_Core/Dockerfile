@@ -7,6 +7,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     curl \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

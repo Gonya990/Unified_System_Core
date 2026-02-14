@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: bot
-          image: gonya/ai-telegram-bot:latest
-          imagePullPolicy: Never
+          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot:v2-ssh-proxy
+          imagePullPolicy: Always
           resources:
             requests:
               cpu: "200m"
@@ -42,6 +42,14 @@ spec:
               value: "708531393,5569219290,578363419"
             - name: ADMIN_ID
               value: "708531393"
+            - name: FACTORY_REMOTE_HOST
+              value: "unified-home-core-cloud"
+            - name: FACTORY_REMOTE_USER
+              value: "gonya"
+            - name: FACTORY_REMOTE_ROOT
+              value: "/home/gonya/Unified_System_Core"
+            - name: CRYPTO_BOT_LOG_PATH
+              value: "/home/gonya/.pm2/logs/crypto-bot-error.log"
           volumeMounts:
             - name: db-storage
               mountPath: /app/data
