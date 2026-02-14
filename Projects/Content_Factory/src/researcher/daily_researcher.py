@@ -411,13 +411,14 @@ def generate_flux_images(scenes, output_dir: Path, style="impact"):
     try:
         import requests
 
-        flux_url = "http://localhost:8080/generate"
+        flux_url = os.getenv("FLUX_URL", "http://localhost:8081/generate")
+        flux_health = os.getenv("FLUX_HEALTH", "http://localhost:8081/")
 
         # Quick health check (1 second timeout)
         try:
-            requests.get("http://localhost:8080/", timeout=1)
+            requests.get(flux_health, timeout=1)
         except Exception:
-            print("❌ Flux server not running")
+            print(f"❌ Flux server not running at {flux_health}")
             return []
 
         print(f"✅ Flux server online! Generating {len(scenes)} scenes...")
