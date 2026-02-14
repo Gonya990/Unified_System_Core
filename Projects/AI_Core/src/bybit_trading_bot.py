@@ -8,7 +8,6 @@ import argparse
 import asyncio
 import logging
 import os
-from datetime import datetime
 from typing import Optional
 
 import aiohttp
@@ -19,8 +18,7 @@ try:
 except ImportError:
     HTTP = None
 
-import numpy as np  # Quantum analysis engine
-import pandas as pd # Data structuring
+import pandas as pd  # Data structuring
 
 # Handle arguments
 parser = argparse.ArgumentParser(description="ByBit Trading Bot")
@@ -66,12 +64,12 @@ class ByBitTradingBot:
         self.monitor_only = monitor_only
 
         # Trading parameters (ELITE QUANTUM)
-        self.max_trade_percent = 0.10  
+        self.max_trade_percent = 0.10
         self.atr_multiplier_sl = 2.0   # ATR-based volatility SL
         self.atr_multiplier_tp = 4.0   # 1:2 Risk/Reward ratio
         self.min_balance_usdt = 5.0
         self.min_order_value = 5.2
-        
+
         self.symbols = ["TONUSDT", "ETHUSDT", "BTCUSDT", "SOLUSDT"]
 
         # State
@@ -139,29 +137,29 @@ class ByBitTradingBot:
     def _calculate_indicators(self, data: list[float]):
         """Quantum indicator engine."""
         prices = pd.Series(data)
-        
+
         # RSI
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
-        
+
         # EMA
         ema_20 = prices.ewm(span=20, adjust=False).mean()
         ema_200 = prices.ewm(span=200, adjust=False).mean()
-        
+
         # MACD
         ema_12 = prices.ewm(span=12, adjust=False).mean()
         ema_26 = prices.ewm(span=26, adjust=False).mean()
         macd = ema_12 - ema_26
         signal_line = macd.ewm(span=9, adjust=False).mean()
-        
+
         # ATR (Volatility)
-        # Using a simplified high-low approximation if only closes are provided, 
+        # Using a simplified high-low approximation if only closes are provided,
         # but here we'll use price fluctuations
         atr = prices.diff().abs().rolling(window=14).mean()
-        
+
         return rsi.iloc[-1], ema_20.iloc[-1], ema_200.iloc[-1], macd.iloc[-1], signal_line.iloc[-1], atr.iloc[-1]
 
     async def analyze_market(self, symbol: str) -> Optional[dict]:
@@ -172,14 +170,14 @@ class ByBitTradingBot:
             # 1h candles
             result = session.get_kline(category="spot", symbol=symbol, interval="60", limit=250)
             if result["retCode"] != 0: return None
-            
+
             closes = [float(k[4]) for k in result["result"]["list"]]
             rsi, ema20, ema200, macd, macd_sig, atr = self._calculate_indicators(closes)
             current_price = closes[-1]
 
             logger.info(f"[{symbol}] P: {current_price:.2f} | RSI: {rsi:.1f} | EMA200: {ema200:.2f} | MACD: {macd:.2f} | ATR: {atr:.4f}")
 
-            # BUY CONDITION: 
+            # BUY CONDITION:
             # 1. Price above EMA 200 (Long trend)
             # 2. RSI < 40 (Oversold in trend)
             # 3. MACD Golden Cross (Momentum)
@@ -206,7 +204,7 @@ class ByBitTradingBot:
             precision = 4 if "TON" in symbol else 5
             if "BTC" in symbol: precision = 5
             formatted_qty = f"{quantity:.{precision}f}".rstrip('0').rstrip('.')
-            
+
             kwargs = {
                 "category": "spot",
                 "symbol": symbol,
@@ -215,7 +213,7 @@ class ByBitTradingBot:
                 "qty": formatted_qty,
             }
             if side == "Buy": kwargs["marketUnit"] = "baseCoin"
-            
+
             result = session.place_order(**kwargs)
             if result["retCode"] == 0:
                 await self.notify(f"🚀 **{side} EXECUTED**\nSymbol: {symbol}\nQty: {formatted_qty}")
@@ -231,14 +229,14 @@ class ByBitTradingBot:
         """Execute elite trade logic."""
         price = await self.get_price(symbol)
         if not price: return
-        
+
         signal = signal_data["signal"]
         atr = signal_data["atr"]
 
         if signal == "BUY" and symbol not in self.positions:
             amount = max(self.balance * self.max_trade_percent, self.min_order_value)
             if amount > self.balance: return
-            
+
             qty = round(amount / price, 4)
             if await self.place_order(symbol, "Buy", qty):
                 self.positions[symbol] = {
@@ -283,9 +281,9 @@ class ByBitTradingBot:
                 for sym in self.symbols:
                     if sym not in self.positions and self.trades_today < self.max_trades_per_day:
                         signal_data = await self.analyze_market(sym)
-                        if signal_data and signal_data["signal"] == "BUY": 
+                        if signal_data and signal_data["signal"] == "BUY":
                             await self.execute_trade(signal_data, sym)
-                await asyncio.sleep(60) 
+                await asyncio.sleep(60)
             except Exception as e:
                 logger.error(f"Loop error: {e}")
                 await asyncio.sleep(60)

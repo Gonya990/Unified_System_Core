@@ -5638,12 +5638,11 @@ def main():
     class BotBridge:
         async def process_api_command(self, user_id, command):
             return await process_api_command(user_id, command)
-        
+
         async def send_alert_to_admin(self, message):
             await application.bot.send_message(chat_id=ADMIN_ID, text=message)
 
     # Inject BOTH bot bridge and inference client into the proxy
-    from api_proxy import set_context
     set_context(bot=BotBridge(), inference=inference)
 
     def start_api():

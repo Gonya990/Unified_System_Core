@@ -9,21 +9,23 @@ if [[ "$(hostname)" != "unified-home-core-cloud" ]]; then
     # If not on the node, SSH and execute itself (assuming file is synced)
     # But files are synced to /home/gonya/Unified_System/Scripts/...
     echo "Remote execution on unified-home-core-cloud..."
-    ssh unified-home-core-cloud "bash /home/gonya/Unified_System/Scripts/Orchestration/deploy/build-bot-local.sh"
+    ssh unified-home-core-cloud "bash /home/gonya/Unified_System_Core/Scripts/Orchestration/deploy/build-bot-local.sh"
     exit $?
 fi
 
 echo "💎 Building Local AI Bot Image for K3s..."
-cd /home/gonya/Unified_System
+cd /home/gonya/Unified_System_Core
 
-# 1. Build the image using Docker (or BuildKit directly if available, but Docker is standard)
+# 1. Build the image using Docker
 # We use the tag expected by the deployment: ai-telegram-bot:local
-if sudo docker build -t ai-telegram-bot:local -f Projects/AI_Core/Dockerfile .; then
+cd /home/gonya/Unified_System_Core/Projects/AI_Core || { echo "Directory not found"; exit 1; }
+if sudo docker build -t ai-telegram-bot:local .; then
     echo "✓ Docker build successful."
 else
     echo "✗ Docker build failed."
     exit 1
 fi
+cd ../..
 
 # 2. Import into K3s (containerd)
 echo "Importing into K3s registry..."

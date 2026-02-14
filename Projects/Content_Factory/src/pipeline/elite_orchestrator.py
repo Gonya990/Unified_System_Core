@@ -44,5 +44,14 @@ class EliteContentOrchestrator:
 
 if __name__ == "__main__":
     orch = EliteContentOrchestrator()
-    test_data = {"script_ru": ("Система 'Вибраниум' активирована на Титане. Это начало новой эры автономии.")}
-    orch.run_elite_pipeline(test_data)
+    import time
+
+    orch = EliteContentOrchestrator()
+    print("✅ Orchestrator Initialized. Entering Daemon Mode...")
+    
+    while True:
+        # pending_tasks = check_queue() # Future: Check Redis/Queue
+        print("💤 Waiting for new content tasks...")
+        time.sleep(60)
+        # For testing, we can trigger manually or via API
+

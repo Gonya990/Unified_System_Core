@@ -1,10 +1,10 @@
 import json
 import logging
 import time
-from typing import List, Optional, Any
+from typing import Any, List, Optional
 
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
