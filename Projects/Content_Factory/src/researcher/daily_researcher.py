@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import hashlib
 import os
 import random
 import re
@@ -399,6 +400,46 @@ def get_style_prompt_prefix(style):
         return "cinematic documentary footage, hyper-realistic, 8k, detailed, dramatic lighting, vertical 9:16 format"
 
 
+def _get_hf_token():
+    return (
+        os.getenv("HF_TOKEN")
+        or os.getenv("HUGGINGFACE_HUB_TOKEN")
+        or os.getenv("HUGGINGFACE_TOKEN")
+    )
+
+
+def _split_env_list(name: str, default: str = "") -> list[str]:
+    raw = (os.getenv(name) or default or "").strip()
+    if not raw:
+        return []
+    return [v.strip() for v in raw.split(",") if v.strip()]
+
+
+_HF_RR_INDEX = 0
+
+
+def _hf_model_candidates(models: list[str], seed: str) -> list[str]:
+    """Rotate model list deterministically to spread load across variants."""
+    if not models:
+        return []
+    mode = (os.getenv("HF_MODEL_ROTATION") or "hash").strip().lower()
+    if mode == "random":
+        shuffled = models[:]
+        random.shuffle(shuffled)
+        return shuffled
+    if mode == "roundrobin":
+        global _HF_RR_INDEX
+        start = _HF_RR_INDEX % len(models)
+        _HF_RR_INDEX += 1
+        return models[start:] + models[:start]
+
+    if not seed:
+        return models
+    h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
+    start = int(h, 16) % len(models)
+    return models[start:] + models[:start]
+
+
 def generate_gemini_images(scenes, output_dir: Path, style="impact"):
     """💎 Gemini 2.0 Flash Image - DISABLED (API not available yet)"""
     print("⚠️ Gemini Image Generation not available (experimental API)")
@@ -453,6 +494,94 @@ def generate_flux_images(scenes, output_dir: Path, style="impact"):
                 break  # Stop trying if one fails
     except Exception as e:
         print(f"❌ Flux error: {e}")
+    return resolved
+
+
+def generate_hf_flux_images(scenes, output_dir: Path, style="impact"):
+    """🌐 HF Inference (Flux + model tree variants) - Remote fallback"""
+    allow_hf = os.getenv("ALLOW_HF_REMOTE", "true").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    if not allow_hf:
+        print("⚠️ HF remote inference disabled (ALLOW_HF_REMOTE=false).")
+        return []
+
+    token = _get_hf_token()
+    if not token:
+        print("⚠️ HF_TOKEN not found. Skipping HF Inference.")
+        return []
+
+    try:
+        from huggingface_hub import InferenceClient
+    except Exception as e:
+        print(f"⚠️ huggingface_hub not installed: {e}")
+        return []
+
+    provider = (os.getenv("HF_PROVIDER") or "nscale").strip()
+    models = _split_env_list(
+        "HF_FLUX_MODELS", "black-forest-labs/FLUX.1-schnell"
+    )
+    if not models:
+        print("⚠️ HF_FLUX_MODELS empty. Skipping HF Inference.")
+        return []
+
+    width = int(os.getenv("HF_IMAGE_WIDTH", "768"))
+    height = int(os.getenv("HF_IMAGE_HEIGHT", "1344"))
+    steps_raw = (os.getenv("HF_IMAGE_STEPS") or "").strip()
+    guidance_raw = (os.getenv("HF_IMAGE_GUIDANCE") or "").strip()
+    steps = int(steps_raw) if steps_raw.isdigit() else None
+    guidance = float(guidance_raw) if guidance_raw else None
+
+    print(
+        f"🌐 HF Inference ({provider}) with {len(models)} model(s): "
+        f"{', '.join(models[:3])}{'...' if len(models) > 3 else ''}"
+    )
+
+    client = InferenceClient(provider=provider, api_key=token)
+    resolved = []
+    prefix = get_style_prompt_prefix(style)
+
+    for s in scenes:
+        time.sleep(1.0)
+        prompt = f"{prefix}, {s['keyword']}"
+        seed = s.get("image") or s.get("keyword") or prompt
+        candidates = _hf_model_candidates(models, seed)
+
+        for model_id in candidates:
+            try:
+                params = {}
+                if width and height:
+                    params["width"] = width
+                    params["height"] = height
+                if steps:
+                    params["num_inference_steps"] = steps
+                if guidance is not None:
+                    params["guidance_scale"] = guidance
+
+                try:
+                    img = client.text_to_image(prompt, model=model_id, **params)
+                except TypeError:
+                    img = client.text_to_image(prompt, model=model_id)
+
+                path = output_dir / f"{s['image']}.jpg"
+                if hasattr(img, "save"):
+                    img.save(path)
+                elif isinstance(img, (bytes, bytearray)):
+                    with open(path, "wb") as f:
+                        f.write(img)
+                else:
+                    raise RuntimeError("Unexpected HF image type")
+
+                s["resolved_path"] = str(path)
+                resolved.append(s)
+                print(f"   ✅ HF ({provider}) {model_id}: {s['image']}")
+                break
+            except Exception as e:
+                print(f"   ⚠️ HF {model_id} failed for {s['image']}: {e}")
+
     return resolved
 
 
@@ -643,7 +772,7 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})"
     )
     print(
-        "   Priority: Context → Gemini 2.0 → Flux.1 → SDXL → DALL-E → Banana → Pexels"
+        "   Priority: Context → Gemini 2.0 → Flux.1 → HF Flux → SDXL → DALL-E → Banana → Pexels"
     )
 
     # LEVEL 0: LOCAL CONTEXT (Highest Priority - Brand Assets)
@@ -668,6 +797,15 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         resolved.extend(flux_results)
         if len(resolved) == len(scenes):
             print("✅ All images completed via Gemini + Flux (FREE)")
+            return resolved
+
+    # FREE/REMOTE TIER: HF Inference (Flux + model tree variants)
+    missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+    if missing:
+        hf_results = generate_hf_flux_images(missing, output_dir, style=style)
+        resolved.extend(hf_results)
+        if len(resolved) == len(scenes):
+            print("✅ All images completed via Gemini + Flux + HF (REMOTE)")
             return resolved
 
     # FREE TIER 3: SDXL (Backup, Local)
