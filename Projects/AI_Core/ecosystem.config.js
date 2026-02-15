@@ -1,8 +1,13 @@
+const path = require("path");
+
+const ROOT_DIR = __dirname;
+
 module.exports = {
   apps: [
     {
       name: "ai-bot-igor",
-      script: "src/ai_telegram_bot_v2.py",
+      script: path.join(ROOT_DIR, "src/ai_telegram_bot_v2.py"),
+      cwd: ROOT_DIR,
       interpreter: "python3",
       args: "--env .env.igor",
       instances: 1,
@@ -31,7 +36,8 @@ module.exports = {
     },
     {
       name: "bybit-monitor",
-      script: "src/bybit_trading_bot.py",
+      script: path.join(ROOT_DIR, "src/bybit_trading_bot.py"),
+      cwd: ROOT_DIR,
       interpreter: "python3",
       args: "--env .env",
       env: {
