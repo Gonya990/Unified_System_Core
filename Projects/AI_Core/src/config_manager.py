@@ -32,6 +32,7 @@ class ConfigManager:
         "GEMINI_API_KEY",
         "OPENAI_API_KEY",
         "OPENROUTER_API_KEY",
+        "NVIDIA_API_KEY",
         "VAPI_API_KEY",
         "GITHUB_TOKEN",
         "HA_TOKEN",
@@ -93,6 +94,11 @@ class ConfigManager:
             ),
             "OPENROUTER_MODEL": os.environ.get(
                 "OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet"
+            ),
+            # NVIDIA NIM settings
+            "NVIDIA_API_KEY": os.environ.get("NVIDIA_API_KEY", ""),
+            "NVIDIA_MODEL": os.environ.get(
+                "NVIDIA_MODEL", "meta/llama-3.1-70b-instruct"
             ),
             # Legacy settings (backwards compatibility)
             "INFERENCE_BASE_URL": os.environ.get(

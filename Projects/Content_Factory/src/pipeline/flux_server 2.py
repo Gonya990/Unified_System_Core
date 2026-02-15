@@ -1,8 +1,6 @@
 import io
 import os
 import threading
-from pathlib import Path
-import sys
 
 import torch
 from einops import rearrange
@@ -14,33 +12,6 @@ from PIL import Image
 from flux.sampling import denoise, get_noise, get_schedule, prepare, unpack
 from flux.util import embed_watermark, load_ae, load_clip, load_flow_model
 from flux.modules.conditioner import HFEmbedder
-
-
-def _ensure_hf_token() -> str | None:
-    token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_HUB_TOKEN")
-    if token:
-        return token
-
-    try:
-        repo_root = Path(__file__).resolve().parents[4]
-        utils_path = repo_root / "Scripts" / "Utilities"
-        if utils_path.exists():
-            sys.path.append(str(utils_path))
-            from token_broker import TokenBroker  # type: ignore
-
-            broker = TokenBroker()
-            token = broker.get_key("huggingface")
-            if token:
-                os.environ["HF_TOKEN"] = token
-                os.environ.setdefault("HUGGINGFACE_HUB_TOKEN", token)
-                return token
-    except Exception:
-        return None
-
-    return None
-
-
-_ensure_hf_token()
 
 
 class GenerateRequest(BaseModel):

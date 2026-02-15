@@ -111,8 +111,36 @@ def deep_research_with_council(topic: str) -> Optional[dict]:
 
 def generate_script_direct(topic, subtopic):
     """
-    Generate script using OpenAI directly to avoid Council complexity for now
+    Generate script using Gemini first (OpenAI fallback)
     """
+    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if gemini_key:
+        try:
+            from google import genai
+
+            client = genai.Client(api_key=gemini_key)
+            model = os.getenv("GEMINI_TEXT_MODEL", "models/gemini-2.0-flash")
+
+            prompt = f"""
+            Write a 3-minute documentary narration script (Russian language) about: {topic}
+            Focus specifically on: {subtopic}
+
+            Style: Professional, Engaging, Discovery Channel style.
+            Length: Approx 400-500 words.
+            Format: Just the text for Voiceover. No scene directions in text.
+            """
+
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+            )
+            text = getattr(response, "text", None)
+            if text:
+                return text.strip()
+            raise ValueError("Empty Gemini response")
+        except Exception as e:
+            print(f"⚠️ Gemini Error: {e}. Falling back to OpenAI...")
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return f"Script generation failed. Topic: {topic}. Subtopic: {subtopic}. (No API Key)"

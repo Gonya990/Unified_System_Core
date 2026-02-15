@@ -41,6 +41,8 @@ spec:
               value: "gonya"
             - name: FACTORY_REMOTE_ROOT
               value: "/home/gonya/Unified_System_Core"
+            - name: OAUTHLIB_INSECURE_TRANSPORT
+              value: "1"
             - name: CRYPTO_BOT_LOG_PATH
               value: "/home/gonya/.pm2/logs/crypto-bot-error.log"
             - name: GITHUB_TOKEN

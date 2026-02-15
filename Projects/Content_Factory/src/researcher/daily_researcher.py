@@ -274,7 +274,25 @@ def run_daily_research(
         except Exception as e:
             print(f"⚠️ Gemini Deep Research failed: {e}. Falling back to OpenAI...")
 
-    # Strategy 1: OpenAI Responses API
+    # Strategy 1: Gemini (Primary for standard research)
+    if not data:
+        try:
+            print("🌠 Researching via Gemini 2.0...")
+            from google import genai
+
+            client = genai.Client(api_key=get_key("gemini"))
+            res = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt,
+            )
+            content = res.text or ""
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            data = json.loads(content)
+        except Exception as e:
+            print(f"⚠️ Gemini Research failed: {e}. Falling back to OpenAI...")
+
+    # Strategy 2: OpenAI Responses API (Fallback)
     if not data:
         try:
             print("🤖 Attempting Research via OpenAI Responses API (GPT-4o)...")
@@ -312,27 +330,7 @@ def run_daily_research(
                 content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
         except Exception as e:
-            print(f"⚠️ OpenAI Research failed: {e}. Checking legacy fallback...")
-
-    # Strategy 2: Gemini Fallback
-    if not data:
-        try:
-            print("🌠 Researching via Gemini 2.0...")
-            from google import genai
-
-            client = genai.Client(api_key=get_key("gemini"))
-            res = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt,
-            )
-            content = res.text or ""
-            if "```json" in content:
-                content = content.split("```json")[1].split("```")[0].strip()
-            data = json.loads(content)
-        except Exception as e:
-            print(
-                f"⚠️ Gemini Research failed: {e}. Falling back to Ollama (Rock Solid)..."
-            )
+            print(f"⚠️ OpenAI Research failed: {e}. Falling back to Ollama (Rock Solid)...")
 
     # Strategy 3: Ollama
     if not data:
@@ -418,6 +416,29 @@ def _split_env_list(name: str, default: str = "") -> list[str]:
 _HF_RR_INDEX = 0
 
 
+def _get_gemini_key() -> str | None:
+    return (
+        os.getenv("GEMINI_API_KEY")
+        or os.getenv("GOOGLE_API_KEY")
+        or os.getenv("GOOGLE_GENAI_API_KEY")
+    )
+
+
+def _get_gemini_key_from_broker() -> str | None:
+    try:
+        repo_root = Path(__file__).resolve().parents[4]
+        utils_path = repo_root / "Scripts" / "Utilities"
+        if utils_path.exists():
+            sys.path.append(str(utils_path))
+            from token_broker import TokenBroker  # type: ignore
+
+            broker = TokenBroker()
+            return broker.get_key("gemini")
+    except Exception:
+        return None
+    return None
+
+
 def _hf_model_candidates(models: list[str], seed: str) -> list[str]:
     """Rotate model list deterministically to spread load across variants."""
     if not models:
@@ -441,9 +462,131 @@ def _hf_model_candidates(models: list[str], seed: str) -> list[str]:
 
 
 def generate_gemini_images(scenes, output_dir: Path, style="impact"):
-    """💎 Gemini 2.0 Flash Image - DISABLED (API not available yet)"""
-    print("⚠️ Gemini Image Generation not available (experimental API)")
-    return []  # Skip for now, will be enabled when API is stable
+    """💎 Gemini/Vertex Image Generation (Google API)"""
+    if not scenes:
+        return []
+
+    api_key = _get_gemini_key() or _get_gemini_key_from_broker()
+    prefix = get_style_prompt_prefix(style)
+    resolved = []
+
+    # Prefer Google GenAI (new SDK)
+    try:
+        from google import genai  # type: ignore
+        from google.genai import types  # type: ignore
+
+        if api_key:
+            client = genai.Client(api_key=api_key)
+            model_name = os.getenv(
+                "GEMINI_IMAGE_MODEL", "imagen-4.0-generate-001"
+            )
+            print(f"💎 Gemini Images via google-genai ({model_name})...")
+
+            for s in scenes:
+                prompt = f"{prefix}, {s['keyword']}"
+                try:
+                    response = client.models.generate_images(
+                        model=model_name,
+                        prompt=prompt,
+                        config=types.GenerateImagesConfig(
+                            number_of_images=1, aspect_ratio="9:16"
+                        ),
+                    )
+                    if response and response.generated_images:
+                        img = response.generated_images[0]
+                        path = output_dir / f"{s['image']}.jpg"
+                        with open(path, "wb") as f:
+                            f.write(img.image.image_bytes)
+                        s["resolved_path"] = str(path)
+                        resolved.append(s)
+                        print(f"   ✅ Gemini image: {s['image']}")
+                    else:
+                        print(f"   ⚠️ Gemini returned no image: {s['image']}")
+                except Exception as e:
+                    print(f"   ⚠️ Gemini genai failed for {s['image']}: {e}")
+            return resolved
+    except Exception:
+        pass
+
+    # Fallback: legacy google.generativeai (if installed)
+    try:
+        import google.generativeai as genai  # type: ignore
+        import base64
+
+        if api_key:
+            genai.configure(api_key=api_key)
+            model_name = os.getenv(
+                "GEMINI_IMAGE_MODEL_LEGACY", "models/gemini-2.0-flash-image"
+            )
+            print(f"💎 Gemini Images via google.generativeai ({model_name})...")
+            model = genai.GenerativeModel(model_name)
+
+            for s in scenes:
+                prompt = f"{prefix}, {s['keyword']}"
+                try:
+                    response = model.generate_content(
+                        ["Generate a vertical 9:16 image:", prompt]
+                    )
+                    image_data = getattr(response, "image_data", None)
+                    if image_data:
+                        if isinstance(image_data, str):
+                            image_bytes = base64.b64decode(image_data)
+                        else:
+                            image_bytes = image_data
+                        path = output_dir / f"{s['image']}.jpg"
+                        with open(path, "wb") as f:
+                            f.write(image_bytes)
+                        s["resolved_path"] = str(path)
+                        resolved.append(s)
+                        print(f"   ✅ Gemini legacy image: {s['image']}")
+                    else:
+                        print(f"   ⚠️ Gemini legacy returned no image: {s['image']}")
+                except Exception as e:
+                    print(f"   ⚠️ Gemini legacy failed for {s['image']}: {e}")
+            return resolved
+    except Exception:
+        pass
+
+    # Fallback: Vertex AI Imagen (requires service account)
+    try:
+        project_id = os.getenv("VERTEX_PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
+        location = os.getenv("VERTEX_LOCATION", "us-central1")
+        if not project_id:
+            print("⚠️ Vertex project not set (VERTEX_PROJECT_ID). Skipping Vertex.")
+            return []
+
+        import vertexai  # type: ignore
+        from vertexai.preview.vision_models import (  # type: ignore
+            ImageGenerationModel,
+        )
+
+        vertexai.init(project=project_id, location=location)
+        model_name = os.getenv(
+            "VERTEX_IMAGE_MODEL", "imagen-3.0-generate-002"
+        )
+        print(f"💎 Vertex Imagen ({model_name})...")
+        model = ImageGenerationModel.from_pretrained(model_name)
+
+        for s in scenes:
+            prompt = f"{prefix}, {s['keyword']}"
+            try:
+                images = model.generate_images(
+                    prompt=prompt, number_of_images=1, aspect_ratio="9:16"
+                )
+                if images:
+                    path = output_dir / f"{s['image']}.jpg"
+                    images[0].save(str(path))
+                    s["resolved_path"] = str(path)
+                    resolved.append(s)
+                    print(f"   ✅ Vertex image: {s['image']}")
+                else:
+                    print(f"   ⚠️ Vertex returned no image: {s['image']}")
+            except Exception as e:
+                print(f"   ⚠️ Vertex failed for {s['image']}: {e}")
+        return resolved
+    except Exception as e:
+        print(f"⚠️ Vertex Imagen unavailable: {e}")
+        return []
 
 
 def generate_flux_images(scenes, output_dir: Path, style="impact"):
@@ -784,12 +927,7 @@ def check_local_context_files(scenes, output_dir: Path):
 
 def generate_vision_assets(scenes, output_dir: Path, style="impact"):
     """💎 VIBRANIUM TRIPLE-THREAT: Local Context → Free → Paid Failover"""
-    print(
-        f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})"
-    )
-    print(
-        "   Priority: Context → Gemini 2.0 → Flux.1 → HF Flux → SDXL → DALL-E → Banana → Pexels"
-    )
+    print(f"🚀 VIBRANIUM TRIPLE-THREAT PIPELINE: Local → Free → Paid Failover (Style: {style})")
 
     # LEVEL 0: LOCAL CONTEXT (Highest Priority - Brand Assets)
     resolved = check_local_context_files(scenes, output_dir)
@@ -797,40 +935,82 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         print("✅ All assets found in Local Context")
         return resolved
 
-    # FREE TIER 1: Gemini 2.0 Flash Image (Best Quality, Free)
-    missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
-    if missing:
-        gemini_results = generate_gemini_images(missing, output_dir, style=style)
-        resolved.extend(gemini_results)
-        if len(resolved) == len(scenes):
-            print("✅ All images generated via Gemini 2.0 (FREE)")
-            return resolved
+    prefer_local = os.getenv("PREFER_LOCAL_IMAGES", "true").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    if prefer_local:
+        print(
+            "   Priority: Context → Flux.1/SDXL (local) → Gemini/Vertex (remote) → HF Flux → DALL-E → Banana → Pexels"
+        )
+    else:
+        print(
+            "   Priority: Context → Gemini/Vertex (remote) → Flux.1/SDXL (local) → HF Flux → DALL-E → Banana → Pexels"
+        )
 
-    # FREE TIER 2: Flux.1 Schnell (Fast, Local)
-    missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
-    if missing:
-        flux_results = generate_flux_images(missing, output_dir, style=style)
-        resolved.extend(flux_results)
-        if len(resolved) == len(scenes):
-            print("✅ All images completed via Gemini + Flux (FREE)")
-            return resolved
+    if prefer_local:
+        # FREE TIER 1: Flux.1 Schnell (Fast, Local)
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            flux_results = generate_flux_images(missing, output_dir, style=style)
+            resolved.extend(flux_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Flux (FREE/local)")
+                return resolved
 
-    # FREE/REMOTE TIER: HF Inference (Flux + model tree variants)
+        # FREE TIER 2: SDXL (Backup, Local)
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            sdxl_results = generate_sdxl_images(missing, output_dir, style=style)
+            resolved.extend(sdxl_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Local (Flux/SDXL)")
+                return resolved
+
+        # REMOTE TIER: Gemini/Vertex (Google)
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            gemini_results = generate_gemini_images(missing, output_dir, style=style)
+            resolved.extend(gemini_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Google (Gemini/Vertex)")
+                return resolved
+    else:
+        # REMOTE TIER: Gemini/Vertex (Google)
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            gemini_results = generate_gemini_images(missing, output_dir, style=style)
+            resolved.extend(gemini_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Google (Gemini/Vertex)")
+                return resolved
+
+        # FREE TIER: Flux.1 Schnell / SDXL (Local Fallback)
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            flux_results = generate_flux_images(missing, output_dir, style=style)
+            resolved.extend(flux_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Flux (FREE/local)")
+                return resolved
+
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            sdxl_results = generate_sdxl_images(missing, output_dir, style=style)
+            resolved.extend(sdxl_results)
+            if len(resolved) == len(scenes):
+                print("✅ All images completed via Local (Flux/SDXL)")
+                return resolved
+
+    # REMOTE TIER: HF Inference (Flux + model tree variants)
     missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
     if missing:
         hf_results = generate_hf_flux_images(missing, output_dir, style=style)
         resolved.extend(hf_results)
         if len(resolved) == len(scenes):
-            print("✅ All images completed via Gemini + Flux + HF (REMOTE)")
-            return resolved
-
-    # FREE TIER 3: SDXL (Backup, Local)
-    missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
-    if missing:
-        sdxl_results = generate_sdxl_images(missing, output_dir, style=style)
-        resolved.extend(sdxl_results)
-        if len(resolved) == len(scenes):
-            print("✅ All images completed via Free Tier (Gemini/Flux/SDXL)")
+            print("✅ All images completed via HF Inference")
             return resolved
 
     # Paid is allowed by default; set ALLOW_PAID_IMAGES=false to force free-only

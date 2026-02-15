@@ -83,9 +83,10 @@ class TokenTracker:
         }
 
     def log(self, provider: str, input_tokens: int, output_tokens: int):
-        if provider in self.usage:
-            self.usage[provider]["input"] += input_tokens
-            self.usage[provider]["output"] += output_tokens
+        if provider not in self.usage:
+            self.usage[provider] = {"input": 0, "output": 0}
+        self.usage[provider]["input"] += input_tokens
+        self.usage[provider]["output"] += output_tokens
 
         # Rough cost estimate (OpenAI GPT-4o pricing)
         if provider == "openai":
@@ -108,6 +109,62 @@ class TokenTracker:
 
 TRACKER = TokenTracker()
 
+
+def _build_council():
+    from council.council import LLMCouncil
+
+    if BROKER:
+        return LLMCouncil.from_token_broker(BROKER)
+    return LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
+
+
+def _filter_council(council, provider_name: str) -> bool:
+    providers = [p for p in council.providers if p.name == provider_name or provider_name in p.name]
+    if not providers:
+        return False
+    council.providers = providers
+    council.chairman = providers[0]
+    council.enable_peer_review = len(providers) > 1
+    return True
+
+
+def _deliberate_with_fallback(prompt: str, system_prompt: str = ""):
+    import asyncio
+
+    # 1) Gemini-only (preferred)
+    council = _build_council()
+    if _filter_council(council, "gemini"):
+        try:
+            return asyncio.run(council.deliberate(prompt, system_prompt, verbose=False))
+        except Exception as e:
+            print(f"⚠️ Gemini council failed: {e}. Falling back to OpenAI...")
+        finally:
+            try:
+                asyncio.run(council.close())
+            except Exception:
+                pass
+
+    # 2) OpenAI-only (fallback)
+    council = _build_council()
+    if _filter_council(council, "openai"):
+        try:
+            return asyncio.run(council.deliberate(prompt, system_prompt, verbose=False))
+        finally:
+            try:
+                asyncio.run(council.close())
+            except Exception:
+                pass
+
+    # 3) Last resort: any available providers
+    council = _build_council()
+    try:
+        return asyncio.run(council.deliberate(prompt, system_prompt, verbose=False))
+    finally:
+        try:
+            asyncio.run(council.close())
+        except Exception:
+            pass
+
 # =============================================================================
 #                           DEEP RESEARCH (PLAN & EXECUTE)
 # =============================================================================
@@ -117,15 +174,7 @@ def get_documentary_structure(topic: str) -> Optional[dict]:
     """Phase 1: Get structured plan with segment outlines"""
     print(f"\n🧠 PHASE 1: Planning Documentary Structure for '{topic}'")
 
-    try:
-        from council.council import LLMCouncil
-
-        if BROKER:
-            council = LLMCouncil.from_token_broker(BROKER)
-        else:
-            council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
-
-        plan_query = f"""
+    plan_query = f"""
         Create a detailed 6-segment OUTLINE for a 28-minute DOCUMENTARY about: {topic}
 
         Return JSON format:
@@ -147,22 +196,18 @@ def get_documentary_structure(topic: str) -> Optional[dict]:
         - Russian language for title/description
         - Exactly 6 segments
         """
-
-        import asyncio
-
-        session = asyncio.run(council.deliberate(plan_query, verbose=False))
+    try:
+        session = _deliberate_with_fallback(plan_query)
+        if not session or not session.stage3_consensus:
+            raise ValueError("Empty council response")
         consensus = session.stage3_consensus
 
         if "```json" in consensus:
             consensus = consensus.split("```json")[1].split("```")[0].strip()
 
         data = json.loads(consensus)
-        TRACKER.log("openai", len(plan_query) // 4, len(consensus) // 4)
-
-        try:
-            asyncio.run(council.close())
-        except:
-            pass
+        provider = session.chairman_provider or "unknown"
+        TRACKER.log(provider, len(plan_query) // 4, len(consensus) // 4)
 
         return data
     except Exception as e:
@@ -175,15 +220,7 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
     seg_name = segment_info.get("name", "Unknown")
     print(f"📝 Phase 2: Writing Script for '{seg_name}' (Target 650+ words)")
 
-    try:
-        from council.council import LLMCouncil
-
-        if BROKER:
-            council = LLMCouncil.from_token_broker(BROKER)
-        else:
-            council = LLMCouncil.from_env(str(ROOT_DIR / "LLM_Council/.env"))
-
-        prompt = f"""
+    prompt = f"""
         Write a FULL DOCUMENTARY SCRIPT for one segment of a documentary about: {topic}
 
         SEGMENT: {seg_name}
@@ -205,10 +242,10 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
             ]
         }}
         """
-
-        import asyncio
-
-        session = asyncio.run(council.deliberate(prompt, verbose=False))
+    try:
+        session = _deliberate_with_fallback(prompt)
+        if not session or not session.stage3_consensus:
+            raise ValueError("Empty council response")
         content = session.stage3_consensus
 
         if "```json" in content:
@@ -216,12 +253,8 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
 
         seg_data = json.loads(content)
         # Approximate tokens
-        TRACKER.log("openai", len(prompt) // 4, len(content) // 4)
-
-        try:
-            asyncio.run(council.close())
-        except:
-            pass
+        provider = session.chairman_provider or "unknown"
+        TRACKER.log(provider, len(prompt) // 4, len(content) // 4)
 
         return seg_data
 
@@ -230,11 +263,19 @@ def generate_segment_script(topic: str, segment_info: dict, context_summary: str
         return None
 
 
-def deep_research_with_council(topic: str) -> dict:
+def deep_research_with_council(topic: str, output_dir: Optional[Path] = None) -> dict:
     """Refactored: Plan with Council, Execute with individual calls"""
     structure = get_documentary_structure(topic)
     if not structure:
         return None
+
+    if output_dir:
+        try:
+            with open(output_dir / "documentary_plan.json", "w", encoding="utf-8") as f:
+                json.dump(structure, f, indent=2, ensure_ascii=False)
+            print(f"📝 Plan saved: {output_dir / 'documentary_plan.json'}")
+        except Exception as e:
+            print(f"⚠️ Failed to save plan: {e}")
 
     full_data = {
         "title": structure.get("title"),
@@ -482,8 +523,12 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
 
     print(f"📌 Topic: {topic}")
 
-    # 1. Deep Research
-    data = deep_research_with_council(topic)
+    # 1. Setup output directory (needed for plan save)
+    output_dir = ROOT_DIR / "outputs" / f"documentary_{timestamp}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # 2. Deep Research
+    data = deep_research_with_council(topic, output_dir=output_dir)
     if not data:
         data = fallback_research(topic)
 
@@ -491,18 +536,14 @@ def run_longform_production(topic: str = None) -> Optional[Path]:
         print("❌ Research failed, aborting production")
         return None
 
-    # 2. Setup output directory
-    output_dir = ROOT_DIR / "outputs" / f"documentary_{timestamp}"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Save research data
+    # 3. Save research data
     with open(output_dir / "documentary_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    # 3. Produce video
+    # 4. Produce video
     final_video = assemble_longform_video(data, output_dir)
 
-    # 4. Token report
+    # 5. Token report
     TRACKER.report()
 
     if final_video:

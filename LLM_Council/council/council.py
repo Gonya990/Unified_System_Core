@@ -6,6 +6,7 @@ Coordinates multiple LLMs through deliberation stages.
 import asyncio
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -90,8 +91,6 @@ class LLMCouncil:
     @classmethod
     def from_env(cls, env_path: str = ".env") -> "LLMCouncil":
         """Create council from environment variables."""
-        import os
-
         from dotenv import load_dotenv
 
         load_dotenv(env_path, override=True)
@@ -126,16 +125,43 @@ class LLMCouncil:
             )
             logger.info("✓ NVIDIA NIM provider initialized")
 
+        # Gemini
+        gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if gemini_key:
+            providers.append(
+                GeminiProvider(
+                    api_key=gemini_key,
+                    model=os.getenv("GEMINI_TEXT_MODEL", "models/gemini-2.0-flash"),
+                )
+            )
+            logger.info("✓ Gemini provider initialized")
+
         if not providers:
             raise ValueError("No valid API keys found. Check your .env file.")
 
-        # Chairman
-        chairman_provider = os.getenv("CHAIRMAN_PROVIDER", "openai")
+        # Provider ordering + chairman selection
+        order_raw = os.getenv("COUNCIL_PROVIDER_ORDER", "gemini,openai,github,nvidia")
+        order = [v.strip().lower() for v in order_raw.split(",") if v.strip()]
+        if order:
+            ordered = []
+            remaining = providers[:]
+            for name in order:
+                for p in list(remaining):
+                    if p.name == name or name in p.name:
+                        ordered.append(p)
+                        remaining.remove(p)
+            ordered.extend(remaining)
+            providers = ordered
+
+        chairman_provider = os.getenv("CHAIRMAN_PROVIDER")
         chairman = None
-        for p in providers:
-            if p.name == chairman_provider or chairman_provider in p.name:
-                chairman = p
-                break
+        if chairman_provider:
+            for p in providers:
+                if p.name == chairman_provider or chairman_provider in p.name:
+                    chairman = p
+                    break
+        if chairman is None and providers:
+            chairman = providers[0]
 
         return cls(
             providers=providers,
@@ -149,7 +175,20 @@ class LLMCouncil:
         """Create council using keys from TokenBroker."""
         providers = []
 
-        # OpenAI
+        # Gemini
+        gemini_key = broker.get_key("gemini", tier=tier)
+        if gemini_key:
+            providers.append(
+                GeminiProvider(
+                    api_key=gemini_key,
+                    model=os.getenv("GEMINI_TEXT_MODEL", "models/gemini-2.0-flash"),
+                )
+            )
+            logger.info(f"✓ Gemini provider initialized via TokenBroker (Tier: {tier})")
+        else:
+            logger.warning(f"TokenBroker returned no key for Gemini (Tier: {tier})")
+
+        # OpenAI (fallback)
         openai_key = broker.get_key("openai", tier=tier)
         if openai_key:
             providers.append(
@@ -163,23 +202,34 @@ class LLMCouncil:
         else:
             logger.warning(f"TokenBroker returned no key for OpenAI (Tier: {tier})")
 
-        # Gemini
-        gemini_key = broker.get_key("gemini", tier=tier)
-        if gemini_key:
-            providers.append(
-                GeminiProvider(
-                    api_key=gemini_key,
-                    model="models/nano-banana-pro-preview",  # Priority: Nana Banana
-                )
-            )
-            logger.info(f"✓ Gemini provider initialized via TokenBroker (Tier: {tier})")
-        else:
-            logger.warning(f"TokenBroker returned no key for Gemini (Tier: {tier})")
-
         if not providers:
             raise ValueError("TokenBroker returned no valid keys for supported providers.")
 
-        return cls(providers=providers, chairman=providers[0] if providers else None, enable_peer_review=True)
+        # Provider ordering + chairman selection
+        order_raw = os.getenv("COUNCIL_PROVIDER_ORDER", "gemini,openai,github,nvidia")
+        order = [v.strip().lower() for v in order_raw.split(",") if v.strip()]
+        if order:
+            ordered = []
+            remaining = providers[:]
+            for name in order:
+                for p in list(remaining):
+                    if p.name == name or name in p.name:
+                        ordered.append(p)
+                        remaining.remove(p)
+            ordered.extend(remaining)
+            providers = ordered
+
+        chairman_provider = os.getenv("CHAIRMAN_PROVIDER")
+        chairman = None
+        if chairman_provider:
+            for p in providers:
+                if p.name == chairman_provider or chairman_provider in p.name:
+                    chairman = p
+                    break
+        if chairman is None and providers:
+            chairman = providers[0]
+
+        return cls(providers=providers, chairman=chairman, enable_peer_review=True)
 
     async def deliberate(self, query: str, system_prompt: str = "", verbose: bool = False) -> CouncilSession:
         """

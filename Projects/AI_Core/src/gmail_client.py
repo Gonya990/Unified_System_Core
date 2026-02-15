@@ -43,14 +43,16 @@ class GmailClient:
             if credentials_dict:
                 self.creds = Credentials.from_authorized_user_info(credentials_dict)
                 self.service = build("gmail", "v1", credentials=self.creds)
-                self.authenticated = True
-                # Get user's email address
+                
+                # Verify and get user's email address
                 profile = self.service.users().getProfile(userId="me").execute()
                 self.user_email = profile.get("emailAddress")
+                self.authenticated = True
                 logger.debug(f"Gmail service initialized for {self.user_email}")
             else:
                 logger.warning("No credentials provided to GmailClient")
         except Exception as e:
+            self.authenticated = False
             logger.error(f"Failed to initialize Gmail service: {e}")
 
     def is_valid(self) -> bool:
@@ -59,16 +61,19 @@ class GmailClient:
     def get_unread_count(self) -> int:
         """Get count of unread emails."""
         if not self.authenticated:
-            return -1
+            return 0
 
         try:
             results = (
-                self.service.users().messages().list(userId="me", labelIds=["INBOX", "UNREAD"], maxResults=1).execute()
+                self.service.users().messages().list(userId="me", labelIds=["UNREAD"], maxResults=1).execute()
             )
+            # resultSizeEstimate is often an estimate, totalEstimate is more reliable in newer API
             return results.get("resultSizeEstimate", 0)
         except Exception as e:
-            logger.error(f"Failed to get unread count: {e}")
-            return -1
+            logger.error(f"Failed to get unread count for {self.user_email}: {e}")
+            if "deleted_client" in str(e):
+                self.authenticated = False # Force re-auth
+            return 0
 
     def get_recent_emails(self, max_results: int = 10, unread_only: bool = False) -> list[dict]:
         """Get recent emails from inbox."""
@@ -160,9 +165,14 @@ class GmailClient:
             return "❌ Gmail не подключен. Используйте /start для подключения Google."
 
         unread = self.get_unread_count()
-        emails = self.get_recent_emails(max_results=5, unread_only=True)
+        
+        if unread == 0 and not self.authenticated:
+            return "❌ Gmail не подключен. Используйте /start для подключения Google."
 
         if unread == 0:
+            # Check if it was really 0 or an error that returned 0
+            if not self.authenticated:
+                return "❌ Ошибка авторизации Gmail. Пожалуйста, переподключите аккаунт через /start."
             return "📭 Нет непрочитанных писем."
 
         summary = f"📧 **Непрочитанных писем: {unread}**\n\n"

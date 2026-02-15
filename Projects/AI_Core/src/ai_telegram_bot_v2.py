@@ -1346,36 +1346,42 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if auth_code:
         await update.message.reply_text("🔄 Verifying code...")
-        credentials = auth_manager.exchange_code(auth_code, user_id=user_id)
-        if credentials:
-            # Use Firestore/SQLite abstraction
-            if hasattr(db, "use_firestore") and db.use_firestore:
-                db.db.collection("users").document(str(user_id)).update(
-                    {"google_creds": credentials.to_json(), "is_google_connected": True}
-                )
-            else:
-                import os
-                import sqlite3
-
-                db_path = os.getenv("DB_PATH", "user_context.db")
-                with sqlite3.connect(db_path) as conn:
-                    cursor = conn.cursor()
-                    cursor.execute(
-                        "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
-                        (credentials.to_json(), user_id),
+        try:
+            credentials = auth_manager.exchange_code(auth_code, user_id=user_id)
+            if credentials:
+                # Use Firestore/SQLite abstraction
+                if hasattr(db, "use_firestore") and db.use_firestore:
+                    db.db.collection("users").document(str(user_id)).update(
+                        {"google_creds": credentials.to_json(), "is_google_connected": True}
                     )
-                    conn.commit()
+                else:
+                    import os
+                    import sqlite3
 
+                    db_path = os.getenv("DB_PATH", "user_context.db")
+                    with sqlite3.connect(db_path) as conn:
+                        cursor = conn.cursor()
+                        cursor.execute(
+                            "UPDATE users SET google_creds = ?, is_google_connected = 1 WHERE user_id = ?",
+                            (credentials.to_json(), user_id),
+                        )
+                        conn.commit()
+
+                await update.message.reply_text(
+                    "✅ Success! Google Calendar connected.",
+                    reply_markup=get_main_menu(user_id),
+                )
+                return
+            else:
+                await update.message.reply_text(
+                    "❌ Connection failed. No credentials returned."
+                )
+        except Exception as e:
             await update.message.reply_text(
-                "✅ Success! Google Calendar connected.",
-                reply_markup=get_main_menu(user_id),
+                f"❌ Error exchanging code: {str(e)}\n\nPlease try /start again to get a fresh link."
             )
-            return
-        else:
-            await update.message.reply_text(
-                "❌ Invalid code or connection failed. Try again."
-            )
-            return
+            logger.error(f"OAuth Exchange Error: {e}", exc_info=True)
+        return
 
     if user_text == "📅 Обзор дня":
         logger.info(f"[INTENT] Brief from {user_id}")

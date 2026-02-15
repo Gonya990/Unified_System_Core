@@ -1,13 +1,14 @@
 """
-Gemini Provider for LLM Council.
-Supports Gemini 2.0 Flash (Nana Banana), Pro, etc.
+Gemini Provider for LLM Council using the modern google-genai SDK.
+Supports Gemini 2.0 Flash, Pro, and experimental models.
 """
 
 import asyncio
 import logging
+import os
 from typing import Optional
-
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from .base import BaseProvider, ProviderResponse
 
@@ -21,66 +22,76 @@ class GeminiProvider(BaseProvider):
 
     def __init__(self, api_key: str, model: str = "models/gemini-2.0-flash", base_url: Optional[str] = None):
         super().__init__(api_key, model, base_url)
-        genai.configure(api_key=api_key)
         self._model_name = model
-        self._setup_model(model)
-
-    def _setup_model(self, model_name: str):
-        """Configure the generative model."""
-        self._model = genai.GenerativeModel(model_name)
+        self._client = genai.Client(api_key=api_key)
 
     async def generate(self, prompt: str, system_prompt: str = "") -> ProviderResponse:
-        """Generate response with fallback logic, prioritizing Nana Banana."""
+        """Generate response with fallback logic for models."""
         models_to_try = [
-            "models/nano-banana-pro-preview",
             self._model_name,
-            "models/gemini-2.5-pro",
-            "models/gemini-2.5-flash",
-            "models/gemini-2.0-flash",
-            "models/gemini-flash-latest",
-            "models/gemini-pro-latest",
+            "gemini-2.0-flash",
+            "gemini-2.0-pro-exp-02-05", # Newest Pro Experimental
+            "gemini-2.0-flash-lite-preview-02-05", # Newest Flash Lite
+            "gemini-1.5-pro",
+            "gemini-1.5-flash",
         ]
 
         last_error = None
         for m_name in models_to_try:
+            # Ensure model name format is correct for the SDK (stripping /models if present for candidates)
+            exec_model = m_name.replace("models/", "")
+            
             with self._measure_time() as timer:
                 try:
-                    # Setup model if it's a fallback
-                    model = genai.GenerativeModel(m_name)
-
-                    full_prompt = prompt
-                    if system_prompt:
-                        full_prompt = f"SYSTEM: {system_prompt}\n\nUSER: {prompt}"
-
                     loop = asyncio.get_event_loop()
-                    response = await loop.run_in_executor(None, lambda: model.generate_content(full_prompt))
+                    
+                    config = types.GenerateContentConfig(
+                        system_instruction=system_prompt if system_prompt else None,
+                        temperature=0.7,
+                    )
 
-                    if not response.text:
+                    response = await loop.run_in_executor(
+                        None,
+                        lambda: self._client.models.generate_content(
+                            model=exec_model,
+                            contents=prompt,
+                            config=config
+                        ),
+                    )
+                    
+                    content = getattr(response, "text", None)
+                    if not content and getattr(response, "candidates", None):
+                        # Extract from candidates if .text is missing/blocked
+                        candidate = response.candidates[0]
+                        if candidate.content and candidate.content.parts:
+                            content = "".join([part.text for part in candidate.content.parts if part.text])
+
+                    if not content:
                         raise ValueError("Empty response from Gemini")
 
                     return ProviderResponse(
                         provider_name=self.name,
-                        model=m_name,
-                        content=response.text,
+                        model=exec_model,
+                        content=content.strip(),
                         latency_ms=timer.elapsed_ms,
-                        tokens_used=0,
+                        tokens_used=0, # SDK doesn't always expose this easily without extra calls
                         metadata={
-                            "finish_reason": str(response.candidates[0].finish_reason)
-                            if response.candidates
-                            else "unknown",
                             "requested_model": self._model_name,
-                            "actual_model": m_name,
+                            "actual_model": exec_model,
+                            "finish_reason": str(response.candidates[0].finish_reason) if response.candidates else "unknown"
                         },
                     )
                 except Exception as e:
                     last_error = e
-                    if "429" in str(e) or "quota" in str(e).lower():
-                        logger.warning(f"Gemini {m_name} rate limited/quota hit, trying next...")
+                    err_str = str(e).lower()
+                    if "429" in err_str or "quota" in err_str:
+                        logger.warning(f"Gemini {exec_model} rate limited, trying next...")
+                        continue
+                    elif "404" in err_str or "not found" in err_str:
+                        logger.warning(f"Gemini {exec_model} not found, trying next...")
                         continue
                     else:
-                        logger.error(f"Gemini {m_name} error: {last_error}")
-                        # If it's not a rate limit, maybe try next model anyway?
-                        # Some models might not be enabled.
+                        logger.error(f"Gemini {exec_model} error: {last_error}")
                         continue
 
         return ProviderResponse(
@@ -96,7 +107,12 @@ class GeminiProvider(BaseProvider):
         try:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                None, lambda: self._model.generate_content("ping", generation_config={"max_output_tokens": 1})
+                None,
+                lambda: self._client.models.generate_content(
+                    model=self._model_name.replace("models/", ""),
+                    contents="ping",
+                    config=types.GenerateContentConfig(max_output_tokens=1),
+                ),
             )
             return True
         except Exception as e:
@@ -106,3 +122,4 @@ class GeminiProvider(BaseProvider):
     async def close(self):
         """Cleanup resources."""
         pass
+

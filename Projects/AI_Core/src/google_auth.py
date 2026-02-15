@@ -7,6 +7,9 @@ from urllib.parse import parse_qs, urlparse
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 
+# Allow HTTP for development/local bot instances
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
 logger = logging.getLogger(__name__)
 
 # Default port for local OAuth callback server (if used)
@@ -136,7 +139,7 @@ class GoogleAuthManager:
             return creds
         except Exception as e:
             logger.error(f"Error exchanging code: {e}")
-            return None
+            raise e
 
     def load_credentials(self, user_id: int):
         """Load credentials from persistent file."""
