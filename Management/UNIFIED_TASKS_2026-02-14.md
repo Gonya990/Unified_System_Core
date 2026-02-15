@@ -9,7 +9,7 @@ Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
 - [x] Prioritize ElevenLabs TTS and add provider/voice rotation in orchestrators.
 - [x] Sync ElevenLabs key into TokenBroker (local + remote).
 - [x] Start Flux/SDXL servers under PM2 on `unified-home-core-cloud`.
-- [ ] Provide HF token + gated access for `black-forest-labs/FLUX.1-schnell`, then verify `http://localhost:8081/`.
+- [ ] Accept gated access for `black-forest-labs/FLUX.1-schnell` (HF token set), then verify `http://localhost:8081/`.
 - [x] SDXL model ready and `http://localhost:8188/` responding.
 - [ ] Set PM2 env for Content Factory:
   `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_IDS`, `ELEVENLABS_VOICE_ROTATION=random`,
