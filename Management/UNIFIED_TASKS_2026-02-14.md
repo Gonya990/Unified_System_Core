@@ -1,0 +1,20 @@
+# Unified Tasks - System Wide
+
+Triaged: 2026-02-15
+
+Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
+
+## Active Tasks
+
+- [x] Prioritize ElevenLabs TTS and add provider/voice rotation in orchestrators.
+- [x] Sync ElevenLabs key into TokenBroker (local + remote).
+- [x] Start Flux/SDXL servers under PM2 on `unified-home-core-cloud`.
+- [ ] Provide HF token + gated access for `black-forest-labs/FLUX.1-schnell`, then verify `http://localhost:8081/`.
+- [x] SDXL model ready and `http://localhost:8188/` responding.
+- [ ] Set PM2 env for Content Factory:
+  `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_IDS`, `ELEVENLABS_VOICE_ROTATION=random`,
+  `TTS_ROTATION=elevenlabs,edge`, `ALLOW_OPENAI_TTS=false`.
+- [ ] Restart `content-factory` + `content-factory-turbo` after current run finishes (apply env).
+- [ ] Confirm new run uses ElevenLabs (no OpenAI TTS calls).
+- [ ] Set `YOUTUBE_TOKEN_FILES` in PM2 env and restart after current run finishes.
+- [ ] Verify uploads go to both channels in parallel.

@@ -72,10 +72,15 @@ class ConfigManager:
             "OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.2"),
             # OpenAI settings
             "OPENAI_BASE_URL": os.environ.get(
-                "OPENAI_BASE_URL", "https://api.openai.com"
+                "OPENAI_BASE_URL", "https://api.openai.com/v1"
             ),
             "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
             "OPENAI_MODEL": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            # Image generation settings
+            "IMAGE_PROVIDER": os.environ.get("IMAGE_PROVIDER", "openai"),
+            "OPENAI_IMAGE_MODEL": os.environ.get("OPENAI_IMAGE_MODEL", "dall-e-3"),
+            "OPENAI_IMAGE_SIZE": os.environ.get("OPENAI_IMAGE_SIZE", "1024x1024"),
+            "OPENAI_IMAGE_QUALITY": os.environ.get("OPENAI_IMAGE_QUALITY", "standard"),
             # Gemini settings
             "GEMINI_API_KEY": os.environ.get(
                 "GEMINI_API_KEY", os.environ.get("GOOGLE_API_KEY", "")

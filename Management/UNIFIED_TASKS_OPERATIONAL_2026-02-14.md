@@ -1,0 +1,586 @@
+# Unified Operational Tasks
+
+Generated: 2026-02-15 00:03
+
+Active: 144 | Sessions: 23 | Reference: 402 | Other: 0
+
+## Active System Tasks
+
+- [x] Rotate Telegram bot token via @BotFather (revoke old, issue new)  _(source: `Management/TODO_CONSOLIDATED.md:164`)_
+- [x] Update `TELEGRAM_BOT_TOKEN` in GKE secret `ai-core-secrets`  _(source: `Management/TODO_CONSOLIDATED.md:165`)_
+- [x] Update `TELEGRAM_BOT_TOKEN` in local env files (`Projects/AI_Core/.env`, `Projects/AI_Core/.env.igor`, root `.env` if used)  _(source: `Management/TODO_CONSOLIDATED.md:166`)_
+- [x] Verify single polling instance (resolve `getUpdates` conflict)  _(source: `Management/TODO_CONSOLIDATED.md:167`)_
+
+- [ ] **Shopping** - Amazon, eBay, AliExpress, Rozetka, Shein  _(source: `Management/TODO_CONSOLIDATED.md:7`)_
+- [ ] **Travel** - Booking, Airbnb, авиакомпании  _(source: `Management/TODO_CONSOLIDATED.md:8`)_
+- [ ] **Banks IL** - בנק הפועלים, לאומי, דיסקונט, מזרחי, Visa Israel  _(source: `Management/TODO_CONSOLIDATED.md:9`)_
+- [ ] **Gov Services** - gov.il, ביטוח לאומי, משרד הפנים, עיריית  _(source: `Management/TODO_CONSOLIDATED.md:10`)_
+- [ ] **Payments** - Bit, PayBox, Pepper, Max, Cal, Isracard  _(source: `Management/TODO_CONSOLIDATED.md:11`)_
+- [ ] **Work/Schindler** - schindler.com, рабочие домены  _(source: `Management/TODO_CONSOLIDATED.md:12`)_
+- [ ] **Family** - Артур, Оксана, Валерий (папа), Виктория (мама)  _(source: `Management/TODO_CONSOLIDATED.md:13`)_
+- [ ] **Health/Kupot** - כללית, מכבי, מאוחדת, לאומית  _(source: `Management/TODO_CONSOLIDATED.md:14`)_
+- [ ] **Insurance** - Migdal, Harel, Phoenix, Menora, AIG  _(source: `Management/TODO_CONSOLIDATED.md:15`)_
+- [ ] Create macOS bootable USB  _(source: `Management/TODO_CONSOLIDATED.md:19`)_
+- [ ] Restore macOS and verify disk  _(source: `Management/TODO_CONSOLIDATED.md:20`)_
+- [ ] Verify ChromeOS Flex is running [ ]  _(source: `Management/TODO_CONSOLIDATED.md:21`)_
+- [ ] Set up Family Link and Tailscale (as per previous requirements) [ ]  _(source: `Management/TODO_CONSOLIDATED.md:22`)_
+- [ ] Подключить Алису к Home Assistant  _(source: `Management/TODO_CONSOLIDATED.md:26`)_
+- [ ] Найти OAuth Client ID/Secret в HA  _(source: `Management/TODO_CONSOLIDATED.md:27`)_
+- [ ] Прописать URLs в Яндекс Диалогах  _(source: `Management/TODO_CONSOLIDATED.md:28`)_
+- [ ] Опубликовать навык  _(source: `Management/TODO_CONSOLIDATED.md:29`)_
+- [ ] Настроить Sentence Triggers для кастомных команд  _(source: `Management/TODO_CONSOLIDATED.md:30`)_
+- [ ] Настроить Webhook эндпоинты  _(source: `Management/TODO_CONSOLIDATED.md:31`)_
+- [ ] Подключить к Home Assistant Assist  _(source: `Management/TODO_CONSOLIDATED.md:32`)_
+- [ ] Добавить SerpApi для поиска (RAG)  _(source: `Management/TODO_CONSOLIDATED.md:33`)_
+- [ ] Настроить алерты  _(source: `Management/TODO_CONSOLIDATED.md:34`)_
+- [ ] Создать дашборд  _(source: `Management/TODO_CONSOLIDATED.md:35`)_
+- [ ] Голосовая команда → HA → Локальный ИИ  _(source: `Management/TODO_CONSOLIDATED.md:36`)_
+- [ ] Метрики появляются в GCP  _(source: `Management/TODO_CONSOLIDATED.md:37`)_
+- [ ] Алерты приходят в Telegram + email  _(source: `Management/TODO_CONSOLIDATED.md:38`)_
+- [ ] Refactor common logic <!-- id: 6 -->  _(source: `Management/TODO_CONSOLIDATED.md:42`)_
+- [/] Configure OpenAI Developer Platform integration <!-- id: 102 --> (OpenAI base URL normalized; image endpoint wired; needs API key/test)  _(source: `Management/TODO_CONSOLIDATED.md:46`)_
+- [ ] Monitor token usage across providers <!-- id: 103 -->  _(source: `Management/TODO_CONSOLIDATED.md:47`)_
+- [ ] Implement cost tracking per conversation <!-- id: 104 -->  _(source: `Management/TODO_CONSOLIDATED.md:48`)_
+- [/] Implement image generation (DALL-E/Stable Diffusion) <!-- id: 202 --> <!-- CURRENT FOCUS --> (DALL-E via OpenAI wired; SD pending)  _(source: `Management/TODO_CONSOLIDATED.md:49`)_
+- [x] Create `/imagine` command for images <!-- id: 204 -->  _(source: `Management/TODO_CONSOLIDATED.md:50`)_
+- [ ] Test all 3 providers (Ollama, OpenAI, Gemini) <!-- id: 304 --> <!-- CURRENT FOCUS -->  _(source: `Management/TODO_CONSOLIDATED.md:51`)_
+- [ ] Configure SerpApi (Google search) <!-- id: 453 -->  _(source: `Management/TODO_CONSOLIDATED.md:52`)_
+- [ ] Configure Linear API (task management) <!-- id: 454 -->  _(source: `Management/TODO_CONSOLIDATED.md:53`)_
+- [ ] Study Yandex Dialogs (Alice skills) <!-- id: 455 -->  _(source: `Management/TODO_CONSOLIDATED.md:54`)_
+- [ ] Test HomeKit Bridge pairing <!-- id: 501 -->  _(source: `Management/TODO_CONSOLIDATED.md:55`)_
+- [ ] Verify HA API access from bot <!-- id: 502 -->  _(source: `Management/TODO_CONSOLIDATED.md:56`)_
+- [ ] Add HA control commands to bot <!-- id: 503 -->  _(source: `Management/TODO_CONSOLIDATED.md:57`)_
+- [ ] Document HA entities available <!-- id: 504 -->  _(source: `Management/TODO_CONSOLIDATED.md:58`)_
+- [ ] Test Ollama models (qwen2, llama3.2, ministral) <!-- id: 601 -->  _(source: `Management/TODO_CONSOLIDATED.md:59`)_
+- [ ] Test Gemini models (flash, pro, 2.0-flash-exp) <!-- id: 602 -->  _(source: `Management/TODO_CONSOLIDATED.md:60`)_
+- [ ] Test OpenAI models (if configured) <!-- id: 603 -->  _(source: `Management/TODO_CONSOLIDATED.md:61`)_
+- [ ] Verify conversation persistence <!-- id: 604 -->  _(source: `Management/TODO_CONSOLIDATED.md:62`)_
+- [ ] Test image generation <!-- id: 605 -->  _(source: `Management/TODO_CONSOLIDATED.md:63`)_
+- [ ] Phase 3: Execute `setup_central_hub.sh` on igor-gaming-1 (Pending Credentials) <!-- id: 17 -->  _(source: `Management/TODO_CONSOLIDATED.md:67`)_
+- [ ] **BIOS Update:** Flash latest available version <!-- id: 201a -->  _(source: `Management/TODO_CONSOLIDATED.md:71`)_
+- [ ] **SVM Mode (CPU Features):** Enable (Advanced -> CPU -> SVM/AMD-V) <!-- id: 202 -->  _(source: `Management/TODO_CONSOLIDATED.md:72`)_
+- [ ] **Above 4G Decoding:** Enable (Advanced -> PCI/Chipset) <!-- id: 203 -->  _(source: `Management/TODO_CONSOLIDATED.md:73`)_
+- [ ] **Re-size BAR:** Auto/Enabled (REQUIRES CSM DISABLED) <!-- id: 203a -->  _(source: `Management/TODO_CONSOLIDATED.md:74`)_
+- [ ] **Power Policy:** Power On (AC Back/Restore on AC Power Loss) <!-- id: 204 -->  _(source: `Management/TODO_CONSOLIDATED.md:75`)_
+- [ ] **IOMMU:** Enable (for Proxmox Passthrough) <!-- id: 204a -->  _(source: `Management/TODO_CONSOLIDATED.md:76`)_
+- [ ] Path B: Service Account JSON extraction (BLOCKED - Chrome crash) <!-- id: 603b -->  _(source: `Management/TODO_CONSOLIDATED.md:77`)_
+- [ ] **NEW BLOCKER:** Credential extraction timeout (180s WebSocket, not crash) <!-- id: 519 -->  _(source: `Management/TODO_CONSOLIDATED.md:78`)_
+- [ ] Интеграция Apple API (Keys extraction via Windows) <!-- id: 502 -->  _(source: `Management/TODO_CONSOLIDATED.md:79`)_
+- [ ] Define new logical structure  _(source: `Management/TODO_CONSOLIDATED.md:83`)_
+- [ ] Execution  _(source: `Management/TODO_CONSOLIDATED.md:84`)_
+- [ ] Create `Unified_Context/` structure  _(source: `Management/TODO_CONSOLIDATED.md:85`)_
+- [ ] Move sessions from `machines/` to unified store  _(source: `Management/TODO_CONSOLIDATED.md:86`)_
+- [ ] Deduplicate if necessary  _(source: `Management/TODO_CONSOLIDATED.md:87`)_
+- [ ] Keep host-specific configs in `machines/`  _(source: `Management/TODO_CONSOLIDATED.md:88`)_
+- [ ] Verification  _(source: `Management/TODO_CONSOLIDATED.md:89`)_
+- [ ] Check links and navigation  _(source: `Management/TODO_CONSOLIDATED.md:90`)_
+- [ ] Final commit and push  _(source: `Management/TODO_CONSOLIDATED.md:91`)_
+- [ ] Identify key configuration files and scripts  _(source: `Management/TODO_CONSOLIDATED.md:95`)_
+- [ ] Map existing "working zones" and Sandbox contents  _(source: `Management/TODO_CONSOLIDATED.md:96`)_
+- [ ] Merge duplicate utilities if any  _(source: `Management/TODO_CONSOLIDATED.md:97`)_
+- [ ] Verify Proxmox connectivity (via Config/Web)  _(source: `Management/TODO_CONSOLIDATED.md:98`)_
+- [ ] Verify Tailscale status  _(source: `Management/TODO_CONSOLIDATED.md:99`)_
+- [ ] Verify Environment Variables (Locale)  _(source: `Management/TODO_CONSOLIDATED.md:100`)_
+- [ ] Generate Deployment Report  _(source: `Management/TODO_CONSOLIDATED.md:101`)_
+- [ ] Final Comprehensive System Report  _(source: `Management/TODO_CONSOLIDATED.md:102`)_
+- [ ] Determine what 'agent' the user is referring to (Suspect: remote process)  _(source: `Management/TODO_CONSOLIDATED.md:106`)_
+- [ ] Sync `my-ai-project` from remote to local Playground  _(source: `Management/TODO_CONSOLIDATED.md:107`)_
+- [ ] Analyze local copy of `chat_llm.py` and `run_llm.ps1`  _(source: `Management/TODO_CONSOLIDATED.md:108`)_
+- [ ] Setup local environment or "Playground" interface  _(source: `Management/TODO_CONSOLIDATED.md:109`)_
+- [ ] Check environment and dependencies on `igor-gaming-1` [/]  _(source: `Management/TODO_CONSOLIDATED.md:113`)_
+- [ ] Verify `gh` CLI presence  _(source: `Management/TODO_CONSOLIDATED.md:114`)_
+- [ ] Check for existing Git configuration  _(source: `Management/TODO_CONSOLIDATED.md:115`)_
+- [ ] Authenticate GitHub  _(source: `Management/TODO_CONSOLIDATED.md:116`)_
+- [ ] Use `gh auth login` or manual SSH key setup  _(source: `Management/TODO_CONSOLIDATED.md:117`)_
+- [ ] Verify authentication  _(source: `Management/TODO_CONSOLIDATED.md:118`)_
+- [ ] Run `gh auth status` or `ssh -T git@github.com`  _(source: `Management/TODO_CONSOLIDATED.md:119`)_
+- [ ] Commit and push changes (as per user rules)  _(source: `Management/TODO_CONSOLIDATED.md:120`)_
+- [ ] Process callback code  _(source: `Management/TODO_CONSOLIDATED.md:124`)_
+- [ ] Verify authentication status <!-- id: 2 -->  _(source: `Management/TODO_CONSOLIDATED.md:125`)_
+- [ ] Update system readiness report <!-- id: 3 -->  _(source: `Management/TODO_CONSOLIDATED.md:126`)_
+- [ ] Define Private/Shared categories  _(source: `Management/TODO_CONSOLIDATED.md:130`)_
+- [ ] Propose new directory structure  _(source: `Management/TODO_CONSOLIDATED.md:131`)_
+- [ ] Implement directory reorganization  _(source: `Management/TODO_CONSOLIDATED.md:132`)_
+- [ ] Create `Shared/` and `Private/` directories  _(source: `Management/TODO_CONSOLIDATED.md:133`)_
+- [ ] Move existing files to respective locations  _(source: `Management/TODO_CONSOLIDATED.md:134`)_
+- [ ] Update internal links and references  _(source: `Management/TODO_CONSOLIDATED.md:135`)_
+- [ ] Configure Security & Access  _(source: `Management/TODO_CONSOLIDATED.md:136`)_
+- [ ] Update `.gitignore` for private data  _(source: `Management/TODO_CONSOLIDATED.md:137`)_
+- [ ] Set up "Privacy Filter" rules for agent communication  _(source: `Management/TODO_CONSOLIDATED.md:138`)_
+- [ ] Create Integration Prompt  _(source: `Management/TODO_CONSOLIDATED.md:139`)_
+- [ ] Save as `Agent_Context/Knowledge_Base/Docs/PARTNER_INTEGRATION_PROMPT.md`  _(source: `Management/TODO_CONSOLIDATED.md:140`)_
+- [ ] Verify  _(source: `Management/TODO_CONSOLIDATED.md:141`)_
+- [ ] Check file access from different "agent personas"  _(source: `Management/TODO_CONSOLIDATED.md:142`)_
+- [ ] Validate references in documentation  _(source: `Management/TODO_CONSOLIDATED.md:143`)_
+- [ ] **Phase 1: Connectivity Check**  _(source: `Management/TODO_CONSOLIDATED.md:147`)_
+- [ ] `tailscale status` (Verify active IP)  _(source: `Management/TODO_CONSOLIDATED.md:148`)_
+- [ ] Ping `igor-gaming`  _(source: `Management/TODO_CONSOLIDATED.md:149`)_
+- [ ] **Phase 2: Proxmox Web Inspection**  _(source: `Management/TODO_CONSOLIDATED.md:150`)_
+- [ ] Locate `igor-gaming` VM (Match hostname or identify if it's VM 100/101)  _(source: `Management/TODO_CONSOLIDATED.md:151`)_
+- [ ] **Full Scan**: Capture CPU, Memor, and Disk usage via UI  _(source: `Management/TODO_CONSOLIDATED.md:152`)_
+- [ ] Verify GPU Passthrough status in "Hardware" tab  _(source: `Management/TODO_CONSOLIDATED.md:153`)_
+- [ ] **Phase 3: Consolidated Report**  _(source: `Management/TODO_CONSOLIDATED.md:154`)_
+- [ ] Summary of Node Health  _(source: `Management/TODO_CONSOLIDATED.md:155`)_
+- [ ] Set up error alerting (future enhancement)  _(source: `Management/TODO_CONSOLIDATED.md:159`)_
+- [ ] Kubernetes deployment  _(source: `Management/TODO_CONSOLIDATED.md:160`)_
+- [ ] Shopping integrations (Amazon, eBay, AliExpress) - Парсеры в разработке  _(source: `Management/MASTER_TASKS.md:69`)_
+- [ ] Bank integrations IL (הפועלים, לאומי) - Категоризация готова ✅  _(source: `Management/MASTER_TASKS.md:70`)_
+- [ ] Gov Services IL (gov.il) - Категоризация готова ✅  _(source: `Management/MASTER_TASKS.md:71`)_
+- [ ] ChromeOS Flex setup - Для Артура  _(source: `Management/MASTER_TASKS.md:72`)_
+- [ ] **Интеграция Фабрики Контента 2.0:**  _(source: `task.md:39`)_
+- [ ] **Status Monitoring:** Уведомления в Telegram о статусе рендера (`daily_researcher` -> Bot).  _(source: `task.md:41`)_
+- [ ] **MCP Mail Intelligence:**  _(source: `task.md:42`)_
+- [ ] **Council Feedback:** Авто-обработка ответов от Кости (FuchsiaCat/VioletCastle).  _(source: `task.md:43`)_
+- [ ] **Alert System:** Уведомлять Админа только о важных письмах ("High Priority").  _(source: `task.md:44`)_
+- [ ] **Account Vizier:** Создать систему управления аккаунтами (Google/Insta) для агентов.  _(source: `task.md:49`)_
+- [ ] **Dashboard:** Починить UI для `/stats` (API готово, нужен фронт).  _(source: `task.md:53`)_
+- [ ] **Git Worktree:** Безопасные тесты веток.  _(source: `task.md:54`)_
+- [ ] **SmartThings:** Добить очистку API.  _(source: `task.md:55`)_
+- [ ] Integrate GustavoASC.google-drive-vscode (manual reset needed).  _(source: `CLOUDMIG_REFACTOR_PLAN.md:72`)_
+- [ ] BIOS Update automation for Proxmox  _(source: `Management/CHANGELOG.md:184`)_
+- [ ] Text-to-Speech for Alice responses  _(source: `Management/CHANGELOG.md:185`)_
+- [ ] Notion integration for notes  _(source: `Management/CHANGELOG.md:186`)_
+- [ ] Apple Health / Google Fit monitoring  _(source: `Management/CHANGELOG.md:187`)_
+- [ ] Advanced analytics dashboard  _(source: `Management/CHANGELOG.md:188`)_
+- [ ] Multi-user support with roles  _(source: `Management/CHANGELOG.md:189`)_
+- [ ] Plugin system for extensions  _(source: `Management/CHANGELOG.md:190`)_
+- [ ] WhatsApp integration  _(source: `Management/CHANGELOG.md:194`)_
+- [ ] Slack bot  _(source: `Management/CHANGELOG.md:195`)_
+- [ ] Email automation  _(source: `Management/CHANGELOG.md:196`)_
+- [ ] Smart home scenes builder  _(source: `Management/CHANGELOG.md:197`)_
+- [ ] Voice commands in Telegram  _(source: `Management/CHANGELOG.md:198`)_
+- [ ] TODO: comments in code if needed  _(source: `Management/AGENTS.md:228`)_
+- [ ] TODO: /FIXME, console logs  _(source: `Management/AGENTS.md:709`)_
+
+## Session Backlog
+
+- [ ] Attempt Wake-on-LAN (if offline) <!-- id: 103 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/18e8d41d-fe79-4d4a-b935-37099b0ba2c9/task.md:8`)_
+- [ ] Verify GitHub Artifacts <!-- id: 203 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/18e8d41d-fe79-4d4a-b935-37099b0ba2c9/task.md:14`)_
+- [ ] Integrate Ministry of Education Portal (Parents) <!-- id: 206 --> <!-- STATUS: Script created, blocked -->  _(source: `Agent_Context/Knowledge_Base/Sessions/arthur_tablet_setup/task.md:13`)_
+- [ ] Implement Screen Time limits via API/ADB <!-- id: 202 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/arthur_tablet_setup/task.md:14`)_
+- [ ] Configure Home Assistant integration (sensors) <!-- id: 203 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/arthur_tablet_setup/task.md:15`)_
+- [ ] Deploy custom dashboard/launcher <!-- id: 204 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/arthur_tablet_setup/task.md:16`)_
+- [ ] Run /commit-push or /autosave <!-- id: 301 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/d8781fed-c6e9-42a4-b9a0-f743467e4389/task.md:16`)_
+- [ ] Verify Telegram Bot status (`/bot`) <!-- id: 104 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/4d03c916-388d-4ab8-8b30-7e467a0bd7a6/task.md:8`)_
+- [ ] Update `CONTEXT_HANDOFF.md` <!-- id: 202 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/4d03c916-388d-4ab8-8b30-7e467a0bd7a6/task.md:16`)_
+- [ ] **Tailscale Fix**: Resolve `Trace/BPT trap: 5` on MacBook to restore  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:21`)_
+- [ ] **Beads Recovery**: Find or reinstall `bd` CLI for task management sync.  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:23`)_
+- [ ] **Credentials Audit**: Retrieve and set `WEBTOP_TOKEN` in `.env`.  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:25`)_
+- [ ] **Infrastructure**: Enable Tailscale SSH on all nodes for unified  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:36`)_
+- [ ] **Marketing**: Finalize "Assistant MVP" offer script for Israel market.  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:42`)_
+- [ ] **Crypto**: Research NowPayments/BitPay API for USDT/BTC gateway.  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:46`)_
+- [ ] **Leads**: Integrate Google Sheets CRM automation in Make.com.  _(source: `Agent_Context/Knowledge_Base/Sessions/30e80d5c-1c72-4c78-b928-5e60cdd0605b/task.md:48`)_
+- [ ] Implement Contact Form (Pending Spec approval) <!-- id: 304 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/75f5a657-2dce-4553-96c6-ac8feee7534c/task.md:21`)_
+- [ ] Implement robust browser monitor (Playwright blocked by MOE flow) <!-- id: 204 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/agent_mail_mashov_fix/task.md:16`)_
+- [ ] **Family Assistant (Webtop Integration)** <!-- id: 9 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/a768d503-a205-4461-a430-6b27e21bee6e/task.md:26`)_
+- [ ] `global1sim` Submodule Integration (⛔️ **LOCKED**)  _(source: `Agent_Context/Knowledge_Base/Sessions/a768d503-a205-4461-a430-6b27e21bee6e/task.md:32`)_
+- [ ] Stabilize SSH connectivity (Blocked: macOS Sandbox - needs restart) <!-- id: 303 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/2026-01-27_cloud_ip_migration/task.md:19`)_
+- [ ] Fix n8n Secure Cookie (Blocked: No SSH) <!-- id: 304 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/2026-01-27_cloud_ip_migration/task.md:20`)_
+- [ ] Sync Git (Blocked: DNS/Net Unreachable) <!-- id: 305 -->  _(source: `Agent_Context/Knowledge_Base/Sessions/2026-01-27_cloud_ip_migration/task.md:21`)_
+
+## Reference/Docs Checklists
+
+- [ ] Refactor common logic <!-- id: 6 -->  _(source: `Agent_Context/Archive/Sessions/f2e08f11-94bf-4e77-9ec5-d5d8ba22b404/task.md:13`)_
+- [ ] **BIOS Update:** Flash version 6203 (Stable) <!-- id: 201a -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:16`)_
+- [ ] **SVM Mode (CPU Features):** Enable (Advanced -> CPU -> SVM/AMD-V) <!-- id: 202 -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:17`)_
+- [ ] **Above 4G Decoding:** Enable (Advanced -> PCI/Chipset) <!-- id: 203 -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:18`)_
+- [ ] **Re-size BAR:** Auto/Enabled (REQUIRES CSM DISABLED) <!-- id: 203a -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:19`)_
+- [ ] **Power Policy:** Power On (AC Back/Restore on AC Power Loss) <!-- id: 204 -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:20`)_
+- [ ] **IOMMU:** Enable (for Proxmox Passthrough) <!-- id: 204a -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:21`)_
+- [ ] Path B: Service Account JSON extraction (BLOCKED - Chrome crash) <!-- id: 603b -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:43`)_
+- [ ] **NEW BLOCKER:** Credential extraction timeout (180s WebSocket, not crash) <!-- id: 519 -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:55`)_
+- [ ] Интеграция Apple API (Keys extraction via Windows) <!-- id: 502 -->  _(source: `Agent_Context/Archive/Sessions/0cc3e59e-49af-43d8-98d5-8e24f7bf422b/task.md:59`)_
+- [ ] Install vector database (ChromaDB)  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:5`)_
+- [ ] Create document ingestion pipeline  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:6`)_
+- [ ] Index project documentation  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:7`)_
+- [ ] Build semantic search interface  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:8`)_
+- [ ] Integrate with Gemini for context-aware responses  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:9`)_
+- [ ] Map available n8n workflows  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:13`)_
+- [ ] Create function definitions for Gemini  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:14`)_
+- [ ] Build n8n API wrapper  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:15`)_
+- [ ] Implement function execution handler  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:16`)_
+- [ ] Test dynamic workflow invocation  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:17`)_
+- [ ] Add RAG context to browser decisions  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:21`)_
+- [ ] Integrate function calling capabilities  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:22`)_
+- [ ] Create documentation-aware prompts  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:23`)_
+- [ ] Build hybrid decision engine (Ollama + Gemini + RAG)  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:24`)_
+- [ ] Test end-to-end automation  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:25`)_
+- [ ] Combine all three systems  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:29`)_
+- [ ] Create unified API  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:30`)_
+- [ ] Build example workflows  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:31`)_
+- [ ] Performance optimization  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:32`)_
+- [ ] Documentation  _(source: `Agent_Context/Archive/Sessions/b64b29bb-d3b8-43dc-824f-dff898807821/task.md:33`)_
+- [ ] Identify key configuration files and scripts  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:6`)_
+- [ ] Map existing "working zones" and Sandbox contents  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:7`)_
+- [ ] Merge duplicate utilities if any  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:13`)_
+- [ ] Verify Proxmox connectivity (via Config/Web)  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:23`)_
+- [ ] Verify Tailscale status  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:24`)_
+- [ ] Verify Environment Variables (Locale)  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:25`)_
+- [ ] Generate Deployment Report  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:29`)_
+- [ ] Final Comprehensive System Report  _(source: `Agent_Context/Archive/Sessions/3d901560-8866-4b17-a27f-c9031b8ead69/task.md:30`)_
+- [ ] Determine what 'agent' the user is referring to (Suspect: remote process)  _(source: `Agent_Context/Archive/Sessions/86bffbe1-e0b5-4eb9-a98f-77f31832bfa3/task.md:4`)_
+- [ ] Sync `my-ai-project` from remote to local Playground  _(source: `Agent_Context/Archive/Sessions/86bffbe1-e0b5-4eb9-a98f-77f31832bfa3/task.md:7`)_
+- [ ] Analyze local copy of `chat_llm.py` and `run_llm.ps1`  _(source: `Agent_Context/Archive/Sessions/86bffbe1-e0b5-4eb9-a98f-77f31832bfa3/task.md:8`)_
+- [ ] Setup local environment or "Playground" interface  _(source: `Agent_Context/Archive/Sessions/86bffbe1-e0b5-4eb9-a98f-77f31832bfa3/task.md:9`)_
+- [ ] Create working Shortcut on Mac/iPhone <!-- id: 304 --> <!-- CURRENT FOCUS -->  _(source: `Agent_Context/Archive/Sessions/gcp_apple_integration_2024-12-27/task.md:29`)_
+- [ ] Pair HomeKit Bridge with Apple Home app <!-- id: 305 -->  _(source: `Agent_Context/Archive/Sessions/gcp_apple_integration_2024-12-27/task.md:30`)_
+- [ ] Connect to PiKVM (`192.168.190.154`) for visual monitoring  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:6`)_
+- [ ] Connect to Proxmox Web UI (Target: `100.74.194.25:8006` or similar)  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:7`)_
+- [ ] Identify running VMs and Containers via Dashboard  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:8`)_
+- [ ] Initiate Shutdown for each running guest  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:9`)_
+- [ ] Monitor status (Wait Loop up to 3 minutes)  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:10`)_
+- [ ] Identify and report any stuck guests  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:11`)_
+- [ ] Verify all guests are stopped  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:15`)_
+- [ ] Execute `shutdown -h now` on Proxmox host  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:16`)_
+- [ ] Check power state (via PiKVM if available)  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:20`)_
+- [ ] Final confirmation to user: "СЕРВЕР ОБЕСТОЧЕН. ГОТОВ К ВСКРЫТИЮ."  _(source: `Agent_Context/Archive/Sessions/a1c2070a-d35e-41bb-8398-427c4934e58f/task.md:21`)_
+- [ ] Process callback code  _(source: `Agent_Context/Archive/Sessions/2f686e4f-32ba-4893-9c60-36aa597cc73b/task.md:7`)_
+- [ ] Verify authentication status <!-- id: 2 -->  _(source: `Agent_Context/Archive/Sessions/2f686e4f-32ba-4893-9c60-36aa597cc73b/task.md:8`)_
+- [ ] Update system readiness report <!-- id: 3 -->  _(source: `Agent_Context/Archive/Sessions/2f686e4f-32ba-4893-9c60-36aa597cc73b/task.md:9`)_
+- [ ] **Phase 1: Connectivity Check**  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:5`)_
+- [ ] `tailscale status` (Verify active IP)  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:6`)_
+- [ ] Ping `igor-gaming`  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:7`)_
+- [ ] **Phase 2: Proxmox Web Inspection**  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:8`)_
+- [ ] Locate `igor-gaming` VM (Match hostname or identify if it's VM 100/101)  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:9`)_
+- [ ] **Full Scan**: Capture CPU, Memor, and Disk usage via UI  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:10`)_
+- [ ] Verify GPU Passthrough status in "Hardware" tab  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:11`)_
+- [ ] **Phase 3: Consolidated Report**  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:12`)_
+- [ ] Summary of Node Health  _(source: `Agent_Context/Archive/Sessions/df5ae705-0062-4857-9de9-9233acfecd52/task.md:13`)_
+- [ ] Создать структуру команд в Linear  _(source: `docs/linear_onboarding.md:7`)_
+- [ ] Engineering Team  _(source: `docs/linear_onboarding.md:8`)_
+- [ ] Operations Team  _(source: `docs/linear_onboarding.md:9`)_
+- [ ] Product Team  _(source: `docs/linear_onboarding.md:10`)_
+- [ ] Назначить Team Leads  _(source: `docs/linear_onboarding.md:11`)_
+- [ ] Настроить роли и права доступа  _(source: `docs/linear_onboarding.md:12`)_
+- [ ] Импортировать задачи из `MASTER_TASKS.md`  _(source: `docs/linear_onboarding.md:16`)_
+- [ ] Перенести GitHub Issues (если есть)  _(source: `docs/linear_onboarding.md:17`)_
+- [ ] Настроить категории и метки  _(source: `docs/linear_onboarding.md:18`)_
+- [ ] Создать шаблоны задач  _(source: `docs/linear_onboarding.md:19`)_
+- [ ] Настроить интеграцию с GitHub  _(source: `docs/linear_onboarding.md:23`)_
+- [ ] Автоматическое создание тикетов из PR  _(source: `docs/linear_onboarding.md:24`)_
+- [ ] Синхронизация статусов  _(source: `docs/linear_onboarding.md:25`)_
+- [ ] Подключить уведомления  _(source: `docs/linear_onboarding.md:26`)_
+- [ ] Telegram (через бота)  _(source: `docs/linear_onboarding.md:27`)_
+- [ ] Email  _(source: `docs/linear_onboarding.md:28`)_
+- [ ] Настроить автоматизации (правила)  _(source: `docs/linear_onboarding.md:29`)_
+- [ ] Провести обучающую сессию (30 мин)  _(source: `docs/linear_onboarding.md:33`)_
+- [ ] Основы интерфейса  _(source: `docs/linear_onboarding.md:34`)_
+- [ ] Создание и управление задачами  _(source: `docs/linear_onboarding.md:35`)_
+- [ ] Keyboard shortcuts  _(source: `docs/linear_onboarding.md:36`)_
+- [ ] Создать FAQ документ  _(source: `docs/linear_onboarding.md:37`)_
+- [ ] Собрать обратную связь  _(source: `docs/linear_onboarding.md:38`)_
+- [ ] Принять приглашение в Linear  _(source: `docs/announcement_template.md:32`)_
+- [ ] Пройти короткое обучение (10–20 мин)  _(source: `docs/announcement_template.md:33`)_
+- [ ] Ознакомиться с FAQ  _(source: `docs/announcement_template.md:34`)_
+- [ ] Проект собран (`npm run build`)  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:391`)_
+- [ ] Alias добавлен в `~/.zshrc`  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:392`)_
+- [ ] MCP Server настроен в IDE  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:393`)_
+- [ ] Тестовое подключение выполнено  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:394`)_
+- [ ] Chrome запускается с remote debugging  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:395`)_
+- [ ] AI может взаимодействовать с DevTools  _(source: `docs/Tools/CHROME_DEVTOOLS_MCP.md:396`)_
+- [ ] `delete_repo` - Удаление репозиториев  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:66`)_
+- [ ] `admin:public_key` - Управление SSH ключами  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:67`)_
+- [ ] Старый токен отозван  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:165`)_
+- [ ] Новый токен создан с правильными правами  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:166`)_
+- [ ] Новый токен скопирован  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:167`)_
+- [ ] Токен проверен через скрипт (опция 2)  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:168`)_
+- [ ] Токен сохранен в ~/.zshrc (опция 3)  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:169`)_
+- [ ] Выполнен `source ~/.zshrc`  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:170`)_
+- [ ] Проверен доступ к GitHub API  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:171`)_
+- [ ] Первый git push выполнен успешно  _(source: `docs/security/GITHUB_TOKEN_SETUP.md:172`)_
+- [ ] Is the task too complex for direct tools?  _(source: `docs/agent-guidelines/orchestration-principles.md:465`)_
+- [ ] Does the agent have a clear, singular goal?  _(source: `docs/agent-guidelines/orchestration-principles.md:466`)_
+- [ ] Can the agent work autonomously (minimal back-and-forth)?  _(source: `docs/agent-guidelines/orchestration-principles.md:467`)_
+- [ ] Is the expected completion time < 2 minutes?  _(source: `docs/agent-guidelines/orchestration-principles.md:468`)_
+- [ ] Are success criteria clear and verifiable?  _(source: `docs/agent-guidelines/orchestration-principles.md:469`)_
+- [ ] Can results be combined with other agents' results?  _(source: `docs/agent-guidelines/orchestration-principles.md:470`)_
+- [ ] Are agents truly independent (can run in parallel)?  _(source: `docs/agent-guidelines/orchestration-principles.md:476`)_
+- [ ] Is there a clear aggregation strategy?  _(source: `docs/agent-guidelines/orchestration-principles.md:477`)_
+- [ ] Have I minimized coupling (loose interfaces)?  _(source: `docs/agent-guidelines/orchestration-principles.md:478`)_
+- [ ] Is coordination overhead < 20% of total time?  _(source: `docs/agent-guidelines/orchestration-principles.md:479`)_
+- [ ] Can I handle partial failures gracefully?  _(source: `docs/agent-guidelines/orchestration-principles.md:480`)_
+- [ ] Is the orchestration pattern the simplest that works?  _(source: `docs/agent-guidelines/orchestration-principles.md:481`)_
+- [ ] Validate all inputs (< 1s)  _(source: `docs/agent-guidelines/feedback-optimization.md:496`)_
+- [ ] Verify files/resources exist (< 1s)  _(source: `docs/agent-guidelines/feedback-optimization.md:497`)_
+- [ ] Check permissions/access (< 1s)  _(source: `docs/agent-guidelines/feedback-optimization.md:498`)_
+- [ ] Emit "starting" message immediately  _(source: `docs/agent-guidelines/feedback-optimization.md:499`)_
+- [ ] Report progress every 15-20s  _(source: `docs/agent-guidelines/feedback-optimization.md:502`)_
+- [ ] Checkpoint after each major step  _(source: `docs/agent-guidelines/feedback-optimization.md:503`)_
+- [ ] Fail fast on errors (don't continue)  _(source: `docs/agent-guidelines/feedback-optimization.md:504`)_
+- [ ] Emit intermediate findings  _(source: `docs/agent-guidelines/feedback-optimization.md:505`)_
+- [ ] Report success/failure clearly  _(source: `docs/agent-guidelines/feedback-optimization.md:508`)_
+- [ ] Include relevant metrics (time, tokens)  _(source: `docs/agent-guidelines/feedback-optimization.md:509`)_
+- [ ] Provide actionable next steps  _(source: `docs/agent-guidelines/feedback-optimization.md:510`)_
+- [ ] Log for future optimization  _(source: `docs/agent-guidelines/feedback-optimization.md:511`)_
+- [ ] Clear, singular responsibility?  _(source: `docs/agent-guidelines/README.md:228`)_
+- [ ] Can complete in < 30 seconds?  _(source: `docs/agent-guidelines/README.md:229`)_
+- [ ] Exactly one success criterion?  _(source: `docs/agent-guidelines/README.md:230`)_
+- [ ] Fast feedback available?  _(source: `docs/agent-guidelines/README.md:231`)_
+- [ ] Results immediately verifiable?  _(source: `docs/agent-guidelines/README.md:232`)_
+- [ ] Reusable for similar tasks?  _(source: `docs/agent-guidelines/README.md:233`)_
+- [ ] Working in small batches?  _(source: `docs/agent-guidelines/README.md:236`)_
+- [ ] Getting feedback quickly (< 10s)?  _(source: `docs/agent-guidelines/README.md:237`)_
+- [ ] Iterating based on evidence?  _(source: `docs/agent-guidelines/README.md:238`)_
+- [ ] Using simplest tool that works?  _(source: `docs/agent-guidelines/README.md:239`)_
+- [ ] Validating early and often?  _(source: `docs/agent-guidelines/README.md:240`)_
+- [ ] Minimizing context loading?  _(source: `docs/agent-guidelines/README.md:241`)_
+- [ ] Primary task completed?  _(source: `docs/agent-guidelines/README.md:244`)_
+- [ ] Correct on first attempt?  _(source: `docs/agent-guidelines/README.md:245`)_
+- [ ] Output clear and actionable?  _(source: `docs/agent-guidelines/README.md:246`)_
+- [ ] Performance metrics tracked?  _(source: `docs/agent-guidelines/README.md:247`)_
+- [ ] Ready for reuse?  _(source: `docs/agent-guidelines/README.md:248`)_
+- [ ] Implement missing core agents (code-explorer, code-reviewer)  _(source: `docs/agent-guidelines/README.md:442`)_
+- [ ] Design orchestration patterns (documented, needs implementation)  _(source: `docs/agent-guidelines/README.md:445`)_
+- [ ] Implement multi-agent workflows  _(source: `docs/agent-guidelines/README.md:446`)_
+- [ ] Apply coupling management  _(source: `docs/agent-guidelines/README.md:447`)_
+- [ ] Optimize coordination  _(source: `docs/agent-guidelines/README.md:448`)_
+- [ ] Test all 5 orchestration patterns  _(source: `docs/agent-guidelines/README.md:449`)_
+- [ ] Implement metrics collection  _(source: `docs/agent-guidelines/README.md:452`)_
+- [ ] Create dashboards  _(source: `docs/agent-guidelines/README.md:453`)_
+- [ ] Set up alerts  _(source: `docs/agent-guidelines/README.md:454`)_
+- [ ] Establish review cadence  _(source: `docs/agent-guidelines/README.md:455`)_
+- [ ] Weekly metric reviews  _(source: `docs/agent-guidelines/README.md:458`)_
+- [ ] Hypothesis-driven improvements  _(source: `docs/agent-guidelines/README.md:459`)_
+- [ ] A/B testing optimizations  _(source: `docs/agent-guidelines/README.md:460`)_
+- [ ] Documentation updates  _(source: `docs/agent-guidelines/README.md:461`)_
+- [ ] Test sequential pipeline pattern  _(source: `docs/agent-guidelines/README.md:665`)_
+- [ ] Create integration test workflows  _(source: `docs/agent-guidelines/README.md:666`)_
+- [ ] Complete all implementation agents  _(source: `docs/agent-guidelines/README.md:669`)_
+- [ ] Implement full orchestration patterns  _(source: `docs/agent-guidelines/README.md:670`)_
+- [ ] Dashboard for real-time metrics  _(source: `docs/agent-guidelines/README.md:671`)_
+- [ ] Establish performance baselines  _(source: `docs/agent-guidelines/README.md:672`)_
+- [ ] DORA metrics automation  _(source: `docs/agent-guidelines/README.md:675`)_
+- [ ] Continuous optimization framework  _(source: `docs/agent-guidelines/README.md:676`)_
+- [ ] A/B testing infrastructure  _(source: `docs/agent-guidelines/README.md:677`)_
+- [ ] Regular review cadence  _(source: `docs/agent-guidelines/README.md:678`)_
+- [ ] Tasks are truly independent  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:441`)_
+- [ ] No shared mutable state  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:442`)_
+- [ ] Task duration > 15s each  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:443`)_
+- [ ] Number of tasks ≥ 2  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:444`)_
+- [ ] Coordination overhead < 20%  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:445`)_
+- [ ] Results can be combined  _(source: `docs/agent-guidelines/parallel-execution-patterns.md:446`)_
+- [ ] Can this task be completed in < 30 seconds?  _(source: `docs/agent-guidelines/velocity-principles.md:253`)_
+- [ ] Is there exactly ONE clear success criterion?  _(source: `docs/agent-guidelines/velocity-principles.md:254`)_
+- [ ] Does the agent have access to fast feedback?  _(source: `docs/agent-guidelines/velocity-principles.md:255`)_
+- [ ] Can results be verified immediately?  _(source: `docs/agent-guidelines/velocity-principles.md:256`)_
+- [ ] Is the responsibility clearly separated from other concerns?  _(source: `docs/agent-guidelines/velocity-principles.md:257`)_
+- [ ] Am I working in small batches?  _(source: `docs/agent-guidelines/velocity-principles.md:260`)_
+- [ ] Am I getting feedback quickly (< 10s)?  _(source: `docs/agent-guidelines/velocity-principles.md:261`)_
+- [ ] Am I iterating based on evidence, not guesses?  _(source: `docs/agent-guidelines/velocity-principles.md:262`)_
+- [ ] Am I using the simplest tool that works?  _(source: `docs/agent-guidelines/velocity-principles.md:263`)_
+- [ ] Can I verify my results immediately?  _(source: `docs/agent-guidelines/velocity-principles.md:264`)_
+- [ ] Did the agent complete its primary task?  _(source: `docs/agent-guidelines/velocity-principles.md:267`)_
+- [ ] Was the result correct on first attempt?  _(source: `docs/agent-guidelines/velocity-principles.md:268`)_
+- [ ] Could this agent be reused for similar tasks?  _(source: `docs/agent-guidelines/velocity-principles.md:269`)_
+- [ ] Did the agent produce clear, actionable output?  _(source: `docs/agent-guidelines/velocity-principles.md:270`)_
+- [ ] Would I be confident running this agent again?  _(source: `docs/agent-guidelines/velocity-principles.md:271`)_
+- [ ] [Key capability 1] still works  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:303`)_
+- [ ] [Key capability 2] still works  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:304`)_
+- [ ] Time budget adherence  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:305`)_
+- [ ] Success rate > 85%  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:306`)_
+- [ ] [Potential enhancement 1]  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:318`)_
+- [ ] [Potential enhancement 2]  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:319`)_
+- [ ] [Metric to optimize]  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:320`)_
+- [ ] Choose appropriate name (descriptive, kebab-case)  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:343`)_
+- [ ] Write clear description with 2+ examples  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:344`)_
+- [ ] Select correct capability category  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:345`)_
+- [ ] Choose appropriate color code  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:346`)_
+- [ ] Set realistic time budget (< 60s for typical task)  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:349`)_
+- [ ] Define validation hierarchy  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:350`)_
+- [ ] Specify context management strategy  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:351`)_
+- [ ] Plan feedback checkpoints  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:352`)_
+- [ ] Identify 2-4 primary skills  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:355`)_
+- [ ] List supporting skills  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:356`)_
+- [ ] Create decision tree for routing  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:357`)_
+- [ ] Document when each skill applies  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:358`)_
+- [ ] Break into 2-4 clear phases  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:361`)_
+- [ ] Assign time budget per phase  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:362`)_
+- [ ] Define success criteria per phase  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:363`)_
+- [ ] Provide concrete code examples  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:367`)_
+- [ ] Include essential commands  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:368`)_
+- [ ] Document error messages  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:369`)_
+- [ ] Show expected outputs  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:370`)_
+- [ ] Define single-agent usage  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:373`)_
+- [ ] Define pipeline usage  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:374`)_
+- [ ] Define parallel usage (if applicable)  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:375`)_
+- [ ] Document input/output contracts  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:376`)_
+- [ ] Set performance targets  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:379`)_
+- [ ] Define quality indicators  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:380`)_
+- [ ] Plan instrumentation points  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:381`)_
+- [ ] Create test scenarios  _(source: `docs/agent-guidelines/templates/AGENT_TEMPLATE.md:382`)_
+- [ ] [Agent-1] produces expected output (describe what)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:117`)_
+- [ ] [Agent-2] produces expected output (describe what)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:118`)_
+- [ ] [Agent-3] produces expected output (describe what)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:119`)_
+- [ ] No duplicate work between agents  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:120`)_
+- [ ] No missing information  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:121`)_
+- [ ] Results are combinable without conflicts  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:122`)_
+- [ ] Completeness: [Percentage or description]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:123`)_
+- [ ] [Element 1 - e.g., "Single message with multiple Task calls"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:244`)_
+- [ ] [Element 2 - e.g., "Independent scopes (no overlap)"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:245`)_
+- [ ] [Element 3 - e.g., "No inter-agent communication"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:246`)_
+- [ ] [Element 4 - e.g., "Read-only shared context"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:247`)_
+- [ ] [Element 1 - e.g., "Collect all results"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:250`)_
+- [ ] [Element 2 - e.g., "Merge without conflicts"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:251`)_
+- [ ] [Element 3 - e.g., "Synthesize unified view"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:252`)_
+- [ ] [Element 4 - e.g., "No data loss"]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:253`)_
+- [ ] Agents don't wait for each other  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:256`)_
+- [ ] Results order-independent  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:258`)_
+- [ ] Failures isolated (one agent failing doesn't block others)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:259`)_
+- [ ] [Issue description]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:267`)_
+- [ ] Coordination overhead > 20%? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:270`)_
+- [ ] Agents taking longer than expected? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:271`)_
+- [ ] Resource contention? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:272`)_
+- [ ] [Other performance issue]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:273`)_
+- [ ] Incomplete results? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:276`)_
+- [ ] Duplicate findings? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:277`)_
+- [ ] Agent interference? [YES/NO - details]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:278`)_
+- [ ] [Other quality issue]  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:279`)_
+- [ ] Speedup > 1.3× (achieved [X.XX]×)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:350`)_
+- [ ] Overhead < 20% (achieved [XX]%)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:351`)_
+- [ ] Quality maintained ([PERCENTAGE]% completeness)  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:352`)_
+- [ ] No interference between agents  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:353`)_
+- [ ] Results combinable  _(source: `docs/agent-guidelines/templates/PARALLEL_EXECUTION_TEST_TEMPLATE.md:354`)_
+- [ ] Coordinator successfully discovers work **dynamically** (not hardcoded)  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:90`)_
+- [ ] Coordinator spawns workers based on discovery results  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:91`)_
+- [ ] Workers execute independently in parallel  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:92`)_
+- [ ] Results aggregated correctly  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:93`)_
+- [ ] Main agent receives unified report  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:94`)_
+- [ ] Speedup > 1.5× vs sequential execution  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:97`)_
+- [ ] Coordination overhead < 20% of total time  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:98`)_
+- [ ] Parallelism factor ≥ number of workers spawned  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:99`)_
+- [ ] First-attempt success rate = 100%  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:102`)_
+- [ ] Results complete and actionable  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:103`)_
+- [ ] No duplicated work across workers  _(source: `docs/agent-guidelines/test-results/2025-11-16-hierarchical-coordination-test-plan.md:104`)_
+- [ ] Complete architectural blueprint with all layers (models, services, repositories, routes)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:40`)_
+- [ ] Pydantic V2 models with frozen=True  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:41`)_
+- [ ] Clear separation of concerns (business logic in services, DB in repositories)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:42`)_
+- [ ] Validation strategy documented  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:43`)_
+- [ ] Error handling strategy defined  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:44`)_
+- [ ] Test strategy included  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:45`)_
+- [ ] Implementation order specified  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:46`)_
+- [ ] List of all API endpoints with decorators (@router.get, @router.post, etc.)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:65`)_
+- [ ] HTTP methods identified  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:66`)_
+- [ ] Request/response models cataloged  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:67`)_
+- [ ] Authentication requirements noted  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:68`)_
+- [ ] Endpoints grouped by module/router  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:69`)_
+- [ ] Common patterns identified (pagination, error handling, etc.)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:70`)_
+- [ ] Execution time < 25s  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:71`)_
+- [ ] Dependency graph for service layer  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:90`)_
+- [ ] Import statements cataloged  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:91`)_
+- [ ] Repository dependencies identified  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:92`)_
+- [ ] Coupling metrics calculated (fan-in, fan-out)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:93`)_
+- [ ] Circular dependencies identified (if any)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:94`)_
+- [ ] Recommendations for reducing coupling  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:95`)_
+- [ ] Execution time < 30s  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:96`)_
+- [ ] List of performance anti-patterns found with file:line locations  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:115`)_
+- [ ] Code examples showing current pattern  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:116`)_
+- [ ] Code examples showing optimized pattern  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:117`)_
+- [ ] Impact estimation (10x, 2-5x, <20% improvement)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:118`)_
+- [ ] Effort estimation (hours/days)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:119`)_
+- [ ] Prioritized optimization recommendations  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:120`)_
+- [ ] Execution time < 45s  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:121`)_
+- [ ] Test file created with failing test (RED)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:140`)_
+- [ ] Implementation created to pass test (GREEN)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:141`)_
+- [ ] Code refactored if needed (REFACTOR)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:142`)_
+- [ ] Type hints included  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:143`)_
+- [ ] Docstring added  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:144`)_
+- [ ] Test passes  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:145`)_
+- [ ] Execution time < 60s  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:146`)_
+- [ ] Test written that reproduces bug (fails initially)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:166`)_
+- [ ] Bug fix implemented  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:167`)_
+- [ ] Test now passes  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:168`)_
+- [ ] Regression tests added for edge cases  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:169`)_
+- [ ] Root cause documented  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-test-plan.md:170`)_
+- [ ] Update agent-guidelines README with test results  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:393`)_
+- [ ] Test Pattern 3: Sequential pipeline (code-explorer → code-architect → implementer)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:394`)_
+- [ ] Create metrics collection baseline  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:395`)_
+- [ ] Refine code-architect time budget (increase to 90-120s)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:398`)_
+- [ ] Test hierarchical coordination pattern  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:399`)_
+- [ ] Create agent performance dashboard  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:400`)_
+- [ ] Document best practices from testing  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:401`)_
+- [ ] Implement automated regression testing for agents  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:404`)_
+- [ ] A/B test optimizations (e.g., code-architect scope vs speed)  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:405`)_
+- [ ] Create agent usage guidelines for developers  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:406`)_
+- [ ] Establish review cadence for agent performance  _(source: `docs/agent-guidelines/test-results/2025-11-16-new-agents-execution.md:407`)_
+- [ ] code-explorer (services) finds all service files  _(source: `docs/agent-guidelines/test-results/2025-11-16-scatter-gather-pattern.md:105`)_
+- [ ] hexagonal-guardian identifies architecture violations  _(source: `docs/agent-guidelines/test-results/2025-11-16-scatter-gather-pattern.md:106`)_
+- [ ] code-explorer (API) catalogs all endpoints  _(source: `docs/agent-guidelines/test-results/2025-11-16-scatter-gather-pattern.md:107`)_
+- [ ] Results are combinable  _(source: `docs/agent-guidelines/test-results/2025-11-16-scatter-gather-pattern.md:110`)_
+- [ ] **Assign Name**: Choose a unique `CamelCase` name (e.g., `GreenForest`).  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:5`)_
+- [ ] **Configure Environment**: Add the following to your session or `.env`:  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:8`)_
+- [ ] **Register**: Run the registration command to create your session.  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:16`)_
+- [ ] **Verify**: Check if you appear in the agent list.  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:22`)_
+- [ ] **Hello World**: Send a test message to yourself.  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:30`)_
+- [ ] **Check Inbox**: Verify you received the test message.  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:37`)_
+- [ ] **Subscribe to Broadcasts**: Ensure your inbox logic handles valid  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:43`)_
+- [ ] **Read Docs**: Review `docs/communication/CAPABILITIES_MATRIX.md` to  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:48`)_
+- [ ] **Sync Tasks**: Familiarize yourself with the issue tracker (`bd` tool).  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:50`)_
+- [ ] **Check Daily Brief**: Read the latest morning brief (if applicable) or  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:57`)_
+- [ ] **Update Task Description**: Set your active task description on the  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:62`)_
+- [ ] **Join Council (Optional)**: If you are a high-level agent, request  _(source: `docs/communication/NEW_AGENT_CHECKLIST.md:64`)_
+- [ ] Проверить актуальность метода (Temp Mail работает?)  _(source: `Reports/script_sora2_free_access.md:474`)_
+- [ ] Проверить все ссылки в описании  _(source: `Reports/script_sora2_free_access.md:475`)_
+- [ ] Добавить disclaimer про этичное использование  _(source: `Reports/script_sora2_free_access.md:476`)_
+- [ ] Создать 3 варианта thumbnail (A/B тест)  _(source: `Reports/script_sora2_free_access.md:477`)_
+- [ ] Настроить End Screen на следующее видео  _(source: `Reports/script_sora2_free_access.md:478`)_
+- [ ] Подготовить закрепленный комментарий с FAQ  _(source: `Reports/script_sora2_free_access.md:479`)_
+- [ ] Запланировать публикацию на пиковое время (18:00-20:00)  _(source: `Reports/script_sora2_free_access.md:480`)_
+- [ ] Перевести канал на **Brand Account** (Технически).  _(source: `Reports/YouTube_Brand_Strategy_2026.md:103`)_
+- [ ] Разработать и утвердить **Visual Identity** (Лого, Баннер, Шаблон превью).  _(source: `Reports/YouTube_Brand_Strategy_2026.md:104`)_
+- [ ] Оптимизировать описание канала и ссылки (SEO).  _(source: `Reports/YouTube_Brand_Strategy_2026.md:105`)_
+- [ ] Настроить расписание в `factory_scheduler.py`.  _(source: `Reports/YouTube_Brand_Strategy_2026.md:109`)_
+- [ ] Выпустить пилотную серию Shorts (7 шт. подряд, каждый день).  _(source: `Reports/YouTube_Brand_Strategy_2026.md:110`)_
+- [ ] Опубликовать 1 флагманское длинное видео с идеальным SEO.  _(source: `Reports/YouTube_Brand_Strategy_2026.md:111`)_
+- [ ] Анализ первых данных через `youtube_analytics.py`.  _(source: `Reports/YouTube_Brand_Strategy_2026.md:115`)_
+- [ ] Запуск рекламных интеграций или коллабораций.  _(source: `Reports/YouTube_Brand_Strategy_2026.md:116`)_
+- [ ] Активация вкладки "Сообщество" (опросы каждый день).  _(source: `Reports/YouTube_Brand_Strategy_2026.md:117`)_
+- [ ] PEXELS_API_KEY configured  _(source: `Reports/sora2_production_ready.md:351`)_
+- [ ] Visual assets downloaded  _(source: `Reports/sora2_production_ready.md:352`)_
+- [ ] Video rendered  _(source: `Reports/sora2_production_ready.md:353`)_
+- [ ] Uploaded to platforms  _(source: `Reports/sora2_production_ready.md:354`)_
+- [ ] Analytics tracking enabled  _(source: `Reports/sora2_production_ready.md:355`)_
+- [ ] Total views across platforms  _(source: `Reports/SORA2_FINAL_REPORT.md:282`)_
+- [ ] Engagement rate (likes, comments, shares)  _(source: `Reports/SORA2_FINAL_REPORT.md:283`)_
+- [ ] Save/bookmark rate  _(source: `Reports/SORA2_FINAL_REPORT.md:284`)_
+- [ ] Click-through to profile  _(source: `Reports/SORA2_FINAL_REPORT.md:285`)_
+- [ ] New followers gained  _(source: `Reports/SORA2_FINAL_REPORT.md:286`)_
+- [ ] Watch time % (YouTube)  _(source: `Reports/SORA2_FINAL_REPORT.md:287`)_
+- [ ] Completion rate  _(source: `Reports/SORA2_FINAL_REPORT.md:288`)_
+- [ ] Total reach  _(source: `Reports/SORA2_FINAL_REPORT.md:291`)_
+- [ ] Viral coefficient (shares/views)  _(source: `Reports/SORA2_FINAL_REPORT.md:292`)_
+- [ ] Comment sentiment analysis  _(source: `Reports/SORA2_FINAL_REPORT.md:293`)_
+- [ ] Traffic to external links  _(source: `Reports/SORA2_FINAL_REPORT.md:294`)_
+- [ ] Subscriber growth  _(source: `Reports/SORA2_FINAL_REPORT.md:295`)_
+- [ ] Настроить Instagram credentials  _(source: `Reports/Archived_Status/FINAL_STATUS.md:211`)_
+- [ ] Проверить связь с агентом Кости  _(source: `Reports/Archived_Status/FINAL_STATUS.md:212`)_
+- [ ] Установить AI модели для аватаров (LivePortrait, SadTalker) - опционально  _(source: `Reports/Archived_Status/FINAL_STATUS.md:216`)_
+- [ ] Настроить резервное копирование видео  _(source: `Reports/Archived_Status/FINAL_STATUS.md:217`)_
+- [ ] Мониторинг автозапусков  _(source: `Reports/Archived_Status/FINAL_STATUS.md:218`)_
+- [ ] Настройки iOS → Home Assistant → Обновление контента: **ВКЛ**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:195`)_
+- [ ] Настройки iOS → Home Assistant → Локация: **Всегда**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:196`)_
+- [ ] Настройки iOS → Home Assistant → Уведомления: **ВКЛ**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:197`)_
+- [ ] Режим энергосбережения: **ВЫКЛ** (или настроена автоматизация)  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:198`)_
+- [ ] HA App → Sensors → Enable All: **ВКЛ**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:199`)_
+- [ ] HA App → Update Sensors: **Выполнено**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:200`)_
+- [ ] HA Web → Developer Tools → States: **Проверено**  _(source: `Reports/Archived_Status/IPHONE_HA_SETUP.md:201`)_
+- [ ] Исправить SmartThings (Вариант A или B)  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:249`)_
+- [ ] Найти и привязать IP пылесоса  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:250`)_
+- [ ] Перезапустить Bluetooth  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:251`)_
+- [ ] Завершить авторизацию Yandex.Station  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:252`)_
+- [ ] Обновить LocalTuya  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:256`)_
+- [ ] Проверить IEC API  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:257`)_
+- [ ] Удалить HASS.Agent-MediaPlayer  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:258`)_
+- [ ] Настроить мониторинг доступности устройств  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:262`)_
+- [ ] Создать автоматизации для самовосстановления  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:263`)_
+- [ ] Документировать конфигурацию  _(source: `Reports/Archived_Status/HA_FIX_PLAN.md:264`)_
+- [ ] **SmartThings:** Очистить подписки в Samsung Developer Console  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:154`)_
+- [ ] **Yandex.Station:** Отсканировать QR-код для авторизации  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:155`)_
+- [ ] **iPhone HA App:** Открыть приложение и включить фоновое обновление  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:156`)_
+- [ ] **Bluetooth:** Добавить DBus в Docker конфигурацию  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:160`)_
+- [ ] **Робот ВАСЯ:** Проверить и обновить IP-адрес  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:161`)_
+- [ ] **ИК-передатчики:** Проверить питание и сеть  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:162`)_
+- [ ] **Ollama:** Настроить подключение к серверу  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:166`)_
+- [ ] **LocalTuya:** Обновить local_key для проблемных устройств  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:167`)_
+- [ ] **RPi:** Проверить доступность Raspberry Pi  _(source: `Reports/Archived_Status/HA_DIAGNOSTIC_REPORT.md:168`)_
+
+## Other

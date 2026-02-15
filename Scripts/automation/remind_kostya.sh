@@ -2,8 +2,13 @@
 # remind_kostya.sh - Send reminder to Kostya about Agent Mail setup
 # Runs via cron twice daily (10:00 and 18:00)
 
-TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-8518131338:AAFzuwI6PJ7ftiZVe3u8cWtjYz1pSU_QIqQ}"
-KOSTYA_CHAT_ID="578363419"
+TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"
+KOSTYA_CHAT_ID="${KOSTYA_CHAT_ID:-}"
+
+if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$KOSTYA_CHAT_ID" ]; then
+  echo "$(date): Reminder skipped (missing TELEGRAM_BOT_TOKEN or KOSTYA_CHAT_ID)" >> /tmp/remind_kostya.log
+  exit 0
+fi
 
 MESSAGE="🤖 *Напоминание от Antigravity*
 

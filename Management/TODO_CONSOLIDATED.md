@@ -43,11 +43,11 @@ Generated from 15 conversation contexts.
 
 ## Context: d97aa1d9-bde8-4c37-82bc-ac55ac8b4c5f
 
-- [ ] Configure OpenAI Developer Platform integration <!-- id: 102 -->
+- [/] Configure OpenAI Developer Platform integration <!-- id: 102 --> (OpenAI base URL normalized; image endpoint wired; needs API key/test)
 - [ ] Monitor token usage across providers <!-- id: 103 -->
 - [ ] Implement cost tracking per conversation <!-- id: 104 -->
-- [ ] Implement image generation (DALL-E/Stable Diffusion) <!-- id: 202 --> <!-- CURRENT FOCUS -->
-- [ ] Create `/imagine` command for images <!-- id: 204 -->
+- [/] Implement image generation (DALL-E/Stable Diffusion) <!-- id: 202 --> <!-- CURRENT FOCUS --> (DALL-E via OpenAI wired; SD pending)
+- [x] Create `/imagine` command for images <!-- id: 204 -->
 - [ ] Test all 3 providers (Ollama, OpenAI, Gemini) <!-- id: 304 --> <!-- CURRENT FOCUS -->
 - [ ] Configure SerpApi (Google search) <!-- id: 453 -->
 - [ ] Configure Linear API (task management) <!-- id: 454 -->
@@ -158,3 +158,10 @@ Generated from 15 conversation contexts.
 
 - [ ] Set up error alerting (future enhancement)
 - [ ] Kubernetes deployment
+
+## Context: 2026-02-14-telegram-rotation
+
+- [x] Rotate Telegram bot token via @BotFather (revoke old, issue new)
+- [x] Update `TELEGRAM_BOT_TOKEN` in GKE secret `ai-core-secrets`
+- [x] Update `TELEGRAM_BOT_TOKEN` in local env files (`Projects/AI_Core/.env`, `Projects/AI_Core/.env.igor`, root `.env` if used)
+- [x] Verify single polling instance (resolve `getUpdates` conflict)

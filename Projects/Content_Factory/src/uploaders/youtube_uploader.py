@@ -167,6 +167,11 @@ if __name__ == "__main__":
         choices=["public", "private", "unlisted"],
         help="Privacy status",
     )
+    parser.add_argument(
+        "--token-file",
+        default=None,
+        help="Path to a specific YouTube OAuth token JSON",
+    )
 
     args = parser.parse_args()
 
@@ -178,4 +183,5 @@ if __name__ == "__main__":
         args.description,
         tags_list,
         privacy_status=args.privacy,
+        token_file=args.token_file,
     )

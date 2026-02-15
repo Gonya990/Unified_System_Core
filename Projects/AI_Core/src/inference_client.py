@@ -232,7 +232,9 @@ class InferenceClient:
     async def _chat_openai(self, messages: list, system_prompt: Optional[str] = None):
         """OpenAI API request."""
         api_key = self.config.get("OPENAI_API_KEY")
-        base_url = self.config.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        base_url = self._normalize_openai_base_url(
+            self.config.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        )
         model = self.config.get("OPENAI_MODEL", "gpt-4o")
 
         if not api_key:
@@ -259,6 +261,59 @@ class InferenceClient:
                     return f"Error: OpenAI status {resp.status}", {}
         except Exception as e:
             return f"OpenAI Connection Error: {e}", {}
+
+    def _normalize_openai_base_url(self, base_url: str) -> str:
+        """Ensure OpenAI base URL includes /v1 when using api.openai.com."""
+        if not base_url:
+            return "https://api.openai.com/v1"
+        normalized = base_url.rstrip("/")
+        if "api.openai.com" in normalized and not normalized.endswith("/v1"):
+            return f"{normalized}/v1"
+        return normalized
+
+    async def generate_image(self, prompt: str) -> Optional[str]:
+        """
+        Generate an image via OpenAI (DALL-E 3) and return the image URL.
+        """
+        provider = self.config.get("IMAGE_PROVIDER", "openai").lower()
+        if provider not in {"openai", "dalle", "dall-e", "dall-e-3"}:
+            raise ValueError(f"Unsupported image provider: {provider}")
+
+        api_key = self.config.get("OPENAI_API_KEY", self.config.get("INFERENCE_API_KEY"))
+        if not api_key:
+            return None
+
+        base_url = self._normalize_openai_base_url(
+            self.config.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        )
+        url = f"{base_url}/images/generations"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+        model = self.config.get("OPENAI_IMAGE_MODEL", "dall-e-3")
+        size = self.config.get("OPENAI_IMAGE_SIZE", "1024x1024")
+        quality = self.config.get("OPENAI_IMAGE_QUALITY", "standard")
+
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "n": 1,
+            "size": size,
+            "response_format": "url",
+        }
+        if model == "dall-e-3":
+            payload["quality"] = quality
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status != 200:
+                        err_msg = await resp.text()
+                        raise Exception(f"OpenAI Image Error: {resp.status} - {err_msg}")
+                    data = await resp.json()
+                    return data.get("data", [{}])[0].get("url")
+        except Exception as e:
+            logger.error(f"OpenAI Image Error: {e}")
+            raise
 
     async def _chat_openrouter(self, messages: list, system_prompt: Optional[str] = None):
         """OpenRouter API request."""

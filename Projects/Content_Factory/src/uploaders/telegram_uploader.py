@@ -17,7 +17,7 @@ def upload_telegram(video_path: str, caption: str) -> bool:
         bot = telebot.TeleBot(bot_token)
 
         with open(video_path, "rb") as video:
-            bot.send_video(chat_id, video, caption=caption, parse_mode="HTML")
+            bot.send_video(chat_id, video, caption=caption)
 
         print(f"✅ Posted to Telegram: {chat_id}")
         return True

@@ -1,11 +1,21 @@
+import os
 from pathlib import Path
 
 from openai import OpenAI
 
 BASE_DIR = Path(__file__).resolve().parent
 env_path = BASE_DIR / "Projects/AI_Core/.env"
-# Temporarily hardcode the other key to test
-api_key = "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"
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(env_path)
+except Exception:
+    pass
+
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise SystemExit("OPENAI_API_KEY is not set.")
 
 client = OpenAI(api_key=api_key)
 try:

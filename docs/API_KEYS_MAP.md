@@ -51,13 +51,12 @@
 #### Environment Variables (from /proc)
 
 ```bash
-TELEGRAM_BOT_TOKEN=8518131338:AAFzuwI6PJ7ftiZVe3u8cWtjYz1pSU_QIqQ
-GEMINI_API_KEY=AIzaSyCZd986TK8vI-lk7ygpwMV0XgquWIHX7ZU
-OPENAI_API_KEY=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
+TELEGRAM_BOT_TOKEN= PLEASE_SET
+GEMINI_API_KEY= PLEASE_SET
+OPENAI_API_KEY= PLEASE_SET
 OPENAI_BASE_URL=https://api.openai.com
-INFERENCE_API_KEY=
-SERPAPI_KEY=e0c281fcc3fc567af344c430e4c1d15c808aa38672274f8319716f9bc5ae1c9c
-LINEAR_API_KEY=lin_api_3BlNd7FQOgeJQpJEojnJVSaVPXqRatQM1TmwfghK
+INFERENCE_API_KEY= PLEASE_SET
+LINEAR_API_KEY= PLEASE_SET
 ```
 
 #### How Keys Are Used
@@ -66,7 +65,7 @@ LINEAR_API_KEY=lin_api_3BlNd7FQOgeJQpJEojnJVSaVPXqRatQM1TmwfghK
 
 ```python
 # bot_config.py (HARDCODED - redundant!)
-BOT_TOKEN = "8518131338:AAFzuw..."
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 
 # config_manager.py (via .env)
 "TELEGRAM_BOT_TOKEN": os.environ.get("TELEGRAM_BOT_TOKEN", "")
@@ -232,7 +231,7 @@ PATH=/home/gonya/.nvm/versions/node/v24.11.1/bin:...
 
 ```bash
 DATABASE_URL=sqlite+aiosqlite:////opt/mcp-agent-mail/data/agent_mail.db
-HTTP_BEARER_TOKEN=antigravity_secret
+HTTP_BEARER_TOKEN= PLEASE_SET
 HTTP_HOST=0.0.0.0
 ```
 

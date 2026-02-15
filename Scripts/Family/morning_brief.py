@@ -233,7 +233,7 @@ async def send_brief():
 
     # Telegram delivery
     if ENABLE_TELEGRAM:
-        token = os.getenv("TELEGRAM_BOT_TOKEN") or "8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk"
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
 
         if token:
             for name, user_info in USERS.items():

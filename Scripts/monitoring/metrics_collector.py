@@ -5,6 +5,7 @@ Collects system metrics and sends them to GCP Cloud Monitoring.
 Also sends alerts to Telegram when thresholds are exceeded.
 """
 
+import os
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -20,9 +21,10 @@ COLLECTION_INTERVAL = 60  # seconds
 # Thresholds for alerts
 THRESHOLDS = {"cpu_usage": 90, "memory_usage": 85, "disk_usage": 90, "gpu_temp": 80}
 
-# Telegram config
-TELEGRAM_BOT_TOKEN = "8518131338:AAFzuwI6PJ7ftiZVe3u8cWtjYz1pSU_QIqQ"
-TELEGRAM_CHAT_IDS = [708531393, 1881720235]
+# Telegram config (avoid hardcoded secrets)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+_admin_id = os.getenv("TELEGRAM_ADMIN_CHAT_ID") or os.getenv("ADMIN_CHAT_ID") or ""
+TELEGRAM_CHAT_IDS = [int(_admin_id)] if _admin_id.isdigit() else []
 
 
 def get_gpu_info():
@@ -71,6 +73,8 @@ def collect_metrics():
 
 def send_telegram_alert(message: str):
     """Send alert to Telegram."""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_IDS:
+        return
     for chat_id in TELEGRAM_CHAT_IDS:
         try:
             url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"

@@ -1,0 +1,81 @@
+# Task Execution Log — 2026-02-14
+
+## Completed (Verified)
+- Tailscale status verified (`debug_status.txt`).
+- Tailscale ping:
+  - `smart` OK
+  - `unified-home-core-cloud` OK
+- GKE access:
+  - `kubectl get nodes` → nodes Ready
+  - `kubectl get ns` → namespaces present (including `trading`)
+- K8s workloads:
+  - `trading` namespace pods Running
+  - `telegram-bot` namespace: empty
+  - `factory` namespace: empty
+- GCloud:
+  - `gcloud auth list` shows active account
+  - `gcloud config` shows active project `my-home-435112`
+- AI Core/Bot:
+  - PM2 processes `ai-bot-igor` and `bybit-monitor` online
+  - API Gateway health (LAN) OK
+  - Dashboard local (8096) OK
+- Home Assistant:
+  - `http://100.118.179.47:8123/` отвечает (HTTP 200)
+- PM2:
+  - `ai-bot-igor` остановлен (для устранения конфликтов Telegram polling)
+- Bybit (K8s):
+  - собраны логи `bybit-ingestion`, `bybit-execution-engine`, `bybit-compliance`, `bybit-risk-guard`, `bybit-ai-alpha-agent`
+- Content Factory:
+  - production run выполнен (`produce_content_v7_final.py`)
+  - видео сгенерировано в `Local_Dev/Media/daily_auto/2026-02-14/`
+  - YouTube upload завершён (ID/URL не фиксировались)
+- Telegram (K8s):
+  - `trading/ai-telegram-bot` масштабирован до 1 реплики (включён)
+  - старт успешен, конфликт `getUpdates` не наблюдается
+- Telegram (Local test):
+  - обновлён `TELEGRAM_ADMIN_CHAT_ID` на `708531393`
+  - тестовое сообщение доставлено
+- GKE secrets:
+  - `ai-core-secrets` обновлён (TELEGRAM_ADMIN_CHAT_ID=708531393), деплой перезапущен
+  - `ai-core-secrets` обновлён (ALLOWED_USERS=708531393)
+- Agents:
+  - добавлены `.claude/agents/*` для пайплайнов `/pipeline`
+- Access control:
+  - Firestore: сняты approvals для `578363419`, `5981377998`, `999999`
+  - Firestore: удалены документы пользователей `578363419`, `5981377998`, `999999`
+  - деплой `ai-telegram-bot` перезапущен после изменений
+- Telegram rotation prep:
+  - удалены hardcoded токены из:
+    - `Projects/AI_Core/src/system_watchdog_v2.py`
+    - `Scripts/automation/remind_kostya.sh`
+    - `Scripts/Family/morning_brief.py`
+  - токен ротирован и обновлён в:
+    - `Projects/AI_Core/.env`
+    - `Projects/AI_Core/.env.igor`
+    - `ai-core-secrets` (GKE)
+  - деплой `ai-telegram-bot` перезапущен, тестовое сообщение доставлено
+- Home Assistant:
+  - `HA_URL` обновлён до `http://100.118.179.47:8123`
+  - HA API auth test (через `HA_TOKEN`) → HTTP 200
+- VSCode:
+  - `*.jsonl` ассоциация на `log` для подавления ложных `scopes` диагностик
+- AI Core/Bot:
+  - OpenAI base URL нормализован (`/v1`) + добавлен `generate_image` (DALL-E 3)
+  - Конфиги изображений добавлены в `ConfigManager` (provider/model/size/quality)
+  - `/imagine` подтверждён как alias для `/img` (готово к использованию при наличии ключа)
+
+## Blocked / Needs Access
+- Proxmox UI: `https://192.168.190.113:8006` — ConnectTimeout
+- Proxmox UI (TS): `https://100.74.137.122:8006` — ConnectTimeout
+- HA endpoint `100.81.133.25:8123` — timeout (likely outdated)
+- Content Factory run — requires explicit approval (API costs)
+- Telegram bot заблокирован пользователем (403) → нужен другой chat/channel ID или разблокировка
+- Telegram polling conflict — **ещё есть** в логах GKE (внешний polling-инстанс)
+- n8n not in PATH (verify installation path)
+
+## Warnings
+- `gcloud` warning: Python 3.9 not officially supported (suggest upgrade to 3.10+)
+- FFmpeg build без `drawtext` → субтитры и watermark пропускаются
+- GitHub Models: 401 Unauthorized (токен невалиден для Models)
+- Bybit execution engine: leader election lease parse errors (400 BadRequest)
+- Bybit compliance: TimescaleDB connection refused

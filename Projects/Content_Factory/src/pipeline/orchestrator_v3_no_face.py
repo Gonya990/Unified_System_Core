@@ -5,16 +5,19 @@ Complete pipeline: Text -> Voice -> B-Roll -> Subtitles
 Supports Russian and English voices
 """
 
+import hashlib
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
+import requests
 
 # Setup paths
 SRC_DIR = Path(__file__).parent.parent.resolve()  # Projects/Content_Factory/src
@@ -49,11 +52,15 @@ except ImportError:
 load_dotenv(ROOT_DIR / ".env", override=True)
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)
 
-# Masked key debug
-openai_key = os.getenv("OPENAI_API_KEY", "")
-pexels_key = os.getenv("PEXELS_API_KEY", "")
-masked_openai = f"{openai_key[:8]}...{openai_key[-4:]}" if openai_key else "None"
-print(f"📡 API Status: OpenAI={masked_openai} Pexels={pexels_key[:8]}...")
+# Key status (no secrets in logs)
+def _has_key(provider: str, env_var: str) -> bool:
+    if broker and broker.key_store.get(provider):
+        return True
+    return bool(os.getenv(env_var))
+
+openai_status = "configured" if _has_key("openai", "OPENAI_API_KEY") else "missing"
+pexels_status = "configured" if _has_key("pexels", "PEXELS_API_KEY") else "missing"
+print(f"📡 API Status: OpenAI={openai_status} Pexels={pexels_status}")
 
 # Import internal tools
 try:
@@ -85,7 +92,7 @@ OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 INPUT_DIR.mkdir(exist_ok=True, parents=True)
 BROLL_DIR.mkdir(exist_ok=True, parents=True)
 
-# Voice options (OpenAI TTS preferred, Edge-TTS fallback)
+# Voice options (ElevenLabs preferred, Edge-TTS/OpenAI fallback)
 VOICES = {
     "en": "alloy",  # Neutral, clear (No accent/burring)
     "en_female": "shimmer",
@@ -99,6 +106,109 @@ VOICES = {
 }
 
 
+def _tts_rotation_order(text: str) -> list[str]:
+    """Resolve provider order with rotation. Defaults to elevenlabs -> edge."""
+    provider = (os.getenv("TTS_PROVIDER") or "").strip().lower()
+    if provider:
+        providers = [provider]
+    else:
+        rotation = os.getenv("TTS_ROTATION", "elevenlabs,edge")
+        providers = [p.strip().lower() for p in rotation.split(",") if p.strip()]
+
+    allow_openai = os.getenv("ALLOW_OPENAI_TTS", "false").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+    if not allow_openai:
+        providers = [p for p in providers if p != "openai"]
+
+    if not providers:
+        providers = ["edge"]
+
+    # Rotate order deterministically by content
+    if len(providers) > 1 and text:
+        h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        shift = int(h, 16) % len(providers)
+        providers = providers[shift:] + providers[:shift]
+
+    return providers
+
+
+def _select_eleven_voice_id(lang: str, text: str) -> str:
+    """Choose ElevenLabs voice ID with optional rotation."""
+    lang_key = f"ELEVENLABS_VOICE_ID_{lang.upper()}"
+    voice_id = (os.getenv(lang_key) or os.getenv("ELEVENLABS_VOICE_ID") or "").strip()
+    voices = os.getenv("ELEVENLABS_VOICE_IDS", "").strip()
+    rotation_mode = os.getenv("ELEVENLABS_VOICE_ROTATION", "random").strip().lower()
+    if voices:
+        ids = [v.strip() for v in voices.split(",") if v.strip()]
+        if ids:
+            if rotation_mode == "hash":
+                if text:
+                    h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                    voice_id = ids[int(h, 16) % len(ids)]
+                else:
+                    voice_id = ids[0]
+            else:
+                voice_id = random.choice(ids)
+    if not voice_id:
+        voice_id = "pNInz6obpgDQGcFmaJgB"  # default ElevenLabs voice
+    return voice_id
+
+
+def generate_audio_elevenlabs(text: str, output_path: Path, lang: str = "en") -> bool:
+    """Generate audio using ElevenLabs (preferred)."""
+    print("🎤 Generating ElevenLabs Audio...")
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        print("⚠️ ElevenLabs API key not found, skipping.")
+        return False
+    try:
+        voice_id = _select_eleven_voice_id(lang, text)
+        model_id = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2")
+        headers = {"xi-api-key": api_key, "Content-Type": "application/json"}
+        data = {
+            "text": text,
+            "model_id": model_id,
+            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+        }
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+        resp = requests.post(url, json=data, headers=headers, timeout=60)
+        if resp.status_code != 200:
+            print(f"❌ ElevenLabs Failed: {resp.status_code}")
+            return False
+
+        tmp_mp3 = output_path.with_suffix(".mp3")
+        with open(tmp_mp3, "wb") as f:
+            f.write(resp.content)
+
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(tmp_mp3),
+                "-ar",
+                "44100",
+                "-ac",
+                "2",
+                "-b:a",
+                "192k",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        tmp_mp3.unlink(missing_ok=True)
+        print("✅ ElevenLabs Success!")
+        return True
+    except Exception as e:
+        print(f"❌ ElevenLabs Exception: {e}")
+        return False
+
+
 def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
     """Generate audio using OpenAI TTS with Studio Post-Processing"""
     print(f"🎙 Generating Studio-Quality OpenAI Audio (voice={voice})...")
@@ -110,9 +220,36 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
         print("❌ Error: OPENAI_API_KEY not found via TokenBroker or Environment.")
         return False
 
-    # Masked key debug
-    masked_key = f"{api_key[:8]}...{api_key[-4:]}"
-    print(f"🔑 Using API Key: {masked_key}")
+    # Do not log secrets
+
+    def chunk_text(content: str, max_chars: int = 3500) -> list[str]:
+        content = re.sub(r"\\s+", " ", content).strip()
+        if len(content) <= max_chars:
+            return [content]
+
+        sentences = re.split(r"(?<=[.!?…])\\s+", content)
+        chunks: list[str] = []
+        buf = ""
+        for sentence in sentences:
+            if not sentence:
+                continue
+            if len(sentence) > max_chars:
+                if buf:
+                    chunks.append(buf.strip())
+                    buf = ""
+                for i in range(0, len(sentence), max_chars):
+                    part = sentence[i : i + max_chars]
+                    if part:
+                        chunks.append(part.strip())
+                continue
+            if len(buf) + len(sentence) + 1 <= max_chars:
+                buf = f"{buf} {sentence}".strip()
+            else:
+                chunks.append(buf.strip())
+                buf = sentence
+        if buf:
+            chunks.append(buf.strip())
+        return [c for c in chunks if c]
 
     try:
         from openai import OpenAI
@@ -122,10 +259,46 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
 
         client = OpenAI(api_key=api_key, base_url=base_url, organization=org_id)
 
-        response = client.audio.speech.create(model="tts-1-hd", voice=voice, input=text)
+        chunks = chunk_text(text)
+        tmp_dir = output_path.parent / f".tts_tmp_{output_path.stem}"
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        part_paths: list[Path] = []
+
+        for idx, chunk in enumerate(chunks, start=1):
+            response = client.audio.speech.create(
+                model="tts-1-hd", voice=voice, input=chunk
+            )
+            part_path = tmp_dir / f"part_{idx:02d}.mp3"
+            response.stream_to_file(str(part_path))
+            part_paths.append(part_path)
 
         mp3_path = output_path.with_suffix(".mp3")
-        response.stream_to_file(str(mp3_path))
+        if len(part_paths) == 1:
+            part_paths[0].replace(mp3_path)
+        else:
+            concat_list = tmp_dir / "concat.txt"
+            with open(concat_list, "w") as f:
+                for p in part_paths:
+                    f.write(f"file '{p.as_posix()}'\n")
+            combined = tmp_dir / "combined.mp3"
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    str(concat_list),
+                    "-c",
+                    "copy",
+                    str(combined),
+                ],
+                check=True,
+                capture_output=True,
+            )
+            combined.replace(mp3_path)
 
         # STUDIO POST-PROCESSING
         subprocess.run(
@@ -150,6 +323,14 @@ def generate_audio_openai(text: str, output_path: Path, voice: str) -> bool:
             capture_output=True,
         )
 
+        # Cleanup temp parts
+        try:
+            for p in tmp_dir.glob("*"):
+                p.unlink(missing_ok=True)
+            tmp_dir.rmdir()
+        except Exception:
+            pass
+
         print(f"✅ Studio Audio Mastered: {output_path}")
         return True
     except Exception as e:
@@ -170,6 +351,7 @@ def generate_audio_edge(text: str, output_path: Path, voice: str) -> bool:
         FACTORY_DIR / "venv/bin/edge-tts",
         ROOT_DIR / "venv_content/bin/edge-tts",
         ROOT_DIR.parent.parent / "venv/bin/edge-tts",
+        Path.home() / ".local/bin/edge-tts",
     ]
 
     for p in search_paths:
@@ -236,10 +418,8 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
         print("❌ Gemini Transcription failed: No API Key found.")
         return []
 
-    print(f"🔑 Using Gemini Key: {api_key[:8]}... (len={len(api_key)})")
     try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("models/gemini-2.0-flash")
+        client = genai.Client(api_key=api_key)
 
         with open(audio_path, "rb") as f:
             audio_data = f.read()
@@ -252,11 +432,12 @@ def transcribe_audio_gemini(audio_path: Path) -> list[dict]:
         )
 
         # Structure payload correctly for Gemini
-        response = model.generate_content(
-            [prompt, {"mime_type": "audio/wav", "data": audio_data}]
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=[prompt, {"mime_type": "audio/wav", "data": audio_data}],
         )
 
-        text = response.text.strip()
+        text = (response.text or "").strip()
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0].strip()
         elif "```" in text:
@@ -335,14 +516,23 @@ def generate_audio(text: str, output_path: Path, lang: str = "en") -> bool:
     if lang == "he":
         voice = VOICES["en"]  # Use Onyx (multilingual model) for Hebrew
 
-    # 1. Try OpenAI (Premium)
-    if generate_audio_openai(text, output_path, voice):
-        return True
+    providers = _tts_rotation_order(text)
+    print(f"🎛️ TTS provider order: {', '.join(providers)}")
 
-    # 2. Fallback to Edge-TTS
-    print("⚠️ OpenAI Failed, falling back to Edge-TTS...")
-    fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-EmmaNeural")
-    return generate_audio_edge(text, output_path, fallback_voice)
+    for provider in providers:
+        if provider == "elevenlabs":
+            if generate_audio_elevenlabs(text, output_path, lang):
+                return True
+        elif provider == "edge":
+            fallback_voice = VOICES.get(f"fallback_{lang}", "en-US-EmmaNeural")
+            if generate_audio_edge(text, output_path, fallback_voice):
+                return True
+        elif provider == "openai":
+            if generate_audio_openai(text, output_path, voice):
+                return True
+
+    print("❌ All TTS providers failed.")
+    return False
 
 
 def add_subtitles(
@@ -351,6 +541,22 @@ def add_subtitles(
     """Add dynamic word-by-word subtitles matching style"""
     style_label = "Impact Vision" if style == "impact" else "Cartoon Fun"
     print(f"📝 Burning '{style_label}' Style Subtitles...")
+
+    # Skip if drawtext filter is unavailable in this ffmpeg build
+    try:
+        check = subprocess.run(
+            ["ffmpeg", "-hide_banner", "-h", "filter=drawtext"],
+            capture_output=True,
+            text=True,
+        )
+        output = (check.stdout or "") + (check.stderr or "")
+        output = output.lower()
+        if "unknown filter" in output or "no such filter" in output:
+            print("⚠️ FFmpeg drawtext filter not available. Skipping subtitles.")
+            return False
+    except Exception:
+        print("⚠️ FFmpeg drawtext check failed. Skipping subtitles.")
+        return False
 
     # 1. Extract audio and transcribe
     temp_audio = output_path.parent / f"temp_{output_path.stem}_sub.wav"
@@ -372,19 +578,20 @@ def add_subtitles(
     if not Path(font_path).exists():
         font_path = "Arial"
 
+    def _sanitize_drawtext(raw: str) -> str:
+        cleaned = raw.upper()
+        cleaned = re.sub(r"[^0-9A-ZА-ЯЁ ]+", "", cleaned)
+        return " ".join(cleaned.split())
+
     for _i, w in enumerate(words):
         # Handle both dict and object (OpenAI SDK returns objects)
         start = w.start if hasattr(w, "start") else w.get("start", 0)
         end = w.end if hasattr(w, "end") else w.get("end", 0)
         text = w.word if hasattr(w, "word") else w.get("word", "")
 
-        text = (
-            text.upper()
-            .replace("'", "")
-            .replace(":", "")
-            .replace('"', "")
-            .replace("\\", "")
-        )
+        text = _sanitize_drawtext(text)
+        if not text:
+            continue
 
         if style == "impact":
             # Color: Golden Yellow (0xFFD700)
@@ -394,6 +601,7 @@ def add_subtitles(
                 f"x=(w-text_w)/2:y=h-(h*0.2):borderw=4:bordercolor=black:"
                 f"enable='between(t,{start},{end})'"
             )
+        else:
             # Cartoon Style: Vibrant Pink/Cyan with white border
             color = random.choice(["0xFF69B4", "0x00FFFF", "0xFFFF00"])
             f = (

@@ -79,9 +79,9 @@ def get_key(provider, owner=None):
     return None
 
 
-PEXELS_API_KEY = (
-    get_key("pexels") or "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"
-)
+PEXELS_API_KEY = get_key("pexels")
+if not PEXELS_API_KEY:
+    print("⚠️ PEXELS_API_KEY not found. Pexels fetch disabled.")
 
 
 def get_client():
@@ -259,14 +259,14 @@ def run_daily_research(
             print(
                 f"🌠 DEEP RESEARCH: Attempting via Gemini (Context size: {len(context)})"
             )
-            import google.generativeai as genai
+            from google import genai
 
-            genai.configure(api_key=get_key("gemini"))
-            model = genai.GenerativeModel(
-                "models/gemini-1.5-pro"
-            )  # Using Pro for deep research
-            res = model.generate_content(prompt)
-            content = res.text
+            client = genai.Client(api_key=get_key("gemini"))
+            res = client.models.generate_content(
+                model="gemini-1.5-pro",
+                contents=prompt,
+            )
+            content = res.text or ""
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
@@ -317,12 +317,14 @@ def run_daily_research(
     if not data:
         try:
             print("🌠 Researching via Gemini 2.0...")
-            import google.generativeai as genai
+            from google import genai
 
-            genai.configure(api_key=get_key("gemini"))
-            model = genai.GenerativeModel("models/gemini-2.0-flash")
-            res = model.generate_content(prompt)
-            content = res.text
+            client = genai.Client(api_key=get_key("gemini"))
+            res = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt,
+            )
+            content = res.text or ""
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             data = json.loads(content)
@@ -338,7 +340,7 @@ def run_daily_research(
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={
-                    "model": "llama3",
+                    "model": "llama3.2:latest",
                     "prompt": (
                         f"{prompt}\nReturn ONLY JSON. Do not include markdown or explanations."
                     ),
@@ -563,6 +565,9 @@ def generate_banana_assets(scenes, output_dir: Path, style="impact"):
 
 def generate_pexels_assets(scenes, output_dir: Path, style="impact"):
     """Pexels search with style-augmented keywords"""
+    if not PEXELS_API_KEY:
+        print("⚠️ Skipping Pexels: PEXELS_API_KEY not configured.")
+        return []
     print(f"🎬 Trying Pexels ({style}) for {len(scenes)} scenes...")
     resolved = []
     for s in scenes:
@@ -673,6 +678,24 @@ def generate_vision_assets(scenes, output_dir: Path, style="impact"):
         if len(resolved) == len(scenes):
             print("✅ All images completed via Free Tier (Gemini/Flux/SDXL)")
             return resolved
+
+    # Paid is allowed by default; set ALLOW_PAID_IMAGES=false to force free-only
+    allow_paid = os.getenv("ALLOW_PAID_IMAGES", "true").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+    if not allow_paid:
+        print("⚠️ Paid image generation disabled. Skipping DALL-E/Banana.")
+        missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]
+        if missing:
+            try:
+                resolved.extend(generate_pexels_assets(missing, output_dir, style=style))
+            except Exception:
+                print("⚠️ Pexels fallback failed")
+        return resolved
 
     # PAID TIER 1: DALL-E 3 (if free options exhausted)
     missing = [s for s in scenes if s["image"] not in {r["image"] for r in resolved}]

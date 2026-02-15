@@ -122,7 +122,7 @@ Projects/AI_Core/
 ## Access Points
 
 ### Igor's Bot
-- **Telegram Bot**: Use token `8518131338:AAH_...`
+- **Telegram Bot**: Use token `YOUR_TELEGRAM_BOT_TOKEN`
 - **Admin ID**: 708531393 (Igor)
 - **Allowed Users**: Igor + Artur (5569219290)
 - **Agent Mail**: `FrostyMeadow`

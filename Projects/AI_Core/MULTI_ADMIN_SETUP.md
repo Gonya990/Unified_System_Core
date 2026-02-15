@@ -24,7 +24,7 @@ This document describes how to run separate Telegram bot instances for Igor and 
 
 ### Igor's Instance (.env.igor)
 - **BOT_INSTANCE**: `igor`
-- **TELEGRAM_BOT_TOKEN**: `8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk`
+- **TELEGRAM_BOT_TOKEN**: `YOUR_TELEGRAM_BOT_TOKEN`
 - **ADMIN_ID**: `708531393` (Igor)
 - **ALLOWED_USERS**: `708531393,5569219290` (Igor + Artur)
 - **HEALTH_PORT**: `8095`
@@ -146,7 +146,7 @@ Each token must be valid and correspond to active @BotFather registrations:
 
 Verify tokens:
 ```bash
-curl -s https://api.telegram.org/bot8518131338:AAH_mDgVZ2UclJvUVT0RI5uypeazSORx2Wk/getMe | jq .
+curl -s https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN/getMe | jq .
 ```
 
 ## Monitoring

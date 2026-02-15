@@ -1,16 +1,22 @@
 === Tailscale Status ===
-The Tailscale CLI failed to start: Failed to load preferences.
-
+100.65.72.56    macbook-air-igor-1       macbook-air-igor-1.ayu-altair.ts.net  macOS    -                                          
+100.67.107.71   gpu-node-1               tagged-devices                        linux    active; relay "par", tx 281884 rx 275816   
+100.115.17.68   igor-gaming-1            tagged-devices                        linux    active; relay "par", tx 110636 rx 113308   
+100.126.23.67   igor-gaming              tagged-devices                        windows  -                                          
+100.75.107.115  iphone-15-pro            tagged-devices                        iOS      -                                          
+100.109.45.63   oneplus-cph2747          KostaGorod@                           android  offline, last seen 6d ago                  
+100.93.171.99   rocinante                tagged-devices                        linux    offline, last seen 10d ago                 
+100.118.179.47  smart                    tagged-devices                        linux    -                                          
+100.87.208.56   unified-home-core-cloud  tagged-devices                        linux    active; relay "par", tx 505016 rx 3049400  
 
 === Internet Check ===
-ping: sendto: Operation not permitted
-ping: sendto: Operation not permitted
 PING 8.8.8.8 (8.8.8.8): 56 data bytes
-Request timeout for icmp_seq 0
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=119 time=7.609 ms
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=119 time=8.951 ms
 
 --- 8.8.8.8 ping statistics ---
-2 packets transmitted, 0 packets received, 100.0% packet loss
-ping failed (likely blocked)
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 7.609/8.280/8.951/0.671 ms
 
 === Node/N8N Check ===
 Node version:
@@ -18,4 +24,4 @@ v20.11.0
 N8N location:
 n8n not found in PATH
 
-Finished at Thu Feb 12 07:24:55 IST 2026
+Finished at Sat Feb 14 22:14:28 IST 2026

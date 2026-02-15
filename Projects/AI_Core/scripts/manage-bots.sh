@@ -202,7 +202,7 @@ Examples:
   ./scripts/manage-bots.sh health
 
 Configuration:
-  Igor:   .env.igor (ADMIN_ID: 708531393, Token: 8518131338:...)
+  Igor:   .env.igor (ADMIN_ID: 708531393, Token: <from .env.igor>)
   Kostya: .env.kostya (ADMIN_ID: 578363419, Token: 7998292224:...)
 
 Ports:

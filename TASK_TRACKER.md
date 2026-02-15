@@ -11,4 +11,10 @@
 | **007** | Dry-run пайплайна | Pipeline Dry-run | 📅 Todo | Critical |
 | **008** | Ремонт Bybit Agent | Repair Bybit Agent | ✅ Done | Critical |
 
-*Последнее обновление / Last Update: 20:45*
+| **009** | Фикс Monitoring | Fix Monitoring (NoneType) | ✅ Done | Critical |
+| **010** | Запуск Flux/SDXL | Start Flux/SDXL servers | ✅ Done | High |
+| **011** | Систематизация логики | Systematize Logic Documentation | ✅ Done | High |
+| **012** | Свод задач системы | Unified Tasks Consolidation | ✅ Done | High |
+| **013** | Системный аудит | System Execution Report | ✅ Done | High |
+
+*Последнее обновление / Last Update: 22:26*

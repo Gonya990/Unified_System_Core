@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 import subprocess
 import time
 
@@ -9,8 +10,12 @@ import aiohttp
 # ==========================================
 # CONFIGURATION
 # ==========================================
-TELEGRAM_BOT_TOKEN = "8518131338:AAFXmKNxvB8Zd5IoCxk_nNrPp2M_3XWRFPo"
-ADMIN_CHAT_ID = 708531393
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+ADMIN_CHAT_ID = (
+    os.getenv("ADMIN_CHAT_ID")
+    or os.getenv("TELEGRAM_ADMIN_CHAT_ID")
+    or ""
+)
 CHECK_INTERVAL = 60  # seconds
 
 # Critical processes to monitor
@@ -38,6 +43,9 @@ app_states = {}  # name -> {status, restarts, last_alive}
 
 async def send_telegram_alert(message: str):
     """Sends a markdown message to the admin chat."""
+    if not TELEGRAM_BOT_TOKEN or not ADMIN_CHAT_ID:
+        logger.warning("Telegram alert skipped: missing TELEGRAM_BOT_TOKEN or ADMIN_CHAT_ID")
+        return
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": ADMIN_CHAT_ID, "text": message, "parse_mode": "Markdown"}
     try:

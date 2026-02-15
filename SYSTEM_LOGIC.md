@@ -64,6 +64,16 @@ graph TD
 
 ---
 
+## 🧩 Task Systemization (2026-02-14)
+
+- **Unified summary:** `Management/UNIFIED_TASKS_SUMMARY_2026-02-14.md`
+- **Raw extraction:** `Management/UNIFIED_TASKS_2026-02-14.md`
+- **Code TODOs snapshot:** `Management/CODE_TODOS_2026-02-14.md`
+
+> Эти файлы агрегируют задачи со всей системы и дают приоритизацию по доменам.
+
+---
+
 ### System Info
 
 Created: 2026-02-14 | Antigravity AI

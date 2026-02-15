@@ -8,6 +8,7 @@
         "start": "next start -p 3001"
     },
     "dependencies": {
+        "@dataconnect/generated": "file:src/dataconnect-generated",
         "next": "^16.1.1",
         "openai": "^4.95.1",
         "react": "19.1.0",

@@ -49,16 +49,39 @@ async def task_youtube(video_path, title, description, tags, skip):
         return
 
     creds_dir = current_dir.parent / "uploaders" / ".credentials"
-    if not (creds_dir / "youtube_token.json").exists():
-        print("⏭ Skipping YouTube: No token found.")
+    token_env = os.getenv("YOUTUBE_TOKEN_FILES", "").strip()
+    if token_env:
+        token_files = [Path(p.strip()) for p in token_env.split(",") if p.strip()]
+    else:
+        token_files = sorted(creds_dir.glob("youtube_token*.json"))
+
+    token_files = [p for p in token_files if p.exists()]
+    if not token_files:
+        print("⏭ Skipping YouTube: No token files found.")
         return
 
-    print("📺 Shipping to YouTube...")
-    try:
-        # Run blocking upload in a thread
-        await asyncio.to_thread(upload_video, Path(video_path), title, description, tags, "28", "public")
-    except Exception as e:
-        print(f"⚠️ YouTube failed: {e}")
+    print(f"📺 Shipping to YouTube ({len(token_files)} channel(s))...")
+    tasks = []
+    for token_file in token_files:
+        label = token_file.stem
+        print(f"   ▶️ Queue upload for {label}")
+        tasks.append(
+            asyncio.to_thread(
+                upload_video,
+                Path(video_path),
+                title,
+                description,
+                tags,
+                "28",
+                "public",
+                str(token_file),
+            )
+        )
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    for token_file, result in zip(token_files, results):
+        if isinstance(result, Exception):
+            print(f"⚠️ YouTube failed for {token_file.name}: {result}")
 
 
 async def task_instagram(video_path, title, description, skip):

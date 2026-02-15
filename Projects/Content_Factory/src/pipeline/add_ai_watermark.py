@@ -1,5 +1,34 @@
 import subprocess
 from pathlib import Path
+from typing import Optional
+
+
+def _resolve_font() -> Optional[str]:
+    candidates = [
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Black.ttf",
+        "/Library/Fonts/Arial.ttf",
+    ]
+    for p in candidates:
+        if Path(p).exists():
+            return p
+    return None
+
+
+def _ffmpeg_has_drawtext() -> bool:
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-hide_banner", "-h", "filter=drawtext"],
+            capture_output=True,
+            text=True,
+        )
+        output = (result.stdout or "") + (result.stderr or "")
+        output = output.lower()
+        if "unknown filter" in output or "no such filter" in output:
+            return False
+        return True
+    except Exception:
+        return False
 
 
 def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
@@ -29,6 +58,13 @@ def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
     except:
         bitrate_k = 3267  # Default
 
+    if not _ffmpeg_has_drawtext():
+        print("⚠️ FFmpeg drawtext filter not available. Skipping watermark.")
+        return False
+
+    font_path = _resolve_font()
+    font_arg = f"fontfile='{font_path}':" if font_path else ""
+
     # FFmpeg command with matched bitrate
     cmd = [
         "ffmpeg",
@@ -36,7 +72,9 @@ def add_ai_watermark(input_video: Path, output_video: Path) -> bool:
         "-i",
         str(input_video),
         "-vf",
-        "drawtext=text='⚠️ Created by AI':fontsize=20:fontcolor=white:borderw=2:bordercolor=black:x=w-tw-10:y=h-th-10:box=1:boxcolor=black@0.5:boxborderw=5",
+        f"drawtext={font_arg}text='Created by AI':fontsize=20:fontcolor=white:"
+        "borderw=2:bordercolor=black:x=w-tw-10:y=h-th-10:"
+        "box=1:boxcolor=black@0.5:boxborderw=5",
         "-c:v",
         "libx264",
         "-preset",

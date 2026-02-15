@@ -39,8 +39,8 @@ def notify_manual_upload(video_path: Path, caption: str):
         admin_chat_id = os.getenv("TELEGRAM_ADMIN_CHAT_ID")
         if bot_token and admin_chat_id:
             bot = telebot.TeleBot(bot_token)
-            msg = f"🎬 **IG/FB Manual Upload**\n\n{caption}"
-            bot.send_message(admin_chat_id, msg, parse_mode="Markdown")
+            msg = f"IG/FB Manual Upload\n\n{caption}"
+            bot.send_message(admin_chat_id, msg)
             with open(video_path, "rb") as video:
                 bot.send_video(admin_chat_id, video)
     except Exception as e:
@@ -79,20 +79,28 @@ def main():
     base_name = f"vibranium_{timestamp}"
 
     output_path = str(output_dir / base_name)
-    success = run_no_face_pipeline(script_ru, lang="ru", output_name=output_path, scenes=scenes)
+    success = run_no_face_pipeline(
+        script_ru, lang="ru", output_name=output_path, scenes=scenes
+    )
 
     if success:
-        temp_video = output_dir / f"{base_name}_final.mp4"
-        final_video = output_dir / f"{base_name}_final_ai.mp4"
-        add_ai_watermark(temp_video, final_video)
+        final_video = Path(success)
+        watermarked = output_dir / f"{base_name}_final_ai.mp4"
+        publish_video = final_video
+        if add_ai_watermark(final_video, watermarked):
+            publish_video = watermarked
+        else:
+            print("⚠️ Watermark failed, using non-watermarked video.")
 
         if dry_run:
             print("DRY RUN: Skipping Telegram/YouTube uploads and notifications.")
         else:
-            upload_telegram(str(final_video), caption)
-            upload_video(final_video, title, caption, tags=["AI", "Future"], privacy_status="public")
-            notify_manual_upload(final_video, caption)
-        print(f"✅ Production Complete: {final_video}")
+            upload_telegram(str(publish_video), caption)
+            upload_video(
+                publish_video, title, caption, tags=["AI", "Future"], privacy_status="public"
+            )
+            notify_manual_upload(publish_video, caption)
+        print(f"✅ Production Complete: {publish_video}")
 
 
 if __name__ == "__main__":

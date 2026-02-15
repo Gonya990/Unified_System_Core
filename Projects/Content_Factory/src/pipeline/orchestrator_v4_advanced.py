@@ -1,5 +1,7 @@
+import hashlib
 import os
 import random
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -38,8 +40,56 @@ GCS_BUCKET = "content-factory-outputs-435112"
 # =============================================================================
 
 
-def generate_audio_elevenlabs(text, output_path, api_key):
-    """Generate audio using ElevenLabs API (Premium)."""
+def _tts_rotation_order(text: str) -> list[str]:
+    provider = (os.getenv("TTS_PROVIDER") or "").strip().lower()
+    if provider:
+        providers = [provider]
+    else:
+        rotation = os.getenv("TTS_ROTATION", "elevenlabs,edge")
+        providers = [p.strip().lower() for p in rotation.split(",") if p.strip()]
+
+    allow_openai = os.getenv("ALLOW_OPENAI_TTS", "false").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+    if not allow_openai:
+        providers = [p for p in providers if p != "openai"]
+
+    if not providers:
+        providers = ["edge"]
+
+    if len(providers) > 1 and text:
+        h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        shift = int(h, 16) % len(providers)
+        providers = providers[shift:] + providers[:shift]
+    return providers
+
+
+def _select_eleven_voice_id(lang: str, text: str) -> str:
+    lang_key = f"ELEVENLABS_VOICE_ID_{lang.upper()}"
+    voice_id = (os.getenv(lang_key) or os.getenv("ELEVENLABS_VOICE_ID") or "").strip()
+    voices = os.getenv("ELEVENLABS_VOICE_IDS", "").strip()
+    rotation_mode = os.getenv("ELEVENLABS_VOICE_ROTATION", "random").strip().lower()
+    if voices:
+        ids = [v.strip() for v in voices.split(",") if v.strip()]
+        if ids:
+            if rotation_mode == "hash":
+                if text:
+                    h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                    voice_id = ids[int(h, 16) % len(ids)]
+                else:
+                    voice_id = ids[0]
+            else:
+                voice_id = random.choice(ids)
+    if not voice_id:
+        voice_id = "pNInz6obpgDQGcFmaJgB"
+    return voice_id
+
+
+def generate_audio_elevenlabs(text, output_path, api_key, lang: str = "en"):
+    """Generate audio using ElevenLabs API (preferred)."""
     print("🎤 Generating ElevenLabs Audio...")
     try:
         if not api_key:
@@ -47,18 +97,38 @@ def generate_audio_elevenlabs(text, output_path, api_key):
         headers = {"xi-api-key": api_key, "Content-Type": "application/json"}
         data = {
             "text": text,
-            "model_id": "eleven_multilingual_v2",
+            "model_id": os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2"),
             "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
         }
-        url = "https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB"
+        voice_id = _select_eleven_voice_id(lang, text)
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
         resp = requests.post(url, json=data, headers=headers, timeout=60)
-        if resp.status_code == 200:
-            with open(output_path, "wb") as f:
-                f.write(resp.content)
-            print("✅ ElevenLabs Success!")
-            return True
-        print(f"❌ ElevenLabs Failed: {resp.status_code}")
-        return False
+        if resp.status_code != 200:
+            print(f"❌ ElevenLabs Failed: {resp.status_code}")
+            return False
+        tmp_mp3 = output_path.with_suffix(".mp3")
+        with open(tmp_mp3, "wb") as f:
+            f.write(resp.content)
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(tmp_mp3),
+                "-ar",
+                "44100",
+                "-ac",
+                "2",
+                "-b:a",
+                "192k",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        tmp_mp3.unlink(missing_ok=True)
+        print("✅ ElevenLabs Success!")
+        return True
     except Exception as e:
         print(f"❌ ElevenLabs Exception: {e}")
         return False
@@ -69,6 +139,39 @@ def generate_audio_openai(text, output_path, voice="alloy"):
     print(f"🎤 Generating OpenAI Audio ({voice})...")
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
+        return False
+
+
+def generate_audio_edge(text, output_path, lang: str = "en") -> bool:
+    """Generate audio using Edge-TTS (free fallback)."""
+    voice_map = {
+        "ru": "ru-RU-DmitryNeural",
+        "en": "en-US-EmmaNeural",
+        "he": "he-IL-AvriNeural",
+    }
+    voice = voice_map.get(lang, "en-US-EmmaNeural")
+    cmd = "edge-tts"
+    found = shutil.which(cmd)
+    if found:
+        cmd = found
+    try:
+        subprocess.run(
+            [
+                cmd,
+                "--voice",
+                voice,
+                "--text",
+                text,
+                "--write-media",
+                str(output_path),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        print(f"✅ Edge-TTS Success ({voice})")
+        return True
+    except Exception as e:
+        print(f"❌ Edge-TTS Error: {e}")
         return False
     try:
         from openai import OpenAI
@@ -217,9 +320,26 @@ def run_advanced_pipeline(
     # 1. AUDIO
     audio_path = INPUT_DIR / f"{output_name}_audio.wav"
     eleven_key = os.getenv("ELEVENLABS_API_KEY")
+    providers = _tts_rotation_order(text)
+    print(f"🎛️ TTS provider order: {', '.join(providers)}")
 
-    if not (eleven_key and generate_audio_elevenlabs(text, audio_path, eleven_key)):
-        generate_audio_openai(text, audio_path)
+    audio_ok = False
+    for provider in providers:
+        if provider == "elevenlabs":
+            if eleven_key and generate_audio_elevenlabs(text, audio_path, eleven_key, lang=lang):
+                audio_ok = True
+                break
+        elif provider == "edge":
+            if generate_audio_edge(text, audio_path, lang=lang):
+                audio_ok = True
+                break
+        elif provider == "openai":
+            if generate_audio_openai(text, audio_path):
+                audio_ok = True
+                break
+
+    if not audio_ok:
+        print("❌ All TTS providers failed.")
 
     # 2. DURATION
     if not audio_path.exists():

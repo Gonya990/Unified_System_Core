@@ -1,13 +1,32 @@
 import json
 import os
 
+try:
+    from token_broker import TokenBroker
+
+    BROKER = TokenBroker()
+except Exception:
+    BROKER = None
+
+
+def _resolve_key(provider: str, env_var: str) -> str | None:
+    """Prefer TokenBroker if available; fall back to environment."""
+    if BROKER:
+        try:
+            key = BROKER.get_key(provider)
+            if key:
+                return key
+        except Exception:
+            pass
+    return os.getenv(env_var)
+
 
 def generate_dynamic_content():
-    # Keys must come from environment; no hardcoded fallbacks.
-    openai_key = os.getenv("OPENAI_API_KEY")
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    gh_token = os.getenv("GITHUB_TOKEN")
-    or_key = os.getenv("OPENROUTER_API_KEY")
+    # Keys must come from TokenBroker or environment; no hardcoded fallbacks.
+    openai_key = _resolve_key("openai", "OPENAI_API_KEY")
+    gemini_key = _resolve_key("gemini", "GEMINI_API_KEY")
+    gh_token = _resolve_key("github", "GITHUB_TOKEN")
+    or_key = _resolve_key("openrouter", "OPENROUTER_API_KEY")
 
     prompt = """
     You are the 'Vibranium' Creative Director for Unified_Core.
@@ -43,7 +62,7 @@ def generate_dynamic_content():
 
     # OpenRouter priority (VERY RELIABLE backup)
     if or_key:
-        print(f"🤖 Trying OpenRouter with key: {or_key[:10]}...")
+        print("🤖 Trying OpenRouter...")
         try:
             import requests
 
@@ -68,7 +87,7 @@ def generate_dynamic_content():
 
     # Try OpenAI (may fail with 401)
     if openai_key and not openai_key.startswith("PLEASE_UPDATE"):
-        print(f"🧠 Trying OpenAI with key: {openai_key[:10]}...")
+        print("🧠 Trying OpenAI...")
         try:
             from openai import OpenAI
 
@@ -103,7 +122,7 @@ def generate_dynamic_content():
 
     # Direct Gemini attempt if OpenAI was not configured
     if gemini_key:
-        print(f"🌠 Trying Gemini with key: {gemini_key[:10]}...")
+        print("🌠 Trying Gemini...")
         try:
             from google import genai
 
@@ -123,8 +142,8 @@ def generate_dynamic_content():
             print(f"⚠️ Gemini failed: {e}")
 
     raise ValueError(
-        "No LLM services responded successfully. Set GITHUB_TOKEN, OPENROUTER_API_KEY, "
-        "OPENAI_API_KEY, or GEMINI_API_KEY."
+        "No LLM services responded successfully. Configure TokenBroker or set "
+        "GITHUB_TOKEN, OPENROUTER_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY."
     )
 
 

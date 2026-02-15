@@ -1,9 +1,11 @@
 import json
 import logging
+import os
 import time
+from pathlib import Path
 from typing import Any, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -13,6 +15,69 @@ app = FastAPI(title="Vibranium AI Gateway (OpenAI Compatible)")
 # Global reference to the bot/orchestrator/inference
 _BOT_INSTANCE = None
 _INFERENCE_CLIENT = None
+_TOKEN_CACHE: Optional[str] = None
+
+
+def _load_token_from_env_file() -> Optional[str]:
+    global _TOKEN_CACHE
+    if _TOKEN_CACHE is not None:
+        return _TOKEN_CACHE
+
+    root = Path(__file__).resolve().parents[3]
+    candidates = [".env.igor", ".env.local", ".env"]
+    keys = {"API_GATEWAY_TOKEN", "COPILOT_API_TOKEN", "API_TOKEN"}
+
+    for name in candidates:
+        path = root / name
+        if not path.exists():
+            continue
+        try:
+            for raw in path.read_text().splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if line.startswith("export "):
+                    line = line[len("export ") :]
+                if "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                if key in keys:
+                    value = value.strip().strip("'").strip('"')
+                    _TOKEN_CACHE = value
+                    return value
+        except Exception:
+            continue
+
+    _TOKEN_CACHE = None
+    return None
+
+
+def _expected_api_token() -> Optional[str]:
+    return (
+        os.getenv("API_GATEWAY_TOKEN")
+        or os.getenv("COPILOT_API_TOKEN")
+        or os.getenv("API_TOKEN")
+        or _load_token_from_env_file()
+    )
+
+
+async def require_api_key(request: Request):
+    """Optional API key guard. Enabled when API_GATEWAY_TOKEN is set."""
+    expected = _expected_api_token()
+    if not expected:
+        return
+
+    auth = request.headers.get("authorization", "")
+    token = None
+    if auth.lower().startswith("bearer "):
+        token = auth.split(" ", 1)[1].strip()
+
+    if not token:
+        token = request.headers.get("x-api-key")
+
+    if not token or token != expected:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 def _summarize_chat_payload(payload: dict) -> dict[str, Any]:
@@ -95,7 +160,7 @@ class ChatCompletionRequest(BaseModel):
     temperature: Optional[float] = 0.7
 
 
-@app.post("/v1/chat/completions")
+@app.post("/v1/chat/completions", dependencies=[Depends(require_api_key)])
 async def chat_completions(request: ChatCompletionRequest):
     """
     OpenAI-compatible endpoint that routes requests to the bot's internal inference client.
@@ -133,7 +198,7 @@ async def chat_completions(request: ChatCompletionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/v1/alert")
+@app.post("/v1/alert", dependencies=[Depends(require_api_key)])
 async def receive_alert(request: AlertRequest):
     """
     Receive alerts from GCP Monitoring and forward to Telegram.
@@ -160,7 +225,7 @@ async def health_check():
     }
 
 
-@app.post("/v1/execute")
+@app.post("/v1/execute", dependencies=[Depends(require_api_key)])
 async def execute_command(request: CommandRequest):
     """
     Execute a natural language command from a mobile device or shortcut.
