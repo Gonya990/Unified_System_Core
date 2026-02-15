@@ -520,7 +520,10 @@ def generate_hf_flux_images(scenes, output_dir: Path, style="impact"):
         print(f"⚠️ huggingface_hub not installed: {e}")
         return []
 
-    provider = (os.getenv("HF_PROVIDER") or "nscale").strip()
+    providers = _split_env_list("HF_PROVIDERS")
+    if not providers:
+        provider = (os.getenv("HF_PROVIDER") or "nscale").strip()
+        providers = [provider]
     models = _split_env_list(
         "HF_FLUX_MODELS", "black-forest-labs/FLUX.1-schnell"
     )
@@ -536,11 +539,9 @@ def generate_hf_flux_images(scenes, output_dir: Path, style="impact"):
     guidance = float(guidance_raw) if guidance_raw else None
 
     print(
-        f"🌐 HF Inference ({provider}) with {len(models)} model(s): "
+        f"🌐 HF Inference ({', '.join(providers)}) with {len(models)} model(s): "
         f"{', '.join(models[:3])}{'...' if len(models) > 3 else ''}"
     )
-
-    client = InferenceClient(provider=provider, api_key=token)
     resolved = []
     prefix = get_style_prompt_prefix(style)
 
@@ -561,24 +562,38 @@ def generate_hf_flux_images(scenes, output_dir: Path, style="impact"):
                 if guidance is not None:
                     params["guidance_scale"] = guidance
 
-                try:
-                    img = client.text_to_image(prompt, model=model_id, **params)
-                except TypeError:
-                    img = client.text_to_image(prompt, model=model_id)
+                last_err = None
+                for provider in providers:
+                    try:
+                        client = InferenceClient(provider=provider, api_key=token)
+                        try:
+                            img = client.text_to_image(
+                                prompt, model=model_id, **params
+                            )
+                        except TypeError:
+                            img = client.text_to_image(prompt, model=model_id)
 
-                path = output_dir / f"{s['image']}.jpg"
-                if hasattr(img, "save"):
-                    img.save(path)
-                elif isinstance(img, (bytes, bytearray)):
-                    with open(path, "wb") as f:
-                        f.write(img)
-                else:
-                    raise RuntimeError("Unexpected HF image type")
+                        path = output_dir / f"{s['image']}.jpg"
+                        if hasattr(img, "save"):
+                            img.save(path)
+                        elif isinstance(img, (bytes, bytearray)):
+                            with open(path, "wb") as f:
+                                f.write(img)
+                        else:
+                            raise RuntimeError("Unexpected HF image type")
 
-                s["resolved_path"] = str(path)
-                resolved.append(s)
-                print(f"   ✅ HF ({provider}) {model_id}: {s['image']}")
-                break
+                        s["resolved_path"] = str(path)
+                        resolved.append(s)
+                        print(f"   ✅ HF ({provider}) {model_id}: {s['image']}")
+                        last_err = None
+                        break
+                    except Exception as e:
+                        last_err = e
+                        continue
+
+                if last_err is None:
+                    break
+                raise last_err
             except Exception as e:
                 print(f"   ⚠️ HF {model_id} failed for {s['image']}: {e}")
 
@@ -593,11 +608,12 @@ def generate_sdxl_images(scenes, output_dir: Path, style="impact"):
     try:
         import requests
 
-        sdxl_url = "http://localhost:8188/generate"
+        sdxl_url = os.getenv("SDXL_URL", "http://localhost:8188/generate")
+        sdxl_health = os.getenv("SDXL_HEALTH", "http://localhost:8188/")
 
         # Quick health check (1 second timeout)
         try:
-            requests.get("http://localhost:8188/", timeout=1)
+            requests.get(sdxl_health, timeout=1)
         except Exception:
             print("❌ SDXL server not running")
             return []

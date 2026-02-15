@@ -60,7 +60,13 @@ def _tts_rotation_order(text: str) -> list[str]:
     if not providers:
         providers = ["edge"]
 
-    if len(providers) > 1 and text:
+    rotate_order = os.getenv("TTS_ROTATE_ORDER", "false").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+    if rotate_order and len(providers) > 1 and text:
         h = hashlib.sha256(text.encode("utf-8")).hexdigest()
         shift = int(h, 16) % len(providers)
         providers = providers[shift:] + providers[:shift]
