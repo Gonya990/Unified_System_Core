@@ -18,7 +18,8 @@ Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
   `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_IDS`, `ELEVENLABS_VOICE_ROTATION=random`,
   `TTS_ROTATION=elevenlabs,edge`, `ALLOW_OPENAI_TTS=false`.
 - [x] Restart `content-factory` + `content-factory-turbo` to apply env.
-- [ ] Confirm new run uses ElevenLabs (no OpenAI TTS calls).
+- [ ] Confirm new run uses ElevenLabs first (no OpenAI TTS calls). `TTS_ROTATE_ORDER=false` applied.
 - [x] Set `YOUTUBE_TOKEN_FILES` in PM2 env (Unified System + Gonya Goncharenko).
-- [ ] Verify uploads go to both channels in parallel.
-- [ ] Verify HF Inference path produces images (log check + sample output).
+- [ ] Verify uploads go to both channels in parallel (code supports; pending live upload).
+- [ ] Verify HF Inference path produces images (current 403 from HF provider; needs permissions).
+- [ ] Fix Flux local model gating + disk space (~24 GB required; ~14.5 GB free).
