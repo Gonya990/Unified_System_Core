@@ -9,8 +9,8 @@ Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
 - [x] Prioritize ElevenLabs TTS and add provider/voice rotation in orchestrators.
 - [x] Sync ElevenLabs key into TokenBroker (local + remote).
 - [x] Start Flux/SDXL servers under PM2 on `unified-home-core-cloud`.
-- [ ] Accept gated access for `black-forest-labs/FLUX.1-schnell` (HF token set), then verify `http://localhost:8081/`.
-- [x] SDXL model ready and `http://localhost:8188/` responding.
+- [ ] Accept gated access for `black-forest-labs/FLUX.1-schnell` (HF token set). Flux server waiting for HF access approval.
+- [ ] SDXL server starting (model download in progress). Waiting for `http://localhost:8188/` to respond.
 - [x] Add HF Inference fallback + model rotation (daily_researcher).
 - [x] Install `huggingface_hub` on remote.
 - [x] Set HF env for Content Factory (HF_TOKEN/HF_PROVIDER/HF_FLUX_MODELS/ALLOW_HF_REMOTE).
@@ -23,3 +23,6 @@ Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
 - [ ] Verify uploads go to both channels in parallel (code supports; pending live upload).
 - [ ] Verify HF Inference path produces images (current 403 from HF provider; needs permissions).
 - [ ] Fix Flux local model gating + disk space (~24 GB required; ~14.5 GB free).
+
+- [ ] Fix `ai-bot-igor` Telegram token (current token rejected by Telegram).
+- [x] Sync TokenBroker vault (`~/.config/unified-system/tokens.yaml`) to remote.
