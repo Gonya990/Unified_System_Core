@@ -1,8 +1,7 @@
 python-telegram-bot>=20.7
 python-dotenv>=1.0.0
 openai>=1.0.0
-google-generativeai>=0.3.0
-google-ai-generativelanguage>=0.6.0
+google-genai>=1.0.0
 google-cloud-firestore>=2.11.1
 google-cloud-logging>=3.13.0
 google-cloud-secret-manager>=2.16.0

@@ -1,8 +1,8 @@
 import os
 
-import google.generativeai as genai
 import openai
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
@@ -31,12 +31,11 @@ def test_gemini():
         print("❌ Gemini API key not found in environment!")
         return
     print(f"Using key: {key[:8]}...{key[-4:]}")
-    genai.configure(api_key=key)
-    model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    client = genai.Client(api_key=key)
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
     print(f"Using model: {model_name}")
     try:
-        model = genai.GenerativeModel(model_name)
-        res = model.generate_content("ping")
+        res = client.models.generate_content(model=model_name, contents="ping")
         print(f"✅ Gemini works: {res.text}")
     except Exception as e:
         print(f"❌ Gemini failed: {e}")

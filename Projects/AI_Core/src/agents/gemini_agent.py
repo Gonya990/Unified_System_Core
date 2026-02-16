@@ -1,7 +1,7 @@
 """
 Gemini-based Agent Orchestrator
 
-Use Google Gemini API instead of OpenAI for function calling.
+Use Google Gemini API (google.genai SDK) for function calling.
 """
 
 import json
@@ -10,7 +10,8 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ Be concise and direct in your responses."""
         if not api_key:
             raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY must be set")
 
-        genai.configure(api_key=api_key)
+        self.client = genai.Client(api_key=api_key)
         self.model_name = model
         self.tools: dict[str, Tool] = {}
         self.conversation_history: list[dict] = []
@@ -58,46 +59,44 @@ Be concise and direct in your responses."""
         self.tools[tool.name] = tool
         logger.info(f"Registered tool: {tool.name}")
 
-    def _build_gemini_tools(self) -> list[genai.protos.Tool]:
+    def _build_gemini_tools(self) -> list[types.Tool]:
         """Convert tools to Gemini format"""
         if not self.tools:
             return []
 
-        # Convert OpenAI-style JSON Schema to Gemini function declarations
         function_declarations = []
         for tool in self.tools.values():
-            # Convert schema
             gemini_params = self._convert_schema_to_gemini(tool.parameters)
 
             function_declarations.append(
-                genai.protos.FunctionDeclaration(name=tool.name, description=tool.description, parameters=gemini_params)
+                types.FunctionDeclaration(name=tool.name, description=tool.description, parameters=gemini_params)
             )
 
-        return [genai.protos.Tool(function_declarations=function_declarations)]
+        return [types.Tool(function_declarations=function_declarations)]
 
-    def _convert_schema_to_gemini(self, openai_schema: dict[str, Any]) -> genai.protos.Schema:
+    def _convert_schema_to_gemini(self, openai_schema: dict[str, Any]) -> types.Schema:
         """Convert OpenAI JSON Schema to Gemini Schema"""
         properties = {}
         required = openai_schema.get("required", [])
 
         for prop_name, prop_def in openai_schema.get("properties", {}).items():
-            prop_type = prop_def.get("type", "string")
+            prop_type = prop_def.get("type", "STRING").upper()
 
             # Map JSON types to Gemini types
             type_mapping = {
-                "string": genai.protos.Type.STRING,
-                "integer": genai.protos.Type.INTEGER,
-                "number": genai.protos.Type.NUMBER,
-                "boolean": genai.protos.Type.BOOLEAN,
-                "array": genai.protos.Type.ARRAY,
-                "object": genai.protos.Type.OBJECT,
+                "STRING": "STRING",
+                "INTEGER": "INTEGER",
+                "NUMBER": "NUMBER",
+                "BOOLEAN": "BOOLEAN",
+                "ARRAY": "ARRAY",
+                "OBJECT": "OBJECT",
             }
 
-            gemini_type = type_mapping.get(prop_type, genai.protos.Type.STRING)
+            gemini_type = type_mapping.get(prop_type, "STRING")
 
-            properties[prop_name] = genai.protos.Schema(type=gemini_type, description=prop_def.get("description", ""))
+            properties[prop_name] = types.Schema(type=gemini_type, description=prop_def.get("description", ""))
 
-        return genai.protos.Schema(type=genai.protos.Type.OBJECT, properties=properties, required=required)
+        return types.Schema(type="OBJECT", properties=properties, required=required)
 
     async def execute_tool(self, tool_name: str, arguments: dict) -> str:
         """Execute a tool"""
@@ -124,14 +123,14 @@ Be concise and direct in your responses."""
         """Run agent with Gemini"""
 
         try:
-            model = genai.GenerativeModel(
-                model_name=self.model_name,
+            config = types.GenerateContentConfig(
                 tools=self._build_gemini_tools() if self.tools else None,
                 system_instruction=self.SYSTEM_PROMPT,
             )
 
+            chat = self.client.chats.create(model=self.model_name, config=config)
+
             iterations = 0
-            chat = model.start_chat(history=[])
 
             while iterations < max_iterations:
                 iterations += 1
@@ -147,7 +146,7 @@ Be concise and direct in your responses."""
                     candidate = response.candidates[0]
 
                     if hasattr(candidate.content, "parts"):
-                        function_calls = [part for part in candidate.content.parts if hasattr(part, "function_call")]
+                        function_calls = [part for part in candidate.content.parts if hasattr(part, "function_call") and part.function_call]
 
                         if function_calls:
                             # Execute function calls
@@ -161,12 +160,12 @@ Be concise and direct in your responses."""
 
                                 result = await self.execute_tool(tool_name, arguments)
 
-                                # Send result back
+                                # Send function response back
                                 response = chat.send_message(
-                                    genai.protos.Content(
+                                    types.Content(
                                         parts=[
-                                            genai.protos.Part(
-                                                function_response=genai.protos.FunctionResponse(
+                                            types.Part(
+                                                function_response=types.FunctionResponse(
                                                     name=tool_name, response={"result": result}
                                                 )
                                             )
