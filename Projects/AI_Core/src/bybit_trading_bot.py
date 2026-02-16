@@ -53,8 +53,8 @@ class ByBitTradingBot:
         api_secret: str,
         telegram_token: str,
         admin_chat_id: str,
-        testnet: bool = False,
-        monitor_only: bool = False,
+        testnet: bool = True,
+        monitor_only: bool = True,
     ):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -62,6 +62,12 @@ class ByBitTradingBot:
         self.admin_chat_id = admin_chat_id
         self.testnet = testnet
         self.monitor_only = monitor_only
+
+        # Safety: if keys are absent, force monitor+testnet
+        if not self.api_key or not self.api_secret:
+            self.monitor_only = True
+            self.testnet = True
+            logger.warning("ByBit keys missing: forcing monitor-only testnet mode")
 
         # Trading parameters (ELITE QUANTUM)
         self.max_trade_percent = 0.10
@@ -87,6 +93,9 @@ class ByBitTradingBot:
 
     async def notify(self, message: str, urgent: bool = False):
         """Send Telegram notification."""
+        if not self.telegram_token:
+            logger.warning("Telegram token missing; notification skipped")
+            return
         try:
             emoji = "🔥" if urgent else "📈"
             text = f"{emoji} **ByBit PREMIUM BOT**\n\n{message}"
@@ -109,6 +118,9 @@ class ByBitTradingBot:
     async def get_balance(self) -> float:
         """Get USDT balance from ByBit."""
         if not HTTP:
+            return 0.0
+        if not self.api_key or not self.api_secret:
+            logger.warning("No API keys set; balance check skipped (returning 0)")
             return 0.0
         try:
             session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
@@ -304,8 +316,8 @@ async def main():
         api_secret=os.getenv("BYBIT_API_SECRET"),
         telegram_token=os.getenv("TELEGRAM_BOT_TOKEN"),
         admin_chat_id=os.getenv("ADMIN_CHAT_ID", "708531393"),
-        testnet=os.getenv("BYBIT_TESTNET", "false").lower() == "true", # LIVE DEFAULT
-        monitor_only=os.getenv("BYBIT_MONITOR_ONLY", "false").lower() == "true" # TRADING DEFAULT
+        testnet=os.getenv("BYBIT_TESTNET", "true").lower() == "true",  # SAFE DEFAULT
+        monitor_only=os.getenv("BYBIT_MONITOR_ONLY", "true").lower() == "true"  # SAFE DEFAULT
     )
     await bot.run()
 

@@ -279,11 +279,11 @@ if __name__ == "__main__":
                 "-F",
                 f"video=@{vid}",
                 "-F",
-                "chat_id=708531393",
+                f"chat_id={os.getenv('TELEGRAM_CHAT_ID', '708531393')}",
                 "-F",
                 f"caption={msg}",
                 "-F",
                 "parse_mode=HTML",
-                "https://api.telegram.org/bot8518131338:AAHtcEgI--E2Fktdo3nE3oynhzq1gvrVON4/sendVideo",
+                f"https://api.telegram.org/bot{os.getenv('TELEGRAM_BOT_TOKEN')}/sendVideo",
             ]
         )

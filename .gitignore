@@ -145,6 +145,9 @@ tmp_backup/
 
 # Security
 secure_vault/
+**/gcp-service-account*.json
+**/*-credentials.json
+*-service-account.json
 
 # Temp Data
 tmp_audio_chunks/

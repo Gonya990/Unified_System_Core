@@ -8,7 +8,7 @@
 | **004** | Imagen 3: B-roll | Imagen 3: B-roll | ✅ Done | High |
 | **005** | Синхронизация GitHub | GitHub Sync | ✅ Done | Critical |
 | **006** | Настройка БД логов | Setup Log Database | ✅ Done | High |
-| **007** | Dry-run пайплайна | Pipeline Dry-run | 📅 Todo | Critical |
+| **007** | Dry-run пайплайна | Pipeline Dry-run | ⏳ Active | Critical |
 | **008** | Ремонт Bybit Agent | Repair Bybit Agent | ✅ Done | Critical |
 
 | **009** | Фикс Monitoring | Fix Monitoring (NoneType) | ✅ Done | Critical |
@@ -17,4 +17,4 @@
 | **012** | Свод задач системы | Unified Tasks Consolidation | ✅ Done | High |
 | **013** | Системный аудит | System Execution Report | ✅ Done | High |
 
-*Последнее обновление / Last Update: 22:26*
+*Последнее обновление / Last Update: 2026-02-16*
