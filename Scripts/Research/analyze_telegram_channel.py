@@ -20,7 +20,7 @@ from datetime import datetime
 
 try:
     from telethon import TelegramClient
-    from telethon.errors import FloodWaitError
+    from telethon.errors import FloodWaitError  # noqa: F401
     from telethon.tl.functions.messages import GetHistoryRequest
 except ImportError:
     print("❌ Error: telethon not installed")

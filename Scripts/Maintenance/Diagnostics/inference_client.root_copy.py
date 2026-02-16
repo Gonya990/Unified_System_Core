@@ -25,7 +25,7 @@ def _get_gemini_client(api_key: str):
     global _gemini_client, _gemini_client_key
     try:
         from google import genai
-        from google.genai.types import GenerateContentConfig
+        from google.genai.types import GenerateContentConfig  # noqa: F401
 
         if not _gemini_client or _gemini_client_key != api_key:
             _gemini_client = genai.Client(api_key=api_key)

@@ -240,7 +240,7 @@ async def show_access_audit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.args:
         try:
             limit = int(context.args[0])
-        except:
+        except Exception:
             pass
 
     logs = rbac.get_audit_log(limit=limit)

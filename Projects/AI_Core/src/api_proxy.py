@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from pydantic import BaseModel
@@ -155,7 +155,7 @@ class ChatMessage(BaseModel):
 
 class ChatCompletionRequest(BaseModel):
     model: str
-    messages: List[ChatMessage]
+    messages: list[ChatMessage]
     stream: Optional[bool] = False
     temperature: Optional[float] = 0.7
 
@@ -195,7 +195,7 @@ async def chat_completions(request: ChatCompletionRequest):
         }
     except Exception as e:
         logger.error(f"OpenAI Proxy Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/v1/alert", dependencies=[Depends(require_api_key)])
@@ -212,7 +212,7 @@ async def receive_alert(request: AlertRequest):
         return {"status": "alert sent"}
     except Exception as e:
         logger.error(f"Alert forwarding error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/v1/health")
@@ -238,7 +238,7 @@ async def execute_command(request: CommandRequest):
         return {"response": response}
     except Exception as e:
         logger.error(f"API Command execution error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 def set_context(bot=None, inference=None):

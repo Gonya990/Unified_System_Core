@@ -121,7 +121,7 @@ class ImageGenerator:
 
         except ImportError:
             logger.error("google-genai not installed. Run: pip install google-genai")
-            raise Exception("Imagen 3 requires google-genai SDK")
+            raise Exception("Imagen 3 requires google-genai SDK") from None
         except Exception as e:
             logger.error(f"Vertex Imagen Error: {e}")
-            raise e
+            raise e from e

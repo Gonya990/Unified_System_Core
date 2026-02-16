@@ -17,7 +17,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 FAMILY_DIR = Path(__file__).resolve().parent
 sys.path.append(str(ROOT_DIR))
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 # Load environment configuration
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env")
@@ -37,7 +37,7 @@ logging.basicConfig(
 logger = logging.getLogger("MorningBriefScheduler")
 
 # Import the brief function
-from Scripts.Family.morning_brief import send_brief
+from Scripts.Family.morning_brief import send_brief  # noqa: E402
 
 # Schedule settings from environment
 SCHEDULE_HOUR = int(os.getenv("BRIEF_TIME_HOUR", "7"))

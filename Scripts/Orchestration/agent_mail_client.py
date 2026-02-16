@@ -14,7 +14,7 @@ if sdk_path not in sys.path:
     sys.path.append(sdk_path)
 
 try:
-    from agent_mail import AgentMailClient, AgentMailConfig
+    from agent_mail import AgentMailClient
 except ImportError:
     # Fallback for when SDK is not yet fully set up or path is wrong
     print("❌ Critical: Could not import 'agent_mail' SDK. Please ensure External_Tools/Stack/agent_mail_sdk exists.")

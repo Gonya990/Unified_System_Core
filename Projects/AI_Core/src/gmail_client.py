@@ -177,7 +177,7 @@ class GmailClient:
 
         summary = f"📧 **Непрочитанных писем: {unread}**\n\n"
 
-        for email in emails:
+        for email in self.get_recent_emails(unread_only=True):
             # Parse sender name
             sender = email["from"]
             if "<" in sender:

@@ -32,7 +32,7 @@ def check_health():
         # Assuming port 8095 based on system_watchdog_v2.py
         response = requests.get("http://localhost:8095/health", timeout=5)
         return response.status_code == 200
-    except:
+    except Exception:
         return False
 
 

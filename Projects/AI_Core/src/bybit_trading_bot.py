@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 class ByBitTradingBot:
     """
     ELITE QUANTUM Strategy for ByBit.
-    
+
     STRATEGY (Triple Confirmation):
     1. Trend Filter: EMA 200 (Long only if price > EMA 200)
     2. Momentum: MACD Cross + RSI Entry
@@ -123,7 +123,8 @@ class ByBitTradingBot:
 
     async def get_price(self, symbol: str) -> float:
         """Get current market price."""
-        if not HTTP: return 0.0
+        if not HTTP:
+            return 0.0
         try:
             session = HTTP(testnet=self.testnet)
             result = session.get_tickers(category="spot", symbol=symbol)
@@ -164,12 +165,14 @@ class ByBitTradingBot:
 
     async def analyze_market(self, symbol: str) -> Optional[dict]:
         """Elite multi-indicator analysis."""
-        if not HTTP: return None
+        if not HTTP:
+            return None
         try:
             session = HTTP(testnet=self.testnet)
             # 1h candles
             result = session.get_kline(category="spot", symbol=symbol, interval="60", limit=250)
-            if result["retCode"] != 0: return None
+            if result["retCode"] != 0:
+                return None
 
             closes = [float(k[4]) for k in result["result"]["list"]]
             rsi, ema20, ema200, macd, macd_sig, atr = self._calculate_indicators(closes)
@@ -202,7 +205,8 @@ class ByBitTradingBot:
             session = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
             # Find decimal precision for symbol (general hack for most major coins)
             precision = 4 if "TON" in symbol else 5
-            if "BTC" in symbol: precision = 5
+            if "BTC" in symbol:
+                precision = 5
             formatted_qty = f"{quantity:.{precision}f}".rstrip('0').rstrip('.')
 
             kwargs = {
@@ -212,7 +216,8 @@ class ByBitTradingBot:
                 "orderType": "Market",
                 "qty": formatted_qty,
             }
-            if side == "Buy": kwargs["marketUnit"] = "baseCoin"
+            if side == "Buy":
+                kwargs["marketUnit"] = "baseCoin"
 
             result = session.place_order(**kwargs)
             if result["retCode"] == 0:
@@ -228,14 +233,16 @@ class ByBitTradingBot:
     async def execute_trade(self, signal_data: dict, symbol: str):
         """Execute elite trade logic."""
         price = await self.get_price(symbol)
-        if not price: return
+        if not price:
+            return
 
         signal = signal_data["signal"]
         atr = signal_data["atr"]
 
         if signal == "BUY" and symbol not in self.positions:
             amount = max(self.balance * self.max_trade_percent, self.min_order_value)
-            if amount > self.balance: return
+            if amount > self.balance:
+                return
 
             qty = round(amount / price, 4)
             if await self.place_order(symbol, "Buy", qty):
@@ -254,7 +261,8 @@ class ByBitTradingBot:
             if await self.place_order(symbol, "Sell", qty):
                 profit = (price - self.positions[symbol]["entry_price"]) / self.positions[symbol]["entry_price"] * 100
                 self.total_profit += (price - self.positions[symbol]["entry_price"]) * qty
-                if profit > 0: self.winning_trades += 1
+                if profit > 0:
+                    self.winning_trades += 1
                 await self.notify(f"🔴 **ELITE POSITION CLOSED**\n{symbol} @ {price}\nProfit: {profit:+.2f}%")
                 del self.positions[symbol]
 
@@ -262,7 +270,8 @@ class ByBitTradingBot:
         """Emergency checks for SL/TP."""
         for sym, pos in list(self.positions.items()):
             price = await self.get_price(sym)
-            if not price: continue
+            if not price:
+                continue
             if price <= pos["stop_loss"]:
                 await self.notify(f"🛑 **STOP LOSS HIT** on {sym}")
                 await self.execute_trade("SELL", sym)

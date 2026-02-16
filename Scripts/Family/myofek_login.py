@@ -76,7 +76,7 @@ def login_myofek_selenium(username, password):
         logger.error(f"Selenium Error: {e}")
         try:
             driver.quit()
-        except:
+        except Exception:
             pass
         return False
 

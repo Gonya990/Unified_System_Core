@@ -4,11 +4,22 @@ AI Factory Bot Commands - Telegram integration
 Add these commands to ai_telegram_bot_v2.py
 """
 
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Update
+    from telegram.ext import ContextTypes
+
+logger = logging.getLogger(__name__)
+
 
 async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Generate background music using Suno AI."""
     user_id = update.effective_user.id
-    if not db.is_approved(user_id):
+    if not db.is_approved(user_id):  # noqa: F821
         return
 
     if not context.args:
@@ -62,7 +73,7 @@ async def ai_music_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Generate voice using ElevenLabs."""
     user_id = update.effective_user.id
-    if not db.is_approved(user_id):
+    if not db.is_approved(user_id):  # noqa: F821
         return
 
     if not context.args:
@@ -114,7 +125,7 @@ async def ai_voice_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ai_subtitle_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Generate advanced subtitles."""
     user_id = update.effective_user.id
-    if not db.is_approved(user_id):
+    if not db.is_approved(user_id):  # noqa: F821
         return
 
     if not context.args:

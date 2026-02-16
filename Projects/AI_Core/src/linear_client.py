@@ -119,27 +119,24 @@ class LinearClient:
 
     def get_my_issues(self, limit: int = 10) -> list[dict]:
         """Get issues assigned to current user."""
-        query = (
-            """
-        query {
-            viewer {
-                assignedIssues(first: %d, filter: { state: { type: { nin: ["completed", "canceled"] } } }) {
-                    nodes {
+        query = f"""
+        query {{
+            viewer {{
+                assignedIssues(first: {limit}, filter: {{ state: {{ type: {{ nin: ["completed", "canceled"] }} }} }}) {{
+                    nodes {{
                         id
                         identifier
                         title
                         priority
-                        state {
+                        state {{
                             name
-                        }
+                        }}
                         url
-                    }
-                }
-            }
-        }
+                    }}
+                }}
+            }}
+        }}
         """
-            % limit
-        )
 
         result = self._query(query)
         if result and "viewer" in result:

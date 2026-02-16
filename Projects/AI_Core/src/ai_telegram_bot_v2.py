@@ -5398,7 +5398,7 @@ async def crypto_info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     )
 
             if log_out:
-                balances = re.findall(r"Balance: \$([\d.]+) USDT", log_out)
+                re.findall(r"Balance: \$([\d.]+) USDT", log_out)
         except Exception as e:
             logger.error(f"Failed to fetch crypto logs: {e}")
             source_info = f"\n⚠️ Ошибка чтения логов: `{e}`"

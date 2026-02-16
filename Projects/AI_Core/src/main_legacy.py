@@ -66,7 +66,7 @@ homekit_bridge = None  # Optional, started on demand
 notion_client = NotionClient()
 device_monitor = None  # Will init in post_init or after ha_controller
 health_integration = HealthIntegration(db_path=config.get("HEALTH_DB_PATH", "health.db"))
-from .modules.proxmox_manager import ProxmoxManager  # We'll need to move/import this
+from .modules.proxmox_manager import ProxmoxManager  # We'll need to move/import this  # noqa: E402
 
 proxmox = ProxmoxManager()
 
@@ -417,7 +417,7 @@ async def cmd_setmodel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     await update.message.reply_text(f"✅ Model set to: `{model}` ({provider})", parse_mode="Markdown")
 
-    await update.message.reply_text(msg, parse_mode="Markdown")
+    await update.message.reply_text(msg, parse_mode="Markdown")  # noqa: F821
 
 
 @require_auth
@@ -2126,7 +2126,7 @@ async def process_text_request(text: str, user_id: int) -> str:
     return clean_response
 
 
-async def post_init(application: Application) -> None:
+async def post_init(application: Application) -> None:  # noqa: F811
     """Post-initialization hook."""
     # Set commands
     commands = [
@@ -2357,7 +2357,7 @@ def main() -> None:
     application.add_handler(CommandHandler("setendpoint", cmd_setendpoint))
     application.add_handler(CommandHandler("setapikey", cmd_setapikey))
     application.add_handler(CommandHandler("setmodel", cmd_setmodel))
-    application.add_handler(CommandHandler("usage", cmd_usage))
+    application.add_handler(CommandHandler("usage", cmd_usage))  # noqa: F821
     application.add_handler(CommandHandler("costs", cmd_costs))
     application.add_handler(CommandHandler("search", cmd_search))
     application.add_handler(CommandHandler("linear", cmd_linear))

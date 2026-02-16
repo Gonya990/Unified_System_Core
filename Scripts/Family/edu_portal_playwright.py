@@ -43,7 +43,7 @@ async def login_edu_portal():
                 await page.click("text=/.*סיסמה.*/", timeout=5000)
                 print("✅ Switched to password tab")
                 await page.wait_for_timeout(1000)
-            except:
+            except Exception:
                 print("ℹ️ Already on password tab or switch failed")
 
             try:
@@ -59,7 +59,7 @@ async def login_edu_portal():
                     await page.fill("#password", pwd, timeout=2000)
                     await page.click("#loginButton")
                     print("🚀 Credentials submitted (fallback)")
-                except:
+                except Exception:
                     print(f"❌ Selection Error: {e}")
                     await page.screenshot(path="login_error.png")
                     await browser.close()

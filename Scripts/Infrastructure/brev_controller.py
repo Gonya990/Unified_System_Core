@@ -76,7 +76,7 @@ class BrevController:
                     # Logic to extract IP or Hostname
                     return inst.get("hostname")
             return None
-        except:
+        except Exception:
             return None
 
 

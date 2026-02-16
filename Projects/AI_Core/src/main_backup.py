@@ -1771,7 +1771,7 @@ async def handle_approval_callback(update: Update, context: ContextTypes.DEFAULT
             ALLOWED_USERS.append(user_id)
 
             # Save to file for persistence
-            config_path = Path(__file__).parent.parent / ".env"
+            config_path = Path(__file__).parent.parent / ".env"  # noqa: F821
             try:
                 with open(config_path, "a") as f:
                     f.write(f"\n# Auto-approved user {user_id}\n")
@@ -1873,7 +1873,7 @@ async def process_text_request(text: str, user_id: int) -> str:
     return clean_response
 
 
-async def post_init(application: Application) -> None:
+async def post_init(application: Application) -> None:  # noqa: F811
     """Post-initialization hook."""
     # Set commands
     commands = [

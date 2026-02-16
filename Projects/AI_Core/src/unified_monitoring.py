@@ -28,12 +28,14 @@ class UnifiedMonitoring:
             seconds = int(now)
             nanos = int((now - seconds) * 10**9)
 
-            interval = monitoring_v3.TimeInterval(
-                {"end_time": {"seconds": seconds, "nanos": nanos}}
-            )
+            from google.protobuf.timestamp_pb2 import Timestamp
+
+            end_time = Timestamp(seconds=seconds, nanos=nanos)
+            interval = monitoring_v3.TimeInterval(end_time=end_time)
 
             point = monitoring_v3.Point(
-                {"value": {"double_value": float(value)}, "interval": interval}
+                value=monitoring_v3.TypedValue(double_value=float(value)),
+                interval=interval,
             )
 
             series.points = [point]

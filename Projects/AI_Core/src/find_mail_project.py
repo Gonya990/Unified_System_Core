@@ -5,7 +5,7 @@ import sys
 sdk_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../External_Tools/Stack/agent_mail_sdk/src"))
 sys.path.append(sdk_path)
 
-from agent_mail import AgentMailClient
+from agent_mail import AgentMailClient  # noqa: E402
 
 
 def main():

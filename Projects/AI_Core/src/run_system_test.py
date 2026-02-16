@@ -14,9 +14,9 @@ mock_bot_config.MODEL_NAME = "llama3"
 mock_bot_config.ALLOWED_USER_IDS = [12345]
 sys.modules["bot_config"] = mock_bot_config
 
-from calendar_client import CalendarClient
-from conversation_manager import ConversationManager
-from user_context_db import UserContextDB
+from calendar_client import CalendarClient  # noqa: E402
+from conversation_manager import ConversationManager  # noqa: E402
+from user_context_db import UserContextDB  # noqa: E402
 
 
 async def run_integration_test():
