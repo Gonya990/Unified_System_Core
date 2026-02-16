@@ -405,6 +405,9 @@ class TokenBroker:
         if tier and tier in ["pro", "tier1", "high"]:
             return agent_role in ["admin", "pro_agent"]
 
+        # Standard tier: all roles have access
+        return True
+
     def get_key_with_failover(
         self, providers: list[str], tier: str = None, session_id: str = None
     ) -> Optional[tuple[str, str]]:

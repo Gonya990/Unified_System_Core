@@ -17,7 +17,10 @@ load_dotenv()
 from agents.gemini_agent import GeminiAgentOrchestrator, Tool
 from agents.tools.file_ops import FileListTool, FileOpsTool
 
+import pytest
 
+
+@pytest.mark.asyncio
 async def test_gemini_agent():
     """Test Gemini agent with file operations"""
     print("=" * 60)

@@ -20,7 +20,10 @@ from agents.base_agent import AgentOrchestrator, Tool
 from agents.tools.file_ops import FileListTool, FileOpsTool
 from agents.tools.home_assistant import HomeAssistantTool
 
+import pytest
 
+
+@pytest.mark.asyncio
 async def test_file_ops():
     """Test agent with file operations"""
     print("=" * 60)
@@ -69,6 +72,7 @@ async def test_file_ops():
     print("\n" + "=" * 60)
 
 
+@pytest.mark.asyncio
 async def test_home_assistant():
     """Test agent with Home Assistant"""
     print("\n" + "=" * 60)

@@ -1,8 +1,8 @@
-import json
 import logging
 import os
 import unittest
 
+import yaml
 from token_broker import TokenBroker
 
 # Configure logging
@@ -11,8 +11,8 @@ logging.basicConfig(level=logging.INFO)
 
 class TestTokenBroker(unittest.TestCase):
     def setUp(self):
-        # Create a dummy keys.json
-        self.test_keys_path = "test_keys_vault.json"
+        # Create a dummy vault YAML
+        self.test_keys_path = "test_keys_vault.yaml"
 
         self.dummy_data = {
             "gemini": [
@@ -23,14 +23,14 @@ class TestTokenBroker(unittest.TestCase):
         }
 
         with open(self.test_keys_path, "w") as f:
-            json.dump(self.dummy_data, f)
+            yaml.dump(self.dummy_data, f)
 
-        # Initialize Broker
-        # Reset singleton instance for testing provided we can (hacky but needed for unit test isolation)
+        # Reset singleton instance for test isolation
         TokenBroker._instance = None
-        self.broker = TokenBroker(secrets_path=self.test_keys_path)
+        self.broker = TokenBroker(vault_path=self.test_keys_path)
 
     def tearDown(self):
+        TokenBroker._instance = None
         if os.path.exists(self.test_keys_path):
             os.remove(self.test_keys_path)
 

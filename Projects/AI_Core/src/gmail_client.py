@@ -43,7 +43,7 @@ class GmailClient:
             if credentials_dict:
                 self.creds = Credentials.from_authorized_user_info(credentials_dict)
                 self.service = build("gmail", "v1", credentials=self.creds)
-                
+
                 # Verify and get user's email address
                 profile = self.service.users().getProfile(userId="me").execute()
                 self.user_email = profile.get("emailAddress")
@@ -165,7 +165,7 @@ class GmailClient:
             return "❌ Gmail не подключен. Используйте /start для подключения Google."
 
         unread = self.get_unread_count()
-        
+
         if unread == 0 and not self.authenticated:
             return "❌ Gmail не подключен. Используйте /start для подключения Google."
 
