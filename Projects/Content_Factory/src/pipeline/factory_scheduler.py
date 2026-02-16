@@ -451,6 +451,7 @@ if __name__ == "__main__":
     parser.add_argument("--longform-topic", type=str, help="Topic for documentary")
 
     parser.add_argument("--auto-upload", action="store_true", help="Force enable auto upload")
+    parser.add_argument("--no-upload", action="store_true", help="Disable all uploads (dry-run)")
     parser.add_argument(
         "--style",
         type=str,
@@ -473,6 +474,8 @@ if __name__ == "__main__":
     # Allow CLI override for upload
     if args.auto_upload:
         REELS_AUTO_UPLOAD = True
+    if args.no_upload:
+        REELS_AUTO_UPLOAD = False
 
     if args.scheduler:
         start_scheduler()
