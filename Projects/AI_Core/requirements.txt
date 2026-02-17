@@ -34,5 +34,6 @@ google-cloud-pubsub>=2.19.0
 numpy>=1.26.0
 pandas>=2.1.0
 pybit>=5.8.0
-google-api-python-client>=2.90.0
+google-api-python-client==2.118.0
+google-auth-httplib2==0.2.0
 argon2-cffi>=23.1.0
