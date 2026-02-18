@@ -1,14 +1,14 @@
-import json
 import os
+
 
 def fix_package_json(file_path, line_numbers):
     if not os.path.exists(file_path):
         print(f"⚠️ {file_path} not found")
         return
-    
-    with open(file_path, 'r') as f:
+
+    with open(file_path) as f:
         lines = f.readlines()
-    
+
     # Sort line numbers in descending order to avoid index issues when deleting
     for ln in sorted(line_numbers, reverse=True):
         idx = ln - 1
@@ -17,7 +17,7 @@ def fix_package_json(file_path, line_numbers):
             lines.pop(idx)
         else:
             print(f"  → Line {ln} out of range for {file_path}")
-    
+
     with open(file_path, 'w') as f:
         f.writelines(lines)
 
@@ -41,7 +41,7 @@ def run_cleanup():
         ("/Users/igorgoncharenko/.antigravity/extensions/techer.open-in-browser-2.0.0-universal/package.json", [21, 22]),
         ("/Users/igorgoncharenko/.antigravity/extensions/vscjava.vscode-java-pack-0.30.5-universal/package.json", [55, 56, 58, 59, 61, 63, 65, 67, 68, 70, 71]),
     ]
-    
+
     for path, lns in problems:
         fix_package_json(path, lns)
 

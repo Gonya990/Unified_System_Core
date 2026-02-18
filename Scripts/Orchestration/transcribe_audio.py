@@ -1,31 +1,30 @@
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Add necessary paths
 ROOT_DIR = Path("/Users/igorgoncharenko/Documents/Unified_System_Core")
 sys.path.append(str(ROOT_DIR / "Scripts" / "Utilities"))
 from token_broker import TokenBroker
 
+
 def transcribe_audio(file_path):
     broker = TokenBroker()
     api_key = broker.get_key("gemini")
-    
+
     if not api_key:
         print("Error: No Gemini API key found.")
         return
 
     from google import genai
-    from google.genai import types
 
     client = genai.Client(api_key=api_key)
-    
+
     print(f"Uploading and transcribing {file_path}...")
-    
+
     # Upload the file
     file_uri = client.files.upload(file=file_path)
-    
+
     print(f"File uploaded to {file_uri.name}. Starting generation...")
     # Generate content
     try:
@@ -46,7 +45,7 @@ def transcribe_audio(file_path):
         return
     print("\n--- TRANSCRIPTION & ANALYSIS ---\n")
     print(output_text)
-    
+
     # Save to Context/transcripts
     transcript_path = ROOT_DIR / "Context" / "transcripts" / (Path(file_path).stem + "_full.txt")
     transcript_path.parent.mkdir(parents=True, exist_ok=True)

@@ -1,5 +1,7 @@
-from token_broker import TokenBroker
 import pprint
+
+from token_broker import TokenBroker
+
 
 def dump_raw_store():
     broker = TokenBroker()

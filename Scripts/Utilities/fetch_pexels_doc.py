@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -6,11 +5,12 @@ from pathlib import Path
 sys.path.insert(0, "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/Content_Factory/src")
 from video.ai_video_generator import VideoGenerator
 
+
 def fetch_doc_assets():
     vgen = VideoGenerator(provider="pexels")
     output_dir = Path("/Users/igorgoncharenko/Documents/Unified_System_Core/Reports/media/scenes")
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     pexels_scenes = {
         "1": "Deep space zoom earth",
         "3": "motherboard microchip glowing",
@@ -22,9 +22,9 @@ def fetch_doc_assets():
         "19": "stock market green candle chart",
         "20": "people using laptops globally"
     }
-    
+
     print(f"🎬 Fetching {len(pexels_scenes)} Pexels videos...")
-    
+
     for sid, prompt in pexels_scenes.items():
         out_path = output_dir / f"scene_{sid}.mp4"
         if out_path.exists():
@@ -33,7 +33,7 @@ def fetch_doc_assets():
         print(f"  → Fetching Scene {sid}: {prompt}")
         try:
             vgen.generate_video(prompt=prompt, output_path=out_path)
-            print(f"    ✅ Downloaded.")
+            print("    ✅ Downloaded.")
         except Exception as e:
             print(f"    ❌ Failed: {e}")
 

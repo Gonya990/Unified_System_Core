@@ -1,35 +1,34 @@
-import os
-import sys
 import asyncio
 import logging
+import os
+import sys
 
 # Add paths for Council
 root_dir = "/Users/igorgoncharenko/Documents/Unified_System_Core"
 sys.path.insert(0, os.path.join(root_dir, "LLM_Council"))
 sys.path.insert(0, os.path.join(root_dir, "Projects/AI_Core/src"))
 
-from token_broker import TokenBroker
 from council.council import LLMCouncil
 from council.providers.openai_provider import OpenAIProvider
-from council.providers.gemini_provider import GeminiProvider
+from token_broker import TokenBroker
 
 logging.basicConfig(level=logging.INFO)
 
 async def generate_15min_script():
     broker = TokenBroker()
-    
+
     # Setup providers manually to ensure they have keys
     openai_key = broker.get_key("openai")
     gemini_key = broker.get_key("gemini")
-    
+
     council = LLMCouncil(providers=[])
-    
+
     if openai_key:
         council.providers.append(OpenAIProvider(api_key=openai_key, model="gpt-4o"))
     else:
         print("❌ No OpenAI key found!")
         return
-        
+
     prompt = """
 Write a 3000-word (15-minute) documentary script entitled "Unified System Core: The Architecture of Autonomous Sovereignty (2026)".
 The script is for a deep, professional male voice (timbre of an experienced narrator).
@@ -43,10 +42,10 @@ Structure:
 
 Ensure the text is deep, research-based, and uses specific technical details mentioned in the provided context (Unified System Core, GKE, TokenBroker, Vibranium Shield).
 """
-    
+
     print("🚀 Generating script...")
     session = await council.deliberate(prompt)
-    
+
     if not session or not session.final_report:
         print("❌ Error: No report generated!")
         return

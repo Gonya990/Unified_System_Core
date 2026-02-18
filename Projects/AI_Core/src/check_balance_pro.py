@@ -1,5 +1,6 @@
 import os
 import sys
+
 from pybit.unified_trading import HTTP
 
 # Add src to path for TokenBroker
@@ -9,13 +10,14 @@ if current_dir not in sys.path:
 
 from token_broker import TokenBroker
 
+
 def check_balances():
     broker = TokenBroker()
     # In TokenBroker key_store, 'bybit' is a list
     bybit_data = broker.key_store.get("bybit", [{}])[0]
     api_key = bybit_data.get("key")
     api_secret = bybit_data.get("secret")
-    
+
     if not api_key or not api_secret:
         print("❌ Bybit keys not found in TokenBroker!")
         return

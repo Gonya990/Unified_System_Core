@@ -1,5 +1,4 @@
-from huggingface_hub import HfApi, model_info
-import sys
+from huggingface_hub import model_info
 
 token = "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"
 repo_id = "black-forest-labs/FLUX.1-schnell"

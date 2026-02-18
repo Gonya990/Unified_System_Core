@@ -1,6 +1,7 @@
+import json
 import os
 import subprocess
-import json
+
 
 def get_duration(file_path):
     cmd = [
@@ -21,7 +22,7 @@ def collect_durations():
             if f.endswith(".mp3") and f.startswith("block_"):
                 d = get_duration(os.path.join(lang_dir, f))
                 report[lang][f] = d
-                
+
     with open("/Users/igorgoncharenko/Documents/Unified_System_Core/Reports/media/audio_durations.json", "w") as f:
         json.dump(report, f, indent=2)
     print("✅ Durations collected.")
