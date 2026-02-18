@@ -7,6 +7,7 @@ from .gemini_provider import GeminiProvider
 from .github_copilot import GitHubCopilotProvider
 from .nvidia_nim import NVIDIANIMProvider
 from .openai_provider import OpenAIProvider
+from .ollama_provider import OllamaProvider
 
 __all__ = [
     "BaseProvider",
@@ -15,4 +16,5 @@ __all__ = [
     "GitHubCopilotProvider",
     "NVIDIANIMProvider",
     "GeminiProvider",
+    "OllamaProvider",
 ]

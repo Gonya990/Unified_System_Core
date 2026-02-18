@@ -39,5 +39,6 @@ Scope: Content Factory pipeline + infra. Legacy/irrelevant items removed.
 - [ ] Fix Flux local model gating (still blocked by HF access approval).
 
 - [x] Fix `ai-bot-igor` Telegram token (PM2). API_PORT moved to 8085 to avoid conflict.
-- [ ] Fix `ai-telegram-bot` in k8s (pods evicted; node DiskPressure).
+- [x] Fix `ai-telegram-bot` in k8s (pods evicted; node DiskPressure).
 - [x] Sync TokenBroker vault (`~/.config/unified-system/tokens.yaml`) to remote.
+- [/] Fix cloud server disk space (moving `broll` to `/mnt/data`).

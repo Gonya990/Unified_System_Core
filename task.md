@@ -29,6 +29,17 @@
 
 ## 📋 Ближайшие шаги (Next Actions)
 
+### ✅ Завершено (неделя)
+
+- GitHub Sync стабилизирован (`git sync`/origin up-to-date; зеркало antibridge остается несведённым по решению).
+- ByBit агент переведен в безопасные дефолты (testnet + monitor-only при отсутствии ключей; защита уведомлений без токена).
+- Content Factory: добавлен `--no-upload` для безопасного dry-run без публикаций.
+
+### 🧪 Dry-run Content Factory (2026-02-16)
+- Запуск: `factory_scheduler.py --auto --no-upload`
+- Итог: **failed** (нет валидных API ключей Gemini/OpenAI, Ollama offline, HF_TOKEN отсутствует, Edge-TTS отсутствует, ffmpeg concat завершился с 254 из-за отсутствующих/невалидных медиасегментов после аварийных фолбэков).
+- Требуется: актуальные ключи (`GOOGLE_GENAI_API_KEY`, `OPENAI_API_KEY`, `HF_TOKEN`), поднять flux/sdxl или Ollama, установить `edge-tts`/TTS провайдер, проверить ffmpeg+inputs, активировать Telegram token для notifier.
+
 ### 🤖 Фаза 5: Продвинутая Автоматизация (Advanced Automation)
 >
 > *Статус: В РАБОТЕ (ПО ЗАПРОСУ)*

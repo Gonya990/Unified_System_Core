@@ -18,6 +18,7 @@ from .providers import (
     GitHubCopilotProvider,
     NVIDIANIMProvider,
     OpenAIProvider,
+    OllamaProvider,
     ProviderResponse,
 )
 from .providers.base import PeerReview
@@ -135,6 +136,17 @@ class LLMCouncil:
                 )
             )
             logger.info("✓ Gemini provider initialized")
+
+        # Ollama
+        ollama_url = os.getenv("OLLAMA_BASE_URL")
+        if ollama_url:
+            providers.append(
+                OllamaProvider(
+                    base_url=ollama_url,
+                    model=os.getenv("OLLAMA_MODEL", "llama3.2"),
+                )
+            )
+            logger.info("✓ Ollama provider initialized")
 
         if not providers:
             raise ValueError("No valid API keys found. Check your .env file.")

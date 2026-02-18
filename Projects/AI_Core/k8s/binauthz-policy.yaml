@@ -1,3 +1,10 @@
+admissionWhitelistPatterns:
+  - namePattern: quay.io/argoproj/argocd:*
+  - namePattern: ghcr.io/dexidp/dex:*
+  - namePattern: public.ecr.aws/docker/library/redis:*
+  - namePattern: redis:*
+  - namePattern: gcr.io/google-containers/pause:*
+  - namePattern: gcr.io/google_containers/pause:*
 defaultAdmissionRule:
   enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
   evaluationMode: ALWAYS_ALLOW

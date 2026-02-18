@@ -16,5 +16,5 @@ def check_port(ip, port):
 
 
 print("Checking connectivity...")
-check_port("100.115.17.68", 8765)  # igor-gaming-1
-check_port("100.110.209.49", 8765)  # unified-home-core-cloud
+check_port("100.115.17.68", 8765)  # igor-gaming-1 (Offline?)
+check_port("100.87.208.56", 8765)  # unified-home-core-cloud

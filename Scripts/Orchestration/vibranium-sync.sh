@@ -61,9 +61,10 @@ if [[ -n $(git status -s) ]]; then
     exit 1
 fi
 
-# 3. Main Sync (Git & Tasks)
-echo -e "\n${YELLOW}[3/5] Running Main Sync (Git & Tasks)...${NC}"
+# 3. Main Sync (Git, Tasks & Tokens)
+echo -e "\n${YELLOW}[3/5] Running Main Sync (Git, Tasks & Tokens)...${NC}"
 bash "$SCRIPT_DIR/sync.sh" all
+bash "$SCRIPT_DIR/sync/token-sync.sh"
 
 # 4. Remote Update
 echo -e "\n${YELLOW}[4/5] Updating Remote Server...${NC}"
