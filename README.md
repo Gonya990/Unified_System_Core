@@ -65,6 +65,7 @@ graph LR
 - **Quick Start Architecture**: [SYSTEM_ARCHITECTURE.md](Agent_Context/Knowledge_Base/Architecture/SYSTEM_ARCHITECTURE.md)
 - **Multi-Machine Handoff**: [HANDOFF_GUIDE.md](Agent_Context/Knowledge_Base/Architecture/HANDOFF_GUIDE.md)
 - **Project Registry**: [PROJECTS.yaml](Agent_Context/Knowledge_Base/Docs/PROJECTS.yaml)
+- **GCP Mobile Fix Guide (RU)**: [docs/guides/gcp_mobile_resources_fix_ru.md](docs/guides/gcp_mobile_resources_fix_ru.md)
 
 ---
 
