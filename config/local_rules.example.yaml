@@ -1,0 +1,44 @@
+version: 1
+
+roots:
+  repo: /workspace
+  drive_mount: /mnt/google-drive/Unified_System
+  inbox: /mnt/google-drive/Unified_System/00_inbox
+  quarantine: /mnt/google-drive/Unified_System/01_quarantine
+  raw: /mnt/google-drive/Unified_System/02_raw_encrypted
+  extracted: /mnt/google-drive/Unified_System/03_extracted
+  sanitized: /mnt/google-drive/Unified_System/04_sanitized
+  indexed_exports: /mnt/google-drive/Unified_System/05_indexed_exports
+  reports: /workspace/Reports
+
+classification:
+  default: untrusted
+  pii_detection: enabled
+  financial_documents: restricted
+  confidential_pitch: restricted
+  logs: restricted
+  source_code: internal
+
+actions:
+  scan_readonly: auto_allowed
+  extract_document_text: auto_allowed_after_scan
+  index_sanitized_text: auto_allowed
+  publish_report: approval_required
+  delete: approval_required
+  deploy: approval_required
+  secret_rotation: approval_required
+  trading_action: approval_required
+
+retention:
+  raw_days: 90
+  quarantine_days: 30
+  logs_days: 30
+  reports_days: 365
+
+security:
+  reject_arbitrary_local_paths: true
+  require_file_hashes: true
+  redact_before_llm: true
+  store_raw_uploads_encrypted: true
+  audit_every_action: true
+

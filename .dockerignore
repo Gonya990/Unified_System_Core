@@ -37,6 +37,28 @@ Projects/ChatKit_Dashboard
 .db
 .sqlite
 
+# Secrets, credentials, sessions, and private records
+.env
+.env.*
+*.env
+*.env.*
+**/.env
+**/.env.*
+**/*credentials*.json
+**/*credential*.json
+**/*secret*.json
+**/*token*.json
+**/*session*.json
+**/insta_session.json
+**/.threads_state.json
+**/gcp-service-account*.json
+**/*-service-account.json
+Reports/
+Agent_Context/Personal_Profile/
+Scripts/openai_data_integration/data/raw/
+Projects/AI_Core/src/latest_emails.json
+Projects/AI_Core/src/emails_4_months.json
+
 # Root media
 /*.mp4
 /*.mov
