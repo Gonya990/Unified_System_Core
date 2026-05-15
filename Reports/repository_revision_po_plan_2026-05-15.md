@@ -439,4 +439,3 @@ Keep deployment separate from audit/PO generation. The PO package should approve
 3. Which records are allowed to be stored in the repository after redaction, and which must remain Drive-only?
 4. Should the one-button workflow create Beads tasks, GitHub issues, or both?
 5. Which environment is authoritative for production: GKE, Firebase App Hosting, Docker Compose, or local Tailscale nodes?
-
