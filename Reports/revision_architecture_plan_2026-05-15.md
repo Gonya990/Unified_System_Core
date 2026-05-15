@@ -35,7 +35,7 @@ Declared submodules in `.gitmodules`:
 6. `Projects/Content_Factory/src/lip_sync/Wav2Lip`
 7. `Projects/Content_Factory/src/live_portrait`
 
-`git submodule status` showed the listed submodules with a leading `-`, meaning they are declared but not initialized in this checkout. A full "all repositories" audit must initialize or separately clone them before release.
+Follow-up shallow initialization succeeded for six submodules: `antibridge`, `gk-cli`, `Wav2Lip`, `live_portrait`, `cliproxyapi/src`, and `chrome-devtools-mcp`. `External_Tools/Stack/mcp_agent_mail` is declared in `.gitmodules` but did not appear in `git submodule status` in this checkout; reconcile that declaration before release.
 
 ## 3. Uploaded Document Findings
 
@@ -71,7 +71,9 @@ Severity reflects packaging risk, not exploit confirmation.
 | High | K8s credential and pod hardening gaps | `Projects/AI_Core/k8s/deployment-gke.yaml` mounts Google/Gmail credentials from ConfigMaps and sets `OAUTHLIB_INSECURE_TRANSPORT=1` | Use Kubernetes Secrets or Workload Identity; remove insecure OAuth flag; add restricted `securityContext`; narrow RBAC/egress. |
 | High | Watchtower and Docker socket exposure | `infra/cliproxyapi/docker-compose.yml` mounts `/var/run/docker.sock`; exposes `8317`; auto-updates containers | Remove Watchtower from production or pin signed digests; enable TLS/auth; bind privately. |
 | Medium | Node production dependency vulnerabilities | `npm audit --omit=dev`: `functions` 31 total, 2 critical/13 high; `unified` 15 total, 1 critical/3 high; `Projects/ChatKit_Dashboard` 4 total, 1 critical/1 high | Upgrade direct deps, regenerate lockfiles, add Dependabot and blocking `npm audit` in CI. |
+| Medium | Initialized AntiBridge backend submodule has production dependency vulnerabilities | `Projects/AI_Core/antibridge/backend`: `npm audit --omit=dev` found 5 total, including critical `basic-ftp` and `simple-git`; root AntiBridge and `tools/chrome-devtools-mcp` had 0 production vulnerabilities | Upgrade backend dependencies and keep submodule audit in CI. |
 | Medium | Python requirements are not auditable/reproducible | `pip-audit --no-deps --disable-pip` fails because requirements use broad/unpinned ranges; full audit also blocked by missing `python3.12-venv` in this environment | Generate locked requirements with hashes; install `python3.12-venv` in agent image; run `pip-audit` against lockfiles. |
+| Medium | AI video submodule dependencies are old or partially vulnerable | `Wav2Lip` uses very old pinned ML packages plus an unpinned OpenCV lower bound; `live_portrait/requirements.txt` has `transformers==4.38.0` with 18 reported vulnerabilities; `requirements_base.txt` has unpinned `pillow>=10.2.0` | Isolate video workloads, upgrade/pin ML dependencies where feasible, and scan container images rather than importing these dependencies into core services. |
 | Medium | CI security scans are not consistently blocking | `.github/workflows/deploy.yaml` uses `continue-on-error: true` and `fail-build: false`; Trivy in `build.yml` runs only for PR/dry-run and uses `aquasecurity/trivy-action@master` | Pin actions, scan pushed images, fail on high/critical unless waived, add CodeQL/Semgrep/gitleaks. |
 | Medium | Privacy/PII tracked in operational artifacts | `Reports/email_actions.json`, conversation exports, uploaded invoices, personal records | Classify, encrypt, relocate to private storage, add DLP scanning before commits. |
 
@@ -218,6 +220,7 @@ Minimum artifacts from the one-button run:
 ## 9. Verification Commands Used in This Revision
 
 - `git submodule status`
+- `git submodule update --init --recursive --depth 1`
 - `git ls-files | rg -i '...'` for sensitive path inventory
 - `npm audit --omit=dev --json` for Node projects
 - `python3 -m pip_audit ...` attempts for Python requirements
