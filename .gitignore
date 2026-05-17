@@ -193,3 +193,12 @@ accounts_config.json
 Projects/ChatKit_Dashboard/.next/
 **/.next/
 Agent_Context/Archive/Sessions/
+
+# Local conversation/email archives
+Agent_Context/machines/igor-gaming/lmstudio-conversations/
+Scripts/openai_data_integration/data/raw/
+Scripts/openai_data_integration/data/archive/
+Scripts/openai_data_integration/data/processed/
+conversation*.txt
+Reports/email_actions.json
+Projects/AI_Core/src/emails_4_months.json
