@@ -160,3 +160,32 @@ unnamed.png
 *.env.*
 Projects/AI_Core/.venv.python39.bak/
 *.worktrees/
+
+# Security freeze: local credentials and runtime secrets
+Projects/AI_Core/.env.igor
+Projects/AI_Core/config/gmail_credentials.json
+Projects/AI_Core/gmail_credentials.json
+test_keys_vault.json
+Scripts/Maintenance/Diagnostics/test_keys_vault.json
+Agent_Context/Knowledge_Base/Configs/tailscale_auth_key_temp.txt
+Agent_Context/Knowledge_Base/Configs/tailscale_auth_key_temp 2.txt
+accounts_config.json
+Projects/accounts_config.json
+
+config/gmail_credentials.json
+config/google_drive_credentials.json
+config/bot_config.json
+config/bot_config.json.bak
+config/bot_config 2.json
+config/users.yaml
+config/resources.yaml
+config/rbac_policy.yaml
+
+*gmail_credentials.json
+*google_drive_credentials.json
+*credentials.json
+*token*.json
+*token*.txt
+*auth_key*.txt
+*keys_vault*.json
+accounts_config.json

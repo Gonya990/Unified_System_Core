@@ -53,3 +53,8 @@ client_secret.json
 watchtower-config.json
 gcp-service-account.json
 gmail_credentials.json
+
+# Security freeze: never track local runtime env
+.env.igor
+gmail_credentials.json
+config/gmail_credentials.json
