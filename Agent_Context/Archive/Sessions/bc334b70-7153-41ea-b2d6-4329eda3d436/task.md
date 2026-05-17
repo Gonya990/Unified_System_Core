@@ -1,7 +1,0 @@
-# Task: Resolve Connection Issues and Configure Hosts
-
-- [x] Analyze current network environment <!-- id: 0 -->
-  - [x] Check local IP and Tailscale IP <!-- id: 1 -->
-  - [x] Check running services (Proxmox, n8n, etc.) <!-- id: 2 -->
-- [x] Provide recommended `/etc/hosts` configuration for Mac <!-- id: 3 -->
-- [x] Verify connectivity from browser agent <!-- id: 4 -->

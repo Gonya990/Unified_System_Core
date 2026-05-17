@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Real-time system status dashboard showing operational health of all services (Docker, Chrome, N8N, Home Assistant, Ollama, Antigravity), Tailscale mesh network connectivity with visual topology, resource utilization (memory, storage, GPU), container status, AI services readiness, and active alerts including critical C: drive warning and offline Proxmox node.",
-  "updatedAt": "2025-12-19T17:12:42.405084757Z"
-}

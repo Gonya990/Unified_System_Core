@@ -189,3 +189,7 @@ config/rbac_policy.yaml
 *auth_key*.txt
 *keys_vault*.json
 accounts_config.json
+
+Projects/ChatKit_Dashboard/.next/
+**/.next/
+Agent_Context/Archive/Sessions/

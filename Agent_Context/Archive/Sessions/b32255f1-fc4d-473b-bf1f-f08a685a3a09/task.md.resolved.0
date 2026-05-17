@@ -1,7 +1,0 @@
-# Task: Antigravity Docker & GPU Access Check Setup
-
-- [ ] Analyze provided n8n workflow JSON <!-- id: 0 -->
-- [ ] Check existing n8n configuration in `~/n8n` <!-- id: 1 -->
-- [ ] Save workflow JSON to file <!-- id: 2 -->
-- [ ] Verify connectivity to Ollama (host.docker.internal) <!-- id: 3 -->
-- [ ] Provide instructions for import/usage <!-- id: 4 -->

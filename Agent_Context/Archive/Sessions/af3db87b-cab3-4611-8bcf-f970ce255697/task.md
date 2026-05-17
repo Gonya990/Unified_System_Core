@@ -1,6 +1,0 @@
-- [x] Install Git via Homebrew <!-- id: 0 -->
-  - [x] Run `brew install git` <!-- id: 1 -->
-  - [x] Verify `git --version` <!-- id: 2 -->
-- [x] Install git-gui (optional, if requested) <!-- id: 3 -->
-- [x] Configure Homebrew Git as default in PATH <!-- id: 4 -->
-- [x] Initialize Git Repository <!-- id: 5 -->

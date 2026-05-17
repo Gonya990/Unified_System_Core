@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Detailed implementation plan for building hybrid AI agent system. Includes RAG with ChromaDB for semantic documentation search, Function Calling for n8n workflow integration, enhanced Browser Agent with context-aware decisions, and unified API. Covers architecture decisions, file structure, verification plan, dependencies, and success criteria. Estimated 6-10 hours implementation time with low risk and clear rollback strategy.",
-  "updatedAt": "2025-12-18T21:46:42.052742220Z"
-}

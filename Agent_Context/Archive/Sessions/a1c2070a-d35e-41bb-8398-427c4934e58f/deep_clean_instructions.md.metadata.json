@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Step-by-step execution guide for Operation Deep Clean. Provides three methods to run the PowerShell scanning script on Windows: direct copy-paste, file transfer via Tailscale, or browser-based execution. Includes safety warnings, expected output description, and next steps for reviewing scan results before any deletion.",
-  "updatedAt": "2025-12-19T18:10:37.988100871Z"
-}

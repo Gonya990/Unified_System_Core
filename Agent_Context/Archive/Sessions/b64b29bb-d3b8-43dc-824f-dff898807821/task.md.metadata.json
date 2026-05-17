@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_TASK",
-  "summary": "Task checklist for implementing RAG system with local vector database, Function Calling integration with n8n workflows, and enhanced Browser Agent with documentation access. Covers installation, integration, testing and optimization phases.",
-  "updatedAt": "2025-12-18T21:46:42.027706063Z"
-}
