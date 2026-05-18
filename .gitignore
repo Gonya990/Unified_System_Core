@@ -205,3 +205,23 @@ Projects/AI_Core/src/emails_4_months.json
 
 # Local sensitive token documentation
 /docs/security/GITHUB_TOKEN_SETUP.md
+
+# Local identity / imported private data
+Agent_Context/Knowledge_Base/identity/
+
+# Local runtime data
+Data/alerts/
+Data/memory-wiki/
+Data/task-queue/
+
+# Local frontend/package caches
+Projects/connect-landing-page/.npm-cache/
+**/.npm-cache/
+
+# Agent/editor duplicate files
+* 2.py
+* 2.md
+* 2.sh
+* 2.json
+* 2.yaml
+* 2.yml
