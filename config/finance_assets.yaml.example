@@ -1,0 +1,12 @@
+# Manual asset registry (Path D fallback) — copy to finance_assets.yaml (gitignored)
+assets:
+  - id: liquid_checking
+    type: bank
+    currency: ILS
+    note: "Primary checking — sync via Moneytor"
+liabilities:
+  - id: mortgage
+    type: loan
+    currency: ILS
+    monthly_payment: 0
+    note: "Update from Moneytor export"

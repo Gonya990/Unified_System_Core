@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "default_action": "deny",
+  "manifest_path": "config/SOVEREIGN_MANIFEST.yaml",
+  "rules": [
+    {
+      "id": "infra-sudo",
+      "domain": "infrastructure",
+      "match": { "type": "regex", "pattern": "\\bsudo\\b", "field": "command" },
+      "action": "require_yubikey",
+      "risk_score": 0.95
+    },
+    {
+      "id": "infra-rm-rf",
+      "domain": "infrastructure",
+      "match": { "type": "regex", "pattern": "\\brm\\s+-rf\\b", "field": "command" },
+      "action": "deny",
+      "risk_score": 1.0
+    },
+    {
+      "id": "secrets-ssh",
+      "domain": "secrets",
+      "match": { "type": "path_prefix", "pattern": "~/.ssh", "field": "path" },
+      "action": "require_yubikey",
+      "risk_score": 0.9
+    },
+    {
+      "id": "secrets-env",
+      "domain": "secrets",
+      "match": { "type": "glob", "pattern": "**/.env", "field": "path" },
+      "action": "require_yubikey",
+      "risk_score": 0.85
+    },
+    {
+      "id": "finance-new-payment",
+      "domain": "finance",
+      "match": { "type": "regex", "pattern": "\\b(transfer|payment|wire)\\b", "field": "command" },
+      "action": "require_yubikey",
+      "risk_score": 0.9
+    },
+    {
+      "id": "self-modify-manifest",
+      "domain": "self_modify",
+      "match": { "type": "glob", "pattern": "**/SOVEREIGN_MANIFEST.yaml", "field": "path" },
+      "action": "require_yubikey",
+      "risk_score": 1.0
+    },
+    {
+      "id": "self-modify-policy",
+      "domain": "self_modify",
+      "match": { "type": "glob", "pattern": "**/policy.json", "field": "path" },
+      "action": "require_yubikey",
+      "risk_score": 1.0
+    }
+  ],
+  "allowlist_commands": [
+    "git status",
+    "git diff",
+    "git log",
+    "./start_here.sh doctor",
+    "./start_here.sh tailscale status"
+  ]
+}

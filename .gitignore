@@ -225,3 +225,6 @@ Projects/connect-landing-page/.npm-cache/
 * 2.json
 * 2.yaml
 * 2.yml
+
+# Local sovereign/private policy manifest
+/config/SOVEREIGN_MANIFEST.yaml
