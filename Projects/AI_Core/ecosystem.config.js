@@ -5,19 +5,19 @@ const ROOT_DIR = __dirname;
 module.exports = {
   apps: [
     {
-      name: "ai-bot-igor",
-      script: path.join(ROOT_DIR, "src/ai_telegram_bot_v2.py"),
+      name: "ai-core-ios-listener",
+      script: path.join(ROOT_DIR, "src/firestore_listener.py"),
       cwd: ROOT_DIR,
-      interpreter: "python3",
-      args: "--env .env.igor",
+      interpreter: ".venv/bin/python3",
+      args: "--env .env",
       instances: 1,
       exec_mode: "fork",
       env: {
         NODE_ENV: "production"
       },
-      error_file: "logs/igor-error.log",
-      out_file: "logs/igor-out.log",
-      log_file: "logs/igor-combined.log",
+      error_file: "logs/ios-error.log",
+      out_file: "logs/ios-out.log",
+      log_file: "logs/ios-combined.log",
       time: true,
       merge_logs: false,
       max_memory_restart: "500M",
@@ -38,7 +38,7 @@ module.exports = {
       name: "bybit-monitor",
       script: path.join(ROOT_DIR, "src/bybit_trading_bot.py"),
       cwd: ROOT_DIR,
-      interpreter: "python3",
+      interpreter: ".venv/bin/python3",
       args: "--env .env",
       env: {
         BYBIT_MONITOR_ONLY: "false",
