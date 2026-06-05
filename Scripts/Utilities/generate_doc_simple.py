@@ -18,7 +18,7 @@ async def generate_script():
     client = AsyncOpenAI(api_key=key)
 
     prompt = """
-Write a 3000-word documentary script "Unified System Core (2026)". 
+Write a 3000-word documentary script "Unified System Core (2026)".
 Deep male narrator voice. Professional, technical, visionary.
 Must cover: Architecture (GKE/Proxmox), Council (Multi-LLM), Security (Vibranium Shield), Wealth (Bybit $50).
 """

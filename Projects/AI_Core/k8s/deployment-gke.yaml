@@ -36,11 +36,11 @@ spec:
             - name: BOT_INSTANCE
               value: "igor"
             - name: FACTORY_REMOTE_HOST
-              value: "unified-home-core-cloud"
+              value: "100.126.23.67"
             - name: FACTORY_REMOTE_USER
               value: "gonya"
             - name: FACTORY_REMOTE_ROOT
-              value: "/home/gonya/Unified_System_Core"
+              value: "C:/Users/gonya/Documents/Unified_System_Core"
             - name: OAUTHLIB_INSECURE_TRANSPORT
               value: "1"
             - name: CRYPTO_BOT_LOG_PATH
@@ -68,6 +68,10 @@ spec:
             - name: vibranium-vault
               mountPath: /root/.config/unified-system/tokens.yaml
               subPath: tokens.yaml
+            - name: ssh-key-volume
+              mountPath: /root/.ssh/id_ed25519
+              subPath: ssh-privatekey
+              readOnly: true
       volumes:
         - name: google-creds
           configMap:
@@ -78,3 +82,7 @@ spec:
         - name: vibranium-vault
           secret:
             secretName: vibranium-tokens
+        - name: ssh-key-volume
+          secret:
+            secretName: gke-bot-ssh-key
+            defaultMode: 0400

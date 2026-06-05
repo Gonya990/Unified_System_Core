@@ -19,7 +19,7 @@ async def generate_15min_script():
 
     # Setup providers manually to ensure they have keys
     openai_key = broker.get_key("openai")
-    gemini_key = broker.get_key("gemini")
+    broker.get_key("gemini")
 
     council = LLMCouncil(providers=[])
 

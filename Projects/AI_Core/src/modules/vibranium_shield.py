@@ -8,7 +8,7 @@ class VibraniumShield:
     """
     🛡️ Vibranium Shield - Personality Protection & Security Module.
     Inspired by NotebookLM 2026 Analysis.
-    
+
     Prevents:
     1. Indirect Prompt Injection (from untrusted inputs)
     2. Autonomous System Damage (without Admin ACK)

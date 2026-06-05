@@ -19,7 +19,6 @@ def publish_documentary():
     os.environ["TELEGRAM_BOT_TOKEN"] = tg_token
     os.environ["TELEGRAM_ADMIN_CHAT_ID"] = "708531393" # From .env
 
-    video_en = "/Users/igorgoncharenko/Documents/Unified_System_Core/Reports/DOCUMENTARY_2026_EN.mp4"
     video_ru = "/Users/igorgoncharenko/Documents/Unified_System_Core/Reports/DOCUMENTARY_2026_RU.mp4"
 
     print("🚀 Publishing documentaries...")

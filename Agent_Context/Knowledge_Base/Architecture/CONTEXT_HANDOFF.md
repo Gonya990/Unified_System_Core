@@ -78,6 +78,7 @@
 | `c0e70185-44...` | **Sync Recovery** | ✅ Done | task.md, walkthrough |
 | `bd50d991-da...` | **Bot Recovery & API Sync** | ✅ Done | task.md, walkthrough |
 | `9d9d6591-f4...` | **Interface Rectification** | ✅ Done | task.md, walkthrough.md, Dashboard |
+| `cadc2656-a2...` | **iOS Factory UI & GKE SSH** | ✅ Done | task.md, walkthrough, Mobile UI |
 <!-- markdownlint-enable MD013 -->
 
 ### Brain Artifact Types
@@ -501,4 +502,13 @@ sessions. Refresh by running the documentation generation workflow.*
 - [x] Resolve Google Cloud JWT Signature Error (Firestore bypass)
 - [x] Update pyproject.toml with missing dependencies
 - [x] Run /sync (Vibranium Full Sync)
+```
+
+### From `cadc2656` (iOS Factory UI & GKE SSH) - COMPLETE ✅
+
+```markdown
+- [x] Reconfigure GKE Bot deployment to target Windows SSH (igor-gaming)
+- [x] Create React Native Expo App (UnifiedCoreMobile) for TestFlight
+- [x] Implement Cyberpunk Mobile UI (Dashboard, Tasks)
+- [x] Update Progress Docs
 ```

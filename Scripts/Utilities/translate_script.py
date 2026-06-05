@@ -18,9 +18,9 @@ async def translate_script():
         en_script = f.read()
 
     prompt = f"""
-Translate the following documentary script into Russian. 
+Translate the following documentary script into Russian.
 Maintain the EXACT SAME structure, scene markers [Scene: ...], and narrator markers [NARRATOR SPEAKS].
-The tone must be deep, professional, and suitable for a narrator (deep male voice). 
+The tone must be deep, professional, and suitable for a narrator (deep male voice).
 Avoid bureaucratic or overly formal language; keep it visionary and technical.
 
 Script:
