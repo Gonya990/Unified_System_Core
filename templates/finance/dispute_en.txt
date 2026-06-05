@@ -1,0 +1,12 @@
+Hello,
+
+Please review an unrecognized charge on my account.
+
+Description: {payee}
+Amount: {amount}
+Date: {date}
+
+Please block or reverse pending investigation.
+
+Regards,
+Igor

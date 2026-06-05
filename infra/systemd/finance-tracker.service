@@ -1,0 +1,14 @@
+[Unit]
+Description=Unified Core Finance Tracker (Moneytor read-only)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=unified
+WorkingDirectory=/opt/unified/guardrails
+EnvironmentFile=-/opt/unified/guardrails/.env
+ExecStart=/opt/unified/guardrails/.venv/bin/python3 -m finance_tracker.tracker --since-days 7
+# Timer: see finance-tracker.timer
+
+[Install]
+WantedBy=multi-user.target

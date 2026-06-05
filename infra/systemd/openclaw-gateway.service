@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenClaw Gateway (Unified Core)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=unified
+WorkingDirectory=/opt/unified/openclaw
+Environment=HOME=/opt/unified
+ExecStart=/usr/bin/openclaw gateway
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
