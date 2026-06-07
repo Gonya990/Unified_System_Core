@@ -30,7 +30,7 @@ outputs
 
 # Specific large project folders
 Projects/connect-landing-page
-Projects/ChatKit_Dashboard
+# Projects/ChatKit_Dashboard
 
 # Logs and configs
 *.log

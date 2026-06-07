@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Entry point for the AI Telegram Bot (Unified System).
-Redirects to the latest version of the bot implementation.
+Entry point for the AI Firestore Listener (Unified System).
+Redirects to the latest version of the listener implementation.
 """
 
 import os
@@ -31,11 +31,7 @@ else:
 print(f"[BOOT] Loading environment from {env_path}")
 load_dotenv(env_path, override=True)
 
-# Debug print (masked)
-token = os.environ.get("TELEGRAM_BOT_TOKEN", "NOT_SET")
-print(f"[BOOT] Token loaded: {token[:5]}...{token[-5:] if len(token) > 10 else ''}")
-
 if __name__ == "__main__":
-    from ai_telegram_bot_v2 import main
+    from firestore_listener import main
 
     main()

@@ -25,5 +25,5 @@ COPY src/ ./src/
 ENV PYTHONPATH=/app:/app/src
 ENV PYTHONUNBUFFERED=1
 
-# Run the bot
-CMD ["python", "-m", "src.ai_telegram_bot_v2"]
+# Run the listener
+CMD ["python", "-m", "src.firestore_listener"]

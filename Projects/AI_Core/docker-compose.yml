@@ -1,12 +1,12 @@
 # Common configuration shared between pre-built and local-build services
-x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
+x-firestore-listener-common: &listener-common
   restart: always
   env_file:
     - .env
   extra_hosts:
     - "host.docker.internal:host-gateway"
   volumes:
-    - ./bot.log:/app/bot.log
+    - ./firestore_listener.log:/app/firestore_listener.log
     - ./user_context.db:/app/user_context.db
     - ./conversations:/app/conversations
     - ./config:/app/config
@@ -16,12 +16,12 @@ x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
     - ./config/gmail_credentials.json:/app/config/gmail_credentials.json
     - ./secrets:/app/secrets
     - ../../secrets:/app/unified_secrets:ro
-    - ./gcp-service-account.json:/app/gcp-service-account.json:ro
+    - ./unified-core-service-account.json:/app/unified-core-service-account.json:ro
     - ../../Scripts:/app/Scripts:ro
   environment:
     - PYTHONUNBUFFERED=1
-    - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
-    - GCP_PROJECT_ID=my-home-435112
+    - GOOGLE_APPLICATION_CREDENTIALS=/app/unified-core-service-account.json
+    - GCP_PROJECT_ID=unified-core-agent-db
   logging:
     driver: "json-file"
     options:
@@ -30,26 +30,20 @@ x-ai-bot-common: &ai-bot-common # container_name: ai_telegram_bot
 
 services:
   # Pre-built image (default)
-  # Usage: docker compose up -d
-  ai-bot:
-    <<: *ai-bot-common
-    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:latest
+  firestore-listener:
+    <<: *listener-common
+    image: ghcr.io/gonya990/unified_system_core/firestore-listener:latest
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
   # Local build (optional)
-  # Usage: docker compose --profile local up -d ai-bot-local
-  ai-bot-local:
-    <<: *ai-bot-common
+  firestore-listener-local:
+    <<: *listener-common
     profiles: ["local"]
     build:
       context: .
       dockerfile: Dockerfile
-    image: ai-telegram-bot:local
-    ports:
-      - "8096:8096"
-      - "8090:8090"
-      - "8095:8095"
+    image: firestore-listener:local
 
   watchtower:
     image: containrrr/watchtower
