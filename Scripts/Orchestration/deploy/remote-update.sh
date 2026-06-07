@@ -14,7 +14,6 @@ NC='\033[0m'
 # Format: "Host:RemotePath"
 NODES=(
     "gpu-node-1:/home/gonya/Unified_System_Core"
-    "igor-gaming:Unified_System_Core"
 )
 
 REPO_URL="git@github.com:Gonya990/Unified_System_Core.git"
