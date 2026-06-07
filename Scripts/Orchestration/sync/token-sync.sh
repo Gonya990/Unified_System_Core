@@ -25,20 +25,26 @@ fi
 for NODE in "${NODES[@]}"; do
     echo -e "${YELLOW}>>> Syncing vault to $NODE...${NC}"
     
+    # Check connectivity with timeout first
+    if ! ssh -q -o BatchMode=yes -o ConnectTimeout=5 "$NODE" exit; then
+        echo -e "${RED}✗ Cannot connect to $NODE. Skipping.${NC}"
+        continue
+    fi
+    
     if [ "$NODE" = "igor-gaming" ]; then
         # Ensure WSL config directory exists
-        ssh "$NODE" "wsl mkdir -p ~/.config/unified-system"
+        ssh -o ConnectTimeout=5 "$NODE" "wsl mkdir -p ~/.config/unified-system"
         # Sync via wsl tee to write directly to WSL filesystem
-        if ssh "$NODE" "wsl tee ~/.config/unified-system/tokens.yaml > /dev/null" < "$VAULT_PATH"; then
+        if ssh -o ConnectTimeout=5 "$NODE" "wsl tee ~/.config/unified-system/tokens.yaml > /dev/null" < "$VAULT_PATH"; then
             echo -e "${GREEN}✓ Vault successfully synced to $NODE (WSL).${NC}"
         else
             echo -e "${RED}✗ Failed to sync vault to $NODE (WSL).${NC}"
         fi
     else
         # Ensure remote directory exists
-        ssh "$NODE" "mkdir -p ~/.config/unified-system"
+        ssh -o ConnectTimeout=5 "$NODE" "mkdir -p ~/.config/unified-system"
         # Securely copy the vault
-        if scp -p "$VAULT_PATH" "$NODE:~/.config/unified-system/tokens.yaml"; then
+        if scp -o ConnectTimeout=5 -p "$VAULT_PATH" "$NODE:~/.config/unified-system/tokens.yaml"; then
             echo -e "${GREEN}✓ Vault successfully synced to $NODE.${NC}"
         else
             echo -e "${RED}✗ Failed to sync vault to $NODE. Check SSH/Tailscale.${NC}"
