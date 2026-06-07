@@ -11,8 +11,8 @@ NC='\033[0m'
 
 VAULT_PATH="$HOME/.config/unified-system/tokens.yaml"
 NODES=(
-    "unified-home-core-cloud"
     "gpu-node-1"
+    "igor-gaming"
 )
 
 echo -e "${GREEN}🔐 Token Sync Started${NC}"
@@ -25,14 +25,24 @@ fi
 for NODE in "${NODES[@]}"; do
     echo -e "${YELLOW}>>> Syncing vault to $NODE...${NC}"
     
-    # Ensure remote directory exists
-    ssh "$NODE" "mkdir -p ~/.config/unified-system"
-    
-    # Securely copy the vault
-    if scp -p "$VAULT_PATH" "$NODE:~/.config/unified-system/tokens.yaml"; then
-        echo -e "${GREEN}✓ Vault successfully synced to $NODE.${NC}"
+    if [ "$NODE" = "igor-gaming" ]; then
+        # Ensure WSL config directory exists
+        ssh "$NODE" "wsl mkdir -p ~/.config/unified-system"
+        # Sync via wsl tee to write directly to WSL filesystem
+        if ssh "$NODE" "wsl tee ~/.config/unified-system/tokens.yaml > /dev/null" < "$VAULT_PATH"; then
+            echo -e "${GREEN}✓ Vault successfully synced to $NODE (WSL).${NC}"
+        else
+            echo -e "${RED}✗ Failed to sync vault to $NODE (WSL).${NC}"
+        fi
     else
-        echo -e "${RED}✗ Failed to sync vault to $NODE. Check SSH/Tailscale.${NC}"
+        # Ensure remote directory exists
+        ssh "$NODE" "mkdir -p ~/.config/unified-system"
+        # Securely copy the vault
+        if scp -p "$VAULT_PATH" "$NODE:~/.config/unified-system/tokens.yaml"; then
+            echo -e "${GREEN}✓ Vault successfully synced to $NODE.${NC}"
+        else
+            echo -e "${RED}✗ Failed to sync vault to $NODE. Check SSH/Tailscale.${NC}"
+        fi
     fi
 done
 
