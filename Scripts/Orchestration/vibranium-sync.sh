@@ -79,7 +79,7 @@ echo -e "\n${YELLOW}[4b/5] Deploying Production Containers to igor-gaming (WSL2)
 
 echo -e "${YELLOW}Syncing Project Context & Secrets...${NC}"
 
-# Compile the list of files to sync (tracked files + .env + Secrets)
+# Compile the list of files to sync (tracked files + .env + Secrets + service account keys)
 files_to_sync=$(git ls-files)
 if [ -f ".env" ]; then
     files_to_sync="$files_to_sync .env"
@@ -90,8 +90,17 @@ if [ -d "Secrets" ]; then
     files_to_sync="$files_to_sync $secrets_files"
 fi
 
+if [ -f "Projects/AI_Core/unified-core-service-account.json" ]; then
+    files_to_sync="$files_to_sync Projects/AI_Core/unified-core-service-account.json"
+fi
+
+if [ -f "Projects/AI_Core/gcp-service-account.json" ]; then
+    files_to_sync="$files_to_sync Projects/AI_Core/gcp-service-account.json"
+fi
+
 # Create tarball and pipe to igor-gaming WSL2
 echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh igor-gaming "mkdir -p /home/gonya/Unified_System_Core && wsl tar -xzf - -C /home/gonya/Unified_System_Core 2>/dev/null"
+
 
 echo -e "${YELLOW}Restarting Compose services on igor-gaming WSL2...${NC}"
 # Use docker compose up -d --build to update container builds with new code

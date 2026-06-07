@@ -1,27 +1,29 @@
 version: "3.8"
 
 services:
-  # AI Telegram Bot (Primary)
-  ai-bot:
+  # Firestore Listener for iOS custom App
+  firestore-listener:
     build:
       context: ./Projects/AI_Core
       dockerfile: Dockerfile
-    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:latest
+    image: ghcr.io/gonya990/unified_system_core/firestore-listener:latest
+    container_name: firestore-listener
     restart: always
+    command: ["python", "-m", "src.firestore_listener"]
     env_file: .env
     environment:
-      - DB_PATH=/app/data/user_context.db
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
-      - GCP_PROJECT_ID=quantum-conduit-496517-p3
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/unified-core-service-account.json
+      - GCP_PROJECT_ID=unified-core-agent-db
     volumes:
       - bot-data:/app/data
       - ./Projects/AI_Core/config:/app/config
       - ./Projects/AI_Core/conversations:/app/conversations
-      - ./Projects/AI_Core/gcp-service-account.json:/app/gcp-service-account.json:ro
+      - ./Projects/AI_Core/unified-core-service-account.json:/app/unified-core-service-account.json:ro
       - ./Secrets:/app/unified_secrets:ro
       - ./Scripts:/app/Scripts:ro
     networks:
       - unified-net
+
 
   # Mail Intelligence Service
   mail-intelligence:
