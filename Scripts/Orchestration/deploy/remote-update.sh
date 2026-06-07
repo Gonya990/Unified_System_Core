@@ -27,7 +27,7 @@ for CONFIG in "${NODES[@]}"; do
     REMOTE_PATH="${CONFIG#*:}"
     
 # Nodes that use Container-Only mode (No Git)
-PRODUCTION_NODES=()
+PRODUCTION_NODES=("deprecated-node-placeholder")
 
 echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
 

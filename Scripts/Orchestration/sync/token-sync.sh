@@ -33,9 +33,9 @@ for NODE in "${NODES[@]}"; do
     
     if [ "$NODE" = "igor-gaming" ]; then
         # Ensure WSL config directory exists
-        ssh -o ConnectTimeout=5 "$NODE" "wsl mkdir -p ~/.config/unified-system"
+        ssh -o ConnectTimeout=5 "$NODE" "wsl mkdir -p /home/gonya/.config/unified-system"
         # Sync via wsl tee to write directly to WSL filesystem
-        if ssh -o ConnectTimeout=5 "$NODE" "wsl tee ~/.config/unified-system/tokens.yaml > /dev/null" < "$VAULT_PATH"; then
+        if ssh -o ConnectTimeout=5 "$NODE" "wsl tee /home/gonya/.config/unified-system/tokens.yaml > /dev/null" < "$VAULT_PATH"; then
             echo -e "${GREEN}✓ Vault successfully synced to $NODE (WSL).${NC}"
         else
             echo -e "${RED}✗ Failed to sync vault to $NODE (WSL).${NC}"

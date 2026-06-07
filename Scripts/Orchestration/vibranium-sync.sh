@@ -99,7 +99,8 @@ if [ -f "Projects/AI_Core/gcp-service-account.json" ]; then
 fi
 
 # Create tarball and pipe to igor-gaming WSL2
-echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh igor-gaming "mkdir -p /home/gonya/Unified_System_Core && wsl tar -xzf - -C /home/gonya/Unified_System_Core 2>/dev/null"
+echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh igor-gaming "wsl bash -c 'mkdir -p /home/gonya/Unified_System_Core && tar -xzf - -C /home/gonya/Unified_System_Core'"
+
 
 
 echo -e "${YELLOW}Restarting Compose services on igor-gaming WSL2...${NC}"
