@@ -74,35 +74,29 @@ else
     echo -e "${RED}✗ Remote handle failed. Check Tailscale!${NC}"
 fi
 
-# 4b. Production Container Deploy (K8s & Compose)
-echo -e "\n${YELLOW}[4b/5] Deploying Production Containers...${NC}"
+# 4b. Production Container Deploy (Docker Compose on igor-gaming)
+echo -e "\n${YELLOW}[4b/5] Deploying Production Containers to igor-gaming (WSL2)...${NC}"
 
-# 1. K8s (AI Bot)
-if ssh unified-home-core-cloud "sudo kubectl apply -f -" < "$UNIFIED_SYSTEM/Projects/AI_Core/k8s/deployment.yaml"; then
-    echo -e "${GREEN}✓ K8s: AI Telegram Bot deployment updated.${NC}"
-    ssh unified-home-core-cloud "sudo kubectl rollout restart deployment/ai-telegram-bot -n trading"
-else
-    echo -e "${RED}✗ K8s deployment failed.${NC}"
-fi
+echo -e "${YELLOW}Syncing Project Context & Secrets...${NC}"
 
-# 2. Docker Compose (Services, Dashboard, MCP)
-echo -e "${YELLOW}Syncing Tracked Project Context (High Speed)...${NC}"
-
-# Use git ls-files to only sync tracked files. This is extremely fast.
-# We also explicitly include any local .env file if it exists.
+# Compile the list of files to sync (tracked files + .env + Secrets)
 files_to_sync=$(git ls-files)
 if [ -f ".env" ]; then
     files_to_sync="$files_to_sync .env"
 fi
 
-# Create tarball from tracked files + .env and pipe to cloud
-# We use --no-recursion because we are providing the file list explicitly
-# Suppress stderr to avoid "Ignoring unknown extended header" noise
-echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh unified-home-core-cloud "mkdir -p /home/gonya/Unified_System && tar -xzf - -C /home/gonya/Unified_System 2>/dev/null"
+if [ -d "Secrets" ]; then
+    secrets_files=$(find Secrets -type f 2>/dev/null || true)
+    files_to_sync="$files_to_sync $secrets_files"
+fi
 
-echo -e "${YELLOW}Restarting Compose services (Background Builder)...${NC}"
-# Use --build to ensure code changes are picked up
-ssh unified-home-core-cloud "cd /home/gonya/Unified_System && sudo docker compose up -d --build"
+# Create tarball and pipe to igor-gaming WSL2
+echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh igor-gaming "mkdir -p /home/gonya/Unified_System_Core && wsl tar -xzf - -C /home/gonya/Unified_System_Core 2>/dev/null"
+
+echo -e "${YELLOW}Restarting Compose services on igor-gaming WSL2...${NC}"
+# Use docker compose up -d --build to update container builds with new code
+ssh igor-gaming "wsl docker compose -f /home/gonya/Unified_System_Core/docker-compose.yml up -d --build"
+
 
 # 5. Final Status
 echo -e "\n${YELLOW}[5/5] Verifying Final State...${NC}"

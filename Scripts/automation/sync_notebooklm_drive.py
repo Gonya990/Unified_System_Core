@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger('DriveSync')
 
 # Scopes for Google Drive
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 # Paths
 BASE_DIR = Path('/Users/igorgoncharenko/Documents/Unified_System_Core')

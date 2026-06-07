@@ -81,26 +81,6 @@ nodes:
         purpose: Windows gaming with GPU passthrough
         disks:
           - scsi0: ent-ssd:500G
-      - vmid: 106
-        name: unified-home-core-cloud
-        purpose: Main AI workloads, Telegram bot, automation
-        cpu: 8 cores
-        ram: 25G
-        disks:
-          - scsi0: nvme-thin:100G (OS)
-          - scsi1: nvme-thin:300G (data, mounted /mnt/data)
-
-  - id: unified-home-core-cloud
-    name: Cloud Gateway (GCP)
-    fqdn: unified-home-core-cloud.tail5e8a72.ts.net
-    ip: 100.87.208.56
-    type: cloud
-    os: debian
-    services:
-      - name: Vasya Gateway
-        port: 8080
-      - name: AIOS MCP
-      - name: Docker
 
   - id: external-ai-cloud
     name: AI Providers Cloud
@@ -156,9 +136,6 @@ apps:
     port: 8095
   - name: Job Hunter
     location: igor-gaming-1
-  - name: Vasya Gateway
-    location: unified-home-core-cloud
-    port: 8080
   - name: Dashboard
     location: igor-gaming-1
     port: 8096

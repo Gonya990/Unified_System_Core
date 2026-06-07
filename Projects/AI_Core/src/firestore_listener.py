@@ -36,12 +36,16 @@ def process_message_async(doc_id, data):
             logger.info(f"[iOS Listener] Processing message from {user_id}: {user_text}")
 
             # Update Firestore history for the user (Memory)
-            db.add_message(user_id, "user", user_text)
-            history = db.get_history(user_id, limit=10)
+            history = db.get_conversation(user_id) or []
+            history.append({"role": "user", "content": user_text})
+
+            # Keep only last 10 messages
+            if len(history) > 10:
+                history = history[-10:]
+
+            db.save_conversation(user_id, history)
 
             # Generate response via AI Core Inference
-            # Convert history to InferenceClient format if needed
-            # InferenceClient usually maintains its own history or takes context
             context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in history])
 
             prompt = f"Conversation History:\n{context}\n\nRespond to the last message."
@@ -50,7 +54,8 @@ def process_message_async(doc_id, data):
             response_text = await inference.complete(prompt)
 
             # Save AI response to Memory
-            db.add_message(user_id, "assistant", response_text)
+            history.append({"role": "assistant", "content": response_text})
+            db.save_conversation(user_id, history)
 
             # Send response back to iOS App via Firestore
             from google.cloud import firestore

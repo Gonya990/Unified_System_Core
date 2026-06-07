@@ -5277,7 +5277,7 @@ async def factory_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Cloud fallback (recommended for GKE bot)
     remote_user = os.getenv("FACTORY_REMOTE_USER", "gonya")
-    remote_host = os.getenv("FACTORY_REMOTE_HOST", "unified-home-core-cloud")
+    remote_host = os.getenv("FACTORY_REMOTE_HOST", "igor-gaming")
     remote_root = os.getenv("FACTORY_REMOTE_ROOT", "/home/gonya/Unified_System_Core")
     remote_script = (
         f"{remote_root}/Projects/Content_Factory/src/pipeline/factory_scheduler.py"

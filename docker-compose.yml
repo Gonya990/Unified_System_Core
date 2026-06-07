@@ -1,22 +1,27 @@
 version: "3.8"
 
 services:
-  #   # AI Telegram Bot (Primary) - DEPLOYED VIA K8S
-  #   ai-bot:
-  #     build:
-  #       context: .
-  #       dockerfile: Projects/AI_Core/Dockerfile
-  #     image: ghcr.io/unified-system-core/unified-system-core/ai-telegram-bot:latest
-  #     restart: always
-  #     env_file: .env
-  #     environment:
-  #       - DB_PATH=/data/user_context.db
-  #       - GOOGLE_CLIENT_SECRETS=/app/config/gmail_credentials.json
-  #     volumes:
-  #       - bot-data:/data
-  #       - ./config:/app/config:ro
-  #     networks:
-  #       - unified-net
+  # AI Telegram Bot (Primary)
+  ai-bot:
+    build:
+      context: ./Projects/AI_Core
+      dockerfile: Dockerfile
+    image: ghcr.io/gonya990/unified_system_core/ai-telegram-bot:latest
+    restart: always
+    env_file: .env
+    environment:
+      - DB_PATH=/app/data/user_context.db
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-service-account.json
+      - GCP_PROJECT_ID=quantum-conduit-496517-p3
+    volumes:
+      - bot-data:/app/data
+      - ./Projects/AI_Core/config:/app/config
+      - ./Projects/AI_Core/conversations:/app/conversations
+      - ./Projects/AI_Core/gcp-service-account.json:/app/gcp-service-account.json:ro
+      - ./Secrets:/app/unified_secrets:ro
+      - ./Scripts:/app/Scripts:ro
+    networks:
+      - unified-net
 
   # Mail Intelligence Service
   mail-intelligence:

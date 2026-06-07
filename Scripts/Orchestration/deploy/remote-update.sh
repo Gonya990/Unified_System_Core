@@ -13,7 +13,6 @@ NC='\033[0m'
 # Define Node Configurations
 # Format: "Host:RemotePath"
 NODES=(
-    "unified-home-core-cloud:/home/gonya/Unified_System"
     "gpu-node-1:/home/gonya/Unified_System_Core"
     "igor-gaming:Unified_System_Core"
 )
@@ -28,7 +27,7 @@ for CONFIG in "${NODES[@]}"; do
     REMOTE_PATH="${CONFIG#*:}"
     
 # Nodes that use Container-Only mode (No Git)
-PRODUCTION_NODES=("unified-home-core-cloud")
+PRODUCTION_NODES=()
 
 echo -e "\n${BLUE}>>> Processing node: $NODE${NC}"
 

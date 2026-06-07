@@ -16,7 +16,7 @@ spec:
       serviceAccountName: ai-telegram-bot-sa
       containers:
         - name: bot
-          image: us-central1-docker.pkg.dev/my-home-435112/unified-core-images/ai-telegram-bot@sha256:b728eed2bba7f01063f4f16261f314ef31083ac1e95e1ca2663fef6fffdc5247
+          image: gcr.io/quantum-conduit-496517-p3/ai-telegram-bot:latest
           imagePullPolicy: Always
           command: ["python", "-m", "src.ai_telegram_bot_v2"]
           resources:

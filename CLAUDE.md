@@ -203,7 +203,7 @@ All configuration is in `.env` (see `.env.example` for template):
 | `AGENT_MAIL_PROGRAM` | Agent program (claude-code) |
 | `AGENT_MAIL_MODEL` | Model identifier |
 | `AGENT_MAIL_PROJECT` | Billboard project path (shared by all agents) |
-| `AGENT_MAIL_SERVER` | MCP server URL (unified-home-core-cloud) |
+| `AGENT_MAIL_SERVER` | MCP server URL (igor-gaming) |
 
 See `.claude/commands/sync-mail.md` for full workflow and agent registry.
 
