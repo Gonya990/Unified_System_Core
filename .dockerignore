@@ -30,7 +30,22 @@ outputs
 
 # Specific large project folders
 Projects/connect-landing-page
-# Projects/ChatKit_Dashboard
+# Projects/ChatKit_Dashboard (needed for dashboard container build)
+Projects/AgentBridge
+Projects/Business_Intelligence
+Projects/Bybit_Arb_Bot
+Projects/Bybit_Bot
+Projects/Copilot_SDK_Experiment
+Projects/Experiments
+Projects/Personal_Assistant
+Projects/UnifiedCoreMobile
+Projects/antibridge
+Projects/antigravity-vscode
+Projects/telegram_bot
+
+# Heavy media and local dev folders
+broll
+Local_Dev
 
 # Logs and configs
 *.log

@@ -101,7 +101,7 @@ services:
       - PROJECT_ID=my-home-435112
     volumes:
       - bot-data:/data
-      - ./gcp-service-account.json:/app/gcp-key.json:ro
+      - ./Projects/AI_Core/gcp-service-account.json:/app/gcp-key.json:ro
     depends_on:
       - markitdown-mcp
     networks:
