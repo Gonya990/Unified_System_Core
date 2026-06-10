@@ -1,0 +1,15 @@
+/*
+!/package.json
+!/Projects/
+/Projects/*
+!/Projects/UnifiedCoreMobile/
+
+# Explicitly ignore heavy folders inside the allowed project
+**/node_modules/
+**/.expo/
+**/ios_backup/
+**/.npm-cache/
+**/.venv/
+**/venv/
+**/.git/
+

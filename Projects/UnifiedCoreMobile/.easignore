@@ -1,0 +1,11 @@
+**/node_modules/
+.expo/
+dist/
+ios/
+android/
+npm-debug.log
+yarn-error.log
+.claude/
+**/.beads/
+**/Secrets/
+ios_backup/

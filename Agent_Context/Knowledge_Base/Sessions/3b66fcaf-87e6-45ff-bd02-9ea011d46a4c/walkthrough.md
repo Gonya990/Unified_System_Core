@@ -14,9 +14,10 @@ run on Hacker News.
 ## Changes Made
 
 1. **Agent Implementation**:
-   - Created [browser_agent_agy.py](file:///Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/browser_agent_agy.py) in
-     `Projects/AI_Core`. The agent connects to `chrome-devtools-mcp` via stdio
-     transport and runs local browser commands.
+   - Created
+     [browser_agent_agy.py](file:///Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/browser_agent_agy.py)
+     in `Projects/AI_Core`. The agent connects to `chrome-devtools-mcp` via
+     stdio transport and runs local browser commands.
    - Installed `google-antigravity` dependency in the `Projects/AI_Core`
      project's virtual environment.
 

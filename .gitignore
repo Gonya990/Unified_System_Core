@@ -49,6 +49,7 @@ logs/
 Scripts/Orchestration/logs/
 Scripts/Orchestration/.mail_processor_state.json
 secrets/
+Secrets/
 Agent_Context/Personal_Profile/RESUME_VARIANTS.md
 logs/automation/resume_attachments/
 

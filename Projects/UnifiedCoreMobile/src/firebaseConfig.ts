@@ -1,6 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { initializeAuth, signInAnonymously } from "firebase/auth";
+// @ts-ignore
+import { getReactNativePersistence } from "firebase/auth";
+import { createAsyncStorage } from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   projectId: "unified-core-agent-db",
@@ -14,7 +17,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+const appStorage = createAsyncStorage("unified-core");
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(appStorage)
+});
+
 export const db = getFirestore(app);
 
 // Authenticate device to get unique identity
