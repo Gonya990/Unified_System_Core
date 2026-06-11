@@ -7,6 +7,18 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useSystemStore } from '@/store/systemStore';
 import { subscribeToSystemStatus } from '@/services/firestoreRelay';
 
+import LogRocket from '@logrocket/react-native';
+import { vexo, identifyDevice } from 'vexo-analytics';
+
+// Initialize Analytics & Logging SDKs
+LogRocket.init('pxtwwo/unifiedcoremobile');
+vexo('415c636e-6e1e-4943-bbca-70f4edc5252f');
+identifyDevice('admin@unified-core'); // Set default identifier for the owner
+
+
+
+
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const { setConnected, updateService, setHAOnline } = useSystemStore();

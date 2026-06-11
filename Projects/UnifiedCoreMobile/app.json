@@ -38,7 +38,9 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "@logrocket/react-native",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,
