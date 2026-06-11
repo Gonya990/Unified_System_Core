@@ -1,0 +1,15 @@
+{
+  "name": "mobile-relay",
+  "script": "src/mobile_relay_listener.py",
+  "interpreter": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/.venv/bin/python3",
+  "cwd": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core",
+  "restart_delay": 3000,
+  "max_restarts": 10,
+  "env": {
+    "GCP_PROJECT_ID": "unified-core-agent-db",
+    "GOOGLE_CLOUD_PROJECT": "unified-core-agent-db"
+  },
+  "log_file": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/mobile_relay.log",
+  "error_file": "/Users/igorgoncharenko/Documents/Unified_System_Core/Projects/AI_Core/src/mobile_relay_err.log",
+  "time": true
+}

@@ -12,12 +12,22 @@
       "distribution": "internal"
     },
     "production": {
+      "env": {
+        "EAS_PROJECT_ROOT": "Projects/UnifiedCoreMobile"
+      },
       "ios": {
         "autoIncrement": true
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleTeamId": "DW65K3AAUJ",
+        "ascApiKeyPath": "../../AuthKey_FBZMC4WSYZ.p8",
+        "ascApiKeyIssuerId": "aa37e1d2-e61a-416a-afe6-8bbca111eccb",
+        "ascApiKeyId": "FBZMC4WSYZ"
+      }
+    }
   }
 }

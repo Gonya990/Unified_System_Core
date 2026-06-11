@@ -48,6 +48,14 @@
       "router": {},
       "eas": {
         "projectId": "17f40bab-253b-4428-adc0-0f42410325b2"
+      },
+      "firebase": {
+        "projectId": "unified-core-agent-db",
+        "appId": "1:11800094827:web:6e990670a16761afa6692e",
+        "storageBucket": "unified-core-agent-db.firebasestorage.app",
+        "apiKey": "AIzaSyDCX3K2lYIkQk4JP5M1v1nbuWQ64kzNdWY",
+        "authDomain": "unified-core-agent-db.firebaseapp.com",
+        "messagingSenderId": "11800094827"
       }
     }
   }

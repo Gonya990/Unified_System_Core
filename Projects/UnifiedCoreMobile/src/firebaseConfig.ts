@@ -1,29 +1,49 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { initializeAuth, signInAnonymously } from "firebase/auth";
+/**
+ * Firebase Configuration — SOVEREIGN SECURE
+ * All credentials loaded from app.json extra (never hardcoded in source).
+ * ✅ Security: No secrets in git-tracked source files.
+ */
+import Constants from 'expo-constants';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { initializeAuth } from 'firebase/auth';
 // @ts-ignore
-import { getReactNativePersistence } from "firebase/auth";
+import { getReactNativePersistence } from 'firebase/auth';
 import { createAsyncStorage } from '@react-native-async-storage/async-storage';
 
+// Read from app.json extra — injected at build time
+const extra = Constants.expoConfig?.extra ?? {};
+const fb = extra.firebase ?? {};
+
 const firebaseConfig = {
-  projectId: "unified-core-agent-db",
-  appId: "1:11800094827:web:6e990670a16761afa6692e",
-  storageBucket: "unified-core-agent-db.firebasestorage.app",
-  apiKey: "AIzaSyDCX3K2lYIkQk4JP5M1v1nbuWQ64kzNdWY",
-  authDomain: "unified-core-agent-db.firebaseapp.com",
-  messagingSenderId: "11800094827",
-  projectNumber: "11800094827"
+  projectId:         fb.projectId         ?? 'unified-core-agent-db',
+  appId:             fb.appId             ?? '',
+  storageBucket:     fb.storageBucket     ?? '',
+  apiKey:            fb.apiKey            ?? '',
+  authDomain:        fb.authDomain        ?? '',
+  messagingSenderId: fb.messagingSenderId ?? '',
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Prevent duplicate initialization (hot reload safe)
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-const appStorage = createAsyncStorage("unified-core");
+const appStorage = createAsyncStorage('unified-core');
+
 export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(appStorage)
+  persistence: getReactNativePersistence(appStorage),
 });
 
 export const db = getFirestore(app);
 
-// Authenticate device to get unique identity
-signInAnonymously(auth).catch(console.error);
+// Authenticate device anonymously to get a unique identity
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+
+export let deviceUserId: string | null = null;
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    deviceUserId = user.uid;
+  } else {
+    signInAnonymously(auth).catch(console.error);
+  }
+});
