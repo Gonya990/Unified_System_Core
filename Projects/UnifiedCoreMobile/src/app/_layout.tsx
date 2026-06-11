@@ -7,19 +7,29 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useSystemStore } from '@/store/systemStore';
 import { subscribeToSystemStatus } from '@/services/firestoreRelay';
 
-import LogRocket from '@logrocket/react-native';
-import { vexo, identifyDevice } from 'vexo-analytics';
+import { Platform } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 
-// Initialize Analytics & Logging SDKs
-LogRocket.init('pxtwwo/unifiedcoremobile');
-vexo('415c636e-6e1e-4943-bbca-70f4edc5252f');
-identifyDevice('admin@unified-core'); // Set default identifier for the owner
+Sentry.init({
+  dsn: 'https://6debb0a80478b4db34cedb7dd1ef0690@o4510437397299200.ingest.de.sentry.io/4511549224517712',
+  debug: false,
+});
+
+// Initialize Analytics & Logging SDKs only on client-side or native
+if (Platform.OS !== 'web' || typeof window !== 'undefined') {
+  const LogRocket = require('@logrocket/react-native').default;
+  const { vexo, identifyDevice } = require('vexo-analytics');
+  
+  LogRocket.init('pxtwwo/unifiedcoremobile');
+  vexo('415c636e-6e1e-4943-bbca-70f4edc5252f');
+  identifyDevice('admin@unified-core'); // Set default identifier for the owner
+}
 
 
 
 
 
-export default function RootLayout() {
+function RootLayout() {
   const colorScheme = useColorScheme();
   const { setConnected, updateService, setHAOnline } = useSystemStore();
 
@@ -119,3 +129,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);

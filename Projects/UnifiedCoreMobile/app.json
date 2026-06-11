@@ -8,7 +8,7 @@
     "scheme": "unifiedcoremobile",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.igorgoncharenko.unifiedcore",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -40,7 +40,15 @@
         }
       ],
       "@logrocket/react-native",
-      "expo-build-properties"
+      "expo-build-properties",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "apple-ios",
+          "organization": "gpt-my"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

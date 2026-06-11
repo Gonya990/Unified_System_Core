@@ -27,11 +27,15 @@ const firebaseConfig = {
 // Prevent duplicate initialization (hot reload safe)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
+import { Platform } from 'react-native';
+
 const appStorage = createAsyncStorage('unified-core');
 
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(appStorage),
-});
+export const auth = Platform.OS === 'web'
+  ? require('firebase/auth').getAuth(app)
+  : initializeAuth(app, {
+      persistence: getReactNativePersistence(appStorage),
+    });
 
 export const db = getFirestore(app);
 
