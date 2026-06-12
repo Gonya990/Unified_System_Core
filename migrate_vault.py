@@ -3,13 +3,14 @@ import sys
 from pathlib import Path
 
 import yaml
-from token_broker import TokenBroker
 
 # Path setup for TokenBroker
 ROOT_DIR = Path(__file__).resolve().parent
 SRC_DIR = ROOT_DIR / "Projects/AI_Core/src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+
+from token_broker import TokenBroker
 
 
 def migrate_from_raw():

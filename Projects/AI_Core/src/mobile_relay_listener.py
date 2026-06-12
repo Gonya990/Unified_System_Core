@@ -45,11 +45,12 @@ except ImportError:
 
 # ── Local modules ──────────────────────────────────────────────────────────────
 try:
+    from config_manager import ConfigManager
     from inference_client import InferenceClient
     HAS_INFERENCE = True
 except ImportError:
     HAS_INFERENCE = False
-    logger.warning("InferenceClient not available — chat will use fallback")
+    logger.warning("InferenceClient or ConfigManager not available — chat will use fallback")
 
 try:
     from ha_controller import HAController
@@ -65,7 +66,7 @@ CREDS_PATH = os.environ.get(
 )
 # The actual Firebase project used by the mobile app
 PROJECT_ID = os.environ.get('GCP_PROJECT_ID', 'unified-core-agent-db')
-STATUS_INTERVAL = 30  # seconds between status updates
+STATUS_INTERVAL = 120  # seconds between status updates
 
 
 def get_firestore_client():
@@ -108,10 +109,12 @@ class MobileRelayProcessor:
         self.inference = None
         if HAS_INFERENCE:
             try:
-                self.inference = InferenceClient(config={})
+                config = ConfigManager()
+                self.inference = InferenceClient(config=config)
             except Exception as e:
                 logger.warning(f"InferenceClient init failed (non-critical): {e}")
         self.processed_ids: set = set()
+        self.last_ha_states: dict = {}
         logger.info("MobileRelayProcessor initialized")
         logger.info(f"  HA available: {self.ha is not None}")
         logger.info(f"  Inference available: {self.inference is not None}")
@@ -186,7 +189,7 @@ class MobileRelayProcessor:
             logger.error(f"Status update failed: {e}")
 
     def push_ha_states(self):
-        """Push current HA entity states to Firestore for Smart Home screen."""
+        """Push current HA entity states to Firestore for Smart Home screen if they changed."""
         if not self.ha:
             return
         try:
@@ -195,37 +198,109 @@ class MobileRelayProcessor:
             loop.close()
 
             batch = self.db.batch()
+            changed_count = 0
             for s in states:
                 entity_id = s.get('entity_id', '')
                 if not entity_id:
                     continue
+                state_val = s.get('state', 'unknown')
+                
+                # Only update if state actually changed
+                if self.last_ha_states.get(entity_id) == state_val:
+                    continue
+                
+                self.last_ha_states[entity_id] = state_val
                 ref = self.db.collection('ha_states').document(entity_id)
                 batch.set(ref, {
-                    'state': s.get('state', 'unknown'),
+                    'state': state_val,
                     'attributes': s.get('attributes', {}),
                     'last_updated': firestore.SERVER_TIMESTAMP,
                 })
-            batch.commit()
-            logger.info(f"Pushed {len(states)} HA states")
+                changed_count += 1
+                
+            if changed_count > 0:
+                batch.commit()
+                logger.info(f"Pushed {changed_count} changed HA states")
         except Exception as e:
             logger.error(f"HA states push failed: {e}")
 
-    def process_chat(self, cmd_id: str, payload: dict):
-        """Handle chat message — send to AI Core."""
+    def process_chat(self, cmd_id: str, payload: dict, data: dict = None):
+        """Handle chat message — send to AI Core with session history."""
         message = payload.get('message', '')
         if not message:
             self.send_response(cmd_id, "⚠️ Пустое сообщение", 'error')
             return
 
+        session_id = data.get('sessionId') if data else None
+        chat_messages = []
+
+        if session_id:
+            try:
+                # Retrieve all commands for the session to avoid composite index requirements
+                commands_ref = self.db.collection('mobile_commands').where('sessionId', '==', session_id)
+                docs = list(commands_ref.stream())
+                
+                chat_docs = []
+                for doc in docs:
+                    d = doc.to_dict()
+                    if d.get('type') == 'chat' and d.get('status') == 'done':
+                        ts = d.get('timestamp')
+                        chat_docs.append((doc.id, d, ts))
+                
+                # Sort by timestamp
+                def get_timestamp_key(item):
+                    ts = item[2]
+                    if ts is None:
+                        return float('inf')
+                    try:
+                        return ts.timestamp()
+                    except AttributeError:
+                        return float(ts) if isinstance(ts, (int, float)) else 0
+                
+                chat_docs.sort(key=get_timestamp_key)
+                
+                # Limit to last 10 completed commands to reconstruct dialogue
+                chat_docs = chat_docs[-10:]
+                cmd_ids = [item[0] for item in chat_docs]
+                
+                resps_dict = {}
+                if cmd_ids:
+                    # Fetch corresponding responses for those completed commands
+                    resps_ref = self.db.collection('mobile_responses').where('commandId', 'in', cmd_ids[:10])
+                    for r in resps_ref.stream():
+                        r_data = r.to_dict()
+                        resps_dict[r_data.get('commandId')] = r_data.get('text', '')
+                
+                for cmd_id_hist, d_hist, _ in chat_docs:
+                    user_text = d_hist.get('payload', {}).get('message', '')
+                    if user_text:
+                        chat_messages.append({"role": "user", "content": user_text})
+                        resp_text = resps_dict.get(cmd_id_hist)
+                        if resp_text:
+                            chat_messages.append({"role": "assistant", "content": resp_text})
+            except Exception as e:
+                logger.error(f"Error rebuilding session history: {e}")
+
+        # Append current message
+        chat_messages.append({"role": "user", "content": message})
+
         try:
             if self.inference:
                 # Use InferenceClient for AI response
-                response = self.inference.chat(
-                    messages=[{"role": "user", "content": message}],
-                    system="Ты — AI Core, суверенный ИИ-помощник системы Unified Core на сервере igor-gaming. "
-                           "Отвечай кратко, по делу, на русском языке.",
-                )
-                text = response if isinstance(response, str) else str(response)
+                loop = asyncio.new_event_loop()
+                try:
+                    response_data = loop.run_until_complete(
+                        self.inference.chat(
+                            messages=chat_messages,
+                            system_prompt="Ты — Личный Ассистент (Antigravity / AI Core), суверенный ИИ-помощник Игоря и его семьи, "
+                                          "управляющий устройствами в его сети на сервере igor-gaming. "
+                                          "Ты защищаешь их интересы в цифровом мире. "
+                                          "Отвечай уверенно, по делу, на русском языке.",
+                        )
+                    )
+                    text = response_data[0] if response_data else "⚠️ Нет ответа от AI Core"
+                finally:
+                    loop.close()
             else:
                 # Fallback echo
                 text = f"[igor-gaming] Получено: {message}\n(AI Core offline — нужен InferenceClient)"
@@ -353,7 +428,10 @@ class MobileRelayProcessor:
         handler = handlers.get(cmd_type)
         if handler:
             try:
-                handler(cmd_id, payload)
+                if cmd_type == 'chat':
+                    handler(cmd_id, payload, data)
+                else:
+                    handler(cmd_id, payload)
                 self.db.collection('mobile_commands').document(cmd_id).update({'status': 'done'})
                 self.write_log(f"Command [{cmd_type}] completed OK", 'success', 'relay')
             except Exception as e:
