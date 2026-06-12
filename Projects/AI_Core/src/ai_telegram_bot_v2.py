@@ -2200,7 +2200,7 @@ async def query_ollama_with_context(
     logger.debug(f"[AI] Found {len(memories)} memories for user {user_id}")
 
     # 2. Get short-term history
-    history = conv_manager.get_context_messages(user_id, limit=10)
+    history = conv_manager.get_context_messages(user_id, limit=50)
     logger.debug(f"[AI] Got {len(history)} history messages for user {user_id}")
 
     tz = pytz.timezone("Asia/Jerusalem")

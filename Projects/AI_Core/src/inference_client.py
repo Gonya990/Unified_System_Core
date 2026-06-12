@@ -170,7 +170,7 @@ class InferenceClient:
                 contents.append({"role": "user" if m["role"] == "user" else "model", "parts": [{"text": m["content"]}]})
 
             # Call Gemini
-            model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+            model_name = self.config.get("GEMINI_MODEL", "gemini-2.5-flash")
             if not model_name.startswith("models/"):
                 model_name = f"models/{model_name}"
 
@@ -431,7 +431,7 @@ class InferenceClient:
                     file_data = f.read()
 
                 def call_sdk():
-                    model_name = self.config.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+                    model_name = self.config.get("GEMINI_MODEL", "gemini-2.5-flash")
                     if not model_name.startswith("models/"):
                         model_name = f"models/{model_name}"
 

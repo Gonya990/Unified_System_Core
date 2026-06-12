@@ -112,7 +112,7 @@ class ConversationManager:
             logger.error(f"Failed to clear history for user {user_id}: {e}")
             return False
 
-    def get_context_messages(self, user_id: int, limit: int = 5) -> list[dict]:
+    def get_context_messages(self, user_id: int, limit: int = 50) -> list[dict]:
         """
         Get recent messages formatted for AI context.
 
