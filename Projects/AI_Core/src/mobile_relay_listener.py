@@ -204,11 +204,11 @@ class MobileRelayProcessor:
                 if not entity_id:
                     continue
                 state_val = s.get('state', 'unknown')
-                
+
                 # Only update if state actually changed
                 if self.last_ha_states.get(entity_id) == state_val:
                     continue
-                
+
                 self.last_ha_states[entity_id] = state_val
                 ref = self.db.collection('ha_states').document(entity_id)
                 batch.set(ref, {
@@ -217,7 +217,7 @@ class MobileRelayProcessor:
                     'last_updated': firestore.SERVER_TIMESTAMP,
                 })
                 changed_count += 1
-                
+
             if changed_count > 0:
                 batch.commit()
                 logger.info(f"Pushed {changed_count} changed HA states")
@@ -239,14 +239,14 @@ class MobileRelayProcessor:
                 # Retrieve all commands for the session to avoid composite index requirements
                 commands_ref = self.db.collection('mobile_commands').where('sessionId', '==', session_id)
                 docs = list(commands_ref.stream())
-                
+
                 chat_docs = []
                 for doc in docs:
                     d = doc.to_dict()
                     if d.get('type') == 'chat' and d.get('status') == 'done':
                         ts = d.get('timestamp')
                         chat_docs.append((doc.id, d, ts))
-                
+
                 # Sort by timestamp
                 def get_timestamp_key(item):
                     ts = item[2]
@@ -256,13 +256,13 @@ class MobileRelayProcessor:
                         return ts.timestamp()
                     except AttributeError:
                         return float(ts) if isinstance(ts, (int, float)) else 0
-                
+
                 chat_docs.sort(key=get_timestamp_key)
-                
+
                 # Limit to last 10 completed commands to reconstruct dialogue
                 chat_docs = chat_docs[-10:]
                 cmd_ids = [item[0] for item in chat_docs]
-                
+
                 resps_dict = {}
                 if cmd_ids:
                     # Fetch corresponding responses for those completed commands
@@ -270,7 +270,7 @@ class MobileRelayProcessor:
                     for r in resps_ref.stream():
                         r_data = r.to_dict()
                         resps_dict[r_data.get('commandId')] = r_data.get('text', '')
-                
+
                 for cmd_id_hist, d_hist, _ in chat_docs:
                     user_text = d_hist.get('payload', {}).get('message', '')
                     if user_text:
