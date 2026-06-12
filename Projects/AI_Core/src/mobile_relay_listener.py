@@ -152,6 +152,9 @@ class MobileRelayProcessor:
             services = {
                 'firebase': 'online',
                 'ai_core': 'online',
+                'n8n': 'offline',
+                'github': 'offline',
+                'bybit': 'offline',
             }
 
             # Check HA
@@ -164,16 +167,51 @@ class MobileRelayProcessor:
                 except Exception:
                     services['ha'] = 'offline'
 
-            # Check docker (simple port check)
+            import subprocess
+            import json
+
+            # Check docker via docker ps
             try:
-                import socket
-                s = socket.socket()
-                s.settimeout(1)
-                s.connect(('localhost', 2375))
-                s.close()
-                services['docker'] = 'online'
+                docker_res = subprocess.run(['docker', 'ps', '--format', '{{.Names}}'], capture_output=True, text=True, timeout=5)
+                if docker_res.returncode == 0:
+                    services['docker'] = 'online'
+                    containers = docker_res.stdout.splitlines()
+                    if any('n8n' in c.lower() for c in containers):
+                        services['n8n'] = 'online'
+                    if any('bybit' in c.lower() for c in containers):
+                        services['bybit'] = 'online'
+                else:
+                    services['docker'] = 'warning'
             except Exception:
                 services['docker'] = 'warning'
+
+            # Check pm2 for processes
+            try:
+                pm2_res = subprocess.run(['pm2', 'jlist'], capture_output=True, text=True, timeout=5)
+                if pm2_res.returncode == 0:
+                    pm2_list = json.loads(pm2_res.stdout)
+                    for proc in pm2_list:
+                        name = proc.get('name', '').lower()
+                        status = proc.get('pm2_env', {}).get('status', '')
+                        if status == 'online':
+                            if 'n8n' in name:
+                                services['n8n'] = 'online'
+                            if 'bybit' in name:
+                                services['bybit'] = 'online'
+            except Exception:
+                pass
+
+            # Check Github Sync
+            try:
+                git_res = subprocess.run(['git', 'status', '-sb'], cwd=str(SRC_DIR), capture_output=True, text=True, timeout=5)
+                if git_res.returncode == 0:
+                    output = git_res.stdout.strip()
+                    if 'behind' in output:
+                        services['github'] = 'warning'
+                    else:
+                        services['github'] = 'online'
+            except Exception:
+                services['github'] = 'warning'
 
             self.db.collection('system_status').document('current').set({
                 'ha_online': ha_online,
