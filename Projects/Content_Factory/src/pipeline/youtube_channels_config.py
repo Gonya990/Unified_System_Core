@@ -60,8 +60,9 @@ YOUTUBE_CHANNELS = {
     # ════════════════════════════════════════
     "unifiedsystem": {
         "name": "UnifiedSystem",
-        "handle": "@UnifiedSystem-l6d",
-        "url": "https://www.youtube.com/@UnifiedSystem-l6d",
+        "handle": "@unifiedsystem-l6d",
+        "channel_id": "UCn8v2BJXq60jupna8y1OACg",  # Verified 2026-06-12
+        "url": "https://www.youtube.com/@unifiedsystem-l6d",
         "token_file": str(CREDENTIALS_DIR / "youtube_token_unifiedsystem.json"),
         "languages": ["en"],            # English only
         "content_modes": ["english", "tutorial"],
