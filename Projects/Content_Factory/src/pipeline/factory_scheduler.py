@@ -88,6 +88,15 @@ except ImportError as e:
     REPORTS_ENABLED = False
     print(f"⚠️ YouTube Daily Report not available: {e}")
 
+# Content Council (Консилиум)
+try:
+    from content_council import run_consilium
+    CONSILIUM_ENABLED = True
+    print("✅ Content Council (Консилиум) loaded")
+except ImportError as e:
+    CONSILIUM_ENABLED = False
+    print(f"⚠️ Content Council not available: {e}")
+
 # Configuration
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
@@ -471,6 +480,25 @@ def start_scheduler():
     """Stable Scheduler Loop with Meta Compliance + YouTube Analytics."""
     agent_sync("⏰ Планировщик фабрики запущен (STRICT COMPLIANCE - 3 видео/день + аналитика 22:00)")
 
+    # 0. КОНСИЛИУМ (06:00 UTC = 09:00 ISR) — ПЕРЕД продакшном
+    def consilium_task():
+        """Исследование трендов и генерация сценариев для обоих каналов."""
+        if not CONSILIUM_ENABLED:
+            print("⚠️ Consilium disabled")
+            return
+        try:
+            agent_sync("🎓 Консилиум: Начинаю исследование трендов (Megaforma + UnifiedSystem)...")
+            # Megaforma — 3 темы на русском
+            pkgs_mega = run_consilium(channel="megaforma", top_n=3, notify=True)
+            agent_sync(f"✅ Megaforma: {len(pkgs_mega)} сценариев готово")
+            # UnifiedSystem — 2 темы на английском
+            pkgs_uni = run_consilium(channel="unifiedsystem", top_n=2, notify=True)
+            agent_sync(f"✅ UnifiedSystem: {len(pkgs_uni)} сценариев готово")
+            total = len(pkgs_mega) + len(pkgs_uni)
+            agent_sync(f"🎓 Консилиум завершён: {total} пакетов в очереди на производство")
+        except Exception as e:
+            agent_sync(f"⚠️ Consilium error: {e}")
+
     # 1. Morning Production (09:00 ISR -> 07:00 UTC)
     def morning_task():
         # Add random jitter up to 45 minutes
@@ -505,6 +533,7 @@ def start_scheduler():
             print("⚠️ Reports module not available")
 
     # Schedule tasks
+    schedule.every().day.at("06:00").do(consilium_task)  # 09:00 ISR — Research first
     schedule.every().day.at("07:00").do(morning_task)
     schedule.every().day.at("12:00").do(lunch_task)
     schedule.every().day.at("18:00").do(evening_task)
@@ -518,6 +547,7 @@ def start_scheduler():
 
     print("🚀 COMPLIANT Scheduler running. Waiting for pending tasks...")
     print("📅 Schedule:")
+    print("   06:00 UTC (09:00 ISR) - 🎓 КОНСИЛИУМ: Тренды + Сценарии (Megaforma+UnifiedSystem)")
     print("   07:00 UTC (10:00 ISR) - Morning Shorts (RU)")
     print("   12:00 UTC (15:00 ISR) - Lunch Shorts (EN)")
     print("   18:00 UTC (21:00 ISR) - Evening Shorts (Cartoon)")

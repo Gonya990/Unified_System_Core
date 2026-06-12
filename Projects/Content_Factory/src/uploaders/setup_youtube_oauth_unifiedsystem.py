@@ -37,7 +37,7 @@ try:
 except ImportError as e:
     print(f"\n❌ Missing library: {e}")
     print("Install: pip install google-auth-oauthlib google-api-python-client")
-    raise SystemExit(1)
+    raise SystemExit(1) from e
 
 print("\n⚠️  IMPORTANT: Sign in with the @UnifiedSystem-l6d account!")
 print("   (NOT your personal account)")
