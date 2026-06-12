@@ -1,5 +1,5 @@
 """
-Configuration Manager for AI Telegram Bot.
+Configuration Manager for AI Core.
 Handles persistent storage with encryption for sensitive values.
 """
 
@@ -28,15 +28,15 @@ class ConfigManager:
     CONFIG_FILE = Path(os.environ.get("CONFIG_PATH", "config/bot_config.json"))
     SENSITIVE_KEYS = {
         "INFERENCE_API_KEY",
-        "TELEGRAM_BOT_TOKEN",
         "GEMINI_API_KEY",
         "OPENAI_API_KEY",
-        "OPENROUTER_API_KEY",
+        "ANTHROPIC_API_KEY",
         "NVIDIA_API_KEY",
         "VAPI_API_KEY",
         "GITHUB_TOKEN",
         "HA_TOKEN",
         "LINEAR_API_KEY",
+        "OPENROUTER_API_KEY",
         "SERPAPI_KEY",
     }
 
@@ -48,22 +48,21 @@ class ConfigManager:
 
     def _init_encryption(self) -> None:
         """Initialize Fernet encryption using a derived key."""
-        # Use TELEGRAM_BOT_TOKEN as salt for key derivation (always available)
-        salt = os.environ.get("TELEGRAM_BOT_TOKEN", "default-salt")[:16].encode()
+        # Use ENCRYPTION_SALT as salt for key derivation
+        salt = os.environ.get("ENCRYPTION_SALT", "unified-core-salt-v2")[:16].encode()
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
             salt=salt,
             iterations=100000,
         )
-        key = base64.urlsafe_b64encode(kdf.derive(b"ai-telegram-bot-key"))
+        key = base64.urlsafe_b64encode(kdf.derive(b"ai-core-key"))
         self._fernet = Fernet(key)
 
     def _load_config(self) -> None:
         """Load configuration from file or environment."""
         # Start with environment variables - load ALL provider configurations
         self._config = {
-            "TELEGRAM_BOT_TOKEN": os.environ.get("TELEGRAM_BOT_TOKEN", ""),
             # Provider selection
             "INFERENCE_PROVIDER": os.environ.get("INFERENCE_PROVIDER", "gemini"),
             # Ollama settings

@@ -4,7 +4,6 @@ version = "1.0.0"
 description = "AI Telegram Bot for Unified System with configurable inference backend"
 requires-python = ">=3.10"
 dependencies = [
-    "python-telegram-bot>=20.0",
     "aiohttp>=3.11.0",
     "cryptography>=46.0.5",
     "argon2-cffi>=23.1.0",
