@@ -46,7 +46,7 @@ async def gather_consilium():
         ),
         (
             "security-hardening-worker",
-            "Securing USDT/Crypto gateways for Telegram automation.",
+            "Securing USDT/Crypto gateways for Unified App automation.",
         ),
         (
             "performance-optimizer",

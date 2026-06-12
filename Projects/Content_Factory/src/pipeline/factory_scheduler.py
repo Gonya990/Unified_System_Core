@@ -38,7 +38,7 @@ from daily_researcher import (  # noqa: E402
     translate_to_english,
     translate_to_hebrew,
 )
-from telegram_notifier import send_telegram_message  # noqa: E402
+
 
 try:
     from insta_uploader import upload_reel  # noqa: E402
@@ -111,7 +111,7 @@ AI_LABEL_MANDATORY = True  # Always label as AI for Meta compliance
 
 
 def agent_sync(msg):
-    """Синхронизация с агентом Кости (VioletCastle) через MCP и уведомление в Telegram"""
+    """Синхронизация с агентом (Unified App log/sync)"""
     try:
         # Sync via MCP Agent Mail
         sync_script = ROOT_DIR / "Scripts/Orchestration/sync_agent.py"
@@ -122,12 +122,11 @@ def agent_sync(msg):
         subprocess.run(["python3", str(sync_script), msg], capture_output=True, text=True, env=env)
         print(f"🔄 Agent Sync: {msg[:50]}...")
 
-        # Also notify via Telegram
-        telegram_msg = f"🏭 <b>Factory Status:</b> {msg}"
-        send_telegram_message(telegram_msg)
+        # Log for Unified App instead of Telegram
+        print(f"[UNIFIED APP STATUS]: {msg}")
 
     except Exception as e:
-        print(f"⚠️ Sync/Notification Error: {e}")
+        print(f"⚠️ Sync Error: {e}")
 
 
 def load_history():
@@ -632,7 +631,7 @@ def start_scheduler():
     print("   07:00 UTC (10:00 ISR) - Morning Shorts (RU)")
     print("   12:00 UTC (15:00 ISR) - Lunch Shorts (EN)")
     print("   18:00 UTC (21:00 ISR) - Evening Shorts (Cartoon)")
-    print("   19:00 UTC (22:00 ISR) - Analytics Report → Telegram")
+    print("   19:00 UTC (22:00 ISR) - Analytics Report → Unified App")
     print("   Saturday 16:00 UTC    - Long-form Documentary")
     print("   Sunday   08:00 UTC    - Hebrew Special")
 

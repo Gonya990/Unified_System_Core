@@ -47,8 +47,6 @@ load_dotenv(PROJECTS_DIR / "AI_Core/.env", override=False)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL   = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-ADMIN_ID       = os.getenv("ADMIN_ID", "708531393")
 
 OUTPUT_BASE = FACTORY_DIR / "outputs" / "consilium"
 OUTPUT_BASE.mkdir(parents=True, exist_ok=True)
@@ -481,18 +479,10 @@ def package_with_seo(script: dict, channel: str = "megaforma") -> dict:
 #  ДИРЕКТОР — главный оркестратор
 # ══════════════════════════════════════════════════════════════
 
-def notify_telegram(message: str):
-    """Отправляет уведомление в Telegram."""
-    if not TELEGRAM_TOKEN:
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": ADMIN_ID, "text": message, "parse_mode": "Markdown"},
-            timeout=10
-        )
-    except Exception:
-        pass
+def notify_app(message: str):
+    """Отправляет уведомление (лог) для Unified App."""
+    print(f"\n[UNIFIED APP NOTIFICATION]\n{message}\n")
+    # TODO: Implement Firebase push notification or Cloud Logging
 
 
 def run_consilium(
@@ -627,16 +617,15 @@ def run_consilium(
             }, ensure_ascii=False, indent=2)
         )
 
-    # Telegram уведомление
-    if notify and TELEGRAM_TOKEN:
+    # App уведомление
+    if notify:
         msg = (
             f"🎓 *КОНСИЛИУМ* — {session_id}\n"
             f"📺 Канал: `{channel}`\n"
             f"📦 Готово: {len(packages)} пакетов\n\n"
             + "\n".join(summary_lines[:5])
         )
-        notify_telegram(msg)
-        print("\n📱 Telegram уведомление отправлено")
+        notify_app(msg)
 
     print(f"\n📁 Все файлы: {output_dir}")
     return packages
@@ -665,7 +654,7 @@ Examples:
     parser.add_argument("--top", type=int, default=3,
                         help="Сколько тем исследовать (default: 3)")
     parser.add_argument("--no-notify", action="store_true",
-                        help="Не отправлять Telegram уведомление")
+                        help="Не отправлять уведомление в Unified App")
     parser.add_argument("--dry-run", action="store_true",
                         help="Не сохранять файлы")
     args = parser.parse_args()

@@ -19,21 +19,9 @@ from openai import OpenAI
 import requests
 
 def notify_admin(message):
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    admin_id = os.getenv("ADMIN_ID", "708531393")
-    if not token:
-        print("⚠️ No TELEGRAM_BOT_TOKEN found for notification")
-        return
-    
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    try:
-        requests.post(url, json={
-            "chat_id": admin_id,
-            "text": message,
-            "parse_mode": "Markdown"
-        })
-    except Exception as e:
-        print(f"⚠️ Failed to send Telegram notification: {e}")
+    """Отправляет лог/уведомление администратору через Unified App."""
+    print(f"\n[UNIFIED APP NOTIFICATION]\n{message}\n")
+    # TODO: Implement Firebase push notification or Cloud Logging
 
 
 # Setup paths

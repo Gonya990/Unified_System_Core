@@ -4,13 +4,12 @@ Multi-Source Content Researcher
 Expands research circle to analyze ALL available sources for script generation.
 
 Sources:
-1. Telegram channels (@vitalycontentcreate + custom)
-2. Google News (existing)
-3. User-provided links (from Reports/research_links.json)
-4. YouTube trending
-5. Reddit r/technology, r/Futurology
-6. Hacker News
-7. Wikipedia trending topics
+1. Google News (existing)
+2. User-provided links (from Reports/research_links.json)
+3. YouTube trending
+4. Reddit r/technology, r/Futurology
+5. Hacker News
+6. Wikipedia trending topics
 """
 
 import json
@@ -67,7 +66,6 @@ class MultiSourceResearcher:
         self.openai_key = self._get_key("openai")
         self.client = OpenAI(api_key=self.openai_key) if self.openai_key else None
         self.sources_data = {
-            "telegram": [],
             "google_news": [],
             "user_links": [],
             "youtube_trending": [],
@@ -90,47 +88,7 @@ class MultiSourceResearcher:
         }
         return os.getenv(env_map.get(provider))
 
-    def fetch_telegram_insights(self) -> list[dict]:
-        """Load latest Telegram channel analysis"""
-        print("📱 Fetching Telegram insights...")
 
-        try:
-            # Find latest scrape report
-            reports = sorted(TELEGRAM_REPORTS_DIR.glob("*_webscrape_*.json"))
-            if not reports:
-                print("   ⚠️  No Telegram reports found")
-                return []
-
-            latest = reports[-1]
-            data = json.loads(latest.read_text())
-
-            messages = data.get("messages", [])
-
-            # Sort by views (top trending)
-            trending = sorted(messages, key=lambda m: m.get("views", 0), reverse=True)[:10]
-
-            insights = []
-            for msg in trending:
-                insights.append(
-                    {
-                        "source": "telegram",
-                        "channel": data.get("channel"),
-                        "id": msg.get("id"),
-                        "text": msg.get("text", "")[:300],
-                        "views": msg.get("views", 0),
-                        "date": msg.get("date"),
-                        "media": msg.get("media"),
-                        "score": msg.get("views", 0),  # Use views as relevance score
-                    }
-                )
-
-            print(f"   ✅ Found {len(insights)} trending Telegram posts")
-            self.sources_data["telegram"] = insights
-            return insights
-
-        except Exception as e:
-            print(f"   ❌ Telegram fetch failed: {e}")
-            return []
 
     def fetch_user_links(self) -> list[dict]:
         """Load user-provided research links"""
@@ -362,7 +320,7 @@ class MultiSourceResearcher:
         all_insights = []
 
         # Fetch from all sources
-        all_insights.extend(self.fetch_telegram_insights())
+
         all_insights.extend(self.fetch_user_links())
         all_insights.extend(self.fetch_google_news())
         all_insights.extend(self.fetch_reddit_trending())
@@ -373,7 +331,7 @@ class MultiSourceResearcher:
         all_insights.sort(key=lambda x: x.get("score", 0), reverse=True)
 
         print(f"\n📊 TOTAL INSIGHTS: {len(all_insights)}")
-        print(f"   Telegram: {len(self.sources_data['telegram'])}")
+
         print(f"   User Links: {len(self.sources_data['user_links'])}")
         print(f"   Google News: {len(self.sources_data['google_news'])}")
         print(f"   Reddit: {len(self.sources_data['reddit'])}")
@@ -461,7 +419,7 @@ Output as JSON array."""
         report = {
             "timestamp": datetime.now().isoformat(),
             "sources_summary": {
-                "telegram": len(self.sources_data["telegram"]),
+
                 "user_links": len(self.sources_data["user_links"]),
                 "google_news": len(self.sources_data["google_news"]),
                 "reddit": len(self.sources_data["reddit"]),
@@ -484,7 +442,7 @@ Output as JSON array."""
 **Timestamp**: {datetime.now().isoformat()}
 
 ## Sources Analyzed:
-- Telegram: {len(self.sources_data["telegram"])} posts
+
 - User Links: {len(self.sources_data["user_links"])} URLs
 - Google News: {len(self.sources_data["google_news"])} articles
 - Reddit: {len(self.sources_data["reddit"])} posts

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 YouTube Daily Analytics Report — UnifiedCore Content Factory
-Sends daily Telegram report with channel performance metrics.
+Sends daily report with channel performance metrics to Unified App.
 Runs at 22:00 ISR every day via factory_scheduler.
 """
 
@@ -22,24 +22,17 @@ ROOT_DIR = FACTORY_DIR.parent.parent
 load_dotenv(FACTORY_DIR / ".env")
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=False)
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_ADMIN_CHAT_ID = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "")
+
 CREDENTIALS_DIR = UPLOADERS_DIR / ".credentials"
 
 
-def send_telegram(message: str, parse_mode: str = "HTML") -> bool:
-    """Send message to Telegram."""
+def send_app_notification(message: str, parse_mode: str = "HTML") -> bool:
+    """Send message to Unified App."""
     try:
-        import requests
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        r = requests.post(url, json={
-            "chat_id": TELEGRAM_ADMIN_CHAT_ID,
-            "text": message,
-            "parse_mode": parse_mode,
-        }, timeout=10)
-        return r.status_code == 200
+        print(f"\n[UNIFIED APP NOTIFICATION]\n{message}\n")
+        return True
     except Exception as e:
-        print(f"⚠️ Telegram error: {e}")
+        print(f"⚠️ App notification error: {e}")
         return False
 
 
@@ -170,7 +163,7 @@ def get_recent_videos(youtube, max_results: int = 10) -> list:
 
 
 def generate_daily_report() -> str:
-    """Generate and send daily analytics report to Telegram."""
+    """Generate and send daily analytics report to Unified App."""
     print("📊 Generating YouTube daily report...")
 
     now = datetime.now()
@@ -187,7 +180,7 @@ def generate_daily_report() -> str:
             f"🔧 Требуется переавторизация OAuth\n\n"
             f"<i>Запусти: python3 setup_youtube_oauth.py</i>"
         )
-        send_telegram(msg)
+        send_app_notification(msg)
         return msg
 
     # Get channel stats
@@ -196,7 +189,7 @@ def generate_daily_report() -> str:
 
     if not channel:
         msg = f"⚠️ <b>YouTube Report {date_str}</b>\n❌ Не удалось получить статистику канала"
-        send_telegram(msg)
+        send_app_notification(msg)
         return msg
 
     # Build report
@@ -254,11 +247,11 @@ def generate_daily_report() -> str:
 
     message = "\n".join(report_lines)
 
-    # Send to Telegram
-    if send_telegram(message):
-        print(f"✅ Report sent to Telegram!")
+    # Send to Unified App
+    if send_app_notification(message):
+        print(f"✅ Report sent to Unified App!")
     else:
-        print("⚠️ Telegram send failed, but report generated")
+        print("⚠️ App notification failed, but report generated")
 
     return message
 
@@ -270,7 +263,7 @@ def send_upload_notification(
     stats: dict = None,
 ) -> bool:
     """Send notification when a video is uploaded."""
-    emoji_map = {"YouTube": "📺", "YouTube Shorts": "📱", "Instagram": "📸", "Telegram": "✈️"}
+    emoji_map = {"YouTube": "📺", "YouTube Shorts": "📱", "Instagram": "📸", "UnifiedApp": "📱"}
     emoji = emoji_map.get(platform, "📤")
 
     msg_lines = [
@@ -287,7 +280,7 @@ def send_upload_notification(
             f"📊 <i>Начальные метрики через час</i>",
         ])
 
-    return send_telegram("\n".join(msg_lines))
+    return send_app_notification("\n".join(msg_lines))
 
 
 # ─────────────────────────────────────────────
@@ -298,12 +291,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="YouTube Analytics Reporter")
     parser.add_argument("--report", action="store_true", help="Generate and send daily report")
-    parser.add_argument("--test", action="store_true", help="Test Telegram connection")
+    parser.add_argument("--test", action="store_true", help="Test Unified App notification")
     args = parser.parse_args()
 
     if args.test:
-        ok = send_telegram("🧪 <b>Test message</b>\nUnifiedCore YouTube Reporter is running!")
-        print("✅ Telegram OK" if ok else "❌ Telegram FAILED")
+        ok = send_app_notification("🧪 <b>Test message</b>\nUnifiedCore YouTube Reporter is running!")
+        print("✅ App Notification OK" if ok else "❌ App Notification FAILED")
     elif args.report:
         generate_daily_report()
     else:

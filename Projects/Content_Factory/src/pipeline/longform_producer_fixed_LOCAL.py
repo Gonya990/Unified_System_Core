@@ -271,19 +271,7 @@ if __name__ == "__main__":
     vid = assemble_longform_video(data, out_dir)
 
     if vid:
-        # Notify Telegram
+        # Notify App
         msg = f"🎬 <b>ДОКУМЕНТАЛЬНЫЙ ФИЛЬМ ГОТОВ!</b>\n\n<b>Тема:</b> {args.topic}\n<b>Файл:</b> {vid.name}"
-        subprocess.run(
-            [
-                "curl",
-                "-F",
-                f"video=@{vid}",
-                "-F",
-                f"chat_id={os.getenv('TELEGRAM_CHAT_ID', '708531393')}",
-                "-F",
-                f"caption={msg}",
-                "-F",
-                "parse_mode=HTML",
-                f"https://api.telegram.org/bot{os.getenv('TELEGRAM_BOT_TOKEN')}/sendVideo",
-            ]
-        )
+        print(f"\n[UNIFIED APP NOTIFICATION]\n{msg}\n")
+        # TODO: Implement Firebase push notification or Cloud Logging
