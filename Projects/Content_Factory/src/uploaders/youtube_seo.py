@@ -111,28 +111,14 @@ def generate_optimized_title(
         "documentary": "Cinematic, dramatic. Sounds like a Netflix title. Max 80 chars.",
     }
 
-    prompt = f"""You are a YouTube SEO expert with 10M+ view channels.
+    prompt = f"""YouTube SEO expert. Generate 3 clickable titles for a {lang_name} video about: {topic}
 
-Generate 3 highly clickable YouTube titles for this content:
-Topic: {topic}
-Language: {lang_name}
 Style: {style_instructions.get(style, style_instructions['shorts'])}
+Rules: hook viewer fast, use power words, main keyword naturally, {lang_name} ONLY.
 
-Rules:
-- Hook the viewer in first 3 words
-- Use power words (secret, revolutionary, shocking, finally, exposed)
-- Include main keyword naturally
-- NO clickbait that disappoints (deliver on the promise)
-- {lang_name} language ONLY
+Return JSON: {{"titles": ["t1","t2","t3"], "recommended": "t1", "primary_keyword": "main keyword"}}"""
 
-Return JSON:
-{{
-  "titles": ["title1", "title2", "title3"],
-  "recommended": "title1",
-  "primary_keyword": "main keyword used"
-}}"""
-
-    result = _ai_generate(prompt, 512, json_mode=True)
+    result = _ai_generate(prompt, 2048, json_mode=True)
     if not result:
         # Fallback
         return {
@@ -238,7 +224,7 @@ Rules:
 IMPORTANT: Output ONLY a raw JSON array, nothing else. No markdown, no explanation.
 Example format: ["tag1", "tag2", "tag3"]"""
 
-    result = _ai_generate(prompt, 800, json_mode=True)
+    result = _ai_generate(prompt, 2048, json_mode=True)
     if not result:
         return ["AI", "технологии", "будущее", "искусственный интеллект",
                 "artificial intelligence", "technology 2026", "AI news",
