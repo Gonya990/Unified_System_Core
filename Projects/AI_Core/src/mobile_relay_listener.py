@@ -167,8 +167,8 @@ class MobileRelayProcessor:
                 except Exception:
                     services['ha'] = 'offline'
 
-            import subprocess
             import json
+            import subprocess
 
             # Check docker via docker ps
             try:
