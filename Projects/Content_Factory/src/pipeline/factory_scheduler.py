@@ -60,6 +60,34 @@ except ImportError:
     LONGFORM_ENABLED = False
     print("⚠️ Long-form producer not available")
 
+# YouTube SEO Engine
+try:
+    sys.path.append(str(SRC_DIR / "uploaders"))
+    from youtube_seo import generate_full_seo_package, get_category_id
+    SEO_ENABLED = True
+    print("✅ YouTube SEO Engine loaded")
+except ImportError as e:
+    SEO_ENABLED = False
+    print(f"⚠️ YouTube SEO not available: {e}")
+
+# Thumbnail Generator
+try:
+    from thumbnail_generator import generate_thumbnail_pair
+    THUMBNAILS_ENABLED = True
+    print("✅ Thumbnail Generator loaded")
+except ImportError as e:
+    THUMBNAILS_ENABLED = False
+    print(f"⚠️ Thumbnail Generator not available: {e}")
+
+# YouTube Daily Report
+try:
+    from youtube_daily_report import generate_daily_report, send_upload_notification
+    REPORTS_ENABLED = True
+    print("✅ YouTube Daily Report loaded")
+except ImportError as e:
+    REPORTS_ENABLED = False
+    print(f"⚠️ YouTube Daily Report not available: {e}")
+
 # Configuration
 REELS_AUTO_UPLOAD = True  # Production Mode
 POSTED_HISTORY_FILE = ROOT_DIR / "posted_history.json"
@@ -331,29 +359,72 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
             else:
                 agent_sync("⚠️ Пропуск Instagram (модуль отключен)")
 
-            # 5.2 YouTube (Multi-channel)
+            # 5.2 YouTube (Multi-channel) — with SEO + Thumbnails
             yt_accounts = acc_manager.get_accounts("youtube")
+            raw_topic = content_data.get("selected_topic", f"New AI Video {day_str}")
+            raw_script = content_data.get("script_ru", "")
+
+            # Generate SEO package
+            seo = None
+            if SEO_ENABLED:
+                try:
+                    agent_sync("🔍 Генерирую SEO (title/description/tags)...")
+                    seo = generate_full_seo_package(
+                        topic=raw_topic,
+                        script=raw_script,
+                        lang=lang,
+                        style="shorts" if mode in ["daily", "cartoon", "english", "hebrew"] else "longform",
+                        channel_name="Megaforma",
+                    )
+                    agent_sync(f"✅ SEO: {seo['title'][:50]}...")
+                except Exception as e:
+                    agent_sync(f"⚠️ SEO failed: {e}")
+
+            # Use SEO data or fallback
+            yt_title = seo["title"] if seo else raw_topic[:100]
+            yt_desc = seo["description"] if seo else f"{caption}\n\n#AI #Tech #Future"
+            yt_tags = seo["tags"] if seo else ["AI", "Future", "Tech", "Megaforma"]
+            yt_category = get_category_id(raw_topic, raw_script) if SEO_ENABLED else "28"
+
+            # Generate thumbnail
+            thumbnail_path = None
+            if THUMBNAILS_ENABLED:
+                try:
+                    agent_sync("🖼️ Генерирую thumbnail...")
+                    thumbs = generate_thumbnail_pair(
+                        title=yt_title,
+                        topic=raw_topic,
+                        output_dir=ROOT_DIR / "assets" / day_str / "thumbnails",
+                        use_ai_bg=False,  # Fast mode - no DALL-E
+                    )
+                    thumbnail_path = thumbs.get("longform")
+                    if thumbnail_path:
+                        agent_sync(f"✅ Thumbnail: {thumbnail_path.name}")
+                except Exception as e:
+                    agent_sync(f"⚠️ Thumbnail failed: {e}")
+
             for acc in yt_accounts:
                 agent_sync(f"Загружаю {prefix} в YouTube ({acc.get('name') or 'Channel'})...")
-                title = content_data.get("selected_topic", f"New AI Video {day_str}")
-                desc_yt = f"{caption}\n\n#AI #Tech #Future #Geopolitics"
-                tags = ["AI", "Future", "Tech", "News", "Geopolitics", "Megaforma"]
 
                 try:
                     from youtube_uploader import upload_video
 
                     token_file = acc.get("token_file")
-                    # If relative path, prefix with CREDENTIALS_DIR from uploader or use absolute
                     yt_success = upload_video(
                         video_path,
-                        title=title,
-                        description=desc_yt,
-                        tags=tags,
+                        title=yt_title,
+                        description=yt_desc,
+                        tags=yt_tags,
+                        category_id=yt_category,
                         privacy_status="public",
                         token_file=token_file,
                     )
                     if yt_success:
                         agent_sync(f"🚀 YouTube ({acc.get('name')}): Успешно!")
+                        # Send upload notification
+                        if REPORTS_ENABLED:
+                            video_url = "https://www.youtube.com/@Megaforma"
+                            send_upload_notification(yt_title, video_url, "YouTube")
                     else:
                         agent_sync(f"❌ YouTube ({acc.get('name')}): Ошибка")
                 except Exception as e:
@@ -397,8 +468,8 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
 
 
 def start_scheduler():
-    """Stable Scheduler Loop with Meta Compliance."""
-    agent_sync("⏰ Планировщик фабрики запущен (STRICT COMPLIANCE - 3 видео/день)")
+    """Stable Scheduler Loop with Meta Compliance + YouTube Analytics."""
+    agent_sync("⏰ Планировщик фабрики запущен (STRICT COMPLIANCE - 3 видео/день + аналитика 22:00)")
 
     # 1. Morning Production (09:00 ISR -> 07:00 UTC)
     def morning_task():
@@ -422,10 +493,22 @@ def start_scheduler():
         time.sleep(delay)
         run_factory_production(mode="cartoon")
 
+    # 4. Daily Analytics Report (22:00 ISR -> 19:00 UTC)
+    def analytics_report_task():
+        if REPORTS_ENABLED:
+            print("📊 Generating daily YouTube analytics report...")
+            try:
+                generate_daily_report()
+            except Exception as e:
+                print(f"⚠️ Analytics report failed: {e}")
+        else:
+            print("⚠️ Reports module not available")
+
     # Schedule tasks
     schedule.every().day.at("07:00").do(morning_task)
     schedule.every().day.at("12:00").do(lunch_task)
     schedule.every().day.at("18:00").do(evening_task)
+    schedule.every().day.at("19:00").do(analytics_report_task)  # 22:00 ISR
 
     # Weekly Special
     schedule.every().sunday.at("08:00").do(run_factory_production, mode="hebrew")
@@ -434,6 +517,13 @@ def start_scheduler():
         schedule.every().saturday.at("16:00").do(run_longform_production)
 
     print("🚀 COMPLIANT Scheduler running. Waiting for pending tasks...")
+    print("📅 Schedule:")
+    print("   07:00 UTC (10:00 ISR) - Morning Shorts (RU)")
+    print("   12:00 UTC (15:00 ISR) - Lunch Shorts (EN)")
+    print("   18:00 UTC (21:00 ISR) - Evening Shorts (Cartoon)")
+    print("   19:00 UTC (22:00 ISR) - Analytics Report → Telegram")
+    print("   Saturday 16:00 UTC    - Long-form Documentary")
+    print("   Sunday   08:00 UTC    - Hebrew Special")
 
     while True:
         schedule.run_pending()
