@@ -23,8 +23,9 @@ YOUTUBE_CHANNELS = {
     # ════════════════════════════════════════
     "megaforma": {
         "name": "Megaforma",
-        "handle": "@Megaforma",
-        "url": "https://www.youtube.com/@Megaforma",
+        "handle": "@megaforma_ai",
+        "channel_id": "UCXiWjKYfCDsmEphcqn5rBzg",  # Verified 2026-06-12
+        "url": "https://www.youtube.com/@megaforma_ai",
         "token_file": str(CREDENTIALS_DIR / "youtube_token_megaforma_full.json"),
         "languages": ["ru", "en", "he"],  # Publish in all 3
         "content_modes": ["daily", "english", "hebrew", "cartoon"],
