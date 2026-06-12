@@ -238,7 +238,7 @@ def run_daily_research(
 
     CRITICAL:
     - Text must be in RUSSIAN.
-    - VISUAL KEYWORDS must be English descriptions for Pexels/AI.
+    - VISUAL KEYWORDS must be highly detailed cinematic English prompts for Video AI (Luma/Runway). Focus heavily on character movement, facial mimicry, speaking, camera pan/zoom, and hyperrealistic lighting (e.g., "A cinematic close-up of a diverse scientist talking passionately, subtle facial mimicry, realistic lip movement, glowing high-tech background, smooth tracking shot"). Do NOT just write short keywords like "space".
     - Do NOT use "Once upon a time". START WITH IMPACT.
     - Narrator should sound like a wise visionary.
     3. If news/context is weak, invent a realistic near-future AI scenario.
@@ -250,7 +250,7 @@ def run_daily_research(
         "description": "YouTube Description",
         "script_ru": "Full spoken text...",
         "pinned_comment": "Question?",
-        "scenes": [{{"image": "scene_1", "keyword": ""}}]
+        "scenes": [{{"image": "scene_1", "keyword": "detailed cinematic english video prompt..."}}]
     }}
     """
 
@@ -284,7 +284,7 @@ def run_daily_research(
 
             client = genai.Client(api_key=get_key("gemini"))
             res = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=prompt,
             )
             content = res.text or ""
@@ -1148,12 +1148,11 @@ def main():
         # Run RU Pipeline
         script_ru = data.get("script_ru", "")
         if script_ru:
-            final_video_ru = orchestrator.run_no_face_pipeline(
+            from src.pipeline import orchestrator_v4_advanced
+            final_video_ru = orchestrator_v4_advanced.run_advanced_pipeline(
                 text=script_ru,
-                lang="ru",
                 output_name="daily_viral_ru",
-                scenes=resolved_scenes,
-                style="impact",
+                scenes=resolved_scenes
             )
             if final_video_ru:
                 print(f"🎉 SUCCESS! Video Ready: {final_video_ru}")

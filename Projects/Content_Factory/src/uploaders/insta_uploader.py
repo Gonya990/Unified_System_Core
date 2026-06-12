@@ -65,7 +65,7 @@ def upload_reel(video_path: str, caption: str, session_id: str = None):
     try:
         # We attempt to use is_ai_generated if the library version supports it
         # Otherwise, the text disclosure in the caption is the secondary safety net.
-        params = {"video_path": video_path, "caption": final_caption[:2000]}
+        params = {"path": video_path, "caption": final_caption[:2000]}
 
         # Check if version supports is_ai_generated (Safe call)
         try:

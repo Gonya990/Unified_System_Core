@@ -224,3 +224,4 @@ Projects/connect-landing-page/.npm-cache/
 /config/SOVEREIGN_MANIFEST.yaml
 
 *.sock
+firebase-admin.json

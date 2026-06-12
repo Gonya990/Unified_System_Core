@@ -13,17 +13,11 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-# API Keys
-RUNWAY_API_KEY = os.getenv("RUNWAY_API_KEY")
-LUMA_API_KEY = os.getenv("LUMA_API_KEY")
-KLING_API_KEY = os.getenv("KLING_API_KEY")
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
-
-RUNWAY_BASE_URL = "https://api.runwayml.com/v1"
+# Base URLs
+RUNWAY_BASE_URL = "https://api.dev.runwayml.com/v1"
 LUMA_BASE_URL = "https://api.lumalabs.ai/dream-machine/v1"
 KLING_BASE_URL = "https://api.kling.ai/v1"
 PEXELS_BASE_URL = "https://api.pexels.com/videos"
-
 
 class VideoGenerator:
     """Generate AI video clips for B-roll."""
@@ -37,29 +31,30 @@ class VideoGenerator:
         self.api_key = None
         self.base_url = None
 
-        if self.provider == "runway" and RUNWAY_API_KEY:
-            self.api_key = RUNWAY_API_KEY
+        if self.provider == "runway" and os.getenv("RUNWAY_API_KEY"):
+            self.api_key = os.getenv("RUNWAY_API_KEY")
             self.base_url = RUNWAY_BASE_URL
-        elif self.provider == "luma" and LUMA_API_KEY:
-            self.api_key = LUMA_API_KEY
+        elif self.provider == "luma" and os.getenv("LUMA_API_KEY"):
+            self.api_key = os.getenv("LUMA_API_KEY")
             self.base_url = LUMA_BASE_URL
-        elif self.provider == "kling" and KLING_API_KEY:
-            self.api_key = KLING_API_KEY
+        elif self.provider == "kling" and os.getenv("KLING_API_KEY"):
+            self.api_key = os.getenv("KLING_API_KEY")
             self.base_url = KLING_BASE_URL
-        elif self.provider == "pexels" and PEXELS_API_KEY:
-            self.api_key = PEXELS_API_KEY
+        elif self.provider == "pexels" and os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"):
+            self.api_key = os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY")
             self.base_url = PEXELS_BASE_URL
         else:
-            if self.provider == "pexels" and not PEXELS_API_KEY:
+            if self.provider == "pexels" and not os.getenv("PEXELS_API_KEY", "5KikfJFyT75Rlibf2u829q4qZOTm0FVfttKCb5znbJSYqb96qAKarEDY"):
                 logger.error("Pexels API key missing.")
             logger.warning(f"Provider '{provider}' not configured. Video generation disabled.")
 
     def generate_video(
         self,
         prompt: str,
-        duration: int = 4,
+        duration: int = 5,
         style: str = "realistic",
         output_path: Optional[Path] = None,
+        image_path: Optional[Path] = None,
     ) -> Optional[Path]:
         """
         Generate AI video clip.
@@ -69,6 +64,7 @@ class VideoGenerator:
             duration: Duration in seconds (4-10s typical)
             style: Visual style (realistic, cinematic, cartoon, anime)
             output_path: Where to save video
+            image_path: Optional path to an initial image for image-to-video
 
         Returns:
             Path to generated video or None if failed
@@ -79,7 +75,7 @@ class VideoGenerator:
 
         try:
             if self.provider == "runway":
-                return self._generate_runway(prompt, duration, style, output_path)
+                return self._generate_runway(prompt, duration, style, output_path, image_path)
             elif self.provider == "luma":
                 return self._generate_luma(prompt, duration, style, output_path)
             elif self.provider == "kling":
@@ -132,27 +128,34 @@ class VideoGenerator:
         logger.info(f"✅ Pexels video saved: {output_path}")
         return output_path
 
-    def _generate_runway(self, prompt: str, duration: int, style: str, output_path: Optional[Path]) -> Path:
+    def _generate_runway(self, prompt: str, duration: int, style: str, output_path: Optional[Path], image_path: Optional[Path]) -> Path:
         """Generate video using Runway ML Gen-3."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
+            "X-Runway-Version": "2024-11-06",
         }
 
         # Enhance prompt with style
         full_prompt = f"{prompt}, {style} style, high quality, professional cinematography"
 
-        payload = {
-            "text_prompt": full_prompt,
-            "duration": duration,
-            "aspect_ratio": "16:9",
-            "model": "gen3",
-        }
+        if image_path and image_path.exists():
+            import base64
+            with open(image_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("utf-8")
+            payload = {
+                "promptImage": f"data:image/png;base64,{b64}",
+                "promptText": full_prompt,
+                "model": "gen3a_turbo",
+            }
+            url = f"{self.base_url}/image_to_video"
+        else:
+            raise ValueError("Runway gen3a_turbo requires an image_path for image_to_video")
 
-        logger.info(f"🎬 Runway Gen-3: {prompt[:50]}...")
+        logger.info(f"🎬 Runway Gen-3 Image-to-Video: {prompt[:50]}...")
 
         # Step 1: Create generation task
-        response = requests.post(f"{self.base_url}/generate", json=payload, headers=headers, timeout=30)
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
 
         task_id = response.json()["id"]
@@ -170,10 +173,11 @@ class VideoGenerator:
             status = status_data.get("status")
 
             if status == "SUCCEEDED":
-                video_url = status_data.get("output", {}).get("url")
-                if not video_url:
+                output_list = status_data.get("output", [])
+                if not output_list or not isinstance(output_list, list):
                     raise ValueError("No video URL in response")
-
+                
+                video_url = output_list[0]
                 # Download video
                 video_response = requests.get(video_url, timeout=60)
                 video_response.raise_for_status()

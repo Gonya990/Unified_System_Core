@@ -125,6 +125,13 @@ function RootLayout() {
             title: 'Settings',
           }}
         />
+        <Drawer.Screen
+          name="factory"
+          options={{
+            drawerLabel: '🎬  Content Factory',
+            title: 'Content Factory',
+          }}
+        />
       </Drawer>
     </ThemeProvider>
   );

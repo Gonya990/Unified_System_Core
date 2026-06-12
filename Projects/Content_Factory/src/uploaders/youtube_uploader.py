@@ -107,6 +107,19 @@ def upload_video(
         return False
 
     tags = tags or []
+    valid_tags = []
+    total_len = 0
+    for t in tags:
+        clean_tag = t.replace("<", "").replace(">", "").strip()
+        if not clean_tag:
+            continue
+        if total_len + len(clean_tag) + 2 > 450:
+            break
+        valid_tags.append(clean_tag)
+        total_len += len(clean_tag) + 2
+        if len(valid_tags) >= 45:
+            break
+    tags = valid_tags
 
     body = {
         "snippet": {

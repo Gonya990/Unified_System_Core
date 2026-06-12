@@ -28,6 +28,7 @@ sys.path.append(str(ROOT_DIR / "Scripts/Utilities"))
 
 # Load environment before importing local modules
 load_dotenv(ROOT_DIR / ".env")
+load_dotenv(FACTORY_DIR / ".env", override=True)
 
 
 from account_manager import AccountManager  # noqa: E402
@@ -243,6 +244,60 @@ def generate_english_content(russian_content):
     }
 
 
+def get_consilium_package(channel: str):
+    """
+    Find the oldest package in outputs/consilium/.../<channel> with status 'ready_for_production'.
+    Marks it as 'processing' and returns its path and data.
+    """
+    consilium_dir = FACTORY_DIR / "outputs" / "consilium"
+    if not consilium_dir.exists():
+        return None, None
+        
+    candidates = []
+    # Search all session folders for the channel
+    for session_dir in consilium_dir.iterdir():
+        if not session_dir.is_dir() or session_dir.name.startswith("_"):
+            continue
+        channel_dir = session_dir / channel
+        if not channel_dir.exists():
+            continue
+            
+        for pkg_dir in channel_dir.iterdir():
+            if not pkg_dir.is_dir() or pkg_dir.name.startswith("_"):
+                continue
+            pkg_file = pkg_dir / "package.json"
+            if pkg_file.exists():
+                try:
+                    data = json.loads(pkg_file.read_text())
+                    if data.get("status") == "ready_for_production":
+                        candidates.append((pkg_file.stat().st_ctime, pkg_file, data))
+                except Exception:
+                    pass
+                    
+    if not candidates:
+        return None, None
+        
+    # Pick the oldest
+    candidates.sort(key=lambda x: x[0])
+    _, pkg_file, data = candidates[0]
+    
+    # Mark as processing
+    data["status"] = "processing"
+    pkg_file.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+    
+    return str(pkg_file), data
+
+def update_consilium_status(pkg_path: str, status: str):
+    try:
+        if not pkg_path:
+            return
+        path = Path(pkg_path)
+        data = json.loads(path.read_text())
+        data["status"] = status
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+    except Exception as e:
+        print(f"⚠️ Failed to update consilium status: {e}")
+
 def run_factory_production(mode="daily", manual_topic=None, manual_outline=None, style_override=None):
     day_str = datetime.now().strftime("%Y-%m-%d")
 
@@ -260,9 +315,6 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
     if manual_topic:
         print(f"💡 Using Manual Topic: {manual_topic}")
 
-    # PHASE 1. RESEARCH
-    agent_sync(f"🔍 Запускаю исследование (Mode: {mode})...")
-
     # Determine style (override > mode-based > default)
     if style_override:
         style = style_override
@@ -271,23 +323,47 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
 
     print(f"🎨 Visual Style: {style.upper()}")
 
-    try:
-        content_data = run_daily_research(style=style, manual_topic=manual_topic, manual_outline=manual_outline)
+    # 0. Check Consilium
+    channel = "unifiedsystem" if mode == "english" else "megaforma"
+    consilium_pkg_path, consilium_pkg = get_consilium_package(channel) if not manual_topic else (None, None)
+    
+    if consilium_pkg:
+        agent_sync(f"🎓 Найден готовый пакет от Консилиума: {consilium_pkg.get('title')}")
+        script_key = "script_en" if mode == "english" else "script_ru"
+        
+        scenes = []
+        for s in consilium_pkg.get("scenes", []):
+            scenes.append({"image": s.get("id", f"scene_{len(scenes)}"), "keyword": s.get("visual_keyword", "")})
+            
+        content_data = {
+            "selected_topic": consilium_pkg.get("title", "Consilium Package"),
+            "description": consilium_pkg.get("seo", {}).get("description", ""),
+            script_key: consilium_pkg.get("script_text", ""),
+            "pinned_comment": consilium_pkg.get("pinned_comment", ""),
+            "scenes": scenes,
+            "_consilium_seo": consilium_pkg.get("seo"),
+            "_consilium_path": consilium_pkg_path
+        }
+    else:
+        # PHASE 1. RESEARCH (Ad-hoc fallback)
+        agent_sync(f"🔍 Запускаю исследование (Mode: {mode})...")
+        try:
+            content_data = run_daily_research(style=style, manual_topic=manual_topic, manual_outline=manual_outline)
 
-        if not content_data:
-            agent_sync("Исследование не дало результатов, использую Fallback")
+            if not content_data:
+                agent_sync("Исследование не дало результатов, использую Fallback")
+                content_data = get_static_fallback()
+
+            # Uniqueness check (skip if manual topic is provided)
+            topic = content_data.get("selected_topic", "")
+            if not manual_topic and is_already_posted(topic):
+                agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
+                content_data = run_daily_research()  # Retry once
+                if not content_data or is_already_posted(content_data.get("selected_topic", "")):
+                    content_data = get_static_fallback()  # Fallback ensures variety better now
+        except Exception as e:
+            agent_sync(f"Ошибка исследования: {e}")
             content_data = get_static_fallback()
-
-        # Uniqueness check (skip if manual topic is provided)
-        topic = content_data.get("selected_topic", "")
-        if not manual_topic and is_already_posted(topic):
-            agent_sync(f"Тема '{topic}' уже была опубликована. Пытаюсь найти другую...")
-            content_data = run_daily_research()  # Retry once
-            if not content_data or is_already_posted(content_data.get("selected_topic", "")):
-                content_data = get_static_fallback()  # Fallback ensures variety better now
-    except Exception as e:
-        agent_sync(f"Ошибка исследования: {e}")
-        content_data = get_static_fallback()
 
     agent_sync(f"Тема выбрана: {content_data.get('selected_topic')}")
 
@@ -374,8 +450,8 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
             raw_script = content_data.get("script_ru", "")
 
             # Generate SEO package
-            seo = None
-            if SEO_ENABLED:
+            seo = content_data.get("_consilium_seo")
+            if not seo and SEO_ENABLED:
                 try:
                     agent_sync("🔍 Генерирую SEO (title/description/tags)...")
                     seo = generate_full_seo_package(
@@ -383,7 +459,7 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
                         script=raw_script,
                         lang=lang,
                         style="shorts" if mode in ["daily", "cartoon", "english", "hebrew"] else "longform",
-                        channel_name="Megaforma",
+                        channel_name="Megaforma" if mode != "english" else "UnifiedSystem",
                     )
                     agent_sync(f"✅ SEO: {seo['title'][:50]}...")
                 except Exception as e:
@@ -469,10 +545,15 @@ def run_factory_production(mode="daily", manual_topic=None, manual_outline=None,
 
             if yt_success or insta_success or threads_success:
                 mark_as_posted(content_data.get("selected_topic"), prefix, lang)
+                update_consilium_status(content_data.get("_consilium_path"), "published")
+            else:
+                update_consilium_status(content_data.get("_consilium_path"), "failed")
 
     except Exception as e:
         print(f"❌ Factory Crash: {e}")
         agent_sync(f"Критическая ошибка фабрики: {e}")
+        if "_consilium_path" in locals() and content_data.get("_consilium_path"):
+            update_consilium_status(content_data.get("_consilium_path"), "failed")
         time.sleep(60)  # Prevent rapid restart loop
 
 

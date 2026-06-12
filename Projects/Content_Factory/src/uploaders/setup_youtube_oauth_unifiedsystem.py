@@ -75,17 +75,31 @@ try:
     if items:
         ch = items[0]
         print("\n🎉 VERIFIED — Channel connected!")
+        handle = ch["snippet"].get("customUrl", "n/a")
+        print("\n🎉 VERIFIED — Channel connected!")
         print(f"   Channel:  {ch['snippet']['title']}")
-        print(f"   Handle:   {ch['snippet'].get('customUrl', 'n/a')}")
+        print(f"   Handle:   {handle}")
         print(f"   Subs:     {ch['statistics'].get('subscriberCount', '?')}")
         print(f"   Videos:   {ch['statistics'].get('videoCount', '?')}")
         print(f"   Channel ID: {ch['id']}")
-        print("\n📝 Add to youtube_channels_config.py:")
-        print(f'   "channel_id": "{ch["id"]}",')
-        print(f'   "handle": "{ch["snippet"].get("customUrl", "?")}",')
+        
+        if handle and handle.lower() != "@unifiedsystem-l6d":
+            print("\n❌ ВНИМАНИЕ: ВЫ АВТОРИЗОВАЛИСЬ НЕ В ТОТ АККАУНТ!")
+            print("   Ожидался: @UnifiedSystem-l6d")
+            print(f"   Подключен: {handle}")
+            print("   Пожалуйста, запустите скрипт заново и выберите правильный аккаунт Google.")
+        else:
+            print("\n✅ Всё отлично! Подключен правильный аккаунт.")
+            print("\n📝 Add to youtube_channels_config.py:")
+            print(f'   "channel_id": "{ch["id"]}",')
+            print(f'   "handle": "{handle}",')
     else:
         print("⚠️  No channel found — did you log into the right account?")
 except Exception as e:
     print(f"\n❌ Verification failed: {e}")
     print("   Token saved but channel check failed.")
     print("   Make sure YouTube Data API v3 is enabled.")
+
+# Предотвращение мгновенного закрытия терминала (Windows/Mac)
+print("\n" + "=" * 60)
+input("Нажмите Enter, чтобы закрыть это окно...")

@@ -17,6 +17,8 @@ except ImportError:
     print("❌ google-genai library not found.")
     genai = None
 
+from src.video.ai_video_generator import VideoGenerator
+
 # =============================================================================
 #                           CONFIGURATION
 # =============================================================================
@@ -32,6 +34,7 @@ INPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Load environment variables
 load_dotenv(ROOT_DIR / ".env", override=True)  # Root .env
 load_dotenv(ROOT_DIR / "Projects/AI_Core/.env", override=True)  # AI Core .env
+load_dotenv(SRC_DIR / ".env", override=True)  # Content Factory .env
 
 GCS_BUCKET = "content-factory-outputs-435112"
 
@@ -156,10 +159,12 @@ def generate_audio_edge(text, output_path, lang: str = "en") -> bool:
         "he": "he-IL-AvriNeural",
     }
     voice = voice_map.get(lang, "en-US-EmmaNeural")
-    cmd = "edge-tts"
-    found = shutil.which(cmd)
-    if found:
-        cmd = found
+    
+    # Force use venv edge-tts
+    venv_bin = Path(sys.executable).parent
+    cmd = str(venv_bin / "edge-tts")
+    if not Path(cmd).exists():
+        cmd = "edge-tts" # fallback
     try:
         subprocess.run(
             [
@@ -182,7 +187,11 @@ def generate_audio_edge(text, output_path, lang: str = "en") -> bool:
     try:
         from openai import OpenAI
 
-        client = OpenAI(api_key=api_key)
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key:
+            return False
+            
+        client = OpenAI(api_key=openai_key)
         response = client.audio.speech.create(model="tts-1", voice=voice, input=text)
         response.stream_to_file(output_path)
         print("✅ OpenAI Success!")
@@ -205,6 +214,13 @@ def upload_to_gcs(file_path: Path, bucket_name: str):
 
         client = storage.Client()
         bucket = client.bucket(bucket_name)
+        if not bucket.exists():
+            print(f"⚠️ Bucket {bucket_name} not found. Attempting to create it...")
+            try:
+                bucket = client.create_bucket(bucket_name, location="US")
+            except Exception as e_create:
+                print(f"⚠️ Could not create bucket: {e_create}. Skipping GCS upload.")
+                return False
         blob = bucket.blob(file_path.name)
         blob.upload_from_filename(str(file_path))
         print(f"✅ GCS Success: gs://{bucket_name}/{file_path.name}")
@@ -379,9 +395,17 @@ def run_advanced_pipeline(
     # 3. VISUALS
     clips = []
     pexels_key = os.getenv("PEXELS_API_KEY")
+    video_provider = os.getenv("VIDEO_PROVIDER", "luma")
+    try:
+        vid_gen = VideoGenerator(provider=video_provider)
+        ai_video_enabled = True
+    except Exception as e:
+        print(f"⚠️ VideoGenerator Init Error: {e}")
+        ai_video_enabled = False
+
     FPS = 30
 
-    for i, scene in enumerate(scenes):
+    def process_scene(i, scene):
         print(f"🎬 Processing Scene {i + 1}/{len(scenes)}...")
         keyword = scene.get("keyword", "abstract futuristic")
         clip_final = OUTPUT_DIR / f"{output_name}_seg_{i}.mp4"
@@ -389,45 +413,109 @@ def run_advanced_pipeline(
 
         success = False
 
-        # A) Pexels (Stock Video)
-        if pexels_key and fetch_pexels_video(keyword, clip_raw, pexels_key):
-            success = True
+        # A0) Pre-generated Asset (from generate_vision_assets)
+        pre_gen = scene.get("image")
+        if pre_gen and Path(pre_gen).exists():
+            pre_gen_path = Path(pre_gen)
+            print(f"🎬 Using pre-generated asset: {pre_gen_path.name}")
+            if pre_gen_path.suffix.lower() in [".mp4", ".mov", ".webm"]:
+                # Just copy/use as raw clip
+                shutil.copy2(pre_gen_path, clip_raw)
+                success = True
+            else:
+                # It's an image, do the zoom animation
+                print(f"🎬 Animating pre-generated image...")
+                temp_scaled = OUTPUT_DIR / f"{output_name}_scaled_{i}.png"
+                subprocess.run(
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        str(pre_gen_path),
+                        "-vf",
+                        "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920",
+                        str(temp_scaled),
+                    ],
+                    capture_output=True,
+                )
 
-        # B) AI Image Gen (Imagen 4 -> DALL-E 3)
-        if not success:
-            img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
-            img_prompt = f"{keyword} cinematic, high detail, 8k"
-            if generate_image_imagen4(img_prompt, img_path):
-                # Animate (Zoom) - Calculate d based on scene_duration and FPS
-                d_frames = int(scene_duration * FPS)
-                zoom_speed = 0.0015
                 cmd = [
                     "ffmpeg",
                     "-y",
                     "-loop",
                     "1",
                     "-i",
-                    str(img_path),
+                    str(temp_scaled),
                     "-t",
                     str(scene_duration),
                     "-vf",
-                    (
-                        f"scale=-1:1920,zoompan=z='min(zoom+{zoom_speed},1.5)':"
-                        f"d={d_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-                        f"s=1080x1920,fps={FPS}"
-                    ),
+                    "zoompan=z='min(zoom+0.0015,1.5)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920",
                     "-c:v",
                     "libx264",
                     "-pix_fmt",
                     "yuv420p",
                     "-r",
-                    str(FPS),
+                    "30",
                     str(clip_raw),
                 ]
-                subprocess.run(cmd, capture_output=True, check=False)
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode != 0:
+                    print(f"❌ FFMPEG Animation Failed: {res.stderr}")
+                    subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", str(temp_scaled), "-t", str(scene_duration), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", str(clip_raw)], capture_output=True)
                 success = True
 
-        # C) FINAL FAILSAFE: Generic Cinematic Video (No more stubs!)
+        # A) Pexels (Stock Video)
+        if not success and pexels_key and fetch_pexels_video(keyword, clip_raw, pexels_key):
+            success = True
+
+        # B) AI Image Generation (ComfyUI Local SDXL -> Imagen 4)
+        img_path = OUTPUT_DIR / f"{output_name}_gen_{i}.png"
+        if not success:
+            if img_path.exists():
+                print(f"🎨 Found existing Initial Image for scene {i}, reusing...")
+                success_image = True
+            else:
+                print(f"🎨 Generating Initial Image for scene {i}...")
+                from src.video import comfyui_client
+                if comfyui_client.generate_image_sdxl(keyword + " cinematic, high detail, 8k", str(img_path)):
+                    success_image = True
+                elif generate_image_imagen4(keyword + " cinematic, high detail, 8k", img_path):
+                    print(f"⚠️ ComfyUI Failed. Fallback to Imagen 4.")
+                    success_image = True
+                else:
+                    success_image = False
+
+        # C) AI Video Generation (ComfyUI Local SVD -> Luma / Runway / Kling) from Image
+        if not success and success_image and ai_video_enabled:
+            vid_path = OUTPUT_DIR / f"ai_video_scene_{i}.mp4"
+            print(f"🎬 Generating AI Video via ComfyUI SVD for scene {i} using generated image...")
+            from src.video import comfyui_client
+            if comfyui_client.generate_video_svd(str(img_path), str(vid_path)):
+                shutil.copy2(vid_path, clip_raw)
+                success = True
+                print(f"✅ AI Video Success (ComfyUI SVD) for scene {i}!")
+            else:
+                print(f"⚠️ ComfyUI SVD failed. Falling back to {video_provider.upper()}...")
+                vid_path_fallback = vid_gen.generate_video(
+                    prompt=keyword, 
+                    output_path=OUTPUT_DIR / f"ai_video_scene_{i}_fallback.mp4", 
+                    duration=5,
+                    image_path=img_path
+                )
+                if vid_path_fallback and Path(vid_path_fallback).exists():
+                    shutil.copy2(vid_path_fallback, clip_raw)
+                    success = True
+                    print(f"✅ AI Video Success ({video_provider.upper()}) for scene {i}!")
+                else:
+                    print(f"⚠️ AI Video failed or API key missing. Falling back to Image/Zoom.")
+
+        # D) Fallback: Animate Image (Zoom) if video failed
+        if not success and success_image:
+            print(f"🎬 Animating image for scene {i} (Video Generation Failed/Disabled)...")
+            from src.video.cinematic_animator import generate_cinematic_animation
+            success = generate_cinematic_animation(img_path, clip_raw, scene_duration, FPS)
+
+        # D) FINAL FAILSAFE: Generic Cinematic Video (No more stubs!)
         if not success:
             print(f"⚠️ Heavy Failsafe: Fetching random cinematic video for scene {i}")
             failsafe_keywords = [
@@ -459,7 +547,25 @@ def run_advanced_pipeline(
             str(clip_final),
         ]
         subprocess.run(cmd_norm, capture_output=True, check=False)
-        clips.append(clip_final)
+        return clip_final
+
+    import concurrent.futures
+    clips_array = [None] * len(scenes)
+    print("🚀 Starting parallel scene processing with 3 workers...")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {executor.submit(process_scene, i, scene): i for i, scene in enumerate(scenes)}
+        for future in concurrent.futures.as_completed(futures):
+            idx = futures[future]
+            try:
+                clips_array[idx] = future.result()
+                print(f"✅ Scene {idx + 1} processing complete.")
+            except Exception as e:
+                import traceback
+                print(f"❌ Scene {idx + 1} failed: {e}")
+                traceback.print_exc()
+                clips_array[idx] = None
+    
+    clips = [c for c in clips_array if c is not None]
 
     # 4. CONCAT & MIX
     concat_list = OUTPUT_DIR / f"{output_name}_concat.txt"
@@ -524,10 +630,28 @@ def run_advanced_pipeline(
 
     print(f"✨ DONE: {final_video}")
 
-    # 5. UPLOAD & NOTIFY
-    upload_to_gcs(final_video, GCS_BUCKET)
+    # 5. PREVIEW & NOTIFY
+    # upload_to_gcs(final_video, GCS_BUCKET) # Disabled upload for now as requested
+    
+    # Открываем видео для предпросмотра на Mac
+    print("🎬 Opening Preview...")
+    if sys.platform == "darwin":
+        subprocess.run(["open", str(final_video)])
+    elif sys.platform == "win32":
+        os.startfile(str(final_video))
+    
+    return final_video
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        run_advanced_pipeline(sys.argv[1], output_name="cli_test")
+    try:
+        if len(sys.argv) > 1:
+            run_advanced_pipeline(sys.argv[1], output_name="cli_test")
+        else:
+            print("No arguments provided. Usage: python orchestrator_v4_advanced.py \"Your script text here\"")
+    except Exception as e:
+        import traceback
+        print(f"❌ Фатальная ошибка в оркестраторе: {e}")
+        traceback.print_exc()
+    finally:
+        input("\nНажмите Enter для выхода из оркестратора (чтобы окно не закрылось)...")
