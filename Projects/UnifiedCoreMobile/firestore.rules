@@ -8,5 +8,23 @@ service cloud.firestore {
                     && request.resource.data.deviceId == request.auth.uid;
       allow update, delete: if false;
     }
+    
+    // Relay Collections
+    match /mobile_commands/{document=**} {
+      allow create: if true;
+      allow read, update: if true;
+    }
+    match /mobile_responses/{document=**} {
+      allow read: if true;
+    }
+    match /system_status/{document=**} {
+      allow read: if true;
+    }
+    match /ha_states/{document=**} {
+      allow read: if true;
+    }
+    match /system_logs/{document=**} {
+      allow read: if true;
+    }
   }
 }

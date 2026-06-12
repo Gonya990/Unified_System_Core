@@ -206,3 +206,38 @@ export function subscribeToHAStates(
 
   return unsub;
 }
+
+// ─── System Logs ──────────────────────────────────────────────────────────────
+
+export interface SystemLog {
+  id?: string;
+  message: string;
+  level: 'info' | 'warning' | 'error' | 'success';
+  source?: string;
+  timestamp?: Timestamp;
+}
+
+/**
+ * Subscribe to live system logs from igor-gaming.
+ * Backend writes to 'system_logs' collection.
+ */
+export function subscribeToLogs(
+  onLog: (logs: SystemLog[]) => void
+): () => void {
+  const q = query(
+    collection(db, 'system_logs'),
+    orderBy('timestamp', 'desc'),
+    limit(100)
+  );
+
+  const unsub = onSnapshot(q, (snapshot) => {
+    const logs = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as SystemLog[];
+    onLog(logs);
+  });
+
+  return unsub;
+}
+

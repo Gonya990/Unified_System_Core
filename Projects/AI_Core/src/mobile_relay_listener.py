@@ -130,6 +130,18 @@ class MobileRelayProcessor:
         except Exception as e:
             logger.error(f"Failed to send response: {e}")
 
+    def write_log(self, message: str, level: str = 'info', source: str = 'relay'):
+        """Write a structured log entry to Firestore for the mobile Logs screen."""
+        try:
+            self.db.collection('system_logs').add({
+                'message': message,
+                'level': level,
+                'source': source,
+                'timestamp': firestore.SERVER_TIMESTAMP,
+            })
+        except Exception as e:
+            logger.error(f"Failed to write Firestore log: {e}")
+
     def update_system_status(self):
         """Push live system status to Firestore for Dashboard."""
         try:
@@ -234,13 +246,11 @@ class MobileRelayProcessor:
         try:
             loop = asyncio.new_event_loop()
             if action == 'turn_on':
-                result = loop.run_until_complete(self.ha.turn_on_light(entity_id))
+                loop.run_until_complete(self.ha.turn_on_light(entity_id))
             elif action == 'turn_off':
-                result = loop.run_until_complete(self.ha.turn_off_light(entity_id))
+                loop.run_until_complete(self.ha.turn_off_light(entity_id))
             elif action == 'activate_scene':
-                result = loop.run_until_complete(self.ha.activate_scene(entity_id))
-            else:
-                result = None
+                loop.run_until_complete(self.ha.activate_scene(entity_id))
             loop.close()
 
             self.send_response(
@@ -324,6 +334,7 @@ class MobileRelayProcessor:
         cmd_type = data.get('type', '')
         payload = data.get('payload', {})
         logger.info(f"Processing [{cmd_type}] cmd {cmd_id[:8]} — payload: {str(payload)[:100]}")
+        self.write_log(f"Received command [{cmd_type}] cmd {cmd_id[:8]}", 'info', 'relay')
 
         # Mark as processing
         try:
@@ -344,12 +355,15 @@ class MobileRelayProcessor:
             try:
                 handler(cmd_id, payload)
                 self.db.collection('mobile_commands').document(cmd_id).update({'status': 'done'})
+                self.write_log(f"Command [{cmd_type}] completed OK", 'success', 'relay')
             except Exception as e:
                 logger.error(f"Handler error: {e}")
                 self.send_response(cmd_id, f"❌ Внутренняя ошибка: {e}", 'error')
                 self.db.collection('mobile_commands').document(cmd_id).update({'status': 'error'})
+                self.write_log(f"Command [{cmd_type}] FAILED: {e}", 'error', 'relay')
         else:
             self.send_response(cmd_id, f"⚠️ Неизвестный тип команды: {cmd_type}", 'error')
+            self.write_log(f"Unknown command type: {cmd_type}", 'warning', 'relay')
 
     def listen(self):
         """Main listener loop — watches Firestore for new commands."""
@@ -382,6 +396,7 @@ class MobileRelayProcessor:
         )
         watch = query.on_snapshot(on_snapshot)
         logger.info("✅ Firestore listener active")
+        self.write_log("🚀 Mobile Relay Listener started", 'success', 'system')
 
         # Periodic status updates
         def status_loop():
