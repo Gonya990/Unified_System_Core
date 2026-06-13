@@ -30,7 +30,7 @@ Targeting "Founder 2026" demographic (Future-focused entrepreneurs).
     - **Text**: Phonetic Year Correction (2026 -> "Две тысячи двадцать шестой").
     - **Format**: Vertical (9:16), <60 sec (Shorts/Reels).
 3.  **Automation**:
-    - **Telegram**: Auto-post with formatting.
+    - **Unified App**: System notifications and reporting.
     - **YouTube**: Auto-upload (OAuth 2.0).
     - **Instagram**: Session-based upload (cookies reused).
 
@@ -49,4 +49,4 @@ Targeting "Founder 2026" demographic (Future-focused entrepreneurs).
 7.  **16:00 (Mon/Thu)**: Auto-Post HE.
 8.  **18:00**: Auto-Post RU #2.
 
-*Approved by Admin ID 708531393. System is LIVE.*
+*Approved by Admin. System is LIVE via Unified App architecture.*
