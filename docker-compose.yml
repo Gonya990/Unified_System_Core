@@ -2,8 +2,29 @@ version: "3.8"
 
 services:
 
-
-
+  # Mobile Relay Listener for iOS App
+  mobile-relay-listener:
+    build:
+      context: ./Projects/AI_Core
+      dockerfile: Dockerfile
+    image: ghcr.io/gonya990/unified_system_core/mobile-relay-listener:latest
+    container_name: mobile-relay-listener
+    restart: always
+    command: ["python", "-m", "src.mobile_relay_listener"]
+    env_file: .env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/unified-core-service-account.json
+      - GCP_PROJECT_ID=unified-core-agent-db
+    volumes:
+      - bot-data:/app/data
+      - ./Projects/AI_Core/config:/app/config
+      - ./Projects/AI_Core/conversations:/app/conversations
+      - ./Projects/AI_Core/unified-core-service-account.json:/app/unified-core-service-account.json:ro
+      - ./Secrets:/app/unified_secrets:ro
+      - ./Scripts:/app/Scripts:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - unified-net
   # Mail Intelligence Service
   mail-intelligence:
     build:

@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     curl \
     openssh-client \
+    docker.io \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -26,4 +28,4 @@ ENV PYTHONPATH=/app:/app/src
 ENV PYTHONUNBUFFERED=1
 
 # Run the listener
-CMD ["python", "-m", "src.firestore_listener"]
+CMD ["python", "-m", "src.mobile_relay_listener"]
