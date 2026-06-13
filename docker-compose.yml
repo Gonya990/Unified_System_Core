@@ -125,6 +125,22 @@ services:
     networks:
       - unified-net
 
+  # Postgres Knowledge Graph Database
+  knowledge-graph-db:
+    image: pgvector/pgvector:pg16
+    container_name: knowledge-graph-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-unified_password}
+      - POSTGRES_DB=knowledge_graph
+    ports:
+      - "5432:5432"
+    volumes:
+      - kg-data:/var/lib/postgresql/data
+    networks:
+      - unified-net
+
 networks:
   unified-net:
     driver: bridge
@@ -132,3 +148,4 @@ networks:
 volumes:
   bot-data:
   factory-outputs:
+  kg-data:
