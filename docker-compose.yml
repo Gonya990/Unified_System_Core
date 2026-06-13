@@ -59,6 +59,24 @@ services:
     networks:
       - unified-net
 
+  # Content Factory Listener (Mobile App Trigger)
+  content-factory-listener:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.services
+    image: ghcr.io/unified-system-core/unified-system-core/content-factory-listener:latest
+    restart: always
+    command: ["python", "Projects/Content_Factory/firebase_listener.py"]
+    environment:
+      - OUTPUT_DIR_OVERRIDE=/app/Projects/Content_Factory/outputs
+    env_file: .env
+    volumes:
+      - factory-outputs:/app/Projects/Content_Factory/outputs
+      - ./Projects/AI_Core/unified-core-service-account.json:/app/Projects/Content_Factory/firebase-admin.json:ro
+      - /home/gonya/.config/unified-system:/root/.config/unified-system:ro
+    networks:
+      - unified-net
+
   # ChatKit Dashboard
   dashboard:
     build:
