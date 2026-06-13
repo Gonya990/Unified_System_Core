@@ -98,6 +98,11 @@ if [ -f "Projects/AI_Core/gcp-service-account.json" ]; then
     files_to_sync="$files_to_sync Projects/AI_Core/gcp-service-account.json"
 fi
 
+if [ -d "Projects/Content_Factory/src/uploaders/.credentials" ]; then
+    creds_files=$(find Projects/Content_Factory/src/uploaders/.credentials -type f 2>/dev/null || true)
+    files_to_sync="$files_to_sync $creds_files"
+fi
+
 # Create tarball and pipe to igor-gaming WSL2
 echo "$files_to_sync" | tr ' ' '\n' | tar --no-xattrs -czf - --no-recursion -T - 2>/dev/null | ssh igor-gaming "wsl bash -c \"mkdir -p /home/gonya/Unified_System_Core && tar -xzf - -C /home/gonya/Unified_System_Core\""
 
